@@ -1,0 +1,11 @@
+To batch convert fonts, re: http://fontforge.org/scripting-tutorial.html :
+
+Open a command shell, and type, for example:
+
+	fontforge -script convert.pe --format ".otf" *.ttf
+
+This will convert every .ttf font file in the command's immediate path to .otf font files (so, the paramater in quote marks is the desired target format).
+
+This works with virtually *any* font format, including the .sfd font projects native to FontForge!
+
+(*So* dang cool!*)

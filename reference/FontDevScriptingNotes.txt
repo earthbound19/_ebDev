@@ -1,0 +1,70 @@
+===GENERAL===
+If you use JUNCTIONS (per the below), whatever you set as the working path thusly, your scripts can refer to files in it without specifying the path (it will simply search there).
+
+http://www.fontqa.com/
+http://kltf.de/kltf_otproduction.shtml
+
+outline problems
+http://typophile.com/node/80520
+
+GENERATE INSTANCES FROM A MULTIPLE MASTER AUTOMATICALLY:
+http://benkiel.com/typeDesign/ (REQUIRES ROBOFAB: http://robofab.com/download/index.html)
+- REQUIRES PYTHON AND ROBOFAB IN FONTLAB
+- REQUIRES NUMPY RE http://typophile.com/node/97489 - http://sourceforge.net/projects/numpy/files/NumPy/1.2.1/
+http://typophile.com/node/97489 - http://www.ww.typophile.com/node/81979 - After RoboFab installed go to Window -> Panels -> Edit Macro etc. re that last link.
+- REQUIRES PYTHON ****2.4.X**** (MUST BE IN THAT SERIES)! RE THE F. MANUAL!
+? http://typophile.com/node/91142
+
+
+http://letterror.com/2013/03/25/robofab-intro/
+
+RENAMING:
+Save the .sfd file, find/replace the font text of the sfd file using a
+text edit. RE: 
+http://fontforge.10959.n7.nabble.com/Font-renaming-td11243.html
+
+Or Microsoft Windows's Font properties editor re
+http://superuser.com/questions/120593/change-ttf-font-name
+
+ANCHORS:
+http://sourceforge.net/apps/trac/fontforge/wiki/How%20to%20create%20anchors
+OR
+http://scripts.sil.org/cms/scripts/page.php?item_id=FLGlyphBuilder
+
+http://sourceforge.net/apps/trac/fontforge/wiki/user-docs
+
+INTERPOLATING . . . expensive stuff follows :(
+http://typophile.com/node/70243
+
+BUILDING and INTERPOLATING; beyond me now and maybe forever :(
+http://betatype.com/node/27 . . . script for diacritics, other things there too . . .
+
+Font Quality Assurance:
+http://www.fontqa.com/quickstart/01_install.html
+
+OpenType layout:
+http://code.typesupply.com/wiki/Compositor
+
+? http://remix-tools.com/
+
+Most of those found from:
+http://www.fontlab.com/python-scripting/
+
+AUTOKERN:
+
+had to manually download and install yaml:
+http://pyyaml.org/download/pyyaml/PyYAML-3.10.win32-py2.6.exe
+	-found via http://pyyaml.org/wiki/PyYAML
+
+copy everything in /dependencies to pythonInstallDir/Lib/packages, and in each respective subfolder, run setup.py from the command line. If it gives an error, try setup.py build, then setup.py install.
+
+===REDUCING ANNOYANCES===
+JUNCTIONS: This can preclude the following annoyance; create a Junction link to whatever font manipulation directory you wish to use; name the junction link after your windows user name, and place it in the following folder:
+C:\cygwin\home
+
+It will insist on trying to open a file that was being edited upon close, even if that file does not exist. If so, clear a file named FontsOpenAtLastQuit in the Cygwin install dir, for example: C:\cygwin\home\ahall\.FontForge.
+
+
+Web font editor?!
+https://github.com/anoxic
+(his /fontclod project)

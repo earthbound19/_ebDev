@@ -1,0 +1,10 @@
+http://search.cpan.org/~mhosken/Font-TTF-Scripts/scripts/addfont
+http://samiam.org/blog/20120908.html
+http://utilities.open-fonts.org/
+https://packages.debian.org/sid/open-font-design-toolkit
+http://search.cpan.org/~mhosken/Font-TTF-Scripts/
+https://launchpad.net/ubuntu/+source/open-font-design-toolkit
+http://blog.typekit.com/2012/08/20/source-sans-pro-revised-and-hosted-on-github/
+https://blog.typekit.com/2010/05/19/typekit-and-google/
+
+WOW! : http://www.howdesign.com/design-business/design-news/new-opensource/
