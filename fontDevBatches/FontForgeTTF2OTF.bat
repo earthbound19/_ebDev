@@ -14,7 +14,7 @@ start /B "" "%FF%\bin\Xming-6.9.0.31\Xming.exe" :9 -multiwindow -clipboard -sile
 
 "%FF%\bin\Xming_close.exe" -wait
 
-"%FF%\bin\fontforge.exe" -script obliquify.pe
-REM "%FF%\bin\fontforge.exe" -script convert2.pe
+REM "%FF%\bin\fontforge.exe" -script obliquify.pe
+"%FF%\bin\fontforge.exe" -script convert.pe
 
 "%FF%\bin\Xming_close.exe" -close
