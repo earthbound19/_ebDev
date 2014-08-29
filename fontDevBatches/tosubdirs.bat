@@ -1,6 +1,6 @@
 ECHO OFF
 
-REM move all files of a the given extension(s) (as may be passed to this script) into subdirectories named after each files' name.
+REM move all files of the given extension(s) (as may be passed to this script) into subdirectories named after each files' name.
 
 SETLOCAL ENABLEDELAYEDEXPANSION
 
