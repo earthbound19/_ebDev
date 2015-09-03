@@ -1,0 +1,182 @@
+SFK - The Swiss File Knife File Tree Processor.
+Release 1.7.1 Base/XD Revision 2 of Apr 15 2014.
+StahlWorks Technologies, http://stahlworks.com/
+Distributed for free under the BSD License, without any warranty.
+
+type "sfk commandname" for help on any of the following.
+some commands require to add "-help" for the help text.
+
+   file system
+      sfk list       - list directory tree contents.
+                       list latest, oldest or biggest files.
+                       list directory differences.
+                       list zip jar tar gz bz2 contents.
+      sfk filefind   - find files by filename
+      sfk treesize   - show directory size statistics
+      sfk copy       - copy directory trees additively
+      sfk sync       - mirror tree content with deletion
+      sfk partcopy   - copy part from a file into another one
+      sfk mkdir      - create directory tree
+      sfk delete     - delete files and folders
+      sfk deltree    - delete whole directory tree
+      sfk deblank    - remove blanks in filenames
+      sfk space [-h] - tell total and free size of volume
+      sfk filetime   - tell times of a file
+      sfk touch      - change times of a file
+      sfk index      - create index file(s) for fast lookup
+      sfk iname      - lookup file names using index files
+   
+   conversion
+      sfk lf-to-crlf - convert from LF to CRLF line endings
+      sfk crlf-to-lf - convert from CRLF to LF line endings
+      sfk detab      - convert TAB characters to spaces
+      sfk entab      - convert groups of spaces to TAB chars
+      sfk scantab    - list files containing TAB characters
+      sfk split      - split large files into smaller ones
+      sfk join       - join small files into a large one
+      sfk hexdump    - create hexdump from a binary file
+      sfk hextobin   - convert hex data to binary
+      sfk hex        - convert decimal number(s) to hex
+      sfk dec        - convert hex number(s) to decimal
+      sfk chars      - print chars for a list of codes
+      sfk bin-to-src - convert binary to source code
+   
+   text processing
+      sfk filter     - search, filter and replace text data
+      sfk addhead    - insert string at start of text lines
+      sfk addtail    - append string at end of text lines
+      sfk patch      - change text files through a script
+      sfk snapto     - join many text files into one file
+      sfk joinlines  - join text lines split by email reformatting
+      sfk inst       - instrument c++ sourcecode with tracing calls
+      sfk replace    - replace words in binary and text files
+      sfk hexfind    - find words in binary files, showing hexdump
+      sfk run        - run command on all files of a folder
+      sfk runloop    - run a command n times in a loop
+      sfk printloop  - print some text many times
+      sfk strings    - extract strings from a binary file
+      sfk sort       - sort text lines produced by another command
+      sfk count      - count text lines, filter identical lines
+      sfk head       - print first lines of a file
+      sfk tail       - print last lines of a file
+      sfk linelen    - tell length of string(s)
+   
+   search and compare
+      sfk find       - find words in text and binary files
+      sfk ftext      - find words only in text files
+      sfk xfind      - find using wildcards and sfk expressions
+      sfk md5gento   - create list of md5 checksums over files
+      sfk md5check   - verify list of md5 checksums over files
+      sfk md5        - calc md5 over a file, compare two files
+      sfk pathfind   - search PATH for location of a command
+      sfk reflist    - list fuzzy references between files
+      sfk deplist    - list fuzzy dependencies between files
+      sfk dupfind    - find duplicate files by content
+   
+   networking
+      sfk httpserv   - run an instant HTTP server.
+                       type "sfk httpserv -help" for help.
+      sfk ftpserv    - run an instant FTP server
+                       type "sfk ftpserv -help" for help.
+      sfk ftp        - instant anonymous FTP client
+      sfk wget       - download HTTP file from the web
+      sfk webrequest - send HTTP request to a server
+      sfk tcpdump    - print TCP conversation between programs
+      sfk udpdump    - print incoming UDP requests
+      sfk udpsend    - send UDP requests
+      sfk ip         - tell own machine's IP address(es).
+                       type "sfk ip -help" for help.
+      sfk netlog     - send text outputs to network,
+                       and/or file, and/or terminal
+      sfk fromnet    - receive and print network text
+   
+   scripting
+      sfk script     - run many sfk commands in a script file
+      sfk echo       - print (coloured) text to terminal
+      sfk color      - change text color of terminal
+      sfk alias      - create command from other commands
+      sfk mkcd       - create command to reenter directory
+      sfk sleep      - delay execution for milliseconds
+      sfk pause      - wait for user input
+      sfk label      - define starting point for a script
+      sfk tee        - split command output in two streams
+      sfk tofile     - save command output to a file
+      sfk toterm     - flush command output to terminal
+      sfk loop       - repeat execution of a command chain
+      sfk cd         - change directory within a script
+      sfk getcwd     - print the current working directory
+      sfk require    - compare version text
+      sfk time [-h]  - print current date and time
+   
+   development
+      sfk bin-to-src - convert binary data to source code
+      sfk make-random-file - create file with random data
+      sfk fuzz       - change file at random, for testing
+      sfk sample     - print example code for programming
+      sfk inst       - instrument c++ with tracing calls
+   
+   diverse
+      sfk media      - cut video and binary files
+      sfk view       - show results in a GUI tool
+      sfk toclip     - copy command output to clipboard
+      sfk fromclip   - read text from clipboard
+      sfk list       - show directory tree contents
+      sfk env        - search environment variables
+      sfk version    - show version of a binary file
+      sfk ascii      - list ISO 8859-1 ASCII characters
+      sfk ascii -dos - list OEM codepage 850 characters
+      sfk spell [-h] - phonetic spelling for telephone
+      sfk license    - print the SFK license text
+   
+   help by subject
+      sfk help select   - how dirs and files are selected in sfk
+      sfk help options  - general options reference
+      sfk help patterns - wildcards and text patterns within sfk
+      sfk help chain    - how to combine (chain) multiple commands
+      sfk help shell    - how to optimize the windows command prompt
+      sfk help unicode  - about unicode file reading support
+      sfk help colors   - how to change result colors
+      sfk help xe       - for infos on sfk extended edition.
+   
+   All tree walking commands support file selection this way:
+
+   1. short format with ONE directory tree and MANY file name patterns:
+      src1dir .cpp .hpp .xml bigbar !footmp
+   2. short format with a list of explicite file names:
+      letter1.txt revenues9.xls report3\turnover5.ppt
+   3. long format with MANY dir trees and file masks PER dir tree:
+      -dir src1 src2 !src\save -file foosys .cpp -dir bin5 -file .exe
+
+   For detailed help on file selection, type "sfk help select".
+
+   * and ? wildcards are supported within filenames. "foo" is interpreted
+   as "*foo*", so you can leave out * completely to search a part of a name.
+   For name start comparison, say "\foo" (finds foo.txt but not anyfoo.txt).
+
+   When you supply a directory name, by default this means "take all files".
+
+      sfk list mydir                lists ALL  files of mydir, no * needed.
+      sfk list mydir .cpp .hpp      lists SOME files of mydir, by extension.
+      sfk list mydir !.cfg          lists all  files of mydir  EXCEPT .cfg
+
+   general options:
+      -tracesel tells in detail which files and/or directories are included
+                or excluded, and why (due to which user-supplied mask).
+      -nosub    do not process files within subdirectories.
+      -nocol    before any command switches off color output.
+      -quiet    or -nohead shows less output on some commands.
+      -hidden   includes hidden and system files and dirs.
+      For detailed help on all options, type "sfk help options".
+
+   beware of Shell Command Characters.
+      command parameters containing characters < > | ! & must be sur-
+      rounded by quotes "". type "sfk filter" for details and examples.
+
+   WRONG COLORS? Use one of:
+      set SFK_COLORS=theme:black    for DARK   backgrounds
+      set SFK_COLORS=theme:white    for BRIGHT backgrounds
+      see also "sfk help colors"
+
+   type "sfk ask word1 word2 ..."   to search ALL help text for words.
+   type "sfk dumphelp"              to print  ALL help text.
+   type "sfk book" for infos on the two dollar printable PDF (website).
