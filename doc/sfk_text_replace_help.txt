@@ -1,0 +1,194 @@
+sfk replace and hexfind for text and binary files
+
+   search, extract or replace text and byte sequences within files.
+
+   SFK OSE/Base+XD/XE fixed text search (no wildcards):
+
+      sfk hexfind  - search  fixed text in text and binary files
+      sfk replace  - replace fixed text in text and binary files
+
+         in SFK OSE and Base+XD, sfk replace can be slow
+         if searched and replaced text have different lengths.
+
+   SFK Base+XD/XE search with wildcards and SFK expressions:
+
+      sfk xhexfind - search in text/binary files with hexdump output
+      sfk xtext    - search in text files only, showing text output.
+      sfk xex      - extract text from a text stream or single file
+                     that must fit into memory, with output as text.
+
+   SFK XE replace and extract with wildcards and SFK expressions:
+
+      sfk xreplace - replace text and byte sequences within files
+      sfk extract  - extract text and data from binary files
+      sfk xed      - replace text and binary in a data stream,
+                     for post processing of output from extract
+
+   basic syntax:
+      sfk replace io.dat "/foo/bar/"
+         replace fixed text "foo" by "bar" within file io.dat.
+      sfk replace -text "/foobar/other/" -dir mydir -file .ext1 .ext2
+         replace fixed text "foobar" by "other" in all files ending
+         .ext1 or .ext2 in a folder mydir. no wildcards are possible.
+
+   Multiple search patterns are executed in the given sequence. Mind this
+   if they overlap, e.g. /foo/bar/ /foosys/thesys/ makes no sense (foo is
+   replaced by the first expression, so the 2nd one will fail to match).
+
+   By default, replace functions run in SIMULATION mode,
+      previewing hits without changing anything. add -yes to apply changes.
+      Changing binaries may lead to unpredictable results, therefore keep
+      backups in any case.
+
+   replacing source / target patterns of different length is slower
+   and may require much memory compared to replacements of same length.
+
+   about wildcards: to use wildcards and expressions type "sfk xhexfind"
+      or just "sfk xhex", and then read the extended help text.
+
+   subdirectories are included by default
+      the sfk default for most commands is to process the given directories,
+      as well as all subdirs within them. specify -nosub to disable this.
+
+   options:
+      -nosub        do not include files in subdirectories. this is default
+                    when specifying a single input filename.
+      -case         case-sensitive text comparison. default is case-insensitive
+                    comparison for all -text strings, but NOT for -bin blocks.
+                    case-sensitive comparison is faster then case-insensitive.
+      -nocase       force case-insensitive comparison ALSO on -bin patterns.
+      -pat          starts a list of search or replace patterns of the form
+                    xsrcxdstx where x is the separator char, src the source
+                    to search for, and dst the destination to replace it with.
+                    e.g. /foo/bar/ or _foo_bar_ both replace foo by bar.
+                    -pat is not required if a singleFile name is given.
+      -text         the same as -pat, starting a text pattern list.
+      -spat         the same, but also activates slash patterns like \t .
+                    type "sfk help pat" for the list of possible patterns.
+      -spats[trict] same as -spat, but stops with error on undefined
+                    slash patterns like \m in C:\myproj. every slash
+                    must then be escaped, e.g. using C:\\myproj.
+      -bin[ary]     starts a list of binary replace patterns, specified
+                    as hexcode like /0A0D/2020/
+      -bylist x.txt read search patterns from a file (add -full for more.)
+      -enddir       to use -dir ... -file ... as first parameters, type:
+                    sfk replace -dir ... -file ... -enddir -pat ...
+      -recsize      with same length replacements: set input record size
+                    for processing (default=100k)
+      -firsthit     process only first found pattern match per file.
+      -quiet        do not print progress, total hits, files checked infos.
+      -perf         show performance statistics.
+      -dump [-lean] create hexdump of hits, listing  8 bytes per line.
+                    also previews changes on replacements of same length.
+      -dump -wide   create hexdump of hits, listing 16 bytes per line;
+                    requires a shell window with at least 120 columns.
+      -nodump       hexfind shows a data dump by default. specify -nodump
+                    to just list the names of files containing matches.
+      -context=n    with hexdump: show additional n bytes of context.
+      -reldist      with hexdump: tell relative distances to previous hits.
+      -memlimit=nm  with different-length replacements, files must be loaded
+                    into memory for processing. the default limit for memory
+                    use is 300 MB. set -memlimit=500m to select 500 MB.
+      -full         print full help text telling about -bylist pattern files,
+                    batch file return codes, special character case sensi-
+                    tivity and nested or repeated replace behaviour.
+
+   about nested replacement patterns
+      sfk replace myfile.dat /foo/bar/ /bar/goo/
+      with SFK base, "foo" will be replaced by "bar" and then
+      immediately "bar" is replaced again by "goo".
+      with SFK XE, a replaced part of text is not replaced again
+      in the same command, so "foo" stays replaced by "bar".
+
+   unexpected repeat replace behaviour
+      depending on the input data and search/replace expressions,
+      it can happen that running the same replace multiple times
+      on the same file produces further hits that didn't exist
+      in the first run. add option -full to read more on this.
+
+   performance notice
+      the system may cache output file(s), writing to disk in
+      background after sfk has finished. subsequent batch file
+      commands may execute slower.
+
+   aliases
+      sfk xtext    same as xfind but reads only text files
+      sfk xhex     same as xfind -hex with hexdump output
+
+   see also
+      sfk hexfind  search  fixed    text in        binary files
+      sfk xhexfind search  wildcard text in        binary files
+      sfk replace  replace fixed    text in   text/binary files
+      sfk xreplace replace wildcard text in   text/binary files
+      sfk extract  extract wildcard text from      binary files
+      sfk xed      replace wildcard text in   a data stream
+      sfk xex      extract wildcard text from a data stream
+      sfk filter   filter and edit text lines with simple wild-
+                   cards but many formatting options
+      sfk view     a realtime GUI based text filter tool
+      sfk help xe  about SFK XE and xreplace with SFK Expressions.
+
+   beware of Shell Command Characters.
+      to find or replace text patterns containing characters < > | ! &
+      you must add quotes "" around parameters, or the shell environment
+      will destroy your command. for example, -text /<br>/&nbsp;/
+      must be written like: -text "/<br>/&nbsp;/"
+      within a .bat or .cmd file the percent % must be escaped like %%
+      even within quotes: sfk echo -spat "percent %% is a percent \x25"
+
+   extended help text
+      type "sfk replace -full" to read the full help text, telling
+      about -bylist pattern files, search/replace detail behaviour,
+      batch file return codes and more.
+
+   common usage errors
+      sfk hexfind in.txt "/foo\r\n/"
+         will not find "foo" at line ends, but searches literal
+         strings like "slash and r". add option -spat to enable
+         slash patterns, converting \r\n to real CRLF codes,
+         or use xhexfind where slash patterns are default.
+      sfk hexfind mydir "/foo*bar/"
+         will not find "foo" and "bar" with any characters
+         inbetween, but searches a literal star "*".
+         use xhexfind to enable search with wildcards.
+      sfk rep in.txt "/foo[1000 bytes]bar/---/"
+         will not replace 1000 bytes between "foo" and "bar",
+         but replaces a literal string "foo" then "[1000 bytes]"
+         then "bar". use xreplace to enable SFK expressions.
+
+   examples
+      sfk replace myfile.dat "/Lemon/Curry/"
+         replace Lemon by Curry within myfile.dat. search is
+         case-insensitive, therefore "lemon" will be replaced as well.
+         the quotes "" are optional here.
+      sfk replace -pat /FooCase// -dir . -file .txt
+         search for FooCase in all .txt files below current directory.
+         note that if you leave out the single fileOrDir parameter,
+         you have to say -[s]pat, -bin or -text first to tell clearly
+         that you will specify the target fileset later on.
+      sfk rep -spat "/The foo/The\tbar/" -dir mydocs
+         replaces "The foo" by "The" and "bar" separated by TAB char,
+         within all files within mydocs.
+      sfk rep -binary /1A/20/ -dir docs -file .txt .info .note
+         replaces all bytes with code 0x1A by code 0x20, in all .txt,
+         .info and .note files, in directory docs and all subdirectories.
+      sfk replace tmp\image.dat -bylist patches.txt
+         searches for source patterns in file tmp\image.dat,
+         replaces by patterns specified in patches.txt
+      SFK Base and XE: swap text in two steps
+      sfk -yes rep io.txt /foo34/foo99/ /foo12/foo34/ +rep /foo99/foo12/
+         replaces foo12 by foo34 and vice versa. with SFK Base, a word
+         which is replaced may be replaced again by a following pattern,
+         therefore the intermediate step: turn foo34 into something
+         not used anywhere in io.txt, then replace foo12, then replace
+         the intermediate pattern back in a second replace command
+         on the same file.
+      SFK XE only: swap text in one step
+      sfk rep io.txt /foo12/foo34/ /foo34/foo12/ -yes
+         replaces foo12 by foo34 and vice versa. with XE, a word which
+         is replaced is not looked at again in the same command, so
+         "foo34" from the first pattern is not changed by the 2nd.
+      sfk hexfind mydir -pat /FooCase/ +list -late
+         do not replace, just find binary files containing "FooCase",
+         then list them sorted by time. also accepts -bylist files.
+

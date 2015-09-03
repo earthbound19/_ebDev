@@ -1,0 +1,235 @@
+sfk filter [fileOrDir] -selectoption(s) -processoption(s)
+sfk filt -selectoption(s) -processoption(s) -dir mydir -file .ext1 .ext2
+sfk filter [-memlimit=n] -write inoutfile -replacepattern(s)
+
+   filter and change text lines, from standard input, or from file(s).
+   input lines may have a maximum length of 4000 characters.
+
+   line selection options
+      -+pat1 -+pat2 [...]   - include lines containing pat1 OR  pat2
+      ++pat1 ++pat2 [...]   - include lines containing pat1 AND pat2
+      -ls+pat1              - include lines starting with pat1
+      -le+pat1 -le+pat2     - include lines ending   with pat1 OR pat2
+
+      -!pat1 -!pat2         - exclude lines containing pat1 OR  pat2
+      -ls!pat1              - exclude lines starting with pat1
+      -le!pat1 -le!pat2     - exclude lines ending with pat1 or pat2
+      -no-empty-lines       - exclude empty lines
+      -no-blank-lines       - exclude lines containing just whitespaces
+      -inc[lude] p1 to p2   - include only lines within blocks surrounded by
+                              boundary lines containing patterns p1 or p2
+      -inc-      p1 to p2   - same, but exclude boundary lines on output
+      -cut[-]    p1 to p2   - remove block of lines from p1 until p2
+      -inc[-]    "*" to p1  - include all from text start until marker
+      -cut[-]    p1 to "*"  - cut all from marker line until end of text
+      -nocheck     - with inc, cut: ignore block endings without a start
+      -addmark txt - with inc, cut: insert txt after every processed block
+      -context=n            - select n lines of context around hit lines
+      -precon=5:blue        - select context before or after hit lines,
+      -postcon=5:cyan:---     in blue or cyan, with separator "---".
+      -unique [-case]       - if same line occurs twice, keep only first.
+                              default is case insensitive text comparison.
+      -global-unique        - when filtering multiple files in one command,
+         then -unique applies to lines in the same file, and -global-unique
+         applies across all files. this will cache the text of all files in
+         memory and may not be used with very large files.
+      -keep pattern         - after -unique: make an exception for lines
+         containing the given pattern, and keep them even if redundant.
+      -keep-empty, -keep-blank - always keep empty or whitespace lines.
+
+   text processing options
+      applied after line selection options only.
+      -rep[lace] _src_dest_
+         replace string src by dest. first character is separator character (e.g. _).
+         src is case-insensitive. to select case-sensitive search, say -case.
+      -lsrep[lace], -lerep[lace]
+         same as -replace, but replaces only once at line start or line end.
+      -high[light] color pattern : highlight matching parts within lines.
+         color   : red = dark red, Red = bright red, green, blue,
+                   yellow, cyan, magenta, default.
+         pattern : e.g. "GET * HTTP/"
+         type "sfk help colors" for more about colors.
+      -lshigh[light], -lehigh[light]
+         same as -highlight, but only at line start or line end.
+      -sep[arate] "; " -form "$col1 mytext $[-0n.nq]col2 ..."
+         break every line into columns separated by any character listed after -sep,
+         then reformat the text according to a user-defined mask similar to printf.
+         when leaving out -sep, the whole line is packed into column 1. if -spat was
+         specified, then -form also supports slash patterns like \t.
+         google for "printf syntax" to get more details. example:
+      -form "$40col1 $-3.5col2 $05qline $(10.10qcount+1000)"
+         reformat column 1 as right-ordered with at least 40 chars, column 2 left-
+         ordered with at least 3 and a maximum of 5 chars, then add the input line
+         number, "q"uoted, right justified with 5 digits, prefixed by zeros,
+         then the output line number plus 1000 within quotes. NOTE: some examples
+         may not work in an sfk script, see section "common errors" below.
+         adding values so far only works with (q)line and (q)count.
+      -tabform "$col1 mytext ..."
+         split and reformat columns of tab separated csv data.
+      -uform "#40col1 #-3.5col2 #05qline"
+         the same as -form but using unix style syntax. short for filter -upat.
+      -blocksep " " = treat blocks of whitespace as single whitespace separator.
+      -join[lines] join output lines, do not print linefeeds.
+      -wrap[=n]    wrap output lines near console width [or at column n].
+                   set SFK_CONFIG=columns:n to define or override the console width.
+      -toiso[=c]   or just -iso converts UTF-8 text to ISO-8859-1. some chars beyond
+                   the 8 bit code range will be reduced to something similar, but
+                   most of them are changed to a dot '.', or character c.
+      -toutf       converts ISO-8859-1 text to UTF-8. if this is done with UTF-8
+                   input text then existing UTF-8 sequences will be destroyed!
+
+   conditional text processing
+      -[ls/le]where pattern -replace | -highlight | -sep ... -form
+          replace, highlight or reformat lines matching the given pattern.
+          all lines that do not match the pattern stay unchanged.
+      -within pattern -replace _from_to_
+          replace text in a part of the line matching the given pattern.
+          the rest of the line text stays unchanged.
+
+   pattern support
+      wildcards * and ? are active by default. add -lit[eral] to disable.
+      slash patterns are NOT active by default. add -spat to use \t \q etc.
+      if you need the wildcard * but ALSO want to find/replace '*' characters:
+      add -spat, then specify \* or \? to find/replace '*' or '?' characters.
+      instead of typing "sfk filter -spat -rep" all the time, you may use the
+      short form "sfk filt -srep". the same applies for -(s)sep, -(s)form etc.
+
+   unified syntax
+      since sfk 1.5.4 you can also use -: -ls: -le: under windows.
+      filter ... -uform or filter -upat ... -form uses # instead of $.
+
+   further options
+      -verbose        show names of all files which are currently scanned.
+      -write          do not print output to console but overwrite input file(s).
+                      only files with actual text changes will be rewritten.
+                      this function may be used only with plain ASCII files, not with
+                      binaries like .doc, .xls. see also "sfk replace".
+      -write -to msk  do not overwrite input files, but save according to mask msk,
+                      e.g. tmp\$file . saves only changed files. say -writeall
+                      to write all files, including those without changes.
+      -memlimit=mb    when using -write, output is cached in memory, which is limited
+                      to 300 mb. use this option to extend, e.g. -memlimit=400
+      -yes            -write simulates by default. add -yes to really write changes.
+      -snap           detect snapfiles and list subfile names having text matches.
+      -snapwithnames  same as -snap, but include subfile names in filtering.
+      -nofile[names]  do not list filenames, do not indent text lines.
+      -count, -cnt    preceed all result lines by output line counter
+      -lnum           preceed all result lines by input  line number
+      -case           compare case-sensitive (not default)
+      -lit[eral]      treat wildcards * and ? as normal chars (read more above).
+      -hidden         include hidden and system files.
+      -noinfo         do not warn on line selection combined with -write.
+      -noop \"        no operation, take the \" parameter but do nothing.
+                      may help if your (windows) shell miscounts quotations.
+      -hitfiles       if another command follows (e.g. +run or +ffilter),
+                      pass a list of files containing at least one hit.
+      -nocconv        disable umlaut and accent character conversions during
+                      output to console. "sfk help opt" for details.
+      -justrc         print no output, just set return code on matching lines.
+
+   list of possible input sources
+      from stdin                : type x.txt | sfk filter -+pattern
+      from single input file    : sfk filter x.txt -+pattern
+      text from chained command : sfk list mydir .txt +filter -+pattern
+      from many files, directly : sfk filter -+pattern -dir mydir -file .txt
+      from many files, by chain : sfk list mydir .txt +filefilter -+pattern
+      in general, whenever you need to make sure that file contents (not the
+      file names) are processed, prefer to say "filefilter" or "ffilt".
+
+   return codes for batch files
+      0   normal execution, no matching lines found.
+      1   normal execution,    matching lines found.
+          with -write: returns rc 1 only if any changes were written.
+     >1   major error occurred. see "sfk help opt" for error handling options.
+
+   common errors
+      when using filter -form within sfk scripts, expressions like $10.10col1
+      may collide with script parameters $1 $2 $3. to solve this, use brackets
+      like $(10.10col1), or "sfk label ... -prefix=%", or -uform.
+
+   see also
+      sfk find       find words in text and binary files. faster, but less flexible.
+      sfk hexfind    find text or binary data in binary files, with hex dump output.
+      sfk xhexfind   search in files using SFK Expressions. (XE Demo)
+      sfk replace    replaces many strings in parallel, in text and binary files.
+      sfk help color for the list of color names.
+      sfk view       a high speed GUI text filter tool. filters text lines instantly
+                     as you type, with a simple syntax like "foo AND htm NOT html".
+
+   beware of Shell Command Characters.
+      to find or replace text containing characters < > | ! & you must add quotes ""
+      around parameters, or the shell will destroy your command. it splits the command
+      into parts, and gives SFK only the first part, producing unreadable errors.
+      therefore -replace _<br>_&nbsp;_ must be written like: -replace "_<br>_&nbsp;_"
+      within a .bat or .cmd file the percent % must be escaped like %% even
+      within quoted strings: sfk echo -spat "percent %% is a percent \x25"
+
+   examples
+      anyprog | sfk filter -+error: -!warning
+         run command anyprog, filter output for error messages, remove warning messages.
+      sfk filter result.txt -rep "_\_/_" -rep "xC:/xD:/x"
+         read result.txt, turn all \ slashes into /, and C:/ expressions to D:/
+         the quotes "" are optional here, and just added for safety.
+      sfk filter index.html -rep "_<u>_<b>_" -rep "_</u>_</b>_" -write
+         replace underlining by bold in an HTML text. quotes "" are strictly
+         required here, otherwise the shell environment would split the command
+         at the < and > characters. add option -yes to really rewrite the file.
+      sfk filter export.csv -sep ";" -format "title: $-40col2 remark: $-60col5"
+         reformat comma-separated data, exported from spreadsheet, as ascii text.
+      sfk stat . +filter -blocksep " " -format "$4col1 mb in folder: $col5"
+         reformats output of the stat command.
+      sfk filter mycsv.txt >out.txt -spat -rep _\"__ -rep _\t__ -rep "_;_\"\t\"_" -form "$qcol1"
+         read semicolon-separated spreadsheet data mycsv, strip all double colons
+         and tab characters from data fields. replace field separator ";" by TAB,
+         and surround all fields by double colon. -form without -sep means "pack the whole
+         line into $col1", allowing -form to add quotes at start and end of each line.
+      sfk filter logs\access.log "-+GET * 404"
+         list all lines from access.log containing a phrase with GET and 404.
+      sfk filter log.txt "-ls!??.??.???? ??:??:?? * *"
+         excludes lines from log.txt starting with a date, and having two more words,
+         like "20.05.2007 07:23:09 org.whatever.server main"
+      cd | sfk run -idirs "sfk filt tpl.conf >httpd.conf -rep _AbsWorkDir_$path_"
+         create httpd.conf from tpl.conf, replacing the word "AbsWorkDir" by the path
+         from which the command is run. note we can NOT use -spat in this case, otherwise
+         a pathname like C:\temp would produce garbage (contains slash pattern "\t").
+      sfk filter in.txt -spat -sep "\t" -rep _\q__ -form "INSERT INTO MYDOCS (DOC_ID,
+         DESCRIPTION) VALUES ('TestDoc$03line','$col2');"
+         this example (typed in one line) creates a list of SQL statements, using tab-
+         separated, quoted input data, and using the input line number for document ids.
+         the -rep _\q__ means the same as -rep _\"__ - it strips quotes from the input,
+         but using \q is safer then \" as it doesn't let the shell miscount quotes.
+      sfk list documents .txt +filter -+big*foo -+wide*foo
+         from all .txt files in documents, filter the filenames (NOT the file contents)
+         for big*foo OR wide*foo.
+      sfk list documents .txt +filefilter -+big*foo -+wide*foo
+         from all .txt files in documents, filter the file contents (NOT the names)
+         for text lines containing big*foo OR wide*foo.
+      sfk list logfiles .txt +filefilter -global-unique +tofile mixedlog.txt
+         join all .txt files from logfiles into one output file mixedlog.txt,
+         dropping all redundant text lines. works only if logfile records are
+         prefixed by a unique record ID, and if overall text data is less than
+         available memory, because all data is cached during processing.
+      sfk list logfiles .txt +ffilter -global-unique -write -to mytmp\$file
+      sfk snapto=mixedlog.txt mytmp
+         same as above in two commands, using temporary files to allow more data.
+      bin\runserver.bat 2>&1 | sfk filter -+exception
+         filter standard output AND error stream ("2>") for exceptions
+      sfk filter result.txt -+error -justrc
+      IF %ERRORLEVEL%==1 GOTO foundError
+         in a batchfile: jump to label foundError if text "error" was found
+         within file result.txt. with -justrc no output is printed to terminal.
+      sfk filt log.txt -high cyan "*.*.*(*.java:*)" -high green "sql select *"
+         dump log.txt, listing java stack traces in cyan, and sql selects in green.
+      sfk filt x.html -where "000099" -rep "_<font*000099*>_<b>_" -rep "_</font>_</b>_"
+         replaces html <font> commands by <b>, but only in lines with "000099" (=blue).
+      sfk filt foo.cpp -cut "ifdef barmode" to "endif // barmode"
+         strip blocks of lines from foo.cpp, surrounded by the given patterns.
+      sfk filt csv.txt -spat -within "\q*\q" -rep _,_\x01_ -rep _,_\t_ -rep _\x01_,_
+         change separators in comma separated data from comma to tab, also taking
+         care of quotes, by replacing in-quote commas by a placeholder (\x01).
+         if the data contains escaped quotes like "" then further prefiltering
+         can be necessary, like removing those quotes by -sreplace _\q\q__
+      sfk filt mysrc.cpp "-+fopen(" -postcontext=3:blue:----- +view
+         filter source file "mysrc.cpp" for fopen calls, and list the following
+         three lines (post context) of every call, separating outputs by -----
+         and showing the whole result in Depeche View ("sfk view" for more).
