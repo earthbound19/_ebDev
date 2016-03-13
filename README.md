@@ -17,4 +17,4 @@ This includes zeranoe's build of ffmpeg, AutoHotkey, and many gnu core utilities
 
 ARCHIVE HISTORY:
 09/02/2015 08:42:48 PM This was initially a project of only font development scripts. I upgraded it to be a repository of executables and scripts I use (and wrote). -RAH
-03/13/2016 04:20:39 PM Except I don't see where that update was so much reflected at the remote repository? This has been dramatically overhauled from what it seems the last repository change reflected; updating the repository to reflect the overhaul. -RAH
+03/13/2016 04:20:39 PM Dramatically expanded/reorganized to include a lot more that I'm using, and have developed and/or moved. -RAH
