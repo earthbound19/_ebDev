@@ -1,0 +1,34 @@
+@ECHO OFF
+
+	REM This batch file will create empty text files in a subfolder __metadataAdditions for all image etc. files you drop onto it. It will create said subdirectory in the same folder as the image. Open the text file and populate the lines it proposes with custom data as appropriate (by typing or copy/paste etc.), then run customImageMetadataPopulate.bat to add all the custom metadata from those text files into copies of the image files suitable for e.g. web publishing.
+	REM NOTE That this batch relies on the existence of Copyright.txt and Description.txt, from which it populates the metadata addition template text files. Note also that those files must have a newline after the first line if you wish for that to properly show up in the resultant template.
+
+IF NOT EXIST __metadataAdditions MKDIR __metadataAdditions
+
+PUSHD
+
+SETLOCAL ENABLEDELAYEDEXPANSION
+
+FOR %%Y IN (%*) DO (
+set driveletter=%%~dY
+set filepath=%%~pY
+set filename=%%~nxY
+set filenameNoExt=%%~nY
+		REM ECHO PATH OF FILE IS echo !filepath! and filename is !filename!
+	REM (Re)-create and populate file with additional metadata template text
+	
+REM \__metadataAdditions\!filename!__metadataAdditions.txt
+
+ECHO -Title="!filenameNoExt!" > !driveletter!\!filepath!\__metadataAdditions\!filename!__metadataAdditions.txt
+
+TYPE Copyright.txt >> !filepath!\__metadataAdditions\!filename!__metadataAdditions.txt
+
+REM This relies on a python gibberish artist statement generator to create a "description" of the work:
+CMD /C "C: && CD C:\devtools\_devbin\GibbGen\pyMarkovGibGen && Python _runMarkovGen.py"
+
+TYPE DescriptionIntro.txt >> !filepath!\__metadataAdditions\!filename!__metadataAdditions.txt
+TYPE C:\devtools\_devbin\GibbGen\pyMarkovGibGen\_generated_gibberish.txt >> !filepath!\__metadataAdditions\!filename!__metadataAdditions.txt
+TYPE descriptionEnd.txt >> !filepath!\__metadataAdditions\!filename!__metadataAdditions.txt
+)
+
+POPD

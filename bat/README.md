@@ -1,1 +1,0 @@
-The code in all of the files in this folder was either written by me or taken from public sources where there is clearly only a desire to help others and no copyright restrictions. I deed all of the works in this folder to the Public Domain. 09/02/2015 07:27:52 PM -RAH

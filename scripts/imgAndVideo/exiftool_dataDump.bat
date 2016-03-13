@@ -1,0 +1,1 @@
+exiftool %1 > %1_tagInfo.txt
