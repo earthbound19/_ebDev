@@ -3,21 +3,21 @@
 # USAGE: from a shell, navigate to a directory that has so many text files in itself and/or subdirectories. Execute this script. Results will be written to corpus.html.
 
 	# re: http://stackoverflow.com/a/24069223/1397555 -- I haven't figured how to filter to only html files, but all the files I have are html \(there is no other type\), so that's moot anyway; COMPILE all files into one file:
-echo Merging all text files in all subdirectories into corpus.html . . .
-find * -exec cat {} \; >> corpus.html
+echo Merging all text files in all subdirectories into one file . . .
+# find * -exec cat {} \; >> corpus.html
+cat *.txt > corpus.html
 
-# Trim everything except for the actual announcment text out of the resultant corpus (trim everything that does *not* match the following pattern); thanks to: http://stackoverflow.com/a/2686369
+	# Trim everything except for the actual announcment text out of the resultant corpus (trim everything that does *not* match the following pattern); thanks to: http://stackoverflow.com/a/2686369
 echo Isolating everything nested in col1 / div tags . . .
 sed -i '/.*col1\"/,/<\/div>.*/I!d' corpus.html
 
-# NOTE: many of these next lines eliminate information in a way that may not be perfect; but it still leaves us with a representative corpus.
-
-# Nuke all lines containing the words separated by \| ; with help from http://superuser.com/a/112000/130772 and http://stackoverflow.com/a/4412964/1397555 :
-echo Removing all paragraphs that contain these words: enquiry\|enquiries\|contact\|contacts\|information\|application -- as nearly all of them will be gallery/press inquiry/contact information . . .
+# PARTICULAR TO the e-flux announcements collection. Comment out if inapplicable.
+	# nuke all lines containing the words separated by \| ; with help from http://superuser.com/a/112000/130772 and http://stackoverflow.com/a/4412964/1397555 :
+echo Removing all paragraphs that contain these words: enquiry\|enquiries\|contact\|contacts\|information\|application
 sed -i '/.*enquiry\|enquiries\|contact\|contacts\|information\|application.*/Id' corpus.html
 
 # Delete with prejudice all paragraphs where another html tag appears within the first 8 characters of the source code (which will usually be a bolded name or title that our corpus isn't concerned with):
-echo Deleting all paragraphs that have bold/italics within the first two words (these are almost always name credits etc.) . . .
+echo Deleting all paragraphs that have bold/italics with the first two words (these are almost always name credits etc.) . . .
 sed -i '/<p>.\{1,8\}<b.*/,/.*<\/p>.*/d' corpus.html
 
 echo Deleting with prejudice all lines that include numbers and are less than or equal to ~140 characters (as these are almost always contact info etc.) . . .
