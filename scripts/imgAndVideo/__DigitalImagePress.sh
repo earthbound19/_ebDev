@@ -52,4 +52,4 @@ echo "As instructed by the echo from the end of numberFilesByLabel.sh, examine t
 archiveMetadata.sh
 imgMetaDataTo7z.bat
 
-echo DERP.
+# Add metadata creation/insertion script here

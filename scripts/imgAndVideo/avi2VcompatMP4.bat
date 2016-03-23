@@ -3,4 +3,4 @@ REM lossless encode, adapted from: http://www.konstantindmitriev.ru/blog/2014/03
 REM Re encoding quality: -q 0 is lossless, -q 23 is default, and -q 51 is worst.
 REM Re: https://trac.ffmpeg.org/wiki/Encode/H.264
 
-ffmpeg -y -i %1 -c:v libx264 -c:a aac -strict experimental -tune fastdecode -pix_fmt yuv420p -b:a 192k -ar 48000 %1lossles.mp4
+ffmpeg -y -i %1 -c:v libx264 -c:a aac -strict experimental -tune fastdecode -pix_fmt yuv420p -b:a 192k -ar 48000 %1lossless.mp4
