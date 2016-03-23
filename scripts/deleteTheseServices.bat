@@ -1,0 +1,1 @@
+SC STOP "gupdate"SC STOP "gupdatem"SC DELETE "gupdate"SC DELETE "gupdatem"
