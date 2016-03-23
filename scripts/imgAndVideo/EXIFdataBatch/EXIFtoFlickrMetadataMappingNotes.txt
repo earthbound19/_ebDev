@@ -1,0 +1,7 @@
+REM Metadata tag to flickr post data mapping:
+REM 	re: https://www.flickr.com/groups/exiftool/discuss/72157603356128202/
+REM			via: https://www.flickr.com/groups/flickrhacks/discuss/72157625288077984/
+REM		TITLE: "Some metadata editors use "title" and others use "headline" or "object name", but any of those that I've filled out and saved (locally) become a title upon uploading to Flickr."
+REM		"Image Description" tag -> flickr description of photo
+REM		flickr tags are mapped from EXIF "keyword" or "keywords" field. Offset multiword keywords/tags with double quotes?
+REM		"Date" tag maps to flickr date.

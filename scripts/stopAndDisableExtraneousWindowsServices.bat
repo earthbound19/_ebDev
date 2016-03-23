@@ -1,0 +1,19 @@
+sc stop TermService
+sc stop wscsvc
+sc stop SysMain
+sc stop Themes
+sc stop WinDefend
+sc stop FontCache
+sc stop wuauserv
+sc stop AeLookupSvc
+sc stop PcaSvc
+
+sc disable TermService
+sc disable wscsvc
+sc disable SysMain
+sc disable Themes
+sc disable WinDefend
+sc disable FontCache
+sc disable wuauserv
+sc disable AeLookupSvc
+sc disable PcaSvc
