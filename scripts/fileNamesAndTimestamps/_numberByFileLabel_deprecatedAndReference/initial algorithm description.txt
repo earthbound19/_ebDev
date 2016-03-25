@@ -1,0 +1,24 @@
+OVERRIDE re new .sh version: all the following is now done, perhaps in another form than initially conceived. 2015-11-27 3:45 PM -RAH
+
+Key: * = done. ! = in progress. All other listed tasks need doing.
+
+	NOTE: the regexes given below may be updated (this is only for logical outlining), and I may have changed the process in actual implementation.
+
+Any file name with the phrase _final in it but without a five-digit number in the filename will be renamed to include [optional label]_xxxxx (where xxxxx is a five-digit number that increments as a count of all final, sorted, publication-ready files.* The procedure for this follows.
+		*NOTE: make it possible to pass the optional label to the program as an argument.
+		*NOTE: make it possible to pass a folder to search through as an argument (for selective renaming by arbitrary criteria by the user).
+PROCEDURE:
+	* Precursor: search all files, folders and sub-folders in the given folder for a match to the regex [0-9]{5} (a five-digit number), add all matches to an array. Then sort the array to determine the highest five-digit number present in the files and folders.
+	Search-and-rename procedure: search and index all files and subfolders in the given folder, by these criteria:
+		* In all these cases: IF the folder name does not match the regex [0-9]{5} AND the folder name includes the phrase _final
+		AND IF ALL file names within that folder do not match the regex "i)_final" AND ALL file names do not match the regex [0-9]{5}
+			* ADD THEM TO AN INDEX for renames of all files in a folder (followed by a rename of the folder itself.
+		-
+		* In all these cases: IF the folder name does not match the regex [0-9]{5} AND the folder name does *not* include the phrase 
+		_final AND any file in the folder does not match the regex [0-9]{5} and matches the regex "i)_final"
+			* ADD THEM TO AN INDEX of individual files to be renamed.
+	* Renaming procedure:
+		* Sort the matched filenames index by creation date, oldest first, and
+			* Rename them sequentially after the last highest available five-digit number, including any optional user-specified label, e.g. ~_abstraction_xxxxx (where xxxxx is the next higher number).
+
+Art that doubles as resources for other art and as standalone art should be . . . placed in subfolders named _RESOURCES?

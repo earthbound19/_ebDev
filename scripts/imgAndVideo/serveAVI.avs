@@ -1,0 +1,1 @@
+DirectShowSource("InputFile.avi")

@@ -1,0 +1,1 @@
+DIR _FINAL* /B /OD /TC > files.txt
