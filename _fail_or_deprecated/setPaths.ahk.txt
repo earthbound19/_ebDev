@@ -1,0 +1,74 @@
+﻿; DEPRECATED in favor of a .bat file that accomplishes the same thing in a few lines, using gnu tools + a free path tool (for which, incidentally, just discovered another, in the /uninstall subdirectory of imagemagick). 09/24/2015 03:56:33 PM -RAH
+
+; DESCRIPTION: setPaths.ahk / .exe parses a plain text file list of directories, and adds them to your system. If it encounters invalid paths in the list, it will ignore them, and automatically open a text log file to notify you.
+; WARNING: This will read everything from your system %PATH%, sort it by descending rank, which, if you care, could mess up intended consequences! The idea is to put intended _devtools subpatsh *first* in the system paths, so that they will be the first found and executed by e.g. Windows or Cygwin reading Windows' paths. _devtools subpaths will appear first in the list because the underscore comes before the alphabet in the sorting algorithm this uses.
+; NOTES: This script must be run with Administrator rights ("Run as Administrator"), and expects one parameter, being a text file list of directories to add to your %PATH%. Also, for this script to work, you must have a copy of the free setenv.exe utility in your %PATH% (the script assumes it is in a \bin subfolder in the same directory as the script). This distro comes with that, and the batch files that call this tool add the path for that (and other needed tools) on run. Even so, you can obtain that utility free at: http://barnyard.syr.edu/~vefatica/ftpfiles/setenv.exe (help/info page: http://barnyard.syr.edu/~vefatica/#SETENV) 
+
+#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
+; #Warn  ; Enable warnings to assist with detecting common errors.
+SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+
+
+; GLOBAL FUNCTION ====
+; Attempt to list the contents of the directory PATH passed to this function, using the Windows console. ErrorLevel will be set to 0 if there is no error (the directory could be listed), or nonzero if there was an error (the directory could not be listed). This function enables us to avoid adding invalid PATH values.
+ShowFolderExist(folder) {
+	; Reference: Run, Target [, WorkingDir, Max|Min|Hide|UseErrorLevel, OutputVarPID]
+		; MsgBox, running command: RunWait, %comspec% /C "DIR %folder%", %A_ScriptDir%, Hide UseErrorLevel
+RunWait, %comspec% /C "DIR %folder%", %A_ScriptDir%, Hide UseErrorLevel
+		; commandReturnValue := %ErrorLevel%
+		; MsgBox, return code:`n`n%ErrorLevel%
+Return %ErrorLevel%
+}
+; END GLOBAL FUNCTION ====
+
+
+EnvGet, machinePaths, PATH
+machinePathsValueBackup := machinePaths
+EnvSet, PATH, %machinePaths%;%A_ScriptDir%\bin
+EnvGet, checkPath, PATH
+		; MsgBox, current PATH has been set to %checkPath%
+
+parameter_one = %1%
+		; MsgBox, value of parameter_one is:`n`n%parameter_one%
+
+pathError = 0
+FileDelete, setPathsLog.txt
+Loop, Read, %parameter_one%
+	{
+			 MsgBox, val is %A_LoopReadLine%; testing for existence . . .
+			 
+	commandReturnValue := ShowFolderExist(A_LoopReadLine)
+			; MsgBox, ErrorLevel value returned is:`n`n%commandReturnValue%
+	If (commandReturnValue == 0) {
+		; Command executed without error; directory is safe to add to %PATH%. Note this in setPathsLog.txt.
+		FileAppend, PATH FOUND:`n%A_LoopReadLine%`n`n, setPathsLog.txt
+		addPathsString = %addPathsString%;%A_LoopReadLine%		
+		} Else {
+		; Command returned error; do not add directory to %PATH%, and note the nonexistent directory to setPathsLog.txt.
+		FileAppend, PATH NOT FOUND:`n%A_LoopReadLine%`n`n, setPathsLog.txt
+				; MsgBox, ERROR encountered for:`n%A_LoopReadLine%`
+		pathError = 1
+		}
+	}
+
+; Replace any accidental double semicolons in finalPathRevision with a single semicolons.
+		; Reference: StringReplace, OutputVar, InputVar, SearchText [, ReplaceText, ReplaceAll?]
+finalPathRevision = %machinePathsValueBackup%;%addPathsString%
+		; In the very rare case of more than two consecutive semicolons in the list:
+StringReplace, finalPathRevision, finalPathRevision, `;`;, `;, 1
+StringReplace, finalPathRevision, finalPathRevision, `;`;, `;, 1
+		; MsgBox, finalPathRevision:`n`n%finalPathRevision%
+Sleep, 48		; That may not be necessary. But I've had bad experiences with Windows not keeping up with AutoHotkey's speed :)
+RunWait, setenv -m PATH %finalPathRevision%
+
+; Open the error log text file if there was an error.
+If (pathError == 1) {
+	; MsgBox, error(s) in run. Opening text file to show.
+	RunWait, %comspec% /C "%A_ScriptDir%\setPathsLog.txt", %A_ScriptDir%, Show
+	}
+
+return
+
+
+; THE PROGRAMMER'S AGONY: after many frustrating false starts using DOS (Nicht! Das chokenbarfen mit die specielcharacteren!), THIS ahk script works, in tandem with the setenv tool. 2015-09-10 11:26 PM -RAH

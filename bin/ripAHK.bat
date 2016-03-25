@@ -1,0 +1,1 @@
+Ahk2exe.exe /in C:\_devtools\bin\fixShortenIMGlist.ahk /out C:\_devtools\bin\fixShortenIMGlist.exe
