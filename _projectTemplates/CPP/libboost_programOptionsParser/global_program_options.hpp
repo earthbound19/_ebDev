@@ -1,1 +1,0 @@
-int global_program_options(int argc , char **argv);

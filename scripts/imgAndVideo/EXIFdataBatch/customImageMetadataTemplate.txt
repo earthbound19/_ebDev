@@ -1,3 +1,0 @@
-copyright="Richard Alexander Hall, all rights reserved."
-artist="Richard Alexander Hall"
-keywords="art, digital, abstract, contemporary"

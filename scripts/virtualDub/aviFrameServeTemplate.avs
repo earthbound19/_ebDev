@@ -1,1 +1,0 @@
-AVISource (inputFile.avi, "audio"=true, "pixel_type"=YV12, libvpx-vp9)
