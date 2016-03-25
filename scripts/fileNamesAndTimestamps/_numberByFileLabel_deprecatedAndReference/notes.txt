@@ -1,5 +1,0 @@
-inner checkeddir before null
-inner soughtdir before null
-
-inner checkeddir after val
-inner soughtdir after null

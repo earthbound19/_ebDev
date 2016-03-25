@@ -1,6 +1,0 @@
-#!/usr/local/bin/fontforge
-i=1
-Open($argv[i])
-SelectAll()
-Skew(12)
-Generate($argv[i]:r + "_Oblique.ttf")
