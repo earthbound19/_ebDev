@@ -1,3 +1,6 @@
+# DESCRIPTION: returns one random string of length 88 characters or per paramaters you pass to the script.
+# USAGE: pass this script two paramaters, the first being how many strings you want it to return, the second being the length of each string.
+
 # Generate random alphanumeric string of specified length, as in parameter fold -w (n). Optional single numeric parameter will generate n (or that number of) random strings.
 # Source: https://gist.github.com/earthgecko/3089509
 # Note also comment: https://gist.github.com/earthgecko/3089509#gistcomment-1541056
@@ -17,13 +20,15 @@
 # OPTION 2: uncomment if you prefer (and comment out the others) :
 # howMany=$1
 if [[ $1 == "" ]]; then howMany=1; else howMany=$1; fi
+if [[ $2 == "" ]]; then length=88; else length=$2; fi
 for (( i=1; i<=$howMany; i++ ))
 do
 		# 103 wide for Fira Mono standard (not medium or bold) 16-pt.
 		# NOTES: 88 wide for 1280x720 pixels cygwin prompt with OCR A Std 14-point.
 	# cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c 88
 	# cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9{}[]~!@#$%^&*()_+-=<>' | head -c 88
-	cat /dev/urandom | tr -dc ' 0oO' | head -c 103
+	cat /dev/urandom | tr -dc '[a-hj-km-np-zA-HJ-KM-NP-Z2-9]' | head -c $length
+	echo
 	# OPTION 3, adapted to generate secure passwords; uncomment if you prefer (and comment out the other) :
 	# cat /dev/urandom | tr -dc 'a-z0-9A-Z{}[]~!@#$%^&*()_+-=<>' | head -c 42
 done
