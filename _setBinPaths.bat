@@ -1,5 +1,7 @@
 REM DESCRIPTION: _setBinPaths.bat adds custom paths to the system PATH (Windows). NOTE: BINPATHS.txt must have a blank line after the last entry, or this batch will fail (and combined two intended defferent lines on the same line in a result). [DESCRIBE MORE WHEN THIS SCRIPT IS DONE.] Reads from BINPATHS.txt and EXTERNALPATHS.txt, which you may populate with custom paths, one per line, no semicolon. Adds the paths in those files to the system PATH variable (Windows), and optionally deletes invalid paths, using the modpath.exe utility.
+
 REM DEPENDENCIES: The modpath.exe tool which I found in the uninstall folder of ImageMagick :) and I don't know where it's from. I presume (perhaps unwisely) that it's free software.
+
 REM LICENSE: I release this work to the Public Domain. 09/24/2015 09:18:03 PM -RAH
 
 ECHO OFF

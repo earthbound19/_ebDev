@@ -232,23 +232,113 @@
   - says
   - exclaims
   - quips
+  - utters
+  - breathes
+  - whispers
+  - sighs
+  - exhales
+  - mutters
+  - grumbles
+  - murmurs
+  - croaks
+  - squeaks
 <modernplace>:
   - bus stop
   - office cubicle
   - post office
+  - grocery store
+  - cubicle
+  - domicile
+  - house
+  - cottage
+  - bazzar
+  - laundromat
+  - computer repair shop
+  - board room
+  - loom
+  - pit stop
+  - gas station
+  - convenience store
+  - checkout lane
+  - front desk
+  - executive suite
+  - boot camp
+  - photography booth
+  - photo booth
+  - processing plant
+  - power plant
+  - bio-engineering laboratory
+  - infirmary
+  - armory
+  - stock room
+  - back office
 <beginning>:
   - beginning
   - ending
   - new ending
   - old ending
   - new beginning
+  - resuming
+  - ever pausing
 <randomnumber>:
+  - one
+  - two
+  - three
+  - four
+  - five
+  - six
+  - seven
+  - eight
+  - nine
+  - ten
+  - eleven
+  - twelve
+  - thirteed
+  - fourteen
+  - fifteen
+  - sixteen
+  - seventeen
+  - eighteen
+  - nineteen
+  - twenty
+  - hundred
+  - two hundred
   - three hundred
   - twenty-seven
+  - countless
+  - numberless
+  - innumerable
+  - uncounted
+  - unnumbered
+  - handful
+  - several
+  - few
+  - many
+  - exceeding many
+  - rare few
+  - without number
   - too many to count
   - too few to count
+  - hundred
+  - hundred
+  - hundred
+  - hundred
+  - thousand
+  - thousand
+  - thousand
   - thousand
   - million
+  - million
+  - million
+  - billion
+  - trillion
+  - quadrillion
+  - quintillion
+  - sextillion
+  - septillion
+  - octillion
+  - nonillion
+  - googolplex
 <direction>:
   - west
   - east
@@ -259,22 +349,65 @@
   - <nnature>
 <pnature>:
   - ocean wave
-  - palm tree leaf
+  - leaf of palm
   - blade of grass
   - ray of sunlight
+  - sunlight
   - pillow of fog
+  - fog
+  - sprinkling
+  - canyon wind
+  - gale
+  - gust
+  - rivulet
+  - river
+  - stream
+  - spring
+  - canyon
+  - godray
+  - godrays
+  - lightning
+  - torrent
+  - rain
 <nnature>:
   - tornado
+  - hurricane
+  - twister
+  - typhoon
+  - monsoon
+  - turbulence
+  - wind
+  - rain
+  - torrent
+  - downpour
+  - blizzard
+  - storm
   - uncomfortable turbulence
   - harrowing wind
   - unrelenting rain
+  - sulpher spring
+  - volcano
+  - chasm
+  - canyon
+  - thunderhead
+  - lightning
 <with>:
   - with
   - without
+  - inclusive of
+  - exclusive of
 <story>:
   - tale
   - history
   - story
+  - legend
+  - myth
+  - talltale
+  - hearsay
+  - epic
+  - rumor
+  - tradition
+  - telling
 <nprep>:
   - among
   - in the middle of
@@ -284,6 +417,21 @@
   - outside
   - under
   - inside
+  - betwixt
+  - hither
+  - yon
+  - apex of 
+  - interior of
+  - exterior of
+  - beyond
+  - afar from
+  - near to
+  - about
+  - convenient to
+  - adjacent to
+  - perpendicular to
+  - parrallel to
+  - surpassing
 <title>:
   - <nprep> <adj> understanding - <noun-pl> and <studyfield>
   - <noun> in the <adj> services
@@ -344,19 +492,195 @@
 <trueto>:
   - untrue to
   - true to
+  - affinitive to
+  - affirmative to
+  - consistent with
+  - inconsistent with
+  - betrays the nature of
+  - inexorably linked to
+  - polar opposite of
+  - opposed to
+  - in line with
 <pfeeling>:
   - love
+  - charity
+  - faith
+  - hope
+  - pleasantness
+  - worshipfullness
   - joy
+  - happiness
   - felicity
   - purity
   - tiredness
   - respect
   - pride
   - honor
-  - happiness
   - wonder
+  - awe
   - sincerity
   - decency
+  - belonging
+  - achievement
+  - charity
+  - compassion
+  - cooperation
+  - curiosity
+  - doubt
+  - enthusiasm
+  - envy
+  - exhilaration
+  - faith
+  - freedom
+  - gratitude
+  - hope
+  - humility
+  - humor
+  - independence
+  - inspiration
+  - joy
+  - justice
+  - kindness
+  - knowledge
+  - love
+  - loyalty
+  - morality
+  - patience
+  - self-respect
+  - success
+  - wisdom
+  - accepting
+  - accommodating
+  - amazed
+  - amused
+  - astonished
+  - astounded
+  - attentive
+  - bold
+  - brave
+  - calm
+  - capable
+  - casual
+  - charming
+  - cheerful
+  - cheery
+  - collected
+  - comfortable
+  - competitive
+  - composed
+  - confident
+  - conscientious
+  - conservative
+  - considerate
+  - conspicuous
+  - content
+  - convivial
+  - cool
+  - courageous
+  - creative
+  - curious
+  - dazzled
+  - delighted
+  - devoted
+  - earnest
+  - edgy
+  - elated
+  - empathetic
+  - enthusiastic
+  - euphoric
+  - expectant
+  - exuberant
+  - flexible
+  - focused
+  - forgiving
+  - furtive
+  - good
+  - grateful
+  - happy
+  - heroic
+  - hopeful
+  - humble
+  - humorous
+  - idealistic
+  - impartial
+  - impolite
+  - insightful
+  - intense
+  - jolly
+  - jovial
+  - joyful
+  - jubilant
+  - kind
+  - liberal
+  - loving
+  - loyal
+  - magical
+  - magnificent
+  - mysterious
+  - passionate
+  - patient
+  - placid
+  - pleased
+  - powerful
+  - rational
+  - reasonable
+  - reflective
+  - remorseful
+  - resilient
+  - resolute
+  - resourceful
+  - respectful
+  - responsible
+  - responsive
+  - restorative
+  - reverent
+  - safe
+  - sensible
+  - sensitive
+  - serene
+  - simple
+  - sober
+  - solemn
+  - somber
+  - speechless
+  - successful
+  - sullen
+  - superior
+  - supportive
+  - sweet
+  - sympathetic
+  - tactful
+  - tenacious
+  - terrific
+  - repugnant
+  - thoughtful
+  - timorous
+  - tolerant
+  - tranquil
+  - treacherous
+  - truthful
+  - ultimate
+  - unique
+  - unruffled
+  - uplifting
+  - upset
+  - uptight
+  - versatile
+  - vigilant
+  - vigorous
+  - virtuous
+  - vivacious
+  - vulnerable
+  - warm
+  - wary
+  - welcoming
+  - wise
+  - wild
+  - wonderful
+  - worthy
+  - youthful
+  - zany
+  - zealous
 <neutral>:
   - positive
   - neutral
@@ -367,6 +691,9 @@
 <recording>:
   - transmission
   - recording
+  - transcript
+  - log
+  - record
 <below>:
   - above
   - below
@@ -375,6 +702,9 @@
   - system
   - environment
   - architecture
+  - context
+  - habitat
+  - setting
 <pulledout>:
   - pulled out
   - shut out
@@ -387,6 +717,7 @@
   - keep going
   - proceed
   - recount
+  - continue
 <element>:
   - fire
   - sky
@@ -396,11 +727,30 @@
   - electricity
   - heat
   - lava
+  - obsidian
   - clay
+  - silt
   - mud
   - earth
   - wind
   - jungle
+  - phosphor
+  - salt
+  - sulfur
+  - iron
+  - steel
+  - copper
+  - brass
+  - tin
+  - aluminum
+  - stone
+  - rock
+  - plasma
+  - ore
+  - gypsum
+  - jade
+  - ruby
+  - silica
 <noun-pl>:
   - inscriptions
   - mats
@@ -416,6 +766,8 @@
   - functionality
 <nplace>:
   - darkness
+  - midnight
+  - shadow
 <pnoun>:
   - sun rise
   - starlight
@@ -595,9 +947,672 @@
   - sun
   - necklace
   - muscle
+    - troupe of artists
+  - tabernacle of bankers
+  - babble of barbers
+  - thought of barons
+  - promise of bartenders
+  - fighting of beggars
+  - coster of beggars
+  - guild of beggars
+  - parliament of beggars
+  - psalter of bishops
+  - bench of bishops
+  - sea of bishops
+  - blush of boys
+  - rascal of boys
+  - shuffle of bureaucrats
+  - goring of butchers
+  - sneer of butlers
+  - slate of candidates
+  - school of clerks
+  - alley of clowns
+  - drunkship of cobblers
+  - hastiness of cooks
+  - troupe of dancers
+  - board of directors
+  - doctrine of doctors
+  - panel of experts
+  - troupe of acrobats
+  - cast of actors
+  - company of actors
+  - cry of actors
+  - condescencion of actors
+  - queue of actors
+  - host of angels
+  - chorus of angels
+  - choir of angels
+  - flight of angels
+  - pinhead of angels
+  - giggle of girls
+  - bevy of girls
+  - observance of hermits
+  - blast of hunters
+  - scoop of journalists
+  - bench of judges
+  - neverthriving of jugglers
+  - damning of jurors
+  - bevy of ladies
+  - eloquence of lawyers
+  - huddle of lawyers
+  - escheat of lawyers
+  - illusion of magicians
+  - faith of merchants
+  - abominable sight of monks
+  - band of musicians
+  - tribe of natives
+  - superfluity of nuns
+  - illusion of painters
+  - posse of police
+  - crowd of people
+  - congregation of people
+  - team of players
+  - huddle of players
+  - retinue of players
+  - cry of players
+  - crew of sailors
+  - deck of sailors
+  - scolding of seamstresses
+  - house of senators
+  - disguising of tailors
+  - obeisance of servants
+  - choir of singers
+  - chorus of singers
+  - harmony of singers
+  - platoon of soldiers
+  - army of soldiers
+  - brigade of soldiers
+  - company of soldiers
+  - division of soldiers
+  - muster of soldiers
+  - squad of soldiers
+  - troop of soldiers
+  - battalion of soldiers
+  - boast of soldiers
+  - flock of tourists
+  - glaze of tourists
+  - ambush of widows
+  - gaggle of women
+  - impatience of wives
+  - worship of writers
+  - aarmory of aardvarks
+  - rookery of albatrosses
+  - flight of albatrosses
+  - weight of albatrosses
+  - company of angel fish
+  - company of archer fish
+  - cete of badgers
+  - colony of badgers
+  - clan of badgers
+  - shoal of bass
+  - fleet of bass
+  - colony of bats
+  - sloth of bears
+  - sleuth of bears
+  - swarm of bees
+  - hive of bees
+  - hum of bees
+  - charm of bees
+  - cluster of bees
+  - erst of bees
+  - drift of bees
+  - grist of bees
+  - game of bees
+  - bike of wild bees
+  - rabble of bees
+  - cast of wild bees
+  - stand of bees
+  - colony of bees
+  - fry of young bees
+  - flock of birds
+  - fleet of birds
+  - parcel of birds
+  - pod of birds
+  - roost of birds
+  - congregation of birds
+  - colony of birds
+  - dissimulation of birds
+  - flight of birds
+  - drift of birds
+  - volary of birds
+  - rush of birds
+  - cloud of black birds
+  - grind of black fish
+  - herd of buffaloes
+  - gang of buffaloes
+  - obsinancy of buffaloes
+  - fusillade of bullets
+  - bellowing of bullfinches
+  - swarm of butterflies
+  - flutter of butterflies
+  - flight of butterflies
+  - rabble of butterflies
+  - kaleidoscope of butterflies
+  - wing of butterflies
+  - rainbow of butterflies
+  - flock of butterflies
+  - school of butterfly fish
+  - caravan of camels
+  - herd of camels
+  - train of camels
+  - flock of camels
+  - opera of canaries
+  - radiance of cardinals
+  - conclave of cardinals
+  - college of cardinals
+  - army of caterpillars
+  - clowder of cats
+  - glaring of cats
+  - cluster of cats
+  - pounce of cats
+  - drove of cattle
+  - herd of cattle
+  - kine of cattle
+  - team of cattle
+  - yoke of cattle
+  - coalition of cheetahs
+  - brood of chickens
+  - clutch of chickens
+  - peep of chickens
+  - lap of cod
+  - rag of colts
+  - rake of colts
+  - shock of corn
+  - herd of cranes
+  - litter of cubs
+  - herd of deer
+  - bunch of deer
+  - mob of deer
+  - parcel of deer
+  - rangale of deer
+  - bevy of roe deer
+  - pod of dolphins
+  - dole of doves
+  - dule of doves
+  - cote of doves
+  - bevy of doves
+  - flight of doves
+  - piteousness of doves
+  - prettying of doves
+  - pitying of doves
+  - flock of ducks
+  - dropping of ducks
+  - raft of ducks
+  - badling of ducks
+  - bunch of ducks
+  - paddling of ducks
+  - plump of ducks
+  - sord of ducks
+  - string of ducks
+  - team of ducks
+  - waddling of ducks
+  - brace of ducks
+  - skein of ducks
+  - flush of ducks
+  - safe of ducks
+  - convocation of eagles
+  - aerie of eagles
+  - clutch of eggs
+  - brood of eggs
+  - sitting of eggs
+  - herd of elephants
+  - herd of elk
+  - gang of elk
+  - mob of emus
+  - charm of finches
+  - chirm of finches
+  - school of fish
+  - shoal of fish
+  - run of fish
+  - catch of fish
+  - haul of fish
+  - fray of fish
+  - draught of fish
+  - scale of fish
+  - kettle of fish
+  - stand of flamingos
+  - skulk of foxes
+  - leash of foxes
+  - gaggle of geese
+  - herd of giraffes
+  - implausibility of gnus
+  - herd of goats
+  - troubling of goldfish
+  - glint of goldfish
+  - down of hares
+  - drove of hares
+  - husk of hares
+  - kindle of hares
+  - flick of hares
+  - trip of hares
+  - herd of hares
+  - warren of hares
+  - leash of hares
+  - trace of hares
+  - leap of hares
+  - dun of hares
+  - cast of hawks
+  - prickle of hedgehogs
+  - array of hedgehogs
+  - cloud of hens
+  - siege of herons
+  - army of herrings
+  - glean of herrings
+  - shoal of herrings
+  - bloat of hippopotamuses
+  - herd of horses
+  - pack of hounds
+  - hover of hummingbirds
+  - train of jackdaws
+  - band of jackdaws
+  - smack of jellyfish
+  - fluther of jellyfish
+  - stuck of jellyfish
+  - smuth of jellyfish
+  - mob of kangaroos
+  - ring of keys
+  - concentration of kingfishers
+  - kindle of kittens
+  - loveliness of ladybirds
+  - bevy of larks
+  - ascension of larks
+  - exaltation of larks
+  - happiness of larks
+  - springful of larks
+  - leap of leopards
+  - lepe of leopards
+  - tissue of lies
+  - pride of lions
+  - tiding of magpies
+  - sord of mallard
+  - suit of mallard
+  - clan of meerkats
+  - wilderness of monkeys
+  - herd of moose
+  - watch of nightingales
+  - family of otters
+  - raft of otters
+  - bevy of otters
+  - romp of otters
+  - parliament of owls
+  - stare of owls
+  - wisdom of owls
+  - sagaciousness of owls
+  - stable of barn owls
+  - blizzard of snowy owls
+  - herd of oxen
+  - drove of oxen
+  - yoke of oxen
+  - team of oxen
+  - span of oxen
+  - meinie of oxen
+  - rake of oxen
+  - bed of oysters
+  - embarrassment of pandas
+  - flock of parrots
+  - covey of partridges
+  - muster of peacocks
+  - ostentation of peacocks
+  - pride of peacocks
+  - pulchritude of peacocks
+  - string of pearls
+  - rope of pearls
+  - colony of penguins
+  - rookery of penguins
+  - parade of penguins
+  - waddle of penguins
+  - creche of penguins
+  - muster of penguins
+  - huddle of penguins
+  - parcel of penguins
+  - formality of penguins
+  - head of pheasants
+  - bouquet of pheasants
+  - nye of pheasants
+  - flock of pigeons
+  - flight of pigeons
+  - dropping of pigeons
+  - kit of pigeons
+  - loft of pigeons
+  - stand of plovers
+  - wing of plovers
+  - congregation of plovers
+  - aurora of polar bears
+  - string of ponies
+  - family of porcupines
+  - pod of porpoises
+  - school of porpoises
+  - herd of porpoises
+  - turmoil of porpoises
+  - circus of puffins
+  - grumble of pugs
+  - litter of puppies
+  - litter of pups
+  - piddle of puppies
+  - piddle of pups
+  - bevy of quail
+  - covey of quail
+  - drift of quail
+  - jug of quail
+  - flush of quail
+  - knob of quail
+  - shake of quail
+  - hotbed of quilts
+  - colony of rabbits
+  - nest of rabbits
+  - warren of rabbits
+  - bury of rabbits
+  - drove of rabbits
+  - leash of rabbits
+  - down of rabbits
+  - trip of rabbits
+  - flick of rabbits
+  - kindle of rabbits
+  - trace of rabbits
+  - wrack of rabbits
+  - constable of ravens
+  - storytelling of ravens
+  - herd of reindeer
+  - worm of robins
+  - bevy of roes
+  - parliament of rooks
+  - building of rooks
+  - bind of salmon
+  - leap of salmon
+  - run of salmon
+  - school of salmon
+  - shoal of salmon
+  - draft of salmon
+  - draught of salmon
+  - herd of seahorses
+  - colony of seals
+  - rookery of seals
+  - herd of seals
+  - pod of seals
+  - harem of seals
+  - spring of seals
+  - team of seals
+  - bob of seals
+  - crash of seals
+  - flock of sheep
+  - herd of sheep
+  - drove of sheep
+  - drift of sheep
+  - down of sheep
+  - fold of sheep
+  - hurtle of sheep
+  - trip of sheep
+  - parcel of sheep
+  - dray of squirrels
+  - scurry of squirrels
+  - galaxy of starfish
+  - bundle of sticks
+  - faggot of sticks
+  - fever of stingrays
+  - mustering of storks
+  - flight of swallows
+  - bevy of swans
+  - herd of swans
+  - wedge of swans
+  - bank of swans
+  - drift of swans
+  - ballet of swans
+  - regatta of swans
+  - whiteness of swans
+  - eyrar of swans
+  - lamentation of swans
+  - whiting of swans
+  - sownder of swans
+  - game of swans
+  - team of swans
+  - flock of swans
+  - squadron of swans
+  - drift of swine
+  - herd of swine
+  - sounder of swine
+  - spring of teal
+  - streak of tigers
+  - creep of tortoises
+  - hover of trout
+  - shoal of trout
+  - float of tuna
+  - troup of tuna
+  - bale of turtles
+  - blessing of unicorns
+  - glory of unicorns
+  - marvel of unicorns
+  - pod of whales
+  - school of whales
+  - herd of whales
+  - gam of whales
+  - shoal of whales
+  - mob of whales
+  - float of whales
+  - run of whales
+  - troup of whales
+  - grind of whales
+  - herd of wolves
+  - rout of wolves
+  - route of wolves
+  - wisdom of wombats
+  - descent of woodpeckers
+  - herd of wrens
+  - herd of yaks
+  - herd of zebras
+  - dazzle of zebras
+  - zeal of zebras
+  - stripe of zebras
+  - cohort of zebras
+  - bushel of apples
+  - pie-full of apples
+  - hand of bananas
+  - bunch of bananas
+  - bunch of grapes
+  - cluster of grapes
+  - fistful of grasses
+  - range of hills
+  - archipelago of islands
+  - range of mountains
+  - galaxy of stars
+  - constellation of stars
+  - cluster of stars
+  - wonder of stars
+  - grove of trees
+  - forest of trees
+  - thicket of trees
+  - stand of trees
+  - orchard of trees
+  - clump of trees
+  - stillness of trees
+  - copse of trees
+  - coupe of trees
+  - wing of aircraft
+  - quiver of arrows
+  - bevy of beauties
+  - galaxy of beauties
+  - peal of bells
+  - carillon of bells
+  - change of bells
+  - batch of bread
+  - caste of bread
+  - library of books
+  - compendium of books
+  - pile of books
+  - pack of cards
+  - deck of cards
+  - hand of cards
+  - fold of chairs
+  - fleet of cars
+  - souffle of clouds
+  - network of computers
+  - baptism of fire
+  - bouquet of flowers
+  - lock of hair
+  - huddle of houses
+  - click of computer mice
+  - ream of paper
+  - pad of paper
+  - anthology of poems
+  - fleet of ships
+  - flotilla of ships
+  - armada of ships
+  - convoy of trucks
+  - baptism of water
+  - bale of wool
+  - skein of wool
+  - bunch of things
+  - cluster of things
+  - phalanx of umbrellas
 <adverb>:
   - slowly
   - headlong
+  - appealingly
+  - blithely
+  - coaxingly
+  - daintily
+  - elliptically
+  - expressively
+  - happily
+  - hilariously
+  - jokingly
+  - lackadaisically
+  - openly
+  - playfully
+  - quaintly
+  - quirkily
+  - acidly
+  - aggressively
+  - alarmingly
+  - angrily
+  - antagonistically
+  - appallingly
+  - arrogantly
+  - atrociously
+  - autocratically
+  - badly
+  - bitterly
+  - blatantly
+  - boastfully
+  - boorishly
+  - brashly
+  - brazenly
+  - brutally
+  - callously
+  - churlishly
+  - contentiously
+  - corruptly
+  - cruelly
+  - cunningly
+  - deceitfully
+  - deceptively
+  - defiantly
+  - deliberately
+  - deviously
+  - diabolically
+  - dictatorially
+  - discontently
+  - disdainfully
+  - disparagingly
+  - dominately
+  - egotistically
+  - evasively
+  - ferociously
+  - fiercely
+  - flagrantly
+  - frenetically
+  - grumpily
+  - harmfully
+  - harshly
+  - hatefully
+  - heartlessly
+  - heinously
+  - horrendously
+  - hurtfully
+  - imperiously
+  - insolently
+  - insufferably
+  - insultingly
+  - jealously
+  - loudly
+  - malevolently
+  - maliciously
+  - menacingly
+  - mockingly
+  - monstrously
+  - nastily
+  - neglectfully
+  - neurotically
+  - notoriously
+  - obnoxiously
+  - obsessively
+  - offensively
+  - ominously
+  - oppressively
+  - ostentatiously
+  - outlandishly
+  - outrageously
+  - overzealously
+  - preposterously
+  - recklessly
+  - reproachfully
+  - repugnantly
+  - roughly
+  - rudely
+  - ruthlessly
+  - sadistically
+  - savagely
+  - scandalously
+  - selfishly
+  - shamefully
+  - shamelessly
+  - shockingly
+  - sinisterly
+  - slovenly
+  - snobbishly
+  - stealthily
+  - tempestuously
+  - treacherously
+  - tyrannically
+  - uncontrollably
+  - unethically
+  - unscrupulously
+  - venomously
+  - viciously
+  - vilely
+  - violently
+  - wantonly
+  - wickedly
+  - annoyingly
+  - begrudgingly
+  - contentiously
+  - disdainfully
+  - forlornly
+  - glumly
+  - grimly
+  - grouchily
+  - grudgingly
+  - half-heartedly
+  - hopelessly
+  - impatiently
+  - irritably
+  - joylessly
+  - lazily
+  - miserably
+  - negatively
+  - parsimoniously
+  - petulantly
+  - rancorously
+  - resentfully
+  - sadly
+  - stressfully
+  - sulkily
+  - uselessly
+  - vainly
+  - wearily
+  - woefully
+  - superstitiously
+  - reptilianly
+  - hysterically
 <bodypart-pl>:
   - shoulders
   - brains
@@ -631,11 +1646,17 @@
   - boat
 <bodypart>:
   - heart
+  - breast
+  - chest
+  - loins
   - brow
   - curves
+  - pimple
+  - armpit
   - brain
   - arm
   - eye
+  - eyes
   - breath
   - fingernails
   - tail
@@ -646,6 +1667,7 @@
   - hand
   - mouth
   - foot
+  - palm
   - shoulder
   - eyelids
   - nose
@@ -665,6 +1687,10 @@
   - rusted nail
   - brick
   - salt
+  - foam
+  - brush
+  - burlap
+  - obsidian
 <herhim>:
   - him
   - her
@@ -1001,11 +2027,9 @@
   - stench
   - city
   - trapdoor
-  - vagina
   - wax
   - nougat
   - stalactite
-  - puberty
   - imbroglio
   - hole
   - cold fire
@@ -1054,6 +2078,160 @@
   - salt
   - howl
   - stick
+  - talent of gamblers
+  - gaggle of gossips
+  - malapertness of pedlars
+  - mob of people
+  - disputation of lawyers
+  - greed of lawyers
+  - quarrel of lawyers
+  - pity of prisoners
+  - skulk of thieves
+  - gang of thieves
+  - band of thieves
+  - den of thieves
+  - unction of undertakers
+  - coven of witches
+  - incantation of witches
+  - battery of barracudas
+  - army of ants
+  - colony of ants
+  - nest of ants
+  - bike of ants
+  - swarm of ants
+  - shrewdness of apes
+  - troop of apes
+  - troop of baboons
+  - congress of baboons
+  - flange of baboons
+  - culture of bacteria
+  - cloud of bats
+  - drove of bullocks
+  - clutter of cats
+  - destruction of cats
+  - cartload of chimpanzees
+  - quiver of cobras
+  - swarm of cockroaches
+  - intrusion of cockroaches
+  - herd of cows
+  - band of coyotes
+  - concerto of crickets
+  - float of crocodiles
+  - murder of crows
+  - pack of dogs
+  - kennel of dogs
+  - herd of donkeys
+  - collective noun for eels
+  - swarm of eels
+  - bed of eels
+  - congress of eels
+  - fry of eels
+  - wisp of eels
+  - draft of eels
+  - business of ferrets
+  - busyness of ferrets
+  - swarm of flies
+  - cloud of flies
+  - army of frogs
+  - knot of frogs
+  - flush of fungi
+  - whoop of gorillas
+  - cloud of grasshoppers
+  - clan of hyenas
+  - mess of iguanas
+  - swarm of insects
+  - horde of insects
+  - flight of insects
+  - plague of insects
+  - rabble of insects
+  - caper of kids
+  - lounge of lizards
+  - plague of locusts
+  - swarm of locusts
+  - herd of asses
+  - drove of asses
+  - pace of asses
+  - pass of asses
+  - coffle of asses
+  - mischief of mice
+  - nest of mice
+  - trip of mice
+  - horde of mice
+  - labour of moles
+  - troop of monkeys
+  - tribe of monkeys
+  - barrel of monkeys
+  - machination of monkeys
+  - cartload of monkeys
+  - mission of monkeys
+  - swarm of mosquitoes
+  - company of parrots
+  - psittacosis of parrots
+  - pandemonium of parrots
+  - prattle of parrots
+  - herd of pigs
+  - drove of pigs
+  - litter of pigs
+  - drift of pigs
+  - sounder of wild pigs
+  - gaze of racoons
+  - pack of rats
+  - colony of rats
+  - swarm of rats
+  - horde of rats
+  - mischief of rats
+  - plague of rats
+  - rabble of rats
+  - rhumba of rattle snakes
+  - unkindness of ravens
+  - conspiracy of ravens
+  - crash of rhinoceroses
+  - herd of rhinoceroses
+  - stubbornness of rhinoceroses
+  - school of sharks
+  - shiver of sharks
+  - shoal of sharks
+  - mob of sheep
+  - cornucopia of slugs
+  - rout of snails
+  - walk of snails
+  - escargatoire of snails
+  - den of snakes
+  - nest of snakes
+  - pit of snakes
+  - bed of snakes
+  - slither of snakes
+  - knot of snakes
+  - trogle of snakes
+  - host of sparrows
+  - cluster of spiders
+  - clutter of spiders
+  - venom of spiders
+  - ambush of tigers
+  - knot of toads
+  - lump of toads
+  - nest of toads
+  - flock of turkeys
+  - gang of turkeys
+  - posse of turkeys
+  - rafter of turkeys
+  - raffle of turkeys
+  - brood of turkeys
+  - dole of turkeys
+  - dule of turkeys
+  - death-row of turkeys
+  - nest of vipers
+  - generation of vipers
+  - den of vipers
+  - colony of vultures
+  - wake of vultures
+  - nest of vultures
+  - looming of vultures
+  - meal of vultures
+  - vortex of vultures
+  - pack of wolves
+  - clew of worms
+  - wriggle of worms
 <place>:
   - boulevard
   - divisions
@@ -1450,9 +2628,147 @@
   - confusion
   - anger
   - fear
+  - contempt
+  - hubris
+  - arrogance
+  - indifference
+  - numbness
   - animosity
-  - beligerance
+  - belligerence
   - illusion
+  - disillusionment
+  - worry
+  - shame
+  - sorrow
+  - conflict
+  - confusion
+  - cruelty
+  - depression
+  - exhaustion
+  - fear
+  - frustration
+  - hate
+  - loneliness
+  - afraid
+  - aggressive
+  - agitated
+  - alarmed
+  - antagonistic
+  - anxious
+  - apathetic
+  - apprehensive
+  - arrogant
+  - blase
+  - bothered
+  - churlish
+  - compulsive
+  - concerned
+  - conflicted
+  - contemptible
+  - covetous
+  - critical
+  - cynical
+  - debilitated
+  - defensive
+  - dejected
+  - demeaned
+  - depressed
+  - destructive
+  - devious
+  - dictatorial
+  - diffident
+  - disdainful
+  - distracted
+  - distraught
+  - distressed
+  - downcast
+  - exhausted
+  - explosive
+  - ferocious
+  - fierce
+  - flabbergasted
+  - forlorn
+  - frightened
+  - gloomy
+  - grouchy
+  - guilty
+  - harassed
+  - hesitant
+  - hostile
+  - hysterical
+  - ignorant
+  - ill-tempered
+  - imprudent
+  - indifferent
+  - infuriated
+  - insulted
+  - intimidated
+  - intolerant
+  - irascible
+  - jealous
+  - jumpy
+  - languid
+  - malevolent
+  - malicious
+  - needy
+  - negative
+  - neglected
+  - nervy
+  - opinionated
+  - overzealous
+  - panicky
+  - perturbed
+  - petrified
+  - petulant
+  - prejudicial
+  - prideful
+  - quarrelsome
+  - queasy
+  - quivering
+  - rancorous
+  - reckless
+  - rude
+  - ruthless
+  - sad
+  - scared
+  - scornful
+  - seething
+  - selfish
+  - shaky
+  - shivering
+  - shocked
+  - sickly
+  - sour
+  - spooked
+  - stern
+  - surly
+  - suspicious
+  - tense
+  - testy
+  - thoughtless
+  - wishy-washy
+  - wistful
+  - witty
+  - trembling
+  - uncivil
+  - uncouth
+  - uneasy
+  - unethical
+  - unfair
+  - unmannerly
+  - unnerved
+  - unrefined
+  - unsavory
+  - unworthy
+  - vicious
+  - vile
+  - villainous
+  - volatile
+  - waspish
+  - weak
+  - wicked
+  - woeful
+  - worrying
 <person-pl>:
   - fill
 <without>:
@@ -1467,6 +2783,8 @@
   - attempt
   - begin
   - seek
+  - endeavour
+  - aspire to
 <geometry>:
   - circle
   - line
@@ -1476,6 +2794,8 @@
   - quadrangle
   - line segment
   - loop
+  - bezier
+  - tangent arc
 <person>:
   - person
   - stranger
@@ -1521,9 +2841,10 @@
 <everybody>:
   - somebody
   - nobody
+  - no one
   - everybody
+  - everyone
   - someone
-  - noone
 <theme-noun>:
   - feedback
   - metric

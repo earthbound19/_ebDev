@@ -10,7 +10,7 @@ import re
 try:
     import en
 except:
-    print("DOWNLOD NODECUBE")
+    print("DOWNLOAD NODECUBE")
     print("""wget https://www.nodebox.net/code/data/media/linguistics.zip
 unzip linguistics.zip""")
 
@@ -23,7 +23,9 @@ class bnfDictionary:
 
     def __init__(self, file):
         self.grammar = yaml.load(open(file,'r'))
-        self.poemtype = "<poem>"
+	# CHOOSE ONE OF THE two following lines of code; comment out the other:
+        # self.poemtype = "<poem>"
+        self.poemtype = "<mushy>"
 
     def generate(self, key, num):
         gram = self.grammar[key]
