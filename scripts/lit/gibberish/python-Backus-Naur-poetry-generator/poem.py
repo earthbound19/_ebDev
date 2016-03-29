@@ -24,8 +24,8 @@ class bnfDictionary:
     def __init__(self, file):
         self.grammar = yaml.load(open(file,'r'))
 	# CHOOSE ONE OF THE two following lines of code; comment out the other:
-        # self.poemtype = "<poem>"
-        self.poemtype = "<mushy>"
+        self.poemtype = "<poem>"
+        # self.poemtype = "<mushy>"
 
     def generate(self, key, num):
         gram = self.grammar[key]
