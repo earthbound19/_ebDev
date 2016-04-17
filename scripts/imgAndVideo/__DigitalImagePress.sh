@@ -51,5 +51,6 @@ echo "As instructed by the echo from the end of numberFilesByLabel.sh, examine t
 
 archiveMetadata.sh
 imgMetaDataTo7z.bat
-
-# Add metadata creation/insertion script here
+	# Add metadata creation/insertion script here
+	# IN DEVELOPMENT:
+# prepImageMetaData.sh
