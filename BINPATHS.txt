@@ -6,6 +6,7 @@ C:\_devtools\scripts\imgAndVideo
 C:\_devtools\scripts\imgAndVideo\imgGetSimilar
 C:\_devtools\scripts\imgAndVideo\EXIFdataBatch
 C:\_devtools\scripts\lit\gibberish\python-Backus-Naur-poetry-generator
+C:\_devtools\scripts\lit\gibberish
 C:\_devtools\bin\GibbGen\pyMarkovGibGen
 C:\_devtools\bin\GibbGen\GibbGenCPP\bin\1.0-functional
 C:\_devtools\bin\gnuCoreUtilsWin32\bin

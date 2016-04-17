@@ -1,8 +1,17 @@
+# REASON THIS VERSION OF THE SCRIPT IS SUSPENDED: Opted to provide a link to made-up postmodern art nonsense statements for images (at a dedicated webunnies page) instead of spamming the web with them. 04/15/2016 08:56:40 PM -RAH
+
 # IF NOT EXIST __metadataAdditions MKDIR __metadataAdditions
 
 # TO DO: make this adaptable for situations without label tags; e.g. no "abstraction" word in the file name--via switches?
 
 # NOTE: This will fail to create an __metadataAdditions subfolder in the root folder from which this script is run (if that would be expected), but in my workflow that should never be expected.
+
+# GIBBERISH OR OTHER GENERATED CAPTION insertion path option:
+# NOTE that the two below differ in giving a slash at the end.
+# Between the following double quotes, paste the Windows path to your caption source files:
+captionSearchPathOne=`cygpath -u "D:\Alex\gibberish\IAE_generatedGibberish\pyMarkovGibbGen\edited"`
+# TO DO: PENDING: Also (for another path):
+# captionSearchPathTwo=`cygpath -u "D:\Alex\gibberish\IAE_generatedGibberish\pyMarkovGibbGen\edited"`
 
 # Custom pre-prepared template metadata to combine with gibberish/caption source metadata; path and file name;
 # Between the following double quotes, paste the Windows path to your custom image metadata template file:
@@ -71,6 +80,14 @@ do
 				rm EXIFdataPrepTemp.txt temp2.txt
 				# cat ___ EXIFdataPrepTemp.txt
 				# INSERT THE DATA HERE
+				# Archive the used gibberish/caption data so it won't be reused:
+				echo \# formerly ${gibberishTextFilenamesArray[0]} \: > header.txt
+				cat header.txt ${gibberishTextFilenamesArray[0]} > catHeaderGibText.txt
+				rm header.txt
+				mv catHeaderGibText.txt "${gibberishTextFilenamesArray[0]}"
+				mv "${gibberishTextFilenamesArray[0]}" $captionSearchPathOne/used/$imageFileNameNoExt-caption.txt
+				# metaDataAdditionsTextFile
+# TO DO: prepend to the gibberish source text file a note about which file the EXIF data was inserted into.
 			else
 				echo no text file found in $captionSearchPathOne. Aborting script.
 				exit
