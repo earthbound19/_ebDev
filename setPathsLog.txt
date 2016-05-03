@@ -490,3 +490,45 @@ Found path: C:\_devtools\scripts\lit\gibberish
 Found path: C:\_devtools\scripts\lit\gibberish\python-Backus-Naur-poetry-generator 
 Found path: C:\Program Files (x86)\Filter Forge 4\Bin 
 Found path: C:\Program Files\AutoHotkey 
+Found path: C:\_devtools\bin 
+Found path: C:\_devtools\bin\AutoHotkey\Compiler 
+Found path: C:\_devtools\bin\FilterForgeBatchWrapper 
+Could not find path: C:\_devtools\bin\GibbGen\GibbGenCPP\bin\1.0-functional 
+Could not find path: C:\_devtools\bin\GibbGen\pyMarkovGibGen 
+Found path: C:\_devtools\bin\gnuCoreUtilsWin32\bin 
+Found path: C:\_devtools\bin\ImageMagick 
+Found path: C:\_devtools\bin\ImageMagick\modules\coders 
+Found path: C:\_devtools\bin\ImageMagick\modules\filters 
+Found path: C:\_devtools\scripts 
+Found path: C:\_devtools\scripts\fileNamesAndTimestamps 
+Found path: C:\_devtools\scripts\font 
+Found path: C:\_devtools\scripts\imgAndVideo 
+Found path: C:\_devtools\scripts\imgAndVideo\EXIFdataBatch 
+Could not find path: C:\_devtools\scripts\imgAndVideo\imgGetSimilar 
+Could not find path: C:\_devtools\scripts\imgGetSimilar 
+Found path: C:\_devtools\scripts\lit\gibberish 
+Found path: C:\_devtools\scripts\lit\gibberish\python-Backus-Naur-poetry-generator 
+Could not find path: C:\Program Files (x86)\Filter Forge 4\Bin 
+Found path: C:\Program Files\AutoHotkey 
+Could not find path: C:\Python31 
+Found path: C:\_devtools\bin 
+Found path: C:\_devtools\bin\AutoHotkey\Compiler 
+Found path: C:\_devtools\bin\FilterForgeBatchWrapper 
+Could not find path: C:\_devtools\bin\GibbGen\GibbGenCPP\bin\1.0-functional 
+Could not find path: C:\_devtools\bin\GibbGen\pyMarkovGibGen 
+Found path: C:\_devtools\bin\gnuCoreUtilsWin32\bin 
+Found path: C:\_devtools\bin\ImageMagick 
+Found path: C:\_devtools\bin\ImageMagick\modules\coders 
+Found path: C:\_devtools\bin\ImageMagick\modules\filters 
+Found path: C:\_devtools\scripts 
+Found path: C:\_devtools\scripts\fileNamesAndTimestamps 
+Found path: C:\_devtools\scripts\font 
+Found path: C:\_devtools\scripts\imgAndVideo 
+Found path: C:\_devtools\scripts\imgAndVideo\EXIFdataBatch 
+Could not find path: C:\_devtools\scripts\imgAndVideo\imgGetSimilar 
+Could not find path: C:\_devtools\scripts\imgGetSimilar 
+Found path: C:\_devtools\scripts\lit\gibberish 
+Found path: C:\_devtools\scripts\lit\gibberish\python-Backus-Naur-poetry-generator 
+Could not find path: C:\Program Files (x86)\Filter Forge 4\Bin 
+Found path: C:\Program Files\AutoHotkey 
+Could not find path: C:\Python31 

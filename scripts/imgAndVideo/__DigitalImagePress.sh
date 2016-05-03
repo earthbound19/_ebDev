@@ -1,11 +1,11 @@
-# USAGE: comment out steps unecessary for your current run of the image press (this script). Then run the script.
+# USAGE: comment out steps unecessary for your current run of the image press (this script). Then run the script. Also NOTE comments in ALL CAPS in this script.
 
 # FIRST, USE; PREFERRED: http://sourceforge.net/projects/file-folder-ren/?source=typ_redirect with MetamorphoseBadFileNameCharacterRemoval.cfg (and adjust the search/select folder as necessary), to remove unwanted characters from file names. NOTE: When it asks about creating a t_e_m_p folder, you may answer no (it only creates a folder maintaining the folder structure of the renamed files, which you may paste back into the root operating folder. Depending on circumstance, you may want to do that).
-		# DEPRECATED (formerly preferred):
-				# cleanup_bad_fileNames__RenameFiles2.3b.exe (*without* using the white spaces option) and file_renamer_install_flex73.exe respectively to remove all special characters and replace all spaces with underscores. NOTE: it freaks out unless you put a \ at the end of the path to scan. THEN, use fixIMGnames.sh, which fails on some or perhaps too many special characters repair :/ but that is mitigated by using the first mentioned tools. FAIL for that, but in development: cleanupGarbageFileNames.sh
-		# THE ABOVE accomplished with the next two lines:
-		# renameFiles.exe
-		# fixIMGnames.sh
+		# Deprecated (formerly preferred):
+						# cleanup_bad_fileNames__RenameFiles2.3b.exe (*without* using the white spaces option) and file_renamer_install_flex73.exe respectively to remove all special characters and replace all spaces with underscores. NOTE: it freaks out unless you put a \ at the end of the path to scan. THEN, use fixIMGnames.sh, which fails on some or perhaps too many special characters repair :/ but that is mitigated by using the first mentioned tools. FAIL for that, but in development: cleanupGarbageFileNames.sh
+				# THE ABOVE accomplished with the next two lines:
+				# renameFiles.exe
+				# fixIMGnames.sh
 
 # NOTE: metamorphose2 is not used because of a strange bug listing files to be renamed (it shows an entirely wrong target file name which is from anoter file name in the tree).
 # TO DO: Move the relevant instructions from bunnieselow, or all of them, into echo statements in the files to which they relate, for cases of using those files independent of this script.
@@ -18,7 +18,7 @@ echo "!============================================================"
 	do
 		case $yn in
 			Yes ) echo Dokee-okee! Working . . .; break;;
-			No ) echo Doh!; exit;;
+			No ) echo D\'oh!; exit;;
 		esac
 	done
 cmd /c "C:\Program Files (x86)\metamorphose\metamorphose.exe"
@@ -30,7 +30,7 @@ cmd /c "C:\Program Files (x86)\metamorphose\metamorphose.exe"
 	do
 		case $yn in
 			Yes ) echo Dokee-okee! Working . . .; break;;
-			No ) echo Doh!; exit;;
+			No ) echo D\'oh!; exit;;
 		esac
 	done
 
@@ -45,12 +45,11 @@ echo "As instructed by the echo from the end of numberFilesByLabel.sh, examine t
 	do
 		case $yn in
 			Yes ) echo Dokee-okee! Working . . .; break;;
-			No ) echo Doh!; exit;;
+			No ) echo D\'oh!; exit;;
 		esac
 	done
 
 archiveMetadata.sh
 imgMetaDataTo7z.bat
-	# Add metadata creation/insertion script here
-	# IN DEVELOPMENT:
-# prepImageMetaData.sh
+prepImageMetaData.sh
+imgTagAndDist.sh
