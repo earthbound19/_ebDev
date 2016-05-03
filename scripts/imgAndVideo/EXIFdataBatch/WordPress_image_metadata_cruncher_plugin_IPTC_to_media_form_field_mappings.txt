@@ -1,4 +1,0 @@
-IPTC:Title -> Title
-IPTC:Headline IPTC:Caption|EXIF:ImageDescription -> Alternate Text
-(none) -> Caption
-IPTC:Caption|EXIF:ImageDescription -> Description
