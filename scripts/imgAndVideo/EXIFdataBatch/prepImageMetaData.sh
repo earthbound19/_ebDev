@@ -22,6 +22,8 @@ find . -iname \*_FINALvar*.tif -o -iname \*_FINALVAR*.tiff -o -iname \*_FINALVAR
 # Because all those necessary searches can lead to duplicate listings, sort everything and trim duplicates:
 sort imagesMetadataPrepList.txt > temp1.txt
 uniq temp1.txt > temp2.txt
+	# Remove ./ from start of file li . . neh.
+	# sed i- 's/^\.\/\(.*\)/g' temp2.txt
 rm imagesMetadataPrepList.txt temp1.txt
 mv temp2.txt imagesMetadataPrepList.txt
 
@@ -82,5 +84,5 @@ do
 done
 
 # DEVELOPMENT HISTORY:
-# BEFORE NOW: MANY. MUCH. SO CODE. SO COMPUTER SCIENCE. SO WOW.
+# BEFORE NOW: SO MANY CODE. SO COMPUTER SCIENCE. SO WOW.
 # 2016-04-26 10:27 PM: regex title prep from filename. Add support for many image file types. One-handed programming in broken radius surgery recovery duress. -RAH
