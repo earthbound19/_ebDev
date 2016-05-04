@@ -1,0 +1,7 @@
+Title="9083271807 55e09829e5 t jpg Filter Forge library 4938 1 ffxml preset 2"
+Copyright="This work was created by and is owned by Richard Alexander Hall, all rights reserved."
+Artist="Richard Alexander Hall"
+Keywords="art, digital, abstract, contemporary"
+SubjectCode="01012000"
+Description="Do you want a hoity-toity postmodern robot to inform you what you (don't and would never) think about this art? Try: http://earthbound.io/gibberish-artist-statements"
+ImageHistory="Exported or copied from master file: ./_imageMetaDataCreationTests/_FINAL_9083271807_55e09829e5_t_jpg_FFlib_4938_1_ffxml_pre2.tif"
