@@ -30,11 +30,10 @@ for (( i=1; i<=$howMany; i++ ))
 do
 		# 103 wide for Fira Mono standard (not medium or bold) 16-pt.
 		# NOTES: 88 wide for 1280x720 pixels cygwin prompt with OCR A Std 14-point.
-	# cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c 88
-	# cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9{}[]~!@#$%^&*()_+-=<>' | head -c 88
+	# cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c $length
+	# cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9{}[]~!@#$%^&*()_+-=<>' | head -c $length
 	cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c $length
-	echo
-	# OPTION 3, adapted to generate secure passwords; uncomment if you prefer (and comment out the other) :
-	# cat /dev/urandom | tr -dc 'a-z0-9A-Z{}[]~!@#$%^&*()_+-=<>' | head -c 42
+	# OPTION 3, adapted to generate secure passwords; uncomment if you prefer (and comment out the other) ; NOTE that complexPassword.sh now des this:
+	# cat /dev/urandom | tr -dc 'a-z0-9A-Z{}[]~!@#$%^&*()_+-=<>' | head -c $length
 done
 

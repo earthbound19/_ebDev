@@ -1,7 +1,0 @@
-Title="Variation of resource custom noise 2015 12 07 01 37 ff polyGridMod"
-Copyright="This work was created by and is owned by Richard Alexander Hall, all rights reserved."
-Artist="Richard Alexander Hall"
-Keywords="art, digital, abstract, contemporary"
-SubjectCode="01012000"
-Description="Do you want a hoity-toity postmodern robot to inform you what you (don't and would never) think about this art? Try: http://earthbound.io/gibberish-artist-statements"
-ImageHistory="Exported or copied from master file: ./_imageMetaDataCreationTests/_FINALvar_resource_custom_noise_2015_12_07__01_37_ff_polyGridMod.tif"
