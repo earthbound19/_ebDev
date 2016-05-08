@@ -53,3 +53,5 @@ archiveMetadata.sh
 imgMetaDataTo7z.bat
 prepImageMetaData.sh
 imgTagAndDist.sh
+
+echo __DigitalImagePress.sh run COMPLETED.

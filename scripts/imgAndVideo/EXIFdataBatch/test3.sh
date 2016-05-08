@@ -7,8 +7,11 @@
 
 
 # TO DO; COPY THIS REF. URL TO GNU DOC.: http://stackoverflow.com/a/12675993
-filename=_FINAL_9083271807_55e09829e5_t_jpg_FF.lib_4938_1_ffxml_pre2.tiff
-echo ist $filename
-# var=`echo "$filename" | grep -o "[0-9.]\+"`
-fileExt=`echo "$filename" | sed 's/.*\(\..\{1,4\}\)\$/\1/g'`
-echo $fileExt
+# filename=_FINAL_9083271807_55e09829e5_t_jpg_FF.lib_4938_1_ffxml_pre2.tiff
+# echo ist $filename
+# fileExt=`echo "$filename" | sed 's/.*\(\..\{1,4\}\)\$/\1/g'`
+# echo $fileExt
+
+echo was > test.txt
+foo=$( < floofy_floo.txt )
+sed "s/was/$foo/g" test.txt
