@@ -44,7 +44,6 @@ do
 		if [ -a $metaDataAdditionsTextFile ]
 		then
 			# DO NOT OVERWRITE THE EXISTING FILE
-			# der=duh
 			echo =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
 			echo Would-be newly created metadata additions text file already exists \($metaDataAdditionsTextFile\). Will not overwrite.
 		else
@@ -64,15 +63,16 @@ do
 					# ALSO WORKS on that last line: ~   [[:space:]]    instead of    \s
 				sed -i 's/^[vV][aA][rR] /Variation of /g' temp2.txt
 					# Thanks to: http://stackoverflow.com/a/10771857 :
-			imagePreparedTitle=$(<temp2.txt)
-			echo Title=\"$imagePreparedTitle\" > temp.txt
+			imagePreparedTitle=$( < temp2.txt)
+			echo \-Title\=\"$imagePreparedTitle\" > temp.txt
 			# Create stub metadata file using (modified) filename for title and metadata template:
 			cat temp.txt $metaDataTemplate > $metaDataAdditionsTextFile
 			rm temp.txt temp2.txt
 			# So the tag to be added doesn't get munged onto the same line as the last tag:
 			printf "\n" >> $metaDataAdditionsTextFile
-			echo ImageHistory=\"Exported or copied from master file: $element\" >> $metaDataAdditionsTextFile
-			# To open the metadata prep file and corresponding image file in the default programs, to make any necessary metadata prep. changes:
+# TO DO? Add this snarf? : https://iptc.org/standards/newscodes/groups/
+			echo \-ImageHistory\=\"Exported or copied from master file\: $element\" >> $metaDataAdditionsTextFile
+			# Open the metadata prep file and corresponding image file in the default programs, to make any necessary metadata prep. changes:
 			echo =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
 			read -n 1 -p "After you press any key, the metadata text file $metaDataAdditionsTextFile and corresponding image \"$element\" will open. There will be a short pause before it opens. Edit and save the opened prep text file, then close it and the image. Another prompt (if any) will appear here."
 			cygstart $element
@@ -86,3 +86,4 @@ done
 # DEVELOPMENT HISTORY:
 # BEFORE NOW: SO MANY CODE. SO COMPUTER SCIENCE. SO WOW.
 # 2016-04-26 10:27 PM: regex title prep from filename. Add support for many image file types. One-handed programming in broken radius surgery recovery duress. -RAH
+# 05/09/2016 02:39:48 AM Tweaks in tandem with imgTafAndDist.sh dev/debugging. -RAH

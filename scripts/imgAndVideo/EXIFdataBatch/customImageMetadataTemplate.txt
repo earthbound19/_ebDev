@@ -1,5 +1,7 @@
-Copyright="Created and owned by Richard Alexander Hall. http://earthbound.io/about"
-Artist="Richard Alexander Hall"
-Keywords="art, digital, abstract, contemporary"
-SubjectCode="01012000"
-Description="A hoity-toity postmodern robot talks about this at http://earthbound.io/gibberish-artist-statements *** This is syndicated from my home page. You may find the original, print and use options at http://earthbound.io/q/?
+-Description="A hoity-toity postmodern robot talks about this at http://earthbound.io/gibberish-artist-statements. ~ This is syndicated from my home page. You may find the original, print and use options at http://earthbound.io/q/?
+-Keywords="art, digital, abstract, contemporary"
+-Artist="Richard Alexander Hall"
+-Copyright="Created and owned by Richard Alexander Hall. http://earthbound.io/about"
+-Creator="Created and owned by Richard Alexander Hall. http://earthbound.io/about"
+-UsageTerms="I'm tickled that you want to use this. Please contact me at the URL in the Copyright field."
+-SubjectCode="01012000"

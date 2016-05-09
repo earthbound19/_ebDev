@@ -17,8 +17,8 @@ echo "!============================================================"
 	select yn in "Yes" "No"
 	do
 		case $yn in
-			Yes ) echo Dokee-okee! Working . . .; break;;
-			No ) echo D\'oh!; exit;;
+			Yes ) echo Dokee-okee! Working . . .; break;
+			No ) echo D\'oh!; exit;
 		esac
 	done
 cmd /c "C:\Program Files (x86)\metamorphose\metamorphose.exe"
@@ -29,8 +29,8 @@ cmd /c "C:\Program Files (x86)\metamorphose\metamorphose.exe"
 	select yn in "Yes" "No"
 	do
 		case $yn in
-			Yes ) echo Dokee-okee! Working . . .; break;;
-			No ) echo D\'oh!; exit;;
+			Yes ) echo Dokee-okee! Working . . .; break;
+			No ) echo D\'oh!; exit;
 		esac
 	done
 
@@ -44,8 +44,8 @@ echo "As instructed by the echo from the end of numberFilesByLabel.sh, examine t
 	select yn in "Yes" "No"
 	do
 		case $yn in
-			Yes ) echo Dokee-okee! Working . . .; break;;
-			No ) echo D\'oh!; exit;;
+			Yes ) echo Dokee-okee! Working . . .; break;
+			No ) echo D\'oh!; exit;
 		esac
 	done
 
