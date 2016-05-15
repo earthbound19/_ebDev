@@ -1,4 +1,4 @@
-# DESCRIPTION: Takes an input text paramater and outputs a ~_anagramized.txt text file where every letter in every word is scrambled. The result is readable to (about half of?) humans, but would take reprogramming for web keyword scanners to read.
+# DESCRIPTION: Takes an input text paramater and outputs a ~_anagramized.txt text file where every vowel may be scrambled with an adjacent character. The result is readable to (about half of?) humans, but would take extra programming or resources for web keyword scanners (SPIES) to make good of.
 
 # USAGE: run the script with one paramaeter, being the name of a text file in the same directory, to scrable. Results will appear in ~_anagramized.txt.
 
