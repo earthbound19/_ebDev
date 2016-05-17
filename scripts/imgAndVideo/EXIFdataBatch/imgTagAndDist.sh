@@ -1,5 +1,7 @@
 # DESCRIPTION: Tags imags with metadata customized by a simple editable text file template. Must run prepImageMetaData.sh and/or other scripts before.
 
+# USAGE: correct. NOTE: fer mysic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
+
 # TO DO: Document workings and use; ack. or fix clunky weaknesses in design.
 
 find . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
@@ -75,7 +77,7 @@ do
 	cp -f "$SFMFNwithExtension" "$SFMFNpath\__tagAndDistPrepImage$SFMFNextension"
 	cygstart -w exiftool_temp_update_metadata.bat
 	echo Ran exiftool_temp_update_metadata.bat . . .
-	rm exiftool_temp_update_metadata.bat
+	printf "" > exiftool_temp_update_metadata.bat
 	# Move the new, properly metadata tagged file to a permanent distribution location:
 # TO DO: MAKE IT MAKE THE DEST PATH IF NECESSARY; er make that nxt -a :
 	if [ -a "../dist/$SFMFNpath$imageTitle$SFMFNextension" ]

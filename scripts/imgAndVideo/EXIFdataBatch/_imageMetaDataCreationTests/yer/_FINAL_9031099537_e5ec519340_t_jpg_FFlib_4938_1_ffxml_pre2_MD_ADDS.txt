@@ -1,5 +1,5 @@
 -Title="9031099537 e5ec519340 t jpg Filter Forge library 4938 1 ffxml preset 2"
--Description="A hoity-toity postmodern robot talks about this at http://earthbound.io/gibberish-artist-statements. ~ This is syndicated from my home page. You may find the original, print and use options at http://earthbound.io/q/?9031099537%%20e5ec519340%%20t%%20jpg%%20Filter%%20Forge%%20library%%204938%%201%%20ffxml%%20preset%%202"
+-Caption="A hoity-toity postmodern robot talks about this at http://earthbound.io/gibberish-artist-statements. ~ This is syndicated from my home page. You may find the original, print and use options at http://earthbound.io/q/?9031099537%%20e5ec519340%%20t%%20jpg%%20Filter%%20Forge%%20library%%204938%%201%%20ffxml%%20preset%%202"
 -Keywords="art, digital, abstract, contemporary"
 -Artist="Richard Alexander Hall"
 -Copyright="Created and owned by Richard Alexander Hall. http://earthbound.io/about"
