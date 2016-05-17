@@ -1,0 +1,40 @@
+- == flickr no see
+^ == irfanview no see
+x == WP image metadata cruncher plugin no see
+! == use this field
+? = maybe?
+
+Preference: don't duplicate data types across different tag types (EXIF/IPTC) unless necessary. Argh. Maybe let's pretend they are for tupid image metadata uses of tupid web sites :(
+
+UPDATE: after the toil of finding the following EXIF/IPTC equivalents, I find the following URL, where exiftool implements an industry consortium standard for synchronizing these! : http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/MWG.html
+
+"The table below lists special Composite tags which are used to access other tags based on the MWG 2.0 recommendations. These tags are only accessible when explicitly loaded, but this is done automatically by the exiftool application if MWG is specified as a group for any tag on the command line, or manually with the -use MWG option."
+
+MWG Regions Tags could probably be used to automatically crop an image for myriad target devices/media.
+
+TITLE
+	IPTC:Headline -- flickr image title
+^-	EXIF:DocumentName
+x	IPTC:Document Title?
+!	IPTC:ObjectName?
+^	exiftool -Title= -- where does this go?
+DESCRIPTION
+!	IPTC:Caption-Abstract
+?!	EXIF:ImageDescription -- used by flickr for img description/caption/whatever
+COPYRIGHT, etc.
+?!	EXIF:Copyright = ja
+!	IPTC:CopyrightNotice?
+!	IPTC:ByLine = Name of creator of work
+!	IPTC:Source = original copyright holder
+!	IPTC:Credit = place distributed from; how to attribute credit.
+?? HOW TO USE IPTC:ContactInfo->Website?
+USAGE TERMS
+??	IPTC:Rights Usage Terms
+ARTIST
+!	EXIF:Artist
+IMAGE HISTORY/ORIGIN
+?!	EXIF:ImageHistory = my comment about master file exported from.
+!	IPTC:DocumentHistory "
+SEARCH TERMS/KEYWORDS
+!	IPTC:Keywords = ja (like tags etc.)
+	EXIF:UserComment?

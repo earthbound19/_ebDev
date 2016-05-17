@@ -1,5 +1,5 @@
 -Title="2015 04 27 10 22 33 milkdrop2 Filter Forge library 12078 1 preset 2"
--Description="A hoity-toity postmodern robot talks about this at http://earthbound.io/gibberish-artist-statements. ~ This is syndicated from my home page. You may find the original, print and use options at http://earthbound.io/q/?2015%%2004%%2027%%2010%%2022%%2033%%20milkdrop2%%20Filter%%20Forge%%20library%%2012078%%201%%20preset%%202"
+-Caption="A hoity-toity postmodern robot talks about this at http://earthbound.io/gibberish-artist-statements. ~ This is syndicated from my home page. You may find the original, print and use options at http://earthbound.io/q/?2015%%2004%%2027%%2010%%2022%%2033%%20milkdrop2%%20Filter%%20Forge%%20library%%2012078%%201%%20preset%%202"
 -Keywords="art, digital, abstract, contemporary"
 -Artist="Richard Alexander Hall"
 -Copyright="Created and owned by Richard Alexander Hall. http://earthbound.io/about"
