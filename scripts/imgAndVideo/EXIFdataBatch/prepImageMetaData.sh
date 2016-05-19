@@ -64,14 +64,15 @@ do
 				sed -i 's/^[vV][aA][rR] /Variation of /g' temp2.txt
 					# Thanks to: http://stackoverflow.com/a/10771857 :
 			imagePreparedTitle=$( < temp2.txt)
-			echo \-Title\=\"$imagePreparedTitle\" > temp.txt
+				# Alas, there is no MWG mapping of ObjectName/Title; this is an IPTC only thing; which is another reason the final distribution image will be renamed to the image title:
+			echo \-IPTC:ObjectName\=\"$imagePreparedTitle\" > temp.txt
 			# Create stub metadata file using (modified) filename for title and metadata template:
 			cat temp.txt $metaDataTemplate > $metaDataAdditionsTextFile
 			rm temp.txt temp2.txt
 			# So the tag to be added doesn't get munged onto the same line as the last tag:
 			printf "\n" >> $metaDataAdditionsTextFile
 # TO DO? Add this snarf? : https://iptc.org/standards/newscodes/groups/
-			echo \-ImageHistory\=\"Exported or copied from master file\: $element\" >> $metaDataAdditionsTextFile
+			echo \-EXIF:ImageHistory\=\"Exported or copied from master file\: $element\" >> $metaDataAdditionsTextFile
 			# Open the metadata prep file and corresponding image file in the default programs, to make any necessary metadata prep. changes:
 			echo =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
 			read -n 1 -p "After you press any key, the metadata text file $metaDataAdditionsTextFile and corresponding image \"$element\" will open. There will be a short pause before it opens. Edit and save the opened prep text file, then close it and the image. Another prompt (if any) will appear here."
