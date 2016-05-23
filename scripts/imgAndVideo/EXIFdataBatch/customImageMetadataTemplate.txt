@@ -1,7 +1,4 @@
--Description="A hoity-toity postmodern robot talks about this at http://earthbound.io/gibberish-artist-statements. ~ This is syndicated from my home page. You may find the original, print and use options at http://earthbound.io/q/?
--Keywords="art, digital, abstract, contemporary"
--Artist="Richard Alexander Hall"
--Copyright="Created and owned by Richard Alexander Hall. http://earthbound.io/about"
--Creator="Created and owned by Richard Alexander Hall. http://earthbound.io/about"
--UsageTerms="I'm tickled that you want to use this. Please contact me at the URL in the Copyright field."
--SubjectCode="01012000"
+-MWG:Description="A hoity-toity robot talks about this at j.mp/art-gib ~ Syndicated from my home page. Original, print and usage at http://earthbound.io/q/?"
+-MWG:Keywords="art, digital, abstract, contemporary"
+-MWG:Copyright="Richard Alexander Hall http://earthbound.io/contact"
+-MWG:Creator="Richard Alexander Hall"
