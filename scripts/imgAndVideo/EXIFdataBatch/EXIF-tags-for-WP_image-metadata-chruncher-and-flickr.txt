@@ -2,7 +2,9 @@
 ^ == irfanview no see
 x == WP image metadata cruncher plugin no see
 ! == use this field
-? = maybe?
+!WP == use this field for mapping in Wordpress Image Metadata Cruncher plugin
+? == maybe?
+_ == don't bother using
 
 Preference: don't duplicate data types across different tag types (EXIF/IPTC) unless necessary. Argh. Maybe let's pretend they are for tupid image metadata uses of tupid web sites :(
 
@@ -13,28 +15,48 @@ UPDATE: after the toil of finding the following EXIF/IPTC equivalents, I find th
 MWG Regions Tags could probably be used to automatically crop an image for myriad target devices/media.
 
 TITLE
-	IPTC:Headline -- flickr image title
+!WP,!--managed by prepImageMetaData.sh:	IPTC:ObjectName
+_	IPTC:Headline -- flickr image title (isn't ObjectName also used, if present?
 ^-	EXIF:DocumentName
-x	IPTC:Document Title?
-!	IPTC:ObjectName?
+x	IPTC:Document Title? ~:ObjectName?
 ^	exiftool -Title= -- where does this go?
 DESCRIPTION
-!	IPTC:Caption-Abstract
-?!	EXIF:ImageDescription -- used by flickr for img description/caption/whatever
+!	MWG:Description
+!WP,_	IPTC:Caption-Abstract
+_	EXIF:ImageDescription -- used by flickr for img description/caption/whatever
+SEARCH TERMS/KEYWORDS
+!	MWG:Keywords
+_	IPTC:Keywords = ja (like tags etc.)
+_	EXIF:UserComment?
+ARTIST
+!	MWG:Artist
+_	EXIF:Artist
 COPYRIGHT, etc.
-?!	EXIF:Copyright = ja
-!	IPTC:CopyrightNotice?
-!	IPTC:ByLine = Name of creator of work
-!	IPTC:Source = original copyright holder
-!	IPTC:Credit = place distributed from; how to attribute credit.
-?? HOW TO USE IPTC:ContactInfo->Website?
+!	MWG:Copyright
+_	EXIF:Copyright = ja
+_	IPTC:CopyrightNotice?
+CREATOR
+!	MWG:Creator = who made the work
+_	IPTC:ByLine = Name of creator of work
 USAGE TERMS
 ??	IPTC:Rights Usage Terms
-ARTIST
-!	EXIF:Artist
-IMAGE HISTORY/ORIGIN
-?!	EXIF:ImageHistory = my comment about master file exported from.
-!	IPTC:DocumentHistory "
-SEARCH TERMS/KEYWORDS
-!	IPTC:Keywords = ja (like tags etc.)
-	EXIF:UserComment?
+SOURCE / DISTRIBUTED FROM:
+_--putting source URL/domain in "Description:"	IPTC:Source = original copyright holder
+_--putting source URL/domain in "Description:"	IPTC:Credit = place distributed from; how to attribute credit.
+USAGE TERMS
+^x?	IPTC:UsageTerms -- creates IPTC data that doesn't show in any presented field in irfanview IPTC.
+?? HOW TO USE IPTC:ContactInfo->Website?
+IMAGE HISTORY / FILE ORIGIN
+!--managed by prepImageMetaData.sh:	EXIF:ImageHistory = my comment about master file exported from.
+_	IPTC:DocumentHistory
+
+UNUSED UNTIL I SORT OUT THE BEST WAY; which may proceed from MWG recommendations:
+-SubjectCode="01012000"
+
+----
+IPTC doc title/image name limit: 64 chars e.g.:
+2015 04 27 10 22 33 milkdrop2 Filter Forge library 12078 1 prese
+
+IPTC caption / description limit: 310 chars e.g.:
+A hoity-toity postmodern robot talks about this at http://earthbound.io/gibberish-artist-statements. ~ This is syndicated from my home page. You may find the original, print and use options at http://earthbound.io/q/?2015%2004%2027%2010%2022%2033%20milkdrop2%20Filter%20Forge%20library%2012078%201%20preset%202
+" EXIF: 255 chars
