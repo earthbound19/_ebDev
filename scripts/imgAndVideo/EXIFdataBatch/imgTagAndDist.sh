@@ -14,21 +14,31 @@
 # 	wget -O shortened_URL.txt "http://s.earthbound.io/api/v2/action/shorten?key=nerpNotForGithubToSee&url=https://google.com&is_secret=false&response_type=plain_text"
 #	NOTE that when logged in, it won't show the new link unless you reload the page.
 
-
 find . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
 mapfile -t images_MD_ADDS_list < images_MD_ADDS_list.txt
 for element in "${images_MD_ADDS_list[@]}"
 do
 	# Retrieve image title from ~MD_ADDS.txt for use in adding search engine query for original image source--adding that to the description tag:
 	imageTitle=`sed -n 's/^-IPTC:ObjectName="\(.*\)"$/\1/p' $element`
+	wgetArgPart="?search=1&query=$imageTitle"
 	# re: https://gimi.name/snippets/urlencode-and-urldecode-for-bash-scripting-using-sed/ :
 			# OR? : https://gist.github.com/cdown/1163649 :
-	echo "$imageTitle" | sed -f /cygdrive/c/_devtools/scripts/urlencode.sed > _toward_oy.txt
+	echo wgetArgPart\:
+	echo $wgetArgPart
+	oy=`echo "$wgetArgPart" | sed -f /cygdrive/c/_devtools/scripts/urlencode.sed`
+	echo oy\:
+	echo $oy
+	# oy="http://earthbound.io/q/search.php$oy"
+	# OH. MY. HECK. I probabunniesly have to escape some characters that escape that URL. 05/23/2016 06:46:25 AM -RAH
+	# echo wget -O oy.txt \"$oy\"
+exit
 	# Insert that image title with a search query URL into the description tag; roundabout means via invoking script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:
 	# BUT WAIT! START OY TEH CLUGY ===================================
 					# BUG FIXED--see next comment; NOTE the following will cause mashed redundant URLs if this script is run twice or more; you must delete the working ~MD_ADDS.txt and run prepImageMetaData.sh before this script: --. 2016-05-07 11:20 PM -RAH
 			# CLEAR the urlencoded text after .*earthbound.io/q (if there is such text), lest redundant encodings append thereto on subsequent runs of this script:
 			sed -i 's/\(.*You may find the original, print and use options at http:\/\/earthbound.io\/q\/?\).*/\1/g' $element
+			# echo sed -i 's/\(.*You may find the original, print and use options at http:\/\/earthbound.io\/q\/?\).*/\1/g' $element
+# exit
 			# OY, that was a rather dodgy bug to sort out :/ 2016-05-07 11:55 PM -RAH
 	# END OY TEH CLUGY ===================================
 	sed -n 's/\(.*\)\(print and use options at.*\)/\2/p' $element > flerf.txt
@@ -41,7 +51,7 @@ do
 	# maybe relvnt thar? : http://stackoverflow.com/a/9488318
 	descriptionAddendum=$( < floofy_floo.txt)
 	sed -i "s/\(.*You may find the original, \).*/\1$descriptionAddendum\"/g" $element
-	rm flerf.txt oy.txt zorg.txt floofy_floo.txt
+	# rm flerf.txt oy.txt zorg.txt floofy_floo.txt
 					# DEPRECATED APPROACH; in favor of specifying argument switches (e.g. + or - or -Tag+=Word) in customImageMetadataTemplate.txt itself:
 					# For every file listed in images_MD_ADDS_list.txt, precede every line with a dash, to make it an exiftool parameter:
 					# sed 's/\(.*\)$/-\1/g' $element > fersh.txt
