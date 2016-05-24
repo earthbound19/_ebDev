@@ -1,4 +1,4 @@
--MWG:Description="A hoity-toity robot talks about this at j.mp/art-gib ~ Syndicated from my home page. Original, print and usage at http://earthbound.io/q/?"
+-MWG:Description="A hoity-toity robot talks about this at http://s.earthbound.io/artgib ~ Syndicated from, original, print and usage at "
 -MWG:Keywords="art, digital, abstract, contemporary"
 -MWG:Copyright="Richard Alexander Hall http://earthbound.io/contact"
 -MWG:Creator="Richard Alexander Hall"

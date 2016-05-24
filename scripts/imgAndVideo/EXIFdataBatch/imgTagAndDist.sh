@@ -3,6 +3,7 @@
 # USAGE: correct. NOTE: fer mysic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
 
 # TO DO:
+# DOUBLE CHECK that the s.earthbound.io~ link is formatted correctly and works in result.
 # - Document workings and use; ack. or fix clunky weaknesses in design.
 # - Implement keyword heirarchies re: http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/MWG.html
 # * DONE: Implement self-hosted polr url shortening for looong titles/self-hosted title search URLS. e.g. like http://polr.me/w9g or http://polr.me/11q3 ; dev code that works or doesn't depending on authentication; the following are for polr_cli_polrAcct.py : C:\Python27\Lib\site-packages\polr_cli\polr_cli.py --shorten http://earthbound\.io/q
@@ -11,7 +12,7 @@
 # 	Command that does NOT work at this writing at my self-hosted Polr install:
 # 	Python polr_cli_s_eb.py --lookup 0
 # 	API call URL that DOES work at my self-hosted Polr install--and saves the result URL to a plain-text URL! :
-# 	wget -O shortened_URL.txt "http://s.earthbound.io/api/v2/action/shorten?key=nerpNotForGithubToSee&url=https://google.com&is_secret=false&response_type=plain_text"
+# 	wget -O shortened_URL.txt "http://s.earthbound.io/api/v2/action/shorten?key=50qq0n183q00p704osp1q1rrr48225&url=https://google.com&is_secret=false&response_type=plain_text"
 #	NOTE that when logged in, it won't show the new link unless you reload the page.
 
 find . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
@@ -20,23 +21,18 @@ for element in "${images_MD_ADDS_list[@]}"
 do
 	# Retrieve image title from ~MD_ADDS.txt for use in adding search engine query for original image source--adding that to the description tag:
 	imageTitle=`sed -n 's/^-IPTC:ObjectName="\(.*\)"$/\1/p' $element`
-	wgetArgPart="?search=1&query=$imageTitle"
 	# re: https://gimi.name/snippets/urlencode-and-urldecode-for-bash-scripting-using-sed/ :
 			# OR? : https://gist.github.com/cdown/1163649 :
-	echo wgetArgPart\:
-	echo $wgetArgPart
-	oy=`echo "$wgetArgPart" | sed -f /cygdrive/c/_devtools/scripts/urlencode.sed`
-	echo oy\:
-	echo $oy
-	# oy="http://earthbound.io/q/search.php$oy"
-	# OH. MY. HECK. I probabunniesly have to escape some characters that escape that URL. 05/23/2016 06:46:25 AM -RAH
-	# echo wget -O oy.txt \"$oy\"
-exit
+	oy="http://earthbound.io/q/search.php?search=1&query=$imageTitle"
+	oy=`echo "$oy" | sed -f /cygdrive/c/_devtools/scripts/urlencode.sed`
+		# target format: http://s.earthbound.io/api/v2/action/shorten?key=50dd0a183d00c704bfc1d1eee48225&url=https://google.com&is_secret=false&response_type=plain_text
+	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=50qq0n183q00p704osp1q1rrr48225&is_secret=false&response_type=plain_text&url=$oy"
+	wget -O oy.txt $wgetArg
 	# Insert that image title with a search query URL into the description tag; roundabout means via invoking script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:
 	# BUT WAIT! START OY TEH CLUGY ===================================
 					# BUG FIXED--see next comment; NOTE the following will cause mashed redundant URLs if this script is run twice or more; you must delete the working ~MD_ADDS.txt and run prepImageMetaData.sh before this script: --. 2016-05-07 11:20 PM -RAH
 			# CLEAR the urlencoded text after .*earthbound.io/q (if there is such text), lest redundant encodings append thereto on subsequent runs of this script:
-			sed -i 's/\(.*You may find the original, print and use options at http:\/\/earthbound.io\/q\/?\).*/\1/g' $element
+			sed -i 's/\(.*print and usage at \).*/\1/g' $element
 			# echo sed -i 's/\(.*You may find the original, print and use options at http:\/\/earthbound.io\/q\/?\).*/\1/g' $element
 # exit
 			# OY, that was a rather dodgy bug to sort out :/ 2016-05-07 11:55 PM -RAH
@@ -50,8 +46,12 @@ exit
 	sed -i 's/%/%%/g' floofy_floo.txt
 	# maybe relvnt thar? : http://stackoverflow.com/a/9488318
 	descriptionAddendum=$( < floofy_floo.txt)
-	sed -i "s/\(.*You may find the original, \).*/\1$descriptionAddendum\"/g" $element
-	# rm flerf.txt oy.txt zorg.txt floofy_floo.txt
+	echo desc. add.\:
+	echo $descriptionAddendum
+	echo elem.\:
+	echo $element
+	sed -i "s/\(.* print and usage at \).*/\1$descriptionAddendum\"/g" $element
+	rm flerf.txt oy.txt zorg.txt floofy_floo.txt
 					# DEPRECATED APPROACH; in favor of specifying argument switches (e.g. + or - or -Tag+=Word) in customImageMetadataTemplate.txt itself:
 					# For every file listed in images_MD_ADDS_list.txt, precede every line with a dash, to make it an exiftool parameter:
 					# sed 's/\(.*\)$/-\1/g' $element > fersh.txt
