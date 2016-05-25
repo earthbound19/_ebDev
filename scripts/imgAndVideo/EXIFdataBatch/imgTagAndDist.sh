@@ -11,8 +11,8 @@
 # 	Python polr_cli.py --lookup w9g
 # 	Command that does NOT work at this writing at my self-hosted Polr install:
 # 	Python polr_cli_s_eb.py --lookup 0
-# 	API call URL that DOES work at my self-hosted Polr install--and saves the result URL to a plain-text URL! :
-# 	wget -O shortened_URL.txt "http://s.earthbound.io/api/v2/action/shorten?key=50qq0n183q00p704osp1q1rrr48225&url=https://google.com&is_secret=false&response_type=plain_text"
+# 	API call URL that DOES work at my self-hosted Polr install--and saves the result URL to a plain-text URL! (except that that key is now retired ;) :
+# 	wget -O shortened_URL.txt "http://s.earthbound.io/api/v2/action/shorten?key=3108e9a45e9f6edcf9eeaa1ca9712d&url=https://google.com&is_secret=false&response_type=plain_text"
 #	NOTE that when logged in, it won't show the new link unless you reload the page.
 
 find . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
@@ -25,7 +25,7 @@ do
 			# OR? : https://gist.github.com/cdown/1163649 :
 	oy="http://earthbound.io/q/search.php?search=1&query=$imageTitle"
 	oy=`echo "$oy" | sed -f /cygdrive/c/_devtools/scripts/urlencode.sed`
-	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=50qq0n183q00p704osp1q1rrr48225&is_secret=false&response_type=plain_text&url=$oy"
+	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=3108e9a45e9f6edcf9eeaa1ca9712d&is_secret=false&response_type=plain_text&url=$oy"
 	wget -O oy.txt $wgetArg
 	# Insert that image title with a search query URL into the description tag; roundabout means via invoking script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:
 	# BUT WAIT! START OY TEH CLUGY ===================================
