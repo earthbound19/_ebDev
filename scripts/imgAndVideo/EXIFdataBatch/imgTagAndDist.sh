@@ -25,7 +25,6 @@ do
 			# OR? : https://gist.github.com/cdown/1163649 :
 	oy="http://earthbound.io/q/search.php?search=1&query=$imageTitle"
 	oy=`echo "$oy" | sed -f /cygdrive/c/_devtools/scripts/urlencode.sed`
-		# target format: http://s.earthbound.io/api/v2/action/shorten?key=50dd0a183d00c704bfc1d1eee48225&url=https://google.com&is_secret=false&response_type=plain_text
 	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=50qq0n183q00p704osp1q1rrr48225&is_secret=false&response_type=plain_text&url=$oy"
 	wget -O oy.txt $wgetArg
 	# Insert that image title with a search query URL into the description tag; roundabout means via invoking script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:
