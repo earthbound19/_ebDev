@@ -1,6 +1,7 @@
 # DESCRIPTION: Tags imags with metadata customized by a simple editable text file template. Must run prepImageMetaData.sh and/or other scripts before.
 
-# USAGE: correct. NOTE: fer mysic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
+# USAGE: correct. (MEAGER) NOTES: This expects all images it works upon to be .tif images, and won't work with anything else. Maybe I'll change it to also do non-standard tags in .png files, and do other source formats also.
+# NOTE: fer mysic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
 
 # TO DO:
 # DOUBLE CHECK that the s.earthbound.io~ link is formatted correctly and works in result.
@@ -15,6 +16,21 @@
 # 	wget -O shortened_URL.txt "http://s.earthbound.io/api/v2/action/shorten?key=3108e9a45e9f6edcf9eeaa1ca9712d&url=https://google.com&is_secret=false&response_type=plain_text"
 #	NOTE that when logged in, it won't show the new link unless you reload the page.
 
+
+# SCRIPT WARNING ==========================================
+echo "imgTagAndDist.sh: this script will erase all metadata from the image files in the entire directory tree from which this is run. If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal."
+	echo "!============================================================"
+	echo "DO YOU WISH TO CONTINUE running this script?"
+	select yn in "Yes" "No"
+	do
+		case $yn in
+			Yes ) echo Ok! Working . . .; break;
+			No ) echo D\'oh!; exit;
+		esac
+	done
+# END SCRIPT WARNING =======================================
+
+
 find . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
 mapfile -t images_MD_ADDS_list < images_MD_ADDS_list.txt
 for element in "${images_MD_ADDS_list[@]}"
@@ -25,7 +41,7 @@ do
 			# OR? : https://gist.github.com/cdown/1163649 :
 	oy="http://earthbound.io/q/search.php?search=1&query=$imageTitle"
 	oy=`echo "$oy" | sed -f /cygdrive/c/_devtools/scripts/urlencode.sed`
-	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=3108e9a45e9f6edcf9eeaa1ca9712d&is_secret=false&response_type=plain_text&url=$oy"
+	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=4ffdbbc5091420d5b0448ce42273c6&is_secret=false&response_type=plain_text&url=$oy"
 	wget -O oy.txt $wgetArg
 	# Insert that image title with a search query URL into the description tag; roundabout means via invoking script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:
 	# BUT WAIT! START OY TEH CLUGY ===================================
@@ -70,7 +86,7 @@ do
 						# echo that plus extension is $SFMFNnoExtension$SFMFNextension
 					# echo ====
 	# If SFMFNextension is .tif, strip all EXIF data by custom command upon inserting custom metadata; otherwise use a more general exif data strip command:
-	if [ $SFMFNextension == ".tif" ]
+	if [ $SFMFNextension == ".tif" ] || [ $SFMFNextension == ".png" ] || [ $SFMFNextension == ".psd" ]
 	then
 		# echo is tif.
 		echo exiftool -CommonIFD0= -adobe:all= -xmp:all= -photoshop:all= -iptc:all= -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension > exiftool_temp_update_metadata.bat

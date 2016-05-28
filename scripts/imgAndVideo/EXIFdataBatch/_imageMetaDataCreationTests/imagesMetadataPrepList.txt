@@ -1,3 +1,7 @@
+./art_syndication_tests/_FINAL_resource_sheep_247_7688_1136.tif
+./art_syndication_tests/_FINAL_resource_winamp_2015_09_19_12_38_26_34.tif
+./art_syndication_tests/_FINAL_resource_winamp_2015_10_08_20_42_23_55.tif
+./art_syndication_tests/_FINAL_resource_winamp_2015_11_13_10_23_15_39.tif
 ./yarp/_FINAL_2015_04_27_10_22_33_milkdrop2_FF12078_1_pre2.tif
 ./yarp/_FINALVAR_9608394037_8bdb06c0f5_t_jpg_FFlib_939_1_ffxml_pre2.tif
 ./yer/_FINAL_9031099537_e5ec519340_t_jpg_FFlib_4938_1_ffxml_pre2.tif
