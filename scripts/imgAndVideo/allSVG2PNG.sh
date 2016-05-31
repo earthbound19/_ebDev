@@ -2,7 +2,7 @@
 
 # USAGE: invoke this script with one parameter, being the number of pixels you wish the longest side of the converted .svg file to be.
 
-# template command: ImageMagick_convert -size 850 test.svg result.png
+# template command: magick -size 850 test.svg result.png
 # NOTE that for the -size parameter, it scales the imagesso that the longest side is that many pixels.
 
 # If no image size parameter, set default image size of 300.
@@ -26,8 +26,8 @@ do
 		echo . . .
 	else
 		echo rendering $element . . .
-		ImageMagick_convert -size $1x$1 $element $svgFilenameNoExtension.png
+		magick -size $1x$1 $element $svgFilenameNoExtension.png
 	fi
 done
 
-rm temp.txt
+rm temp.txt all_svgs.txt

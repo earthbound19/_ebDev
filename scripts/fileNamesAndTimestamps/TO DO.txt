@@ -1,0 +1,5 @@
+TO DO? ; make a script re:
+
+"I already have a script to rename the file based on the creation date:
+
+REM C:\exiftool.exe -overwrite_original -d %%d_%%m_%%Y-%%Hx%%Mx%%S%%a%%%%-c.%%%%e "-filename<file:filecreatedate" -P . . . http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,5983.msg29430.html#msg29430" : http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,5983.msg29430.html#msg29430
