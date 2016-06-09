@@ -5,11 +5,11 @@
 # TO DO: only copy files that do not already have a transcoded target, and create a script that runs this periodically (a chron job would do on 'nix systems).
 
 # Global PATH VARIABLES:
-sheep_content_XML_path='H:\_electricsheep\content\xml'
+sheep_content_XML_path='C:\ProgramData\ElectricSheep\content\xml'
 cyg_sheep_content_XML_path=`cygpath -u $sheep_content_XML_path`
 sheep_content_XML_file='list_member.xml'
-sheep_avis_local_path=`cygpath -u 'H:\_electricsheep\content\mpeg'`
-sheep_transcodedDestPath='H:\_losslessTranscodedTaggedSheep'
+sheep_avis_local_path=`cygpath -u 'C:\ProgramData\ElectricSheep\content\mpeg'`
+sheep_transcodedDestPath='C:\ratedSheep'
 # END global PATH VARIABLES
 
 sed -n 's/.*rating=\"\([0-9]\{1,\}\)\".*url=\"\(.*\)\".*/\1 \2/p' $sheep_content_XML_path\\$sheep_content_XML_file > ratedSheepAndURLs.txt
@@ -36,17 +36,18 @@ do
 	localFileNoEXT=`echo $localFile | sed 's/.*\/\(.*\)\.avi/\1/g'`
 		# echo local file name without extension is\: $localFileNoEXT
 	# Losslessly transcode and embed rating in metadata only if target file does not already exist:
-	if [ -a "$sheep_transcodedDestPath\\$localFileNoEXT.mp4" ]
+	i=0
+	# if the following file does not exist, do stuff:
+	if [ ! -e "$sheep_transcodedDestPath\\$localFileNoEXT.mp4" ]
 	then
-# TO DO: There has to be a way to check existence (not non-existence) of a file, yes?
-		FEERP=bEEERP
-	else
-		echo bunniesooooooooooooooooooooooooooooooorp
+		i=$[ $i + 1]
 		DOSlocalFilePath=`cygpath -w $sheep_avis_local_path`
 		FFMPEGcommand="ffmpeg -y -i $DOSlocalFilePath\\$localFileNoEXT.avi -vcodec copy $sheep_transcodedDestPath\\$localFileNoEXT.mp4"
-		echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+		echo Target transcoded file does not exist\; will create . . .
 		$FFMPEGcommand
 		exiftool -overwrite_original -MWG:Rating="$rating" "$sheep_transcodedDestPath\\$localFileNoEXT.mp4"
 		echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 	fi
 done
+
+echo losslessly transcoded and updated metadata for $i new animated fractal flames.
