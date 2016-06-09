@@ -1,4 +1,6 @@
 C:\autobrood
+C:\autobrood\batch-scripts
+C:\autobrood\bin
 C:\_devtools\bin\FilterForgeBatchWrapper
 C:\Program Files\AutoHotkey
 C:\Program Files (x86)\Filter Forge 4\Bin
