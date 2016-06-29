@@ -4,6 +4,8 @@
 # NOTE: fer mysic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
 
 # TO DO:
+# Fix the continue prompt selection at the start to *work*. It used to; no idea what's different. ?
+# Check: is it proper or does it work to use the -IPTC:ObjectName in this script? Should that be -MWG:Description?
 # DOUBLE CHECK that the s.earthbound.io~ link is formatted correctly and works in result.
 # - Document workings and use; ack. or fix clunky weaknesses in design.
 # - Implement keyword heirarchies re: http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/MWG.html
@@ -16,18 +18,20 @@
 # 	wget -O shortened_URL.txt "http://s.earthbound.io/api/v2/action/shorten?key=3108e9a45e9f6edcf9eeaa1ca9712d&url=https://google.com&is_secret=false&response_type=plain_text"
 #	NOTE that when logged in, it won't show the new link unless you reload the page.
 
+# echo wheh
+# exit
 
 # SCRIPT WARNING ==========================================
+# NOTE: the following is commented out because something goofy is going on with maybe parenthesis parsing in the answers:
 echo "imgTagAndDist.sh: this script will erase all metadata from the image files in the entire directory tree from which this is run. If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal."
 	echo "!============================================================"
-	echo "DO YOU WISH TO CONTINUE running this script?"
-	select yn in "Yes" "No"
-	do
-		case $yn in
-			Yes ) echo Ok! Working . . .; break;
-			No ) echo D\'oh!; exit;
-		esac
-	done
+	# echo "DO YOU WISH TO CONTINUE running this script?"
+    read -p "DO YOU WISH TO CONTINUE running this script? : y/n" CONDITION;
+    if [ "$CONDITION" == "y" ]; then
+		echo Ok! Working . . .
+	else
+		echo D\'oh!; exit;	
+    fi
 # END SCRIPT WARNING =======================================
 
 
@@ -78,7 +82,10 @@ do
 	SFMFNextension=`sed -n 's/.*from master file.*\(\..\{1,4\}\)"/\1/p' $element`
 	# Retrieve and store full ~ file name with extension; the \.\/ part escapes ./ (which ./ this sed command also strips) :
 				# SFMFNnoExtension=`sed -n 's/.*from master file: \.\/\(.*\)\..\{1,4\}"/\1/p' $element`
+	# SFMFNpath will preserve any subdirectory paths and duplicate them to the target ../dist path:
 	SFMFNpath=`sed -n 's/.*from master file: \.\/\(.*\/\).*\"/\1/p' $element`
+# e.g. result val of SFMFNpath: subdir/
+# OR if no subdir, it is blank.
 	SFMFNwithExtension=`sed -n 's/.*from master file: \.\/\(.*\..\{1,4\}\)"/\1/p' $element`
 					# echo ~~~~
 						# echo SFMFNwithExtension is $SFMFNwithExtension
@@ -89,6 +96,7 @@ do
 	if [ $SFMFNextension == ".tif" ] || [ $SFMFNextension == ".png" ] || [ $SFMFNextension == ".psd" ]
 	then
 		# echo is tif.
+# TO DO: double-check: I *think* the -m flag, in ignoring minor warnings, allows writing strings into metadata longer than specs allow:
 		echo exiftool -CommonIFD0= -adobe:all= -xmp:all= -photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension > exiftool_temp_update_metadata.bat
 		# In two commands because for wait what?
 		# echo exiftool $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension >> exiftool_temp_update_metadata.bat
@@ -107,29 +115,43 @@ do
 		# -q quiet
 
 	# run created script, then delete it:
-	if [ -a ../dist ]; then	der=derp; else mkdir ../dist; fi
+	if [ ! -d ../dist ]; then mkdir ../dist; fi
 	# echo -=-=
-	# Copy to new ~tagAndDistPrep image before running metadata update batch against it (so that the batch will even do any work) ; but only if the dist. file doesn't exist:
-	cp -f "$SFMFNwithExtension" "$SFMFNpath\__tagAndDistPrepImage$SFMFNextension"
+	# Copy to new ~tagAndDistPrep image before running metadata update batch against it (so that the batch will even do any work) ; NOTE that if $SFMFNpath is empty, the dest path to copy to will simply be ./ ; this doom of using two sets of double quotes for the dest path was at last prophecied 06/20/2016 11:18:51 PM -RAH :
+	cp -f "$SFMFNwithExtension" "./$SFMFNpath""__tagAndDistPrepImage$SFMFNextension"
+# sleep 3000
+	# Because (it seems) cygwin can create a batch file the system doesn't have permission to run? :
+	chmod 777 exiftool_temp_update_metadata.bat
 	cygstart -w exiftool_temp_update_metadata.bat
 	echo Ran exiftool_temp_update_metadata.bat . . .
 	printf "" > exiftool_temp_update_metadata.bat
-	# Move the new, properly metadata tagged file to a permanent distribution location:
+	# Move the new, properly metadata tagged file to a permanent distribution location; but only if the dist. file doesn't exist:
 # TO DO: MAKE IT MAKE THE DEST PATH IF NECESSARY; er make that nxt -a :
-	if [ -a "../dist/$SFMFNpath$imageTitle$SFMFNextension" ]
+	if [ -e "../dist/$SFMFNpath$imageTitle$SFMFNextension" ]
 	then
 		echo DESTINATION FILE "../dist/$SFMFNpath$imageTitle$SFMFNextension" already exists\, so this won\'t overwrite it. If you mean to update the destination file\, first delete it\, and then run this script again. If you also intend to alter or recreate the metadata\, delete the assocaited ~_MD_ADDS.txt file as well\, and run prepImageMetaData.sh before this.
 	else
 		# Make target directory for dist file, only if it doesn't exist:
-		if [ -a ../dist/$SFMFNpath ]; then	der=derp; else mkdir ../dist/$SFMFNpath; fi
-		mv "$SFMFNpath\__tagAndDistPrepImage$SFMFNextension" "../dist/$SFMFNpath$imageTitle$SFMFNextension"
+		if [ ! -e ../dist/$SFMFNpath ]; then mkdir ../dist/$SFMFNpath; fi
+		mv -f "./$SFMFNpath""__tagAndDistPrepImage$SFMFNextension" "../dist/$SFMFNpath$imageTitle$SFMFNextension"
 	fi
 	echo -~-~
 done
+
+rm -f exiftool_temp_update_metadata.bat imagesMetadataPrepList.txt images_MD_ADDS_list.txt
 
 echo Metadata modified for each image\, and each final distribution image copied one directory tree up\, in \.\.\/dist \[dist. path mirror of origin path\]\.
 
 
 # DEVELOPMENT HISTORY:
-# 2016-05-07 feature complete and debugged.
-# 05/08/2016 01:03:47 PM--05/08/2016 10:35:46 PM oops, moar bunniesugs. Also needs feature of /dist/[path/] copy being named after img. title. got that working but and BUGS FIXED: * not copying to dist/[mirror src path] -- FIXED 05/08/2016 01:23:46 PM * keyword tag items duplicating -- FIXED cause uncertain but found process could build them up or not clear prior ones [how? no prior ones in process I thought?!] until removal of -tagsfromfile @ argument. Remove that argument, and EXIF/IPTC tags fully (instead of partially) clear. 05/08/2016 19:48:07 PM RAH* somehow echoed ls / dir. items listed in Description field -- FIXED: cause was asterisks used as separators in customImageMetadataTemplate.txt which somehow functioned as a "list everything in this directory" command when called by? . . . something. 05/08/2016 03:17:11 PM * redundant file list files and no delete of. EH, WHATEV. * conditional creation of ../dist/$SFMFNpath directory -- DONE 05/08/2016 03:28:12 PM * Also found urlencoded strings in metadata prep file lost % sign; found cause is DOS misinterpreting them in metadata update batch; escaped them via %%. FIXED. 05/08/2016 10:34:53 PM -RAH
+
+# 2016-06-20 11:47:00 PM
+# Bug fix: tagged files in root of dir from which script is run wouldn't create in same dir, and therefore wouldn't get metadata update and move to ../dist/[path]. Corrected relevant code line to:
+# cp -f "$SFMFNwithExtension" "./$SFMFNpath""__tagAndDistPrepImage$SFMFNextension"
+# .. and modified other relevant lines to have two sets of "" for the target.
+
+# 2016-05-08 01:03:47 PM--2016-05-08 10:35:46 PM
+# Bug fixes. Also needs feature of /dist/[path/] copy being named after img. title. got that working but and BUGS FIXED: * not copying to dist/[mirror src path] -- FIXED 05/08/2016 01:23:46 PM * keyword tag items duplicating -- FIXED cause uncertain but found process could build them up or not clear prior ones [how? no prior ones in process I thought?!] until removal of -tagsfromfile @ argument. Remove that argument, and EXIF/IPTC tags fully (instead of partially) clear. 19:48:07 PM RAH* somehow echoed ls / dir. items listed in Description field -- FIXED: cause was asterisks used as separators in customImageMetadataTemplate.txt which somehow functioned as a "list everything in this directory" command when called by? . . . something. 03:17:11 PM * redundant file list files and no delete of. EH, WHATEV. * conditional creation of ../dist/$SFMFNpath directory -- DONE 03:28:12 PM * Also found urlencoded strings in metadata prep file lost % sign; found cause is DOS misinterpreting them in metadata update batch; escaped them via %%. FIXED. 10:34:53 PM -RAH
+
+# 2016-05-07
+# Feature complete.

@@ -3,3 +3,6 @@ C:\Program Files\AutoHotkey
 C:\Program Files (x86)\Filter Forge 4\Bin
 C:\Python27
 E:\Program_Distributions\_artAudioVisual\FredsImageMagickScripts
+C:\autobrood\bin
+C:\autobrood\batch-scripts
+C:\autobrood\bin\fractorium_openCL_GPU_fractal_flames

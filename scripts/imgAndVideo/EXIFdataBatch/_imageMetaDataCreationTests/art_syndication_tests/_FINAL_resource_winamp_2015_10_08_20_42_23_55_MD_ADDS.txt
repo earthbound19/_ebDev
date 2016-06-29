@@ -1,0 +1,6 @@
+-IPTC:ObjectName="resource winamp 2015 10 08 20 42 23 55"
+-MWG:Description="A hoity-toity robot talks about this at http://s.earthbound.io/artgib ~ Syndicated from, original, print and usage at http://s.earthbound.io/6"
+-MWG:Keywords="art, digital, abstract, contemporary"
+-MWG:Copyright="Richard Alexander Hall http://earthbound.io/contact"
+-MWG:Creator="Richard Alexander Hall"
+-EXIF:ImageHistory="Exported or copied from master file: ./art_syndication_tests/_FINAL_resource_winamp_2015_10_08_20_42_23_55.tif"
