@@ -1,0 +1,6 @@
+-IPTC:ObjectName="resource sheep 247 7688 1136"
+-MWG:Description="A hoity-toity robot talks about this at http://s.earthbound.io/artgib ~ Syndicated from, original, print and usage at http://s.earthbound.io/4"
+-MWG:Keywords="art, digital, abstract, contemporary"
+-MWG:Copyright="Richard Alexander Hall http://earthbound.io/contact"
+-MWG:Creator="Richard Alexander Hall"
+-EXIF:ImageHistory="Exported or copied from master file: ./art_syndication_tests/_FINAL_resource_sheep_247_7688_1136.tif"
