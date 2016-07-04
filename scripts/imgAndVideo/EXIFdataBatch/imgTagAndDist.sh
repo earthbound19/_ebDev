@@ -4,22 +4,20 @@
 # NOTE: fer mysic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
 
 # TO DO:
-# Fix the continue prompt selection at the start to *work*. It used to; no idea what's different. ?
+# ? Don't update metadata template with a shortened URL (and retrieve a short URL) if one already exists.
+#? Fix the continue prompt selection at the start to *work*. It used to; no idea what's different. ?
 # Check: is it proper or does it work to use the -IPTC:ObjectName in this script? Should that be -MWG:Description?
 # DOUBLE CHECK that the s.earthbound.io~ link is formatted correctly and works in result.
 # - Document workings and use; ack. or fix clunky weaknesses in design.
 # - Implement keyword heirarchies re: http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/MWG.html
 # * DONE: Implement self-hosted polr url shortening for looong titles/self-hosted title search URLS. e.g. like http://polr.me/w9g or http://polr.me/11q3 ; dev code that works or doesn't depending on authentication; the following are for polr_cli_polrAcct.py : C:\Python27\Lib\site-packages\polr_cli\polr_cli.py --shorten http://earthbound\.io/q
-#	Command that looks up target of shortened link, but relies on faulty dependency:
-# 	Python polr_cli.py --lookup w9g
-# 	Command that does NOT work at this writing at my self-hosted Polr install:
-# 	Python polr_cli_s_eb.py --lookup 0
+				#	Command that looks up target of shortened link, but relies on faulty dependency:
+				# 	Python polr_cli.py --lookup w9g
+				# 	Command that does NOT work at this writing at my self-hosted Polr install:
+				# 	Python polr_cli_s_eb.py --lookup 0
 # 	API call URL that DOES work at my self-hosted Polr install--and saves the result URL to a plain-text URL! (except that that key is now retired ;) :
 # 	wget -O shortened_URL.txt "http://s.earthbound.io/api/v2/action/shorten?key=3108e9a45e9f6edcf9eeaa1ca9712d&url=https://google.com&is_secret=false&response_type=plain_text"
 #	NOTE that when logged in, it won't show the new link unless you reload the page.
-
-# echo wheh
-# exit
 
 # SCRIPT WARNING ==========================================
 # NOTE: the following is commented out because something goofy is going on with maybe parenthesis parsing in the answers:
@@ -56,21 +54,29 @@ do
 # exit
 			# OY, that was a rather dodgy bug to sort out :/ 2016-05-07 11:55 PM -RAH
 	# END OY TEH CLUGY ===================================
-	sed -n 's/\(.*\)\(print and use options at.*\)/\2/p' $element > flerf.txt
-	cat flerf.txt oy.txt > zorg.txt
-	tr -d '\n' < zorg.txt > floofy_floo.txt
-	# BECAUSE that text file has / characters that choke sed later on, escape them to \/	; this doom was foretold after much pain of spirit 2016-05-07 7:54 PM -RAH:
-	sed -i 's/\//\\\//g' floofy_floo.txt
-	# for % characters also, only for DOS, so double %; this doom was also foretold after much pain of spirit 05/08/2016 10:30:25 PM -RAH
-	sed -i 's/%/%%/g' floofy_floo.txt
-	# maybe relvnt thar? : http://stackoverflow.com/a/9488318
-	descriptionAddendum=$( < floofy_floo.txt)
-	echo desc. add.\:
-	echo $descriptionAddendum
-	echo elem.\:
-	echo $element
-	sed -i "s/\(.* print and usage at \).*/\1$descriptionAddendum\"/g" $element
-	rm flerf.txt oy.txt zorg.txt floofy_floo.txt
+	# ~
+	# IF NO s.earthbound.io SHORTENED URL is in the metadata, fetch one and include it:
+	grep -q s.earthbound.io $element
+	if [ $? -eq 0 ]
+		then
+			echo Metadata file already contains s.earthbound.io\; will not update with any shortened URL.
+		else
+		sed -n 's/\(.*\)\(print and use options at.*\)/\2/p' $element > flerf.txt
+		cat flerf.txt oy.txt > zorg.txt
+		tr -d '\n' < zorg.txt > floofy_floo.txt
+		# BECAUSE that text file has / characters that choke sed later on, escape them to \/	; this doom was foretold after much pain of spirit 2016-05-07 7:54 PM -RAH:
+		sed -i 's/\//\\\//g' floofy_floo.txt
+		# for % characters also, only for DOS, so double %; this doom was also foretold after much pain of spirit 05/08/2016 10:30:25 PM -RAH
+		sed -i 's/%/%%/g' floofy_floo.txt
+		# maybe relvnt thar? : http://stackoverflow.com/a/9488318
+		descriptionAddendum=$( < floofy_floo.txt)
+		echo desc. add.\:
+		echo $descriptionAddendum
+		echo elem.\:
+		echo $element
+		sed -i "s/\(.* print and usage at \).*/\1$descriptionAddendum\"/g" $element
+		rm flerf.txt oy.txt zorg.txt floofy_floo.txt
+	fi
 					# DEPRECATED APPROACH; in favor of specifying argument switches (e.g. + or - or -Tag+=Word) in customImageMetadataTemplate.txt itself:
 					# For every file listed in images_MD_ADDS_list.txt, precede every line with a dash, to make it an exiftool parameter:
 					# sed 's/\(.*\)$/-\1/g' $element > fersh.txt
@@ -97,6 +103,8 @@ do
 	then
 		# echo is tif.
 # TO DO: double-check: I *think* the -m flag, in ignoring minor warnings, allows writing strings into metadata longer than specs allow:
+				echo writing commmand for tif file to exiftool_temp_update_metadata.bat\:
+				echo exiftool -CommonIFD0= -adobe:all= -xmp:all= -photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension
 		echo exiftool -CommonIFD0= -adobe:all= -xmp:all= -photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension > exiftool_temp_update_metadata.bat
 		# In two commands because for wait what?
 		# echo exiftool $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension >> exiftool_temp_update_metadata.bat
@@ -105,6 +113,8 @@ do
 				# -adobe:all= -xmp:all= -photoshop:all= -tagsfromfile @ -iptc:all -overwrite_original
 	else
 		# echo is not tif.
+				echo writing commmand for non-tif file to exiftool_temp_update_metadata.bat\:
+				echo exiftool -adobe:all= -xmp:all= -photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension
 		echo exiftool -adobe:all= -xmp:all= -photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension > exiftool_temp_update_metadata.bat
 	fi
 		# Use any/which? :
@@ -117,14 +127,13 @@ do
 	# run created script, then delete it:
 	if [ ! -d ../dist ]; then mkdir ../dist; fi
 	# echo -=-=
-	# Copy to new ~tagAndDistPrep image before running metadata update batch against it (so that the batch will even do any work) ; NOTE that if $SFMFNpath is empty, the dest path to copy to will simply be ./ ; this doom of using two sets of double quotes for the dest path was at last prophecied 06/20/2016 11:18:51 PM -RAH :
-	cp -f "$SFMFNwithExtension" "./$SFMFNpath""__tagAndDistPrepImage$SFMFNextension"
-# sleep 3000
-	# Because (it seems) cygwin can create a batch file the system doesn't have permission to run? :
-	chmod 777 exiftool_temp_update_metadata.bat
+	# Copy to new ~tagAndDistPrep image before running metadata update batch against it (so that the batch will even do any work) ; NOTE that if $SFMFNpath is empty, the dest path to copy to will simply be ./ ; this doom of using two sets of double quotes for the dest path was at last prophecied 06/20/2016 11:18:51 PM -RAH; BUT WAIT, THERE'S MORE!--and rediscovered thanks to a missing double quote mark typographical error 07/01/2016 10:18:40 PM -RAH:
+	cp -f "./$SFMFNwithExtension" "./$SFMFNpath""__tagAndDistPrepImage""$SFMFNextension"
+	# Because (it seems) cygwin can create a batch file the system doesn't have permission to run? AND no permissions are given to open that copied file:
+	chmod 777 exiftool_temp_update_metadata.bat "./$SFMFNpath""__tagAndDistPrepImage""$SFMFNextension"
 	cygstart -w exiftool_temp_update_metadata.bat
 	echo Ran exiftool_temp_update_metadata.bat . . .
-	printf "" > exiftool_temp_update_metadata.bat
+# printf "" > exiftool_temp_update_metadata.bat
 	# Move the new, properly metadata tagged file to a permanent distribution location; but only if the dist. file doesn't exist:
 # TO DO: MAKE IT MAKE THE DEST PATH IF NECESSARY; er make that nxt -a :
 	if [ -e "../dist/$SFMFNpath$imageTitle$SFMFNextension" ]
