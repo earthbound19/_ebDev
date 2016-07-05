@@ -622,3 +622,29 @@ Found path: C:\Program Files (x86)\Filter Forge 4\Bin
 Found path: C:\Program Files\AutoHotkey 
 Found path: C:\Python27 
 Found path: E:\Program_Distributions\_artAudioVisual\FredsImageMagickScripts 
+Found path: C:\_devtools\bin 
+Found path: C:\_devtools\bin\AutoHotkey\Compiler 
+Could not find path: C:\_devtools\bin\GibbGen\GibbGenCPP\bin\1.0-functional 
+Could not find path: C:\_devtools\bin\GibbGen\pyMarkovGibGen 
+Found path: C:\_devtools\bin\gnuCoreUtilsWin32\bin 
+Found path: C:\_devtools\bin\ImageMagick 
+Could not find path: C:\_devtools\bin\ImageMagick\modules\coders 
+Could not find path: C:\_devtools\bin\ImageMagick\modules\filters 
+Found path: C:\_devtools\scripts 
+Found path: C:\_devtools\scripts\fileNamesAndTimestamps 
+Found path: C:\_devtools\scripts\font 
+Found path: C:\_devtools\scripts\imgAndVideo 
+Found path: C:\_devtools\scripts\imgAndVideo\EXIFdataBatch 
+Could not find path: C:\_devtools\scripts\imgAndVideo\fractalFlame 
+Could not find path: C:\_devtools\scripts\imgAndVideo\imgGetSimilar 
+Could not find path: C:\_devtools\scripts\imgGetSimilarC:\_devtools\bin\FilterForgeBatchWrapper 
+Found path: C:\_devtools\scripts\lit\gibberish 
+Found path: C:\_devtools\scripts\lit\gibberish\python-Backus-Naur-poetry-generator 
+Found path: C:\autobrood 
+Found path: C:\autobrood\batch-scripts 
+Found path: C:\autobrood\bin 
+Found path: C:\autobrood\bin\fractorium_openCL_GPU_fractal_flames 
+Could not find path: C:\Program Files (x86)\Filter Forge 4\Bin 
+Found path: C:\Program Files\AutoHotkey 
+Could not find path: C:\Python27 
+Could not find path: E:\Program_Distributions\_artAudioVisual\FredsImageMagickScripts 
