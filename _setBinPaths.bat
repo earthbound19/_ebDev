@@ -19,7 +19,7 @@ TYPE EXTERNALPATHS.txt >> temp.txt
 		REM TYPE win7defaultPATHs.txt >> temp.txt
 
 REM the magic uniqify and sort commands:
-%CD%\bin\gnuCoreUtilsWin32\bin\sort.exe temp.txt > temp2.txt
+%CD%\bin\gnuCoreUtilsWin32\bin\gsort.exe temp.txt > temp2.txt
 	REM NOTE: I'd had the -u flag on the next line; that messes up my intent (it does not print lines that have duplicates, it only prints unique lines. FACE PALM. ALSO: after I RT_M I learned it only detects *adjacent* duplicate lines. GEH!
 %CD%\bin\gnuCoreUtilsWin32\bin\uniq temp2.txt > allPathsTemp.txt
 REM ECHO Ready to modify PATH.
