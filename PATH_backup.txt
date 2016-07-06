@@ -1,1 +1,0 @@
-C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\Users\Hermoine\AppData\Local\Temp;C:\Program Files (x86)\Skype\Phone;C:\Program Files\AutoHotkey;C:\Program Files\TortoiseGit\bin;C:\Program Files\Git\cmd; 
