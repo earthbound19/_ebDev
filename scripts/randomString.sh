@@ -33,6 +33,8 @@ do
 	# cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c $length
 	# cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9{}[]~!@#$%^&*()_+-=<>' | head -c $length
 	cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c $length
+		# For newline between printed strings:
+		echo
 	# OPTION 3, adapted to generate secure passwords; uncomment if you prefer (and comment out the other) ; NOTE that complexPassword.sh now des this:
 	# cat /dev/urandom | tr -dc 'a-z0-9A-Z{}[]~!@#$%^&*()_+-=<>' | head -c $length
 done

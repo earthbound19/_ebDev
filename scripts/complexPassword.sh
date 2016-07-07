@@ -10,5 +10,7 @@ if [[ $2 == "" ]]; then length=44; else length=$2; fi
 for (( i=1; i<=$howMany; i++ ))
 do
 	cat /dev/urandom | tr -dc 'a-z0-9A-Z{}[]~!@#$%^&*()_+-=<>' | head -c $length
+		# For newline between printed strings:
+		echo
 done
 
