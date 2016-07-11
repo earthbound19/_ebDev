@@ -1,11 +1,10 @@
 # DESCRIPTION: Tags imags with metadata customized by a simple editable text file template. Must run prepImageMetaData.sh and/or other scripts before.
 
-# USAGE: correct. (MEAGER) NOTES: This expects all images it works upon to be .tif images, and won't work with anything else. Maybe I'll change it to also do non-standard tags in .png files, and do other source formats also.
+# USAGE: NOTE that a run of prepImageMetaData.sh must precede this script, or this script will not work. ALSO: correct. (MEAGER) NOTES: This expects all images it works upon to be .tif images, and won't work with anything else. Maybe I'll change it to also do non-standard tags in .png files, and do other source formats also.
 # NOTE: fer mysic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
 
 # TO DO:
 # ? Don't update metadata template with a shortened URL (and retrieve a short URL) if one already exists.
-#? Fix the continue prompt selection at the start to *work*. It used to; no idea what's different. ?
 # Check: is it proper or does it work to use the -IPTC:ObjectName in this script? Should that be -MWG:Description?
 # DOUBLE CHECK that the s.earthbound.io~ link is formatted correctly and works in result.
 # - Document workings and use; ack. or fix clunky weaknesses in design.
@@ -49,38 +48,16 @@ do
 	# BUT WAIT! START OY TEH CLUGY ===================================
 					# BUG FIXED--see next comment; NOTE the following will cause mashed redundant URLs if this script is run twice or more; you must delete the working ~MD_ADDS.txt and run prepImageMetaData.sh before this script: --. 2016-05-07 11:20 PM -RAH
 			# CLEAR the urlencoded text after .*earthbound.io/q (if there is such text), lest redundant encodings append thereto on subsequent runs of this script:
-			sed -i 's/\(.*print and usage at \).*/\1/g' $element
-			# echo sed -i 's/\(.*You may find the original, print and use options at http:\/\/earthbound.io\/q\/?\).*/\1/g' $element
-# exit
-			# OY, that was a rather dodgy bug to sort out :/ 2016-05-07 11:55 PM -RAH
-	# END OY TEH CLUGY ===================================
-	# ~
-	# IF NO s.earthbound.io SHORTENED URL is in the metadata, fetch one and include it:
-	grep -q s.earthbound.io $element
-	if [ $? -eq 0 ]
-		then
-			echo Metadata file already contains s.earthbound.io\; will not update with any shortened URL.
-		else
-		sed -n 's/\(.*\)\(print and use options at.*\)/\2/p' $element > flerf.txt
-		cat flerf.txt oy.txt > zorg.txt
-		tr -d '\n' < zorg.txt > floofy_floo.txt
-		# BECAUSE that text file has / characters that choke sed later on, escape them to \/	; this doom was foretold after much pain of spirit 2016-05-07 7:54 PM -RAH:
-		sed -i 's/\//\\\//g' floofy_floo.txt
-		# for % characters also, only for DOS, so double %; this doom was also foretold after much pain of spirit 05/08/2016 10:30:25 PM -RAH
-		sed -i 's/%/%%/g' floofy_floo.txt
-		# maybe relvnt thar? : http://stackoverflow.com/a/9488318
-		descriptionAddendum=$( < floofy_floo.txt)
+			sed -i 's/\(.*print and usage options at \).*/\1/g' $element
+		sed -i 's/\//\\\//g' oy.txt
+		descriptionAddendum=$( < oy.txt)
 		echo desc. add.\:
+		echo descriptionAddendum value is\:
 		echo $descriptionAddendum
 		echo elem.\:
 		echo $element
-		sed -i "s/\(.* print and usage at \).*/\1$descriptionAddendum\"/g" $element
-		rm flerf.txt oy.txt zorg.txt floofy_floo.txt
-	fi
-					# DEPRECATED APPROACH; in favor of specifying argument switches (e.g. + or - or -Tag+=Word) in customImageMetadataTemplate.txt itself:
-					# For every file listed in images_MD_ADDS_list.txt, precede every line with a dash, to make it an exiftool parameter:
-					# sed 's/\(.*\)$/-\1/g' $element > fersh.txt
-					# tr '\n' ' ' < fersh.txt > ghor.txt
+		sed -i "s/\(.* print and usage options at \).*/\1$descriptionAddendum\"/g" $element
+		rm zorg.txt oy.txt
 	tr '\n' ' ' < $element > ghor.txt
 	exifTagArgs=$( < ghor.txt)
 	rm ghor.txt

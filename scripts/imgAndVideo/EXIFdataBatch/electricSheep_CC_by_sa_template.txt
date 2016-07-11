@@ -1,4 +1,4 @@
--MWG:Description="Fractal flame abstract animation. Rendered with autobrood scripts https://github.com/earthbound19/autobrood A hoity-toity robot talks about this at http://s.earthbound.io/artgib ~ Syndicated from, original, print and usage at "
+-MWG:Description="Fractal flame abstract animation. Rendered with autobrood scripts https://github.com/earthbound19/autobrood A hoity-toity robot talks about this at http://s.earthbound.io/artgib ~ Syndicated from, original, print and usage options at "
 -MWG:Keywords="art, digital, abstract, contemporary, MyWork, derivedWork, CC_BY_SA, fractalflame, electricsheep, fractal, animation"
 -MWG:Copyright="CC BY-SA 4 Scott Draves and the Electric Sheep generation 242, http://electricsheep.org"
 -MWG:Creator="Animation created and rendered by Richard Alexander Hall, with genomes from project in copyright."
