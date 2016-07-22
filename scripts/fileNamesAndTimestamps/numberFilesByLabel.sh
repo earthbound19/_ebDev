@@ -3,6 +3,8 @@
 # TO DO? Alter the following to use a parameter:
 label=abstr
 
+# TO DO? : is the result file name fileNamesWithNumberTags.txt even accurate? Is it actually just file names that have numbers in them? Fix to reflect that if so.
+
 echo NOTE: this batch will NOT tag files that begin with FINAL_, and it will produce errors if you have files with \5\-padded numbers in their name which do not also include the tag _FINAL_ \(case-insensitive\)\. Ensure your files meet these criteria before continuing. ALSO filenames must be properly named with underscores _ instead of spaces\, and also any nnnnn numbers must be surrounded by underscores\, for this to work. To get files nearer to or at that standard\, see the notes at the start of __DigitalImagePress.sh.
 # TO DO: update dateByFileName.sh to check for that? Prompt the user to check for that via metamorphose2.exe?
 
@@ -53,8 +55,10 @@ sed -i '/.*_[fF][iI][nN][aA][lL]_.*/! s/.*/NO_NOT_DO_NORTHING_DELETE_THE_LINE_TH
 # TO DO: put the following note in the documentation: Note also that this necessitates a stub "image" file with the highest used number to be placed in the directory tree in which this script will be executed, in cases where the highest used number would not otherwise be in said tree!
 echo Finding highest number tag among all file names in this directory tree . . .
 sed '/.*_[0-9]\{5\}_.*\|.*_[0-9]\{5\}\.[^0-9]\{1,4\}/!d' ./_batchNumbering/PartB_originalFiles.txt > ./_batchNumbering/numbersFromFileNames.txt
-	# Reduce those results to numbers only (no text):
-sed -i 's/.*_\([0-9]\{5\}\)\(.*\.[^\.]\{1,6\}\)/\1/g' ./_batchNumbering/numbersFromFileNames.txt
+# Reduce those results to numbers only (no text):
+				# BUG FIX 2016-07-21: what are the file naming assumptions for the following? Because if I have a file name like _FINAL_00010_2016_07_07__04_27_34__813340400_and_2016_07_07__04_31_01__597083900_alternate.flam3.png, it extracts the highest number from the first five digits of that last long number in the file name, which is erroneous. I *think* I need it to only match where there's a pattern of numbers, then not numbers--the numbers five characters long? I'm going to re-code with that assumption. So the next line is DEPRECATED, and the line after it is the re-worked one; UNANSWERED QUESTION: do I also require the number to be prefixed with an underscore? I'm going to assume NOT--that I only need the 5-digit number to be preceded and postfixed by non-number characters. ALSO TO DO: variablize (is that a word?!) the 5-digit padding to make it possible for it to be 4, 7, whatever--ANYWAY:
+				# sed -i 's/.*_\([0-9]\{5\}\)\(.*\.[^\.]\{1,6\}\)/\1/g' ./_batchNumbering/numbersFromFileNames.txt
+sed -i 's/.*[^0-9]\([0-9]\{5\}\)[^0-9].*/\1/g' ./_batchNumbering/numbersFromFileNames.txt
 		# 6, because Dessault Systemmes names files *.sldprt and *.sldasm, and I want to consider them too.
 	# Put those numbers into an array, and sort it to find the highest one
 # mapfile -t numbersArray < ./_batchNumbering/numbersFromFileNames.txt
