@@ -44,7 +44,7 @@ REM in development: TYPE robowipelist.txt >> robowipeTempDirList.txt
 
 FOR /F "delims=*" %%A IN (robowipeTempDirList.txt) DO (
 REM ECHO WOULD HERE WIPE DIRECTORY %%A ...
-ROBOCOPY robowipeStubDir "%%A" /E /PURGE /MT:%NUM%
+ROBOCOPY robowipeStubDir "%%A" /E /PURGE /MT:%NUM% /W:0 /R:0
 )
 
 REM Delete all *.dmp files in all directories on the drive.
@@ -85,3 +85,8 @@ RMDIR cleanupTemp
 )
 
 POPD
+
+
+REM DEVELOPMENT HISTORY
+REM Before now: Many thing.
+REM 2016-07-26 Added /W:0 and /R:0 flags to skip file delete/other failures (zero retries) re: http://pureinfotech.com/robocopy-recover-and-skip-files-with-errors-from-bad-hard-drive-in-windows/
