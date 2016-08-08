@@ -6,8 +6,8 @@
 
 # NOTE: cygpath use else err next:
 metaDataTemplatePath=`cygpath -u "C:\_devtools\scripts\imgAndVideo\EXIFdataBatch"`
-# metaDataTemplateFile=customImageMetadataTemplate.txt
-metaDataTemplateFile=electricSheep_CC_by_sa_template.txt
+metaDataTemplateFile=customImageMetadataTemplate.txt
+# metaDataTemplateFile=electricSheep_CC_by_sa_template.txt
 metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 
 find . -iname \*_FINAL*.mp4 -o -iname \*_FINAL*.tif -o -iname \*_FINAL*.tiff -o -iname \*_FINAL*.png -o -iname \*_FINAL*.psd -o -iname \*_FINAL*.ora -o -iname \*_FINAL*.rif -o -iname \*_FINAL*.riff -o -iname \*_FINAL*.jpg -o -iname \*_FINAL*.jpeg -o -iname \*_FINAL*.gif -o -iname \*_FINAL*.bmp -o -iname \*_FINAL*.cr2 -o -iname \*_FINAL*.raw  -o -iname \*_FINAL*.crw -o -iname \*_FINAL*.pdf > imagesMetadataPrepList.txt
