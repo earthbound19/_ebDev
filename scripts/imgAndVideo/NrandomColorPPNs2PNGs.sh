@@ -18,6 +18,7 @@ do
 	count=0
 	for i in $( seq $numLoops )
 	do
+					echo Generating row for image number $a . . .
 		count=$(( count + 1 ))
 		shuf -i 1-255 -n $numbersNeedsPerRow > temp.txt
 		tr '\n' ' ' < temp.txt > $count.temp
@@ -34,12 +35,13 @@ do
 	255
 	" > ppmheader.txt
 
-	# concatenate all those prep files into the new .ppm file, with relevent info in the file name itself:
+					echo Concatenating generated rows into one new .ppm file . . .
 	timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
 	cat ppmheader.txt grid.ppm > $1x$1gridRND_$timestamp.ppm
 	rm ppmheader.txt grid.ppm
 
 	# Convert new image to upscaled (preserving hard edges) by 50 time as large png:
 	newXpix=$((numbersNeedsPerRow * $multiplierScale))
+					echo Creating enlarged png version with hard edges maintained . . .
 	nconvert -ratio -rtype quick -resize $newXpix $newXpix -out png -o $1x$1gridRND_$timestamp.png $1x$1gridRND_$timestamp.ppm
 done
