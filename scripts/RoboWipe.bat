@@ -12,6 +12,8 @@ REM WARNING:
 REM This script errs on the side of clearing possibly too much unused junk on your computer. If you've examined the contents of this batch, and you know what you're doing, and/or you're doing this in a test environment, press <enter> If you actually don't need to clear a ton of space, CLOSE THIS CONSOLE.
 
 REM TO DO? Change this to execute from any directory yet clear all temp files from the drive root directory down.
+REM eh, probably as well or better: for /D %d in (*) do rmdir /S /Q "%d"
+REM re (can't seem to link to comment directly!) : https://social.technet.microsoft.com/Forums/windows/en-US/6b8d5a57-2929-44d1-93ef-a9d825d9e17a/how-can-i-disable-this-folder-is-shared-with-other-people-message?forum=w7itprogeneral
 
 REM 02/08/2015 01:17:31 PM RAH CRITICAL BUG FIX: The FINDSTR search string \temp was not escaped as \\temp; consequently any path at all containing that word would have been listed and wiped. FIXED. It only lists directories that _only_ say "temp" (the entire word and nothing less or more). Erm, better add a disclaimer to this :/ Frustrating, but it seems other command-line contexts don't require that \ be escaped as \\.
 

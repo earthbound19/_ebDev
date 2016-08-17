@@ -9,8 +9,7 @@
 
 # GLOBAL VAR SET; if numeric parameter $1 is passed to script, set $getNrandChars to that; otherwise default it to 4:
 if ! [ -z ${1+x} ]; then echo parameter passed to script\; will set getNrandChars to passed value of $1.; getNrandChars="$1"; else getNrandChars=4; echo no parameter passed to script\; using default value of \4 for getNrandChars.; fi
-
-echo val of 1 is $1.
+		# echo val of 1 is $1.
 
 ls > allFiles.txt
 mapfile -t array < allFiles.txt
@@ -23,7 +22,7 @@ arrSize=${#array[@]}
 	# re: http://stackoverflow.com/a/1405641
 	numRandomCharsToGet=`echo $(( arrSize * getNrandChars ))`
 		# echo numRandomCharsToGet val is $numRandomCharsToGet
-	randomCharsString=`cat /dev/urandom | tr -cd 'a-km-np-zA-KM-NP-Z2-9___~~~~' | head -c $numRandomCharsToGet`
+	randomCharsString=`cat /dev/urandom | tr -cd 'a-km-np-zA-KM-NP-Z2-9' | head -c $numRandomCharsToGet`
 		# echo randomCharsString val is $randomCharsString
 
 # Initialize counter at negative the number of getNrandChars, so that the first iteration in the following loop will set it to 0, which is where we need it to start:
@@ -37,12 +36,12 @@ do
 			# echo fileExt val is $fileExt
 		# For file renaming, grab next n random characters from pre-generated randomCharsString:
 		# num=$(($multCounter + $num2))
-		echo multCounter val is $multCounter
+			# echo multCounter val is $multCounter
 			# echo getNrandChars vlas is $getNrandChars
 		multCounter=$(($multCounter + $getNrandChars))
 			# echo getNrandChars val is $getNrandChars
 		newFileBaseName=${randomCharsString:$multCounter:$getNrandChars}
-			echo ~----- newFileBaseName vla is $newFileBaseName
+			# echo ~----- newFileBaseName is $newFileBaseName
 	mv ./$filename ./$newFileBaseName.$fileExt
 done
 
