@@ -5,6 +5,8 @@
 # --which will produce 10x10 pixel random colored .ppm images, fifteen of them, and scale each up x80, maintaining hard edges, to accompanying .png images.
 
 # TO DO: set default values if no $1 $2 and $3 variables passed to script. Make this take string/switch parameters using em wah dut that testing that.
+# TO DO? : use ffmpeg for upscaling instead?
+# TO DO? : Allow upscale to target resolution?
 
 numLoops=$1
 howManyImages=$2
