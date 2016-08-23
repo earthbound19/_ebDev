@@ -8,13 +8,17 @@
 				# fixIMGnames.sh
 
 # NOTE: metamorphose2 is not used because of a strange bug listing files to be renamed (it shows an entirely wrong target file name which is from anoter file name in the tree).
+
+# TO DO: update documentation in comments and have it refer to an outside file (move relevant comments from here to said file).
 # TO DO: Move the relevant instructions from bunnieselow, or all of them, into echo statements in the files to which they relate, for cases of using those files independent of this script.
 # TO DO? : split this into two scripts (one for file name and metadata fixup, another for custom metadata creation), and update documentation referencing the (to be former) file name of this script accordingly.
 
 echo "!============================================================"
-	echo "WARNING: Before using this script, ensure all file names in your execution path do not have any console-unfriendly characters in their file names, including no spaces (replace those with underscores). OTHERWISE, this script will not work as hoped. This script will first attempt to run metamorphose (see https://sourceforge.net/projects/file-folder-ren/files/Metamorphose/1.1.2%20stable/ ). Load the Metamorphose1BadFileNameCharacterRemoval_step01.cfg configuration into metamorphose, adjust the search folder as necessary, and execute it. Then reload the file list, and repeat this with ~02.cfg, and any others after that. IMPORTANT NOTES: At this writing I haven't figured out how to get Metamorphose to rename directories with unwanted characters in their name. You must more manually check for and properly rename those; you can do that with the Flexible Renamer program, operating only on folders, with the regex in badCharsFRregex.txt, replacing with _. ALSO, to include all files in subdires, look for a \"walk\" checkbox and tick it. Finally, if metamorphose fails to open from this script, you will have a chance to abort this script."
+	echo "WARNING: Before using this script, ensure all file names in your execution path do not have any console-unfriendly characters in their file names, including no spaces (replace those with underscores). OTHERWISE, this script will not work as hoped. This script will first attempt to run metamorphose (see https://sourceforge.net/projects/file-folder-ren/files/Metamorphose/1.1.2%20stable/ ). Load the Metamorphose1BadFileNameCharacterRemoval_step01.cfg configuration into metamorphose, adjust the search folder as necessary, and execute it. Then reload the file list, and repeat this with ~02.cfg, and any others after that. ALTERNATE option for this: manually use the Flexible Renamer program, operating only on folders, with the regex in badCharsFRregex.txt, replacing with _. ALSO, to include all files in subdirectories, look for a \"walk\" checkbox and tick it. Finally, if metamorphose fails to open from this script, you will have a chance to abort this script."
 	echo "Do you wish to run this script?"
 	echo "!============================================================"
+# TO DO:
+# Update this (non-working anyway for whatever reason--it *did* work before) prompt with that to be found at: http://stackoverflow.com/a/3232082/1397555
 	echo "IF YOU HAVE READ the above warning, type the number corresponding to your answer, then press <enter>. If you haven't read the warning, your answer is 2 (No)."
 	select yn in "Yes" "No"
 	do
@@ -36,8 +40,9 @@ cmd /c "C:\Program Files (x86)\metamorphose\metamorphose.exe"
 		esac
 	done
 
-dateByFileName.sh
-dateByMetaData.sh
+# COMMENT OUT OR USE PER NEED:
+# dateByFileName.sh
+# dateByMetaData.sh
 numberFilesByLabel.sh
 
 echo "As instructed by the echo from the end of numberFilesByLabel.sh, examine the files created by that batch, and if you are ready to continue, select 1. If you are not ready, make adjustments and manually run said ~.sh script until you are ready, then select 1, or select 2 to terminate this script, and examine the source to determine what to do next."
