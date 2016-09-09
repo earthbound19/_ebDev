@@ -4,15 +4,34 @@
 # USAGE
 # From a terminal, in a folder with terminal-processing-unfriendly names, execute this script and follow the prompts.
 
-# TO DO
+# NOT TO DO
 # Use the elegant means I found somewhere of eliminating lines that are identical between alles and alles2.txt etc. (as this would avoid time-wasting and error-trowing renames of a file to itself) before further marking up and pasting them.
+# Reason: I couldn't manage to find that.
+
+
+# SCRIPT WARNING ==========================================
+echo "Dude. In the wrong hands this script is a weapon. You sure you wanna do that? If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal."
+	echo "!============================================================"
+	# echo "DO YOU WISH TO CONTINUE running this script?"
+    read -p "DO YOU WISH TO CONTINUE running this script? : y/n" CONDITION;
+    if [ "$CONDITION" == "y" ]; then
+		echo Ok! Working . . .
+	else
+		echo D\'oh!; exit;	
+    fi
+# END SCRIPT WARNING =======================================
+
+
+# FAIL, as near I can tell:
+# shopt -s nullglob
+# for i in *\'* ; do mv -v "$i" "${i/\'/}" ; done
 
 # === FOLDERS RENAMING ===
 find * -type d > alles.txt
 # Build first part of mv command in .sh file:
 sed -i "s/\(.*\)/mv '\1'/" alles.txt
 # Build second part of move command by replacing all terminal-unfriendly characters in listed folder names, via tr:
-find * -type d | tr \=\'\@\`~\!#$%^\&\(\)+[{]}\;\ ,- _ > alles2.txt
+find * -type d | tr \=\@\`~\!#$%^\&\(\)+[{]}\;\ , _ > alles2.txt
 				# Example bad folder name that was tested against:
 				# WUT`'''''~!@#$%^&a()-=hi hi HEY+[{]};' ,
 # Prune all triplicate+ underscores to double (for target folder names) :
@@ -38,6 +57,7 @@ esac
 
 mv badPathsRename.sh.txt badPathsRename.sh
 ./badPathsRename.sh
+rm ./badPathsRename.sh
 # === FILES RENAMING ===
 # DO all of the same things again, but for files only (now that paths have been fixed up, eliminating problems that would otherwise cause in path renaming, and because fixing paths at the same time as files would mean wasted and error-throwing duplicate path rename commands.)
 
@@ -46,7 +66,7 @@ shopt -s extglob
 find !(alles*.txt) -type f > alles3.txt
 	# find * -type f > alles3.txt
 sed -i "s/\(.*\)/mv '\1'/" alles3.txt
-find !(alles*.txt) -type f | tr \=\'\@\`~\!#$%^\&\(\)+[{]}\;\ ,- _ > alles4.txt
+find !(alles*.txt) -type f | tr \=\'\@\`~\!#$%^\&\(\)+[{]}\;\ , _ > alles4.txt
 sed -i "s/_\{3,\}/__/g" alles4.txt
 sed -i "s/\(.*\)/ '\1'/" alles4.txt
 paste -d '' alles3.txt alles4.txt > badFilesRename.sh.txt
