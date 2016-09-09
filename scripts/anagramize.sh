@@ -1,6 +1,6 @@
-# DESCRIPTION: Takes an input text paramater and outputs a ~_anagramized.txt text file where every vowel may be scrambled with an adjacent character. The result is readable to (about half of?) humans, but would take extra programming or resources for web keyword scanners (SPIES) to make good of.
+# DESCRIPTION: Takes an input text paramater and outputs an ~_anagramized.txt text file where every vowel may be scrambled with an adjacent character. The result is readable to (about half of?) humans, but would take extra programming or resources for web keyword scanners (SPIES) to make good of.
 
-# USAGE: run the script with one paramaeter, being the name of a text file in the same directory, to scrable. Results will appear in ~_anagramized.txt.
+# USAGE: run the script with one paramaeter, being the name of a text file in the same directory, to scramble. Results will appear in ~_anagramized.txt.
 
 # cluge to keep punctuation clearer if oddly spaced bcse sed command my not make skip punctuation:
 sed 's/\(\.,;:!?\"\)/ \1 /g' $1 > temp1.txt

@@ -7,4 +7,4 @@ C:\autobrood\bin\fractorium_openCL_GPU_fractal_flames
 C:\Program Files (x86)\Filter Forge 4\Bin
 C:\Program Files\AutoHotkey
 C:\Python27
-E:\Program_Distributions\_artAudioVisual\FredsImageMagickScripts
+D:\Program_Distributions\_artAudioVisual\FredsImageMagickScripts

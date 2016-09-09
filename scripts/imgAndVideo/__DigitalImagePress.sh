@@ -9,6 +9,7 @@
 
 # NOTE: metamorphose2 is not used because of a strange bug listing files to be renamed (it shows an entirely wrong target file name which is from anoter file name in the tree).
 
+# TO DO: Revise this to call ftun.sh instead?
 # TO DO: update documentation in comments and have it refer to an outside file (move relevant comments from here to said file).
 # TO DO: Move the relevant instructions from bunnieselow, or all of them, into echo statements in the files to which they relate, for cases of using those files independent of this script.
 # TO DO? : split this into two scripts (one for file name and metadata fixup, another for custom metadata creation), and update documentation referencing the (to be former) file name of this script accordingly.

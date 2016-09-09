@@ -19,7 +19,6 @@
 #	NOTE that when logged in, it won't show the new link unless you reload the page.
 
 # SCRIPT WARNING ==========================================
-# NOTE: the following is commented out because something goofy is going on with maybe parenthesis parsing in the answers:
 echo "imgTagAndDist.sh: this script will erase all metadata from the image files in the entire directory tree from which this is run. If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal."
 	echo "!============================================================"
 	# echo "DO YOU WISH TO CONTINUE running this script?"
@@ -76,7 +75,7 @@ do
 						# echo that plus extension is $SFMFNnoExtension$SFMFNextension
 					# echo ====
 	# If SFMFNextension is .tif, strip all EXIF data by custom command upon inserting custom metadata; otherwise use a more general exif data strip command:
-	if [ $SFMFNextension == ".tif" ] || [ $SFMFNextension == ".png" ] || [ $SFMFNextension == ".psd" ]
+	if [ $SFMFNextension == ".tif" ] || [ $SFMFNextension == ".png" ] || [ $SFMFNextension == ".psd" || [ $SFMFNextension == ".svg" ]
 	then
 		# echo is tif.
 # TO DO: double-check: I *think* the -m flag, in ignoring minor warnings, allows writing strings into metadata longer than specs allow:
