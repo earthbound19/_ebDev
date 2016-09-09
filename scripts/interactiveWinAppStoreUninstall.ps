@@ -1,0 +1,3 @@
+# Re: https://www.reddit.com/r/Windows10/comments/3diylq/powershell_commands_to_uninstall_unwanted_builtin/ctme6iy
+
+Get-AppxProvisionedPackage -Online | Out-GridView -PassThru | Remove-AppxProvisionedPackage -Online
