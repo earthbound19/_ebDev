@@ -1,38 +1,61 @@
-FIX THE FOLLOWING TO WORK:
+REM DESCRIPTION
+REM Sets services to states which I prefer for not wasteroo ridiculous process hogging on Windows 8+ computers.
 
-SC STOP "DPS"
-SC STOP "FontCache"
-SC STOP "WPCSvc"
-SC STOP "ehRecvr"
-SC STOP "ehSched"
-SC STOP "WMPNetworkSvc"
-SC STOP "HomeGroupProvider"
-SC STOP "HomeGroupListener"
-SC STOP "TabletInputService"
-SC STOP "wscsvc"
-SC STOP "WinDefend"
-SC STOP "WMPNetworkSvc"
-SC STOP "WinRM"
-SC STOP "Mcx2Svc"
-SC STOP "CscService"
-SC STOP "AeLookupSvc"
-SC CONFIG "DPS" DEMAND
-SC CONFIG "FontCache" DEMAND
-SC CONFIG "WPCSvc" DEMAND
-SC CONFIG "ehRecvr" DEMAND
-SC CONFIG "ehSched" DEMAND
-SC CONFIG "WMPNetworkSvc" DEMAND
-SC CONFIG "HomeGroupProvider" DEMAND
-SC CONFIG "HomeGroupListener" DEMAND
-SC CONFIG "TabletInputService" DEMAND
-SC CONFIG "wscsvc" DEMAND
-SC CONFIG "WinDefend" DEMAND
-SC CONFIG "WMPNetworkSvc" DEMAND
-SC CONFIG "WinRM" DEMAND
-SC CONFIG "Mcx2Svc" DEMAND
-SC CONFIG "CscService" DEMAND
-SC CONFIG "AeLookupSvc" DEMAND
-SC STOP gusvc
-SC DELETE gusvc
-SC STOP gupdate
-SC DELETE gupdate
+REM REVISION HISTORY
+REM BEFORE NOW: yesh.
+REM 2016-08-31 corrected syntax; I don't know how long this hasn't been working :p
+
+sc stop "DPS"
+sc stop "FontCache"
+sc stop "WPCSvc"
+sc stop "ehRecvr"
+sc stop "ehSched"
+sc stop "WMPNetworkSvc"
+sc stop "HomeGroupProvider"
+sc stop "HomeGroupListener"
+sc stop "TabletInputService"
+sc stop "wscsvc"
+sc stop "WinDefend"
+sc stop "WMPNetworkSvc"
+sc stop "WinRM"
+sc stop "Mcx2Svc"
+sc stop "CscService"
+sc stop "AeLookupSvc"
+sc stop "NgcSvc"
+sc stop "NgcCtnrSvc"
+sc stop "tiledatamodelsvc"
+sc stop "Themes"
+sc stop "LicenseManager"
+sc stop "DoSvc"
+sc stop "DiagTrack"
+sc stop "BITS"
+sc stop "StorSvc"
+sc config "DPS" start= demand
+sc config "FontCache" start= demand
+sc config "WPCSvc" start= demand
+sc config "ehRecvr" start= demand
+sc config "ehSched" start= demand
+sc config "WMPNetworkSvc" start= demand
+sc config "HomeGroupProvider" start= demand
+sc config "HomeGroupListener" start= demand
+sc config "TabletInputService" start= demand
+sc config "wscsvc" start= demand
+sc config "WinDefend" start= demand
+sc config "WMPNetworkSvc" start= demand
+sc config "WinRM" start= demand
+sc config "Mcx2Svc" start= demand
+sc config "CscService" start= demand
+sc config "AeLookupSvc" start= demand
+sc config "NgcSvc" start= disabled
+sc config "NgcCtnrSvc" start= disabled
+sc config "tiledatamodelsvc" start= disabled
+sc config "Themes" start= disabled
+sc config "LicenseManager" start= disabled
+sc config "DoSvc" start= disabled
+sc config "DiagTrack" start= disabled
+sc config "BITS" start= disabled
+sc config "StorSvc" start= disabled
+sc stop gusvc
+sc delete gusvc
+sc stop gupdate
+sc delete gupdate
