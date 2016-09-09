@@ -6,7 +6,7 @@
 
 # DEPENDENCIES bm.exe, uh, byte . . . mangler. The original author named it byte molester, and programmed it to use .fck file extensions. No thanks. And did he want it to be mistakenly thought of as BowelMovement.exe?
 
-if [ ! -d ./out ]; then mkdir out; fi
+# if [ ! -d ./out ]; then mkdir out; fi
 
 find ./*.$1 > alles.txt
 mapfile -t alles < alles.txt
