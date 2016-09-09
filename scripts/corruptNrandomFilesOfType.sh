@@ -3,13 +3,14 @@
 # OR, with some code change, invokes BM.exe (Byte Molester, a free tool) for all files of a given extension in the directory from which this script is invoked, producing N glitched e.g. image file variants of all such file types, output to a /_glitched folder.
 
 # USAGE
-# Pass this script three parameters, being:
+# Pass this script four parameters, being:
 # $1, a file extension (without the .) for file types in the current directory which you want to produce glitched variants of
-# 2$, the number of randomly chosen images among all available images in the directory to "glitch,"
-# 3$, the number of glitched images per image you wish to make. The following example command will select 20 random jpg images from the current directory, and create 10 glitched copies of them in a _glitched subfolder (sorting each glitched variant of an image into a sub-subfolder named after the image) :
-# thisScript.sh jpg 20 10
+# $2, the number of randomly chosen images among all available images in the directory to "glitch,"
+# $3, the number of glitched images per image you wish to make. The following example command will select 20 random jpg images from the current directory, and create 10 glitched copies of them in a _glitched subfolder (sorting each glitched variant of an image into a sub-subfolder named after the image)
+# $4 What percent of each file to corrupt (1 to 100)
 
-# TO DO: Make this work. Is borken. Stopped coding halfway through a thought?
+# The following command, for example, will select 20 jpg images, make 10 corrupted copies of each, corrupting each copy by 2 percent:
+# thisScript.sh jpg 20 10 2
 
 find *$1 > _alles.txt
 mapfile -t allFilesOfExtension < _alles.txt
@@ -22,14 +23,14 @@ if [ ! -d _glitched ]; then mkdir _glitched; fi
 copiedFilesCount=0
 
 # throw an error and exit if paramater $2 passed to script is greater than the number of available files (of extension $1) to copy:
-if [ $sizeOfallFilesOfExtension -lt $2 ]
+if [ $sizeOfallFilesOfExtension -le $2 ]
 then
 	echo ERROR\: parameter \$2\, the requested number of files to copy of type $1 \(paramater \$1\) is greater than available number of such files\, $sizeOfallFilesOfExtension\ \(this script is not designed to avoid file name conflicts by e.g. duplicating the same source file to a new target name\)\.
 	exit
 fi
 
 # In case of duplicate selections, keep copying files until the count of $2 is met.
-while [ $copiedFilesCount -lt $2 ]
+while [ $copiedFilesCount -le $2 ]
 do
 	whichFileNum=`shuf -i 1-$sizeOfallFilesOfExtension -n 1`
 			echo Randomly chosen file is:
@@ -43,7 +44,7 @@ do
 		cd _glitched
 		for x in $( seq $3 )
 			do
-			corruptThisFile.sh ${allFilesOfExtension[$whichFileNum]}
+			corruptThisFile.sh ${allFilesOfExtension[$whichFileNum]} $4
 			done
 		cd ..
 					# another option, which would be done without a loop; use bm.exe, to be found in this repository: https://github.com/earthbound19/_devtools
