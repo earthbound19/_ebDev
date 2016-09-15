@@ -25,6 +25,7 @@ arrSize=${#array[@]}
 	randomCharsString=`cat /dev/urandom | tr -cd 'a-km-np-zA-KM-NP-Z2-9' | head -c $numRandomCharsToGet`
 		# echo randomCharsString val is $randomCharsString
 
+# TO DO: check if the following math is right. I think it isn't, and effectively sets it to $(( getNrandChars * (-1) )) ; although it probably works out for the same intended effect; ALSO SEE rndHexColorsGen.sh for a possibly more elegant way to do this:
 # Initialize counter at negative the number of getNrandChars, so that the first iteration in the following loop will set it to 0, which is where we need it to start:
 multCounter=-$getNrandChars
 	# echo multCounter val is $multCounter

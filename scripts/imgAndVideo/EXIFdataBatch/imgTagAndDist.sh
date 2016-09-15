@@ -19,7 +19,7 @@
 #	NOTE that when logged in, it won't show the new link unless you reload the page.
 
 # SCRIPT WARNING ==========================================
-echo "imgTagAndDist.sh: this script will erase all metadata from the image files in the entire directory tree from which this is run. If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal."
+echo "imgTagAndDist.sh: this script will erase all metadata from the image files in the entire directory tree from which this is run. If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal. NOTE FOR DISTRIBUTION PURPOSES: images uploaded to flickr must *not* have comma separated keyword values--there must be no commas."
 	echo "!============================================================"
 	# echo "DO YOU WISH TO CONTINUE running this script?"
     read -p "DO YOU WISH TO CONTINUE running this script? : y/n" CONDITION;

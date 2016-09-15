@@ -1,7 +1,11 @@
 # DESCRIPTION
 # Takes an .svg file and fills all white (FFFFFF) shape regions with random colors, n times (per paramater passed to script).
 
-# USAGE: pass this script three parameters (the third is optional), being $1 an .svg file name and $2 how many random color fill variations of that file to create, and $3 a flat text file list of hexadecimal RGB color codes, one per line, from which to choose random colors for this fill. This makes a copy of the .svg with a name being a time stamp. NOTE: This expects an svg colored via hexadecimal color code fills. If your svg is not thus, potrace the original black bitmap using potraceAllBMPs.sh, or use the SVGOMG service (convert your SVG file online) at: https://jakearchibald.github.io/svgomg/ -- or use or SVGO re https://github.com/svg/svgo and https://web-design-weekly.com/2014/10/22/optimizing-svg-web/ -- but NOTE: DO NOT use the "minify colors" option. It converts rgb values to hex by default.
+# USAGE
+# Pass this script three parameters (the third is optional), being:
+# $1 an .svg file name and
+# $2 how many random color fill variations of that file to create, and
+# $3 a flat text file list of hexadecimal RGB color codes, one per line, from which to choose random colors for this fill. This makes a copy of the .svg with a name being a time stamp. NOTE: This expects an svg colored via hexadecimal color code fills. If your svg is not thus, potrace the original black bitmap using potraceAllBMPs.sh, or use the SVGOMG service (convert your SVG file online) at: https://jakearchibald.github.io/svgomg/ -- or use or SVGO re https://github.com/svg/svgo and https://web-design-weekly.com/2014/10/22/optimizing-svg-web/ -- but NOTE: DO NOT use the "minify colors" option. It converts rgb values to hex by default.
 
 # TO DO? : implement an optional buffer memory of the last three colors used, and if the current picked color is among them, pick another color until it is not among them.
 

@@ -5,20 +5,21 @@
 
 # USAGE
 # From the directory with the image animation source images, invoke this script with these parameters:
-# $1 desired output framerate
-# $2 desired constant quality (crf)
-# $3 the file extension of the input images.
+# $1 input "frame rate" (how to interpret the speed of input images in fps
+# $2 desired output framerate
+# $3 desired constant quality (crf)
+# $4 the file extension of the input images.
 
 # TO DO: adjustable input file list "frame rate."
 # TO DO? : make it name the output file after the ../.. parent folder name?
 
 # horked from renumberFiles.sh:
-find *.$3 > allFiles.txt
+find *.$4 > allFiles.txt
 arraySize=$(wc -l < allFiles.txt)
 numDigitsOf_arraySize=${#arraySize}
 rm allFiles.txt
 
-ffmpeg -y -f image2 -i %0"$numDigitsOf_arraySize"d.$3 -r $1 -crf $2 _out.mp4
+ffmpeg -y -f image2 -r $1 -i %0"$numDigitsOf_arraySize"d.$4 -r $2 -crf $3 _out.mp4
 
 # DEV NOTES
 # ex. command:
