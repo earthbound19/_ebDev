@@ -9,6 +9,7 @@
 
 # TO DO? give this script a warning y/n prompt.
 
+echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
 find *.$1 > allFiles.txt
 arraySize=$(wc -l < allFiles.txt)
 numDigitsOf_arraySize=${#arraySize}
