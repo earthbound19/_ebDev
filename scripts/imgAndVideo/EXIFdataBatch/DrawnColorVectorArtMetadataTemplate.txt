@@ -1,0 +1,4 @@
+-MWG:Description="Decorative lines doodled and scanned, fixed up and converted to vector art by yours truly. A hoity-toity robot talks about this at http://s.earthbound.io/artgib ~ Syndicated from, original, print and usage options at "
+-MWG:Keywords="myWork art digital abstract doodle lines vector contemporary biomorphic decorative"
+-MWG:Copyright="Richard Alexander Hall http://earthbound.io/contact"
+-MWG:Creator="Richard Alexander Hall"

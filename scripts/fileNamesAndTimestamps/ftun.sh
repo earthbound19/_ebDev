@@ -12,7 +12,7 @@
 
 
 # SCRIPT WARNING ==========================================
-echo "Dude. In the wrong hands this script is a weapon. You sure you wanna do that? If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal. NOTE: any folder starting with a - (minus or dash) in the folder name will cause this script to fail. You'll want to avoid ever naming any folder thus."
+echo "Dude. In the wrong hands this script is a weapon. You sure you wanna do that? If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal. NOTE: any folder starting with a - (minus or dash) in the folder name will cause this script to fail. You'll want to avoid ever naming any folder thus. ALSO: this script will ignore all files containing the string 'alles'. For technical reasons."
 	echo "!============================================================"
 	# echo "DO YOU WISH TO CONTINUE running this script?"
     read -p "DO YOU WISH TO CONTINUE running this script? : y/n" CONDITION;
@@ -28,10 +28,11 @@ echo "Dude. In the wrong hands this script is a weapon. You sure you wanna do th
 # shopt -s nullglob
 # for i in *\'* ; do mv -v "$i" "${i/\'/}" ; done
 
-# === FOLDERS RENAMING ===
-find * -type d > alles1.txt
+# === BEGIN FOLDERS RENAMING ===
+# NOTE that all of these find commands add an exclusion of every file with the string 'alles' in it via grep; re: http://stackoverflow.com/a/8525459/1397555
+find * -type d | grep -v '.*alles.*' > alles1.txt
 # Build second part of move command by replacing all terminal-unfriendly characters in listed folder names, via tr:
-find * -type d | tr \=\@\`~\!#$%^\&\(\)+[{]}\;\ , _ > alles2.txt
+find * -type d | grep -v '.*alles.*' | tr \=\@\`~\!#$%^\&\(\)+[{]}\;\ , _ > alles2.txt
 				# Example bad folder name that was tested against:
 				# WUT`'''''~!@#$%^&a()-=hi hi HEY+[{]};' ,
 # Prune all triplicate+ underscores to double (for target folder names) :
@@ -57,7 +58,7 @@ mv temp.txt badPathsRename.sh.txt
 echo !=======================!
 echo \! WARNING \! AND NOTE\: This rename script may choke and fail or cause DRASTICALLY WRONG file renames IF ANY folders and files have single-quote marks \(\'\)\ in their name \(never put that in a file name--that\'s terminal-unfriendly\)\. You will want to take care of those via the free FlexibleRenamer.exe or metamorphose utilities\; for the latter\, with noQuotes.cfg. PROGRAMMER TO DO\: Clarify that by elaborating on it.
 echo !=======================!
-echo DONE creating proposed folder rename script. Examine badPathsRename.sh.txt\, and correct any errors. EXAMINE EVERY LINE of that file for correctness\, and fix any errors. \(You must understand the mv command\). Once you\'re certain the proposed mv \(rename\) commands in it are all good\, press y\, and I will rename that \.txt file to a \.sh script and execute it\, to actually do the renames. NOTE\: any folder names prefixed with a dash \(\-\) will not rename\, and throw an error--but the script will continue and properly rename anything else. You can abuse this as a strategy to avoid renaming particular folders \(not recommended\)\.
+echo DONE creating proposed folders rename script. Examine badPathsRename.sh.txt\, and correct any errors. EXAMINE EVERY LINE of that file for correctness\, and fix any errors. \(You must understand the mv command\). Once you\'re certain the proposed mv \(rename\) commands in it are all good\, press y\, and I will rename that \.txt file to a \.sh script and execute it\, to actually do the renames. NOTE\: any folder names prefixed with a dash \(\-\) will not rename\, and throw an error--but the script will continue and properly rename anything else. You can abuse this as a strategy to avoid renaming particular folders \(not recommended\)\.
 read -r -p "Are you sure? [y/N] " response
 case $response in
     [yY][eE][sS]|[yY]) 
@@ -71,26 +72,29 @@ esac
 mv badPathsRename.sh.txt badPathsRename.sh
 ./badPathsRename.sh
 rm ./badPathsRename.sh
+# === END FOLDERS RENAMING ===
 
-exit
 
-# TO DO: rewrite the FILES RENAMING section below to follow the same process used to rename folders.
-# === FILES RENAMING ===
-# DO all of the same things again, but for files only (now that paths have been fixed up, eliminating problems that would otherwise cause in path renaming, and because fixing paths at the same time as files would mean wasted and error-throwing duplicate path rename commands.)
+# === BEGIN FILES RENAMING ===
+# DO all of the same things again, but for files only (now that paths have been fixed up, eliminating problems that would otherwise cause in path renaming, and because fixing paths at the same time as files would mean wasted and error-throwing duplicate path rename commands.) All comments deleted here--code copied and adapted from folders renaming section (see). TWEAK: exclude (alles*.txt) named files via !(alles*.txt).
+# shopt -s extglob
+find * -type f | grep -v '.*alles.*' > alles1.txt
+find * -type f | grep -v '.*alles.*' | tr \=\@\`~\!#$%^\&\(\)+[{]}\;\ , _ > alles2.txt
+sed -i "s/_\{3,\}/__/g" alles2.txt
+paste -d '\n' alles1.txt alles2.txt > ZERP.txt
+uniq -u ZERP.txt > badFilesRename.sh.txt
+rm ZERP.txt alles1.txt alles2.txt
+sed -n -i "s/\(.*\)/'\1'/p" badFilesRename.sh.txt
+echo OHHAI_DELETE_THIS_LINE_6D7C3qwFyXe2K4WMxevdf355tR27tESbpr_KTHXBAI >> badFilesRename.sh.txt
+sed -i ':a;N;$!ba;s/\([^\n]*\)\n\([^\n]*[\n|$]\)/mv \1 \2/g' badFilesRename.sh.txt
+head --lines=-1 badFilesRename.sh.txt > temp.txt
+rm badFilesRename.sh.txt
+mv temp.txt badFilesRename.sh.txt
 
-# Without some "do not match" search conditions in find commands, the alles3.txt and alles4.txt files which would be generated by the following commands will show up in the list files, and drastically mess up renaming!
-shopt -s extglob
-find !(alles*.txt) -type f > alles3.txt
-	# find * -type f > alles3.txt
-sed -i "s/\(.*\)/mv '\1'/" alles3.txt
-find !(alles*.txt) -type f | tr \=\'\@\`~\!#$%^\&\(\)+[{]}\;\ , _ > alles4.txt
-sed -i "s/_\{3,\}/__/g" alles4.txt
-sed -i "s/\(.*\)/ '\1'/" alles4.txt
-paste -d '' alles3.txt alles4.txt > badFilesRename.sh.txt
-rm alles3.txt alles4.txt
-
-echo
-echo DONE creating proposed folder rename script. Examine badFilesRename.sh.txt\, and correct any errors. EXAMINE EVERY LINE of that file for correctness\, and fix any errors. \(You must understand the mv command\). Once you\'re certain the proposed mv \(rename\) commands in it are all good\, press y\, and I will rename that \.txt file to a \.sh script and execute it\, to actually do the renames. NOTE: This rename script may choke and fail on file names that include single-quote marks \(\'\)\. You will want to take care of those via the free FlexibleRenamer.exe or metamorphose utilities\; for the latter\, with noQuotes.cfg. PROGRAMMER TO DO\: Clarify that by elaborating on it.
+echo !=======================!
+echo \! WARNING \! AND NOTE\: This rename script may choke and fail or cause DRASTICALLY WRONG file renames IF ANY folders and files have single-quote marks \(\'\)\ in their name \(never put that in a file name--that\'s terminal-unfriendly\)\. You will want to take care of those via the free FlexibleRenamer.exe or metamorphose utilities\; for the latter\, with noQuotes.cfg. PROGRAMMER TO DO\: Clarify that by elaborating on it.
+echo !=======================!
+echo DONE creating proposed folders rename script. Examine badFilesRename.sh.txt\, and correct any errors. EXAMINE EVERY LINE of that file for correctness\, and fix any errors. \(You must understand the mv command\). Once you\'re certain the proposed mv \(rename\) commands in it are all good\, press y\, and I will rename that \.txt file to a \.sh script and execute it\, to actually do the renames. NOTE\: any folder names prefixed with a dash \(\-\) will not rename\, and throw an error--but the script will continue and properly rename anything else. You can abuse this as a strategy to avoid renaming particular folders \(not recommended\)\.
 read -r -p "Are you sure? [y/N] " response
 case $response in
     [yY][eE][sS]|[yY]) 
@@ -103,13 +107,14 @@ esac
 
 mv badFilesRename.sh.txt badFilesRename.sh
 ./badFilesRename.sh
-rm badFilesRename.sh
+rm ./badFilesRename.sh
+# === END FILES RENAMING ===
 
 
 # CHANGE LOG
 # Pre 09/14/2016: correct.
 # 09/14/2016 10:06:07 PM made folder renaming much more reliable (unknown characters or patterns could mess it up). Plan to implement same new process for file renaming.
-
+# 09/17/2016 04:11:38 PM Bug fix: don't list temp files created during run of this script.
 
 # DEVELOPMENT NOTES
 # Re: http://dimitar.me/quickly-remove-special-characters-from-file-names/
