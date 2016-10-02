@@ -1,7 +1,8 @@
-# TO DO: Describe and document usage of this script. It makes a batch file to review for numbering particular files. Files will be number tagged that have a name format including _final_ or _final.{1,4} (the latter regex matching a file extension). Note in the documentation that var = variation, and any file name with a word including the letter group "var" may behave unexpectedly.
+# TO DO: Describe and document usage of this script. It makes a batch file to review for numbering particular files. Files that have a name format including _final_ or _final.{1,4} (the latter regex matching a file extension) will be number tagged. Note in the documentation that var = variation, and any file name with a word including the letter group "var" may behave unexpectedly.
 
 # TO DO? Alter the following to use a parameter:
-label=abstr
+label=work
+# label=abstr
 
 # TO DO? : is the result file name fileNamesWithNumberTags.txt even accurate? Is it actually just file names that have numbers in them? Fix to reflect that if so.
 
@@ -30,8 +31,8 @@ fi
 # ALL FILE TYPES OPTION; comment out for use with images:
 # find . -type f -regex '\.\/.*' -printf '%TY %Tm %Td %TH %TM %TS %p\n' | sort -g > _batchNumbering/fileNamesWithNumberTags.txt
 # ALL USED IMAGE FILE TYPES OPTION; comment out for all files; NOTE: find -regex ".*\.\(xls\|csv\)" format is necessary here, apparently (else it thinks -printf is a parameter to -iname?) ; re: http://unix.stackexchange.com/a/28157/110338 -- also, -iregex makes the search case-insensitive:
-find . -type f -iregex '\.\/.*.\(tif\|tiff\|png\|.psd\|ora\|kra\|rif\|riff\|jpg\|jpeg\|gif\|bmp\|cr2\|crw\|pdf\|ptg\)' -printf '%TY %Tm %Td %TH %TM %TS %p\n' | sort -g > _batchNumbering/fileNamesWithNumberTags.txt
-	# Heck yeah! That worked! NOTE: that command sorts the file list by date per the need of the purpose of this script. I don't need the date info; printing that info enables a sort switch to so sort it. In the next step I remove the date prints and ./ before file paths.
+find . -type f -iregex '\.\/.*.\(tif\|tiff\|png\|.psd\|ora\|kra\|rif\|riff\|jpg\|jpeg\|gif\|bmp\|cr2\|crw\|pdf\|ptg\|svg\)' -printf '%TY %Tm %Td %TH %TM %TS %p\n' | sort -g > _batchNumbering/fileNamesWithNumberTags.txt
+	# Heck yeah! That worked! NOTE: that command sorts the file list by date per the need of the purpose of this script--the | sort -g part of it sorts by earliest time stamp first. I won't need the date info for renaming parsing (only to the file names in the proper order first. In the next step I remove the date prints and ./ before file paths.
 # TO DO: create a mechanism that imports the file extensions to search for from a more easily modifiable text file, to be used by this and other scripts (like dateByFileName.sh and dateByMetaData.sh).
 	# Trim that to a . (the current directory) and the rest of the path (no date info) :
 sed -i 's/\([^\/]*\)\(\/.*\)/\.\2/g' ./_batchNumbering/fileNamesWithNumberTags.txt
@@ -87,8 +88,9 @@ do
 	else
 		# Increment the highest number, to put it in the file rename list:
 		num=$(printf %05d "$((10#$num + 1))")
-		# The following puts in necessary explicit spacing bewtween the underscores and $num, else it won't interpret the variable; and I take out the spaces after. Surely there's a better way?
-		echo $fileName | sed "s/\(.*_[fF][iI][nN][aA][lL]\)\(.*\)/\1_ $label _ $num _\2/g" >> ./_batchNumbering/target_fileNames.txt
+		# The following puts in necessary explicit spacing between the underscores and $num, else it won't interpret the variable; and I take out the spaces after. Surely there's a better way?
+			# Yes, there is. Surround the $variable with double-quote marks and it will print the variable value. 09/17/2016 RAH
+		echo $fileName | sed "s/\(.*_[fF][iI][nN][aA][lL]\)\(.*\)/\1_"$label"_"$num"_\2/g" >> ./_batchNumbering/target_fileNames.txt
 	fi
 done 
 # Remove the inserted spaces created in that loop (most previous comment):
@@ -124,6 +126,8 @@ uniq -d ./_batchNumbering/possible_unwanted_duplicates.txt > ./_batchNumbering/t
 sed -i '/^$/d' ./_batchNumbering/temp2.txt
 cat ./_batchNumbering/temp1.txt ./_batchNumbering/temp2.txt > ./_batchNumbering/temp3.txt
 mv ./_batchNumbering/temp3.txt ./_batchNumbering/possible_unwanted_duplicates.txt
+# OPTION to filter that down to only paths/files including the string FINAL; comment out if unwanted:
+# sed -i -n 's/\(.*[Ff][Ii[Nn][Aa][Ll]*.\)/\1/p' ./_batchNumbering/possible_unwanted_duplicates.txt
 
 
 # PRINT STATISTICS and help messages.

@@ -6,13 +6,14 @@
 
 # NOTE: cygpath use else err next:
 metaDataTemplatePath=`cygpath -u "C:\_devtools\scripts\imgAndVideo\EXIFdataBatch"`
-metaDataTemplateFile=customImageMetadataTemplate.txt
+# metaDataTemplateFile=customImageMetadataTemplate.txt
 # metaDataTemplateFile=electricSheep_CC_by_sa_template.txt
+metaDataTemplateFile=DrawnColorVectorArtMetadataTemplate.txt
 metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 
-find . -iname \*_FINAL*.mp4 -o -iname \*_FINAL*.tif -o -iname \*_FINAL*.tiff -o -iname \*_FINAL*.png -o -iname \*_FINAL*.psd -o -iname \*_FINAL*.ora -o -iname \*_FINAL*.rif -o -iname \*_FINAL*.riff -o -iname \*_FINAL*.jpg -o -iname \*_FINAL*.jpeg -o -iname \*_FINAL*.gif -o -iname \*_FINAL*.bmp -o -iname \*_FINAL*.cr2 -o -iname \*_FINAL*.raw  -o -iname \*_FINAL*.crw -o -iname \*_FINAL*.pdf  -o -iname \*_FINAL*.svg > imagesMetadataPrepList.txt
+find . -iname \*_FINAL*.mp4 -o -iname \*_FINAL*.tif -o -iname \*_FINAL*.tiff -o -iname \*_FINAL*.png -o -iname \*_FINAL*.psd  -o -iname \*_FINAL*.psb -o -iname \*_FINAL*.ora -o -iname \*_FINAL*.rif -o -iname \*_FINAL*.riff -o -iname \*_FINAL*.jpg -o -iname \*_FINAL*.jpeg -o -iname \*_FINAL*.gif -o -iname \*_FINAL*.bmp -o -iname \*_FINAL*.cr2 -o -iname \*_FINAL*.raw  -o -iname \*_FINAL*.crw -o -iname \*_FINAL*.pdf  -o -iname \*_FINAL*.svg > imagesMetadataPrepList.txt
 
-find . -iname \*_FINALvar*.mp4 -o -iname \*_FINALvar*.tif -o -iname \*_FINALVAR*.tiff -o -iname \*_FINALVAR*.png -o -iname \*_FINALVAR*.psd -o -iname \*_FINALVAR*.ora -o -iname \*_FINALVAR*.rif -o -iname \*_FINALVAR*.riff -o -iname \*_FINALVAR*.jpg -o -iname \*_FINALVAR*.jpeg -o -iname \*_FINALVAR*.gif -o -iname \*_FINALVAR*.bmp -o -iname \*_FINALVAR*.cr2 -o -iname \*_FINALVAR*.raw  -o -iname \*_FINALVAR*.crw -o -iname \*_FINALVAR*.pdf -o -iname \*_FINALVAR*.svg >> imagesMetadataPrepList.txt
+find . -iname \*_FINALvar*.mp4 -o -iname \*_FINALvar*.tif -o -iname \*_FINALVAR*.tiff -o -iname \*_FINALVAR*.png -o -iname \*_FINALVAR*.psd -o -iname \*_FINAL*.psb -o -iname \*_FINALVAR*.ora -o -iname \*_FINALVAR*.rif -o -iname \*_FINALVAR*.riff -o -iname \*_FINALVAR*.jpg -o -iname \*_FINALVAR*.jpeg -o -iname \*_FINALVAR*.gif -o -iname \*_FINALVAR*.bmp -o -iname \*_FINALVAR*.cr2 -o -iname \*_FINALVAR*.raw  -o -iname \*_FINALVAR*.crw -o -iname \*_FINALVAR*.pdf -o -iname \*_FINALVAR*.svg >> imagesMetadataPrepList.txt
 				# FORMER CODE:
 				# find . -iname \*_FINAL*.tif > imagesMetadataPrepList.txt
 				# find . -iname \*_finalvar_*.tif >> imagesMetadataPrepList.txt
