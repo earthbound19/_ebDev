@@ -30,7 +30,7 @@ then
 fi
 
 
-find . -iname \*.svg > all_svgs.txt
+CygwinFind . -iname \*.svg > all_svgs.txt
 mapfile -t all_svgs < all_svgs.txt
 for element in "${all_svgs[@]}"
 do

@@ -81,10 +81,4 @@ do
 	cat ppmheader.txt grid.ppm > "$numRows"x"$numCols"gridRND_"$timestamp".ppm
 	rm ppmheader.txt grid.ppm
 
-			# DEPRECATED, on account of wanting to make mp4 animations where ffmpeg can upscale on the fly (and skip need of any upscaled .png image) see improved approach at end of makeBWGridRandomNoise.sh:
-			# Convert new image to upscaled (preserving hard edges) by 50 time as large png:
-			# newXpix=$((numbersNeedsPerRow * $multiplierScale))
-			# newYpix=$((numRows * $multiplierScale))
-							# echo Creating enlarged png version with hard edges maintained . . .
-			# nconvert -ratio -rtype quick -resize $newXpix $newYpix -out png -o "$numRows"x"$numCols"gridRND_"$timestamp".png "$numRows"x"$numCols"gridRND_"$timestamp".ppm
 done

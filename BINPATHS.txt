@@ -11,7 +11,7 @@ C:\_devtools\scripts\lit\gibberish\python-Backus-Naur-poetry-generator
 C:\_devtools\scripts\lit\gibberish
 C:\_devtools\bin\GibbGen\pyMarkovGibGen
 C:\_devtools\bin\GibbGen\GibbGenCPP\bin\1.0-functional
-C:\_devtools\bin\gnuCoreUtilsWin32\bin
+C:\_devtools\bin\gnuCoreUtilsWin32
 C:\_devtools\bin\AutoHotkey\Compiler
 C:\_devtools\bin\ImageMagick
 C:\_devtools\bin\ImageMagick\modules\coders

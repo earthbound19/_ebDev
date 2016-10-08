@@ -8,9 +8,13 @@
 
 printf "" > temp.txt
 
+THIS_SCRIPTS_PATH="`dirname \"$0\"`"
+	# echo THIS_SCRIPTS_PATH val is\:
+	# echo $THIS_SCRIPTS_PATH
+
 for elm in {1..90}
 do
-	shuf blockChars.txt >> temp.txt
+	shuf "$THIS_SCRIPTS_PATH/blockChars.txt" >> temp.txt
 done
 
 tr -d '\n' < temp.txt > blockString.txt
@@ -20,4 +24,5 @@ cygstart blockString.txt
 
 # HISTORY:
 # 05/04/2016 12:37:50 PM -RAH Created after seeing these interesting characters in an .nfo; coincidentally, just such blocky "noise" suited for what I had wanted at that moment to make!
+# 10/04/good buddy/2016 12:15 PM on lunch at work -RAH updated to find the path of this dir, store it in THIS_SCRIPTS_PATH, and invoke it locally to actually make use of blockstring.txt
 
