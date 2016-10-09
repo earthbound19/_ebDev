@@ -43,20 +43,20 @@ do
 	oy=`echo "$oy" | sed -f /cygdrive/c/_devtools/scripts/urlencode.sed`
 	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=4ffdbbc5091420d5b0448ce42273c6&is_secret=false&response_type=plain_text&url=$oy"
 	wget -O oy.txt $wgetArg
-	# Insert that image title with a search query URL into the description tag; roundabout means via invoking script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:
-	# BUT WAIT! START OY TEH CLUGY ===================================
-					# BUG FIXED--see next comment; NOTE the following will cause mashed redundant URLs if this script is run twice or more; you must delete the working ~MD_ADDS.txt and run prepImageMetaData.sh before this script: --. 2016-05-07 11:20 PM -RAH
-			# CLEAR the urlencoded text after .*earthbound.io/q (if there is such text), lest redundant encodings append thereto on subsequent runs of this script:
-			sed -i 's/\(.*print and usage options at \).*/\1/g' $element
-		sed -i 's/\//\\\//g' oy.txt
-		descriptionAddendum=$( < oy.txt)
-		echo desc. add.\:
-		echo descriptionAddendum value is\:
-		echo $descriptionAddendum
-		echo elem.\:
-		echo $element
-		sed -i "s/\(.* print and usage options at \).*/\1$descriptionAddendum\"/g" $element
-		rm zorg.txt oy.txt
+			# Insert that with a search query URL into the description tag; roundabout means via invoking script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:
+	# parse that result and store it in a variable $descriptionAddendum:
+	sed -i 's/\//\\\//g' oy.txt
+			# ?? :
+			# descriptionAddendum=http:\\/
+	descriptionAddendum=$( < oy.txt)
+			echo descriptionAddendum value is\:
+			echo $descriptionAddendum
+			echo element is\:
+			echo $element
+	# strip placeholder URL from description and replace it with URL from $descriptionAddendum:
+	# sed -i 's/\(.*See\) http:\/\/[^ ]* for \(.*\)/ \1 $descriptionAddendum for \2/g' $element
+	sed -i -e s/"\(.*See\) http:\/\/[^ ]* \(for .*\)"/"\1 $descriptionAddendum \2"/g $element
+	rm zorg.txt oy.txt
 	tr '\n' ' ' < $element > ghor.txt
 	exifTagArgs=$( < ghor.txt)
 	rm ghor.txt
