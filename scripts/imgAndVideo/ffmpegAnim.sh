@@ -9,17 +9,25 @@
 # $2 desired output framerate
 # $3 desired constant quality (crf)
 # $4 the file extension of the input images.
+# Optional: $5 rescale target resolution expressed as nnnnXnnnn. Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution.
 
 # TO DO: adjustable input file list "frame rate."
 # TO DO? : make it name the output file after the ../.. parent folder name?
 
+if [ ! -z ${5+x} ]
+then
+	rescaleParams="-vf scale=$5:flags=neighbor"
+		# echo rescaleParams val is\:
+		# echo $rescaleParams
+fi
+
 # horked from renumberFiles.sh:
-find *.$4 > allFiles.txt
+CygwinFind *.$4 > allFiles.txt
 arraySize=$(wc -l < allFiles.txt)
 numDigitsOf_arraySize=${#arraySize}
 rm allFiles.txt
 
-ffmpeg -y -f image2 -r $1 -i %0"$numDigitsOf_arraySize"d.$4 -r $2 -crf $3 _out.mp4
+ffmpeg -y -f image2 -r $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -r $2 -crf $3 _out.mp4
 
 # DEV NOTES
 # ex. command:

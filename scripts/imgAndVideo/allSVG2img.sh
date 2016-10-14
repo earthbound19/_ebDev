@@ -36,7 +36,7 @@ for element in "${all_svgs[@]}"
 do
 		# Because I couldn't get this done with an echo piped to sed:
 		echo $element > temp.txt
-		sed -i 's/\(.*\).svg/\1/g' temp.txt
+		sed -i 's/\(.*\)\.svg/\1/g' temp.txt
 	svgFilenameNoExtension=$( < temp.txt)
 	if [ -a $svgFilenameNoExtension.$img_format ]
 	then
