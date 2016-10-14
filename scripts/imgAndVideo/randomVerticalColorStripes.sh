@@ -8,8 +8,8 @@
 # $3 How many pixels wide to scale the final image
 # $4 How many pixels tall to scale the final image
 # $5 How many such random images you want to create
-# $6 Optional. A file list of hex color values to randomly pick from. If not provided, every stripe is a pseudo-randomly selected color.
-# $7 Optional. Randomly vary max. number of columns at a maximum minus of 1 to the number given in this variable.
+# $6 Optional. Randomly vary max. number of columns at a maximum minus of 1 to the number given in this variable.
+# $7 Optional. A file list of hex color values to randomly pick from. If not provided, every stripe is a pseudo-randomly selected color.
 
 # NOTES
 # TO DO
@@ -18,23 +18,20 @@
 # In case of interrupted run, clean up first:
 rm *.temp temp.txt
 
-# VARS ARE
+# GLOBAL VARIABLES
+hexColorListsPath=/cygdrive/d/Alex/Programming/_devtools/scripts/imgAndVideo/ColorSchemesHex
+
 minColorColumnRepeat=$1
 maxColorColumnRepeat=$2
 scalePixX=$3
 scalePixY=$4
 howManyImages=$5
-colorSelectionList=$6
+maxColorColumnsVariation=$6
+colorSelectionList="$hexColorListsPath"/$7
 
-# ! VARS WERE: !
-# $1 How many pixels wide wide you want a random image grid to be
-# $2 How many pixels tall ~
-# $3 How many such random images you want to create
-# $4 A file list of hex color values to randomly pick from (instead of 
-
-# The logic of this variable check is: of not no value for this var, do something (in other words, if there is this var with a value, do something) ;
+# The logic of this variable check is: if not no value for this var, do something (in other words, if there is this var with a value, do something) ;
 # UNFORTUNATELY, it seems this type of check only works with environment parameter variables, not assigned variables that have no value, WHICH MEANS that the following must be hard-coded for the parameter:
-if [ ! -z ${6+x} ]
+if [ ! -z ${7+x} ]
 	then
 	echo IMPORTING FROM COLOR LIST from file name\:
 	echo $colorSelectionList
@@ -50,9 +47,9 @@ do
 	# stripesPerRow=$(( $numCols * 3 ))
 	# numbersNeedsPerRow=$(( $numCols * 3 ))
 			# Check and make changes for optional random negative variation of max random number pick range:
-			if [ ! -z ${7+x} ]
+			if [ ! -z ${6+x} ]
 				then
-					randomVariation=`shuf -i 1-"$7" -n 1`
+					randomVariation=`shuf -i 1-"$6" -n 1`
 					maxRange=$(( $maxColorColumnRepeat - $randomVariation ))
 				else
 					maxRange=$maxColorColumnRepeat
@@ -62,12 +59,12 @@ do
 	for i in $( seq $howManyStripes )
 	do
 					echo Generating stripe for image number $a . . .
-				# Pick a random color from a hex color list if such a list is specified (converting to RGB along the way); otherwise pick completely random RGB values.
 						repeatColumnColorCount=`shuf -i $minColorColumnRepeat-$maxColorColumnRepeat -n 1`
-				if [ ! -z ${6+x} ]
+				if [ ! -z ${7+x} ]
 					then
 						# empty temp.txt before writing new color columns to it:
 						printf "" > temp.txt
+							# Pick a random color from a hex color list if such a list is specified (converting to RGB along the way); otherwise pick completely random RGB values.
 							pick=`shuf -i 0-"$sizeOf_hexColorsArray" -n 1`
 							hex="${hexColorsArray[$pick]}"
 									# Pick a number of times to repeat that chosen hex color, then write it that number of times to the temp file that will make up the eventual .ppm file: 
@@ -103,12 +100,15 @@ do
 
 					echo Concatenating generated rows into one new .ppm file . . .
 	timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
-	ppmFileName=1x"$count"gridRND_"$timestamp"
+	ppmFileName=1x"$howManyStripes"stripesRND_"$timestamp"
 	cat ppmheader.txt grid.ppm > $ppmFileName.ppm
 	rm ppmheader.txt grid.ppm
 
 # OPTIONAL:
 echo Creating enlarged png version with hard edges maintained . . .
+# nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png $ppmFileName.ppm
+# DEV OVERRIDE:
+scalePixY=$(( $scalePixX / 2 ))
 nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png $ppmFileName.ppm
 
 done
