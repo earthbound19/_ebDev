@@ -33,7 +33,9 @@ for filename in ${array[@]}
 do
 		# Get file extension, re: http://stackoverflow.com/a/30863119/1397555
 		# Extension (all) : '1.0.1.tar.gz'
-		fileExt=`echo "$filename" | awk '{sub(/[^.]*[.]/, "", $0)} 1'`
+			# DEPRECATED; apparently less portable:
+			# fileExt=`echo "$filename" | awk '\{sub(/[^.]*[.]/, "", $0)\} 1'`
+		fileExt=`echo "$filename" | sed 's/.*\.\([^\.]*\)/\1/g'`
 			# echo fileExt val is $fileExt
 		# For file renaming, grab next n random characters from pre-generated randomCharsString:
 		# num=$(($multCounter + $num2))
@@ -42,7 +44,7 @@ do
 		multCounter=$(($multCounter + $getNrandChars))
 			# echo getNrandChars val is $getNrandChars
 		newFileBaseName=${randomCharsString:$multCounter:$getNrandChars}
-			# echo ~----- newFileBaseName is $newFileBaseName
+			# echo ~----- "renaming $filename to $newFileBaseName"."$fileExt"
 	mv ./$filename ./$newFileBaseName.$fileExt
 done
 
