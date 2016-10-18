@@ -12,7 +12,7 @@
 # The following command, for example, will select 20 jpg images, make 10 corrupted copies of each, corrupting each copy by 2 percent:
 # thisScript.sh jpg 20 10 2
 
-find *$1 > _alles.txt
+CygwinFind *$1 > _alles.txt
 mapfile -t allFilesOfExtension < _alles.txt
 rm ./_alles.txt
 sizeOfallFilesOfExtension=${#allFilesOfExtension[@]}
@@ -46,6 +46,7 @@ do
 			do
 			corruptThisFile.sh ${allFilesOfExtension[$whichFileNum]} $4
 			done
+		rm "${allFilesOfExtension[$whichFileNum]}"
 		cd ..
 					# another option, which would be done without a loop; use bm.exe, to be found in this repository: https://github.com/earthbound19/_devtools
 					# bm.exe "${allFilesOfExtension[$whichFileNum]}" bm.exe $1 -x jpg -u 100 -r 12 -t 1 -s 9 -a 5 -v -m +-

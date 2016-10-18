@@ -6,13 +6,11 @@
 ffmpeg -i $1 %20d.jpg
 corruptMangleAllFilesOfTypeNtimes.sh jpg 1
 rm *.jpg
-renumberFiles.sh jpg
-# It'd be good to nuke all those resultant ~_corrupted folders here.
 identifyCorruptIMGs.sh jpg
-	# OPTIONAL step:
-# TESTING HERE
-# exit
-	rm ./_irrecoverable/*.*
+rm ./_irrecoverable/*.*
+renumberFiles.sh jpg
+# Nukes all resultant empty directories:
+CygwinFind -type d -empty -delete
 ffmpegAnim.sh 29.97 29.97 13 jpg
 mkdir _frames
 mv *.jpg ./_frames

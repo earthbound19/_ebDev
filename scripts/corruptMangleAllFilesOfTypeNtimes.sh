@@ -15,7 +15,7 @@ rm alles.txt
 for element in ${alles[@]}
 do
 	# randomCharsString=`cat /dev/urandom | tr -cd 'a-km-np-zA-KM-NP-Z2-9' | head -c $numRandomCharsToGet`
-	bm.exe $element -x jpg -u $2 -r 17 -t 1 -s 100 -v -a -m +-
+	bm.exe $element -x jpg -u $2 -r 6 -t 1 -s 100 -v -a -m +-
 	mv ./out ./"$element"_corrupted
 	mkdir out
 done

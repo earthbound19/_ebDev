@@ -39,7 +39,7 @@ find *.tif *.tiff *.png *.jpg *.jpeg *.gif *.bmp *.psd *.cr2 *.crw *.pdf -maxdep
 # !=======================================
 # CREATE ARRAY OF NEW FILE NAMES and RENAME them. IN ALL CAPS. Except not in all caps.
 # 57 preferred:
-shortenFileLengthTo=175
+shortenFileLengthTo=57
 mapfile -t imgs_oldNames < imgs_oldNames.txt
 rm imgs_oldNames.txt
 # USED BY makeIMGjunctionsBatch.ahk/exe; needs to be blanked by this before it is used by that:
