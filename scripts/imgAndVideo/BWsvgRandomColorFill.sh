@@ -1,21 +1,21 @@
 # DESCRIPTION
-# Takes an .svg file and fills all white (FFFFFF) shape regions with random colors, n times (per paramater passed to script).
+# Takes an .svg file and fills all white (ffffff) shape regions with random colors, n times, OR from colors randomly selected from a list (per optional paramater passed to script).
 
 # USAGE
 # Pass this script three parameters (the third is optional), being:
 # $1 an .svg file name and
 # $2 how many random color fill variations of that file to create, and
-# $3 a flat text file list of hexadecimal RGB color codes, one per line, from which to choose random colors for this fill. This makes a copy of the .svg with a name being a time stamp. NOTE: This expects an svg colored via hexadecimal color code fills. If your svg is not thus, potrace the original black bitmap using potraceAllBMPs.sh, or use the SVGOMG service (convert your SVG file online) at: https://jakearchibald.github.io/svgomg/ -- or use or SVGO re https://github.com/svg/svgo and https://web-design-weekly.com/2014/10/22/optimizing-svg-web/ -- but NOTE: DO NOT use the "minify colors" option. It converts rgb values to hex by default.
+# $3 a flat text file list of hexadecimal RGB color codes, one per line, from which to choose random colors for this fill. NOTE: each hex color must be preceded by #. This script makes a copy of the .svg with a name being a time stamp. NOTE: This expects an svg colored via hexadecimal color code fills where areas to color are designated in the svg as #ffffff. If your svg is not thus, potrace the original black bitmap using potraceAllBMPs.sh, or use the SVGOMG service (convert your SVG file online) at: https://jakearchibald.github.io/svgomg/ -- or use or SVGO re https://github.com/svg/svgo and https://web-design-weekly.com/2014/10/22/optimizing-svg-web/ -- It converts rgb values to hex by default. BUT NOTE: DO NOT use the "minify colors" option. 
 
 # TO DO? : implement an optional buffer memory of the last three colors used, and if the current picked color is among them, pick another color until it is not among them.
 
 
 # CODE
-# If no $1 parameter passed to script, create an array of 9 random hex RGB color values. Otherwise, create the array from the list in the filename specified in $1.
+# If no $3 parameter passed to script, create an array of 10 random hex RGB color values. Otherwise, create the array from the list in the filename specified in $3.
 if [ -z ${3+x} ]
 	then
 		echo Generating random hex colors array . . .
-		for i in $( seq 11 );
+		for i in $( seq 10 );
 		do
 # TO DO: make this work faster with one pre-generated string in memory that you bite six bytes off in increments.
 		randomHexString=`cat /dev/urandom | tr -cd 'a-f0-9' | head -c 6`
@@ -24,11 +24,13 @@ if [ -z ${3+x} ]
 		done
 	else
 		echo Generating hex colors array from file $3 . . .
-		mapfile -t rndHexColors < $3
+		sed 's/#//g' $3 > srcHexColorsNoHash.txt
+		mapfile -t rndHexColors < srcHexColorsNoHash.txt
 				for element in ${rndHexColors[@]}
 				do
 					echo Color $element . . .
 				done
+		rm srcHexColorsNoHash.txt
 fi
 
 sizeOf_rndHexColors=${#rndHexColors[@]}
@@ -67,23 +69,6 @@ do
 	done
 	rm ./tempCommand.sh
 done
-
-# DEV NOTES
-# test file wut.svg:
-# ----
-# first line
-# second line
-# third line
-# jack=1
-# fifth line
-# jack=
-# seventh line
-# jack=
-# blergh
-# fjloor
-# jack0328203
-# fwewf
-# ----
 
 # working command that replaces the 4th instance of jack in the file with jill:
 # sed ':a;N;$!ba;s/jack/jill/4' wut.svg
