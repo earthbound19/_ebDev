@@ -10,9 +10,6 @@ destIMGformat=$2
 img_sizeX=$3
 img_sizeY=$4
 
-if [ -a $3 ]; then img_sizeX=$3; fi
-if [ -a $4 ]; then img_sizeY=$4; fi
-
 if [ ! -a $5 ]
 then
 	param3="-background none"
