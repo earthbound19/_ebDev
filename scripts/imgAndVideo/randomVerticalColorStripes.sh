@@ -8,18 +8,27 @@
 # $3 How many pixels wide to scale the final image
 # $4 How many pixels tall to scale the final image
 # $5 How many such random images you want to create
-# $6 Optional. Randomly vary max. number of columns at a maximum minus of 1 to the number given in this variable.
+# $6 Randomly vary max. number of columns by subtraction between 0 and the number given in this variable. SET THIS TO 0 if no variation desired.
 # $7 Optional. A file list of hex color values to randomly pick from. If not provided, every stripe is a pseudo-randomly selected color.
 
 # NOTES
 # TO DO
 # This script was adapted from randomColorTilesGen.sh -- adapt any necessary comments therefrom.
 
+# SEE README.md in https://github.com/earthbound19/_devtools.git :
+if [ -e ~/_devToolsPath.txt ]; then devToolsPath=`<~/_devToolsPath.txt`; fi
+devToolsPath=`cygpath -u "\$devToolsPath"`
+		# echo devToolsPath val is\:
+		# echo $devToolsPath
+# the path in _devTools where all hex color scheme text files are stored:
+hexColorSchemesRootSubPath="/scripts/imgAndVideo/ColorSchemesHex"
+
 # In case of interrupted run, clean up first:
-rm *.temp temp.txt
+if [ -e temp.txt ]; then rm temp.txt; fi
+# if [ -e *.temp ]; then rm *.temp; fi
 
 # GLOBAL VARIABLES
-hexColorListsPath=/cygdrive/d/Alex/Programming/_devtools/scripts/imgAndVideo/ColorSchemesHex
+hexColorListsRootPath="$devToolsPath""$hexColorSchemesRootSubPath"
 
 minColorColumnRepeat=$1
 maxColorColumnRepeat=$2
@@ -27,7 +36,8 @@ scalePixX=$3
 scalePixY=$4
 howManyImages=$5
 maxColorColumnsVariation=$6
-colorSelectionList="$hexColorListsPath"/$7
+# PURE INFURIATING NONSENSE, again appeased by a genius breath yon: http://stackoverflow.com/a/23207966
+colorSelectionList=`cygwinFind $hexColorListsRootPath -name $7 -type f`
 
 # The logic of this variable check is: if not no value for this var, do something (in other words, if there is this var with a value, do something) ;
 # UNFORTUNATELY, it seems this type of check only works with environment parameter variables, not assigned variables that have no value, WHICH MEANS that the following must be hard-coded for the parameter:
@@ -40,6 +50,13 @@ if [ ! -z ${7+x} ]
 	sizeOf_hexColorsArray=$(( $sizeOf_hexColorsArray - 1))		# Else we get an out of range error for the zero-based index of arrays.
 fi
 
+# Create a subdir based on the hex color scheme file name, and move into it for this run (move out of it at the end of this run):
+currDir=`pwd`
+newDirName=`echo $7 | sed 's/\.txt//g'`
+# if [ ! -e $newDirName ]; then mkdir $newDirName; else exit; fi
+if [ ! -e $newDirName ]; then mkdir $newDirName; fi
+cd $newDirName
+
 # Outer loop per howManyImages:
 for a in $( seq $howManyImages )
 do
@@ -49,7 +66,7 @@ do
 			# Check and make changes for optional random negative variation of max random number pick range:
 			if [ ! -z ${6+x} ]
 				then
-					randomVariation=`shuf -i 1-"$6" -n 1`
+					randomVariation=`shuf -i 0-"$6" -n 1`
 					maxRange=$(( $maxColorColumnRepeat - $randomVariation ))
 				else
 					maxRange=$maxColorColumnRepeat
@@ -67,6 +84,8 @@ do
 							# Pick a random color from a hex color list if such a list is specified (converting to RGB along the way); otherwise pick completely random RGB values.
 							pick=`shuf -i 0-"$sizeOf_hexColorsArray" -n 1`
 							hex="${hexColorsArray[$pick]}"
+							# Strip the (text format required) # symbol off that. Via yet another genius breath yon: http://unix.stackexchange.com/a/104887
+							hex=`echo ${hex//#/}`
 									# Pick a number of times to repeat that chosen hex color, then write it that number of times to the temp file that will make up the eventual .ppm file: 
 									for k in $( seq $repeatColumnColorCount )
 									do
@@ -112,3 +131,5 @@ scalePixY=$(( $scalePixX / 2 ))
 nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png $ppmFileName.ppm
 
 done
+
+cd $currDir

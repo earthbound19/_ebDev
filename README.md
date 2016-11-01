@@ -9,11 +9,21 @@ I believe that everything here is at least freely available and open source. If 
 
 # INSTALLATION AND USAGE:
 
-Make a junction link to this directory, pointed to e.g. from one C:\devtools\_devbin, and put that same path in the system %PATH% (along with the paths to any other utilities or scripts in this repository that you will use).
+Make a junction link to this directory, pointed to e.g. from one C:\devtools\_devbin, and put that same path in the system %PATH% (along with the paths to any other utilities or scripts in this repository that you will use). OR examine and use _setBinBaths.bat, which will permanently modify your path to include all relevant paths in this archive. OR examine and use getDevEnv.sh per the instructions therein.
 
-To create a junction link, see:http://schinagl.priv.at/nt/hardlinkshellext/linkshellextension.html
+To create a junction link, see: http://schinagl.priv.at/nt/hardlinkshellext/linkshellextension.html
 
-As these tools and scripts etc. can be in flux (meaning I edit and develop them as I use them, and/or I freely add or remove utilities from this archive.
+Some scripts rely on the existence of a file which you must manually create in your home dir (type <cd ~><ENTER> in bash to view it) named _devToolsPath.txt. That file should have one line consisting of the path to the directory in which you install _devtools, e.g.:
+
+C:\Users\<yourUserName>\Documents\scrap\_devtools-master
+
+or
+
+C:\_devTools
+
+-- AND NOTE: If those paths include spaces or other "special" characters, it may not work. I'm not working around that. You must work around it by not using spaces etc. in your path.
+
+The tools and scripts in this repository are subject to high flux, because I edit and develop them as I use them, and/or because I freely add or remove utilities from this archive.
 
 This includes zeranoe's build of ffmpeg, AutoHotkey, and many gnu core utilities for windows 32-bit.
 

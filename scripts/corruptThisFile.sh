@@ -50,9 +50,9 @@ __size=${__ln[3]}
 			# To find what percent of N = y, divide N by 100, then mutliply by y:
 
 # ALTERNATE OPTIONS HERE; comment out the one you don't want:
-corruptionPasses=$(($__size / 100000 * $percentToCorrupt))
+# corruptionPasses=$(($__size / 100000 * $percentToCorrupt))
 # corruptionPasses=$(($__size / 10000 * $percentToCorrupt))
-# corruptionPasses=$(($__size / 1000 * $percentToCorrupt))
+corruptionPasses=$(($__size / 1000 * $percentToCorrupt))
 # corruptionPasses=$(($__size / 100 * $percentToCorrupt))
 # corruptionPasses=3
 
