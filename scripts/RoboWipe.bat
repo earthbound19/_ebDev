@@ -51,10 +51,7 @@ ROBOCOPY robowipeStubDir "%%A" /E /PURGE /MT:%NUM% /W:0 /R:0
 
 REM Delete all *.dmp files in all directories on the drive.
 REM NOTE: To NOT also delete all .bak files on a drive (this is a common extension name for needful backups), comment out the last line in this group:
-DEL /S *.dmp
-
-DEL /S *.temp
-DEL /S *.tmp
+DEL /S *.dmp *.temp *.tmp *.log
 REM DEL /S *.bak
 
 REM Remove temporary robowipe files:

@@ -5,7 +5,7 @@
 
 # USAGE
 # From the directory with the image animation source images, invoke this script with these parameters:
-# $1 input "frame rate" (how to interpret the speed of input images in fps
+# $1 input "frame rate" (how to interpret the speed of input images in fps)
 # $2 desired output framerate
 # $3 desired constant quality (crf)
 # $4 the file extension of the input images.
