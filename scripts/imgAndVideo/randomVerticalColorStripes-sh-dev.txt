@@ -109,7 +109,9 @@ nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png
 
 done
 
-DONE creating ppm and png images and moved into respective subfolders.
-mkdir ppm png
-mv *.png ./png
+if [ ! -d ppm ]; then mkdir ppm; fi
 mv *.ppm ./ppm
+if [ ! -d png ]; then mkdir png; fi
+mv *.png ./png
+
+echo DONE creating ppm and png images\, and moved into respective subfolders.
