@@ -18,3 +18,7 @@ bin/ImageMagick/modules/coders
 bin/ImageMagick/modules/filters
 scripts/font
 scripts/imgGetSimilar
+../autobrood
+../autobrood/batch-scripts
+../autobrood/bin
+../autobrood/bin/fractorium_openCL_GPU_fractal_flames
