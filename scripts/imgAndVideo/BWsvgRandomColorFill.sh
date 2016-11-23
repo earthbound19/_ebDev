@@ -12,17 +12,8 @@
 
 # CODE
 # If no $3 parameter passed to script, create an array of 10 random hex RGB color values. Otherwise, create the array from the list in the filename specified in $3.
-if [ -z ${3+x} ]
+if [ ! -z ${3+x} ]
 	then
-		echo Generating random hex colors array . . .
-		for i in $( seq 10 );
-		do
-# TO DO: make this work faster with one pre-generated string in memory that you bite six bytes off in increments.
-		randomHexString=`cat /dev/urandom | tr -cd 'a-f0-9' | head -c 6`
-				echo Random color \#"$randomHexString" . . .
-		rndHexColors[$i]=$randomHexString
-		done
-	else
 		echo Generating hex colors array from file $3 . . .
 		sed 's/#//g' $3 > srcHexColorsNoHash.txt
 		mapfile -t rndHexColors < srcHexColorsNoHash.txt
@@ -33,18 +24,31 @@ if [ -z ${3+x} ]
 		rm srcHexColorsNoHash.txt
 fi
 
-sizeOf_rndHexColors=${#rndHexColors[@]}
-sizeOf_rndHexColors=$(( $sizeOf_rndHexColors - 1))		# Else we get an out of range error for the zero-based index of arrays.
-		# echo val of sizeOf_rndHexColors is $sizeOf_rndHexColors
-		# Dev test to assure no picks are out of range (with the first seq command in this script changed to 3):
-		# for i in $( seq 50 )
-		# do
-			# pick=`shuf -i 0-"$sizeOf_rndHexColors" -n 1`
-			# echo sizeOf_rndHexColors val \(\*zero-based\*\) is $sizeOf_rndHexColors
-			# echo rnd pick is $pick
-		# done
 for i in $( seq $2 )
 do
+
+		if [ -z ${3+x} ]
+		then
+				echo Generating random hex colors array . . .
+				for i in $( seq 10 );
+				do
+		# TO DO: make this work faster with one pre-generated string in memory that you bite six bytes off in increments.
+				randomHexString=`cat /dev/urandom | tr -cd 'a-f0-9' | head -c 6`
+						echo Random color \#"$randomHexString" . . .
+				rndHexColors[$i]=$randomHexString
+				done
+		fi
+
+		sizeOf_rndHexColors=${#rndHexColors[@]}
+		sizeOf_rndHexColors=$(( $sizeOf_rndHexColors - 1))		# Else we get an out of range error for the zero-based index of arrays.
+				# echo val of sizeOf_rndHexColors is $sizeOf_rndHexColors
+				# Dev test to assure no picks are out of range (with the first seq command in this script changed to 3):
+				# for i in $( seq 50 )
+				# do
+					# pick=`shuf -i 0-"$sizeOf_rndHexColors" -n 1`
+					# echo sizeOf_rndHexColors val \(\*zero-based\*\) is $sizeOf_rndHexColors
+					# echo rnd pick is $pick
+				# done
 	echo Generating variant $i of $1 . . .
 	timestamp=`date +"%Y%m%d_%H%M%S_%N"`
 	newFile="$timestamp"rndColorFill__$1

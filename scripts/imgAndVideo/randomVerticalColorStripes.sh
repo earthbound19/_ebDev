@@ -86,6 +86,8 @@ do
 							hex="${hexColorsArray[$pick]}"
 							# Strip the (text format required) # symbol off that. Via yet another genius breath yon: http://unix.stackexchange.com/a/104887
 							hex=`echo ${hex//#/}`
+echo hex is $hex
+exit
 									# Pick a number of times to repeat that chosen hex color, then write it that number of times to the temp file that will make up the eventual .ppm file: 
 									for k in $( seq $repeatColumnColorCount )
 									do
