@@ -30,7 +30,7 @@ do
 		if [ -z ${3+x} ]
 		then
 				echo Generating random hex colors array . . .
-				for i in $( seq 10 );
+				for i in $( seq 30 );
 				do
 		# TO DO: make this work faster with one pre-generated string in memory that you bite six bytes off in increments.
 				randomHexString=`cat /dev/urandom | tr -cd 'a-f0-9' | head -c 6`

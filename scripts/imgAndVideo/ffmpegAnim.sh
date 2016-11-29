@@ -11,6 +11,8 @@
 # $4 the file extension of the input images.
 # Optional: $5 rescale target resolution expressed as nnnnXnnnn. Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution.
 
+# NOTE: You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).
+
 # TO DO: adjustable input file list "frame rate."
 # TO DO? : make it name the output file after the ../.. parent folder name?
 
