@@ -1,0 +1,19 @@
+# to backup and restore the MBR and partition table of the main drive, adapted for cygwin--but move that output .bin file to a secure backup drive--! ; re:
+http://unix.stackexchange.com/q/12986
+# see also: https://www.cyberciti.biz/faq/linux-backup-restore-a-partition-table-with-sfdisk-command/
+# https://www.cyberciti.biz/faq/howto-copy-mbr/
+# interesting diversion: http://wiki.osdev.org/MBR_(x86)
+
+# to backup and restore the boot sector:
+# backup:
+dd if=/dev/sda of=/cygdrive/c/bootsector.bin bs=1 count=446
+# restore:
+dd if=/cygdrive/c/bootsector.bin of=/dev/sda bs=1 count=446
+
+# to backup and restore the partition table:
+# backup:
+dd if=/dev/sda of=/cygdrive/c/partitiontable.bin bs=1 skip=446 count=64
+# restore:
+dd if=/cygdrive/c/partitiontable.bin of=/dev/sda bs=1 seek=446 count=64
+
+to do both, backup and restore 64+446 bytes?

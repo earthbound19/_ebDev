@@ -1,0 +1,50 @@
+# DESCRIPTION
+# genRHS.sh = (Gen)erate (R)andom (H)ardlinks (S)ubdir.sh
+# Produces a subdirectory of incrementally numbered (file name) hardlinks to all files of a given file extension $1 in a directory, optionally randomly shuffling the file list before generating hardlinks.
+
+# USAGE
+# Pass this script one parameter, being the file type to generate a subfolder of numbered hardlinks to; e.g.:
+# genRHS.sh png
+# OPTIONAL: pass anything as a second parameter to this script to randomly shuffle the list of files (of the given extension) before generating numbered hardlinks.
+
+# TO DO: Make this instead create a script file which upon execution will generate the hardlinks--so that configurations of hardlinks can be effectively deleted and recreated!
+
+echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
+
+cygwinFind ./*.$1 > xQpr95b2N_list.txt
+
+# For optional paramater 2 to shuffle list:
+if ! [ -z ${2+x} ]
+	then
+		shuf xQpr95b2N_list.txt > temp_fjioem882.txt
+		rm xQpr95b2N_list.txt
+		mv temp_fjioem882.txt xQpr95b2N_list.txt
+fi
+
+arraySize=$(wc -l < xQpr95b2N_list.txt)
+numDigitsOf_arraySize=${#arraySize}
+
+mapfile -t allFilesArray < xQpr95b2N_list.txt
+rm xQpr95b2N_list.txt
+
+# generate empty shell script to write so many commands into.
+timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
+		# wowee gee parsing . . .
+hardLinkDir=_""$1""_""$timestamp""numberedHardlinks
+echoThis="if [ ! -d $hardLinkDir ]; then mkdir $hardLinkDir; fi"
+echoTargetFile="$timestamp"_gen_"$1"_Hardlinks.sh.txt
+echo $echoThis > $echoTargetFile
+
+counter=0
+for elm in ${allFilesArray[@]}
+do
+			# echo current file in list is\:
+			# echo $elm
+	counter=$((counter + 1))
+	countString=`printf "%0""$numDigitsOf_arraySize""d\n" $counter`
+	echo link $elm ./$hardLinkDir/"$countString"."$1" >> $echoTargetFile
+done
+
+echo -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+echo Created and populated hard link creation script $echoTargetFile\. Examine that file\, and if all the commands appear suitable\, temporarily rename it from \~\.sh.txt to \~\.sh and execute it. via this command\:
+echo \.\/\<thatScriptName.sh\>

@@ -1,0 +1,4 @@
+-MWG:Description="See http://replaceThisURL for source, print and usage. ~ Fractal flame abstract art. Produced via http://s.earthbound.io/autobrood ~ I randomly generated a lot of fractals, picked pretty ones, and interbtred them. This fractal results."
+-MWG:Keywords="art, digital, abstract, contemporary, MyWork, fractalflame, fractal"
+-MWG:Copyright="Richard Alexander Hall"
+-MWG:Creator="Created and rendered by Richard Alexander Hall"

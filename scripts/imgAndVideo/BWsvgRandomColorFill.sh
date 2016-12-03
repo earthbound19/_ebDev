@@ -5,8 +5,9 @@
 # Pass this script three parameters (the third is optional), being:
 # $1 an .svg file name and
 # $2 how many random color fill variations of that file to create, and
-# $3 a flat text file list of hexadecimal RGB color codes, one per line, from which to choose random colors for this fill. NOTE: each hex color must be preceded by #. This script makes a copy of the .svg with a name being a time stamp. NOTE: This expects an svg colored via hexadecimal color code fills where areas to color are designated in the svg as #ffffff. If your svg is not thus, potrace the original black bitmap using potraceAllBMPs.sh, or use the SVGOMG service (convert your SVG file online) at: https://jakearchibald.github.io/svgomg/ -- or use or SVGO re https://github.com/svg/svgo and https://web-design-weekly.com/2014/10/22/optimizing-svg-web/ -- It converts rgb values to hex by default. BUT NOTE: DO NOT use the "minify colors" option. 
+# $3 OPTIONAL; will produce random colors if absent: a flat text file list of hexadecimal RGB color codes, one per line, from which to choose random colors for this fill. NOTE: each hex color must be preceded by #. This script makes a copy of the .svg with a name being a time stamp. NOTE: This expects an svg colored via hexadecimal color code fills where areas to color are designated in the svg as #ffffff. If your svg is not thus, potrace the original black bitmap using potraceAllBMPs.sh, or use the SVGOMG service (convert your SVG file online) at: https://jakearchibald.github.io/svgomg/ -- or use or SVGO re https://github.com/svg/svgo and https://web-design-weekly.com/2014/10/22/optimizing-svg-web/ -- It converts rgb values to hex by default. BUT NOTE: DO NOT use the "minify colors" option. 
 
+# TO DO: make it name the target file after the color scheme.
 # TO DO? : implement an optional buffer memory of the last three colors used, and if the current picked color is among them, pick another color until it is not among them.
 
 
@@ -22,6 +23,7 @@ if [ -z ${3+x} ]
 				echo Random color \#"$randomHexString" . . .
 		rndHexColors[$i]=$randomHexString
 		done
+# TO DO: make this save the generated hex color scheme to a plain text file.
 	else
 		echo Generating hex colors array from file $3 . . .
 		sed 's/#//g' $3 > srcHexColorsNoHash.txt
@@ -68,6 +70,7 @@ do
 		./tempCommand.sh
 	done
 	rm ./tempCommand.sh
+	chmod 777 $newFile
 done
 
 # working command that replaces the 4th instance of jack in the file with jill:

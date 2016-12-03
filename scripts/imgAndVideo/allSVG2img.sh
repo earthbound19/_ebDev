@@ -8,20 +8,9 @@
 # template command: magick -size 850 test.svg result.tif
 # NOTE that for the -size parameter, it scales the imagesso that the longest side is that many pixels.
 
-<<<<<<< HEAD
-# If no image size parameter, set default image size of 300.
-# TO DO: update this to use the more robust non-parameter (/variable) detection method I found.
-img_format=$1
-img_size=$2
-
-if [ ! -z ${1+x} ]; then img_format=jpg; fi
-if [ ! -z ${2+x} ]; then img_size=4120; fi
-if [ ! -z ${3+x} ]; then param3="-background none"; fi
-=======
 if [ -z ${1+x} ]; then img_size=4120; else img_size=$1; fi
 if [ -z ${2+x} ]; then img_format=jpg; else img_format=$2; fi
 if [ -z ${3+x} ]; then param3="-background none"; fi
->>>>>>> 78e3e82bdbfe896bc8c4f6d2a066c2bc6ada706a
 
 CygwinFind . -iname \*.svg > all_svgs.txt
 mapfile -t all_svgs < all_svgs.txt

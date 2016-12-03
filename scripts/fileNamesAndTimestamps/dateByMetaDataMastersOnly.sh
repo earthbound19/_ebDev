@@ -1,10 +1,12 @@
+# IN DEVELOPMENT? Figure that out.
+
 # DESCRIPTION: Corrects erroneous creation and moficiation file system timestamps in image files by modifying file system file time stamps from file metadata. Runs on every file in a directory tree from which this script is executed. This is a fix for the problem that file system time stamps for files can be thrown off by e.g. restoring files from backups or copying accross drives. It assumes there is any such useful metadata to correct time stamps from. If there isn't any such metadata, nothing will happen for every respective files this script runs against.
 
 echo BEGINNING correcting of timestamps to match any EXIF data . . .
 
 # TO DO: remove file extensions from the following list which will never contain metadata.
-# Another (easier to read and change?) way to do the following: find . -type f -iregex '\.\/.*.\(tif\|tiff\|png\|.psd\|ora\|kra\|rif\|riff\|jpg\|jpeg\|gif\|bmp\|cr2\|crw\|pdf\|ptg\)' -printf '%TY %Tm %Td %TH %TM %TS %p\n' | sort -g > _batchNumbering/fileNamesWithNumberTags.txt
-find . -iname \*.tif -o -iname \*.tiff -o -iname \*.psd -o -iname \*.mov -o -iname \*.mp4 -o -iname \*.m4a > dateByImageInfoFilesListTemp.txt
+# Another (easier to read and change?) way to do the following: cygwinFind . -type f -iregex '\.\/.*.\(tif\|tiff\|png\|.psd\|ora\|kra\|rif\|riff\|jpg\|jpeg\|gif\|bmp\|cr2\|crw\|pdf\|ptg\)' -printf '%TY %Tm %Td %TH %TM %TS %p\n' | sort -g > _batchNumbering/fileNamesWithNumberTags.txt
+cygwinFind . -iname \*.tif -o -iname \*.tiff -o -iname \*.psd -o -iname \*.mov -o -iname \*.mp4 -o -iname \*.m4a > dateByImageInfoFilesListTemp.txt
 mapfile -t imageFiles < ./dateByImageInfoFilesListTemp.txt
 for filename in ${imageFiles[@]}
 do

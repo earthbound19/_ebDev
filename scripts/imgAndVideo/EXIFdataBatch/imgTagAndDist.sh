@@ -31,7 +31,7 @@ echo "imgTagAndDist.sh: this script will erase all metadata from the image files
 # END SCRIPT WARNING =======================================
 
 
-find . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
+cygwinFind . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
 mapfile -t images_MD_ADDS_list < images_MD_ADDS_list.txt
 for element in "${images_MD_ADDS_list[@]}"
 do
@@ -64,7 +64,7 @@ do
 	SFMFNextension=`sed -n 's/.*from master file.*\(\..\{1,4\}\)"/\1/p' $element`
 	# Retrieve and store full ~ file name with extension; the \.\/ part escapes ./ (which ./ this sed command also strips) :
 				# SFMFNnoExtension=`sed -n 's/.*from master file: \.\/\(.*\)\..\{1,4\}"/\1/p' $element`
-	# SFMFNpath will preserve any subdirectory paths and duplicate them to the target ../dist path:
+	# SFMFNpath will preserve any subdirectory paths and duplicate them to the target ./_dist path:
 	SFMFNpath=`sed -n 's/.*from master file: \.\/\(.*\/\).*\"/\1/p' $element`
 # e.g. result val of SFMFNpath: subdir/
 # OR if no subdir, it is blank.
@@ -101,7 +101,7 @@ do
 		# -q quiet
 
 	# run created script, then delete it:
-	if [ ! -d ../dist ]; then mkdir ../dist; fi
+	if [ ! -d ./_dist ]; then mkdir ./_dist; fi
 	# echo -=-=
 	# Copy to new ~tagAndDistPrep image before running metadata update batch against it (so that the batch will even do any work) ; NOTE that if $SFMFNpath is empty, the dest path to copy to will simply be ./ ; this doom of using two sets of double quotes for the dest path was at last prophecied 06/20/2016 11:18:51 PM -RAH; BUT WAIT, THERE'S MORE!--and rediscovered thanks to a missing double quote mark typographical error 07/01/2016 10:18:40 PM -RAH:
 	cp -f "./$SFMFNwithExtension" "./$SFMFNpath""__tagAndDistPrepImage""$SFMFNextension"
@@ -111,21 +111,20 @@ do
 	echo Ran exiftool_temp_update_metadata.bat . . .
 # printf "" > exiftool_temp_update_metadata.bat
 	# Move the new, properly metadata tagged file to a permanent distribution location; but only if the dist. file doesn't exist:
-# TO DO: MAKE IT MAKE THE DEST PATH IF NECESSARY; er make that nxt -a :
-	if [ -e "../dist/$SFMFNpath$imageTitle$SFMFNextension" ]
+	if [ -e "./_dist/$SFMFNpath$imageTitle$SFMFNextension" ]
 	then
-		echo DESTINATION FILE "../dist/$SFMFNpath$imageTitle$SFMFNextension" already exists\, so this won\'t overwrite it. If you mean to update the destination file\, first delete it\, and then run this script again. If you also intend to alter or recreate the metadata\, delete the assocaited ~_MD_ADDS.txt file as well\, and run prepImageMetaData.sh before this.
+		echo DESTINATION FILE "./_dist/$SFMFNpath$imageTitle$SFMFNextension" already exists\, so this won\'t overwrite it. If you mean to update the destination file\, first delete it\, and then run this script again. If you also intend to alter or recreate the metadata\, delete the assocaited ~_MD_ADDS.txt file as well\, and run prepImageMetaData.sh before this.
 	else
 		# Make target directory for dist file, only if it doesn't exist:
-		if [ ! -e ../dist/$SFMFNpath ]; then mkdir ../dist/$SFMFNpath; fi
-		mv -f "./$SFMFNpath""__tagAndDistPrepImage$SFMFNextension" "../dist/$SFMFNpath$imageTitle$SFMFNextension"
+		if [ ! -e ./_dist/$SFMFNpath ]; then mkdir ./_dist/$SFMFNpath; fi
+		mv -f "./$SFMFNpath""__tagAndDistPrepImage$SFMFNextension" "./_dist/$SFMFNpath$imageTitle$SFMFNextension"
 	fi
 	echo -~-~
 done
 
 rm -f exiftool_temp_update_metadata.bat imagesMetadataPrepList.txt images_MD_ADDS_list.txt
 
-echo Metadata modified for each image\, and each final distribution image copied one directory tree up\, in \.\.\/dist \[dist. path mirror of origin path\]\.
+echo Metadata modified for each image\, and each final distribution image copied to \.\/_dist in the same path as respective _FINAL_ images\.
 
 
 # DEVELOPMENT HISTORY:
@@ -140,3 +139,5 @@ echo Metadata modified for each image\, and each final distribution image copied
 
 # 2016-05-07
 # Feature complete.
+
+# 2016-11-11 changed to distribute to ./_dist folders in respective _FINAL_ file folders (instead of ../dist).

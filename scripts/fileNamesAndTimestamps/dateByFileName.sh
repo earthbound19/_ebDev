@@ -20,7 +20,7 @@ echo Creating batch script to update time stamps of all files in this path by pa
 		# touch -c -t 201405140809.16 "./_patreon_cropOfFinal_07-18-2014__11-18-21_AM_FINAL_v04_29-703x12-377_300dpi.tif"
 		# nested backreference command that works:
 		# echo hello | sed 's/\(.*\(ll\).*\)/\1 \2/g'
-find -type f | sed -n 's/\(.*\([0-9]\{4\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\).*\)/touch -c -t  \2 \3 \4 \5 \6.\7 "\1"/p' > _UPDtimeStamp.sh
+cygwinFind -type f | sed -n 's/\(.*\([0-9]\{4\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\).*\)/touch -c -t  \2 \3 \4 \5 \6.\7 "\1"/p' > _UPDtimeStamp.sh
 # NOTE: that double-space after the -t flag is intentional (so that there remains a space after later number string processing.
 
 # replace all single-digit space-padded numbers with one zero pad:
