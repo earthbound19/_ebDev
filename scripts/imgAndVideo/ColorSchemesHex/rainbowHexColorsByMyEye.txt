@@ -3,8 +3,8 @@
 #ff6400
 #ffb700
 #fae000
-#f9f000
-#e6ed00
+#fff960
+#faff54
 #afe300
 #65d700
 #1dcf00

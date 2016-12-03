@@ -3,17 +3,36 @@
 # TO DO--DONE: make this keep extensions. this is quick and drity for flam3 files. 06/12/2016 09:15:44 AM -RAH -- DONE 2016-07-16 6:33 PM -RAH
 
 # USAGE
-# Put this script in your $PATH. From a directory in which you wish to rename all file names with n random characters (per optional parameter), invoke this script thusly:
-# thisScriptName.sh 34
-# --where you can change that number to specify how many random characters you want in the new file name. If you don't specify any number, it defaults to 4
+# WARNING: if you do not pass this the correct parameters, it may DELETE files instead of renaming them. RT#M! WARNING: This will randomly rename *all files in a tree* (including subfolders) and move the renamed files to the root folder this script is invoked from.
+# Put this script in your $PATH, with these parameters:
+# $1 : The length of random characters to rename the file with. If you don't specify any number for the first parameter, it defaults to 4.
+# $2 : Optional: a file extension (without any . in it) to restrict random renames to. It will not rename any other file types. If this is not provided, it will rename all file types in the current path.
+# NOTE: if you pass parameter 2, you must also pass parameter 1. IF YOU DO NOT DO THIS, IT WILL TRUNCATE ALL FILES OF INTENDED PARAMETER 2 TO TO SIMPLY .[extension], THEREBY DELETING ALL BUT ONE OF THEM (overwriting the same stupid file name with all the other files of that extension).
+
+# TO DO
+# Throw an error and exit if non-numeric first parameter passed.
+# Throw an error and exit if no files of type parameter 2 found.
 
 # GLOBAL VAR SET; if numeric parameter $1 is passed to script, set $getNrandChars to that; otherwise default it to 4:
-if ! [ -z ${1+x} ]; then echo parameter passed to script\; will set getNrandChars to passed value of $1.; getNrandChars="$1"; else getNrandChars=4; echo no parameter passed to script\; using default value of \4 for getNrandChars.; fi
+if ! [ -z ${1+x} ]
+	then
+		getNrandChars="$1"
+				echo parameter passed to script\; will set getNrandChars to passed value of $1.
+	else
+		getNrandChars=4
+				echo no parameter passed to script\; using default value of \4 for getNrandChars.
+fi
 		# echo val of 1 is $1.
 
-ls > allFiles.txt
-mapfile -t array < allFiles.txt
-rm allFiles.txt
+if ! [ -z ${2+x} ]
+	then
+		cygwinFind ./*.$2 > files_list.txt
+	else
+		cygwinFind ./* > files_list.txt
+fi
+
+mapfile -t array < files_list.txt
+rm files_list.txt
 
 arrSize=${#array[@]}
 # echo arrSize val is $arrSize
@@ -51,4 +70,4 @@ done
 
 # DEVELOPMENT HISTORY
 # Prior to now: script that was inefficient by reading 4 bytes from /dev/urandom with every single file rename.
-# 2016-07-16 Made script much more efficient by prefetching necessary number of random characters into a variable, and fetching iterative groups of chars from said variable. -RAH
+# 2016-07-16 Made script much more efficient by prefetching necessary number of random characters into a variable, and fetching iterative groups of chars from said variable (in memory, instead of using a file on disk). -RAH

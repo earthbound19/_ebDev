@@ -9,7 +9,7 @@
 >>>>>>> 947fd5f52876f88f02a00e30e0d98c160d9e5b10
 
 # Possible variant command to adapt that shows paths:
-# find $PWD/*.exe
+# cygwinFind $PWD/*.exe
 
 ls -Rs -S | grep "\.$1\$" > $1_files_by_size.txt
 sort -r -n $1_files_by_size.txt > temp.txt

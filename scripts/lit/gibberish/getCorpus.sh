@@ -8,7 +8,7 @@ sleep 1
 
 	# re: http://stackoverflow.com/a/24069223/1397555 -- I haven't figured how to filter to only html files, but all the files I have are html \(there is no other type\), so that's moot anyway; COMPILE all files into one file:
 echo Merging all text files in all subdirectories into one file . . .
-# find * -exec cat {} \; >> corpus.html
+# cygwinFind * -exec cat {} \; >> corpus.html
 cat *.txt > corpus.html
 	# Trim everything except for the actual announcment text out of the resultant corpus (trim everything that does *not* match the following pattern); thanks to: http://stackoverflow.com/a/2686369
 # OPTION TO TOGGLE HERE:

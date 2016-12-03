@@ -6,7 +6,7 @@ label=work
 
 # TO DO? : is the result file name fileNamesWithNumberTags.txt even accurate? Is it actually just file names that have numbers in them? Fix to reflect that if so.
 
-echo NOTE: this batch will NOT tag files that begin with FINAL_, and it will produce errors if you have files with \5\-padded numbers in their name which do not also include the tag _FINAL_ \(case-insensitive\)\. Ensure your files meet these criteria before continuing. ALSO filenames must be properly named with underscores _ instead of spaces\, and also any nnnnn numbers must be surrounded by underscores\, for this to work. To get files nearer to or at that standard\, see the notes at the start of __DigitalImagePress.sh.
+echo NOTE: this batch will NOT tag files that begin with FINAL_\, and it will produce errors if you have files with \5\-padded numbers in their name which do not also include the tag _FINAL_ \(meaning also\, if the file name ends e.g. _FINAL.tif\, it will not number it.\) \(case-insensitive\)\. Ensure your files meet these criteria before continuing. ALSO filenames must be properly named with underscores _ instead of spaces\, and also any nnnnn numbers must be surrounded by underscores\, for this to work. To get files nearer to or at that standard\, see the notes at the start of __DigitalImagePress.sh.
 # TO DO: update dateByFileName.sh to check for that? Prompt the user to check for that via metamorphose2.exe?
 
 echo Finding files to number by tag . . .

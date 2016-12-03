@@ -4,25 +4,30 @@
 
 # DEV NOTE: if you make only temporary changes to this for ripping art, revert the changes so there aren't a lot of extraneous repository commits of unnecessary changes.
 
+# _MTPL=_FINAL
+_MTPL=_EXPORTED
+
 # NOTE: cygpath use else err next:
 metaDataTemplatePath=`cygpath -u "C:\_devtools\scripts\imgAndVideo\EXIFdataBatch"`
-# metaDataTemplateFile=customImageMetadataTemplate.txt
-# metaDataTemplateFile=electricSheep_CC_by_sa_template.txt
-# metaDataTemplateFile=DrawnColorVectorArtMetadataTemplate.txt
-metaDataTemplateFile=TFTMdraftMetadataTemplate.txt
+	# Pick and uncomment one:
+	# metaDataTemplateFile=customImageMetadataTemplate.txt
+	# metaDataTemplateFile=electricSheep_CC_by_sa_template.txt
+	metaDataTemplateFile=fractalFlame_template.txt
+	# metaDataTemplateFile=DrawnColorVectorArtMetadataTemplate.txt
+	# metaDataTemplateFile=TFTMdraftMetadataTemplate.txt
 metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 
-find . -iname \*_FINAL*.mp4 -o -iname \*_FINAL*.tif -o -iname \*_FINAL*.tiff -o -iname \*_FINAL*.png -o -iname \*_FINAL*.psd  -o -iname \*_FINAL*.psb -o -iname \*_FINAL*.ora -o -iname \*_FINAL*.rif -o -iname \*_FINAL*.riff -o -iname \*_FINAL*.jpg -o -iname \*_FINAL*.jpeg -o -iname \*_FINAL*.gif -o -iname \*_FINAL*.bmp -o -iname \*_FINAL*.cr2 -o -iname \*_FINAL*.raw  -o -iname \*_FINAL*.crw -o -iname \*_FINAL*.pdf  -o -iname \*_FINAL*.svg > imagesMetadataPrepList.txt
+cygwinFind . -iname \*$_MTPL*.mp4 -o -iname \*$_MTPL*.tif -o -iname \*$_MTPL*.tiff -o -iname \*$_MTPL*.png -o -iname \*$_MTPL*.psd  -o -iname \*$_MTPL*.psb -o -iname \*$_MTPL*.ora -o -iname \*$_MTPL*.rif -o -iname \*$_MTPL*.riff -o -iname \*$_MTPL*.jpg -o -iname \*$_MTPL*.jpeg -o -iname \*$_MTPL*.gif -o -iname \*$_MTPL*.bmp -o -iname \*$_MTPL*.cr2 -o -iname \*$_MTPL*.raw  -o -iname \*$_MTPL*.crw -o -iname \*$_MTPL*.pdf  -o -iname \*$_MTPL*.svg > imagesMetadataPrepList.txt
 
-find . -iname \*_FINALvar*.mp4 -o -iname \*_FINALvar*.tif -o -iname \*_FINALVAR*.tiff -o -iname \*_FINALVAR*.png -o -iname \*_FINALVAR*.psd -o -iname \*_FINAL*.psb -o -iname \*_FINALVAR*.ora -o -iname \*_FINALVAR*.rif -o -iname \*_FINALVAR*.riff -o -iname \*_FINALVAR*.jpg -o -iname \*_FINALVAR*.jpeg -o -iname \*_FINALVAR*.gif -o -iname \*_FINALVAR*.bmp -o -iname \*_FINALVAR*.cr2 -o -iname \*_FINALVAR*.raw  -o -iname \*_FINALVAR*.crw -o -iname \*_FINALVAR*.pdf -o -iname \*_FINALVAR*.svg >> imagesMetadataPrepList.txt
+find . -iname \*"$_MTPL"var*.mp4 -o -iname \*"$_MTPL"var*.tif -o -iname \*"$_MTPL"VAR*.tiff -o -iname \*"$_MTPL"VAR*.png -o -iname \*"$_MTPL"VAR*.psd -o -iname \*"$_MTPL"*.psb -o -iname \*"$_MTPL"VAR*.ora -o -iname \*"$_MTPL"VAR*.rif -o -iname \*"$_MTPL"VAR*.riff -o -iname \*"$_MTPL"VAR*.jpg -o -iname \*"$_MTPL"VAR*.jpeg -o -iname \*"$_MTPL"VAR*.gif -o -iname \*"$_MTPL"VAR*.bmp -o -iname \*"$_MTPL"VAR*.cr2 -o -iname \*"$_MTPL"VAR*.raw  -o -iname \*"$_MTPL"VAR*.crw -o -iname \*"$_MTPL"VAR*.pdf -o -iname \*"$_MTPL"VAR*.svg >> imagesMetadataPrepList.txt
 				# FORMER CODE:
-				# find . -iname \*_FINAL*.tif > imagesMetadataPrepList.txt
-				# find . -iname \*_finalvar_*.tif >> imagesMetadataPrepList.txt
+				# cygwinFind . -iname \*$_MTPL*.tif > imagesMetadataPrepList.txt
+				# cygwinFind . -iname \*"$_MTPL"var_*.tif >> imagesMetadataPrepList.txt
 
 
 # dev reference; for to do the preceding line but with many differtent file types:
 # use prefix=\*_FINAL*		~finalvar~			?	;		OR an or regex if poss.?	:
-	# find . -iname \*.tif -o -iname \*.tiff -o -iname \*.png -o -iname \*.psd -o -iname \*.ora -o -iname \*.rif -o -iname \*.riff -o -iname \*.jpg -o -iname \*.jpeg -o -iname \*.gif -o -iname \*.bmp -o -iname \*.cr2 -o -iname \*.raw  -o -iname \*.crw -o -iname \*.pdf > imageFilesList.txt
+	# cygwinFind . -iname \*.tif -o -iname \*.tiff -o -iname \*.png -o -iname \*.psd -o -iname \*.ora -o -iname \*.rif -o -iname \*.riff -o -iname \*.jpg -o -iname \*.jpeg -o -iname \*.gif -o -iname \*.bmp -o -iname \*.cr2 -o -iname \*.raw  -o -iname \*.crw -o -iname \*.pdf > imageFilesList.txt
 # OR: just list _all_ image files to text file, then reduce it to list _final / _finalvar name-tagged file names only?
 # Because all those necessary searches can lead to duplicate listings, sort everything and trim duplicates:
 sort imagesMetadataPrepList.txt > temp1.txt

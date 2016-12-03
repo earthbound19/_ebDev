@@ -1,4 +1,4 @@
-REM DESCRIPTION: _setBinPaths.bat adds custom paths to the system PATH (Windows). NOTE: BINPATHS.txt must have a blank line after the last entry, or this batch will fail (and combined two intended defferent lines on the same line in a result). [DESCRIBE MORE WHEN THIS SCRIPT IS DONE.] Reads from BINPATHS.txt and EXTERNALPATHS.txt, which you may populate with custom paths, one per line, no semicolon. Adds the paths in those files to the system PATH variable (Windows), and optionally deletes invalid paths, using the modpath.exe utility.
+REM DESCRIPTION: _setBinPaths.bat adds custom paths to the system PATH (Windows). MUST BE RUN FROM ADMINISTRATOR command prompt. NOTE: BINPATHS.txt must have a blank line after the last entry, or this batch will fail (and combined two intended defferent lines on the same line in a result). [DESCRIBE MORE WHEN THIS SCRIPT IS DONE.] Reads from BINPATHS.txt and EXTERNALPATHS.txt, which you may populate with custom paths, one per line, no semicolon. Adds the paths in those files to the system PATH variable (Windows), and optionally deletes invalid paths, using the modpath.exe utility.
 
 REM DEPENDENCIES: The modpath.exe tool which I found in the uninstall folder of ImageMagick :) and I don't know where it's from. I presume (perhaps unwisely) that it's free software.
 
@@ -19,9 +19,9 @@ TYPE EXTERNALPATHS.txt >> temp.txt
 		REM TYPE win7defaultPATHs.txt >> temp.txt
 
 REM the magic uniqify and sort commands:
-%CD%\bin\gnuCoreUtilsWin32\bin\gsort.exe temp.txt > temp2.txt
+%CD%\bin\gnuCoreUtilsWin32\gsort.exe temp.txt > temp2.txt
 	REM NOTE: I'd had the -u flag on the next line; that messes up my intent (it does not print lines that have duplicates, it only prints unique lines. FACE PALM. ALSO: after I RT_M I learned it only detects *adjacent* duplicate lines. GEH!
-%CD%\bin\gnuCoreUtilsWin32\bin\uniq temp2.txt > allPathsTemp.txt
+%CD%\bin\gnuCoreUtilsWin32\uniq temp2.txt > allPathsTemp.txt
 REM ECHO Ready to modify PATH.
 
 FOR /F "delims=*" %%A IN (allPathsTemp.txt) DO (
@@ -32,8 +32,8 @@ FOR /F "delims=*" %%A IN (allPathsTemp.txt) DO (
 IF NOT EXIST %%A ECHO Could not find path: %%A >> setPathsLog.txt
 IF EXIST %%A ECHO Found path: %%A >> setPathsLog.txt
 REM NOTE: without the quote marks on the next line, it won't add directories that include spaces ( ). It will work if the first %%A doesn't have quote marks (and will mess up sorting if they do, it seems--odd).
-IF EXIST %%A %CD%\bin\modpath /add "%%A"
-IF EXIST %%A ECHO Added directory to PATH: "%%A"
+IF EXIST %%A %CD%\bin\modpath.exe /add "%%A"
+IF EXIST %%A ECHO MERP Added directory to PATH: "%%A"
 )
 
 DEL temp.txt
