@@ -1,4 +1,4 @@
--MWG:Description="See http://replaceThisURL for archive, original, print and usage options. ~ A hoity-toity robot talks about this at http://s.earthbound.io/artgib"
+-MWG:Description="See http://replaceThisURL for original, print and usage. ~ A hoity-toity robot talks about this at http://s.earthbound.io/artgib"
 -MWG:Keywords="art digital abstract contemporary myWork"
 -MWG:Copyright="Richard Alexander Hall http://earthbound.io/contact"
 -MWG:Creator="Richard Alexander Hall"
