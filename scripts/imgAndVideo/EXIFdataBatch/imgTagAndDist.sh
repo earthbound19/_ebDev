@@ -19,7 +19,7 @@
 #	NOTE that when logged in, it won't show the new link unless you reload the page.
 
 # SCRIPT WARNING ==========================================
-echo "imgTagAndDist.sh: this script will erase all metadata from the image files in the entire directory tree from which this is run. If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal. NOTE FOR DISTRIBUTION PURPOSES: images uploaded to flickr must *not* have comma separated keyword values--there must be no commas."
+echo "imgTagAndDist.sh: this script will erase all metadata from applicable image files in the entire directory tree from which this is run. If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal. NOTE FOR DISTRIBUTION PURPOSES: images uploaded to flickr must *not* have comma separated keyword values--there must be no commas."
 	echo "!============================================================"
 	# echo "DO YOU WISH TO CONTINUE running this script?"
     read -p "DO YOU WISH TO CONTINUE running this script? : y/n" CONDITION;
@@ -37,22 +37,22 @@ for element in "${images_MD_ADDS_list[@]}"
 do
 	# Retrieve image title from ~MD_ADDS.txt for use in adding search engine query for original image source--adding that to the description tag:
 	imageTitle=`sed -n 's/^-IPTC:ObjectName="\(.*\)"$/\1/p' $element`
+	# Strip out characters (from imageTitle) which may choke the Sphider search engine which I use; adapted from ftun.sh; dunno why, but that backtick \` had to be triple-escaped \\\ and also a backslash double-escaped, and even that only worked if everything is surrounded by single-quote marks ':
+	imageTitleForURLencode=`echo $imageTitle | tr -d '\=\@\\\`~\!#$%^\&\(\)+[{<]}>\*\;\|\/\\\,'`
 	# re: https://gimi.name/snippets/urlencode-and-urldecode-for-bash-scripting-using-sed/ :
 			# OR? : https://gist.github.com/cdown/1163649 :
-	oy="http://earthbound.io/q/search.php?search=1&query=$imageTitle"
+	oy="http://earthbound.io/q/search.php?search=1&query=$imageTitleForURLencode"
 	oy=`echo "$oy" | sed -f /cygdrive/c/_devtools/scripts/urlencode.sed`
 	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=4ffdbbc5091420d5b0448ce42273c6&is_secret=false&response_type=plain_text&url=$oy"
 	wget -O oy.txt $wgetArg
 			# Insert that with a search query URL into the description tag; roundabout means via invoking script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:
 	# parse that result and store it in a variable $descriptionAddendum:
 	sed -i 's/\//\\\//g' oy.txt
-			# ?? :
-			# descriptionAddendum=http:\\/
 	descriptionAddendum=$( < oy.txt)
-			echo descriptionAddendum value is\:
-			echo $descriptionAddendum
-			echo element is\:
-			echo $element
+			# echo descriptionAddendum value is\:
+			# echo $descriptionAddendum
+			# echo element is\:
+			# echo $element
 	# strip placeholder URL from description and replace it with URL from $descriptionAddendum:
 	# sed -i 's/\(.*See\) http:\/\/[^ ]* for \(.*\)/ \1 $descriptionAddendum for \2/g' $element
 	sed -i -e s/"\(.*See\) http:\/\/[^ ]* \(for .*\)"/"\1 $descriptionAddendum \2"/g $element
@@ -129,6 +129,8 @@ echo Metadata modified for each image\, and each final distribution image copied
 
 # DEVELOPMENT HISTORY:
 
+# 12/04/2016 11:30:53 PM
+# Strip non-alpha-numeric characters out of title before sending it as a Sphider search engine query to Polr2 URL shortener (workaround for Sphider apparently stopping query on unusual characters).
 # 2016-06-20 11:47:00 PM
 # Bug fix: tagged files in root of dir from which script is run wouldn't create in same dir, and therefore wouldn't get metadata update and move to ../dist/[path]. Corrected relevant code line to:
 # cp -f "$SFMFNwithExtension" "./$SFMFNpath""__tagAndDistPrepImage$SFMFNextension"
