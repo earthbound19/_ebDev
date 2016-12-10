@@ -1,10 +1,25 @@
-# Invoke this with one paramater, being the extension of videos you wish to convert to lossless utvideo avis without sound.
+# DESCRIPTION:
+# Invokes utVideoNoSound.sh repeatedly. Encodes all video files of a given type (default .avi) in a directory to UTvideo (lossless but compressed) format AVIs.
 
-cygwinFind ./*.$1 > all$1
-mapfile -t allvids < all$1
-rm all$1
+# USAGE:
+# Ensure this script is in your $PATH, and invoke it from a directory with avi files that are too huge. Results will appear as ~UTvideo~ file names.
+# Optional paramater $1 <videoExtension> e.g.:
+# thisScript.sh avi
+# If no parameter passed, defaults to avi.
 
-for filename in ${allvids[@]}
+# DEPENDENCIES: ffmpeg and a 'nix system (can be cygwin for Windows).
+
+if [ ! -z ${1+x} ]
+	then
+	vidExt=$1
+	else
+	vidExt=avi
+fi
+
+find *.$vidExt > allvids.txt
+mapfile -t allVids < allvids.txt
+rm allvids.txt
+for element in "${allVids[@]}"
 do
-	ffmpeg -y -i "$filename" -map 0:v -vcodec utvideo "$filename"_utvideo.avi
+	utVideoNoSound.sh "$element"
 done
