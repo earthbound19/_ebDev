@@ -32,6 +32,8 @@ do
 		# NOTES: 88 wide for 1280x720 pixels cygwin prompt with OCR A Std 14-point.
 	# cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c $length
 	# cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9{}[]~!@#$%^&*()_+-=<>' | head -c $length
+	# re a stackoverflow answer abt illegal byte sequence in tr:
+	export LC_CTYPE=C
 	cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c $length
 		# For newline between printed strings:
 		echo
