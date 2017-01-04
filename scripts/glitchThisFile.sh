@@ -9,7 +9,6 @@
 # NOTE: See comment ALTERNATE OPTIONS HERE for other percent options (which are effective for variously sized files)
 
 # TO DO: throw errors for missing paramaters and exit.
-# TO DO? Add random (relatively rare, or paramaterized?) deletion of copied chunks before concatination.
 # TO DO? If the source file is a common movie format, convert it first to a transport stream and corrupt that?
 # TO DO? Exert fine control over header bytes skipped (by using dd bs=1, where it is now using the default 512 bytes).
 
@@ -62,6 +61,7 @@ do
 	echo Corruption write pass $i of $corruptionPasses underway . . .
 	seekToByte=`shuf -i 1-"$__size" -n 1`
 # TO DO: prefetch n random bytes earlier, and get new ones sequentially from that in memory.
+# TO DO: Add random (relatively rare, or paramaterized?) deletion of copied chunks before concatination; e.g.: at a 5 on 5-sided die roll, split imgData.dat into two files, delete some random bytes (in a range) from the second file, and concatenate them--thus *deleting* bytes from the data instead of corrupting the bytes, sometimes.
 	dd conv=notrunc bs=1 count=1 seek=$seekToByte if=/dev/urandom of=./imgData.dat
 done
 
