@@ -5,11 +5,11 @@
 # Pass this script three parameters (the third is optional), being:
 # $1 an .svg file name and
 # $2 how many random color fill variations of that file to create, and
-# $3 OPTIONAL; will produce random colors if absent: a flat text file list of hexadecimal RGB color codes, one per line, from which to choose random colors for this fill. NOTE: each hex color must be preceded by #. This script makes a copy of the .svg with a name being a time stamp. NOTE: This expects an svg colored via hexadecimal color code fills where areas to color are designated in the svg as #ffffff. If your svg is not thus, potrace the original black bitmap using potraceAllBMPs.sh, or use the SVGOMG service (convert your SVG file online) at: https://jakearchibald.github.io/svgomg/ -- or use or SVGO re https://github.com/svg/svgo and https://web-design-weekly.com/2014/10/22/optimizing-svg-web/ -- It converts rgb values to hex by default. BUT NOTE: DO NOT use the "minify colors" option. 
+# $3 OPTIONAL; will produce random colors if absent: a flat text file list of hexadecimal RGB color codes, one per line, from which to choose random colors for this fill. NOTE: each hex color must be preceded by #. This script makes a copy of the .svg with a name being a time stamp. NOTE: This expects an svg colored via hexadecimal color code fills where areas to color are designated in the svg as #ffffff. If your svg is not thus, potrace the original black bitmap using potraceAllBMPs.sh, or use the SVGOMG service (convert your SVG file online) at: https://jakearchibald.github.io/svgomg/ -- or use SVGO re https://github.com/svg/svgo and https://web-design-weekly.com/2014/10/22/optimizing-svg-web/ -- It converts rgb values to hex by default. BUT NOTE: DO NOT use the "minify colors" option. 
 
 # TO DO: make it name the target file after the color scheme.
 # TO DO? : implement an optional buffer memory of the last three colors used, and if the current picked color is among them, pick another color until it is not among them.
-
+# TO DO? replace all this functionality with a script that works with a nodejs svg library, if possible? It cold be run from a CLI on any local nodejs (node) install.
 
 # CODE
 # If no $3 parameter passed to script, create an array of 10 random hex RGB color values. Otherwise, create the array from the list in the filename specified in $3.

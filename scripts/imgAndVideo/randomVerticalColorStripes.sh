@@ -16,7 +16,7 @@
 # This script was adapted from randomColorTilesGen.sh -- adapt any necessary comments therefrom.
 
 # SEE README.md in https://github.com/earthbound19/_devtools.git :
-if [ -e ~/_devToolsPath.txt ]; then devToolsPath=`<~/_devToolsPath.txt`; fi
+if [ -e $HOME/_devToolsPath.txt ]; then devToolsPath=`< $HOME/_devToolsPath.txt`; fi
 devToolsPath=`cygpath -u "\$devToolsPath"`
 		# echo devToolsPath val is\:
 		# echo $devToolsPath
@@ -51,7 +51,7 @@ if [ ! -z ${7+x} ]
 fi
 
 # Create a subdir based on the hex color scheme file name, and move into it for this run (move out of it at the end of this run):
-currDir=`pwd`
+pushd
 newDirName=`echo $7 | sed 's/\.txt//g'`
 # if [ ! -e $newDirName ]; then mkdir $newDirName; else exit; fi
 if [ ! -e $newDirName ]; then mkdir $newDirName; fi
@@ -86,8 +86,7 @@ do
 							hex="${hexColorsArray[$pick]}"
 							# Strip the (text format required) # symbol off that. Via yet another genius breath yon: http://unix.stackexchange.com/a/104887
 							hex=`echo ${hex//#/}`
-echo hex is $hex
-exit
+							echo hex is $hex
 									# Pick a number of times to repeat that chosen hex color, then write it that number of times to the temp file that will make up the eventual .ppm file: 
 									for k in $( seq $repeatColumnColorCount )
 									do
@@ -97,6 +96,7 @@ exit
 									done
 					else
 # TO DO: make this spit out hex or is it already? -- no, generate a triplet of numbers from 1-255; perhaps gen. the hex first and then format like that other if control block else thing here above? neh just numbers.
+# TO DO: pre-generate so many hex colors in-memory (in which script did I do that?), and get them from memory instead of disk (urandom):
 						printf "" > temp.txt
 							hex=`cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6`
 									for k in $( seq $repeatColumnColorCount )
@@ -123,6 +123,7 @@ exit
 	timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
 	ppmFileName=1x"$howManyStripes"stripesRND_"$timestamp"
 	cat ppmheader.txt grid.ppm > $ppmFileName.ppm
+	echo wrote new ppm file $ppmFileName.ppm
 	rm ppmheader.txt grid.ppm
 
 # OPTIONAL:
@@ -134,4 +135,4 @@ nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png
 
 done
 
-cd $currDir
+popd

@@ -21,8 +21,8 @@ do
 		# POTRACE OPTIONS REFERENCE:
 		# -a = angle threshold (1 means widest angle, 0 means most acute--really no--angle); -O = optimization threshold (0 will optimize less, 1 will optimize most); r = resolution (dots per inch)?
 		# potrace -n -s --group -r 72 -u 5 -t 4 -a 10 -O 10 -C \#000000 --fillcolor \#ffffff $element
-		potrace -s -t 2 -a 0.73 -r 150 -O 0.71 -C \#000000 --fillcolor \#ffffff $element
-		# potrace -s -t 12 -a 0.88 -r 150 -O 0.86 -C \#000000 --fillcolor \#ffffff $element
+		# potrace -s -t 2 -a 0.73 -r 150 -O 0.71 -C \#000000 --fillcolor \#ffffff $element
+		potrace -s -t 12 -a 0.88 -r 150 -O 0.86 -C \#000000 --fillcolor \#ffffff $element
 		# potrace -s -t 4 -a 0.84 -r 150 -O 0.347 -C \#000000 --fillcolor \#ffffff $element
 	i=$[ $i+1 ]
 	fi
