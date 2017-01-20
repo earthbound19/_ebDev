@@ -10,10 +10,10 @@ _MTPL=_EXPORTED
 # NOTE: cygpath use else err next:
 metaDataTemplatePath=`cygpath -u "C:\_devtools\scripts\imgAndVideo\EXIFdataBatch"`
 	# Pick and uncomment one:
-	metaDataTemplateFile=customImageMetadataTemplate.txt
+	# metaDataTemplateFile=customImageMetadataTemplate.txt
 	# metaDataTemplateFile=electricSheep_CC_by_sa_template.txt
 	# metaDataTemplateFile=fractalFlame_template.txt
-	# metaDataTemplateFile=DrawnColorVectorArtMetadataTemplate.txt
+	metaDataTemplateFile=DrawnColorVectorArtMetadataTemplate.txt
 	# metaDataTemplateFile=TFTMdraftMetadataTemplate.txt
 metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 

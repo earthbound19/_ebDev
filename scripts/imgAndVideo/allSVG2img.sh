@@ -1,9 +1,10 @@
-# DESCRIPTION: creates .tif files from all .svg files in a directory tree, via imagemagick. Creates 4120px jpg images by default. This script was formerly entitled allSVG2PNG.sh.
+# DESCRIPTION: creates .tif files from all .svg files in a directory tree, via imagemagick. Creates 4120px jpg images by default. Also, does not overwrite files if the render target name exists (you must first delete the existing target file, then run this script to re-create it).
+# This script was formerly entitled allSVG2PNG.sh.
 
 # USAGE: invoke this script with these parameters:
 # $1 the number of pixels you wish the longest side of the converted .svg file to be.
-# $2 the target file format e.g. tif or jpg
-# $3 optional--include this parameter (it can be anything) to make white transparent; otherwise white will be opaque.
+# $2 the target file format e.g. tif or jpg -- defaults to jpg if not provided.
+# $3 optional--include this parameter (it can be anything) to make white transparent; otherwise white will default to opaque.
 
 # template command: magick -size 850 test.svg result.tif
 # NOTE that for the -size parameter, it scales the imagesso that the longest side is that many pixels.

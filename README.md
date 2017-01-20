@@ -7,19 +7,23 @@ I believe that everything here is at least freely available and open source. If 
 
 09/02/2015 07:29:00 PM -RAH
 
-# INSTALLATION AND USAGE:
+# INSTALLATION AND USAGE
 
-Make a junction link to this directory, pointed to e.g. from one C:\devtools\_devbin, and put that same path in the system %PATH% (along with the paths to any other utilities or scripts in this repository that you will use). OR examine and use _setBinBaths.bat, which will permanently modify your path to include all relevant paths in this archive. OR examine and use getDevEnv.sh per the instructions therein.
+Examine and use _setBinBaths.bat, which will permanently modify your path to include all relevant paths in this archive. OR examine and use getDevEnv.sh per the comments therein.
 
-To create a junction link, see: http://schinagl.priv.at/nt/hardlinkshellext/linkshellextension.html
+Some scripts rely on the existence of a file which you must manually create in your $HOME dir named _devToolsPath.txt. In cygwin, to learn your home dir, enter the command "cygpath -w ~" or in any (?) 'nix environment, try the command "echo $HOME". The file _devToolsPath.txt should have one line consisting of the path to the directory in which you install _devtools, e.g.:
 
-Some scripts rely on the existence of a file which you must manually create in your home dir (type <cd ~><ENTER> in bash to view it) named _devToolsPath.txt. That file should have one line consisting of the path to the directory in which you install _devtools, e.g.:
-
-C:\Users\<yourUserName>\Documents\scrap\_devtools-master
+C:\Users\yourUserName\Documents\scrap\_devtools-master
 
 or
 
-C:\_devTools
+C:\artDevTools
+
+An example command to create this would be:
+
+echo C:\\_devTools > $HOME/_devToolsPath.txt
+
+(The \\ there is to escape the backslash so it will actually print into the file.)
 
 -- AND NOTE: If those paths include spaces or other "special" characters, it may not work. I'm not working around that. You must work around it by not using spaces etc. in your path.
 
@@ -27,6 +31,10 @@ The tools and scripts in this repository are subject to high flux, because I edi
 
 This includes zeranoe's build of ffmpeg, AutoHotkey, and many gnu core utilities for windows 32-bit.
 
-## ARCHIVE HISTORY:
+## TO DO
+- Update all scripts that could use it to exploit the method of reading from $HOME/_devToolsPath.txt used in randomVerticalColorStripes.sh
+- Update getDevEnv.sh to use the same mechanism
+
+## ARCHIVE HISTORY
 - 09/02/2015 08:42:48 PM This was initially a project of only font development scripts. I upgraded it to be a repository of executables and scripts I use (and wrote). -RAH
 - 03/13/2016 04:20:39 PM Dramatically expanded/reorganized to include a lot more that I'm using, and have developed and/or moved. -RAH
