@@ -2,11 +2,13 @@
 # Optimizes an svg input file (writing the result to <originalFileName>_opt.svg) including color code conversion suited for random recoloring via BWsvgRandomColorFill.sh.
 
 # DEPENDENCIES
-# A nodejs install with the svgo package installed, and the svgo_config.json file in the same directory as this script.
+# A nodejs install with the svgo package installed, and the svgo_config.json file in the same directory as this script. Also svgo_BWsvgRandomColorFill_target_config.js in the same directory as this script?
 
 # INSTALLATION
 # 1) install the prerequisites ;) 
-# 2) Consider the comments at the top of svgo_BWsvgRandomColorFill_target_config.js, and overwrite file those comments mention with it, if you prefer.
+# EITHER overwrite convertColors.js with the contents of svgo_config.json or, if you can (I couldn't), get svgo to recognize this as a legitimate config file. The only changes from the default config at this writing are:
+	# shorthex: false,
+	# shortname: false
 
 # USAGE
 # REQUIRES one parameter $1, being the name of the svg file for which you want an ~_opt.svg file produced in the same directory; e.g.:

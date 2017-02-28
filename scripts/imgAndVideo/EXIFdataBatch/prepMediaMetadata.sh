@@ -4,6 +4,7 @@
 
 # DEV NOTE: if you make only temporary changes to this for ripping art, revert the changes so there aren't a lot of extraneous repository commits of unnecessary changes.
 
+# Q. Should those be _FINAL_ and _EXPORTED_, not _FINAL and _EXPORTED ? :
 # _MTPL=_FINAL
 _MTPL=_EXPORTED
 

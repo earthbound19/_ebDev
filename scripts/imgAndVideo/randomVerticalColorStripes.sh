@@ -3,8 +3,8 @@
 
 # USAGE
 # Pass this script the following parameters; the last being optional.
-# $1 The minimum number of columns to repeat a color (note that this is *before*) the image upscale).
-# $2 The maximum number of columns to repeat a color (note that this is *before*) the image upscale).
+# $1 The minimum number of columnar pixels to repeat a color (note that this is *before*) the image upscale).
+# $2 The maximum number of columnar pixels to repeat a color (note that this is *before*) the image upscale).
 # $3 How many pixels wide to scale the final image
 # $4 How many pixels tall to scale the final image
 # $5 How many such random images you want to create
@@ -13,7 +13,14 @@
 
 # NOTES
 # TO DO
-# This script was adapted from randomColorTilesGen.sh -- adapt any necessary comments therefrom.
+# See comments to that effect throughout code.
+
+# In case of interrupted run, clean up first:
+if [ -e temp.txt ]; then rm temp.txt; fi
+if [ -e *.temp ]; then rm *.temp; fi
+rm *.temp temp.txt
+
+# GLOBAL VARIABLES
 
 # SEE README.md in https://github.com/earthbound19/_devtools.git :
 if [ -e $HOME/_devToolsPath.txt ]; then devToolsPath=`< $HOME/_devToolsPath.txt`; fi
@@ -22,20 +29,16 @@ devToolsPath=`cygpath -u "\$devToolsPath"`
 		# echo $devToolsPath
 # the path in _devTools where all hex color scheme text files are stored:
 hexColorSchemesRootSubPath="/scripts/imgAndVideo/ColorSchemesHex"
-
-# In case of interrupted run, clean up first:
-if [ -e temp.txt ]; then rm temp.txt; fi
-# if [ -e *.temp ]; then rm *.temp; fi
-
-# GLOBAL VARIABLES
 hexColorListsRootPath="$devToolsPath""$hexColorSchemesRootSubPath"
-
 minColorColumnRepeat=$1
 maxColorColumnRepeat=$2
 scalePixX=$3
 scalePixY=$4
 howManyImages=$5
 maxColorColumnsVariation=$6
+maxPossibleColumns=$(( $maxColorColumnRepeat + $maxColorColumnsVariation))
+padDigitsTo=${#maxPossibleColumns}
+
 # PURE INFURIATING NONSENSE, again appeased by a genius breath yon: http://stackoverflow.com/a/23207966
 colorSelectionList=`cygwinFind $hexColorListsRootPath -name $7 -type f`
 
@@ -57,12 +60,17 @@ newDirName=`echo $7 | sed 's/\.txt//g'`
 if [ ! -e $newDirName ]; then mkdir $newDirName; fi
 cd $newDirName
 
-# Outer loop per howManyImages:
+	# IN DEVELOPMENT:
+	# ? Pregenerate a long string which is so many random hex colors smushed together (without any delimiters), to pull hex colors from in chuncks of six characters for greater efficiency; re: http://stackoverflow.com/a/1405641
+	# WUT FIX VAR NAMES
+	# numRandomCharsToGet=`echo $(( arrSize * getNrandChars ))`
+		# echo numRandomCharsToGet val is $numRandomCharsToGet
+	# randomCharsString=`cat /dev/urandom | tr -cd 'a-km-np-zA-KM-NP-Z2-9' | head -c $numRandomCharsToGet`
+		# echo randomCharsString val is $randomCharsString
+
 for a in $( seq $howManyImages )
 do
-	# Inner loop which produces each image:
-	# stripesPerRow=$(( $numCols * 3 ))
-	# numbersNeedsPerRow=$(( $numCols * 3 ))
+
 			# Check and make changes for optional random negative variation of max random number pick range:
 			if [ ! -z ${6+x} ]
 				then
@@ -95,14 +103,14 @@ do
 							printf "%d\n %d\n %d\n" 0x${hex:0:2} 0x${hex:2:2} 0x${hex:4:2} >> temp.txt
 									done
 					else
-# TO DO: make this spit out hex or is it already? -- no, generate a triplet of numbers from 1-255; perhaps gen. the hex first and then format like that other if control block else thing here above? neh just numbers.
-# TO DO: pre-generate so many hex colors in-memory (in which script did I do that?), and get them from memory instead of disk (urandom):
+
 						printf "" > temp.txt
 							hex=`cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6`
 									for k in $( seq $repeatColumnColorCount )
 									do
 											# count each increment of columns:
 											count=$(( count + 1 ))
+# IN DEVELOPMENT; here it would be a string variable and just + ' ' + $newHexThing ?
 							printf "%d\n %d\n %d\n" 0x${hex:0:2} 0x${hex:2:2} 0x${hex:4:2} >> temp.txt
 									done
 				fi
@@ -121,18 +129,34 @@ do
 
 					echo Concatenating generated rows into one new .ppm file . . .
 	timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
-	ppmFileName=1x"$howManyStripes"stripesRND_"$timestamp"
+		# Format $howManyStripes by padding digits to the number of digits in the highest possible number $maxColorColumnRepeat:
+		paddedNum=`printf "%0""$padDigitsTo""d\n" $howManyStripes`
+		# echo ===========================
+		# echo paddedNum val is\: $paddedNum
+	ppmFileName=1x"$paddedNum"stripesRND_"$timestamp"
 	cat ppmheader.txt grid.ppm > $ppmFileName.ppm
 	echo wrote new ppm file $ppmFileName.ppm
 	rm ppmheader.txt grid.ppm
 
 # OPTIONAL:
 echo Creating enlarged png version with hard edges maintained . . .
-# nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png $ppmFileName.ppm
-# DEV OVERRIDE:
-scalePixY=$(( $scalePixX / 2 ))
 nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png $ppmFileName.ppm
+	# OPTION THAT OVERRIDES X dimension to be half of what the parameter gives:
+	# scalePixY=$(( $scalePixX / 2 ))
+	# nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png $ppmFileName.ppm
 
 done
 
 popd
+
+
+
+	# IN DEVELOPMENT:
+	# WUT FIX VAR NAMES and adapt
+	# Initialize counter at negative the number of getNrandChars, so that the first iteration in the following loop will set it to 0, which is where we need it to start:
+	# multCounter=-$getNrandChars
+		# echo multCounter val is $multCounter
+	# for filename in ${array[@]}
+	# do
+			# multCounter=$(($multCounter + $getNrandChars))
+			# newFileBaseName=${randomCharsString:$multCounter:$getNrandChars}
