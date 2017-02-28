@@ -1,23 +1,22 @@
-# DESCRIPTION: creates .tif files from all .svg files in a directory tree, via imagemagick. Creates 4120px jpg images by default. Also, does not overwrite files if the render target name exists (you must first delete the existing target file, then run this script to re-create it).
+# DESCRIPTION: creates .jpg (by default) files from all .svg files in a directory tree, via imagemagick. Creates 4120px jpg images by default. Also, does not overwrite files if the render target name exists (you must first delete the existing target file, then run this script to re-create it).
 # This script was formerly entitled allSVG2PNG.sh.
 
 # USAGE: invoke this script with these parameters:
-# $1 the number of pixels you wish the longest side of the converted .svg file to be.
+# $1 the number of pixels you wish the longest side of the converted .svg file(s) to be.
 # $2 the target file format e.g. tif or jpg -- defaults to jpg if not provided.
 # $3 optional--include this parameter (it can be anything) to make white transparent; otherwise white will default to opaque.
 
-# template command: magick -size 850 test.svg result.tif
+# DEV NOTE: template command: magick -size 850 test.svg result.tif
 # NOTE that for the -size parameter, it scales the imagesso that the longest side is that many pixels.
 
-# If no image size parameter, set default image size of 300.
-
-# If no image size parameter, set default image size of 300.
-# TO DO: update this to use the more robust non-parameter (/variable) detection method I found.
 img_format=$1
 img_size=$2
 
+# If no image size parameter, set default image size of 4120.
 if [ -z ${1+x} ]; then img_size=4120; else img_size=$1; fi
+# If no image format parameter, set default image format of jpg.
 if [ -z ${2+x} ]; then img_format=jpg; else img_format=$2; fi
+# If no third parameter, make background transparent.
 if [ -z ${3+x} ]; then param3="-background none"; fi
 
 CygwinFind . -iname \*.svg > all_svgs.txt

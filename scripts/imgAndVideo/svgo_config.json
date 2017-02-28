@@ -15,7 +15,7 @@ exports.description = 'converts colors: rgb() to #rrggbb and #rrggbb to #rgb';
     // shortname: true
 // };
 
-// CLUGY hard-coded options change by RAH:
+// KLUDGE hard-coded options change by RAH:
 exports.params = {
     currentColor: false,
     names2hex: false,

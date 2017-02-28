@@ -59,7 +59,7 @@ echo "As instructed by the echo from the end of numberFilesByLabel.sh, examine t
 
 archiveMetadata.sh
 imgMetaDataTo7z.bat
-prepImageMetaData.sh
-imgTagAndDist.sh
+prepMediaMetadata.sh
+mediaTagAndDist.sh
 
 echo __DigitalImagePress.sh run COMPLETED.

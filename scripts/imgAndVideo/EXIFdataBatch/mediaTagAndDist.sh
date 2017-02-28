@@ -3,23 +3,28 @@
 # USAGE: NOTE that a run of prepImageMetaData.sh must precede this script, or this script will not work. ALSO: correct. (MEAGER) NOTES: This expects all images it works upon to be .tif images, and won't work with anything else. Maybe I'll change it to also do non-standard tags in .png files, and do other source formats also.
 # NOTE: fer mysic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
 
-# TO DO:
+# TO DO; * = done, / = in progress:
+# Figure out why this updates metadata ok to to __tagAndDistPrepImage.jpg with e.g. 9000x6000 px jpgs, but chokes on copying them to _dist; fix that. WAIT: I think the real problem was I couldn't rename a file to a duplicate target file name. Catch errors when that happens? Verify this is what happens (the "WAIT" hypothesis).
 # ? Don't update metadata template with a shortened URL (and retrieve a short URL) if one already exists.
 # Check: is it proper or does it work to use the -IPTC:ObjectName in this script? Should that be -MWG:Description?
-# DOUBLE CHECK that the s.earthbound.io~ link is formatted correctly and works in result.
 # - Document workings and use; ack. or fix clunky weaknesses in design.
-# - Implement keyword heirarchies re: http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/MWG.html
-# * DONE: Implement self-hosted polr url shortening for looong titles/self-hosted title search URLS. e.g. like http://polr.me/w9g or http://polr.me/11q3 ; dev code that works or doesn't depending on authentication; the following are for polr_cli_polrAcct.py : C:\Python27\Lib\site-packages\polr_cli\polr_cli.py --shorten http://earthbound\.io/q
+# ? - Implement keyword heirarchies re: http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/MWG.html
+# * DOUBLE CHECK that the s.earthbound.io~ link is formatted correctly and works in result.
+# * Implement self-hosted polr url shortening for looong titles/self-hosted title search URLS. e.g. like http://polr.me/w9g or http://polr.me/11q3 ; dev code that works or doesn't depending on authentication; the following are for polr_cli_polrAcct.py : C:\Python27\Lib\site-packages\polr_cli\polr_cli.py --shorten http://earthbound\.io/q -- NOTES:
 				#	Command that looks up target of shortened link, but relies on faulty dependency:
 				# 	Python polr_cli.py --lookup w9g
 				# 	Command that does NOT work at this writing at my self-hosted Polr install:
 				# 	Python polr_cli_s_eb.py --lookup 0
-# 	API call URL that DOES work at my self-hosted Polr install--and saves the result URL to a plain-text URL! (except that that key is now retired ;) :
-# 	wget -O shortened_URL.txt "http://s.earthbound.io/api/v2/action/shorten?key=3108e9a45e9f6edcf9eeaa1ca9712d&url=https://google.com&is_secret=false&response_type=plain_text"
+	# 	API call URL that DOES work at my self-hosted Polr install--and saves the result URL to a plain-text URL! (except that that key is now retired ;) :
+	# 	wget -O shortened_URL.txt "http://s.earthbound.io/api/v2/action/shorten?key=3108e9a45e9f6edcf9eeaa1ca9712d&url=https://google.com&is_secret=false&response_type=plain_text"
 #	NOTE that when logged in, it won't show the new link unless you reload the page.
 
+# GLOBAL API key for Polr URL shortener; stored in a private file outside repository ;) and here imported therefrom (will only work per local install of _devTools)
+PolrAPIkey=$( < ~/PolrAPIkey.txt)
+		# echo PolrAPIkey value is\: $PolrAPIkey
+
 # SCRIPT WARNING ==========================================
-echo "imgTagAndDist.sh: this script will erase all metadata from applicable image files in the entire directory tree from which this is run. If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal. NOTE FOR DISTRIBUTION PURPOSES: images uploaded to flickr must *not* have comma separated keyword values--there must be no commas."
+echo "This script will erase all metadata from applicable image files in the entire directory tree from which this is run. If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal. NOTE FOR DISTRIBUTION PURPOSES: images uploaded to flickr must *not* have comma separated keyword values--there must be no commas."
 	echo "!============================================================"
 	# echo "DO YOU WISH TO CONTINUE running this script?"
     read -p "DO YOU WISH TO CONTINUE running this script? : y/n" CONDITION;
@@ -43,7 +48,7 @@ do
 			# OR? : https://gist.github.com/cdown/1163649 :
 	oy="http://earthbound.io/q/search.php?search=1&query=$imageTitleForURLencode"
 	oy=`echo "$oy" | sed -f /cygdrive/c/_devtools/scripts/urlencode.sed`
-	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=4ffdbbc5091420d5b0448ce42273c6&is_secret=false&response_type=plain_text&url=$oy"
+	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=""$PolrAPIkey""&is_secret=false&response_type=plain_text&url=$oy"
 	wget -O oy.txt $wgetArg
 			# Insert that with a search query URL into the description tag; roundabout means via invoking script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:
 	# parse that result and store it in a variable $descriptionAddendum:

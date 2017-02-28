@@ -1,4 +1,4 @@
 -MWG:Description="See http://replaceThisURL for archive and Public Domain use."
--MWG:Keywords="myWork silly goofy comedy song tune music sketch draft"
+-MWG:Keywords="myWork, silly, goofy, comedy, song, tune, music, sketch, draft"
 -MWG:Copyright="Richard Alexander Hall http://earthbound.io/contact"
 -MWG:Creator="Richard Alexander Hall"
