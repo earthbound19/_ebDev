@@ -9,8 +9,8 @@
 # DEV NOTE: template command: magick -size 850 test.svg result.tif
 # NOTE that for the -size parameter, it scales the imagesso that the longest side is that many pixels.
 
-img_format=$1
-img_size=$2
+img_size=$1
+img_format=$2
 
 # If no image size parameter, set default image size of 4120.
 if [ -z ${1+x} ]; then img_size=4120; else img_size=$1; fi

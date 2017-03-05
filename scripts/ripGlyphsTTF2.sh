@@ -1,5 +1,12 @@
+# DESCRIPTION
+# Rips all glyphs out of a .ttf font and generates individual ~.eps (PostScript) files of them.
+
+# DEPENDENCY
+# ttf2eps from FontForge, which (I think) must be manually compiled for your system.
+
 # USAGE
-# invoke with parameter $1, being the name of a true-type font file, which probably has to be in the same  name in your $PATH.
+# invoke with parameter $1 and $2; being:
+# $1 the name of a true-type font file in your $PATH
 
   # basic latin unicode code page ref: http://www.fileformat.info/info/unicode/block/index.htm
   # OR: http://www.fileformat.info/info/unicode/block/basic_latin/list.htm
@@ -12,7 +19,7 @@ done < printableBasicLatinUnicode_codepages.txt
 # rename resultant files after font file name.
 # //using mac find; dunno whether this will work with cygwin or other 'nix environments; re: http://apple.stackexchange.com/a/1449
 fontFileNameNoExt=`echo $1 | sed 's/\(.*\)\.ttf/\1/g'`
-epsArray=`find . -type f -name '*.eps'`
+epsArray=`find . -type f -name "*.eps"`
 for epsFileName in ${epsArray[@]}
 do
   epsFileName=`basename "$epsFileName"`

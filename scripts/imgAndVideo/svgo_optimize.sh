@@ -31,16 +31,20 @@ fileNameNoExt=`echo $1 | sed 's/\(.*\)\.svg/\1/g'`
 				# fi
 				# WANT TO MAKE THIS WORK: --config=""$configFileName" e.g. :
 				# svgoCLIopts="--disable=mergePaths --enable=removeRasterImages --disable=convertShapeToPath --config=$configFileName"
-svgoCLIopts="--disable=mergePaths --enable=removeRasterImages --disable=convertShapeToPath"
+CLIopts="--disable=mergePaths --enable=removeRasterImages --disable=convertShapeToPath"
+# OTHER ADDITIONAL OPTIONS; comment out if you don't want them:
+# moreCLIopts="--enable=removeDimensions --enable=removeRasterImages --enable=removeUnknownsAndDefaults --enable=removeViewBox"
 # ==== END GLOBALS
 
-SVGOcommand="svgo -i $1 -p 3 --pretty $svgoCLIopts -o "$fileNameNoExt"_opt.svg"
+SVGOcommand="svgo -i $1 -p 3 --pretty $CLIopts $moreCLIopts -o "$fileNameNoExt"_opt.svg"
 echo Running command\:
 echo $SVGOcommand
 echo . . .
 $SVGOcommand
 
-# rm ./$configFileName
+# OPTIONAL and DANGER: will toast original file--comment out if you do not want that! :
+rm $1 && mv "$fileNameNoExt"_opt.svg" $1
+
 
 # SVGO CLI OPTIONS NOTES
 # -i input.svg -o output.svg

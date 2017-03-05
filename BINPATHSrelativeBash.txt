@@ -1,6 +1,7 @@
 bin
 bin/byteMangling
 scripts
+bin/FilterForgeBatchWrapper
 bin/AutoHotkey/Compiler
 scripts/fileNamesAndTimestamps
 scripts/imgAndVideo
@@ -12,7 +13,6 @@ scripts/lit/gibberish
 bin/GibbGen/pyMarkovGibGen
 bin/GibbGen/GibbGenCPP/bin/1.0-functional
 bin/gnuCoreUtilsWin32
-bin/AutoHotkey/Compiler
 bin/ImageMagick
 bin/ImageMagick/modules/coders
 bin/ImageMagick/modules/filters

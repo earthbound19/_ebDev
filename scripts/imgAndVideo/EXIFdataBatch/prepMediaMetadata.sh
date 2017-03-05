@@ -15,6 +15,7 @@ metaDataTemplatePath=`cygpath -u "C:\_devtools\scripts\imgAndVideo\EXIFdataBatch
 	# metaDataTemplateFile=electricSheep_CC_by_sa_template.txt
 	# metaDataTemplateFile=fractalFlame_template.txt
 	metaDataTemplateFile=DrawnColorVectorArtMetadataTemplate.txt
+	# metaDataTemplateFile=vectorRandomColorAnimTemplate.txt
 	# metaDataTemplateFile=TFTMdraftMetadataTemplate.txt
 metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 
