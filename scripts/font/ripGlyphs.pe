@@ -1,5 +1,5 @@
 Open($argv[1])
 SelectWorthOutputting()
 foreach
-  Export("svg")
+  Export($argv[2])
 endloop
