@@ -1,4 +1,3 @@
-C:\_devtools\bin\FilterForgeBatchWrapper
 C:\autobrood
 C:\autobrood\batch-scripts
 C:\autobrood\bin
@@ -7,3 +6,5 @@ C:\Program Files (x86)\Filter Forge 4\Bin
 C:\Program Files\AutoHotkey
 C:\Python27
 D:\Program_Distributions\_artAudioVisual\FredsImageMagickScripts
+C:\Program Files (x86)\FontForgeBuilds\bin
+C:\Program Files\gs\gs9.06\bin

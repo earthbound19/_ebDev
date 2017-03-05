@@ -1,0 +1,13 @@
+re http://fontforge.10959.n7.nabble.com/Saving-glyphs-as-SVG-files-via-command-line-td12726.html
+
+fontforge -lang=ff -c 'Open($1); SelectWorthOutputting(); foreach Export("svg"); endloop;' font.ttf 
+
+re: http://fontforge.github.io/en-US/documentation/scripting/
+-- adapted those commands to a loop e.g.:
+
+i=1
+while ( i<$argc )
+  Open($argv[i])
+  Generate($argv[i]:r + ".ttf")
+  i = i+1
+endloop
