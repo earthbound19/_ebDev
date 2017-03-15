@@ -24,4 +24,4 @@
 # Template command; meaning use the ripGlyphs.pe script, and rip arial.ttf into individual eps glyph files:
 # fontforge.exe -script ripGlyphs.pe arial.ttf eps
 
-fontforge.exe -script ripGlyphs.pe $1 $2
+fontforge -script ripGlyphs.pe $1 $2
