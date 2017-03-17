@@ -6,22 +6,22 @@
 
 # Q. Should those be _FINAL_ and _EXPORTED_, not _FINAL and _EXPORTED ? :
 # _MTPL=_FINAL
-_MTPL=_EXPORTED
+_MTPL=_EXPORTED_
 
 # NOTE: cygpath use else err next:
-metaDataTemplatePath=`cygpath -u "C:\_devtools\scripts\imgAndVideo\EXIFdataBatch"`
+metaDataTemplatePath=`cygpath -u "C:\_devtools\scripts\imgAndVideo\EXIFdataBatch\metaDataTemplates"`
 	# Pick and uncomment one:
-	# metaDataTemplateFile=customImageMetadataTemplate.txt
+	metaDataTemplateFile=customImageMetadataTemplate.txt
 	# metaDataTemplateFile=electricSheep_CC_by_sa_template.txt
 	# metaDataTemplateFile=fractalFlame_template.txt
-	metaDataTemplateFile=DrawnColorVectorArtMetadataTemplate.txt
+	# metaDataTemplateFile=DrawnColorVectorArtMetadataTemplate.txt
 	# metaDataTemplateFile=vectorRandomColorAnimTemplate.txt
 	# metaDataTemplateFile=TFTMdraftMetadataTemplate.txt
 metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 
 cygwinFind . -iname \*$_MTPL*.mp4 -o -iname \*$_MTPL*.tif -o -iname \*$_MTPL*.tiff -o -iname \*$_MTPL*.png -o -iname \*$_MTPL*.psd  -o -iname \*$_MTPL*.psb -o -iname \*$_MTPL*.ora -o -iname \*$_MTPL*.rif -o -iname \*$_MTPL*.riff -o -iname \*$_MTPL*.jpg -o -iname \*$_MTPL*.jpeg -o -iname \*$_MTPL*.gif -o -iname \*$_MTPL*.bmp -o -iname \*$_MTPL*.cr2 -o -iname \*$_MTPL*.raw  -o -iname \*$_MTPL*.crw -o -iname \*$_MTPL*.pdf  -o -iname \*$_MTPL*.svg > imagesMetadataPrepList.txt
 
-find . -iname \*"$_MTPL"var*.mp4 -o -iname \*"$_MTPL"var*.tif -o -iname \*"$_MTPL"VAR*.tiff -o -iname \*"$_MTPL"VAR*.png -o -iname \*"$_MTPL"VAR*.psd -o -iname \*"$_MTPL"*.psb -o -iname \*"$_MTPL"VAR*.ora -o -iname \*"$_MTPL"VAR*.rif -o -iname \*"$_MTPL"VAR*.riff -o -iname \*"$_MTPL"VAR*.jpg -o -iname \*"$_MTPL"VAR*.jpeg -o -iname \*"$_MTPL"VAR*.gif -o -iname \*"$_MTPL"VAR*.bmp -o -iname \*"$_MTPL"VAR*.cr2 -o -iname \*"$_MTPL"VAR*.raw  -o -iname \*"$_MTPL"VAR*.crw -o -iname \*"$_MTPL"VAR*.pdf -o -iname \*"$_MTPL"VAR*.svg >> imagesMetadataPrepList.txt
+cygwinFind . -iname \*"$_MTPL"var*.mp4 -o -iname \*"$_MTPL"var*.tif -o -iname \*"$_MTPL"VAR*.tiff -o -iname \*"$_MTPL"VAR*.png -o -iname \*"$_MTPL"VAR*.psd -o -iname \*"$_MTPL"*.psb -o -iname \*"$_MTPL"VAR*.ora -o -iname \*"$_MTPL"VAR*.rif -o -iname \*"$_MTPL"VAR*.riff -o -iname \*"$_MTPL"VAR*.jpg -o -iname \*"$_MTPL"VAR*.jpeg -o -iname \*"$_MTPL"VAR*.gif -o -iname \*"$_MTPL"VAR*.bmp -o -iname \*"$_MTPL"VAR*.cr2 -o -iname \*"$_MTPL"VAR*.raw  -o -iname \*"$_MTPL"VAR*.crw -o -iname \*"$_MTPL"VAR*.pdf -o -iname \*"$_MTPL"VAR*.svg >> imagesMetadataPrepList.txt
 				# FORMER CODE:
 				# cygwinFind . -iname \*$_MTPL*.tif > imagesMetadataPrepList.txt
 				# cygwinFind . -iname \*"$_MTPL"var_*.tif >> imagesMetadataPrepList.txt
@@ -119,4 +119,4 @@ done
 # DEVELOPMENT HISTORY:
 # BEFORE NOW: SO MANY CODE. SO COMPUTER SCIENCE. SO WOW.
 # 2016-04-26 10:27 PM: regex title prep from filename. Add support for many image file types. One-handed programming in broken radius surgery recovery duress. -RAH
-# 05/09/2016 02:39:48 AM Tweaks in tandem with imgTafAndDist.sh dev/debugging. -RAH
+# 05/09/2016 02:39:48 AM Tweaks in tandem with imgTagAndDist.sh dev/debugging. -RAH
