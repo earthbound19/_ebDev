@@ -1,0 +1,1 @@
+gource --max-file-lag 12 -f -1920x1080 --seconds-per-day 7.1 --auto-skip-seconds 0.7 --file-idle-time 0 --key --bloom-multiplier 0.6 --bloom-intensity 0.6 -e 0.2 --hide files,progress,users,usernames -o 
