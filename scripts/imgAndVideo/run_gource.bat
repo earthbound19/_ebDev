@@ -1,1 +1,0 @@
-gource --max-file-lag 0.8 -f -1280x720 --seconds-per-day .6 --auto-skip-seconds 0.1 --file-idle-time 0.4 --key --bloom-multiplier 0.7 --bloom-intensity 0.6 -e 0.06 --hide mouse,usernames,filenames -o gitProjectFrame_ -r 30 --font-size 18
