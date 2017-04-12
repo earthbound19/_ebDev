@@ -6,6 +6,8 @@
 # TO DO: update this to use the better means of empty variable checkign I found; e.g if [ -z ${1+x} ]; then img_size=4120; else img_size=$1; fi :
 if [[ $1 == "" ]]; then howMany=1; else howMany=$1; fi
 if [[ $2 == "" ]]; then length=44; else length=$2; fi
+# To force tr to operate on non-text (urandom) output:
+export LC_CTYPE=C
 for (( i=1; i<=$howMany; i++ ))
 do
 	cat /dev/urandom | tr -dc 'a-z0-9A-Z{}[]~!@#$%^&*()_+-' | head -c $length
