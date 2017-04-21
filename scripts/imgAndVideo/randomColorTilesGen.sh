@@ -12,6 +12,7 @@
 # Example command that will generate one hundred and seventy 16x9 pixel files of colors picked randomly from the color hex code list file rainbowHexColorsByMyEye.txt:
 # thisScript.sh 16 9 170 rainbowHexColorsByMyEye.txt
 
+# TO DO: wut? I think the following isn't true anymore? Omit comment if so; or comment leading elsewhere . . .
 # --which will produce 10x10 pixel random colored .ppm images, fifteen of them, and scale each up x80, maintaining hard edges, to accompanying .png images.
 
 # TO DO make the cols / rows paramater input sequence consistent between this and makeBWGridRandomNoise.sh, if they aren't (check).

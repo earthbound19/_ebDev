@@ -7,7 +7,7 @@
 # $3 optional--include this parameter (it can be anything) to make white transparent; otherwise white will default to opaque.
 
 # DEV NOTE: template command: magick -size 850 test.svg result.tif
-# NOTE that for the -size parameter, it scales the imagesso that the longest side is that many pixels.
+# NOTE that for the -size parameter, it scales the images so that the longest side is that many pixels.
 
 img_size=$1
 img_format=$2
@@ -25,7 +25,7 @@ for element in "${all_svgs[@]}"
 do
 		# Because I couldn't get this done with an echo piped to sed:
 		echo $element > temp.txt
-		sed -i 's/\(.*\)\.svg/\1/g' temp.txt
+		sed -i 's/\(.*\)\.eps/\1/g' temp.txt
 	svgFilenameNoExtension=$( < temp.txt)
 	if [ -a $svgFilenameNoExtension.$img_format ]
 	then
