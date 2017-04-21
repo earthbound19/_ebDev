@@ -2,7 +2,7 @@
 # Create XMP (metadata) sidecar file in a subdirectory; the -r option causes sub-directories to be recursively processed:
 # Thanks to: http://stackoverflow.com/a/4909968 and http://stackoverflow.com/a/4040324
 
-# NOT TDO: update this to only work on file names that include _final_. I do actually want to archive metadata from everything. Even if it means it takes longer the first run.
+# NOT TO DO: update this to only work on file names that include _final_. I do actually want to archive metadata from everything. Even if it means it takes longer the first run.
 
 cygwinFind . -iname \*.tif -o -iname \*.tiff -o -iname \*.png -o -iname \*.psd -o -iname \*.ora -o -iname \*.rif -o -iname \*.riff -o -iname \*.jpg -o -iname \*.jpeg -o -iname \*.gif -o -iname \*.bmp -o -iname \*.cr2 -o -iname \*.raw  -o -iname \*.crw -o -iname \*.pdf > imageFilesList.txt
 # \*.ptg (ArtRage) and *.kra (Krita) no recognized metadata :( I'd be surprised if .ora (any program) and .rif/.riff (any program though most likely Corel Painter) have readable metadata.
