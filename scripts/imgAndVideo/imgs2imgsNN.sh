@@ -10,7 +10,7 @@
 # e.g. imgs2imgsnn.sh ppm png 640 480
 
 # TO DO
-		# Make it do no resizing if no params 3 and 4 given; e.g. adapt htis:
+		# Make it do no resizing if no params 3 and 4 given; e.g. adapt this:
 		# if [ ! -z ${5+x} ]
 		# then
 			# rescaleParams="-vf scale=$5:flags=neighbor"
@@ -30,5 +30,12 @@ do
 			# echo imgFileNoExt val is\:
 			# echo $imgFileNoExt
 			# echo Running command\: nconvert -rtype quick -resize $3 $4 -out $2 -o $imgFileNoExt.$2 $img
-	nconvert -rtype quick -resize $3 $4 -out $2 -o $imgFileNoExt.$2 $img
+	if [ ! -f $imgFileNoExt.$2 ]; then
+		echo ~~
+		echo RENDERING target file $imgFileNoExt.$2 as it does not exist . . .
+		nconvert -rtype quick -resize $3 $4 -out $2 -o $imgFileNoExt.$2 $img
+		echo ~~
+		else
+			echo Target file $imgFileNoExt.$2 already exists\; delete the file if you wish to re-render it\; SKIPPING RENDER . . .
+	fi
 done

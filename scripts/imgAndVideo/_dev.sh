@@ -29,16 +29,15 @@ arraySize=$(wc -l < allFiles.txt)
 numDigitsOf_arraySize=${#arraySize}
 rm allFiles.txt
 
-# UTvideo codec option; comment out the x264 codec option if you uncomment this:
-# ffmpeg -y -f image2 -r $1 -i %0"$numDigitsOf_arraySize"d.$4 -r 29.97 -codec:v utvideo _out.avi
+ffmpeg -y -f image2 -r $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -r $2 _out.avi
 
-# x264 codec option; comment out the UTvideo option if you uncomment this:
-ffmpeg -y -f image2 -r $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -r $2 -crf $3 _out.mp4
 
-# THE FOLLOWING could be adapted to a rawvideo option:
-# ffmpeg -y -r 24 -f image2 -i doctoredFrames\mb-DGYTMSWA-fr_%07d.png -vf "format=yuv420p" -vcodec rawvideo -r 29.97 _DGYTMSWAsourceDoctoredUncompressed.avi
+
 
 # DEV NOTES
+# ex. command:
+# ffmpeg -y -r 24 -f image2 -i doctoredFrames\mb-DGYTMSWA-fr_%07d.png -vf "format=yuv420p" -vcodec rawvideo -r 29.97 _DGYTMSWAsourceDoctoredUncompressed.avi
+
 # to enable simple interpolation to up the framerate to 30, use this tag in the codec/output flags section:
 # -vf fps=30
 
