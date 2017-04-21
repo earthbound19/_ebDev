@@ -16,6 +16,7 @@ bin/gnuCoreUtilsWin32
 bin/ImageMagick
 bin/ImageMagick/modules/coders
 bin/ImageMagick/modules/filters
+bin/graphicsMagick
 scripts/font
 scripts/imgGetSimilar
 ../autobrood
