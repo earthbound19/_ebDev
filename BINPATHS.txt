@@ -1,6 +1,7 @@
 C:\_devtools\bin
 C:\_devtools\bin\byteMangling
 C:\_devtools\bin\FilterForgeBatchWrapper
+C:\_devtools\bin\graphicsMagick
 C:\_devtools\scripts
 C:\_devtools\bin\AutoHotkey\Compiler
 C:\_devtools\scripts\fileNamesAndTimestamps
