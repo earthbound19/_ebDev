@@ -5,7 +5,7 @@ if [ -z ${1+x} ]
 	then
 	echo msg 1
 fi
-	
+
 if [ -z ${2+x} ]
 	then
 	echo msg 2
