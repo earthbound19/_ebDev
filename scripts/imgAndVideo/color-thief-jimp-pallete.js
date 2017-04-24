@@ -13,8 +13,11 @@
 // TO DO
 // cross-compile this to an exe targeting any platform? roll all dependencies into one repo I control?
 
+console.log(wut);
 
-var ColorThief = require('color-thief-jimp');
+exit;
+var ColorThief = require('color-thief-jimp.js');
+
 var Jimp = require('jimp');
 
 Jimp.read('./' + process.argv[2], (err, sourceImage) => {

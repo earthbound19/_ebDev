@@ -46,11 +46,12 @@ echo gm montage $tileParam -background gray -geometry 300x300+0+0 \\ > mkGridHea
   # convert hex color scheme text list file to parameter list for ~magick:
     # to do? make the following in-memory:
 sed 's/.*#\(.*\)$/zertsmeh_temp_for_colors\/\1.png \\/' $1.hybrid-colors-hex.txt > mkGridSRCimgs.txt
-mv zertsmeh_temp_for_colors $1.colors
 echo $1.extracted-colors.png > mkGridTail.txt
 cat mkGridHead.txt mkGridSRCimgs.txt mkGridTail.txt > mkColorPaletteGrid.sh
 rm mkGridHead.txt mkGridSRCimgs.txt mkGridTail.txt
 chmod 777 ./mkColorPaletteGrid.sh
 ./mkColorPaletteGrid.sh
-rm ./mkColorPaletteGrid.sh
-rm -r zertsmeh_temp_for_colors
+mv ./mkColorPaletteGrid.sh ./$1-mkColorPaletteGrid.sh.txt
+mv zertsmeh_temp_for_colors $1.colors
+
+echo DONE--created color palette image is $1.extracted-colors.png, and the .sh script that generated it has been renamed to $1-mkColorPaletteGrid.sh.txt. You will also find color swatch images from the palette in $1.colors.
