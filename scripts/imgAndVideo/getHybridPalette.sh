@@ -7,7 +7,9 @@
 # $2 how many colors for color-thief-jimp and imagemagick (respectively) to extract. Resultant palette and image will have (n * 2) colors.
 
 # DEPENDENCIES
-# On Mac: imagemagick ideally via macports; re: https://www.imagemagick.org/script/binary-releases.php
+# nodejs, imagemagick. On Mac imagemagick perhaps ideally via macports; re: https://www.imagemagick.org/script/binary-releases.php -- and node installs should be global:
+# npm install -g jimp
+# npm install -g color-thief-jimp
 
 # INTERESTING AND UNRELATED; posterizes:
 # http://stackoverflow.com/a/27882332/1397555
@@ -22,9 +24,9 @@ node color-thief-jimp-pallete.js $1 $(($2 + 1)) > $1.ctj-colors-hex.txt
 # possibly more useful parameter omitted: -colorspace LAB
 convert $1 -format %c -colorspace LAB -colors $2 histogram:info:- > $1.mg-colors-hex.txt
 
-sed -i -n "s/.*'\([aA-fF0-9]\{6\}\).*/#\1/g" $1.ctj-colors-hex.txt
-sed -i -n 's/.*\(#[aA-fF0-9]\{6\}\).*/\1/g' "$1".mg-colors-hex.txt
-
+# NOTES: hrm. it seems that perhaps on Mac that -n switches here (with -i) make it work, and on cygwin they make it *not* work.
+sed -i "s/.*'\([aA-fF0-9]\{6\}\).*/#\1/g" $1.ctj-colors-hex.txt
+sed -i 's/.*\(#[aA-fF0-9]\{6\}\).*/\1/g' "$1".mg-colors-hex.txt
 # paste and sort the two into one file:
 paste -s -d '\n\n' ./$1.ctj-colors-hex.txt ./$1.mg-colors-hex.txt > tmp.txt
 # UPPERCASE all that:
@@ -34,6 +36,10 @@ tr '[:lower:]' '[:upper:]' < tmp.txt > tmp2.txt
 awk '{printf("%050s\t%s\n", toupper($0), $0)}' tmp2.txt | LC_COLLATE=C sort -r -k1,1 | cut -f2 > $1.hybrid-colors-hex.txt
 
 # cleanup
-# because some bug in OSX sed or summat is leaving behind files ending with -n:
-rm ./$1.ctj-colors-hex.txt-n ./$1.mg-colors-hex.txt-n
-rm ./$1.ctj-colors-hex.txt ./$1.gm-colors-hex.txt ./tmp.txt ./tmp2.txt
+# Mac OS only' because some bug in OSX sed or summat is leaving behind files ending with -n:
+if [ -e ./$1.ctj-colors-hex.txt-n ]
+then
+	rm ./$1.ctj-colors-hex.txt-n ./$1.mg-colors-hex.txt-n
+fi
+
+rm ./$1.ctj-colors-hex.txt ./$1.mg-colors-hex.txt ./tmp.txt ./tmp2.txt

@@ -1,10 +1,10 @@
-# DESCRIPTION: Tags imags with metadata customized by a simple editable text file template. Must run prepImageMetaData.sh and/or other scripts before.
+# DESCRIPTION: Tags images with easily customizable metadata; Customizable via a simple editable text file template. Must run prepMediaMetaData.sh and/or other scripts before.
 
-# USAGE: NOTE that a run of prepImageMetaData.sh must precede this script, or this script will not work. ALSO: correct. (MEAGER) NOTES: This expects all images it works upon to be .tif images, and won't work with anything else. Maybe I'll change it to also do non-standard tags in .png files, and do other source formats also.
+# USAGE: NOTE that a run of prepMediaMetaData.sh must precede this script, or this script will not work. ALSO: correct. (MEAGER) NOTES: This expects all images it works upon to be .tif images, and won't work with anything else. Maybe I'll change it to also do non-standard tags in .png files, and do other source formats also.
 # NOTE: fer mysic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
 
 # TO DO; * = done, / = in progress:
-# Figure out why this updates metadata ok to to __tagAndDistPrepImage.jpg with e.g. 9000x6000 px jpgs, but chokes on copying them to _dist; fix that. WAIT: I think the real problem was I couldn't rename a file to a duplicate target file name. Catch errors when that happens? Verify this is what happens (the "WAIT" hypothesis).
+# Figure out why this updates metadata ok to __tagAndDistPrepImage.jpg with e.g. 9000x6000 px jpgs, but chokes on copying them to _dist; fix that. WAIT: I think the real problem was I couldn't rename a file to a duplicate target file name. Catch errors when that happens? Verify this is what happens (the "WAIT" hypothesis).
 # ? Don't update metadata template with a shortened URL (and retrieve a short URL) if one already exists.
 # Check: is it proper or does it work to use the -IPTC:ObjectName in this script? Should that be -MWG:Description?
 # - Document workings and use; ack. or fix clunky weaknesses in design.
@@ -24,7 +24,7 @@ PolrAPIkey=$( < ~/PolrAPIkey.txt)
 		# echo PolrAPIkey value is\: $PolrAPIkey
 
 # SCRIPT WARNING ==========================================
-echo "This script will erase all metadata from applicable image files in the entire directory tree from which this is run. If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal. NOTE FOR DISTRIBUTION PURPOSES: images uploaded to flickr must *not* have comma separated keyword values--there must be no commas."
+echo "This script will erase all metadata from applicable image files in the entire directory tree from which this is run. If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal."
 	echo "!============================================================"
 	# echo "DO YOU WISH TO CONTINUE running this script?"
     read -p "DO YOU WISH TO CONTINUE running this script? : y/n" CONDITION;
@@ -118,7 +118,7 @@ do
 	# Move the new, properly metadata tagged file to a permanent distribution location; but only if the dist. file doesn't exist:
 	if [ -e "./_dist/$SFMFNpath$imageTitle$SFMFNextension" ]
 	then
-		echo DESTINATION FILE "./_dist/$SFMFNpath$imageTitle$SFMFNextension" already exists\, so this won\'t overwrite it. If you mean to update the destination file\, first delete it\, and then run this script again. If you also intend to alter or recreate the metadata\, delete the assocaited ~_MD_ADDS.txt file as well\, and run prepImageMetaData.sh before this.
+		echo DESTINATION FILE "./_dist/$SFMFNpath$imageTitle$SFMFNextension" already exists\, so this won\'t overwrite it. If you mean to update the destination file\, first delete it\, and then run this script again. If you also intend to alter or recreate the metadata\, delete the assocaited ~_MD_ADDS.txt file as well\, and run prepMediaMetaData.sh before this.
 	else
 		# Make target directory for dist file, only if it doesn't exist:
 		if [ ! -e ./_dist/$SFMFNpath ]; then mkdir ./_dist/$SFMFNpath; fi
