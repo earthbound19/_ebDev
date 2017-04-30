@@ -13,8 +13,9 @@
 # $1 image file name for which a palette was made.
 
 # TO DO
-# fix this zertsmeh_temp_for_colors nonsense. Maybe try and see if just colors/imagename.png will work again.
-# - make for params: num colors, num columns, num rows.
+# Incorporate dominant color extraction and utilization (as bg and/or extended tile)
+# ? Fix this zertsmeh_temp_for_colors thing? Maybe try and see if just colors/imagename.png will work again.
+# - make for params: num colors, num columns, num rows, tile size.
 # - strip bad . characters out of generated intermediate files.
 
 
