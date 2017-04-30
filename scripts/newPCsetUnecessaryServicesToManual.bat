@@ -5,6 +5,9 @@ REM REVISION HISTORY
 REM BEFORE NOW: yesh.
 REM 2016-08-31 corrected syntax; I don't know how long this hasn't been working :p
 
+sc stop "SharedAccess"
+sc stop "ehRecvr"
+sc stop "ehSched"
 sc stop "DPS"
 sc stop "FontCache"
 sc stop "WPCSvc"
@@ -30,6 +33,9 @@ sc stop "DoSvc"
 sc stop "DiagTrack"
 sc stop "BITS"
 sc stop "StorSvc"
+sc config "SharedAccess" start= demand
+sc config "ehRecvr" start= demand
+sc config "ehSched" start= demand
 sc config "DPS" start= demand
 sc config "FontCache" start= demand
 sc config "WPCSvc" start= demand

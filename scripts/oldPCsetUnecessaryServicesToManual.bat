@@ -1,3 +1,6 @@
+sc stop "SharedAccess"
+sc stop "ehRecvr"
+sc stop "ehSched"
 sc stop "DPS"
 sc stop "FontCache"
 sc stop "WPCSvc"
@@ -20,6 +23,9 @@ sc stop "WSearch"
 sc stop "wuauserv"
 sc stop "TabletInputService"
 sc stop "Fax"
+sc config "SharedAccess" start= demand
+sc config "ehRecvr" start= demand
+sc config "ehSched" start= demand
 sc config "DPS" start= demand
 sc config "FontCache" start= demand
 sc config "WPCSvc" start= demand
