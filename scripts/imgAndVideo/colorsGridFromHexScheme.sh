@@ -27,6 +27,13 @@ else
 	echo !--------------------------------------------------------!
 fi
 
+if [ -d ./$1.colors ]
+then
+# TO DO
+# Add a yes/no delete prompt here.
+	rm -rf $1.colors
+fi
+
 if [ ! -d ./_hexPaletteIMGgenTMP_2bbVyVxD ]
 then
 	mkdir ./_hexPaletteIMGgenTMP_2bbVyVxD
