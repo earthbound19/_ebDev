@@ -1,4 +1,4 @@
-# OR DON'T, and instead use macports to compile/install it.
+# OR DON'T, because I had odd run-time errors from gm after this means of installing--perhaps instead use macports to compile/install it.
 
 # THANKS TO: http://mac-dev-env.patrickbougie.com/graphicsmagick/
 # ! : http://mac-dev-env.patrickbougie.com/
