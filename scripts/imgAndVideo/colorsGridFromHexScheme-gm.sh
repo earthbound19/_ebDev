@@ -12,6 +12,7 @@
 # NOTES
 # This produces individual color tiles in a subfolder and runs slower. colorsGridFromHexScheme.sh runs much faster but doesn't produce the subfolder of color tiles.
 
+
 # NOTE
 # doc. wut following block is:
 if [ -e ~/colorSchemesHexRootDir.txt ]
@@ -28,6 +29,13 @@ else
 	echo
 	echo aborting script.
 	echo !--------------------------------------------------------!
+fi
+
+if [ -d ./$1.colors ]
+then
+# TO DO
+# Add a yes/no delete prompt here.
+	rm -rf $1.colors
 fi
 
 if [ ! -d ./_hexPaletteIMGgenTMP_2bbVyVxD ]
