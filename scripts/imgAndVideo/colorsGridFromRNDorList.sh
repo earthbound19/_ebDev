@@ -37,7 +37,8 @@ else
 	cp $4 tmp_feoijwefjojeoo.txt
 fi
 
-sed -i 
+# TO DO: wut? CONTINUE DEVELOPING HERE? :
+# sed -i 
 
 if [ ! -z ${4+x} ]
 then
