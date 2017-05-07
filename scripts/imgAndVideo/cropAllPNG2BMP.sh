@@ -4,7 +4,7 @@
 
 # TO DO: upgrade listing to all possible image types.
 
-cygwinFind . -iname \*.png > crop_imgs.txt
+find . -iname \*.png > crop_imgs.txt
 
 i=0
 mapfile -t imgs < crop_imgs.txt

@@ -14,7 +14,7 @@ if [ -a numberedLinks ]; then rm -d -r numberedLinks; mkdir numberedLinks; else 
 # cd ./testFiles
 # if [ -a links ]; then rm -d -r links; mkdir links; else mkdir links; fi
 
-CygwinFind . -iname \*.$1 > allJunctionSrcs.txt
+find . -iname \*.$1 > allJunctionSrcs.txt
 mapfile -t arr < allJunctionSrcs.txt
 rm allJunctionSrcs.txt
 arraySize=${#arr[@]}

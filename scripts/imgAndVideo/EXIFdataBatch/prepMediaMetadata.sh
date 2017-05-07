@@ -19,17 +19,17 @@ metaDataTemplatePath=`cygpath -u "C:\_devtools\scripts\imgAndVideo\EXIFdataBatch
 	# metaDataTemplateFile=TFTMdraftMetadataTemplate.txt
 metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 
-cygwinFind . -iname \*$_MTPL*.mp4 -o -iname \*$_MTPL*.tif -o -iname \*$_MTPL*.tiff -o -iname \*$_MTPL*.png -o -iname \*$_MTPL*.psd  -o -iname \*$_MTPL*.psb -o -iname \*$_MTPL*.ora -o -iname \*$_MTPL*.rif -o -iname \*$_MTPL*.riff -o -iname \*$_MTPL*.jpg -o -iname \*$_MTPL*.jpeg -o -iname \*$_MTPL*.gif -o -iname \*$_MTPL*.bmp -o -iname \*$_MTPL*.cr2 -o -iname \*$_MTPL*.raw  -o -iname \*$_MTPL*.crw -o -iname \*$_MTPL*.pdf  -o -iname \*$_MTPL*.svg > imagesMetadataPrepList.txt
+find . -iname \*$_MTPL*.mp4 -o -iname \*$_MTPL*.tif -o -iname \*$_MTPL*.tiff -o -iname \*$_MTPL*.png -o -iname \*$_MTPL*.psd  -o -iname \*$_MTPL*.psb -o -iname \*$_MTPL*.ora -o -iname \*$_MTPL*.rif -o -iname \*$_MTPL*.riff -o -iname \*$_MTPL*.jpg -o -iname \*$_MTPL*.jpeg -o -iname \*$_MTPL*.gif -o -iname \*$_MTPL*.bmp -o -iname \*$_MTPL*.cr2 -o -iname \*$_MTPL*.raw  -o -iname \*$_MTPL*.crw -o -iname \*$_MTPL*.pdf  -o -iname \*$_MTPL*.svg > imagesMetadataPrepList.txt
 
-cygwinFind . -iname \*"$_MTPL"var*.mp4 -o -iname \*"$_MTPL"var*.tif -o -iname \*"$_MTPL"VAR*.tiff -o -iname \*"$_MTPL"VAR*.png -o -iname \*"$_MTPL"VAR*.psd -o -iname \*"$_MTPL"*.psb -o -iname \*"$_MTPL"VAR*.ora -o -iname \*"$_MTPL"VAR*.rif -o -iname \*"$_MTPL"VAR*.riff -o -iname \*"$_MTPL"VAR*.jpg -o -iname \*"$_MTPL"VAR*.jpeg -o -iname \*"$_MTPL"VAR*.gif -o -iname \*"$_MTPL"VAR*.bmp -o -iname \*"$_MTPL"VAR*.cr2 -o -iname \*"$_MTPL"VAR*.raw  -o -iname \*"$_MTPL"VAR*.crw -o -iname \*"$_MTPL"VAR*.pdf -o -iname \*"$_MTPL"VAR*.svg >> imagesMetadataPrepList.txt
+find . -iname \*"$_MTPL"var*.mp4 -o -iname \*"$_MTPL"var*.tif -o -iname \*"$_MTPL"VAR*.tiff -o -iname \*"$_MTPL"VAR*.png -o -iname \*"$_MTPL"VAR*.psd -o -iname \*"$_MTPL"*.psb -o -iname \*"$_MTPL"VAR*.ora -o -iname \*"$_MTPL"VAR*.rif -o -iname \*"$_MTPL"VAR*.riff -o -iname \*"$_MTPL"VAR*.jpg -o -iname \*"$_MTPL"VAR*.jpeg -o -iname \*"$_MTPL"VAR*.gif -o -iname \*"$_MTPL"VAR*.bmp -o -iname \*"$_MTPL"VAR*.cr2 -o -iname \*"$_MTPL"VAR*.raw  -o -iname \*"$_MTPL"VAR*.crw -o -iname \*"$_MTPL"VAR*.pdf -o -iname \*"$_MTPL"VAR*.svg >> imagesMetadataPrepList.txt
 				# FORMER CODE:
-				# cygwinFind . -iname \*$_MTPL*.tif > imagesMetadataPrepList.txt
-				# cygwinFind . -iname \*"$_MTPL"var_*.tif >> imagesMetadataPrepList.txt
+				# find . -iname \*$_MTPL*.tif > imagesMetadataPrepList.txt
+				# find . -iname \*"$_MTPL"var_*.tif >> imagesMetadataPrepList.txt
 
 
 # dev reference; for to do the preceding line but with many differtent file types:
 # use prefix=\*_FINAL*		~finalvar~			?	;		OR an or regex if poss.?	:
-	# cygwinFind . -iname \*.tif -o -iname \*.tiff -o -iname \*.png -o -iname \*.psd -o -iname \*.ora -o -iname \*.rif -o -iname \*.riff -o -iname \*.jpg -o -iname \*.jpeg -o -iname \*.gif -o -iname \*.bmp -o -iname \*.cr2 -o -iname \*.raw  -o -iname \*.crw -o -iname \*.pdf > imageFilesList.txt
+	# find . -iname \*.tif -o -iname \*.tiff -o -iname \*.png -o -iname \*.psd -o -iname \*.ora -o -iname \*.rif -o -iname \*.riff -o -iname \*.jpg -o -iname \*.jpeg -o -iname \*.gif -o -iname \*.bmp -o -iname \*.cr2 -o -iname \*.raw  -o -iname \*.crw -o -iname \*.pdf > imageFilesList.txt
 # OR: just list _all_ image files to text file, then reduce it to list _final / _finalvar name-tagged file names only?
 # Because all those necessary searches can lead to duplicate listings, sort everything and trim duplicates:
 sort imagesMetadataPrepList.txt > temp1.txt

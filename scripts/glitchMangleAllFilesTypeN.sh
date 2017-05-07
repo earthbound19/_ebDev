@@ -8,7 +8,7 @@
 
 # if [ ! -d ./out ]; then mkdir out; fi
 
-cygwinFind ./*.$1 > alles.txt
+find ./*.$1 > alles.txt
 mapfile -t alles < alles.txt
 rm alles.txt
 

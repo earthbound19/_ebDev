@@ -16,7 +16,7 @@ yTiles=$2
 echo yTiles is $yTiles
 totalTiles=$((xTiles * yTiles))
 
-cygwinFind ./_selected/* > alles.txt
+find ./_selected/* > alles.txt
 mapfile -t alles < alles.txt
 allesSize=${#alles[@]}
 

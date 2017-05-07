@@ -24,7 +24,7 @@ then
 fi
 
 # horked from renumberFiles.sh:
-CygwinFind *.$4 > allFiles.txt
+find *.$4 > allFiles.txt
 arraySize=$(wc -l < allFiles.txt)
 numDigitsOf_arraySize=${#arraySize}
 rm allFiles.txt

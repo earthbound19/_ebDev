@@ -1,14 +1,14 @@
 # Lists all files that have the tag FINAL in them:
-# cygwinFind . -type f -iregex '.*FINAL.*'
+# find . -type f -iregex '.*FINAL.*'
 
 
 # USAGE
 # Call this script from a path where you wish to list all files that include the string FINAL in them. If you wish instead to find all files that have the offset string _FINAL_ in them, pass this script any parameter.
 
 # List ALL files, because the following command:
-		# CygwinFind . -type f -iregex '.*FINAL.*' > ___ALL_FINALS___.txt
+		# find . -type f -iregex '.*FINAL.*' > ___ALL_FINALS___.txt
 		# -- results in listing files that include '.*FINAL.*' in the *path* but not the file name (as well as all that have it in the file name).
-CygwinFind . -type f > ___ALL_FINALS___.txt
+find . -type f > ___ALL_FINALS___.txt
 # strip off paths, leaving only file names:
 sed -i 's/.*\///g' ___ALL_FINALS___.txt
 # remove all listings that end with _MD_ADDS.txt:

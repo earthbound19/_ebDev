@@ -13,7 +13,7 @@ img_format_1=$1
 img_format_2=$2
 
 
-CygwinFind . -iname \*.$1 > all_"$1".txt
+find . -iname \*.$1 > all_"$1".txt
 mapfile -t all_imgs.txt < all_"$1".txt
 for element in "${all_imgs[@]}"
 do

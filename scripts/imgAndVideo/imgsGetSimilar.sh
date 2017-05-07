@@ -2,7 +2,7 @@
 # compare -metric MAE img_11.png img_3.png null: 2>&1
 
 # List all possible pairs of file type $1, order is not important, repetition is now allows ($1 pick 2):
-CygwinFind *.$1 > allIMGs.txt
+find *.$1 > allIMGs.txt
 mapfile -t allIMGs < allIMGs.txt
 
 i_count=0
