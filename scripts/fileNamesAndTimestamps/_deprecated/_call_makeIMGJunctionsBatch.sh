@@ -34,7 +34,7 @@
 
 # Blank the following file and fill it with a list of images:
 printf "" > imgs_oldNames.txt
-cygwinFind *.tif *.tiff *.png *.jpg *.jpeg *.gif *.bmp *.psd *.cr2 *.crw *.pdf -maxdepth 1 -type f >& /dev/null > imgs_oldNames.txt
+find *.tif *.tiff *.png *.jpg *.jpeg *.gif *.bmp *.psd *.cr2 *.crw *.pdf -maxdepth 1 -type f >& /dev/null > imgs_oldNames.txt
 
 # !=======================================
 # CREATE ARRAY OF NEW FILE NAMES and RENAME them. IN ALL CAPS. Except not in all caps.

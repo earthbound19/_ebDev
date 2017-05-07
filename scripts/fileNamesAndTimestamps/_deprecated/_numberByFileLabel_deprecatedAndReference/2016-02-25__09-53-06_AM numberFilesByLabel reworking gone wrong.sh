@@ -26,9 +26,9 @@ fi
 	# sort command reference: -k, --key=KEYDEF: sort via a key; KEYDEF gives location and type; KEYDEF is F[.C][OPTS][,F[.C][OPTS]] ; OPTS is one or more single-letter ordering options [bdfgiMhnRrV] ; --sort= WORD: WORD can include -g = general numeric sorting, -r = reverse sort. --parallel=N change number of sort threads. It happens that general numeric sorting sorts dates as I want; oldest first, from years down to seconds and even microseconds. -t _ would make the underscore _ a field separator.
 
 # ALL FILE TYPES OPTION; comment out for use with images:
-# cygwinFind . -type f -regex '\.\/.*' -printf '%TY %Tm %Td %TH %TM %TS %p\n' | sort -g > _batchNumbering/fileNamesWithNumberTags.txt
-# ALL USED IMAGE FILE TYPES OPTION; comment out for all files; NOTE: cygwinFind -regex ".*\.\(xls\|csv\)" format is necessary here, apparently (else it thinks -printf is a parameter to -iname?) ; re: http://unix.stackexchange.com/a/28157/110338 -- also, -iregex makes the search case-insensitive:
-cygwinFind . -type f -iregex '\.\/.*.\(tif\|tiff\|png\|.psd\|ora\|kra\|rif\|riff\|jpg\|jpeg\|gif\|bmp\|cr2\|crw\|pdf\|ptg\)' -printf '%TY %Tm %Td %TH %TM %TS %p\n' | sort -g > _batchNumbering/fileNamesWithNumberTags.txt
+# find . -type f -regex '\.\/.*' -printf '%TY %Tm %Td %TH %TM %TS %p\n' | sort -g > _batchNumbering/fileNamesWithNumberTags.txt
+# ALL USED IMAGE FILE TYPES OPTION; comment out for all files; NOTE: find -regex ".*\.\(xls\|csv\)" format is necessary here, apparently (else it thinks -printf is a parameter to -iname?) ; re: http://unix.stackexchange.com/a/28157/110338 -- also, -iregex makes the search case-insensitive:
+find . -type f -iregex '\.\/.*.\(tif\|tiff\|png\|.psd\|ora\|kra\|rif\|riff\|jpg\|jpeg\|gif\|bmp\|cr2\|crw\|pdf\|ptg\)' -printf '%TY %Tm %Td %TH %TM %TS %p\n' | sort -g > _batchNumbering/fileNamesWithNumberTags.txt
 	# Heck yeah! That worked!
 # TO DO: create a mechanism that imports the file extensions to search for from a more easily modifiable text file, to be used by this and other scripts (like dateByFileName.sh and dateByMetaData.sh).
 	# Trim that to a . (the current directory) and the rest of the path (no date info) :

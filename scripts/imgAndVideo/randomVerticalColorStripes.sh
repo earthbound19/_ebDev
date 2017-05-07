@@ -40,7 +40,7 @@ maxPossibleColumns=$(( $maxColorColumnRepeat + $maxColorColumnsVariation))
 padDigitsTo=${#maxPossibleColumns}
 
 # PURE INFURIATING NONSENSE, again appeased by a genius breath yon: http://stackoverflow.com/a/23207966
-colorSelectionList=`cygwinFind $hexColorListsRootPath -name $7 -type f`
+colorSelectionList=`find $hexColorListsRootPath -name $7 -type f`
 
 # The logic of this variable check is: if not no value for this var, do something (in other words, if there is this var with a value, do something) ;
 # UNFORTUNATELY, it seems this type of check only works with environment parameter variables, not assigned variables that have no value, WHICH MEANS that the following must be hard-coded for the parameter:

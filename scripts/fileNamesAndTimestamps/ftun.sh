@@ -30,9 +30,9 @@ echo "Dude. In the wrong hands this script is a weapon. You sure you wanna do th
 
 # === BEGIN FOLDERS RENAMING ===
 # NOTE that all of these find commands add an exclusion of every file with the string 'alles' in it via grep; re: http://stackoverflow.com/a/8525459/1397555
-cygwinFind * -type d | grep -v '.*alles.*' > alles1.txt
+find * -type d | grep -v '.*alles.*' > alles1.txt
 # Build second part of move command by replacing all terminal-unfriendly characters in listed folder names, via tr:
-cygwinFind * -type d | grep -v '.*alles.*' | tr \=\@\`~\!#$%^\&\(\)+[{]}\;\ , _ > alles2.txt
+find * -type d | grep -v '.*alles.*' | tr \=\@\`~\!#$%^\&\(\)+[{]}\;\ , _ > alles2.txt
 				# Example bad folder name that was tested against:
 				# WUT`'''''~!@#$%^&a()-=hi hi HEY+[{]};' ,
 # Prune all triplicate+ underscores to double (for target folder names) :
@@ -78,8 +78,8 @@ rm ./badPathsRename.sh
 # === BEGIN FILES RENAMING ===
 # DO all of the same things again, but for files only (now that paths have been fixed up, eliminating problems that would otherwise cause in path renaming, and because fixing paths at the same time as files would mean wasted and error-throwing duplicate path rename commands.) All comments deleted here--code copied and adapted from folders renaming section (see). TWEAK: exclude (alles*.txt) named files via !(alles*.txt).
 # shopt -s extglob
-cygwinFind * -type f | grep -v '.*alles.*' > alles1.txt
-cygwinFind * -type f | grep -v '.*alles.*' | tr \=\@\`~\!#$%^\&\(\)+[{]}\;\ , _ > alles2.txt
+find * -type f | grep -v '.*alles.*' > alles1.txt
+find * -type f | grep -v '.*alles.*' | tr \=\@\`~\!#$%^\&\(\)+[{]}\;\ , _ > alles2.txt
 sed -i "s/_\{3,\}/__/g" alles2.txt
 paste -d '\n' alles1.txt alles2.txt > ZERP.txt
 uniq -u ZERP.txt > badFilesRename.sh.txt
@@ -131,9 +131,9 @@ rm ./badFilesRename.sh
 # Built also with help from:
 # http://www.cyberciti.biz/faq/howto-find-a-directory-linux-command/
 # Find directories in the current path:
-# cygwinFind * -type d
+# find * -type d
 # I like it but probably re http://stackoverflow.com/a/9612232/1397555 it's problematic [SEE COMMENTS ON THAT POST for an explanation that could potentially make for a far simpler version of this script]:
-# for file in "`cygwinFind . -name "*.txt"`"; do echo "$file"; done
+# for file in "`find . -name "*.txt"`"; do echo "$file"; done
 # Re http://stackoverflow.com/a/30911798/1397555
 
 # Example command that WORKS as far as demonstrating replacing characters:

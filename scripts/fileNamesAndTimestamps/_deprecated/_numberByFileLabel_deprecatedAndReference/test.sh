@@ -1,4 +1,4 @@
-# cygwinFind . -regex '.*_final_.*' -printf '%T@ %c %p\n' | sort -k 1n,1 -k 7 | cut -d' ' -f2- > 1.txt
+# find . -regex '.*_final_.*' -printf '%T@ %c %p\n' | sort -k 1n,1 -k 7 | cut -d' ' -f2- > 1.txt
 # sed 's/.*\.\/\(.*\)/\1/g' 1.txt > 2.txt
 # sed 's/[\^0-9]/~~__~~__/g' 2.txt > 3.txt
 # sed -i 's/.*~~__~~__.*//g' 3.txt > 4.txt
@@ -22,7 +22,7 @@
 
 # FIND HIGHEST numbered file in format [0-9]{5} (five digits).
 # TO DO: Make this dynamically adaptable to include any possible number of digits for identified and manipulated numbers.
-cygwinFind . -regex '.*_final_.*' -printf '%T@ %c %p\n' | sort -k 1n,1 -k 7 | cut -d' ' -f2- > allFilesWithTag.txt
+find . -regex '.*_final_.*' -printf '%T@ %c %p\n' | sort -k 1n,1 -k 7 | cut -d' ' -f2- > allFilesWithTag.txt
 	# I actually don't entirely know how that adapted line of code works, so I'm just pruning its output to omit the date stamp information and trim it to the paths and filenames only:
 sed 's/.*\.\/\(.*\)/\1/g' allFilesWithTag.txt > filesWith~tag~AndNoNumber.txt
 		# Would produce a list of file names without the paths, but it turns out I want the paths:

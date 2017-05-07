@@ -18,7 +18,7 @@
 if [ -e ~/colorSchemesHexRootDir.txt ]
 then
 	colorSchemesHexRootDir=$(< ~/colorSchemesHexRootDir.txt)
-	hexColorSrcFullPath=`cygwinFind "$colorSchemesHexRootDir" -iname *$1`
+	hexColorSrcFullPath=`find "$colorSchemesHexRootDir" -iname *$1`
 	echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 	echo colorSchemesHexRootDir.txt found and contains value $hexColorSrcFullPath . . .
 else

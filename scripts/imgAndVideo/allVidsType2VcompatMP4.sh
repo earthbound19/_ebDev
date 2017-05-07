@@ -5,7 +5,7 @@
 # Re encoding quality: -q 0 is lossless, -q 23 is default, and -q 51 is worst.
 # Re: https://trac.ffmpeg.org/wiki/Encode/H.264
 
-cygwinFind ./*.$1 > all$1
+find ./*.$1 > all$1
 mapfile -t allvids < all$1
 rm all$1
 

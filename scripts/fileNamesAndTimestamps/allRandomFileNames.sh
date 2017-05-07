@@ -26,9 +26,9 @@ fi
 
 if ! [ -z ${2+x} ]
 	then
-		cygwinFind ./*.$2 > files_list.txt
+		find ./*.$2 > files_list.txt
 	else
-		cygwinFind ./* > files_list.txt
+		find ./* > files_list.txt
 fi
 
 mapfile -t array < files_list.txt

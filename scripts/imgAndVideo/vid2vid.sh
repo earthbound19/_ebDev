@@ -14,7 +14,7 @@ then
 fi
 
 
-CygwinFind . -iname \*.$srcIMGformat > IMGconvertList.txt
+find . -iname \*.$srcIMGformat > IMGconvertList.txt
 sed -i 's/^\.\/\(.*\)/\1/g' IMGconvertList.txt
 mapfile -t IMGconvertList < IMGconvertList.txt
 for element in "${IMGconvertList[@]}"

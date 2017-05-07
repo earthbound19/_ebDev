@@ -9,7 +9,7 @@
 
 if [ ! -d _irrecoverable ]; then mkdir _irrecoverable; fi
 
-CygwinFind $directory -type f -name "*.$1" > all_"$1"_files.txt
+find $directory -type f -name "*.$1" > all_"$1"_files.txt
 sed -i 's/^\.\/\(.*\)/\1/g' all_"$1"_files.txt
 
 mapfile -t allIMGsArray < all_"$1"_files.txt

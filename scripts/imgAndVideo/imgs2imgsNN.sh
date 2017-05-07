@@ -17,7 +17,7 @@
 		# fi
 
 	# DEPRECATED command for unexpected behavior; it may be that the following command somehow caused nconvert to iterate over every source file format by wildcard? Removing the . from the command, it iterates over the list; whereas with the . it did so twice:
-	# cygwinFind . *.$1 > all_$1.txt
+	# find . *.$1 > all_$1.txt
 find *.$1 > all_$1.txt
 
 mapfile -t all_imgs < all_$1.txt

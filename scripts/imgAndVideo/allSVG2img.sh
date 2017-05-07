@@ -19,7 +19,7 @@ if [ -z ${2+x} ]; then img_format=jpg; else img_format=$2; fi
 # If no third parameter, make background transparent.
 if [ -z ${3+x} ]; then param3="-background none"; fi
 
-CygwinFind . -iname \*.svg > all_svgs.txt
+find . -iname \*.svg > all_svgs.txt
 mapfile -t all_svgs < all_svgs.txt
 for element in "${all_svgs[@]}"
 do
