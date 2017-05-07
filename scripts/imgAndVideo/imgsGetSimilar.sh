@@ -16,7 +16,7 @@ do
 	for j in "${allIMGs_innerLoop[@]}"
 	do
 		echo "comparing images: $i | $j . . ."
-		metricPrint=`compare -metric MAE $i $j null: 2>&1`
+		metricPrint=`gm compare -metric MAE $i $j null: 2>&1`
 		# strip first number and parenthesis off that result:
 		metricPrint=`echo $metricPrint | sed 's/.* (\(.*\))/\1/g'`
 		echo "$metricPrint | $i | $j" >> temp.txt

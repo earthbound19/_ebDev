@@ -6,7 +6,7 @@ IN PROGRESS.
 # $1 the source file format e.g. eps or svg
 # $2 the target file format e.g. tif or jpg
 
-# DEV NOTE: template command: magick -size 850 test.svg result.tif
+# DEV NOTE: template command: gm -size 850 test.svg result.tif
 # NOTE that for the -size parameter, it scales the imagesso that the longest side is that many pixels.
 
 img_format_1=$1
