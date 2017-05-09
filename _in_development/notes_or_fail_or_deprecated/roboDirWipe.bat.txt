@@ -1,0 +1,18 @@
+ECHO WARNING! This batch file will wipe out all files in the directories coded into it! If this is what you want, and you know what you're doing, press <enter>. Otherwise, CLOSE THIS CONSOLE.
+PAUSE
+Please read that again. If you're double-certain you want to do that, press any key to continue. Otherwise, again, CLOSE THIS CONSOLE (or press CTRL+C).
+DIR * /A:D /B /S %CD% | FINDSTR /E /I \\NVIDIA > %CD%robowipeTempDirList.txt
+DIR * /A:D /B /S %CD% | FINDSTR /E /I \\SolidWorks >> %CD%robowipeTempDirList.txt
+DIR * /A:D /B /S %CD% | FINDSTR /E /I \\Dassault >> %CD%robowipeTempDirList.txt
+DIR * /A:D /B /S %CD% | FINDSTR /E /I \\Systemmes >> %CD%robowipeTempDirList.txt
+DIR * /A:D /B /S %CD% | FINDSTR /E /I \\FlexLM >> %CD%robowipeTempDirList.txt
+DIR * /A:D /B /S %CD% | FINDSTR /E /I \\FlexNet >> %CD%robowipeTempDirList.txt
+DIR * /A:D /B /S %CD% | FINDSTR /E /I \\GWX >> %CD%robowipeTempDirList.txt
+SET /A NUM = %NUMBER_OF_PROCESSORS% * 3
+MKDIR %CD%robowipeStubDir
+FOR /F "delims=*" %%A IN (%CD%robowipeTempDirList.txt) DO (
+ROBOCOPY robowipeStubDir "%%A" /E /PURGE /MT:%NUM%
+)
+DEL %CD%robowipeTempDirList.txt
+
+REM 2015-12-14 DUMBLEDORE system drive BEFORE: 194 GB free. AFTER: 197; FREED: ~3GB
