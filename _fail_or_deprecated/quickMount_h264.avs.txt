@@ -1,2 +1,0 @@
-LoadPlugin("ffms2.dll")
-AviSource("D:\Alex\Art\__WORKSHOP__IN_PROGRESS\colorNoiseResources\Color Noise interpolated x7 strobing 1920x 30p 00.00.27.mp4")
