@@ -1,0 +1,28 @@
+imagemagick_convert -define modulate:colorspace=LCHuv -modulate 37,32,-59 R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches.png R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches_lab_HSL_variants\labHSLshiftSwatches_variant02_LCHuv-LAB_37_32_-59.png
+
+imagemagick_convert -define modulate:colorspace=LCHuv -modulate 71,-59,-48 R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches.png R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches_lab_HSL_variants\labHSLshiftSwatches_variant03_LCHuv-LAB_71_-59_-48.png
+
+imagemagick_convert -define modulate:colorspace=LCHuv -modulate 79,59,-7 R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches.png R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches_lab_HSL_variants\labHSLshiftSwatches_variant04_LCHuv-LAB_79_59_-7.png
+
+imagemagick_convert -define modulate:colorspace=LCHuv -modulate 62,-71,56 R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches.png R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches_lab_HSL_variants\labHSLshiftSwatches_variant05_LCHuv-LAB_62_-71_56.png
+
+imagemagick_convert -define modulate:colorspace=LCHuv -modulate 37,32,-59 R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches.png R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches_lab_HSL_variants\labHSLshiftSwatches_variant06_LCHuv-LAB_37_32_-59.png
+
+imagemagick_convert -define modulate:colorspace=LCHuv -modulate 94,6,57 R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches.png R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches_lab_HSL_variants\labHSLshiftSwatches_variant07_LCHuv-LAB_94_6_57.png
+
+imagemagick_convert -define modulate:colorspace=LCHuv -modulate 89,29,59 R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches.png R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches_lab_HSL_variants\labHSLshiftSwatches_variant08_LCHuv-LAB_89_29_59.png
+
+imagemagick_convert -define modulate:colorspace=LCHuv -modulate 84,55,71 R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches.png R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches_lab_HSL_variants\labHSLshiftSwatches_variant09_LCHuv-LAB_84_55_71.png
+
+imagemagick_convert -define modulate:colorspace=LCHuv -modulate 40,56,63 R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches.png R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches_lab_HSL_variants\labHSLshiftSwatches_variant10_LCHuv-LAB_40_56_63.png
+
+imagemagick_convert -define modulate:colorspace=LCHuv -modulate 44,64,-10 R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches.png R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches_lab_HSL_variants\labHSLshiftSwatches_variant11_LCHuv-LAB_44_64_-10.png
+
+imagemagick_convert -define modulate:colorspace=LCHuv -modulate 47,71,-19 R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches.png R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches_lab_HSL_variants\labHSLshiftSwatches_variant12_LCHuv-LAB_47_71_-19.png
+
+imagemagick_convert -define modulate:colorspace=LCHuv -modulate 41,61,-33 R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches.png R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches_lab_HSL_variants\labHSLshiftSwatches_variant13_LCHuv-LAB_41_61_-33.png
+
+imagemagick_convert -define modulate:colorspace=LCHuv -modulate 37,59,-51 R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches.png R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches_lab_HSL_variants\labHSLshiftSwatches_variant14_LCHuv-LAB_37_59_-51.png
+
+imagemagick_convert -define modulate:colorspace=LCHuv -modulate 47,43,-65 R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches.png R:\arexProg\_imageProcessing_static\makeHueShiftedVariantImages\TEST_S~1\labHSLshiftSwatches_lab_HSL_variants\labHSLshiftSwatches_variant15_LCHuv-LAB_47_43_-65.png
+
