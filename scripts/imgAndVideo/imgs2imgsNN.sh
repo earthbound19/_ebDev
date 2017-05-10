@@ -22,6 +22,7 @@ rm all_$1.txt
 for img in ${all_imgs[@]}
 do
 
+# IN PROGRESS: auto-upscale to pix Y given target X by figuring from pics' aspect.
 			# thing $4 not $5 dev. commands:
 			if [ -z ${4+x} ]
 			then
