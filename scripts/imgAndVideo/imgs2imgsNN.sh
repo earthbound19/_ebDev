@@ -17,24 +17,24 @@
 find *.$1 > all_$1.txt
 
 mapfile -t all_imgs < all_$1.txt
-rm all_$1.txt
+# rm all_$1.txt
 
 for img in ${all_imgs[@]}
 do
 
-# IN PROGRESS: auto-upscale to pix Y given target X by figuring from pics' aspect.
+			# IN PROGRESS: auto-upscale to pix Y given target X by figuring from pics' aspect.
 			# thing $4 not $5 dev. commands:
-			if [ -z ${4+x} ]
-			then
-			derp=`gm identify $img`
-			pixX=`echo $derp | sed 's/.* \([0-9]\{1,\}\)x[0-9]\{1,\}+[0-9]\{1,\}+[0-9]\{1,\} .*/\1/g'`
-			pixY=`echo $derp | sed 's/.* [0-9]\{1,\}x\([0-9]\{1,\}\)+[0-9]\{1,\}+[0-9]\{1,\} .*/\1/g'`
-			echo pixX val is $pixX
-			echo pixY val is $pixY
+			# if [ -z ${4+x} ]
+			# then
+			# derp=`gm identify $img`
+			# pixX=`echo $derp | sed 's/.* \([0-9]\{1,\}\)x[0-9]\{1,\}+[0-9]\{1,\}+[0-9]\{1,\} .*/\1/g'`
+			# pixY=`echo $derp | sed 's/.* [0-9]\{1,\}x\([0-9]\{1,\}\)+[0-9]\{1,\}+[0-9]\{1,\} .*/\1/g'`
+			# echo pixX val is $pixX
 			# echo pixY val is $pixY
-			5x6 img upscaled to 850px X maintaining aspect = 850 x 1020
-			fi
-			exit
+			# echo pixY val is $pixY
+			# 5x6 img upscaled to 850px X maintaining aspect = 850 x 1020
+			# fi
+			# exit
 
 			# echo img is $img
 	imgFileNoExt=`echo $img | sed 's/\(.*\)\..\{1,4\}/\1/g'`
@@ -44,7 +44,7 @@ do
 	if [ ! -f $imgFileNoExt.$2 ]; then
 		echo ~~
 		echo RENDERING target file $imgFileNoExt.$2 as it does not exist . . .
-		nconvert -rtype quick -resize $3 $4 -out $2 -o $imgFileNoExt.$2 $img
+		nconvert -rtype quick -resize $3 -out $2 -o $imgFileNoExt.$2 $img
 		echo ~~
 		else
 			echo Target file $imgFileNoExt.$2 already exists\; delete the file if you wish to re-render it\; SKIPPING RENDER . . .
