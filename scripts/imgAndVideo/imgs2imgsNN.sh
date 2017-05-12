@@ -22,19 +22,22 @@ mapfile -t all_imgs < all_$1.txt
 for img in ${all_imgs[@]}
 do
 
-			# IN PROGRESS: auto-upscale to pix Y given target X by figuring from pics' aspect.
-			# thing $4 not $5 dev. commands:
-			# if [ -z ${4+x} ]
-			# then
-			# derp=`gm identify $img`
-			# pixX=`echo $derp | sed 's/.* \([0-9]\{1,\}\)x[0-9]\{1,\}+[0-9]\{1,\}+[0-9]\{1,\} .*/\1/g'`
-			# pixY=`echo $derp | sed 's/.* [0-9]\{1,\}x\([0-9]\{1,\}\)+[0-9]\{1,\}+[0-9]\{1,\} .*/\1/g'`
-			# echo pixX val is $pixX
-			# echo pixY val is $pixY
-			# echo pixY val is $pixY
-			# 5x6 img upscaled to 850px X maintaining aspect = 850 x 1020
-			# fi
-			# exit
+			# IN WHICH THE BLOCK BELOW THIS FURTHER INDENTED is absurd because what I really want is a command like this:
+			# gm convert 6x5gridRND_2017_05_06__01_51_14__099842100.ppm -scale 1200 out.png
+			
+				# IN PROGRESS: auto-upscale to pix Y given target X by figuring from pics' aspect.
+				# thing $4 not $5 dev. commands:
+				# if [ -z ${4+x} ]
+				# then
+				# derp=`gm identify $img`
+				# pixX=`echo $derp | sed 's/.* \([0-9]\{1,\}\)x[0-9]\{1,\}+[0-9]\{1,\}+[0-9]\{1,\} .*/\1/g'`
+				# pixY=`echo $derp | sed 's/.* [0-9]\{1,\}x\([0-9]\{1,\}\)+[0-9]\{1,\}+[0-9]\{1,\} .*/\1/g'`
+				# echo pixX val is $pixX
+				# echo pixY val is $pixY
+				# echo pixY val is $pixY
+				# 5x6 img upscaled to 850px X maintaining aspect = 850 x 1020
+				# fi
+				# exit
 
 			# echo img is $img
 	imgFileNoExt=`echo $img | sed 's/\(.*\)\..\{1,4\}/\1/g'`
