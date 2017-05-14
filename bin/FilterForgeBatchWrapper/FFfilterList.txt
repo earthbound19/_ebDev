@@ -1,3 +1,5 @@
+Sketchy Painting Default Mod 1.ffxml
+Library_10067-1.ffxml
 Library_13468-1.ffxml
 Library_8351-3.ffxml
 Library_10407-1.ffxml
