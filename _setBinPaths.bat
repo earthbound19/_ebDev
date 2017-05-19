@@ -4,14 +4,11 @@ REM DEPENDENCIES: The modpath.exe tool which I found in the uninstall folder of 
 
 REM LICENSE: I release this work to the Public Domain. 09/24/2015 09:18:03 PM -RAH
 
+REM TO DO: port this to a .sh script and deprecate this .bat.
+
 ECHO OFF
 REM Just in case, that'll be there:
 ECHO %PATH% > PATH_backup.txt
-
-REM should end up atting this path: C:\_devtools\bin\gnuCoreUtilsWin32\bin
-REM SET PATH=%PATH%;\%CD%\bin\gnuCoreUtilsWin32\bin
-REM ECHO %PATH%
-REM PAUSE
 
 TYPE BINPATHS.txt > temp.txt
 TYPE EXTERNALPATHS.txt >> temp.txt
@@ -19,16 +16,20 @@ TYPE EXTERNALPATHS.txt >> temp.txt
 		REM TYPE win7defaultPATHs.txt >> temp.txt
 
 REM the magic uniqify and sort commands:
-%CD%\bin\gnuCoreUtilsWin32\gsort.exe temp.txt > temp2.txt
+		REM NOT ANY MORE: %CD%\bin\gnuCoreUtilsWin32\gsort.exe temp.txt > temp2.txt
+REM TEMP KLUDGE: COPY THAT EXE INTO THIS PATH for the following to work:
+gsort temp.txt > temp2.txt
 	REM NOTE: I'd had the -u flag on the next line; that messes up my intent (it does not print lines that have duplicates, it only prints unique lines. FACE PALM. ALSO: after I RT_M I learned it only detects *adjacent* duplicate lines. GEH!
-%CD%\bin\gnuCoreUtilsWin32\uniq temp2.txt > allPathsTemp.txt
+		REM NOT ANY MORE: %CD%\bin\gnuCoreUtilsWin32\uniq temp2.txt > allPathsTemp.txt
+REM KLUDGE: copy gnuWin32 CoreUtils uniq to uniq in this path.
+uniq temp2.txt > allPathsTemp.txt
 REM ECHO Ready to modify PATH.
 
 FOR /F "delims=*" %%A IN (allPathsTemp.txt) DO (
 	REM Optional, if you want this to clean up invalid paths in the list which you may have in your path PATH already ;) :
 	REM NOTE: If you don't want this deleting anything in the path, comment out the next two lines!
-	REM IF NOT EXIST "%%A" modpath /del %%A
-	REM IF NOT EXIST "%%A" ECHO Deleted invalid directory in PATH: %%A >> setPathsLog.txt
+	IF NOT EXIST "%%A" modpath /del %%A
+	IF NOT EXIST "%%A" ECHO Deleted invalid directory in PATH: %%A >> setPathsLog.txt
 IF NOT EXIST %%A ECHO Could not find path: %%A >> setPathsLog.txt
 IF EXIST %%A ECHO Found path: %%A >> setPathsLog.txt
 REM NOTE: without the quote marks on the next line, it won't add directories that include spaces ( ). It will work if the first %%A doesn't have quote marks (and will mess up sorting if they do, it seems--odd).
@@ -39,9 +40,6 @@ IF EXIST %%A ECHO MERP Added directory to PATH: "%%A"
 DEL temp.txt
 DEL temp2.txt
 DEL allPathsTemp.txt
-
-REM ===========
-REM NOT IMPLEMENTED, if ever it will be; would be in the for loop:
 
 REM DEVELOPMENT HISTORY:
 REM 2015 09 25? -- First version?
