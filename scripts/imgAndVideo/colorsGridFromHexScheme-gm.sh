@@ -80,7 +80,12 @@ rm mkGridHead.txt mkGridSRCimgs.txt mkGridTail.txt
 chmod 777 ./mkColorPaletteGrid.sh
 
 ./mkColorPaletteGrid.sh
-mv ./mkColorPaletteGrid.sh ./$1-mkColorPaletteGrid.sh.txt
-mv _hexPaletteIMGgenTMP_2bbVyVxD $1.colors
+# mv ./mkColorPaletteGrid.sh ./$1-mkColorPaletteGrid.sh.txt
+	# OR, to delete that if you've no permanent need of it:
+	rm ./mkColorPaletteGrid.sh
+# mv _hexPaletteIMGgenTMP_2bbVyVxD $1.colors
+	# OR, to delete that dir if it annoys you ;)  :
+	rm ./_hexPaletteIMGgenTMP_2bbVyVxD/*
+	rmdir ./_hexPaletteIMGgenTMP_2bbVyVxD
 
 echo DONE--created color palette image is $1, and the .sh script that generated it has been renamed to $1-mkColorPaletteGrid.sh.txt. You will also find color swatch images from the palette in the folder $1.colors.
