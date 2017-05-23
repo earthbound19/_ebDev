@@ -6,15 +6,11 @@
 # $1 source format (without .)
 # $2 destination format
 # $3 scale by nearest neighbor method to pixels X
-# $4 scale by nearest neighbor method to pixels Y
-# e.g. imgs2imgsnn.sh ppm png 640 480
+# $4 scale by nearest neighbor method to pixels Y. IF OMITTED, scales to $3 (X pix) by nearest neighbor preserving aspect ratio. Example command for that:
+# imgs2imgsnn.sh ppm png 640
+# OR, to force a given x by y dimension:
+# imgs2imgsnn.sh ppm png 640 480
 
-# TO DO
-		# Make it do no resizing if no params 3 and 4 given; e.g. adapt this:
-		# if [ ! -z ${5+x} ]
-		# then
-			# rescaleParams="-vf scale=$5:flags=neighbor"
-		# fi
 
 	# DEPRECATED command for unexpected behavior; it may be that the following command somehow caused nconvert to iterate over every source file format by wildcard? Removing the . from the command, it iterates over the list; whereas with the . it did so twice:
 	# find . *.$1 > all_$1.txt
@@ -27,14 +23,17 @@ for img in ${all_imgs[@]}
 do
 			# echo img is $img
 	imgFileNoExt=`echo $img | sed 's/\(.*\)\..\{1,4\}/\1/g'`
-			# echo imgFileNoExt val is\:
-			# echo $imgFileNoExt
-			# echo Running command\: nconvert -rtype quick -resize $3 $4 -out $2 -o $imgFileNoExt.$2 $img
 	if [ ! -f $imgFileNoExt.$2 ]; then
 		echo ~~
 		echo RENDERING target file $imgFileNoExt.$2 as it does not exist . . .
-		nconvert -rtype quick -resize $3 $4 -out $2 -o $imgFileNoExt.$2 $img
+			# DEPRECATED:
+			# nconvert -rtype quick -resize $3 -out $2 -o $imgFileNoExt.$2 $img
+			# ex. command of newly preferred tool:
+			# gm convert 6x5gridRND_2017_05_06__01_51_14__099842100.ppm -scale 1200 out.png
+		# If params $3 or $4 were not passed to the script, the command will simply be empty where they are (on the following line of code), and it should still work:
+		gm convert $img -scale $3 $4 $imgFileNoExt.$2
 		echo ~~
+# exit
 		else
 			echo Target file $imgFileNoExt.$2 already exists\; delete the file if you wish to re-render it\; SKIPPING RENDER . . .
 	fi
