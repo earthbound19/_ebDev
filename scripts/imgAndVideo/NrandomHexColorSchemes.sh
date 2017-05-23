@@ -44,7 +44,7 @@ do
 						echo Will generate $colorsPerScheme random hex colors for the generated color scheme.
 			fi
 	paddedNumColors=$(printf %016d $colorsPerScheme)
-	outfile=./ColorSchemesHex/random/"$paddedNumColors"_"$rndFileNameChars"_HexColors.txt
+	outfile=./"$paddedNumColors"_"$rndFileNameChars"_HexColors.txt
 	# printf "" > $outfile
 	echo Generating $colorsPerScheme random hex colors for $outfile . . .
 	
@@ -59,4 +59,5 @@ done
 
 # DEVELOPMENT LOG
 # Before now: duplicate work of rndHexColorsGen.sh (or that is of this). 1st working version.
-# 2016-10-22: merged more efficient functionality of duplicate work rndHexColorsGen.sh with better file naming functionality of this.
+# 2016-10-22 merged more efficient functionality of duplicate work rndHexColorsGen.sh with better file naming functionality of this.
+# 2017-05-23 altered to just output generated hex color scheme list file to current path (and fuss about folders before even invoking or after invoking script).
