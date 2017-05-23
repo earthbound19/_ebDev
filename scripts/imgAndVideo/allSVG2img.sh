@@ -6,7 +6,7 @@
 # $2 the target file format e.g. tif or jpg -- defaults to jpg if not provided.
 # $3 optional--include this parameter (it can be anything) to make white transparent; otherwise white will default to opaque.
 
-# DEV NOTE: template command: magick -size 850 test.svg result.tif
+# DEV NOTE: template command: gm -size 850 test.svg result.tif
 # NOTE that for the -size parameter, it scales the images so that the longest side is that many pixels.
 
 img_size=$1
@@ -34,7 +34,7 @@ do
 		echo . . .
 	else
 		echo rendering $element . . .
-		magick $param3 -size $1x$1 $element $svgFilenameNoExtension.$img_format
+		gm $param3 -size $1x$1 $element $svgFilenameNoExtension.$img_format
 	fi
 done
 

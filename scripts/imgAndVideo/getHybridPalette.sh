@@ -4,7 +4,7 @@
 # USAGE
 # Invoke this script with two parameters:
 # $1 the image to extract colors from
-# $2 how many colors for color-thief-jimp and imagemagick (respectively) to extract. Resultant palette and image will have (n * 2) colors.
+# $2 how many colors for color-thief-jimp and imagemagick (respectively--and actually graphicsmagick) to extract. Resultant palette and image will have (n * 2) colors.
 
 # DEPENDENCIES
 # nodejs, imagemagick. On Mac imagemagick perhaps ideally via macports; re: https://www.imagemagick.org/script/binary-releases.php -- and node installs should be global:
@@ -20,9 +20,8 @@
 # $(($2 + 1)) because it's only giving e.g. 7 colors if I ask for 8:
 node color-thief-jimp-pallete.js $1 $(($2 + 1)) > $1.ctj-colors-hex.txt
 # re: http://stackoverflow.com/questions/26889358/generate-color-palette-from-image-with-imagemagick
-# ALAS, graphicsMagick (e.g. gm convert) often outputs to a file instead of stdout, for which I lost two hours of my life.
 # possibly more useful parameter omitted: -colorspace LAB
-convert $1 -format %c -colorspace LAB -colors $2 histogram:info:- > $1.mg-colors-hex.txt
+gm convert $1 -format %c -colorspace LAB -colors $2 histogram:info:- > $1.mg-colors-hex.txt
 
 # NOTES: hrm. it seems that perhaps on Mac that -n switches here (with -i) make it work, and on cygwin they make it *not* work.
 sed -i "s/.*'\([aA-fF0-9]\{6\}\).*/#\1/g" $1.ctj-colors-hex.txt
