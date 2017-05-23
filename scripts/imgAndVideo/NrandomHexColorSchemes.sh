@@ -2,7 +2,7 @@
 # Parameters:
 # $1 REQUIRED. The number of colors to have in the generated color scheme. OR to have the script randomly pick a number between 2 and N (first variable assignment hard-coded into script), make this paramater simply the letter r (for random).
 # Outputs to randomly named file in e.g.
-# ColorSchemesHex/random/Zqev73VvHyv_HexColors.txt
+# ColorSchemesHex/random/Zqev73VvHyv_HexColors.hexplt
 # $2 Optional: how many such color schemes to generate. If not provided, two will be made.
 
 # NOTE: at this writing, this script must be executed from the /scripts/imgAndVideo folder.
@@ -44,7 +44,7 @@ do
 						echo Will generate $colorsPerScheme random hex colors for the generated color scheme.
 			fi
 	paddedNumColors=$(printf %016d $colorsPerScheme)
-	outfile=./"$paddedNumColors"_"$rndFileNameChars"_HexColors.txt
+	outfile=./"$paddedNumColors"_"$rndFileNameChars"_HexColors.hexplt
 	# printf "" > $outfile
 	echo Generating $colorsPerScheme random hex colors for $outfile . . .
 	
@@ -60,4 +60,4 @@ done
 # DEVELOPMENT LOG
 # Before now: duplicate work of rndHexColorsGen.sh (or that is of this). 1st working version.
 # 2016-10-22 merged more efficient functionality of duplicate work rndHexColorsGen.sh with better file naming functionality of this.
-# 2017-05-23 altered to just output generated hex color scheme list file to current path (and fuss about folders before even invoking or after invoking script).
+# 2017-05-23 altered to just output generated hex color scheme list file to current path (and fuss about folders before even invoking or after invoking script). Redifined output file format as .hexplt and updated script to output to that.
