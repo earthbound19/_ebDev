@@ -5,6 +5,6 @@
 # TO DO: Make versions that split and/or join images (if I haven't already).
 
 # ADAPTED FROM: http://stackoverflow.com/questions/9636350/using-imagemagick-how-can-i-slice-up-an-image-into-several-separate-images
-convert $1 -crop $2x$3-0-0@ +repage +adjoin $1_Tile%d.png
+gm convert $1 -crop $2x$3-0-0@ +repage +adjoin $1_Tile%d.png
 
 # FINIS 10/29/2015 12:20:25 AM -RAH

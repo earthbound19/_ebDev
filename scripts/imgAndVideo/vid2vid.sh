@@ -14,7 +14,7 @@ then
 fi
 
 
-CygwinFind . -iname \*.$srcIMGformat > IMGconvertList.txt
+find . -iname \*.$srcIMGformat > IMGconvertList.txt
 sed -i 's/^\.\/\(.*\)/\1/g' IMGconvertList.txt
 mapfile -t IMGconvertList < IMGconvertList.txt
 for element in "${IMGconvertList[@]}"
@@ -27,7 +27,7 @@ do
 		echo . . .
 	else
 		echo converting $element . . .
-		# magick $param3 -scale $img_size $element $IMGfilenameNoExt.$destIMGformat
+		# gm convert $param3 -scale $img_size $element $IMGfilenameNoExt.$destIMGformat
 		ffmpeg -i $IMGfilenameNoExt.$srcIMGformat -crf 13 $IMGfilenameNoExt.$destIMGformat
 	fi
 done

@@ -1,0 +1,127 @@
+REM READ THESE FIRST COMMENTS IF NOTHING ELSE: This batch may clean about 16GB of strictly unnecessary files (junk files) from a Windows 7 installation. You may wish to read all of the REM comments in this file before running it; for example, beware that it will delete all *.bak and *.dmp files off a drive (which you can prevent by commenting out the relevant lines). Run this as an Administrator, or from a console with Administrator rights. This is designed for Windows 7, untested on prior and newer versions of Windows (it may or may not work on those; I don't know).
+
+REM BATCH STEPS:
+REM Wipe all temp files from so many temp directories and custom directories (as delineated by the user in a text file, and as found with a search) by "tricking" the ROBOCOPY command to wipe everything in a destination directory that is not found in a deliberately empty source directory. It will also do so with a number of threads matching the number of system cores (CPUS) times 3. This is basically RMDIR on steroids for temp file cleanup.
+
+REM RE: http://serverfault.com/questions/409948/what-are-these-tmp-directories-for-and-if-can-they-be-eliminated-how
+REM RE: http://stackoverflow.com/questions/8844868/what-are-the-undocumented-features-and-limitations-of-the-windows-findstr-comman
+REM RE: http://www.techrepublic.com/blog/windows-and-office/use-the-pushd-popd-commands-for-quick-network-drive-mapping-in-windows-7/
+REM RE: http://stackoverflow.com/a/14499141
+
+REM Save the current directory and go to the root:
+REM in development: copy robowipelist.txt \
+PUSHD %CD%
+
+CD\
+
+REM (Re)-create a list of all temp folders
+REM Because there apparently isn't a way to tell the DIR command to list files with *any* of these attributes--instead of requiring a listed file to have *all* of them:
+DIR * /A:D /B /S %CD% | FINDSTR /E /I \\temp > %CD%robowipeTempDirList.txt
+REM Set number of threads to number of processors * 3
+SET /A NUM = %NUMBER_OF_PROCESSORS% * 3
+
+REM Delete all files in those folders (as described), and also all files in a custom folder list if it exists:
+REM in development: TYPE robowipelist.txt >> robowipeTempDirList.txt
+
+MKDIR %CD%robowipeStubDir
+
+FOR /F "delims=*" %%A IN (%CD%robowipeTempDirList.txt) DO (
+REM ECHO WOULD HERE WIPE DIRECTORY %%A ...
+ROBOCOPY robowipeStubDir "%%A" /E /PURGE /MT:%NUM%
+)
+
+REM Remove temporary %CD%robowipeTempDirList.txt file:
+DEL %CD%robowipeTempDirList.txt
+
+REM Wipe everything in c:\windows\softwaredistribution, and any of a number of other paths which may exist on your computer (uncomment them if so), by "tricking" ROBOCOPY into syncing it/them with a temporarily created empty directory. 
+
+net stop wuauserv
+SET /A NUM = %NUMBER_OF_PROCESSORS% * 3
+ROBOCOPY robowipeStubDir %SYSTEMROOT%\\softwaredistribution /E /PURGE /MT:%NUM%
+ROBOCOPY robowipeStubDir "C:\Users\Alex\AppData\LocalLow\Google\GoogleEarth\unified_cache_leveldb_leveldb2" /E /PURGE /MT:%NUM%
+ROBOCOPY robowipeStubDir C:\ProgramData\Package Cache" /E /PURGE /MT:%NUM%
+TIMEOUT /T 2
+
+REM Remove temporary robowipeStubDir:
+RMDIR %CD%\robowipeStubDir
+
+REM in development: DEL robowipelist.txt
+
+REM Everything else that follows in this script is re: http://arstechnica.com/civis/viewtopic.php?f=15&t=1162579
+
+REM NOTE: To NOT regain about the amount of RAM you have installed (in hard drive space) by turning off hibernation, comment out the next line by typing REM<space> at the start of it:
+powercfg /h off
+
+REM Remove uninstallers for service packs:
+dism /online /cleanup-image /spsuperseded
+
+REM Delete all *.dmp files in all directories on the drive.
+REM NOTE: To NOT also delete all .tmp and .bak etc. files on a drive, delete the relevant comments and file masks from the following line:
+DEL /S *.dmp, *.tmp, *.temp
+REM , *.bak
+
+REM Return to the saved directory:
+POPDREM READ THESE FIRST COMMENTS IF NOTHING ELSE: This batch may clean about 16GB of strictly unnecessary files (junk files) from a Windows 7 installation. You may wish to read all of the REM comments in this file before running it; for example, beware that it will delete all *.bak and *.dmp files off a drive (which you can prevent by commenting out the relevant lines). Run this as an Administrator, or from a console with Administrator rights. This is designed for Windows 7, untested on prior and newer versions of Windows (it may or may not work on those; I don't know).
+
+REM BATCH STEPS:
+REM Wipe all temp files from so many temp directories and custom directories (as delineated by the user in a text file, and as found with a search) by "tricking" the ROBOCOPY command to wipe everything in a destination directory that is not found in a deliberately empty source directory. It will also do so with a number of threads matching the number of system cores (CPUS) times 3. This is basically RMDIR on steroids for temp file cleanup.
+
+REM RE: http://serverfault.com/questions/409948/what-are-these-tmp-directories-for-and-if-can-they-be-eliminated-how
+REM RE: http://stackoverflow.com/questions/8844868/what-are-the-undocumented-features-and-limitations-of-the-windows-findstr-comman
+REM RE: http://www.techrepublic.com/blog/windows-and-office/use-the-pushd-popd-commands-for-quick-network-drive-mapping-in-windows-7/
+REM RE: http://stackoverflow.com/a/14499141
+
+REM Save the current directory and go to the root:
+REM in development: copy robowipelist.txt \
+PUSHD %CD%
+
+CD\
+
+REM (Re)-create a list of all temp folders
+REM Because there apparently isn't a way to tell the DIR command to list files with *any* of these attributes--instead of requiring a listed file to have *all* of them:
+DIR * /A:D /B /S %CD% | FINDSTR /E /I \\temp > %CD%robowipeTempDirList.txt
+REM Set number of threads to number of processors * 3
+SET /A NUM = %NUMBER_OF_PROCESSORS% * 3
+
+REM Delete all files in those folders (as described), and also all files in a custom folder list if it exists:
+REM in development: TYPE robowipelist.txt >> robowipeTempDirList.txt
+
+MKDIR %CD%robowipeStubDir
+
+FOR /F "delims=*" %%A IN (%CD%robowipeTempDirList.txt) DO (
+REM ECHO WOULD HERE WIPE DIRECTORY %%A ...
+ROBOCOPY robowipeStubDir "%%A" /E /PURGE /MT:%NUM%
+)
+
+REM Remove temporary %CD%robowipeTempDirList.txt file:
+DEL %CD%robowipeTempDirList.txt
+
+REM Wipe everything in c:\windows\softwaredistribution, and any of a number of other paths which may exist on your computer (uncomment them if so), by "tricking" ROBOCOPY into syncing it/them with a temporarily created empty directory. 
+
+net stop wuauserv
+SET /A NUM = %NUMBER_OF_PROCESSORS% * 3
+ROBOCOPY robowipeStubDir %SYSTEMROOT%\\softwaredistribution /E /PURGE /MT:%NUM%
+ROBOCOPY robowipeStubDir "C:\Users\Alex\AppData\LocalLow\Google\GoogleEarth\unified_cache_leveldb_leveldb2" /E /PURGE /MT:%NUM%
+ROBOCOPY robowipeStubDir C:\ProgramData\Package Cache" /E /PURGE /MT:%NUM%
+TIMEOUT /T 2
+
+REM Remove temporary robowipeStubDir:
+RMDIR %CD%\robowipeStubDir
+
+REM in development: DEL robowipelist.txt
+
+REM Everything else that follows in this script is re: http://arstechnica.com/civis/viewtopic.php?f=15&t=1162579
+
+REM NOTE: To NOT regain about the amount of RAM you have installed (in hard drive space) by turning off hibernation, comment out the next line by typing REM<space> at the start of it:
+powercfg /h off
+
+REM Remove uninstallers for service packs:
+dism /online /cleanup-image /spsuperseded
+
+REM Delete all *.dmp files in all directories on the drive.
+REM NOTE: To NOT also delete all .tmp and .bak etc. files on a drive, delete the relevant comments and file masks from the following line:
+DEL /S *.dmp, *.tmp, *.temp
+REM , *.bak
+
+REM Return to the saved directory:
+POPD

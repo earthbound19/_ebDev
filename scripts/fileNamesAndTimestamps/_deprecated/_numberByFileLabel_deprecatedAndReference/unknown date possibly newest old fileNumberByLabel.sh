@@ -12,7 +12,7 @@ fi
 
 # PREPARE A LIST of all files to be tagged by number.
 	# print every file (and do not print any folder names isolated), recursively, in the directory this script is run from, also excluding . (to avoid a parsing problem) to a text file:
-cygwinFind . -type f -regex '\.\/.*' -printf '%T@ %c %p\n' | sort -k 1n,1 -k 7 | cut -d' ' -f2- > ./_batchNumbering/fileNamesWithNumberTags.txt
+find . -type f -regex '\.\/.*' -printf '%T@ %c %p\n' | sort -k 1n,1 -k 7 | cut -d' ' -f2- > ./_batchNumbering/fileNamesWithNumberTags.txt
 	# Trim that to a . (the current directory) and the rest of the path (no date info) :
 sed -i 's/\([^\/]*\)\(\/.*\)/\.\2/g' ./_batchNumbering/fileNamesWithNumberTags.txt
 	# Split that to two files; one is the paths, the other is all the file names after the paths:

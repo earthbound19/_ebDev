@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?><XnView_script version="1.0" name="hsl_blues_to_oranges">
+    <HLS hue="-47" lightness="0" saturation="0" colorize="false"/>
+    <Output folder="" filename="{Filename}_result" case="0" format="TIFF">
+        <Options overwrite="0" orgDate="true" keepMeta="true" keepICC="true" keepFolder="false" delOrg="false" multipage="true" allPages="false" openExplorer="false" openBrowser="false" clearItems="false"/>
+        <TIFF compress="3" quality="80" compressBW="6" oneStrip="false"/>
+    </Output>
+</XnView_script>
