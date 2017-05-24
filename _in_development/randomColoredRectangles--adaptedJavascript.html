@@ -1,0 +1,43 @@
+Hello! Here's some randomly generated rectangles. Code horked and adapted by RAH.
+
+<script>
+//TO DO: Make this an interactive form that allows you to set the canvas size, the random transparency range of rectangles, and also random stroke widths and colors for the rectangle.
+	//May require: http://www.w3schools.com/tags/canvas_strokestyle.asp
+	//http://www.html5canvastutorials.com/tutorials/html5-canvas-rectangles/
+	//http://stackoverflow.com/questions/15912213/drawing-a-rectangle-with-dashed-lines-using-rafael-js
+	//http://stackoverflow.com/questions/8351431/processing-js-rect-different-border-colors
+	//http://stackoverflow.com/questions/8677547/how-to-draw-a-dashed-line-rectangle-in-canvas
+	//http://stackoverflow.com/questions/8677547/how-to-draw-a-dashed-line-rectangle-in-canvas
+	//http://raphaeljs.com/
+	//http://paperjs.org/reference/style/
+	//http://processingjs.org/reference/rect_/
+//TO DO: Also allow for random rectangle size/position/color ranges that are more controlled?
+
+function init() {
+    var body = document.getElementsByTagName("body")[0];
+    var canvas = document.createElement("canvas");
+    //canvas.width = window.innerWidth;
+	canvas.width = 9000;
+    //canvas.height = window.innerHeight;
+	canvas.height = 4225;
+
+    var context = canvas.getContext("2d");
+
+	//context.global1lpha = 0.3
+    context.global1lpha = 75;
+
+    for (var i = 0; i < 3255; i++) {
+        var colour = '#' + Math.round(0xffffff * Math.random()).toString(16);
+        context.fillStyle = colour;
+        //context.fillRect(Math.random() * window.innerWidth, Math.random() * window.innerHeight, Math.random() * 80 + 20, Math.random() * 80 + 20);
+		randomRectangleUpperLeftCornerX = Math.floor((Math.random() * canvas.width) + 1)
+		randomRectangleUpperLeftCornerY = Math.floor((Math.random() * canvas.height) + 1)
+		randomRectangleWidth = Math.floor((Math.random() * (canvas.width - randomRectangleUpperLeftCornerX)) + 1);	//Any number between (canvas width - upper left corner X coordinate) and 1 -- the rectangle will be a width anywhere from the right edge of the screen to the rectangle's X coordinate corner.
+		randomRectangleHeight = Math.floor((Math.random() * (canvas.height - randomRectangleUpperLeftCornerY)) + 1);	//Any number between (canvas width - upper left corner Y coordinate) and 1, ~.
+		context.fillRect(randomRectangleUpperLeftCornerX, randomRectangleUpperLeftCornerY, randomRectangleWidth, randomRectangleHeight);
+    }
+
+    body.appendChild(canvas);
+}
+init();
+</script>
