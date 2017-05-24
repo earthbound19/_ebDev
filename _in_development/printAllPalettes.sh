@@ -9,5 +9,5 @@ fi
 while IFS= read -r line || [ -n "$line" ]
 do
 	baseFileName=`basename "$line"`
-	colorsGridFromHexScheme-gm.sh "$baseFileName"
+	echo colorsGridFromHexScheme-gm.sh "$baseFileName"
 done < XPaugYhv6XYXsV5QcDFU_paletteFilesListTMP.txt
