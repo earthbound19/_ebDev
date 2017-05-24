@@ -8,4 +8,5 @@ C:\Python27
 D:\Program_Distributions\_artAudioVisual\FredsImageMagickScripts
 C:\Program Files (x86)\FontForgeBuilds\bin
 C:\Program Files\gs\gs9.06\bin
+C:\Program Files\Git\bin
 C:\PHP

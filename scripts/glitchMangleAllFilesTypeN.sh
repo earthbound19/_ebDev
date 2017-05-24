@@ -8,14 +8,16 @@
 
 # if [ ! -d ./out ]; then mkdir out; fi
 
-find ./*.$1 > alles.txt
-mapfile -t alles < alles.txt
-rm alles.txt
+# re http://stackoverflow.com/a/5927391/1397555
+find . -type f -name "*.$1" > alles.txt
 
-for element in ${alles[@]}
+while read -r element
 do
 	# randomCharsString=`cat /dev/urandom | tr -cd 'a-km-np-zA-KM-NP-Z2-9' | head -c $numRandomCharsToGet`
 	bm.exe $element -x jpg -u $2 -r 6 -t 1 -s 100 -v -a -m +-
 	mv ./out ./"$element"_corrupted
 	mkdir out
-done
+	echo element is $element
+done < alles.txt
+
+rm ./alles.txt
