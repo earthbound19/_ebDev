@@ -1,2 +1,0 @@
-# TO DO: make this recieve an input image parameter, get the image dimensions, and produce an output image of the same dimensions. Re: http://www.imagemagick.org/Usage/canvas/#random
-magick -size 100x100 xc:	+noise Random	random.png
