@@ -1,3 +1,4 @@
+C:\_devtools\_in_development
 C:\_devtools\bin
 C:\_devtools\bin\byteMangling
 C:\_devtools\bin\FilterForgeBatchWrapper

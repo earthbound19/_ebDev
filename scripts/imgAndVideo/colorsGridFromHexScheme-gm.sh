@@ -12,23 +12,43 @@
 # NOTES
 # This produces individual color tiles in a subfolder and runs slower. colorsGridFromHexScheme.sh runs much faster but doesn't produce the subfolder of color tiles.
 
+# TO DO: check for target and skip render if already exists.
+
 
 # NOTE
 # doc. wut following block is:
-if [ -e ~/colorSchemesHexRootDir.txt ]
+if [ -e ~/palettesRootDir.txt ]
 then
-	colorSchemesHexRootDir=$(< ~/colorSchemesHexRootDir.txt)
-	hexColorSrcFullPath=`find "$colorSchemesHexRootDir" -iname *$1`
+	palettesRootDir=$(< ~/palettesRootDir.txt)
+			echo palettesRootDir.txt found\;
+			echo searching in path $palettesRootDir found therien for file $1 . . .
+	hexColorSrcFullPath=`find "$palettesRootDir" -iname *$1`
 	echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
-	echo colorSchemesHexRootDir.txt found and contains value $hexColorSrcFullPath . . .
+	if [ "$hexColorSrcFullPath" == "" ]
+		then
+			echo No file of name $1 found in path \"$palettesRootDir\" \! ABORTING script.
+			exit
+		# else
+			# echo File name $1 found in path \"$palettesRootDir\" \! PROCEEDING. IN ALL CAPS.
+	fi
 else
 	echo !--------------------------------------------------------!
-	echo file ~/colorSchemesHexRootDir.txt \(in your root user path\) not found. This file should exist and have one line, being the path of your hex color scheme text files e.g.:
+	echo file ~/palettesRootDir.txt \(in your root user path\) not found. This file should exist and have one line, being the path of your palette text files e.g.:
 	echo
-	echo /cygdrive/c/_devtools/scripts/imgAndVideo/ColorSchemesHex
+	echo /cygdrive/c/_devtools/scripts/imgAndVideo/palettes
 	echo
-	echo aborting script.
+	echo ABORTING script.
 	echo !--------------------------------------------------------!
+	exit
+fi
+
+# IF RENDER TARGET already exists, abort script. Otherwise continue.
+if [ -f ./$1.png ]
+then
+	echo Render target $1.png already exists\; SKIPPING render.
+	exit
+else
+	echo Render target $1.png does not exist\; WILL RENDER.
 fi
 
 if [ -d ./$1.colors ]
@@ -46,7 +66,8 @@ else
 	mkdir ./_hexPaletteIMGgenTMP_2bbVyVxD
 fi
 
-# this here complexity solves a problem of not reading a last line if it doesn't end with a new line; dunno how but magic says ok re http://stackoverflow.com/a/31398490 :
+# this here complexity solves a problem of not reading a last line if it doesn't end with a new line; dunno how but magic says ok re http://stackoverflow.com/a/31398490 ;
+# make directory of color tiles from palette:
 while IFS= read -r line || [ -n "$line" ]
 do
 	hexNoHash=`echo $line | sed 's/\#//g'`
@@ -63,7 +84,8 @@ tileParam="-tile ""$3"x"$4"
 echo gm montage $tileParam -background gray -geometry "$2"x"$2"+0+0 \\ > mkGridHead.txt
   # convert hex color scheme text list file to parameter list for ~magick:
 sed 's/.*#\(.*\)$/_hexPaletteIMGgenTMP_2bbVyVxD\/\1.png \\/' $hexColorSrcFullPath > ./mkGridSRCimgs.txt
-
+# IF PARAMATER $5 was passed, randomly sort that list:
+	if [ ! -z ${5+x} ];	then shuf ./mkGridSRCimgs.txt > ./tmp_3A7u2ZymRgdss4rsXuxs.txt; rm ./mkGridSRCimgs.txt; mv ./tmp_3A7u2ZymRgdss4rsXuxs.txt ./mkGridSRCimgs.txt; fi
 echo $1.png > mkGridTail.txt
 cat mkGridHead.txt mkGridSRCimgs.txt mkGridTail.txt > mkColorPaletteGrid.sh
 
@@ -71,7 +93,12 @@ rm mkGridHead.txt mkGridSRCimgs.txt mkGridTail.txt
 chmod 777 ./mkColorPaletteGrid.sh
 
 ./mkColorPaletteGrid.sh
-mv ./mkColorPaletteGrid.sh ./$1-mkColorPaletteGrid.sh.txt
-mv _hexPaletteIMGgenTMP_2bbVyVxD $1.colors
+# mv ./mkColorPaletteGrid.sh ./$1-mkColorPaletteGrid.sh.txt
+	# OR, to delete that if you've no permanent need of it:
+	rm ./mkColorPaletteGrid.sh
+# mv _hexPaletteIMGgenTMP_2bbVyVxD $1.colors
+	# OR, to delete that dir if it annoys you ;)  :
+	rm ./_hexPaletteIMGgenTMP_2bbVyVxD/*
+	rmdir ./_hexPaletteIMGgenTMP_2bbVyVxD
 
 echo DONE--created color palette image is $1, and the .sh script that generated it has been renamed to $1-mkColorPaletteGrid.sh.txt. You will also find color swatch images from the palette in the folder $1.colors.
