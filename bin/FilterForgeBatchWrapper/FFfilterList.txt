@@ -1,10 +1,6 @@
-<<<<<<< HEAD
 Sketchy Painting Default Mod 1.ffxml
 Library_10067-1.ffxml
-Library_13468-1.ffxml
-=======
 Library_9930-1.ffxml
->>>>>>> master
 Library_8351-3.ffxml
 Library_13468-1.ffxml
 Library_10407-1.ffxml
