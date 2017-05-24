@@ -1,3 +1,4 @@
+_in_development
 bin
 bin/byteMangling
 scripts
