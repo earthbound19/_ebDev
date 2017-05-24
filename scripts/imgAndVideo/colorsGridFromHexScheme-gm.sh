@@ -17,14 +17,9 @@
 # doc. wut following block is:
 if [ -e ~/palettesRootDir.txt ]
 then
-<<<<<<< HEAD
-	colorSchemesHexRootDir=$(< ~/colorSchemesHexRootDir.txt)
-	hexColorSrcFullPath=`find "$colorSchemesHexRootDir" -iname *$1`
-=======
 	palettesRootDir=$(< ~/palettesRootDir.txt)
 			echo palettesRootDir.txt found, searching in path $palettesRootDir found therien for file $1 . . .
 	hexColorSrcFullPath=`find "$palettesRootDir" -iname *$1`
->>>>>>> master
 	echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 	if [ "$hexColorSrcFullPath" == "" ]
 		then
