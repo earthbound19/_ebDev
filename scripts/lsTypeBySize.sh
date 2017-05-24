@@ -7,7 +7,7 @@
 # Run this script with one parameter, being the extension of a type of file you want to list by descending order of size in all subdirectories of the path from which you invoke this script.
 
 # Possible variant command to adapt that shows paths:
-# cygwinFind $PWD/*.exe
+# find $PWD/*.exe
 
 ls -Rs -S | grep "\.$1\$" > $1_files_by_size.txt
 sort -r -n $1_files_by_size.txt > temp.txt

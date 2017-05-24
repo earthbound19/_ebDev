@@ -12,10 +12,10 @@
 
 echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
 
-# CygwinFind *.$1 > allFiles.txt
+# find *.$1 > allFiles.txt
 
 	# OPTIONAL variation that renames all files of given extension *recursively--* WARNING; it moves all of them into whatever path root this is invoked from:
-	CygwinFind $directory -type f -name "*.$1" > allFiles.txt
+	find $directory -type f -name "*.$1" > allFiles.txt
 
 # WORKAROUND for that or other versions of echo sometimes throwing in unwanted \r characters:
 tr -d '\r' < allFiles.txt > wut.txt

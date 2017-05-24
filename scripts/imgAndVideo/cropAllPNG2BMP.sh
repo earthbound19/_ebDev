@@ -1,10 +1,10 @@
-# DESCRIPTION: Creates cropped .bmp images from all .png images with white borders and a black interior (I think) in a directory tree. Useful e.g. for prepping art for conversion to a vector format without wasted border space.  NOTE: this relies on one of Fred's imagemagick scripts, which are not freely redistributable; you'll have to download it from the source yourself at: http://www.fmwconcepts.com/imagemagick/innercrop/index.php -- and for the newest imagemagick, you may need to search/replace all instances of convert with magick in that script. AND make sure imagemagick is in your PATH.
+# DESCRIPTION: Creates cropped .bmp images from all .png images with white borders and a black interior (I think) in a directory tree. Useful e.g. for prepping art for conversion to a vector format without wasted border space.  NOTE: this relies on one of Fred's imagemagick scripts, which are not freely redistributable; you'll have to download it from the source yourself at: http://www.fmwconcepts.com/imagemagick/innercrop/index.php -- However, I use graphicsmagick, so that all imagemagic utilities are executed as `gm (utility name)`.
 
 # USAGE: call this script from a directory tree full of .png images.
 
 # TO DO: upgrade listing to all possible image types.
 
-cygwinFind . -iname \*.png > crop_imgs.txt
+find . -iname \*.png > crop_imgs.txt
 
 i=0
 mapfile -t imgs < crop_imgs.txt

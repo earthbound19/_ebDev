@@ -8,8 +8,14 @@
 
 # if [ ! -d ./out ]; then mkdir out; fi
 
+<<<<<<< HEAD
+find ./*.$1 > alles.txt
+mapfile -t alles < alles.txt
+rm alles.txt
+=======
 # re http://stackoverflow.com/a/5927391/1397555
 find . -type f -name "*.$1" > alles.txt
+>>>>>>> master
 
 while read -r element
 do

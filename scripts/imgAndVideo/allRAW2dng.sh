@@ -5,7 +5,7 @@
 # Invoke with one parameter $1, being a file type to operate on, e.g.:
 # ./thisScript.sh CR2
 
-CygwinFind . -iname \*.$1 > all_wut.txt
+find . -iname \*.$1 > all_wut.txt
 mapfile -t all_wut < all_wut.txt
 for element in "${all_wut[@]}"
 do
