@@ -11,7 +11,7 @@
 # brew install --use-gcc --with-perlmagick graphicsmagick
 
 # USAGE
-# call this script from the terminal to thusly destroy so many images thusly, e.g.:
+# call this script from the terminal to thusly destroy so many images e.g.:
 # ./thisScript.sh png "SET A"
 # To have global use of it, copy this script to somewhere in your $PATH, or make such a path.
 
