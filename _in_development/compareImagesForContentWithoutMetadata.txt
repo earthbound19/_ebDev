@@ -1,2 +1,0 @@
-re: http://www.imagemagick.org/discourse-server/viewtopic.php?t=28381
-compare -metric AE dir1/in.png dir2/in.png NULL:
