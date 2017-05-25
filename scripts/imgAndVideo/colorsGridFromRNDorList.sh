@@ -106,7 +106,7 @@ do
 
 					echo Concatenating generated rows into one new .ppm file . . .
 	timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
-	cat ppmheader.txt grid.ppm > "$numRows"x"$numCols"gridRND_"$timestamp".ppm
+	cat ppmheader.txt grid.ppm > "$numCols"x"$numRows"gridRND_"$timestamp".ppm
 	rm ppmheader.txt grid.ppm
 
 done
