@@ -4,7 +4,7 @@ exports.type = 'perItem';
 
 exports.active = true;
 
-exports.description = 'converts colors: rgb() to #rrggbb and #rrggbb to #rgb';
+exports.description = 'converts colors: rgb() to #rrggbb and does NOT convert #rrggbb to #rgb';
 
 // ORIGINAL:
 // exports.params = {
@@ -90,16 +90,6 @@ exports.fn = function(item, params) {
                     val = rgb2hex(match);
                 }
 
-                // Convert long hex to short hex
-                if (params.shorthex && (match = val.match(regHEX))) {
-                    val = '#' + match[0][1] + match[0][3] + match[0][5];
-                }
-
-                // Convert hex to short name
-                if (params.shortname && val in collections.colorsShortNames) {
-                    val = collections.colorsShortNames[val];
-                }
-
                 attr.value = val;
 
             }
@@ -124,5 +114,5 @@ exports.fn = function(item, params) {
  * @author Jed Schmidt
  */
 function rgb2hex(rgb) {
-    return '#' + ('00000' + (rgb[0] << 16 | rgb[1] << 8 | rgb[2]).toString(16)).slice(-6).toUpperCase();
+    return '#' + ('00000' + (rgb[0] << 16 | rgb[1] << 8 | rgb[2]).toString(16)).slice(-6);
 }

@@ -1,11 +1,11 @@
 # DESCRIPTION
-# Invokes svgo_optimize.sh repeatedly. Optimizes all .svg files in a given directory according to configuration of svgo_optimize.sh and 
+# Invokes svgo_optimize.sh repeatedly. See comments in that script.
 
-# USAGE
-# Ensure this script is in your $PATH, and invoke it from a directory with svg files you wish to produce optimized copies of.
-
-# DEPENDENCIES
-# As listed in svgo_optimize.sh
+CLIopts="--disable=mergePaths --enable=removeRasterImages --disable=convertShapeToPath"
+# OTHER ADDITIONAL OPTIONS; comment out if you don't want them:
+# moreCLIopts="--enable=removeDimensions --enable=removeRasterImages --enable=removeUnknownsAndDefaults"
+# UNUSED option(s):
+# --enable=removeViewBox
 
 find *.svg > allSVGs.txt
 mapfile -t allSVGs < allSVGs.txt

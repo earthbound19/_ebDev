@@ -5,7 +5,7 @@
 # A nodejs install with the svgo package installed, and the svgo_config.json file in the same directory as this script. Also svgo_BWsvgRandomColorFill_target_config.js in the same directory as this script?
 
 # INSTALLATION
-# 1) install the prerequisites ;) 
+# 1) install the prerequisites ;) and invoke svgo via command line without any parameters (just run it once, as this creates a default convertColors.js file).
 # EITHER overwrite convertColors.js with the contents of svgo_config.json or, if you can (I couldn't), get svgo to recognize this as a legitimate config file. The only changes from the default config at this writing are:
 	# shorthex: false,
 	# shortname: false
@@ -32,8 +32,10 @@ fileNameNoExt=`echo $1 | sed 's/\(.*\)\.svg/\1/g'`
 				# WANT TO MAKE THIS WORK: --config=""$configFileName" e.g. :
 				# svgoCLIopts="--disable=mergePaths --enable=removeRasterImages --disable=convertShapeToPath --config=$configFileName"
 CLIopts="--disable=mergePaths --enable=removeRasterImages --disable=convertShapeToPath"
+# UNUSED option(s):
 # OTHER ADDITIONAL OPTIONS; comment out if you don't want them:
-# moreCLIopts="--enable=removeDimensions --enable=removeRasterImages --enable=removeUnknownsAndDefaults --enable=removeViewBox"
+moreCLIopts="--enable=removeDimensions --enable=removeUnknownsAndDefaults --enable=removeViewBox"
+# UNUSED option(s):  
 # ==== END GLOBALS
 
 SVGOcommand="svgo -i $1 -p 3 --pretty $CLIopts $moreCLIopts -o "$fileNameNoExt"_opt.svg"
@@ -43,7 +45,7 @@ echo . . .
 $SVGOcommand
 
 # OPTIONAL and DANGER: will toast original file--comment out if you do not want that! :
-rm $1 && mv "$fileNameNoExt"_opt.svg" $1
+# rm $1 && mv "$fileNameNoExt"_opt.svg $1
 
 
 # SVGO CLI OPTIONS NOTES
