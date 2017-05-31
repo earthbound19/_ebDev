@@ -34,14 +34,13 @@ IF NOT EXIST %%A ECHO Could not find path: %%A >> setPathsLog.txt
 IF EXIST %%A ECHO Found path: %%A >> setPathsLog.txt
 REM NOTE: without the quote marks on the next line, it won't add directories that include spaces ( ). It will work if the first %%A doesn't have quote marks (and will mess up sorting if they do, it seems--odd).
 IF EXIST %%A %CD%\bin\modpath.exe /add "%%A"
-IF EXIST %%A ECHO MERP Added directory to PATH: "%%A"
+IF EXIST %%A ECHO Added directory to PATH: "%%A"
 )
 
-DEL temp.txt
-DEL temp2.txt
-DEL allPathsTemp.txt
+DEL temp.txt temp2.txt allPathsTemp.txt
 
 REM DEVELOPMENT HISTORY:
 REM 2015 09 25? -- First version?
 REM 2015-11-12 Bug fix to include necessary paths on run (had assumed so many .exes were in the same path.
 REM 2015-12-20 Add bug comment to comments at start of file
+REM 05/31/2017 10:17:59 AM severely minor tweaks
