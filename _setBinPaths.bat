@@ -22,7 +22,7 @@ gsort temp.txt > temp2.txt
 	REM NOTE: I'd had the -u flag on the next line; that messes up my intent (it does not print lines that have duplicates, it only prints unique lines. FACE PALM. ALSO: after I RT_M I learned it only detects *adjacent* duplicate lines. GEH!
 		REM NOT ANY MORE: %CD%\bin\gnuCoreUtilsWin32\uniq temp2.txt > allPathsTemp.txt
 REM KLUDGE: copy gnuWin32 CoreUtils uniq to uniq in this path.
-uniq temp2.txt > allPathsTemp.txt
+guniq temp2.txt > allPathsTemp.txt
 REM ECHO Ready to modify PATH.
 
 FOR /F "delims=*" %%A IN (allPathsTemp.txt) DO (
