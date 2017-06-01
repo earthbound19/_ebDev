@@ -3,7 +3,7 @@
 
 # USAGE: invoke this script with these parameters:
 # $1 the number of pixels you wish the longest side of the converted .svg file(s) to be.
-# $2 the target file format e.g. tif or jpg -- defaults to jpg if not provided.
+# $2 the target file format e.g. png or jpg -- defaults to jpg if not provided.
 # $3 optional--include this parameter (it can be anything) to make white transparent; otherwise white will default to opaque.
 
 # DEV NOTE: template command: gm -size 850 test.svg result.tif
@@ -26,13 +26,9 @@ if [ -z ${3+x} ]; then param3="-background none"; fi
 # NOTE: you may tweak that line to say "-background gray" to replace a transparent background with gray (if you leave off the third parameter when calling this script. Or instead of gray, any hex color code e.g. #555555. Otherwise, revert it to the default "-background none" to leave transparency in the resultant image.)
 
 find . -iname \*.svg > all_svgs.txt
-mapfile -t all_svgs < all_svgs.txt
-for element in "${all_svgs[@]}"
+while read element
 do
-		# Because I couldn't get this done with an echo piped to sed:
-		echo $element > temp.txt
-		sed -i 's/\(.*\)\.eps/\1/g' temp.txt
-	svgFilenameNoExtension=$( < temp.txt)
+		svgFilenameNoExtension=`echo $element | sed 's/\(.*\)\.svg/\1/g'`
 	if [ -a $svgFilenameNoExtension.$img_format ]
 	then
 		echo render candidate is $svgFilenameNoExtension.$img_format
@@ -40,9 +36,9 @@ do
 		echo . . .
 	else
 		echo rendering $element . . .
-		echo COMMAND\: gm convert $param3 -size $1x$1 $element $svgFilenameNoExtension.$img_format
-		gm convert $param3 -size $1x$1 $element $svgFilenameNoExtension.$img_format
+		echo COMMAND\: gm convert $param3 -scale $1 $element $svgFilenameNoExtension.$img_format
+		gm convert $param3 -scale $1 $element $svgFilenameNoExtension.$img_format
 	fi
-done
+done < all_svgs.txt
 
 rm temp.txt all_svgs.txt
