@@ -1,0 +1,16 @@
+SETLOCAL ENABLEDELAYEDEXPANSION
+
+SET PATH=%PATH%;%CD%\bin
+REM NOTES: You may need to run this from an elavated system console. Also, it would be more elegant to write one batch and invoke it with text lists of paths to add, one per line, but that was bizarrely unreliable; it worked one minute, not the next. Three different batch files it is.
+
+FOR /F "delims=*" %%A IN (%CD%\EXTERNALPATHS.txt) DO (
+		REM DEPRECATED: that's only a temporary thing and doesn't set the system variables permanently! :
+			REM pathed /APPEND %%A
+		REM DEPRECATED: cannot delete invalid path variable elements with that tool . . . or any tool other than one I'd program myself? ; and frustratingly unreliable :( it seems, besides:
+			REM SET ADD_THIS=%PATH%;%%A
+			REM setenv -m PATH %ADD_THIS%
+		REM Thanks to: http://stackoverflow.com/a/10411111
+setx PATH "%PATH%;%%A" /M
+)
+
+ENDLOCAL

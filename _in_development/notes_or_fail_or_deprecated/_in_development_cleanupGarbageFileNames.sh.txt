@@ -1,0 +1,80 @@
+# NOTE: This is in development and presently a horrible FAIL in some settings. Not for production use!
+
+# DESCRIPTION: Creates a batch file to rename files such that horrible characters for filenames e.g. ( ) & ' { } ` ; ! " * etc. will all be deleted, and only characters A-Z, a-z, 0-9, _ . and - will be retained. The terrible characters will, however, be replaced with something even more terrible, e.g. ~3uV~, to avoid file name conflicts from renaming files that were named so thoughtlessly to begin with that to delete the horrible characters would result in identical (conflicting) file names. Any good file renamer (e.g. Flexible Renamer, which it turns out it might be far more efficient to use that than this script) or an ingenious bash scripter can more easily workup the rename batch file containing so many instances of that pattern ~...~ to something useful, and by all this therefore achieve something better than renaming ten thousand files by hand. The batch file template it creates is mv_commands.sh.txt; edit those results per need and rename to ~.sh and execute.
+
+# LICENSE: I wrote this and release it to the Public Domain. 12/02/2015 06:00:22 PM -RAH
+
+# NOTE: This script expects one paramater, being a directory to work upon. Except it doesn't expect that, yet.
+# TO DO: that.
+
+# NOTE: the following simple for loop from http://dimitar.me/quickly-remove-special-characters-from-file-names/#comment-154 may far better do the trick:
+# for file in *
+# do
+# mv “$file” $(echo “$file” | sed ‘s/[^A-Za-z0-9_.]/_/g’)
+# done
+
+# Print all file names from the given folder ($1--TO DO; that), and all subfolders, into a file:
+find . -regex '.*' > allFileNames.txt
+# Surround each line with quote marks via sed, else the command to read each line into an array separates items by spaces:
+sed -i 's/^\(.*\)$/"\1"/g' allFileNames.txt
+# Begin building mv_commands.sh.txt:
+printf "" > temp.txt
+sed 's/^\(.*\)$/mv \1/g' allFileNames.txt >> temp.txt
+	# Create a rename command file and execute it.
+	# re: http://ccm.net/faq/1757-how-to-read-a-file-line-by-line
+printf "" > newFileNames.txt
+printf "" > gib.txt
+while read element 
+do
+		# Grab first three characters of supaGibStr (will be empty on first loop iteration):
+	gibStr=${supaGibStr:0:3}
+		# Inline replace supaGibStr with everything after its first n characters (shorten it so as not to reuse the first n) :
+	supaGibStr=`echo ${supaGibStr:3}`
+	gibStrSize=${#gibStr}
+	if (( $gibStrSize < 3 ))
+		then
+		{
+			# echo gib pool too low, refilling . . .
+		supaGibStr=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 6000`
+			# Get a gib string, since this block only executes if we just got one with too few characters:
+		gibStr=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 3`
+		}
+	fi
+					# Re: http://dimitar.me/quickly-remove-special-characters-from-file-names/#comment-154
+					# Characters I may not ever want in any file names: %^,=[]+@,()&'{}`;!"*$~
+					# Characters that must have an escape character \ in variable assignment and to be recognized by tr:
+					#   ( ) & ' { } ` ; ! " * $ ~
+					# ~But NOT for string assignment: *~ -- probably others. This may only matter in script assignment vs. file name reading from a text file.
+					# $ Does not need an escape for tr to delete it. ? But it will with an escape. Using escape.
+					# dev commands; the one(s) not commented out is what I used:
+				# mv "$element" $(echo "$element" | sed 's/[^A-Za-z0-9_\.\- ]/_/g')
+				# It seems sed is faster for this.
+		# GIB STRING added to file names option:
+			echo "$element" | sed "s/[^A-Za-z0-9_ \.\-\'\/\"]/~$gibStr~/g" >> newFileNames.txt
+		# NO GIB string added to file names option (preferred):
+		echo "$element" | sed "s/[^A-Za-z0-9_ \.\-\'\/\"]//g" >> newFileNames.txt
+		tr ' ' '_' < newFileNames.txt > tr_temp.txt
+		rm newFileNames.txt
+		mv tr_temp.txt newFileNames.txt
+		# echo $element | tr -d %^,=[]+@,\(\)\&\'\{\}\`\;\!\"\*\$\~ >> newFileNames.txt
+done < allFileNames.txt
+
+# Attempted deleting duplicate lines from both files (which would waste mv commands when the intended target is identical to the source, again re genius breaths at; http://stackoverflow.com/questions/4780203/deleting-lines-from-one-file-which-are-in-another-file/18477228#18477228 : but haven't managed cross-wrangling the files thus. TO DO: fix that with a regex examining the contents of the first and second double-quote mark groups. Meanwhile . . .
+
+# Finish building mv_commands.sh.txt; thanks to gnu paste re: http://stackoverflow.com/questions/4358192/how-do-i-append-lines-from-one-file-to-the-end-of-each-line-of-another-file
+printf "" > mv_commands.sh.txt
+paste --delimiter=' ' temp.txt newFileNames.txt > mv_commands.sh.txt
+# TO DO, if I haven't already list this: build and implement a sed command that eliminates all lines from that file which would be a vain mv command to rename a file . . . to exactly the same name.
+rm temp.txt
+
+echo ~-~-~-~-~-~-~-~- DONE. EXAMINE mv_commands.sh.txt, and if it is suitable, rename it to mv_commands.sh and execute it.
+
+# reference dual-action loop for file renaming:
+# printf "" > call_fixShortenIMGlist.txt
+# for file in "${imgs_oldNames[@]}"
+# do
+	# cygCurrDir=`pwd`
+	# DOScurrDir=`cygpath -p -w $cygCurrDir`
+	# echo "fixShortenIMGlist.exe \"$DOScurrDir\" \"$file\" $shortenFileLengthTo" >> call_fixShortenIMGlist.txt
+	# echo >> call_fixShortenIMGlist.txt
+# done

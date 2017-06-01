@@ -1,0 +1,27 @@
+{{Colort/ColorShort|hex=002147|r=000|g=033|b=071|h=212|s=100|v=028|name=[[Oxford University|Oxford Blue]]}}
+{{Colort/ColorShort|hex=4E1609|r=078|g=022|b=009|h=011|s=088|v=031|name=[[Puce#French puce|French puce]]}}
+{{Colort/ColorShort|hex=003153|r=000|g=049|b=083|h=205|s=100|v=033|name=[[Prussian blue]]}}
+{{Colort/ColorShort|hex=333366|r=051|g=051|b=102|h=240|s=050|v=040|name=Deep koamaru}}
+{{Colort/ColorShort|hex=79443B|r=121|g=068|b=059|h=009|s=051|v=047|name=[[Tuscan red#Medium Tuscan red|Medium Tuscan red]]}}
+{{Colort/ColorShort|hex=32127A|r=050|g=018|b=122|h=258|s=085|v=048|name=[[Persian bluePersian indigo|Persian indigo]]}}
+{{Colort/ColorShort|hex=2E8B57|r=046|g=139|b=087|h=146|s=067|v=055|name=[[Shades of greenSea green|Sea green]]}}
+{{Colort/ColorShort|hex=009B7D|r=000|g=155|b=125|h=168|s=100|v=061|name=[[ViridianPaolo Veronese green|Paolo Veronese green]]}}
+{{Colort/ColorShort|hex=A45A52|r=164|g=090|b=082|h=006|s=050|v=064|name=[[Redwood (color)|Redwood]]}}
+{{Colort/ColorShort|hex=00A693|r=000|g=166|b=147|h=173|s=100|v=065|name=[[Shades of greenPersian green|Persian green]]}}
+{{Colort/ColorShort|hex=00A86B|r=000|g=168|b=107|h=158|s=100|v=066|name=[[Shades of greenJade|Jade]]}}
+{{Colort/ColorShort|hex=C23B22|r=194|g=059|b=034|h=009|s=082|v=076|name=[[Shades of red#Dark pastel red|Dark pastel red]]}}
+{{Colort/ColorShort|hex=CB410B|r=203|g=065|b=011|h=017|s=095|v=080|name=[[Sinopia]]}}
+{{Colort/ColorShort|hex=CC5500|r=204|g=085|b=000|h=025|s=100|v=080|name=[[Shades of orange#Burnt orange|Burnt orange]]}}
+{{Colort/ColorShort|hex=CFB53B|r=207|g=181|b=059|h=049|s=071|v=081|name=[[Old gold]]}}
+{{Colort/ColorShort|hex=88D8C0|r=136|g=216|b=192|h=162|s=037|v=085|name=[[Aqua (color)|Pearl Aqua]]}}
+{{Colort/ColorShort|hex=00FA9A|r=000|g=250|b=154|h=157|s=100|v=098|name=[[Spring green (color)Medium spring green|Medium spring green]]}}
+{{Colort/ColorShort|hex=FDFD96|r=253|g=253|b=150|h=060|s=041|v=099|name=[[Shades of yellowPastel yellow|Pastel yellow]]}}
+{{Colort/ColorShort|hex=FD0E35|r=253|g=014|b=053|h=350|s=094|v=099|name=[[Scarlet (color)#Torch red|Scarlet]]}}
+{{Colort/ColorShort|hex=FFA000|r=255|g=160|b=000|h=018|s=100|v=100|name=[[Shades of orange|Vivid orange peel]]}}
+{{Colort/ColorShort|hex=CEFF00|r=205|g=255|b=000|h=072|s=100|v=100|name=[[Lime (color)Volt|Volt]]}}
+{{Colort/ColorShort|hex=ADFF2F|r=173|g=255|b=047|h=084|s=082|v=100|name=[[Shades of greenYellow-green|Green-yellow]]}}
+{{Colort/ColorShort|hex=F0FFF0|r=240|g=255|b=240|h=120|s=006|v=100|name=[[Spring green (color)Honeydew|Honeydew]]}}
+{{Colort/ColorShort|hex=7FFFD4|r=127|g=255|b=212|h=160|s=050|v=100|name=[[Aquamarine (color)|Aquamarine]]}}
+{{Colort/ColorShort|hex=00FFEF|r=000|g=255|b=239|h=176|s=100|v=100|name=[[Turquoise (color)Turquoise Blue|Turquoise blue]]}}
+{{Colort/ColorShort|hex=E0FFFF|r=224|g=255|b=255|h=180|s=012|v=100|name=[[Cyan#Light cyan|Light cyan]]}}
+{{Colort/ColorShort|hex=FF00FF|r=255|g=000|b=255|h=300|s=100|v=100|name=[[Magenta]]}}

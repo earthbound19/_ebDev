@@ -1,0 +1,6 @@
+REM CALL addPaths.bat win7defaultPATHs.txt
+REM TIMEOUT /T 2
+REM CALL addPaths.bat EXTERNALPATHS.txt
+REM TIMEOUT /T 2
+REM CALL addPaths.bat BINPATHS.txt
+CALL addPaths.bat bOOR.txt
