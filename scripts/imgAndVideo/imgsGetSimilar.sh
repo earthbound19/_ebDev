@@ -1,3 +1,7 @@
+# USAGE
+# invoke this script with one parameter, being the file format in the current dir. to operate on, e.g.:
+# ./thisScript.sh png
+
 # template command, re: http://www.imagemagick.org/Usage/compare/
 # compare -metric MAE img_11.png img_3.png null: 2>&1
 
