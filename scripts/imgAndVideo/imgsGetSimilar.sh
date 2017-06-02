@@ -63,6 +63,8 @@ sed -i 's/.*Total: \([0-9]\{1,11\}\.[0-9]\{1,11\}\) .*| \([^|]*\) .*| \([^|]*\).
 sort -n -r --field-separator='|' -k 1n,1n -k 3n,3n ImagePairSimilarityRankings.txt > wut.txt
 rm ./ImagePairSimilarityRankings.txt && mv ./wut.txt ./ImagePairSimilarityRankings.txt
 # TO DO: make use of allIMGs.txt here for further filtering of that list to eliminate all subsequent duplicate appearances of a file name.
+# dev command that will delete all but first occurance of word 'pattern' from a line; re; https://unix.stackexchange.com/a/18324/110338 :
+# sed -e 's/pattern/_&/1' -e 's/\([^_]\)pattern//g' -e 's/_\(pattern\)/\1/' tstpattern.txt
 
 rm allIMGs.txt hFeJPeBYE6w3ur_col1.txt hFeJPeBYE6w3ur_col2.txt
 rm __vapTe8pw8uWT6PPT4fcYURKQcXgaDZYfEY__*
