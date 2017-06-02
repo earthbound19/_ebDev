@@ -18,7 +18,9 @@ sudo ln -s mac-dev-env/graphicsmagick-1.3.25 /usr/local/graphicsmagick
 echo 'export PATH=/usr/local/graphicsmagick/bin:$PATH' >> ~/.bash_profile
 source ~/.bash_profile
 echo ~=~=~=~=~=~=~ VERIFYING INSTALL ~=~=~=~=~=~=~
-echo ~=~=~=~=~=~=~ if the below shows no errors, you're good.
+echo ~=~=~=~=~=~=~ if the below shows no errors\, everything is good. ~=~=~=~=~=~=~
+
+
 gm version
 gm convert -list formats
 
