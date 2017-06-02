@@ -50,8 +50,19 @@ do
 	done
 done
 
+# Combine ~col1 and ~col2 files into one file (pasting as columns), after getting the line endings in col1 to match col2 :
 dos2unix hFeJPeBYE6w3ur_col1.txt
 paste -d '' hFeJPeBYE6w3ur_col1.txt hFeJPeBYE6w3ur_col2.txt > ImagePairSimilarityRankings.txt
+# Remove temp file name gobbeldy-gook padding:
+sed -i 's/__vapTe8pw8uWT6PPT4fcYURKQcXgaDZYfEY__//g' ImagePairSimilarityRankings.txt
+# Filter out information cruft; NOTE that if the first column isn't preceded by | then the later sort command won't work as intended:
+sed -i 's/.*Total: \([0-9]\{1,11\}\.[0-9]\{1,11\}\) .*| \([^|]*\) .*| \([^|]*\).*/| \1 | \2 | \3/g' ImagePairSimilarityRankings.txt
+# Sort results by rank of most similar pairs; an -r flag added after -n will reverse the result sorting:
+	# e.g.:
+	# sort --field-separator='|' -k 1n,1n -k 3n,3n -k 2n,2n ImagePairSimilarityRankings.txt > wut.txt
+sort -n -r --field-separator='|' -k 1n,1n -k 3n,3n ImagePairSimilarityRankings.txt > wut.txt
+rm ./ImagePairSimilarityRankings.txt && mv ./wut.txt ./ImagePairSimilarityRankings.txt
+# TO DO: make use of allIMGs.txt here for further filtering of that list to eliminate all subsequent duplicate appearances of a file name.
 
 rm allIMGs.txt hFeJPeBYE6w3ur_col1.txt hFeJPeBYE6w3ur_col2.txt
 rm __vapTe8pw8uWT6PPT4fcYURKQcXgaDZYfEY__*
