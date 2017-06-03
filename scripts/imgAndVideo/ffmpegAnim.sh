@@ -13,7 +13,6 @@
 
 # NOTE: You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).
 
-# TO DO: adjustable input file list "frame rate."
 # TO DO? : make it name the output file after the ../.. parent folder name?
 
 if [ ! -z ${5+x} ]
