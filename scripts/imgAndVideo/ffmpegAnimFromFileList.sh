@@ -25,7 +25,7 @@ fi
 # UTvideo codec option; comment out the x264 codec option if you uncomment this:
 # ffmpeg -y -f image2 -r $1 -i %0"$numDigitsOf_arraySize"d.$4 -r 29.97 -codec:v utvideo _out.avi
 
-# DEV render command that WORKS! :
+# re https://stackoverflow.com/questions/25073292/how-do-i-render-a-video-from-a-list-of-time-stamped-images --it works--! :
 ffmpeg -y -f concat -r $1 -i $4 -r $2 -crf $3 _out.mp4
 
 # | ffmpeg -y -r $1 -f image2pipe $rescaleParams -r $2 -crf $3 _out.mp4
