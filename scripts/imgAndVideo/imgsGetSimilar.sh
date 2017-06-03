@@ -81,5 +81,9 @@ done < allIMGs.txt
 
 # replace | with newlines to produce final frame list for e.g. ffmpeg to use:
 tr '|' '\n' < tmp_yyYM7wvUZdc3Qg.txt > IMGlistByMostSimilar.txt
+# --or, that's ready after one more tweak for file list format ffmpeg demands:
+sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
 
 rm allIMGs.txt hFeJPeBYE6w3ur_col1.txt hFeJPeBYE6w3ur_col2.txt tmp_yyYM7wvUZdc3Qg.txt tmp_fx49V6cdmuFp.txt tmp_WzzNtNBw2jYD9A.txt __vapTe8pw8uWT6PPT4fcYURKQcXgaDZYfEY__*
+
+# FINIS!
