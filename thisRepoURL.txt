@@ -1,1 +1,1 @@
-https://github.com/earthbound19/_devtools.git
+https://github.com/earthbound19/_ebdev.git
