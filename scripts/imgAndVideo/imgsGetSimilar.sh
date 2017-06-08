@@ -1,16 +1,17 @@
+# DESCRIPTION
+# Produces list of images arranged by most similar to nearest neighbor in list (roughly, with some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list). Resultant file list is suitable for use by ffmpeg as a frame list for animation. Potential uses: render abstract art collections in animation by sort of most similar groups. Quasi-un-randomize randomly color-filled (or palette random filled) renders from e.g. colored svg images. Jumble up movie frames from a film scene excerpt in a perhaps wrong but similar frame order. etc.
+
 # USAGE
 # Invoke this script with one parameter, being the file format in the current dir. to operate on, e.g.:
 # ./thisScript.sh png
 
-# Template graphicsmagick command, re: http://www.imagemagick.org/Usage/compare/
-# compare -metric MAE img_11.png img_3.png null: 2>&1
+# DEPENDENCIES
+# Graphicsmagick, image files in a directory to work on, and bash / GNU utilities
 
-# List all possible pairs of file type $1, order is not important, repetition is not allowed ($1 pick 2).
 
+# CODE
 # Delete any wonky file names from prior or interrupted run:
 rm __vapTe8pw8uWT6PPT4fcYURKQcXgaDZYfEY__*
-# DEV ONLY:
-rm *.txt
 
 find *.$1 > allIMGs.txt
 
@@ -32,6 +33,7 @@ i_count=0
 j_count=0
 printf "" > hFeJPeBYE6w3ur_col1.txt
 printf "" > hFeJPeBYE6w3ur_col2.txt
+# List all possible pairs of file type $1, order is not important, repetition is not allowed ($1 pick 2).
 for i in "${allIMGs[@]}"
 do
 	i_count=$(( i_count + 1 ))
@@ -41,6 +43,8 @@ do
 			# echo size of arr for inner loop is ${#allIMGs_innerLoop[@]}
 	for j in "${allIMGs_innerLoop[@]}"
 	do
+# Template graphicsmagick compare command, re: http://www.imagemagick.org/Usage/compare/
+# compare -metric MAE img_11.png img_3.png null: 2>&1
 		echo "comparing images: $i | $j . . . VIA COMMAND: gm compare -metric MAE $i $j null: 2>&1 | grep 'Total'"
 		metricPrint=`gm compare -metric MAE $i $j null: 2>&1 | grep 'Total'`
 		# ODD ERRORS arise from mixed line-ending types, where gm returns windows-style, and printf commands produce unix-style. Solution: write to separate column files, convert all gm-created files to unix via dos2unix, then paste them into one file.
@@ -67,7 +71,6 @@ tr '\n' '|' < tmp_fx49V6cdmuFp.txt > tmp_yyYM7wvUZdc3Qg.txt
 	# ALSO NOTE that the & is a reference to the matched pattern, meaning the matched pattern will be substituted for & in the output.
 # Scan through all image file names (which appear in our most previous temp file), repeating this step (the step being: delete all but the first occurance of the file name) for each file name. We will be left with one instance of each file name, in an order which (hopefully) has as many most similar image files near each other in the sequence:
 	# NOTE that we are only using allIMGs.txt for this loop as a count of how many times to perform this operation.
-
 count=0
 while read x
 do
@@ -86,4 +89,4 @@ sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
 
 rm allIMGs.txt hFeJPeBYE6w3ur_col1.txt hFeJPeBYE6w3ur_col2.txt tmp_yyYM7wvUZdc3Qg.txt tmp_fx49V6cdmuFp.txt tmp_WzzNtNBw2jYD9A.txt __vapTe8pw8uWT6PPT4fcYURKQcXgaDZYfEY__*
 
-# FINIS!
+echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with ffmpegAnimFromFileList.sh (see comments of that script) to produce 
