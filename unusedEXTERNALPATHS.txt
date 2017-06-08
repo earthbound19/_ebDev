@@ -1,6 +1,0 @@
-C:\cygwin\bin
-C:\jython2.7.0\bin
-C:\Program Files (x86)\PixVue Shell EXIF data manipulator\bin
-C:\Program Files\TortoiseGit\bin
-C:\ProgramData\Oracle\Java\javapath
-C:\Python31

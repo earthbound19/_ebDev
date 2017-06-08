@@ -1,5 +1,0 @@
-REM The below doesn't get added in this setup; and escaping the percent signs as %% doesn't fix it. Cause unknown. These add fine if you manually enter them via the command prompt, but the variables get expanded.
-%SystemRoot%
-%SystemRoot%\system32
-%SystemRoot%\System32\Wbem
-%SYSTEMROOT%\System32\WindowsPowerShell\v1.0
