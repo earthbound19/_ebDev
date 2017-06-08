@@ -2,8 +2,10 @@ _in_development
 scripts
 scripts\fileNamesAndTimestamps
 scripts\font
+scripts\iconConverter
 scripts\imgAndVideo
 scripts\imgAndVideo\EXIFdataBatch
+scripts\imgAndVideo\EXIFdataBatch\metaDataTemplates
 scripts\imgAndVideo\fractalFlame
 scripts\imgAndVideo\imgGetSimilar
 scripts\imgGetSimilar
