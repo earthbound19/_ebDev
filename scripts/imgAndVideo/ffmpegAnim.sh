@@ -9,7 +9,7 @@
 # $2 desired output framerate
 # $3 desired constant quality (crf)
 # $4 the file extension of the input images.
-# Optional: $5 rescale target resolution expressed as nnnnXnnnn. Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution.
+# Optional: $5 rescale target resolution expressed as N[NN..]xN[NN..], for example 200x112. Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution.
 
 # NOTE: You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).
 

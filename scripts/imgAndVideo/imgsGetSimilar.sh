@@ -89,4 +89,4 @@ sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
 
 rm allIMGs.txt hFeJPeBYE6w3ur_col1.txt hFeJPeBYE6w3ur_col2.txt tmp_yyYM7wvUZdc3Qg.txt tmp_fx49V6cdmuFp.txt tmp_WzzNtNBw2jYD9A.txt __vapTe8pw8uWT6PPT4fcYURKQcXgaDZYfEY__*
 
-echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with ffmpegAnimFromFileList.sh (see comments of that script) to produce 
+echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with ffmpegAnimFromFileList.sh \(see comments of that script\) to produce an animation of these images arranged by most similar to nearest neighbor in list \(roughly\, with some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list\)\.

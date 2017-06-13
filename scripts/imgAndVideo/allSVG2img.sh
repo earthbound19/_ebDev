@@ -41,4 +41,4 @@ do
 	fi
 done < all_svgs.txt
 
-rm temp.txt all_svgs.txt
+rm all_svgs.txt
