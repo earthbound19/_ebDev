@@ -35,7 +35,7 @@ else
 	echo !--------------------------------------------------------!
 	echo file ~/palettesRootDir.txt \(in your root user path\) not found. This file should exist and have one line, being the path of your palette text files e.g.:
 	echo
-	echo /cygdrive/c/_devtools/scripts/imgAndVideo/palettes
+	echo /cygdrive/c/_ebdev/scripts/imgAndVideo/palettes
 	echo
 	echo ABORTING script.
 	echo !--------------------------------------------------------!

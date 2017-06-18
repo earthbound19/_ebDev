@@ -19,7 +19,7 @@
 	# 	wget -O shortened_URL.txt "http://s.earthbound.io/api/v2/action/shorten?key=3108e9a45e9f6edcf9eeaa1ca9712d&url=https://google.com&is_secret=false&response_type=plain_text"
 #	NOTE that when logged in, it won't show the new link unless you reload the page.
 
-# GLOBAL API key for Polr URL shortener; stored in a private file outside repository ;) and here imported therefrom (will only work per local install of _devTools)
+# GLOBAL API key for Polr URL shortener; stored in a private file outside repository ;) and here imported therefrom (will only work per local install of _ebdev)
 PolrAPIkey=$( < ~/PolrAPIkey.txt)
 		# echo PolrAPIkey value is\: $PolrAPIkey
 
@@ -47,7 +47,7 @@ do
 	# re: https://gimi.name/snippets/urlencode-and-urldecode-for-bash-scripting-using-sed/ :
 			# OR? : https://gist.github.com/cdown/1163649 :
 	oy="http://earthbound.io/q/search.php?search=1&query=$imageTitleForURLencode"
-	oy=`echo "$oy" | sed -f /cygdrive/c/_devtools/scripts/urlencode.sed`
+	oy=`echo "$oy" | sed -f /cygdrive/c/_ebdev/scripts/urlencode.sed`
 	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=""$PolrAPIkey""&is_secret=false&response_type=plain_text&url=$oy"
 	wget -O oy.txt $wgetArg
 			# Insert that with a search query URL into the description tag; roundabout means via invoking script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:

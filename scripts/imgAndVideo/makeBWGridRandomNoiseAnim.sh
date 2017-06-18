@@ -2,7 +2,7 @@
 # Generates a series of images of black and white boxes (noise scaled up with hard edges preserved), the sum of all black and white boxes in all images being just over the number of bits in a megabyte, then strings them together into a video representative of about 1 megabyte (in bits). Accomplishes this by first generating so many .pbm format (plain-text) images, then converting them (and animating them).
 
 # DEPENDENCIES
-# Requires a 'nix/Cygwin environment installed and in the $PATH; also ffmpeg, and renumberFiles.sh and mkNumberedLinks.sh from: https://github.com/earthbound19/_devtools
+# Requires a 'nix/Cygwin environment installed and in the $PATH; also ffmpeg, and renumberFiles.sh and mkNumberedLinks.sh from: https://github.com/earthbound19/_ebdev
 
 # USAGE
 # Run this script with these parameters:

@@ -22,12 +22,12 @@ rm *.temp temp.txt
 
 # GLOBAL VARIABLES
 
-# SEE README.md in https://github.com/earthbound19/_devtools.git :
-if [ -e $HOME/_devToolsPath.txt ]; then devToolsPath=`< $HOME/_devToolsPath.txt`; fi
+# SEE README.md in https://github.com/earthbound19/_ebdev.git :
+if [ -e $HOME/_ebdevPath.txt ]; then devToolsPath=`< $HOME/_ebdevPath.txt`; fi
 devToolsPath=`cygpath -u "\$devToolsPath"`
 		# echo devToolsPath val is\:
 		# echo $devToolsPath
-# the path in _devTools where all hex color scheme text files are stored:
+# the path in _ebdev where all hex color scheme text files are stored:
 hexColorSchemesRootSubPath="/scripts/imgAndVideo/ColorSchemesHex"
 hexColorListsRootPath="$devToolsPath""$hexColorSchemesRootSubPath"
 minColorColumnRepeat=$1
