@@ -9,12 +9,6 @@
 # $4 number of tiles down of tiles-assembled image (rows)
 # $5 Any value--if set, it will randomly shuffle the hex color files before compositing them to one image
 
-# NOTES
-# This produces individual color tiles in a subfolder and runs slower. colorsGridFromHexScheme.sh (note no -gm.sh in that file name) runs much faster but doesn't produce the subfolder of color tiles.
-
-# TO DO: rename this for clarity that it is intended to render limited number of color palette images; also update any scripts that use it.
-
-
 # NOTE
 # doc. wut following block is:
 if [ -e ~/palettesRootDir.txt ]
