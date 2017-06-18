@@ -6,7 +6,7 @@
 # $2 Optional: how many such color schemes to generate. If not provided, two will be made.
 
 # NOTE: at this writing, this script must be executed from the /scripts/imgAndVideo folder.
-# TO DO? : Make an unsynced local folder with the absolute path to _devtools root, and reference that? Could be for many scripts, not just this.
+# TO DO? : Make an unsynced local folder with the absolute path to _ebdev root, and reference that? Could be for many scripts, not just this.
 
 colorsPerScheme=12		# This may be overruled by a numeric parameter $1.
 rndFileNameLen=34

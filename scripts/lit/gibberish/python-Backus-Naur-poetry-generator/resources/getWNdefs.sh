@@ -1,4 +1,4 @@
-mapfile -t wordList < /cygdrive/c/_devtools/scripts/lit/gibberish/python-Backus-Naur-poetry-generator/resources/ACT_study_words.txt
+mapfile -t wordList < /cygdrive/c/_ebdev/scripts/lit/gibberish/python-Backus-Naur-poetry-generator/resources/ACT_study_words.txt
 
 for word in "${wordList[@]}"
 do
