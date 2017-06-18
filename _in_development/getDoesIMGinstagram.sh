@@ -1,6 +1,8 @@
 # DESCRIPTION
 # Retrieves the aspect of an image as a decimal and informs you (to do: and does stuff based on) whether the image falls within Instagram's allowed aspects of 0.8:1 to 1.9:1 (WxH) for uploads.
 
+# NOTE
+# Image aspects and dimensions allowed by Instagram: 0.8:1 through 1.9:1 and it may upload images larger than 1080px on a side but it will always shrink them to that if not to 600 px on a side. re: https://help.instagram.com/1631821640426723 -- and other URLs in comments in this script.
 # USAGE
 	# Invoke with one parameter, being the image file name to check for Instagram aspect restraints fit (for upload), e.g.:
 # thisScript.sh ./_EXPORTED_M_variantWork_00099_FFsideToside_v02_PZ-8280x.jpg
