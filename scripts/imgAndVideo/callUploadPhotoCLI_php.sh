@@ -11,8 +11,8 @@
 
 currentDir=`pwd`
 currentDir=`cygpath -w "$currentDir"`
-FullIMGpath="$currentDir""$2"
-echo $FullIMGpath
+FullIMGpath="$currentDir"\\"$2"
+		# echo $FullIMGpath
 
 tmp=`which UploadPhotoCLI.php`
 instagramAPIrepoPath=`dirname "$tmp"`
@@ -21,17 +21,16 @@ then
 	foundAPIpath=1
 else
 	foundAPIpath=0
+	echo Could not locate UploadPhotoCLI.php. Aborting script.
+	exit
 fi
 		# echo path found is\:
 		# echo $instagramAPIrepoPath
 
+caption=$3
 		# echo caption is\:
-		# echo $3
-
-# nope, doesn't work:
-# caption=`echo "$3" | sed -f /cygdrive/c/_ebdev/scripts/urlencode.sed`
-# TEMPORARY KLUDGE:
-caption=
+		echo $caption
+# exit
 
 # Only call uploadImageToInstagram.php if the file ~/instagramPassword.txt exists AND $foundAPIpath has a value of 1:
 if [ -e ~/instagramPassword.txt ] && [ $foundAPIpath == 1 ]
@@ -43,14 +42,16 @@ then
 	pushd .
 			echo moving to another dir . . .
 	cd $instagramAPIrepoPath
-			echo invoking command\:
-	echo php UploadPhotoCLI.php $1 $pw $FullIMGpath $caption
-	php UploadPhotoCLI.php $1 $pw $FullIMGpath $caption
-# TO DO: fix whatever isn't allowing the full phrase for $3 to transmit for the caption; it seems that whatever I do (no quote marks, single quote marks, double-quote marks), it chops off the words after any space. This script even URL-encodes; that doesn't work either :(
+			echo Writing command to batch and invoking batch:
+			echo php UploadPhotoCLI.php $1 $pw $FullIMGpath \"$caption\"
+	# This is ridiculous, but the only thing I've found that works: export the command to a stinking .bat file and call that .bat file.
+	echo php UploadPhotoCLI.php $1 $pw $FullIMGpath \"$caption\" > tmp_dZv7S9WXXheh298ApQFmtyWnB6ya877vZw.bat
+	chmod 777 ./tmp_dZv7S9WXXheh298ApQFmtyWnB6ya877vZw.bat
+	tmp_dZv7S9WXXheh298ApQFmtyWnB6ya877vZw.bat
+	rm ./tmp_dZv7S9WXXheh298ApQFmtyWnB6ya877vZw.bat
 			echo returning to saved dir . . .
 	popd
 fi
-
 
 
 
