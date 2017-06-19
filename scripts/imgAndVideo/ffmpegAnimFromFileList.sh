@@ -13,7 +13,9 @@
 
 # NOTE: You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).
 
-# TO DO? : make it name the output file after the ../.. parent folder name?
+# TO DO
+# ? make it name the output file after the ../.. parent folder name?
+# Adapt the script from which this is derived to handle parameter $4 here (and then scrap this script)?
 
 if [ ! -z ${5+x} ]
 then
