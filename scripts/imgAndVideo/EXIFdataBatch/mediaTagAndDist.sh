@@ -49,7 +49,10 @@ do
 	oy="http://earthbound.io/q/search.php?search=1&query=$imageTitleForURLencode"
 	oy=`echo "$oy" | sed -f /cygdrive/c/_ebdev/scripts/urlencode.sed`
 	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=""$PolrAPIkey""&is_secret=false&response_type=plain_text&url=$oy"
-	wget -O oy.txt $wgetArg
+echo command to run will be:
+			# DEPRECATED as it stopped working and I'm not figuring out why, when a working alternative is available:
+			# echo wget -O oy.txt $wgetArg
+	curl "$wgetArg" > oy.txt
 			# Insert that with a search query URL into the description tag; roundabout means via invoking script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:
 	# parse that result and store it in a variable $descriptionAddendum:
 	sed -i 's/\//\\\//g' oy.txt
