@@ -1,6 +1,5 @@
 # DESCRIPTION
-# Invokes a script that corrupts files of a certain type (determined by paramater--with the script determining on its own the extent of corruption), repeatedly, choosing N random files of such type, and copying N corrupt file variations for each selection. Written specifically for the purpose of deliberately making glitch art out of e.g. .jpg files, but it may produce "good" results for a variety of file formats.
-# OR, with some code change, invokes BM.exe (Byte Molester, a free tool) for all files of a given extension in the directory from which this script is invoked, producing N glitched e.g. image file variants of all such file types, output to a /_glitched folder.
+# Invokes a script that corrupts all files of a given extension in the directory from which this script is invoked, producing N glitched e.g. image file variants of all such file types, output to a /_glitched folder. See USAGE for options. Written specifically for the purpose of deliberately making glitch art out of e.g. .jpg files, but it may produce "good" results for a variety of file formats. OR, with some code change, invokes BM.exe (Byte Molester, a free tool).
 
 # USAGE
 # Pass this script four parameters, being:
@@ -44,7 +43,7 @@ do
 		cd _glitched
 		for x in $( seq $3 )
 			do
-			corruptThisFile.sh ${allFilesOfExtension[$whichFileNum]} $4
+			glitchThisFile.sh ${allFilesOfExtension[$whichFileNum]} $4
 			done
 		rm "${allFilesOfExtension[$whichFileNum]}"
 		cd ..
