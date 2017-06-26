@@ -17,11 +17,11 @@ if [ -z ${1+x} ]; then img_size=4120; else img_size=$1; fi
 # If no image format parameter, set default image format of jpg.
 if [ -z ${2+x} ]; then img_format=jpg; else img_format=$2; fi
 # If no third parameter, make background transparent.
-# if [ -z ${3+x} ]; then param3="-background none"; fi
+if [ -z ${3+x} ]; then param3="-background none"; fi
 # if [ -z ${3+x} ]; then param3="-background white"; fi
 # if [ -z ${3+x} ]; then param3="-background black"; fi
-# if [ -z ${3+x} ]; then param3="-background #584560"; fi
-if [ -z ${3+x} ]; then param3="-background #3b383c"; fi
+# if [ -z ${3+x} ]; then param3="-background #584560"; fi		# Darkish plum?
+# if [ -z ${3+x} ]; then param3="-background #3b383c"; fi		# Medium-dark purplish-gray
 # potentially good black line color change options: #2fd5fe #bde4e4
 # NOTE: you may tweak that line to say "-background gray" to replace a transparent background with gray (if you leave off the third parameter when calling this script. Or instead of gray, any hex color code e.g. #555555. Otherwise, revert it to the default "-background none" to leave transparency in the resultant image.)
 
