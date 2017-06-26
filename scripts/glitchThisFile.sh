@@ -18,6 +18,8 @@ skipHeaderBytes=1
 fileToMakeCorruptedCopyOf=$1
 percentToCorrupt=$2
 
+echo making corrupt copy of $fileToMakeCorruptedCopyOf and corrupting by $percentToCorrupt percent . . .
+
 # Retrieve extension of source file; thanks re http://stackoverflow.com/a/1665574 :
 fileExt=`echo $fileToMakeCorruptedCopyOf | sed -n 's/.*\.\(.\{1,5\}\).*/\1/p'`
 
