@@ -27,7 +27,7 @@ do
 				echo generating corrupt file copy number $corrupt_file_copy for $element . . .
 		glitchThisFile.sh "$element" $3
 		done
-	rm "${allFilesOfExtension[$whichFileNum]}"
+	rm "$element"
 	cd ..
 			# another option, which would be done without a loop; use bm.exe, to be found in this repository: https://github.com/earthbound19/_ebdev
 			# bm.exe "$element" bm.exe $1 -x jpg -u 100 -r 12 -t 1 -s 9 -a 5 -v -m +-
