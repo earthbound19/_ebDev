@@ -17,6 +17,9 @@
 # Generate one hundred and seventy 16x9 pixel files of colors picked randomly from the color hex code list file rainbowHexColorsByMyEye.txt:
 # thisScript.sh 16 9 170 rainbowHexColorsByMyEye.txt
 
+# DEBUGGING:
+# with params up to how many to make (3) isn't working correctly; hangs.
+# with params up to only hex list isn't working; it's drawing colors randomly from list, but uses all 8 slots.
 
 # TO DO: get this using the root hex colors list dir location that summat other script then there used.
 # TO DO: as much of this script as possible in-memory instead of on disk, to speed it up dramatically.
@@ -30,7 +33,7 @@ numRows=$2
 howManyImages=$3
 
 # if $6 was passed to script, "randomly" shuffle the elements of the source file into a temp file, and generate the array from that. If no $6, just copy the file (without shuffling it) into a temp file, create the array from the temp file, and destroy the temp file.
-if [ ! -z ${6+x} ]
+if [ -z ${6+x} ]
 then
 	shuf $4 > tmp_feoijwefjojeoo.txt
 else
@@ -40,6 +43,7 @@ fi
 # TO DO: wut? CONTINUE DEVELOPING HERE? :
 # sed -i 
 
+# is that ! properly used? it wasn't for $6 above, which I fixed:
 if [ ! -z ${4+x} ]
 then
 	mapfile -t hexColorsArray < tmp_feoijwefjojeoo.txt
