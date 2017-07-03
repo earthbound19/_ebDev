@@ -1,4 +1,4 @@
-IN PROGRESS.
+# IN PROGRESS.
 
 # DESCRIPTION: converts all images of one type in a directory tree to another.
 
@@ -12,12 +12,16 @@ IN PROGRESS.
 img_format_1=$1
 img_format_2=$2
 
-
-find . -iname \*.$1 > all_"$1".txt
-mapfile -t all_imgs.txt < all_"$1".txt
-for element in "${all_imgs[@]}"
+find . -iname \*.$img_format_1 > all_"$img_format_1".txt
+while read element
 do
-	# ? magick $param3 -size $1x$1 $element $svgFilenameNoExtension.$img_format
-done
+	fileNameNoExtension=`basename $element .$img_format_1`
+			# REFERENCE for script hacking for custom runs: the [-scale n] switch will resize the image maintaining aspect with the longest side at n pixels.
+	# what parameter was I after here? : -size $1x$1
+	command="gm convert $element $fileNameNoExtension.$img_format_2 -scale 640"
+	echo running command\: $command
+	echo . . .
+	$command
+done < all_"$img_format_1".txt
 
-rm all_imgs.txt all_svgs.txt
+rm all_imgs.txt

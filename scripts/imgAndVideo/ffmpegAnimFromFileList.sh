@@ -28,6 +28,7 @@ fi
 # ffmpeg -y -f image2 -r $1 -i %0"$numDigitsOf_arraySize"d.$4 -r 29.97 -codec:v utvideo _out.avi
 
 # re https://stackoverflow.com/questions/25073292/how-do-i-render-a-video-from-a-list-of-time-stamped-images --it works--! :
+# TO DO: script adapting the frame list to make numbered symlinks in a subdir, because ffmpeg often drops frames using the concat method (or, in other words, deprecate concat)
 ffmpeg -y -f concat -r $1 -i $4 -r $2 -crf $3 _out.mp4
 
 # | ffmpeg -y -r $1 -f image2pipe $rescaleParams -r $2 -crf $3 _out.mp4
