@@ -16,14 +16,14 @@ I believe that everything not created by me in this archive is at least freely a
 From a cygwin (or adapt for another 'nixy environment on Windows, or for similar utilities on a Mac) run the following commands. For my preferences on Windows, right from your windows drive root via the Cygwin terminal:
 
 apt-cyg install p7zip
-wget http://earthbound.io/dist/eb_super_bin/_ebSuperBin.7z
+wget http://earthbound.io/dist/_ebSuperBin.7z
 p7zip -d ./_ebSuperBin.7z
 
 --which will extract that in a folder (per the archive) ./_ebSuperBin
 
 OR instead of wget use curl:
 apt-cyg install curl
-curl http://earthbound.io/dist/eb_super_bin/_ebSuperBin.7z
+curl http://earthbound.io/dist/_ebSuperBin.7z
 
 Clone ane make use of _setBinBaths.bat from https://github.com/earthbound19/_ebPathMan, which will permanently modify your path to include all relevant paths in this archive. OR examine and use getDevEnv.sh per the comments therein.
 
