@@ -10,7 +10,7 @@ mapfile -t all_wut < all_wut.txt
 for element in "${all_wut[@]}"
 do
 	echo executing command\: AdobeDNGConverter.exe -c -p1 -fl $element . . .
-	AdobeDNGConverter.exe -c -p1 -fl $element
+	AdobeDNGConverter.exe -c -fl $element
 done
 
 rm all_wut.txt all_wut.txt
