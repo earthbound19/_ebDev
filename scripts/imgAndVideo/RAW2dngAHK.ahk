@@ -16,7 +16,7 @@ fileExistsCount = 0
 	IfNotExist, %nameNoExt%.dng
 		{
 ; TO DO: change that path to %programfiles%\~ or summat:
-		RunWait, AdobeDNGConverter.exe -c -p1 -fl %name%,, Max
+		RunWait, AdobeDNGConverter.exe -c -fl %name%,, Max
 		}
 		else
 		{
