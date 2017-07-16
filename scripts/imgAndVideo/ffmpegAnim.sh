@@ -9,7 +9,7 @@
 # $2 desired output framerate
 # $3 desired constant quality (crf)
 # $4 the file extension of the input images.
-# Optional: $5 rescale target resolution expressed as N[NN..]xN[NN..], for example 200x112. Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution.
+# Optional: $5 rescale target resolution expressed as N[NN..]xN[NN..], for example 200x112; OR to scale to one target dimension and calculate the other automatically (to maintain aspect), give e.g. 1280:-1 (to produce an image that is 1280 pix wide by whatever the other dimension should be). Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution.
 
 # NOTE: You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).
 
@@ -31,6 +31,7 @@ rm allFiles.txt
 # UTvideo codec option; comment out the x264 codec option if you uncomment this:
 # ffmpeg -y -f image2 -r $1 -i %0"$numDigitsOf_arraySize"d.$4 -r 29.97 -codec:v utvideo _out.avi
 
+echo executing ffmpeg command . . .
 # x264 codec option; comment out the UTvideo option if you uncomment this:
 ffmpeg -y -f image2 -r $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -r $2 -crf $3 _out.mp4
 
