@@ -10,6 +10,7 @@
 # $3 desired constant quality (crf)
 # $4 the file extension of the input images.
 # Optional: $5 rescale target resolution expressed as N[NN..]xN[NN..], for example 200x112; OR to scale to one target dimension and calculate the other automatically (to maintain aspect), give e.g. 1280:-1 (to produce an image that is 1280 pix wide by whatever the other dimension should be). Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution.
+# TO DO; Optional: padding re https://superuser.com/a/690211
 
 # NOTE: You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).
 
@@ -21,6 +22,19 @@ then
 		# echo rescaleParams val is\:
 		# echo $rescaleParams
 fi
+
+# IN DEVELOPMENT: automatic centering of image in blacke matte borders (padding):
+# steps:
+# - get matte WxH intended
+# - get src images to anim WxH
+# - div. matte W / 2 for center X pixmark
+# - div. src image W / 2 for offset from matte center X pixmark
+# - subtr. offset from center X pixmark for X pixmark to place src images at.
+# - Follow same process on Y to get Y offset pixmark and place src images there.
+# - formulate ur paramater to pass to ffmpeg from that; in form:
+# padParams=-vf "pad=width=1920:height=1080:x=0:y=0:color=black"
+# ex commands to fetch and parse src pix dimensions is in getDoesIMGinstagram.sh.
+# an example command wut does some math as would be needer per this algo: echo "scale=5; 3298 / 1296" | bc
 
 # horked from renumberFiles.sh:
 find *.$4 > allFiles.txt
