@@ -4,7 +4,9 @@
 # USAGE
 # Invoke with one parameter $1, being a .bmp bitmap (or other supported format?) to trace. Result will be found as $1_centerline.svg
 
-autotrace --centerline --despeckle-level=4 --remove-adjacent-corners --output-file="$1"_centerline.svg --output-format=svg $1
+# autotrace --centerline --despeckle-level=4 --remove-adjacent-corners --output-file="$1"_centerline.svg --output-format=svg $1
+# OR:
+autotrace --centerline --output-file="$1"_centerline.svg --output-format=svg $1
 # The resultant .svg file doesn't display in modern browsers unless I resave it via inkscape, with this command:
 inkscape -f "$1"_centerline.svg -l "$1"_centerline.svg
 

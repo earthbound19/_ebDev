@@ -3,6 +3,7 @@
 # USAGE: call this script from a directory tree full of .png images.
 
 # TO DO: upgrade listing to all possible image types.
+# TO DO: make a private fork of Fred's scripts that use graphicsmagick, since I've migrated to that for all of my scripts? Keep a legacy imagemagick install? :/
 
 find . -iname \*.png > crop_imgs.txt
 
