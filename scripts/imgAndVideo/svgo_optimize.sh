@@ -14,6 +14,9 @@
 # REQUIRES one parameter $1, being the name of the svg file for which you want an ~_opt.svg file produced in the same directory; e.g.:
 # thisScript.sh inputFile.svg
 
+# NOTES
+# At this writing, misbehaving when invoked via cygwin. If I copy and paste the printed command to a cmd prompt, it works ok . . . except the result displays wonky in Internet Explorer and inkscape. :()
+
 
 # ==== GLOBALS
 fileNameNoExt=`echo $1 | sed 's/\(.*\)\.svg/\1/g'`
