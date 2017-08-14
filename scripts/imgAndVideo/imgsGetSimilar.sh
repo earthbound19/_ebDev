@@ -4,16 +4,27 @@
 # USAGE
 # Invoke this script with one parameter, being the file format in the current dir. to operate on, e.g.:
 # ./thisScript.sh png
+# OPTIONAL: omit variable 1 to compare all files in current dir; will throw errors if some files are not images or valid images.
 
 # DEPENDENCIES
 # Graphicsmagick, image files in a directory to work on, and bash / GNU utilities
 
+# change search regex depending on presence or absense of parameter $1:
+if [ -z ${1+x} ]
+then
+	searchRegex='.*'
+else
+	searchRegex=".$1"
+fi
 
 # CODE
 # Delete any wonky file names from prior or interrupted run:
 rm __vapTe8pw8uWT6PPT4fcYURKQcXgaDZYfEY__*
 
-find *.$1 > allIMGs.txt
+# find . -type f -iregex $searchRegex
+find ./* -type f -iregex '.*'
+# find $searchRegex > allIMGs.txt
+exit
 
 # Create heavily shrunken image copies to run comparison on.
 echo Generating severely shrunken image copies to run comparisons with . . .
