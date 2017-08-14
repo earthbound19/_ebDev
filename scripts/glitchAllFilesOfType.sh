@@ -10,16 +10,20 @@
 # The following command, for example, will make 10 corrupted copies of every jpg in the current path, corrupting each copy by 2 percent:
 # thisScript.sh jpg 10 2
 
-find *$1 > _alles.txt
+find . -iname \*.jpg > _alles.txt
+# I WASTED A CURSEDLY LARGE PORTION OF MY BREATH AND TOIL before figuring out I need to do the following:
+dos2unix _alles.txt
+# strip off ./ at start as it messes up later glitchThisFile.sh call:
+sed -i 's/\.\/\(.*\)/\1/g' _alles.txt
+
 if [ ! -d _glitched ]; then mkdir _glitched; fi
 
 while read element
 do
-	# copy the file to /_glitched and corrupt the copy.
 			echo corrupting file $element . . .
-	cp "$element" _glitched/
+	cp "$element" ./_glitched/
 	# Corrupt the file $2 times.
-	cd _glitched
+	cd ./_glitched
 			corrupt_file_copy=0
 	for x in $( seq $2 )
 		do
@@ -35,4 +39,4 @@ done < _alles.txt
 rm ./_alles.txt
 
 # because my windows Cygwin install can be a buggy moron about permissions:
-chmod 777 ./_glitched/*
+# chmod 777 ./_glitched/*

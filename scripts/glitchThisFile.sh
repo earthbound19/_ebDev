@@ -19,23 +19,19 @@ fileToMakeCorruptedCopyOf=$1
 percentToCorrupt=$2
 
 echo making corrupt copy of $fileToMakeCorruptedCopyOf and corrupting by $percentToCorrupt percent . . .
-
 # Retrieve extension of source file; thanks re http://stackoverflow.com/a/1665574 :
 fileExt=`echo $fileToMakeCorruptedCopyOf | sed -n 's/.*\.\(.\{1,5\}\).*/\1/p'`
-
 __ln=( $( ls -Lon "$fileToMakeCorruptedCopyOf" ) )
 __size=${__ln[3]}
 		echo file size in bytes is $__size.
 __size_minus_header=$((__size - $skipHeaderBytes))
 		echo file size minus header, in bytes, is $__size_minus_header.
-
 		echo command one\: dd count=$skipHeaderBytes if=$fileToMakeCorruptedCopyOf of=header.dat
 dd count=$skipHeaderBytes if=$fileToMakeCorruptedCopyOf of=header.dat
 		echo command two\: dd skip=$skipHeaderBytes if=$fileToMakeCorruptedCopyOf of=imgData.dat
 dd skip=$skipHeaderBytes if=$fileToMakeCorruptedCopyOf of=imgData.dat
 
 # while there's still data left to corrupt, keep rolling a virtual die until you roll an N, then corrupt a random number of bytes left; this is all done as dd copies that will be concatenated later: 
-
 __ln=( $( ls -Lon "imgData.dat" ) )
 __size=${__ln[3]}
 		echo file size of imgData.dat in bytes is $__size
@@ -51,7 +47,8 @@ __size=${__ln[3]}
 			# To find what percent of N = y, divide N by 100, then mutliply by y:
 
 # ALTERNATE OPTIONS HERE; comment out the one you don't want:
-corruptionPasses=$(($__size / 100000 * $percentToCorrupt))
+# corruptionPasses=$(($__size / 100000 * $percentToCorrupt))
+corruptionPasses=$(($__size / 75000 * $percentToCorrupt))
 # corruptionPasses=$(($__size / 10000 * $percentToCorrupt))
 # corruptionPasses=$(($__size / 1000 * $percentToCorrupt))
 # corruptionPasses=$(($__size / 100 * $percentToCorrupt))
@@ -63,10 +60,10 @@ do
 	echo Corruption write pass $i of $corruptionPasses underway . . .
 	seekToByte=`shuf -i 1-"$__size" -n 1`
 # TO DO: prefetch n random bytes earlier, and get new ones sequentially from that in memory.
-# TO DO: Add random (relatively rare, or paramaterized?) deletion of copied chunks before concatination; e.g.: at a 5 on 5-sided die roll, split imgData.dat into two files, delete some random bytes (in a range) from the second file, and concatenate them--thus *deleting* bytes from the data instead of corrupting the bytes, sometimes.
+# TO DO: Add random (relatively rare, or paramaterized?) deletion of copied chunks before concatination; e.g.: at a 5 on 5-sided die roll, split imgData.dat into two files, delete some random bytes (in a range) from the second file, and concatenate them--thus sometimes *deleting* bytes from the data instead of corrupting the bytes.
 	dd conv=notrunc bs=1 count=1 seek=$seekToByte if=/dev/urandom of=./imgData.dat
 done
 
 timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
-cat header.dat imgData.dat > __corrupted_"$percentToCorrupt"pct_"$timestamp"__$fileToMakeCorruptedCopyOf
+cat ./header.dat ./imgData.dat > "__corrupted_""$percentToCorrupt""pct_""$timestamp""__""$fileToMakeCorruptedCopyOf"
 rm header.dat imgData.dat
