@@ -1,0 +1,67 @@
+# DESCRIPTION
+# Produce psuedo-random data which for all anyone knows could be called true random data if you begin with pure random entropy files like jpeg photograps. Reference: https://crypto.stackexchange.com/a/43121 WARNING: do this only on a copy of data or on expendable data--it will destroy all original data in the folder from which it was run! It moves generated PRND data into the ../_final_TRND_archive folder
+
+# USAGE
+# Invoke with one optional parameter, being the block size to split the concatenated data into before hashing, e.g.:
+# thisScript.sh 780
+# -- if the optional parameter is not chosen it will pseudo-randomly choose a split block size between 464 and 1247.
+
+# DEPENDENCIES
+# xxd. On Cygwin install it via `apt-cyg install hxd`
+
+# PROCESS
+# This script: creates a .dat file by 1a-4) concatenating all data in a directory into one file, moving that new file out of the way, deleting all files in the directory, moving the concatenated file back, and 2) cutting the file (binary split) into files of a size of bytes psuedo-randomly chosen between 242-512 bytes, extracting noise from all of them via non-cryptographic hashing (and collating the hashes into one hex string and interpreting that as binary values written to a new random data file (.dat). It then moves the new random data file into an archive folder and concatenating all the split files into one file which may be "recycled" with this same "chaos machine" process. 
+
+
+# TO DO: adapt this to a TRND script which doesn't invoke any chaos machine process on files.
+
+if [ -z ${1+x} ]
+	then
+		echo No split block size passed to script. Picking one at random \(for super-concatenated superBlock.dat to be made\) . . .
+		blockSplitSize=`shuf -i 242-512 -n 1`
+		echo chose block size $blockSplitSize.
+	else
+	blockSplitSize=$1
+	echo block size specified is $blockSplitSize.
+fi
+
+# Large bytes blocks pseudo-random rearrangement to reuse the data; if you don't like this you need to read the code to alter implications for later code in the script:
+cat * > ../superBlock.dat
+rm *.*
+mv ../superBlock.dat .
+splits superBlock.dat $blockSplitSize
+rm ./superBlock.dat
+# Psuedo-randomly renames all files, effectively shuffing their order so they can be re-concatenated into a new, unique, timestamped ~superBlock.dat at the end of the script; this is VERY inneficient and could be replaced by a shuffled array of file names iterating over cat commands to append to the dest data:
+allRandomFileNames.sh 11
+
+# NOTE: fcs32 hashes collide with crc32.
+# Huh. The following command sometimes does and sometimes doesn't run under cygwin; it apparently consistently does though if I invoke it on windows' cmd (terminal) by calling *that* from the cygwin shell, thusly:
+cmd /c 'rehash -none -adler32 -crc16 -crc16c -crc16x -crc32 -elf32 -fcs16 -fnv32 -fnv64 -ghash3 -ghash5 -rmd120 -rmd160 -xum32 -out:raw -out:pad:false -out:nospaces *.* > rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt'
+# because that results in windows "newlines" (\n\r), change them to 'nix:
+dos2unix rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt
+# strip down that output to only hex prints and newlines:
+sed -i -e 's/.*: \(.*\).*/\1/g' -e 's/<.*>//g' rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt
+timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
+tr -d '\n' < rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt > __trueRandomData_"$timestamp"_HEXsrcTable.txt
+rm rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt
+xxd -r -p __trueRandomData_"$timestamp"_HEXsrcTable.txt __trueRandomData_"$timestamp".dat
+
+mv __trueRandomData_"$timestamp"_HEXsrcTable.txt __trueRandomData_"$timestamp".dat ../_final_TRND_archive
+
+echo ----
+# nah -- and __trueRandomData_"$timestamp"_HEXsrcTable.txt have
+echo DONE. __trueRandomData_"$timestamp".dat has been moved to ../_final_TRND_archive
+
+timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
+cat * > ../_superblock_SOURCE_notPRND__$timestamp.dat
+rm *.*
+mv ../_superblock_SOURCE_notPRND__$timestamp.dat ./
+
+
+# DEV NOTES
+# usage of rehash:
+# rehash [options1] filespec [options2] [> outputfile]
+# for further help, see: http://rehash.sourceforge.net/rehash.html#resamples
+
+# usage of xhd to convert a hex string to a binary file (of corresponding actual hex binary values):
+# https://stackoverflow.com/a/7826789/1397555 -- e.g. `xxd -r -p in.txt out.bin` OR `echo 17F6EC7100437960F8EEDFD0A2D33B514DCC9726 | xxd -r > out.dat`
