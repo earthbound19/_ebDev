@@ -12,11 +12,11 @@
 
 # Optional: $5 rescale target resolution expressed either as nnnnXnnnn or per the following note. Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution. To calculate and keep and aspect ratio automatically targeting a given X or Y pix dimension, specify one or the other and : -1; e.g. 320:-1 will target 320x pixels and whatever corresponding Y pixels would keep the aspect, or -1:800 would target 800y pixels and whatever corresponding X pixels will keep the aspect.
 
-# TO DO; Optional: padding re https://superuser.com/a/690211
-
 # NOTE: You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).
 
-# TO DO? : make it name the output file after the ../.. parent folder name?
+# TO DO? :
+# Make it name the output file after the ../.. parent folder name?
+# Optional padding re https://superuser.com/a/690211
 
 if [ ! -z ${5+x} ]
 then
