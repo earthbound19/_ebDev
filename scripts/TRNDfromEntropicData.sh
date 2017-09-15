@@ -1,0 +1,2 @@
+# IN DEVELOPMENT
+# What was this script is now arguably technically a psuedo-random number generator, renamed to TRNDfromEntropicData.sh (in this same directory). That script will be adapted into a true random number generator here.

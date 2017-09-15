@@ -19,6 +19,24 @@ metaDataTemplatePath=`cygpath -u "C:\_ebdev\scripts\imgAndVideo\EXIFdataBatch\me
 	# metaDataTemplateFile=TFTMdraftMetadataTemplate.txt
 metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 
+# IN DEVELOPMENT; to retrieve crypto donation address one from each of following file for each artwork (and simply remove the first line of each as they are used; NOTE that this assumes the address list is backed up somewhere else!) :
+# define text files in local home dir from which to extract cryptocurrency payment addresses:
+		# BTCaddressesFile=~/bitcoinARTaddresses_BLOCK01.txt
+		# ETHaddressesFile=~/ethereumARTaddresses_BLOCK01.txt
+# extract addresses from first line of each file into variable:
+		# BTCdonate=`head -n 1 $BTCaddressesFile`
+				# echo "BTC $BTCdonate" >> ~/consumedCryptoDonationAddresses.txt
+		# ETHdonate=`head -n 1 $ETHaddressesFile`
+				# echo "ETH $ETHdonate" >> ~/consumedCryptoDonationAddresses.txt
+# update the address lists by removing the first line of each (print all but first line to a temp file, copy temp over original, remove temp) :
+		# tail -n +2 $BTCaddressesFile > BTC_addrs_temp_b88caDbgCxP9cGSjAyu9uN6.txt
+		# tail -n +2 $ETHaddressesFile > ETH_addrs_temp_b88caDbgCxP9cGSjAyu9uN6.txt
+		# cp ./BTC_addrs_temp_b88caDbgCxP9cGSjAyu9uN6.txt $BTCaddressesFile
+		# cp ./ETH_addrs_temp_b88caDbgCxP9cGSjAyu9uN6.txt $ETHaddressesFile
+		# rm ./BTC_addrs_temp_b88caDbgCxP9cGSjAyu9uN6.txt ./ETH_addrs_temp_b88caDbgCxP9cGSjAyu9uN6.txt
+		# exit
+# END IN DEVELOPMENT SECTION
+
 find . -iname \*$_MTPL*.mp4 -o -iname \*$_MTPL*.tif -o -iname \*$_MTPL*.tiff -o -iname \*$_MTPL*.png -o -iname \*$_MTPL*.psd  -o -iname \*$_MTPL*.psb -o -iname \*$_MTPL*.ora -o -iname \*$_MTPL*.rif -o -iname \*$_MTPL*.riff -o -iname \*$_MTPL*.jpg -o -iname \*$_MTPL*.jpeg -o -iname \*$_MTPL*.gif -o -iname \*$_MTPL*.bmp -o -iname \*$_MTPL*.cr2 -o -iname \*$_MTPL*.raw  -o -iname \*$_MTPL*.crw -o -iname \*$_MTPL*.pdf  -o -iname \*$_MTPL*.svg > imagesMetadataPrepList.txt
 
 find . -iname \*"$_MTPL"var*.mp4 -o -iname \*"$_MTPL"var*.tif -o -iname \*"$_MTPL"VAR*.tiff -o -iname \*"$_MTPL"VAR*.png -o -iname \*"$_MTPL"VAR*.psd -o -iname \*"$_MTPL"*.psb -o -iname \*"$_MTPL"VAR*.ora -o -iname \*"$_MTPL"VAR*.rif -o -iname \*"$_MTPL"VAR*.riff -o -iname \*"$_MTPL"VAR*.jpg -o -iname \*"$_MTPL"VAR*.jpeg -o -iname \*"$_MTPL"VAR*.gif -o -iname \*"$_MTPL"VAR*.bmp -o -iname \*"$_MTPL"VAR*.cr2 -o -iname \*"$_MTPL"VAR*.raw  -o -iname \*"$_MTPL"VAR*.crw -o -iname \*"$_MTPL"VAR*.pdf -o -iname \*"$_MTPL"VAR*.svg >> imagesMetadataPrepList.txt
