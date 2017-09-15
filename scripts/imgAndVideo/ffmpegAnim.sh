@@ -9,7 +9,7 @@
 # $2 desired output framerate
 # $3 desired constant quality (crf)
 # $4 the file extension of the input images.
-# Optional: $5 rescale target resolution expressed as N[NN..]xN[NN..], for example 200x112. Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution.
+# Optional: $5 rescale target resolution expressed either as nnnnXnnnn or per the following note. Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution. To calculate and keep an aspect ratio automatically targeting a given X or Y pix dimension, specify one or the other and : -1; e.g. 320:-1 will target 320x pixels and whatever corresponding Y pixels would keep the aspect, or -1:800 would target 800y pixels and whatever corresponding X pixels will keep the aspect.
 
 # NOTE: You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).
 
