@@ -5,13 +5,22 @@
 # Call this script with one parameter $1, being a file type in the directory from which you run this script--a file type for which all thing whom what this yes you wish to convert to Adobe digital negatives format (.dng), e.g.:
 # thisScript.sh CR2
 
-for element in *.$1
+find . -iname \*.$1 > all_wut.txt
+while read element
 do
 # TO DO: check if target file exists (get base file name of element first), then only create it if it doesn't.
-	AdobeDNGConverter.exe -c -p2 -fl -cr5.4 $element
-done
+	elementBaseName=`echo $element | sed "s/\(.*\)\.$1/\1/g"`
+	if [ ! -f "$elementBaseName".dng ]
+	then
+		echo "$elementBaseName".dng does not exist\; will execute dng conversion command.
+		# NOTE if you add the -e switch it will embed the original raw (/CR2 etc) file in the dng.
+		command="AdobeDNGConverter.exe -c -fl -cr5.4 $element"
+		echo running command\: $command
+		echo . . .
+		$command
+	else
+		echo Would-be target file "$elementBaseName".dng already exists\; will not re-create.
+	fi
+done < all_wut.txt
 
-
-
-# in 
-# out 2:50
+rm ./all_wut.txt
