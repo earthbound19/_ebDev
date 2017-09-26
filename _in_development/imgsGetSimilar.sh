@@ -1,13 +1,21 @@
 # DESCRIPTION
-# Produces list of images arranged by most similar to nearest neighbor in list (roughly, with some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list). Resultant file list is suitable for use by ffmpeg as a frame list for animation. Potential uses: render abstract art collections in animation by sort of most similar groups. Quasi-un-randomize randomly color-filled (or palette random filled) renders from e.g. colored svg images. Jumble up movie frames from a film scene excerpt in a perhaps wrong but similar frame order. etc.
+# Produces list of images arranged by most similar to nearest neighbor in list (roughly, with some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list). Resultant file list is suitable for use by ffmpeg as a frame list for animation. Some potential uses: render abstract art collections in animation by sort of most similar groups, quasi-un-randomize randomly color-filled (or palette random filled) renders from e.g. colored svg images. Jumble up movie frames from a film scene excerpt in a perhaps wrong but similar frame order. etc.
 
 # USAGE
 # Invoke this script with one parameter, being the file format in the current dir. to operate on, e.g.:
 # ./thisScript.sh png
-# OPTIONAL: omit variable 1 to compare all files in current dir; will throw errors if some files are not images or valid images.
+# OPTIONAL: omit variable 1 to compare ALL files in current dir; will throw errors if some files are not images or valid images.
 
 # DEPENDENCIES
 # Graphicsmagick, image files in a directory to work on, and bash / GNU utilities
+
+# TO DO:
+# - fix so that formatting is not like the following:
+# file './tile_0115.png
+# '
+# -- but rather like the following:
+# file './tile_0115.png'
+# - UM, this is making a monster file list? does it need de-duping? Is this script actually done?
 
 # change search regex depending on presence or absense of parameter $1:
 if [ -z ${1+x} ]
@@ -19,36 +27,32 @@ fi
 
 # CODE
 # Delete any wonky file names from prior or interrupted run:
-rm __vapTe8pw8uWT6PPT4fcYURKQcXgaDZYfEY__*
+rm __superShrunkRc6d__*
 
-# find . -type f -iregex $searchRegex
-find ./* -type f -iregex '.*'
-# find $searchRegex > allIMGs.txt
-exit
+gfind ./* -type f -iregex ".*\.$1" > allIMGs.txt
 
 # Create heavily shrunken image copies to run comparison on.
-echo Generating severely shrunken image copies to run comparisons with . . .
+echo Generating severely shrunken image copies to run comparisons against . . .
 while read element
 do
-	echo copying $element to shrunken __vapTe8pw8uWT6PPT4fcYURKQcXgaDZYfEY__$element to make image comparison much faster . . .
-	gm convert $element -scale 10 __vapTe8pw8uWT6PPT4fcYURKQcXgaDZYfEY__$element
+	echo copying $element to shrunken __superShrunkRc6d__$element to make image comparison much faster . . .
+	gm convert $element -scale 10 __superShrunkRc6d__$element
 done < allIMGs.txt
 
 # Prepend everything in allIMGs.txt with that wonky string file name identifier before running comparison via;
-sed -i 's/^\(.*\)/__vapTe8pw8uWT6PPT4fcYURKQcXgaDZYfEY__\1/g' allIMGs.txt
+sed -i 's/^\(.*\)/__superShrunkRc6d__\1/g' allIMGs.txt
 
-mapfile -t allIMGs < allIMGs.txt
-# TO DO: how to get things into an array on systems without mapfile--because methinks that's needed here with a nested loop where a read loop might be ridiculous? Can I just install mapfile on necessary platforms?
+allIMGs=( $( < allIMGs.txt) )
 
 i_count=0
 j_count=0
-printf "" > hFeJPeBYE6w3ur_col1.txt
-printf "" > hFeJPeBYE6w3ur_col2.txt
+printf "" > compare__superShrunkRc6d__col1.txt
+printf "" > compare__superShrunkRc6d__col2.txt
 # List all possible pairs of file type $1, order is not important, repetition is not allowed ($1 pick 2).
 for i in "${allIMGs[@]}"
 do
 	i_count=$(( i_count + 1 ))
-	# Remove element i from a copy of the array so that we only iterate through the remaining un-paired element science thing computer sort yeh in inner loop;
+	# Remove element i from a copy of the array so that we only iterate through the remaining in the array which have not already been compared;
 	# re: http://unix.stackexchange.com/a/68323
 	allIMGs_innerLoop=("${allIMGs[@]:$i_count}")
 			# echo size of arr for inner loop is ${#allIMGs_innerLoop[@]}
@@ -59,16 +63,16 @@ do
 		echo "comparing images: $i | $j . . . VIA COMMAND: gm compare -metric MAE $i $j null: 2>&1 | grep 'Total'"
 		metricPrint=`gm compare -metric MAE $i $j null: 2>&1 | grep 'Total'`
 		# ODD ERRORS arise from mixed line-ending types, where gm returns windows-style, and printf commands produce unix-style. Solution: write to separate column files, convert all gm-created files to unix via dos2unix, then paste them into one file.
-		echo "$metricPrint" >> hFeJPeBYE6w3ur_col1.txt
-		printf "|$i|$j\n" >> hFeJPeBYE6w3ur_col2.txt
+		echo "$metricPrint" >> compare__superShrunkRc6d__col1.txt
+		printf "|$i|$j\n" >> compare__superShrunkRc6d__col2.txt
 	done
 done
 
 # Combine ~col1 and ~col2 files into one file (pasting as columns), after getting the line endings in col1 to match col2 :
-dos2unix hFeJPeBYE6w3ur_col1.txt
-paste -d '' hFeJPeBYE6w3ur_col1.txt hFeJPeBYE6w3ur_col2.txt > tmp_WzzNtNBw2jYD9A.txt
+dos2unix compare__superShrunkRc6d__col1.txt
+paste -d '' compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt > tmp_WzzNtNBw2jYD9A.txt
 # Remove temp file name gobbeldy-gook padding:
-sed -i 's/__vapTe8pw8uWT6PPT4fcYURKQcXgaDZYfEY__//g' tmp_WzzNtNBw2jYD9A.txt
+sed -i 's/__superShrunkRc6d__//g' tmp_WzzNtNBw2jYD9A.txt
 # Filter out information cruft; NOTE that if the first column isn't preceded by | then the later sort command won't work as intended:
 sed -i 's/.*Total: \([0-9]\{1,11\}\.[0-9]\{1,11\}\).*|\([^|]*\).*|\([^|]*\).*/\1|\2|\3/g' tmp_WzzNtNBw2jYD9A.txt
 # Sort results by reverse rank of keys by priority of columns 2, 1, 3; which is an attempt at most similar pairs adjacent (usually) :
@@ -98,7 +102,7 @@ tr '|' '\n' < tmp_yyYM7wvUZdc3Qg.txt > IMGlistByMostSimilar.txt
 # --or, that's ready after one more tweak for file list format ffmpeg demands:
 sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
 
-rm allIMGs.txt hFeJPeBYE6w3ur_col1.txt hFeJPeBYE6w3ur_col2.txt tmp_yyYM7wvUZdc3Qg.txt tmp_fx49V6cdmuFp.txt tmp_WzzNtNBw2jYD9A.txt __vapTe8pw8uWT6PPT4fcYURKQcXgaDZYfEY__*
+rm allIMGs.txt compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt tmp_yyYM7wvUZdc3Qg.txt tmp_fx49V6cdmuFp.txt tmp_WzzNtNBw2jYD9A.txt __superShrunkRc6d__*
 
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with ffmpegAnimFromFileList.sh \(see comments of that script\) to produce an animation of these images arranged by most similar to nearest neighbor in list \(roughly\, with some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list\)\.
