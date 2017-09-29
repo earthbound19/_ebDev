@@ -1,0 +1,37 @@
+# TO INSTALL THIS FILE, run this command:
+# cp ./mac_.bash_profile ~/.bash_profile
+# Number of lines to keep (1000 in this example)
+export HISTFILESIZE=2100
+
+# Set how many commands to keep in the current session history list
+export HISTSIZE=80
+
+# Ignore commands that start with a space
+export HISTIGNORE="&:[ ]*:exit"
+
+# Re: https://serverfault.com/a/414762
+LANG=
+LC_COLLATE="en_US.UTF-8"
+LC_CTYPE="en_US.UTF-8"
+LC_MESSAGES="en_US.UTF-8"
+LC_MONETARY="en_US.UTF-8"
+LC_NUMERIC="en_US.UTF-8"
+LC_TIME="en_US.UTF-8"
+LC_ALL="en_US.UTF-8"
+export LANG=en_US.UTF-8
+
+export PATH=/Users/earthbound/Documents/breakTime/_ebPathMan:$PATH
+export PATH=/Users/earthbound/Documents/breakTime/_ebDev:$PATH
+
+echo "APPLIED CUSTOM .bash_profile settings. Also $(buzzphrase)."
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# atom open-terminal-here override lines for keymap.cson to avoid conflicts with other packages:
+'.platform-darwin atom-workspace':
+  'ctrl-shift-alt-t': 'open-terminal-here:open'
+  'ctrl-alt-cmd-t': 'open-terminal-here:open-root'
+# atom open-terminal-here override command in settings; note that you must `npm install ttab -g` from the terminal first (ttab dependency):
+# ttab && cd "$PWD"
+# OR follow instructions at end of open-terminal-here settings page in Atom?
