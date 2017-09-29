@@ -9,13 +9,11 @@
 # DEPENDENCIES
 # Graphicsmagick, image files in a directory to work on, and bash / GNU utilities
 
+# NOTE
+# The comparison algorithm never compares the same image pair more than once.
+
 # TO DO:
-# - fix so that formatting is not like the following:
-# file './tile_0115.png
-# '
-# -- but rather like the following:
-# file './tile_0115.png'
-# - UM, this is making a monster file list? does it need de-duping? Is this script actually done?
+# Refactor to allow continuation of interrupted runs (do not erase temp files; rather append to them.)
 
 # change search regex depending on presence or absense of parameter $1:
 if [ -z ${1+x} ]
@@ -27,10 +25,8 @@ fi
 
 
 # CODE
-
 	# OPTIONAL wipe of all leftover files from previous run; comment out everything in the following block if you don't want that:
 	rm __superShrunkRc6d__*
-	rm allIMGs.txt compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt tmp_yyYM7wvUZdc3Qg.txt tmp_fx49V6cdmuFp.txt comparisons__superShrunkRc6d__cols.txt __superShrunkRc6d__*
 
 find ./* -type f -iregex ".*\.$1" > allIMGs.txt
 # because gfind produces windows line-endings, convert them to unix:
@@ -52,9 +48,8 @@ do
 	fi
 done
 
-# Prepend everything in allIMGs.txt with that wonky string file name identifier before running comparison via;
+# Prepend everything in allIMGs.txt with that wonky string file name identifier before running comparison via the next block;
 sed -i 's/^\(.*\)/__superShrunkRc6d__\1/g' allIMGs.txt
-
 
 i_count=0
 j_count=0
@@ -79,6 +74,9 @@ do
 	done
 done
 
+# Reverse the sed operation before that block:
+sed -i 's/__superShrunkRc6d__//' allIMGs.txt
+
 # Re prevous comment in nested loop blocks:
 dos2unix compare__superShrunkRc6d__col1.txt
 paste -d '' compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt > comparisons__superShrunkRc6d__cols.txt
@@ -88,31 +86,27 @@ sed -i 's/.*Total: \([0-9]\{1,11\}\.[0-9]\{1,11\}\).*|\([^|]*\).*|\([^|]*\).*/\1
 sort -n -b -t\| -k2r -k1r -k1 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
 # Strip the numeric column so we can work up a file list of said ordering for animation:
 sed -i 's/[^|]*|\(.*\)/\1/g' tmp_fx49V6cdmuFp.txt
-exit
-tr '\n' '|' < tmp_fx49V6cdmuFp.txt > tmp_yyYM7wvUZdc3Qg.txt
+# Strip all newlines so that the following sed operation that removes all but the 1st appearance of a match will work over every appearance of a match in the entire file (since they are all on one line, where otherwise the replace would only work on every individual line where the match is found):
+tr '\n' '|' < tmp_fx49V6cdmuFp.txt > comparisons__superShrunkRc6d__cols.txt
 
-# Delete all but first occurance of a word e.g. 'pattern' from a line; the way it works is: change the first 1 (in the following command) to a 2 to remove everything but the 2nd occurances of 'pattern', or 4 to remove everything but the 4th occurance of the pattern, or 1 to remove all but the first etc., re; https://unix.stackexchange.com/a/18324/110338 :
-	# e.g.
-	# sed -e 's/pattern/_&/1' -e 's/\([^_]\)pattern//g' -e 's/_\(pattern\)/\1/' tstpattern.txt
-	# ALSO NOTE that the & is a reference to the matched pattern, meaning the matched pattern will be substituted for & in the output.
-# Scan through all image file names (which appear in our most previous temp file), repeating this step (the step being: delete all but the first occurance of the file name) for each file name. We will be left with one instance of each file name, in an order which (hopefully) has as many most similar image files near each other in the sequence:
-	# NOTE that we are only using allIMGs.txt for this loop as a count of how many times to perform this operation.
+echo -------------------
 count=0
 while read x
 do
-	count=$(($count + 1))
-	# find first occurance of a file name and store it in a variable. Note that the command combines two stream editor (sed) operations one after the other. Note also that the -e switch enables this operation after another operation:
-	FFN=`sed -e "s/\([^|]*\)/ \1 /$count" -e 's/[^ ]* \([^ ]*\).*/\1/g' tmp_yyYM7wvUZdc3Qg.txt`
-			# echo found file name $FFN for count $count
-	# remove all but the first occurance of found file name:
-	sed -i -e "s/$FFN/_&/1" -e "s/\([^_]\)$FFN//g" -e "s/_\($FFN\)/\1/" tmp_yyYM7wvUZdc3Qg.txt
+	echo replacing all but first appearance of file name $x in result file . . .
+	# Delete all but first occurance of a word e.g. 'pattern' from a line; the way it works is: change the first 1 (in the following command) to a 2 to remove everything but the 2nd occurances of 'pattern', or 4 to remove everything but the 4th occurance of the pattern, or 1 to remove all but the first etc., the next example code line re; https://unix.stackexchange.com/a/18324/110338 :
+	# sed -e 's/pattern/_&/1' -e 's/\([^_]\)pattern//g' -e 's/_\(pattern\)/\1/' tstpattern.txt
+	# ALSO NOTE that the & is a reference to the matched pattern, meaning the matched pattern will be substituted for & in the output.
+	# sed -e 's/pattern/_&/1' -e 's/\([^_]\)pattern//g' -e 's/_\(pattern\)/\1/' tstpattern.txt
+	sed -i -e "s/$x/_&/1" -e "s/\([^_]\)$x//g" -e "s/_\($x\)/\1/" comparisons__superShrunkRc6d__cols.txt
 done < allIMGs.txt
 
 # replace | with newlines to produce final frame list for e.g. ffmpeg to use:
-tr '|' '\n' < tmp_yyYM7wvUZdc3Qg.txt > IMGlistByMostSimilar.txt
+tr '|' '\n' < comparisons__superShrunkRc6d__cols.txt > IMGlistByMostSimilar.txt
 # --or, that's ready after one more tweak for file list format ffmpeg demands:
 sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
 
-
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with ffmpegAnimFromFileList.sh \(see comments of that script\) to produce an animation of these images arranged by most similar to nearest neighbor in list \(roughly\, with some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list\)\.
+
+rm allIMGs.txt compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt tmp_fx49V6cdmuFp.txt comparisons__superShrunkRc6d__cols.txt __superShrunkRc6d__*
