@@ -1,3 +1,6 @@
+# DESCRIPTION
+# Exports layers in an image file (e.g. psd or tif source file) to png images.
+
 # USAGE
 # Invoke this script with $1 parameter, being a file name to rip layers out of and place in a /$1_layers subdir; e.g.:
 # thisScript.sh inFile.psd

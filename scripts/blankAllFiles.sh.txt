@@ -14,7 +14,7 @@
 	# rm "$p"
 	# dd count=0 if=/dev/zero of="$p"
 # done < ../allFiles.txt
-# rm allFiles.txt
+# rm ../allFiles.txt
 
 # !!===============DANGER ZONE===============!!
 
