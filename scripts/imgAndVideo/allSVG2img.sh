@@ -6,24 +6,26 @@
 # $2 the target file format e.g. png or jpg -- defaults to jpg if not provided.
 # $3 optional--include this parameter (it can be anything) to make white transparent; otherwise white will default to opaque.
 
+# WARNING: Many svgs, despite being technically infinitely scaleable, are upscaled by graphicsmagick using poor raster techniquies. You must manually upscale such svgs in svg editing software before rendering them at a resolution "larger" than they had originally been defined.
+
 # DEV NOTE: template command: gm -size 850 test.svg result.tif
 # NOTE that for the -size parameter, it scales the images so that the longest side is that many pixels.
 
 img_size=$1
 img_format=$2
 
-# If no image size parameter, set default image size of 4120.
-if [ -z ${1+x} ]; then img_size=4120; else img_size=$1; fi
+# If no image size parameter, set default image size of 4280.
+if [ -z ${1+x} ]; then img_size=4280; echo SET img_size to DEFAULT 4280; else img_size=$1; echo SET img_size to $1; fi
 # If no image format parameter, set default image format of jpg.
-if [ -z ${2+x} ]; then img_format=jpg; else img_format=$2; fi
+if [ -z ${2+x} ]; then img_format=jpg; echo SET img_format to DEFAULT jpg; else img_format=$2; echo SET img_format to $2; fi
 # If no third parameter, make background transparent.
-if [ -z ${3+x} ]; then param3="-background none"; fi
+if [ -z ${3+x} ]; then param3="-background none"; echo SET parameter DEFAULT \"-background none\"; else img_format=$2; echo DID NOT SET any background control parameter; fi
+# NOTE: you may tweak that line to say "-background gray" to replace a transparent background with gray, if you leave off the third parameter when calling this script. Or instead of gray, any hex color code e.g. #555555. Otherwise, revert it to the default "-background none" to leave transparency in the resultant image. You may uncomment any of the following (and comment out the previous line) for various options:
 # if [ -z ${3+x} ]; then param3="-background white"; fi
 # if [ -z ${3+x} ]; then param3="-background black"; fi
 # if [ -z ${3+x} ]; then param3="-background #584560"; fi		# Darkish plum?
 # if [ -z ${3+x} ]; then param3="-background #3b383c"; fi		# Medium-dark purplish-gray
 # potentially good black line color change options: #2fd5fe #bde4e4
-# NOTE: you may tweak that line to say "-background gray" to replace a transparent background with gray (if you leave off the third parameter when calling this script. Or instead of gray, any hex color code e.g. #555555. Otherwise, revert it to the default "-background none" to leave transparency in the resultant image.)
 
 find . -iname \*.svg > all_svgs.txt
 while read element

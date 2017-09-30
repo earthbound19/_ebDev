@@ -13,4 +13,4 @@ do
 	AdobeDNGConverter.exe -c -fl $element
 done
 
-rm all_wut.txt all_wut.txt
+rm all_wut.txt
