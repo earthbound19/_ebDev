@@ -1,9 +1,0 @@
-Copying skeleton files.
-These files are for the users to personalise their cygwin experience.
-
-They will never be overwritten nor automatically updated.
-
-'./.bashrc' -> '/home/Hermione//.bashrc'
-'./.bash_profile' -> '/home/Hermione//.bash_profile'
-'./.inputrc' -> '/home/Hermione//.inputrc'
-'./.profile' -> '/home/Hermione//.profile'
