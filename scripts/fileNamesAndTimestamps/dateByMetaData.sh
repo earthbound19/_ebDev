@@ -7,25 +7,21 @@ echo BEGINNING correcting of timestamps to match any EXIF data . . .
 # TO DO: remove file extensions from the following list which will never contain metadata.
 # Another (easier to read and change?) way to do the following: find . -type f -iregex '\.\/.*.\(tif\|tiff\|png\|.psd\|ora\|kra\|rif\|riff\|jpg\|jpeg\|gif\|bmp\|cr2\|crw\|pdf\|ptg\)' -printf '%TY %Tm %Td %TH %TM %TS %p\n' | sort -g > _batchNumbering/fileNamesWithNumberTags.txt
 find . -iname \*.tif -o -iname \*.tiff -o -iname \*.psd -o -iname \*.mov -o -iname \*.mp4 -o -iname \*.m4a -o -iname \*.jpg > dateByImageInfoFilesListTemp.txt
-mapfile -t imageFiles < ./dateByImageInfoFilesListTemp.txt
-for filename in ${imageFiles[@]}
+while read filename
 do
-			# echo filename is:
-			# echo $filename
-			# DEPRECATED FOR FAIL; looks for date information which so far it seems only exists in .psd files, where I know exiftool can extract date modified and date created info:
+			# DEPRECATED tool for other preference; looks for date information which so far it seems only exists in .psd files, where I know exiftool can extract date modified and date created info:
 			# exiv2 -T mv "$filename"
 		# NOTES on metadata e.g. shown by exiftool; all of these can be manipulated by exiftool:
-# File Modification Date/Time: 2016:09:24 20:37:23+01:00		FileModifyDate; file system's modification date+time
-# File Access Date/Time      : 2016:09:24 20:37:23+01:00		Computer file system's access date+time
-# File Creation Date/Time    : 2016:09:24 20:37:23+01:00		FileCreateDate; Computer file system's create date+time
-# Create Date                : 2016:09:13 05:43:22-06:00		CreateDate; EXIF metadata create date+time, more reliable
-# Metadata Date              : 2016:09:13 06:26:04-06:00		Exif access time?
-# Modify Date                : 2016:09:13 06:26:04				ModifyDate; EXIF metadata modify date+time, more reliable
-
+		# File Modification Date/Time: 2016:09:24 20:37:23+01:00		FileModifyDate; file system's modification date+time
+		# File Access Date/Time      : 2016:09:24 20:37:23+01:00		Computer file system's access date+time
+		# File Creation Date/Time    : 2016:09:24 20:37:23+01:00		FileCreateDate; Computer file system's create date+time
+		# Create Date                : 2016:09:13 05:43:22-06:00		CreateDate; EXIF metadata create date+time, more reliable
+		# Metadata Date              : 2016:09:13 06:26:04-06:00		Exif access time?
+		# Modify Date                : 2016:09:13 06:26:04				ModifyDate; EXIF metadata modify date+time, more reliable
 	# With thanks to smart folks who wrote at: http://photo.stackexchange.com/a/27246/44663 and http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html :
 	exiftool -overwrite_original "-CreateDate>FileCreateDate" "$filename"
 	exiftool -overwrite_original "-ModifyDate>FileModifyDate" "$filename"
-done
+done < dateByImageInfoFilesListTemp.txt
 
 echo DONE updating image file timestamps to match metadata.
 

@@ -10,7 +10,7 @@
 # The following command, for example, will make 10 corrupted copies of every jpg in the current path, corrupting each copy by 2 percent:
 # thisScript.sh jpg 10 2
 
-find . -iname \*.jpg > _alles.txt
+gfind . -iname \*.$1 > _alles.txt
 # I WASTED A CURSEDLY LARGE PORTION OF MY BREATH AND TOIL before figuring out I need to do the following:
 dos2unix _alles.txt
 # strip off ./ at start as it messes up later glitchThisFile.sh call:
