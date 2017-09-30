@@ -48,6 +48,8 @@ sc config "WSearch" start= disabled
 sc config "wuauserv" start= disabled
 sc config "TabletInputService" start= disabled
 sc config "Fax" start= demand
+sc config "SysMain" start= demand
+REM I don't like things that update in the background automatically without telling you and which are just re-enabled to do so by other programs even if you disable the function. How presumptuous and obnoxious--against user want and taking bandwidth unannounced! DELETE:
 sc stop gusvc
 sc delete gusvc
 sc stop gupdate

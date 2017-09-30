@@ -3,4 +3,4 @@ REM Command line options and use of program found here: http://cpicture.thecloud
 
 REM "C:\Program Files (x86)\Adobe\Adobe DNG Converter.exe"
 REM From program copied to and renamed in an environment dev folder:
-AdobeDNGConverter.exe -c -p2 -fl -cr5.4 %1
+AdobeDNGConverter.exe -c -fl -cr5.4 %1
