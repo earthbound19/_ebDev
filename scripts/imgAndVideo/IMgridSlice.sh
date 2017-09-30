@@ -8,7 +8,3 @@
 gm convert $1 -crop $2x$3 +repage +adjoin $1_tile_%05d.png
 
 # FINIS 10/29/2015 12:20:25 AM -RAH
-
-
-
-# 72 total
