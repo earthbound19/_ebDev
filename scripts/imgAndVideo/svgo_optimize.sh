@@ -2,20 +2,18 @@
 # Optimizes an svg input file (writing the result to <originalFileName>_opt.svg) including color code conversion suited for random recoloring via BWsvgRandomColorFill.sh.
 
 # DEPENDENCIES
-# A nodejs install with the svgo package installed, and the svgo_config.json file in the same directory as this script. Also svgo_BWsvgRandomColorFill_target_config.js in the same directory as this script?
+# A nodejs install with the svgo package installed
 
 # INSTALLATION
 # 1) install the prerequisites ;) and invoke svgo via command line without any parameters (just run it once, as this creates a default convertColors.js file).
-# EITHER overwrite convertColors.js with the contents of svgo_config.json or, if you can (I couldn't), get svgo to recognize this as a legitimate config file. The only changes from the default config at this writing are:
-	# shorthex: false,
-	# shortname: false
+# EITHER overwrite convertColors.js with the contents of svgo_config_convertColors.js (which is in the same PATH as this script) or, if you can (I couldn't), get svgo to recognize this as a legitimate config file.
 
 # USAGE
 # REQUIRES one parameter $1, being the name of the svg file for which you want an ~_opt.svg file produced in the same directory; e.g.:
 # thisScript.sh inputFile.svg
 
 # NOTES
-# At this writing, misbehaving when invoked via cygwin. If I copy and paste the printed command to a cmd prompt, it works ok . . . except the result displays wonky in Internet Explorer and inkscape. :()
+# At this writing, misbehaving when invoked via cygwin. If I copy and paste the printed command to a cmd prompt, it works ok . . . except the result displays wonky in Internet Explorer and inkscape. :(
 
 
 # ==== GLOBALS
@@ -41,7 +39,7 @@ moreCLIopts="--enable=removeDimensions --enable=removeUnknownsAndDefaults --enab
 # UNUSED option(s):  
 # ==== END GLOBALS
 
-SVGOcommand="svgo -i $1 -p 3 --pretty $CLIopts $moreCLIopts -o "$fileNameNoExt"_opt.svg"
+SVGOcommand="svgo -i $1 --pretty $CLIopts $moreCLIopts -o "$fileNameNoExt"_opt.svg"
 echo Running command\:
 echo $SVGOcommand
 echo . . .

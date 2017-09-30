@@ -70,7 +70,7 @@ numDigits=`basename $numDigits .pbm`
 numDigits=${#numDigits}
 		# echo numDigits val is $numDigits
 timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
-ffmpeg -y -r $inputFPS -f image2 -i %0"$numDigits"d.pbm -vf scale=1280:960:flags=neighbor -crf 6 -c:a aac -strict experimental -tune fastdecode -pix_fmt yuv420p -b:a 192k -ar 48000 -r 29.97 "$timestamp"__1MB_img_seq_representation.mp4
+ffmpeg -y -framerate $inputFPS -f image2 -i %0"$numDigits"d.pbm -vf scale=1280:960:flags=neighbor -crf 6 -c:a aac -strict experimental -tune fastdecode -pix_fmt yuv420p -b:a 192k -ar 48000 -r 29.97 "$timestamp"__1MB_img_seq_representation.mp4
 
 mv "$timestamp"__1MB_img_seq_representation.mp4 ..
 rm *.pbm
