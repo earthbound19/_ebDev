@@ -9,14 +9,12 @@
 # $2 desired output framerate
 # $3 desired constant quality (crf)
 # $4 the file extension of the input images.
-
-# Optional: $5 rescale target resolution expressed either as nnnnXnnnn or per the following note. Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution. To calculate and keep and aspect ratio automatically targeting a given X or Y pix dimension, specify one or the other and : -1; e.g. 320:-1 will target 320x pixels and whatever corresponding Y pixels would keep the aspect, or -1:800 would target 800y pixels and whatever corresponding X pixels will keep the aspect.
+# Optional: $5 rescale target resolution expressed as N[NN..]xN[NN..], for example 200x112; OR to scale to one target dimension and calculate the other automatically (to maintain aspect), give e.g. 1280:-1 (to produce an image that is 1280 pix wide by whatever the other dimension should be). Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution.
+# TO DO; Optional: padding re https://superuser.com/a/690211
 
 # NOTE: You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).
 
-# TO DO? :
-# Make it name the output file after the ../.. parent folder name?
-# Optional padding re https://superuser.com/a/690211
+# TO DO? : make it name the output file after the ../.. parent folder name?
 
 if [ ! -z ${5+x} ]
 then
@@ -39,17 +37,21 @@ fi
 # an example command wut does some math as would be needer per this algo: echo "scale=5; 3298 / 1296" | bc
 
 # horked from renumberFiles.sh:
-find *.$4 > allFiles.txt
+gfind *.$4 > allFiles.txt
+dos2unix allFiles.txt
 arraySize=$(wc -l < allFiles.txt)
 numDigitsOf_arraySize=${#arraySize}
 rm allFiles.txt
 
-# UTvideo codec option; comment out the x264 codec option if you uncomment this:
-# ffmpeg -y -f image2 -r $1 -i %0"$numDigitsOf_arraySize"d.$4 -r 29.97 -codec:v utvideo _out.avi
-
 echo executing ffmpeg command . . .
-# x264 codec option; comment out the UTvideo option if you uncomment this:
-ffmpeg -y -f image2 -r $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -r $2 -crf $3 _out.mp4
+# x264 codec and UTvideo options both follow; comment out whatever you don't want:
+# ffmpeg -y -f image2 -framerate $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -vf fps=$2 -crf $3 _out.mp4
+ffmpeg -y -f image2 -framerate $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -vf fps=$2 -crf $3 -codec:v utvideo _out.avi
+
+		# EXPERIMENT re: https://stackoverflow.com/a/45465730
+		# ffmpeg -y -i seeing_noaudio.mp4 -c copy -f h264 seeing_noaudio.h264
+		# ffmpeg -y -r 24 -i seeing_noaudio.h264 -c copy seeing.mp4
+
 
 # THE FOLLOWING could be adapted to a rawvideo option:
 # ffmpeg -y -r 24 -f image2 -i doctoredFrames\mb-DGYTMSWA-fr_%07d.png -vf "format=yuv420p" -vcodec rawvideo -r 29.97 _DGYTMSWAsourceDoctoredUncompressed.avi
