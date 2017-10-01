@@ -13,6 +13,7 @@
 # This script: creates a .dat file by 1a-4) concatenating all data in a directory into one file, moving that new file out of the way, deleting all files in the directory, moving the concatenated file back, and 2) cutting the file (binary split) into files of a size of bytes psuedo-randomly chosen between 242-512 bytes, extracting noise from all of them via non-cryptographic hashing (and collating the hashes into one hex string and interpreting that as binary values written to a new random data file (.dat). It then moves the new random data file into an archive folder and concatenating all the split files into one file which may be "recycled" with this same "chaos machine" process. 
 
 # TO DO
+# - If applicable? : adapt this to have output in pure hex to begin with via e.g. hexData=`xxd -ps dataFile.dat`
 # - adapt this to a TRND script which doesn't invoke any chaos machine process on files.
 # - find cross-platform tools that will accomplish the same as rehash -- OH. OR: compile the source code which is here: https://sourceforge.net/projects/rehash/files/rehash/0.2/
 # - use--and additional algos provided by? : https://github.com/ColumPaget/Hashrat
@@ -22,7 +23,7 @@
 #  - e.g.:
 #  echo "wut" | openssl dgst -mdc2
 # OR? :
-# SHA256, used in chef cookbooks
+# SHA256
 # openssl dgst -sha256 path/to/myfile
 # MD5
 # openssl dgst -md5 path/to/myfile
