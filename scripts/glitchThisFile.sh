@@ -8,9 +8,15 @@
 # This will produce a corrupted version of the file, named __corrupted_"$2"pct_$timestamp__<originalFileName>.
 # NOTE: See comment ALTERNATE OPTIONS HERE for other percent options (which are effective for variously sized files)
 
-# TO DO: throw errors for missing paramaters and exit.
-# TO DO? If the source file is a common movie format, convert it first to a transport stream and corrupt that?
-# TO DO? Exert fine control over header bytes skipped (by using dd bs=1, where it is now using the default 512 bytes).
+# TO DO
+# optional random truncation (deletion) of bytes
+# throw errors for missing paramaters and exit.
+# If the source file is a common movie format, convert it first to a transport stream and corrupt that?
+# Exert fine control over header bytes skipped (by using dd bs=1, where it is now using the default 512 bytes).
+
+# NOT TO DO
+# In-memory instead of on-disk corruption via xxd. Tried hexStr=`xxd -ps imgData.dat` . . . then (after corruption), with the -r switch reverse the operation. It was prohibitively slow. Piping the output to a file also (resulted in gigabytes-size file).
+
 
 # IMPORTANT GLOBAL:
 skipHeaderBytes=1
@@ -31,7 +37,6 @@ dd count=$skipHeaderBytes if=$fileToMakeCorruptedCopyOf of=header.dat
 		echo command two\: dd skip=$skipHeaderBytes if=$fileToMakeCorruptedCopyOf of=imgData.dat
 dd skip=$skipHeaderBytes if=$fileToMakeCorruptedCopyOf of=imgData.dat
 
-# while there's still data left to corrupt, keep rolling a virtual die until you roll an N, then corrupt a random number of bytes left; this is all done as dd copies that will be concatenated later: 
 __ln=( $( ls -Lon "imgData.dat" ) )
 __size=${__ln[3]}
 		echo file size of imgData.dat in bytes is $__size
@@ -44,7 +49,6 @@ __size=${__ln[3]}
 			# echo file size of imgData in bytes is $__size
 		# Re: reply by "lewis" here: http://echochamber.me/viewtopic.php?t=6377
 		# Also: http://stackoverflow.com/a/7290825/1397555
-			# To find what percent of N = y, divide N by 100, then mutliply by y:
 
 # ALTERNATE OPTIONS HERE; comment out the one you don't want:
 # corruptionPasses=$(($__size / 100000 * $percentToCorrupt))
