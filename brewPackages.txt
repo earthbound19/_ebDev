@@ -1,4 +1,5 @@
 argtable
+autoconf
 boost
 cmake
 cocoapods
@@ -15,6 +16,7 @@ gmp
 gnu-sed
 gperftools
 graphicsmagick
+hiredis
 icu4c
 jpeg
 jsoncpp
@@ -36,6 +38,7 @@ pcre2
 perl
 phantomjs
 pkg-config
+pyenv
 python3
 qt
 readline
@@ -46,3 +49,4 @@ sqlite
 x264
 xvid
 xz
+yarn
