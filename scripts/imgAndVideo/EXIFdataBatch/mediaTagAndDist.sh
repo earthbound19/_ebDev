@@ -4,6 +4,7 @@
 # NOTE: fer mysic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
 
 # TO DO; * = done, / = in progress:
+# Don't do any copying and metadata then copy again operations if the target file in _dist already exists (it's recreating them but shouldn't--maybe this is a bug, as I already coded for that.)
 # Figure out why this updates metadata ok to __tagAndDistPrepImage.jpg with e.g. 9000x6000 px jpgs, but chokes on copying them to _dist; fix that. WAIT: I think the real problem was I couldn't rename a file to a duplicate target file name. Catch errors when that happens? Verify this is what happens (the "WAIT" hypothesis).
 # ? Don't update metadata template with a shortened URL (and retrieve a short URL) if one already exists.
 # Check: is it proper or does it work to use the -IPTC:ObjectName in this script? Should that be -MWG:Description?
@@ -49,9 +50,10 @@ do
 	oy="http://earthbound.io/q/search.php?search=1&query=$imageTitleForURLencode"
 	oy=`echo "$oy" | sed -f /cygdrive/c/_ebdev/scripts/urlencode.sed`
 	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=""$PolrAPIkey""&is_secret=false&response_type=plain_text&url=$oy"
-echo command to run will be:
+echo command to run will be\:
 			# DEPRECATED as it stopped working and I'm not figuring out why, when a working alternative is available:
 			# echo wget -O oy.txt $wgetArg
+			echo "curl \"$wgetArg\" > oy.txt"
 	curl "$wgetArg" > oy.txt
 			# Insert that with a search query URL into the description tag; roundabout means via invoking script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:
 	# parse that result and store it in a variable $descriptionAddendum:
@@ -64,7 +66,7 @@ echo command to run will be:
 	# strip placeholder URL from description and replace it with URL from $descriptionAddendum:
 	# sed -i 's/\(.*See\) http:\/\/[^ ]* for \(.*\)/ \1 $descriptionAddendum for \2/g' $element
 	sed -i -e s/"\(.*See\) http:\/\/[^ ]* \(for .*\)"/"\1 $descriptionAddendum \2"/g $element
-	rm zorg.txt oy.txt
+	rm oy.txt
 	tr '\n' ' ' < $element > ghor.txt
 	exifTagArgs=$( < ghor.txt)
 	rm ghor.txt
@@ -132,7 +134,7 @@ done
 
 rm -f exiftool_temp_update_metadata.bat imagesMetadataPrepList.txt images_MD_ADDS_list.txt
 
-echo Metadata modified for each image\, and each final distribution image copied to \.\/_dist in the same path as respective _FINAL_ images\.
+echo Metadata modified for each image\, and each final distribution image copied to \.\/_dist in the same path\.
 
 
 # DEVELOPMENT HISTORY:

@@ -24,7 +24,7 @@ if [ -z ${3+x} ]; then param3="-background none"; echo SET parameter DEFAULT \"-
 # if [ -z ${3+x} ]; then param3="-background white"; fi
 # if [ -z ${3+x} ]; then param3="-background black"; fi
 # if [ -z ${3+x} ]; then param3="-background #584560"; fi		# Darkish plum?
-# if [ -z ${3+x} ]; then param3="-background #3b383c"; fi		# Medium-dark purplish-gray
+if [ -z ${3+x} ]; then param3="-background #39383b"; fi		# Medium-dark purplish-gray
 # potentially good black line color change options: #2fd5fe #bde4e4
 
 find . -iname \*.svg > all_svgs.txt
