@@ -45,8 +45,8 @@ rm allFiles.txt
 
 echo executing ffmpeg command . . .
 # x264 codec and UTvideo options both follow; comment out whatever you don't want:
-# ffmpeg -y -f image2 -framerate $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -vf fps=$2 -crf $3 _out.mp4
-ffmpeg -y -f image2 -framerate $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -vf fps=$2 -crf $3 -codec:v utvideo _out.avi
+ffmpeg -y -f image2 -framerate $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -vf fps=$2 -crf $3 _out.gif
+# ffmpeg -y -f image2 -framerate $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -vf fps=$2 -crf $3 -codec:v utvideo _out.avi
 
 		# EXPERIMENT re: https://stackoverflow.com/a/45465730
 		# ffmpeg -y -i seeing_noaudio.mp4 -c copy -f h264 seeing_noaudio.h264

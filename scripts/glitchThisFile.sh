@@ -51,8 +51,9 @@ __size=${__ln[3]}
 		# Also: http://stackoverflow.com/a/7290825/1397555
 
 # ALTERNATE OPTIONS HERE; comment out the one you don't want:
+corruptionPasses=$(($__size / 147500 * $percentToCorrupt))
 # corruptionPasses=$(($__size / 100000 * $percentToCorrupt))
-corruptionPasses=$(($__size / 75000 * $percentToCorrupt))
+# corruptionPasses=$(($__size / 75000 * $percentToCorrupt))
 # corruptionPasses=$(($__size / 10000 * $percentToCorrupt))
 # corruptionPasses=$(($__size / 1000 * $percentToCorrupt))
 # corruptionPasses=$(($__size / 100 * $percentToCorrupt))

@@ -26,13 +26,13 @@ count=1
 pairArrayCount=0
 while read element
 do
-	if (( $count % 2 ))		# ODD RUN (you wouldn't think) : uncomment this and comment out the next line for the first run.
-	# if ! (( $count % 2 ))	# EVEN RUN (you wouldn't think) : uncomment this and comment out the previous line for the second run.
+	# if (( $count % 2 ))		# ODD RUN (you wouldn't think) : uncomment this and comment out the next line for the first run.
+	if ! (( $count % 2 ))	# EVEN RUN (you wouldn't think) : uncomment this and comment out the previous line for the second run.
 	then
 		# Re a genius breath yon: https://stackoverflow.com/a/6022431/1397555
 		# And because I can't . . . interpolate? the $count variable in-line in a sed command:
 		sedCommand="$count""q;d"
-		# Slowish, but faster than other options if I am to believe said genius breath yon; stores current (even) list item in a variable; ALSO the tr -d command eliminates a maddening problem of gsed returning windows-style line endings, which much up echo and varaible concatenation commands so that elements after one varaible with a bad line ending disappear; RE: https://stackoverflow.com/a/16768848/1397555
+		# Slowish, but faster than other options if I am to believe said genius breath yon; stores current (even) list item number in a variable; ALSO the tr -d command eliminates a maddening problem of gsed returning windows-style line endings, which much up echo and varaible concatenation commands so that elements after one varaible with a bad line ending disappear; RE: https://stackoverflow.com/a/16768848/1397555
 		secondOfPair=`gsed "$sedCommand" numberedCopies.txt | tr -d '\15\32'`
 				# echo secondOfPair is $secondOfPair
 		countMinusOne=$(($count - 1))
@@ -47,6 +47,7 @@ do
 	fi
 	count=$((count + 1))
 done < numberedCopies.txt
+rm ./numberedCopies.txt
 
 for element in ${pairArray[@]}
 do
