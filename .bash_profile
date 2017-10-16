@@ -1,5 +1,5 @@
 # TO INSTALL THIS FILE, run this command:
-# cp ./mac_.bash_profile ~/.bash_profile
+# cp ./bash_profile ~/.bash_profile
 # Number of lines to keep (1000 in this example)
 export HISTFILESIZE=2100
 
@@ -27,11 +27,3 @@ echo "APPLIED CUSTOM .bash_profile settings. Also $(buzzphrase)."
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# atom open-terminal-here override lines for keymap.cson to avoid conflicts with other packages:
-'.platform-darwin atom-workspace':
-  'ctrl-shift-alt-t': 'open-terminal-here:open'
-  'ctrl-alt-cmd-t': 'open-terminal-here:open-root'
-# atom open-terminal-here override command in settings; note that you must `npm install ttab -g` from the terminal first (ttab dependency):
-# ttab && cd "$PWD"
-# OR follow instructions at end of open-terminal-here settings page in Atom?
