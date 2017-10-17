@@ -1,14 +1,11 @@
-# DESCRIPTION
-# Render a sequence of image crossfades from a list (e.g. by next most similar image), using ffmpegCrossfadeImagesToAnim.sh repeatedly. Several other scripts (commented out here near the start) must first be run against a series of images.
-
-# PRECURSOR RUNS needed: they take a while (depending, or even a llooong time), so you'll want to keep the file IMGlistByMostSimilar.txt created by the second:
-# renumberFiles.sh png
-# imgsGetSimilar.sh png
-
-# TO DO
-# Paramaterize whether to run against %2 (even-denominated pairs) or ! %2 (odd-denominated pairs); the latter being between the former to dovetail the former crossfades into the latter. OR build in logic that does a second odd-number run. UNTIL THEN, see the comments "EVEN RUN" and "ODD RUN."
-# Parameterize source image extension.
-# Parameterize crossfade duration.
+# USAGE
+# Pass this script three parameters, being:
+# $1 the first video
+# $2 the second video
+# $3 the duration of the crossfade between them
+# $4 what time (in seconds, allowing for decimals) the crossfade will start for both videos (in and out).
+# TO DO:
+# Make $3 and $4 optional and default them to 3 and 1, respectively.
 
 crossFadeDuration=5.8
 
@@ -19,18 +16,20 @@ crossFadeDuration=5.8
 # cd numberedCopies
 
 # Use ffmpegCrossfadeImagesToAnim.sh repeatedly on pairs of images by number until there are no more:
-gfind *.png > numberedCopies.txt
+gfind *.mp4 > numberedCopies.txt
+
+# TO DO: rewrite the loop to do everything in the first and second run in one run, if possible (also in ffmepgCrossfadeIMGsToAnimList.sh, which I am adapting this from):
 
 # create an array from that list; I won't do this with mapfile because it's not found on platforms I use (though could it be?) :
 count=1
 pairArrayCount=0
 while read element
 do
-	# if (( $count % 2 ))		# ODD RUN (you wouldn't think) : uncomment this and comment out the next line for the first run.
-	if ! (( $count % 2 ))	# EVEN RUN (you wouldn't think) : uncomment this and comment out the previous line for the second run.
+	# if (( $count % 2 ))	# ODD RUN: for the first run, uncomment this and comment out the next line.
+	if ! (( $count % 2 ))	# EVEN RUN: for the second run, uncomment this and comment out the previous line.
 	then
 		# Re a genius breath yon: https://stackoverflow.com/a/6022431/1397555
-		# And because I can't . . . interpolate? the $count variable in-line in a sed command:
+		# Gets Nth line from a file via sed (fragment of sed command), set in a variable because I haven't got bash to parse variables and a sed command the way I want in-line:
 		sedCommand="$count""q;d"
 		# Slowish, but faster than other options if I am to believe said genius breath yon; stores current (even) list item number in a variable; ALSO the tr -d command eliminates a maddening problem of gsed returning windows-style line endings, which much up echo and varaible concatenation commands so that elements after one varaible with a bad line ending disappear; RE: https://stackoverflow.com/a/16768848/1397555
 		secondOfPair=`gsed "$sedCommand" numberedCopies.txt | tr -d '\15\32'`
