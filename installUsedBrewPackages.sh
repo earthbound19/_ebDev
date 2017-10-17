@@ -5,6 +5,9 @@
 # brew list -1 | xargs brew rm
 
 brewPackages=" \
+automake \
+libxslt \
+unixodbc \
 argtable \
 autoconf \
 boost \
@@ -12,7 +15,6 @@ cmake \
 cocoapods \
 coreutils \
 cryptopp \
-curl \
 ffmpeg \
 fish \
 freetype \
@@ -38,7 +40,6 @@ libtool \
 libyaml \
 little-cms2 \
 miniupnpc \
-node \
 openssl \
 pandoc \
 pcre2 \
