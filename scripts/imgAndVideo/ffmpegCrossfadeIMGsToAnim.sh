@@ -29,16 +29,23 @@ fadeSRCtwoFileName="${imgTwo%.*}"
 ffmpeg -y -loop 1 -i $imgOne -t $crossFadeLength -codec:v utvideo "$fadeSRConeFileName".avi
 ffmpeg -y -loop 1 -i $imgTwo -t $crossFadeLength -codec:v utvideo "$fadeSRCtwoFileName".avi
 
-# Adapted from: http://superuser.com/a/778967/130772
-ffmpeg -y -i "$fadeSRConeFileName".avi -i "$fadeSRCtwoFileName".avi -f lavfi -i color=black -filter_complex \
-"[0:v]fade=t=out:st=0:d=$crossFadeLength:alpha=1,setpts=PTS-STARTPTS[va0];\
-[1:v]fade=t=in:st=0:d=$crossFadeLength:alpha=1,setpts=PTS-STARTPTS[va1];\
-[va0][va1]overlay[over]" \
--vcodec utvideo -map [over] "$fadeSRConeFileName"_xFade"$3"s_"$fadeSRCtwoFileName".avi
+# ONLY EXECUTE the following if the target file does not already exist; if it does exist warn the user and skip:
+if [ -e "$fadeSRConeFileName"_xFade"$3"s_"$fadeSRCtwoFileName".avi ]
+then
+	echo target file "$fadeSRConeFileName"_xFade"$3"s_"$fadeSRCtwoFileName".avi already exists\; will not render. To recreate it\, delete the file and run this script again.
+else
+	echo target file does not exist\; will render.
+	# Adapted from: http://superuser.com/a/778967/130772
+	ffmpeg -y -i "$fadeSRConeFileName".avi -i "$fadeSRCtwoFileName".avi -f lavfi -i color=black -filter_complex \
+	"[0:v]fade=t=out:st=0:d=$crossFadeLength:alpha=1,setpts=PTS-STARTPTS[va0];\
+	[1:v]fade=t=in:st=0:d=$crossFadeLength:alpha=1,setpts=PTS-STARTPTS[va1];\
+	[va0][va1]overlay[over]" \
+	-vcodec utvideo -map [over] "$fadeSRConeFileName"_xFade"$3"s_"$fadeSRCtwoFileName".avi
 
-# OPTIONAL: comment out either or both of the next two delete commands, depending on what you may want to keep:
-rm ./"$fadeSRConeFileName".avi
-# rm ./"$fadeSRCtwoFileName".avi
+	# OPTIONAL: comment out either or both of the next two delete commands, depending on what you may want to keep:
+	rm ./"$fadeSRConeFileName".avi
+	rm ./"$fadeSRCtwoFileName".avi
 
-# Cygwin option: auto-launch the completed cross-faded video:
-# cygstart ./"$1"_xFade"$3"s_"$2".avi
+	# Cygwin option: auto-launch the completed cross-faded video:
+	# cygstart ./"$1"_xFade"$3"s_"$2".avi
+fi
