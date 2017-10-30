@@ -1,6 +1,5 @@
 # DESCRIPTION
 # Renames files with random character strings of length n (per paramater passed to script or default 4), preserving file extension.
-# TO DO--DONE: make this keep extensions. this is quick and drity for flam3 files. 06/12/2016 09:15:44 AM -RAH -- DONE 2016-07-16 6:33 PM -RAH
 
 # USAGE
 # WARNING: This will randomly rename *all files in a tree* (including subfolders) and move the renamed files to the root folder this script is invoked from.
@@ -69,5 +68,6 @@ done
 
 
 # DEVELOPMENT HISTORY
+# made this keep extensions. this is quick and dirty for flam3 files. 06/12/2016 09:15:44 AM -RAH -- DONE 2016-07-16 6:33 PM -RAH
 # Prior to now: script that was inefficient by reading 4 bytes from /dev/urandom with every single file rename.
 # 2016-07-16 Made script much more efficient by prefetching necessary number of random characters into a variable, and fetching iterative groups of chars from said variable (in memory, instead of using a file on disk). -RAH
