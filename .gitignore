@@ -3,3 +3,4 @@
 .DS_Store
 /bin/FilterForgeBatchWrapper/sourceImagesList.txt
 /bin/FilterForgeBatchWrapper/ffBatch_FAWKES.ini
+node_modules
