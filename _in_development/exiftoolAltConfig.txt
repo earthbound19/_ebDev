@@ -1,0 +1,8 @@
+Trying something I saw here; first try fail; re http://u88.n24.queensu.ca/exiftool/forum/index.php?topic=4336.0 :
+Failed invoke with: exiftool -config exiftoolAltCongig.txt "-filename<$MyRandomNumber" .
+
+MyRandomNumber => {
+	Require => 'FileName',
+	ValueConv => 'int(rand(10000))',
+	PrintConv => 'sprintf("%.4d",$val)',
+},
