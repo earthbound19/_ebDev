@@ -10,7 +10,7 @@
 crossFadeDuration=5.8
 
 # CODE
-# I strongly suspect this script could be done more swiftly and elegantly with Python. But here it is; I coded it, it works, and I am not re-doing it.
+# I strongly suspect this script could be done more swiftly and elegantly with Python. But here it is; I coded it, it works, and I am not re-doing it. (Unless I am.)
 # Runs needed to render this sequence:
 # mkNumberedCopiesFromFileList.sh
 # cd numberedCopies
@@ -25,8 +25,8 @@ count=1
 pairArrayCount=0
 while read element
 do
-	# if (( $count % 2 ))	# ODD RUN: for the first run, uncomment this and comment out the next line.
-	if ! (( $count % 2 ))	# EVEN RUN: for the second run, uncomment this and comment out the previous line.
+	if (( $count % 2 ))	# ODD RUN: for the first run, uncomment this and comment out the next line.
+	# if ! (( $count % 2 ))	# EVEN RUN: for the second run, uncomment this and comment out the previous line.
 	then
 		# Re a genius breath yon: https://stackoverflow.com/a/6022431/1397555
 		# Gets Nth line from a file via sed (fragment of sed command), set in a variable because I haven't got bash to parse variables and a sed command the way I want in-line:

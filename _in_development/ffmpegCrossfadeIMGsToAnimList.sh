@@ -6,11 +6,12 @@
 # imgsGetSimilar.sh png
 
 # TO DO
-# Paramaterize whether to run against %2 (even-denominated pairs) or ! %2 (odd-denominated pairs); the latter being between the former to dovetail the former crossfades into the latter. OR build in logic that does a second odd-number run. UNTIL THEN, see the comments "EVEN RUN" and "ODD RUN."
+# Paramaterize whether to run against %2 (even-denominated pairs) or ! %2 (odd-denominated pairs); the latter being between the former to dovetail the former crossfades into the latter. OR build in logic that does a second odd-number run. UNTIL THEN, see the comments "EVEN RUN" and "ODD RUN." OR do something more clever to have it run odd and even pairs both, in one run.
 # Parameterize source image extension.
 # Parameterize crossfade duration.
 
-crossFadeDuration=5.8
+crossFadeDuration=2.4
+# crossFadeDuration=5.8
 
 # CODE
 # I strongly suspect this script could be done more swiftly and elegantly with Python. But here it is; I coded it, it works, and I am not re-doing it.
@@ -18,7 +19,7 @@ crossFadeDuration=5.8
 # mkNumberedCopiesFromFileList.sh
 # cd numberedCopies
 
-# Use ffmpegCrossfadeImagesToAnim.sh repeatedly on pairs of images by number until there are no more:
+# Use ffmpegCrossfadeIMGsToAnim.sh repeatedly on pairs of images by number until there are no more:
 gfind *.png > numberedCopies.txt
 
 # create an array from that list; I won't do this with mapfile because it's not found on platforms I use (though could it be?) :
@@ -26,8 +27,8 @@ count=1
 pairArrayCount=0
 while read element
 do
-	# if (( $count % 2 ))	# ODD RUN: for the first run, uncomment this and comment out the next line.
-	if ! (( $count % 2 ))	# EVEN RUN: for the second run, uncomment this and comment out the previous line.
+	if (( $count % 2 ))	# ODD RUN: for the first run, uncomment this and comment out the next line.
+	# if ! (( $count % 2 ))	# EVEN RUN: for the second run, uncomment this and comment out the previous line.
 	then
 		# Re a genius breath yon: https://stackoverflow.com/a/6022431/1397555
 		# And because I can't . . . interpolate? the $count variable in-line in a sed command:
@@ -53,6 +54,6 @@ for element in ${pairArray[@]}
 do
 	imgOne=`echo $element | gsed 's/\(.*\),.*/\1/g' | tr -d '\15\32'`
 	imgTwo=`echo $element | gsed 's/.*,\(.*\)/\1/g' | tr -d '\15\32'`
-	echo invoking ffmpegCrossfadeImagesToAnim.sh with image pair $element . . .
-	ffmpegCrossfadeImagesToAnim.sh $imgOne $imgTwo $crossFadeDuration
+	echo invoking ffmpegCrossfadeIMGsToAnim.sh with image pair $element . . .
+	ffmpegCrossfadeIMGsToAnim.sh $imgOne $imgTwo $crossFadeDuration
 done
