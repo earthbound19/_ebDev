@@ -3,6 +3,8 @@
 // -- then from a path you intend to use it from, run this command:
 // npm link ag-psd
 
+// or maybe? : https://stackoverflow.com/questions/11794344/imagemagick-multi-layer-tiff
+
 // Working up this test re:  re: https://www.npmjs.com/package/ag-psd
 console.log('Code start . . .')
 
@@ -30,4 +32,4 @@ fs.writeFileSync('test800x800.psd', buffer)
 console.log('Code end.')
 
 console.log('Functions available from agpsd:\n')
-console.log(Object.getOwnPropertyNames(agpsd))
+console.log(Object.getOwnPropertyNames(agpsd.PsdReader))
