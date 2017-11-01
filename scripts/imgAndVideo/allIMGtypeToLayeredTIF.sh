@@ -5,5 +5,8 @@ gfind *.$1 > all_$1.txt
 
 while read element
 do
-	echo $element
+	# echo $element
+	inputFiles="$inputFiles " "$element"
 done < all_$1.txt
+
+echo all inptue files val is $inputFiles
