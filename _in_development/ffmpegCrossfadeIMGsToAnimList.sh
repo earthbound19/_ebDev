@@ -2,7 +2,7 @@
 # Render a sequence of image crossfades from a list (e.g. by next most similar image), using ffmpegCrossfadeIMGsToAnim.sh repeatedly. Several other scripts (commented out here near the start) must first be run against a series of images.
 
 # PRECURSOR RUNS needed: they take a while (depending, or even a llooong time), so you'll want to keep the file IMGlistByMostSimilar.txt created by the second:
-# renumberFiles.sh png
+# OPTIONAL, depending on circumstance: renumberFiles.sh png
 # imgsGetSimilar.sh png
 
 # TO DO
@@ -10,7 +10,9 @@
 # Parameterize source image extension.
 # Parameterize crossfade duration.
 
-crossFadeDuration=2.4
+# crossFadeDuration=1.68
+# crossFadeDuration=2.4
+crossFadeDuration=4.36
 # crossFadeDuration=5.8
 
 # CODE
@@ -19,8 +21,10 @@ crossFadeDuration=2.4
 # mkNumberedCopiesFromFileList.sh
 # cd numberedCopies
 
-# Use ffmpegCrossfadeIMGsToAnim.sh repeatedly on pairs of images by number until there are no more:
-gfind *.png > numberedCopies.txt
+# Use ffmpegCrossfadeIMGsToAnim.sh repeatedly on pairs of images by number until there are no more; UNLESS you're using IMGlistByMostSimilar.txt, in which case comment out the next line:
+# gfind *.png > numberedCopies.txt
+# AGH. filesReadList=numberedCopies.txt
+filesReadList=IMGlistByMostSimilar.txt
 
 # create an array from that list; I won't do this with mapfile because it's not found on platforms I use (though could it be?) :
 count=1
@@ -34,11 +38,11 @@ do
 		# And because I can't . . . interpolate? the $count variable in-line in a sed command:
 		sedCommand="$count""q;d"
 		# Slowish, but faster than other options if I am to believe said genius breath yon; stores current (even) list item number in a variable; ALSO the tr -d command eliminates a maddening problem of gsed returning windows-style line endings, which much up echo and varaible concatenation commands so that elements after one varaible with a bad line ending disappear; RE: https://stackoverflow.com/a/16768848/1397555
-		secondOfPair=`gsed "$sedCommand" numberedCopies.txt | tr -d '\15\32'`
+		secondOfPair=`gsed "$sedCommand" "$filesReadList" | tr -d '\15\32'`
 				# echo secondOfPair is $secondOfPair
 		countMinusOne=$(($count - 1))
 		sedCommand="$countMinusOne""q;d"
-		firstOfPair=`gsed "$sedCommand" numberedCopies.txt | tr -d '\15\32'`
+		firstOfPair=`gsed "$sedCommand" "$filesReadList" | tr -d '\15\32'`
 				# echo firstOfPair is $firstOfPair
 				# echo "$firstOfPair,$secondOfPair"
 		pairArray[$pairArrayCount]="$firstOfPair,$secondOfPair"
@@ -47,13 +51,12 @@ do
 		pairArrayCount=$((pairArrayCount + 1))
 	fi
 	count=$((count + 1))
-done < numberedCopies.txt
-rm ./numberedCopies.txt
+done < $filesReadList
 
 for element in ${pairArray[@]}
 do
 	imgOne=`echo $element | gsed 's/\(.*\),.*/\1/g' | tr -d '\15\32'`
 	imgTwo=`echo $element | gsed 's/.*,\(.*\)/\1/g' | tr -d '\15\32'`
 	echo invoking ffmpegCrossfadeIMGsToAnim.sh with image pair $element . . .
-	ffmpegCrossfadeIMGsToAnim.sh $imgOne $imgTwo $crossFadeDuration
+	echo ffmpegCrossfadeIMGsToAnim.sh $imgOne $imgTwo $crossFadeDuration
 done
