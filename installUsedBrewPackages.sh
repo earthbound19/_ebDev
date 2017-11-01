@@ -16,6 +16,7 @@ cocoapods \
 coreutils \
 cryptopp \
 ffmpeg \
+findutils \
 fish \
 freetype \
 gdbm \
