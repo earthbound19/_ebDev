@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Outputs a .jpg image frame from a given percent (time) of an input video file.
+# Outputs a .jpg image frame from a given percent (time) of an input video file. Output image is _video_frame_.jpg at this writing (plan: name it after the input video).
 
 # USAGE
 # Pass this script two parameters, being:
@@ -33,4 +33,6 @@ eval "$(ffprobe -v error -of flat=s=_ -show_entries format=duration tmp.mp4)"
 	# echo "scale=5; $xPix / $yPix" | bc
 selectSecond=`echo "scale=0; $format_duration" | bc`
 
+# re: https://stackoverflow.com/a/1198191/1397555
 ffmpeg -ss $selectSecond -i tmp.mp4 -crf 1 -frames:v 1 oot.jpg
+rm tmp.mp4
