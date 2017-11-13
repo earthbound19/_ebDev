@@ -19,7 +19,17 @@
 
 
 # IMPORTANT GLOBAL:
-skipHeaderBytes=1
+	# This isn't necessarily an accurate number of bytes for any header of any bmp image; the header size varies and would have to be determined by parsing the format;
+	# "So what you want to do is read the bytes at offsets 10-13, parse them as a 4-byte integer, and that integer represents where in the file to seek to get all of the image data." Re: https://stackoverflow.com/a/21368975
+	# http://karpolan.com/software/bmp-header-remover/
+	# http://magazine.art21.org/2011/09/13/how-to-create-a-bitmap-image-file-by-hand-without-stencils/#.WgktdyZlBcY
+	# possibly the best concise guide: http://www.dragonwins.com/domains/getteched/bmp/bmpfileformat.htm
+	# https://en.wikipedia.org/wiki/BMP_file_format#File_structure
+	# Interesting--! all possible images in a given resolution generator: http://code.activestate.com/recipes/577674-bitmap-maker/
+	# To create a "black" 0x0 bitmap, which turns out 66 bytes:
+	# gm convert -size 0x0 xc:black out.bmp
+		# HEADER NOTES: Little Endian. File header 14 bytes, ends at 0xE. 0xA (in 4 bytes, starting 10 bytes into file) tells offset to start of pixel data. 0x12 is where image dimensions are given, w and h, 4 bytes each. 0xE gives size of image header (at end of which pixel data starts?) in bytes.
+skipHeaderBytes=66
 
 fileToMakeCorruptedCopyOf=$1
 percentToCorrupt=$2
