@@ -1,7 +1,7 @@
 # DESCRIPTION: Tags images with easily customizable metadata; Customizable via a simple editable text file template. Must run prepMediaMetaData.sh and/or other scripts before.
 
 # USAGE: NOTE that a run of prepMediaMetaData.sh must precede this script, or this script will not work. ALSO: correct. (MEAGER) NOTES: This expects all images it works upon to be .tif images, and won't work with anything else. Maybe I'll change it to also do non-standard tags in .png files, and do other source formats also.
-# NOTE: fer mysic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
+# NOTE: fer mystic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
 
 # TO DO; * = done, / = in progress:
 # Don't do any copying and metadata then copy again operations if the target file in _dist already exists (it's recreating them but shouldn't--maybe this is a bug, as I already coded for that.)

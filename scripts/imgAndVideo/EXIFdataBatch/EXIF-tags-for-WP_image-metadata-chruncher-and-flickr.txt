@@ -16,7 +16,7 @@ MWG Regions Tags could probably be used to automatically crop an image for myria
 
 TITLE
 !WP,!--managed by prepImageMetaData.sh:	IPTC:ObjectName
-_	IPTC:Headline -- flickr image title (isn't ObjectName also used, if present?
+_	IPTC:Headline -- flickr image title (isn't ObjectName also used, if present?)
 ^-	EXIF:DocumentName
 x	IPTC:Document Title? ~:ObjectName?
 ^	exiftool -Title= -- where does this go?
