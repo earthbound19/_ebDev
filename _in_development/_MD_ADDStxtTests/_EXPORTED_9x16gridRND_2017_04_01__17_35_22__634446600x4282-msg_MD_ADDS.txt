@@ -1,6 +1,0 @@
--IPTC:ObjectName="9x16 random color grid with message 2017 04 01"
--MWG:Description="you may see duplicates of previously published art here for technical reasons i'm not bothering to fix kthxbai"
--MWG:Keywords="art, digital, abstract, contemporary, myWork"
--MWG:Copyright="Richard Alexander Hall http://earthbound.io/contact"
--MWG:Creator="Richard Alexander Hall"
--EXIF:ImageHistory="Exported or copied from master file: ./_EXPORTED_9x16gridRND_2017_04_01__17_35_22__634446600x4282-msg.jpg"

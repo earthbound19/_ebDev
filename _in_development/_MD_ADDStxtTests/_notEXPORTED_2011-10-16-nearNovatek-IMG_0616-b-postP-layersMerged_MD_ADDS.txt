@@ -1,6 +1,0 @@
--IPTC:ObjectName="Mountain Landscape over Downtown Provo UT"
--MWG:Description="A hoity-toity robot talks about this at http://s.earthbound.io/artgib ~ Process description, syndicated from, original, print and usage options at http://s.earthbound.io/9"
--MWG:Keywords="art, digital, contemporary, MyWork"
--MWG:Copyright="Richard Alexander Hall http://earthbound.io/contact"
--MWG:Creator="Richard Alexander Hall"
--EXIF:ImageHistory="Exported or copied from master file: ./_FINAL_2011-10-16-nearNovatek-IMG_0616-b-postP-layersMerged.psd"

@@ -1,6 +1,0 @@
--IPTC:ObjectName="A Glitch in Lucifer's Plan--select frame 0002--recolored mosaic variant"
--MWG:Description="Still from an animation by yours truly ~ Syndicated from, original, print and usage options at http://replaceThisURL"
--MWG:Keywords="myWork, glitch, art, digital, abstract, experimental, symbol, cross, contemporary, pixelated, mosaic"
--MWG:Copyright="I release this work into the Public Domain. http://earthbound.io/contact"
--MWG:Creator="Richard Alexander Hall"
--EXIF:ImageHistory="Exported or copied from master file: ./_EXPORTED_FINALvariant_B_pixelated.jpg"

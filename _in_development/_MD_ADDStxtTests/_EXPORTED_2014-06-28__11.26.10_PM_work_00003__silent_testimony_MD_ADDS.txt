@@ -1,6 +1,0 @@
--IPTC:ObjectName="Silent Testimony (Work 00003)"
--MWG:Description="Thank you, Brothers and Sisters, for your testimonies. Also, thank you to those of you who bore your testimonies silently. Brother Hall has produced a painting which we thought it would be appropriate to hang in the foyer. What? What's funny about it? Why are some of you laughing? I think it's a nice painting. ~ See http://s.earthbound.io/1x for archive, original, print and usage options. ~ A hoity-toity robot talks about this at http://s.earthbound.io/artgib"
--MWG:Keywords="art digital contemporary boring stillLife farce LDS flowers impressionist mormon pots surreal water testimony myWork"
--MWG:Copyright="Richard Alexander Hall http://earthbound.io/contact"
--MWG:Creator="Richard Alexander Hall"
--EXIF:ImageHistory="First publication blar Exported or copied from master file: ./_EXPORTED_2014-06-28__11.26.10_PM_work_00003__silent_testimony.jpg"
