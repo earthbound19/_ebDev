@@ -1,0 +1,6 @@
+-IPTC:ObjectName="Work 00059 abstraction variant color blindness chart experiment"
+-MWG:Description="See http://s.earthbound.io/4f for original, print and usage. ~ A hoity-toity robot talks about this at http://s.earthbound.io/artgib"
+-MWG:Keywords="art, digital, abstract, contemporary, myWork"
+-MWG:Copyright="Richard Alexander Hall http://earthbound.io/contact"
+-MWG:Creator="Richard Alexander Hall"
+-EXIF:ImageHistory="Exported or copied from master file: ./_EXPORTED_abstraction_lightGradient9-krita-splatter-test_var_colorBlindnessExperiment.jpg"

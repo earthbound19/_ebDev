@@ -1,0 +1,6 @@
+-IPTC:ObjectName="SOL (Work 00007)"
+-MWG:Description="SOL began as an experiment creating brush stroke-style particle effects. Tools used: 3ds Max, Painter, Photoshop. Digital oil, watercolor, and pencil. See http://s.earthbound.io/23 for archive, original, print and usage options. ~ A hoity-toity robot talks about this at http://s.earthbound.io/artgib"
+-MWG:Keywords="art digital contemporary myWork"
+-MWG:Copyright="Richard Alexander Hall http://earthbound.io/contact"
+-MWG:Creator="Richard Alexander Hall"
+-EXIF:ImageHistory="First publication blor Exported or copied from master file: ./_EXPORTED_2014-07-15__01.08.28_PM_SOL_FINAL_work_00007.jpg"
