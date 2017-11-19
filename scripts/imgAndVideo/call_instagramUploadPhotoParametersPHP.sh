@@ -1,27 +1,34 @@
 # USAGE
-# Invoke with two parameters:
+# Invoke with the following parameters:
 # $1 instagram username (e.g. earthbound.io)
 # $2 image file name to upload thereto, which image must be in your current PATH
 # $3 caption for photo (surrounded by double quotes)
 # -- e.g.:
 # thisScript.sh earthbound.io ./_EXPORTED_M_variantWork_00099_FFsideToside_v02_PZ-8280x.jpg
 
-# NOTE
-# This script provides the password parameter to uploadImageToInstagram.php via a text file (which text file you should keep secure in your home path, and out of any repository!), ~/instagramPassword.txt -- ALSO NOTE that the /examples subdir of the Instagram-API repository must be in your PATH, as this script searches for one file UploadPhotoCLI.php in your path, and cds into that directory, AND LASTLY NOTE that owing to something butchering captions here, the caption parameter will be blanked out in this script until that is fixed.
+# DEPENDENCIES
+# - A text file in your home dir, ~/instagramPassword.txt.
+# - Cygwin.
+# - PHP Composer? -- https://getcomposer.org/download/ -- to install the Instagram-API (unofficial! re https://github.com/mgp25/Instagram-API) PHP script packages; UploadPhotoParameters.php should also be in your path.
+# After composer is installed and you have reloaded the %PATH% (e.g. by logging off and on), install Instagram-API via this DOS terminal command:
+# composer require mgp25/instagram-php
+
+# NOTES
+# This script provides the password parameter to UploadPhotoParameters.php via a text file (which text file you should keep secure in your home path, and out of any repository!), ~/instagramPassword.txt -- ALSO NOTE that the /examples subdir of the Instagram-API repository must be in your PATH, as this script searches for one file UploadPhotoParameters.php in your path, and cds into that directory, AND LASTLY NOTE (or is this still true--? check and document here) that owing to something butchering captions here, the caption parameter will be blanked out in this script until that is fixed.
 
 currentDir=`pwd`
 currentDir=`cygpath -w "$currentDir"`
 FullIMGpath="$currentDir"\\"$2"
 		# echo $FullIMGpath
 
-tmp=`which UploadPhotoCLI.php`
+tmp=`which UploadPhotoParameters.php`
 instagramAPIrepoPath=`dirname "$tmp"`
 if [ $? == "0" ]
 then
 	foundAPIpath=1
 else
 	foundAPIpath=0
-	echo Could not locate UploadPhotoCLI.php. Aborting script.
+	echo Could not locate UploadPhotoParameters.php. Aborting script.
 	exit
 fi
 		# echo path found is\:
@@ -43,9 +50,9 @@ then
 			echo moving to another dir . . .
 	cd $instagramAPIrepoPath
 			echo Writing command to batch and invoking batch:
-			echo php UploadPhotoCLI.php $1 $pw $FullIMGpath \"$caption\"
+			echo php UploadPhotoParameters.php $1 $pw $FullIMGpath \"$caption\"
 	# This is ridiculous, but the only thing I've found that works: export the command to a stinking .bat file and call that .bat file.
-	echo php UploadPhotoCLI.php $1 $pw $FullIMGpath \"$caption\" > tmp_dZv7S9WXXheh298ApQFmtyWnB6ya877vZw.bat
+	echo php UploadPhotoParameters.php $1 $pw $FullIMGpath \"$caption\" > tmp_dZv7S9WXXheh298ApQFmtyWnB6ya877vZw.bat
 	chmod 777 ./tmp_dZv7S9WXXheh298ApQFmtyWnB6ya877vZw.bat
 	tmp_dZv7S9WXXheh298ApQFmtyWnB6ya877vZw.bat
 	rm ./tmp_dZv7S9WXXheh298ApQFmtyWnB6ya877vZw.bat

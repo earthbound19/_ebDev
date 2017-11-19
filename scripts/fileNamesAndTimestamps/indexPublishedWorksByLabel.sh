@@ -1,22 +1,22 @@
 # DESCRIPTION
 # Indexes all text files in a directory tree with a file name of pattern .*_EXPORTED_.*_MD_ADDS.txt (case-sensitive). Such file names which contain the string:
-# -EXIF:ImageHistory=".*First publication.*
+# -EXIF:ImageHistory=".*publication.*
 # -- will be written to __EXPORTED_PUBLISHED_WORKS.txt, BY OVERWRITE (the file contents will be replaced). Such file names which do *not* contain that string will be written to __EXPORTED_UNPUBLISHED_WORKS.txt, also by overwrite.
 # These files are reference for publishing my art work (determining what to publish next).
 
 # DEPENDENCIES
-# Gnu core utils, Everything search engine CLI (and an install of Everything search engine tool).
+# Cygwin (and gsed), Everything search engine CLI (and an install of Everything search engine tool).
 
 # USAGE
 # Invoke this script from the root of a directory tree with so many so name-patterned text files you wish to index; e.g.:
 # ./thisScript.sh
 
-# NOTES
+# DEV NOTES
 # This is a ghastly mutant of various text processing tools, and tied to the Windows platform (you can find code commented out with "DEPRECATED" comments, code which will make it work on a 'nix platform), but it works.
 
 # TO DO
-# Parameterize label so I can index works by keyword indicating publication at e.g. Flickr, Diaspora*, or email list. Get sed/gsed stinking case-insensitive search (necessarily) working for that task.
-# index MD_ADDS-~named text file names not compliant to pattern standard (to find and fix up anything so erroneously named). How can I do non-matches with Everything CLI? There is a general expression option. Use a general expression?
+# Parameterize label so I can index works by keyword indicating publication at e.g. Flickr, Diaspora*, or email list. The grep -i flag which is in place already makes the search for that label case-insensitive. When you do this, update the documentation under DESCRIPTION.
+# Index MD_ADDS-~named text file names that do not also have the label _EXPORTED_ (to find and fix up anything so erroneously named). How can I do non-matches with Everything CLI? There is a general expression option. Use a general expression?
 
 
 # CODE
@@ -48,7 +48,7 @@ done < _tmp_4UFKgbkrnpDvZK.txt
 printf "" > __EXPORTED_PUBLISHED_WORKS.txt
 printf "" > __EXPORTED_UNPUBLISHED_WORKS.txt
 
-echo Scanning all files in this directory tree that match file name pattern \.\*_EXPORTED_.\*_MD_ADDS.txt\, each for a line matching pattern \-EXIF\:ImageHistory\=\"\.\*\[pP\]ublication
+echo Scanning all files in this directory tree that match file name pattern \.\*_EXPORTED_.\*_MD_ADDS.txt\, each for a line matching pattern \-EXIF\:ImageHistory\=\"\.\*\published \(case-insensitive\)
 echo . . .
 # Read the lines in that temp file in a loop, run a grep operation on each file searching for a pattern, and log whether the pattern was found in the two described files:
 while read element
@@ -62,7 +62,7 @@ do
 	echo checking file\: $element . . .
 	echo ~~~~
 	# Command that matches the desired pattern, and sets errorlevel as a result to 0 if the pattern is found:
-	grep '\-EXIF\:ImageHistory=".*[pP]ublication' "$element"
+	grep -i '\-EXIF\:ImageHistory=".*published' "$element"
 	# After that command, errorlevel will be 0 if a match was found, and 1 if a match was not found. Exploit this. Store state of errorlevel after that command, in a variable:
 	thisErrorLevel=`echo $?`
 	if [ "$thisErrorLevel" == "0" ]
