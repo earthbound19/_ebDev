@@ -35,7 +35,7 @@ howManyImages=$3
 # if $6 was passed to script (if $6 not null), "randomly" shuffle the elements of the source file into a temp file, and generate the array from that. If no $6, just copy the file (without shuffling it) into a temp file, create the array from the temp file, and destroy the temp file.
 if [ ! -z ${6+x} ]
 then
-	shuf $4 > tmp_feoijwefjojeoo.txt
+	gshuf $4 > tmp_feoijwefjojeoo.txt
 else
 	cp $4 tmp_feoijwefjojeoo.txt
 fi
@@ -80,7 +80,7 @@ do
 												# colorListIterate=0
 											# fi
 						else
-							pick=`shuf -i 0-"$sizeOf_hexColorsArray" -n 1`
+							pick=`gshuf -i 0-"$sizeOf_hexColorsArray" -n 1`
 						fi
 				hex=${hexColorsArray[$pick]}
 				# If $hex is an invalid hex color (0, because I assigned from out of range of the array, or in other words we used all the colors in the list), default to gray #404040, re stdout error when this was a bug: "line 69: printf: 0x: invalid hex number" :
@@ -96,7 +96,7 @@ do
 				printf "%d\n %d\n %d\n" 0x${hex:1:2} 0x${hex:3:2} 0x${hex:5:2} >> temp.txt
 			done
 		else
-			shuf -i 1-255 -n $numbersNeedsPerRow > temp.txt
+			gshuf -i 1-255 -n $numbersNeedsPerRow > temp.txt
 		fi
 		tr '\n' ' ' < temp.txt > $rowCount.temp
 		# adds a newline after that last line:

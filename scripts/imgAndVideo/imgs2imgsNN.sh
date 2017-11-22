@@ -16,10 +16,7 @@
 	# find . *.$1 > all_$1.txt
 find *.$1 > all_$1.txt
 
-mapfile -t all_imgs < all_$1.txt
-rm all_$1.txt
-
-for img in ${all_imgs[@]}
+while read img
 do
 			# echo img is $img
 	imgFileNoExt=`echo $img | sed 's/\(.*\)\..\{1,4\}/\1/g'`
@@ -37,4 +34,6 @@ do
 		else
 			echo Target file $imgFileNoExt.$2 already exists\; delete the file if you wish to re-render it\; SKIPPING RENDER . . .
 	fi
-done
+done < all_$1.txt
+
+rm all_$1.txt
