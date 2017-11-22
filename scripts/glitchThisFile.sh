@@ -9,13 +9,16 @@
 # NOTE: See comment ALTERNATE OPTIONS HERE for other percent options (which are effective for variously sized files)
 
 # TO DO
+# speed up using maths discovered in data2BMPglitchArt.sh (see comments in that) development
 # optional random truncation (deletion) of bytes
 # throw errors for missing paramaters and exit.
 # If the source file is a common movie format, convert it first to a transport stream and corrupt that?
-# Exert fine control over header bytes skipped (by using dd bs=1, where it is now using the default 512 bytes).
 
 # NOT TO DO
 # In-memory instead of on-disk corruption via xxd. Tried hexStr=`xxd -ps imgData.dat` . . . then (after corruption), with the -r switch reverse the operation. It was prohibitively slow. Piping the output to a file also (resulted in gigabytes-size file).
+
+# DEVELOPMENT LOG
+# Discovered by reading help and re-examining that for my purposes (prompted by data2BMPglitchArt.sh development) that I must add bs=1 to dd operations or I am copying way more bytes than I intend (I think?). Updated script accordingly. 11/21/2017 09:37:02 PM -RAH
 
 
 # IMPORTANT GLOBAL:
@@ -26,10 +29,7 @@
 	# possibly the best concise guide: http://www.dragonwins.com/domains/getteched/bmp/bmpfileformat.htm
 	# https://en.wikipedia.org/wiki/BMP_file_format#File_structure
 	# Interesting--! all possible images in a given resolution generator: http://code.activestate.com/recipes/577674-bitmap-maker/
-	# To create a "black" 0x0 bitmap, which turns out 66 bytes:
-	# gm convert -size 0x0 xc:black out.bmp
-		# HEADER NOTES: Little Endian. File header 14 bytes, ends at 0xE. 0xA (in 4 bytes, starting 10 bytes into file) tells offset to start of pixel data. 0x12 is where image dimensions are given, w and h, 4 bytes each. 0xE gives size of image header (at end of which pixel data starts?) in bytes.
-skipHeaderBytes=66
+skipHeaderBytes=54
 
 fileToMakeCorruptedCopyOf=$1
 percentToCorrupt=$2
@@ -43,9 +43,9 @@ __size=${__ln[3]}
 __size_minus_header=$((__size - $skipHeaderBytes))
 		echo file size minus header, in bytes, is $__size_minus_header.
 		echo command one\: dd count=$skipHeaderBytes if=$fileToMakeCorruptedCopyOf of=header.dat
-dd count=$skipHeaderBytes if=$fileToMakeCorruptedCopyOf of=header.dat
+dd bs=1 count=$skipHeaderBytes if=$fileToMakeCorruptedCopyOf of=header.dat
 		echo command two\: dd skip=$skipHeaderBytes if=$fileToMakeCorruptedCopyOf of=imgData.dat
-dd skip=$skipHeaderBytes if=$fileToMakeCorruptedCopyOf of=imgData.dat
+dd bs=1 skip=$skipHeaderBytes if=$fileToMakeCorruptedCopyOf of=imgData.dat
 
 __ln=( $( ls -Lon "imgData.dat" ) )
 __size=${__ln[3]}
