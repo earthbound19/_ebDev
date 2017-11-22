@@ -26,7 +26,7 @@ BMPsideLength=`echo "sqrt ($__size)" | bc`
     # echo BMPsideLength $BMPsideLength
 # divide that by 3 because we're going to use three decimal values from 0-255 for each pixel on each row:
 BMPsideLength=$((BMPsideLength / 3))
-    # echo now is $BMPsideLength
+    echo BMP length on each side will be $BMPsideLength. Churning HEX data into decimal triplets\, each of which will be an RGB value . . .
 
 # Make P3 PPM format header:
 echo "P3" > PPMheader.txt
@@ -55,7 +55,11 @@ do
       if (($colsCount == $BMPsideLength))
       then
         # append RGBvalsRowTXT row to PPM body buildup file, and reset colsCount and RGBvalsRowTXT for next row accumulation:
+        echo Made row at offset $i of $__size\; RGB decimal values\:
+        echo $RGBvalsRowTXT
+        echo appending that to PPM text body . . .
         echo $RGBvalsRowTXT >> PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+        echo ~~
         colsCount=0
         RGBvalsRowTXT=
       fi
@@ -66,4 +70,5 @@ cat PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt > "$inputDataFile"_a
 
 rm PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 
+# OPTIONAL open of the file immediately after render (for Cygwin, "open" must be "cygstart") :
 # open "$inputDataFile"_asPPM.ppm
