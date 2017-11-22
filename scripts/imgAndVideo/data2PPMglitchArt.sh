@@ -66,4 +66,4 @@ cat PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt > "$inputDataFile"_a
 
 rm PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 
-open "$inputDataFile"_asPPM.ppm
+# open "$inputDataFile"_asPPM.ppm
