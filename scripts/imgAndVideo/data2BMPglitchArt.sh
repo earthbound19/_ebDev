@@ -12,7 +12,11 @@
 
 # TO DO
 # Various data mapping, signal processing/pattern matching type things to data to more meaningfully map it to color values. e.g. for every  raw RGB (three values from 0 to 255)-aligned datum map to fewer values approximating the range of that datum?
-# Make a script that does this in ppm format, translating hex-mapped values to RGB values?
+# Make a script that does this in ppm format, translating hex-mapped values to RGB values? Could (slowly) convert hex pairs to decimal numbers between 0 and 255 this way:
+# valOne=`xxd -ps ocean2.wav`
+# ..read over pairs of those values (put each in valTwo) and convert them to decimal:
+# echo $((0x"$valTwo"))
+# ..
 
 fileToMakeCorruptedCopyOf=$1
 __ln=( $( ls -Lon "$fileToMakeCorruptedCopyOf" ) )
