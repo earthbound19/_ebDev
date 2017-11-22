@@ -61,7 +61,9 @@ sed -i -e 's/.*: \(.*\).*/\1/g' -e 's/<.*>//g' rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZH
 timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
 tr -d '\n' < rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt > __trueRandomData_"$timestamp"_HEXsrcTable.txt
 rm rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt
-xxd -r -p __trueRandomData_"$timestamp"_HEXsrcTable.txt __trueRandomData_"$timestamp".dat
+# Huh? There is no -p flag. Did I mean -ps? TO DO: check:
+# xxd -r -p __trueRandomData_"$timestamp"_HEXsrcTable.txt __trueRandomData_"$timestamp".dat
+xxd -r -ps __trueRandomData_"$timestamp"_HEXsrcTable.txt __trueRandomData_"$timestamp".dat
 
 mv __trueRandomData_"$timestamp"_HEXsrcTable.txt __trueRandomData_"$timestamp".dat ../_final_TRND_archive
 
