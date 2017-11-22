@@ -18,16 +18,52 @@
 # Does a square root calculation (rounded) from the byte size of the data to determine the bmp X and Y dimensions which this creates a header from.
 
 # CODE
-fileToMakeCorruptedCopyOf=$1
-__ln=( $( ls -Lon "$fileToMakeCorruptedCopyOf" ) )
+inputDataFile=$1
+__ln=( $( ls -Lon "$inputDataFile" ) )
 __size=${__ln[3]}
-side=`echo "sqrt ($__size)" | bc`
+    # echo __size val is\: $__size
+BMPsideLength=`echo "sqrt ($__size)" | bc`
+    # echo BMPsideLength $BMPsideLength
+# divide that by 3 because we're going to use three decimal values from 0-255 for each pixel on each row:
+BMPsideLength=$((BMPsideLength / 3))
+    # echo now is $BMPsideLength
 
+# Make P3 PPM format header:
+echo "P3" > PPMheader.txt
+echo "# The P3 means colors are in ascii, then $BMPsideLength columns and $BMPsideLength rows, then 255 for max color, then RGB triplets within that range:" >> PPMheader.txt
+echo $BMPsideLength $BMPsideLength >> PPMheader.txt
+echo 255 >> PPMheader.txt
+
+# will this break for very large files? :
+hexMonolith=`xxd -ps $inputDataFile`
+# remove spaces (and line breaks?) from that:
+hexMonolith=`echo $hexMonolith | tr -d ' \n'`
+    # echo hexMonolith val is\:
+    # echo $hexMonolith
+
+hexPairIndexCounter=0
+colsCount=0
+printf "" > PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+RGBvalsRowTXT=
 for i in $( seq $__size )
 do
-	echo fyerp
+      tmpHEX=${hexMonolith:$hexPairIndexCounter:2}
+      RGBval=`echo $((16#$tmpHEX))`
+      # echo RGBval $RGBval
+      RGBvalsRowTXT="$RGBvalsRowTXT $RGBval"
+      colsCount=$((colsCount + 1))
+      if (($colsCount == $BMPsideLength))
+      then
+        # append RGBvalsRowTXT row to PPM body buildup file, and reset colsCount and RGBvalsRowTXT for next row accumulation:
+        echo $RGBvalsRowTXT >> PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+        colsCount=0
+        RGBvalsRowTXT=
+      fi
+      hexPairIndexCounter=$((hexPairIndexCounter + 2))
 done
 
-# cat stubHeader.txt "$fileToMakeCorruptedCopyOf"_rawHexTXT.txt > "$fileToMakeCorruptedCopyOf"_asPPM.ppm
+cat PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt > "$inputDataFile"_asPPM.ppm
 
-# rm stubHeader.txt "$fileToMakeCorruptedCopyOf"_rawHexTXT.txt
+rm PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+
+open "$inputDataFile"_asPPM.ppm
