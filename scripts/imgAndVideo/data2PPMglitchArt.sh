@@ -1,17 +1,5 @@
-<<<<<<< HEAD
-# DESCRIPTION
-# Makes glitch art from any data source by creating a ppm header approximating a defined image size (at this writing square) into which that data would fit; takes that image header and writes rows of copied hex value pairs (converted to decimal) into an RGB value array which composes the remainder of the PPM format file. The result may be converted to any other image format e.g. via GraphicsMagick. Results end up in a new PPM image file named "$inputDataFile"_asPPM.ppm
-=======
-# Make a script that does this in ppm format, translating hex-mapped values to RGB values? Could (slowly) convert hex pairs to decimal numbers between 0 and 255 this way:
-# valOne=`xxd -ps ocean2.wav`
-# ..read over pairs of those values (put each in valTwo) and convert them to decimal, by adapting this, assuming $x is a string variable, and $p is an incrementing position:
-# echo ${x:$p:2}          ;# syntax is ${string:index:length}
-# ..
-
-
 # DESCRIPTION
 # Makes glitch art from any data source by creating a ppm header approximating a defined image size (at this writing square) into which that data would fit; takes that image header and slaps raw copied hex value pairs (converted to decimal) into an RGB value array which composes the remainder of the PPM format file. The result may be converted to any other image format e.g. via GraphicsMagick.
->>>>>>> ef8caf4f9a83a28e99197c08b655b2a55e56e338
 
 # USAGE
 # ./thisScript.sh dataSource.file
@@ -19,7 +7,6 @@
 # DEPENDENCIES
 # a 'nix environment, xxd
 
-<<<<<<< HEAD
 # CODE
 # Get size of input data in bytes
 inputDataFile=$1
@@ -65,9 +52,6 @@ echo 255 >> PPMheader.txt
 hexMonolith=`xxd -ps $inputDataFile`
 # remove spaces (and line breaks?) from that:
 hexMonolith=`echo $hexMonolith | tr -d ' \n'`
-    # echo hexMonolith val is\:
-    # echo $hexMonolith
->>>>>>> ef8caf4f9a83a28e99197c08b655b2a55e56e338
 
 hexPairIndexCounter=0
 colsCount=0
@@ -77,10 +61,6 @@ for i in $( seq $__size )
 do
       tmpHEX=${hexMonolith:$hexPairIndexCounter:2}
       RGBval=`echo $((16#$tmpHEX))`
-<<<<<<< HEAD
-=======
-      # echo RGBval $RGBval
->>>>>>> ef8caf4f9a83a28e99197c08b655b2a55e56e338
       RGBvalsRowTXT="$RGBvalsRowTXT $RGBval"
       colsCount=$((colsCount + 1))
       if (($colsCount == $BMPsideLength))
