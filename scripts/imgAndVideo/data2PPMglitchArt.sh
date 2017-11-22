@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Makes glitch art from any data source by creating a ppm header approximating a defined image size (at this writing square) into which that data would fit; takes that image header and slaps raw copied hex value pairs (converted to decimal) into an RGB value array which composes the remainder of the PPM format file. The result may be converted to any other image format e.g. via GraphicsMagick.
+# Makes glitch art from any data source by creating a ppm header approximating a defined image size (at this writing square) into which that data would fit; takes that image header and writes rows of copied hex value pairs (converted to decimal) into an RGB value array which composes the remainder of the PPM format file. The result may be converted to any other image format e.g. via GraphicsMagick. Results end up in a new PPM image file named "$inputDataFile"_asPPM.ppm
 
 # USAGE
 # ./thisScript.sh dataSource.file
@@ -26,31 +26,6 @@ echo 255 >> PPMheader.txt
 # Will this break for very large files? :
 hexMonolith=`xxd -ps $inputDataFile`
 # Remove spaces (and line breaks?) from that:
-hexMonolith=`echo $hexMonolith | tr -d ' \n'`
-=======
-# DETAILS
-# Does a square root calculation (rounded) from the byte size of the data to determine the bmp X and Y dimensions which this creates a header from.
-
-# CODE
-inputDataFile=$1
-__ln=( $( ls -Lon "$inputDataFile" ) )
-__size=${__ln[3]}
-    # echo __size val is\: $__size
-BMPsideLength=`echo "sqrt ($__size)" | bc`
-    # echo BMPsideLength $BMPsideLength
-# divide that by 3 because we're going to use three decimal values from 0-255 for each pixel on each row:
-BMPsideLength=$((BMPsideLength / 3))
-    echo BMP length on each side will be $BMPsideLength. Churning HEX data into decimal triplets\, each of which will be an RGB value . . .
-
-# Make P3 PPM format header:
-echo "P3" > PPMheader.txt
-echo "# The P3 means colors are in ascii, then $BMPsideLength columns and $BMPsideLength rows, then 255 for max color, then RGB triplets within that range:" >> PPMheader.txt
-echo $BMPsideLength $BMPsideLength >> PPMheader.txt
-echo 255 >> PPMheader.txt
-
-# will this break for very large files? :
-hexMonolith=`xxd -ps $inputDataFile`
-# remove spaces (and line breaks?) from that:
 hexMonolith=`echo $hexMonolith | tr -d ' \n'`
 
 hexPairIndexCounter=0
