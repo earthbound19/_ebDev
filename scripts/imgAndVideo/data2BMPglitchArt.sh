@@ -25,7 +25,7 @@ side=`echo "sqrt ($__size)" | bc`
 gm convert -compress none -size "$side"x"$side" xc:gray stub.bmp
 		# NOTE that we want 2 x 27 bytes (count=2, bs=27) for 54 bytes, the size of the header as I'm seeing it in a hex editor:
 		# Byte size of header figured from http://www.dragonwins.com/domains/getteched/bmp/bmpfileformat.htm (file header + image header size) and observing color values white FF FF FF and gray 7E 7E 7E at offset 0x36 (hex for decimal 54) in a hex editor.
-dd status=none bs=27 count=2 if=stub.bmp of=stubHeader.dat
+dd bs=27 count=2 if=stub.bmp of=stubHeader.dat
 cat stubHeader.dat $fileToMakeCorruptedCopyOf > "$fileToMakeCorruptedCopyOf"_asBMP.bmp
 
 
