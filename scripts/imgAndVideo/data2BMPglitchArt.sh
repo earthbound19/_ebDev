@@ -28,5 +28,4 @@ gm convert -compress none -size "$side"x"$side" xc:gray stub.bmp
 dd bs=27 count=2 if=stub.bmp of=stubHeader.dat
 cat stubHeader.dat $fileToMakeCorruptedCopyOf > "$fileToMakeCorruptedCopyOf"_asBMP.bmp
 
-
-# rm stub.bmp stubHeader.dat
+rm stub.bmp stubHeader.dat
