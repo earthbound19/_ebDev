@@ -19,7 +19,7 @@
 
 if [ ! -z ${5+x} ]
 then
-	rescaleParams="-vf scale=$5:flags=neighbor"
+	rescaleParams="-vf scale=$5:-1:flags=neighbor"
 		# echo rescaleParams val is\:
 		# echo $rescaleParams
 fi
