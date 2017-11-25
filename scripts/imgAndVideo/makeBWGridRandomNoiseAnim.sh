@@ -23,7 +23,9 @@
 PUTTING THAT TOGETHER, call this script thus:
 ./thisScript.sh 144 80 729 7 
 
-# TO DO: take parameters to this script to alter the following globals.
+# TO DO
+# - Take parameters to this script to alter the following globals.
+# - Alter the scale=1280:960 vars accordingly--or wouldn't I just use e.g. 1280:-1 to maintain aspect with 1280 x pixels?
 
 numCols=$1
 numRows=$2

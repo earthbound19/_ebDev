@@ -17,9 +17,7 @@ fileToMakeCorruptedCopyOf=$1
 __ln=( $( ls -Lon "$fileToMakeCorruptedCopyOf" ) )
 __size=${__ln[3]}
 		# echo file size in bytes is $__size
-		# echo square root of that (rounded to integer) is:
-		# echo "sqrt ($__size)" | bc
-side=`echo "sqrt ($__size)" | bc`
+side=`echo "sqrt ($__size / 3)" | bc`
 		# echo side val is\: $side
 
 gm convert -compress none -size "$side"x"$side" xc:gray stub.bmp
