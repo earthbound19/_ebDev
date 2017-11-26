@@ -4,6 +4,8 @@
 # Also, to uninstall every brew package but keep brew, run; re: https://github.com/Homebrew/legacy-homebrew/issues/48792
 # brew list -1 | xargs brew rm
 
+# TO DO: always install gnu-sed with default names (override mac sed?!) : brew install gnu-sed --with-default-names : re https://stackoverflow.com/a/27834828/1397555 -- also see: https://developer.apple.com/library/content/documentation/OpenSource/Conceptual/ShellScripting/PortingScriptstoMacOSX/PortingScriptstoMacOSX.html -- https://unix.stackexchange.com/questions/13711/differences-between-sed-on-mac-osx-and-other-standard-sed ("complex history")
+
 brewPackages=" \
 automake \
 libxslt \
