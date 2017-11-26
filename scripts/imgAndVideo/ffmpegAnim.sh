@@ -44,7 +44,7 @@ numDigitsOf_arraySize=${#arraySize}
 rm allFiles.txt
 
 echo executing ffmpeg command . . .
-# x264 codec and UTvideo options both follow; comment out whatever you don't want:
+# default codec for file type and UTvideo options both follow; comment out whatever you don't want; for the first you can change the _out.ttt file type to e.g. .mp4, .gif, etc.:
 ffmpeg -y -f image2 -framerate $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -vf fps=$2 -crf $3 _out.gif
 # ffmpeg -y -f image2 -framerate $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -vf fps=$2 -crf $3 -codec:v utvideo _out.avi
 
