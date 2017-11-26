@@ -5,14 +5,10 @@
 # ./thisScript.sh dataSource.file
 
 # DEPENDENCIES
-# a 'nix environment, xxd, optionally IrfanView and irfanView2imgNN.sh
+# a 'nix environment including the od utility, and optionally IrfanView and irfanView2imgNN.sh
 
 # NOTES
-# You cannot use this to obfuscate data reliably, or the process usually is not reversible. This is because a relatively very small amount of zero-padding or data chop off can occur where data usually doesn't align with an image size where one length N = square root of (data size / 3), and the image size is NxN (a square).
-
-# TO DO
-# Use od for hex output instead? Ex. command that outputs 5 1-byte hex values per row:
-# od -t x1 -w5 input.dat
+# You *may* be able to reliably reverse the process to recreate an original file a PPM was made from: all of the hex values for a source file are recorded in a resulting PPM via this script. In other words, this may be a way to obfuscate data (but note that the obfuscation is easily unmaked or reversed).
 
 
 # CODE
@@ -42,49 +38,34 @@ echo "# P3 means text file, $IMGsideLength $IMGsideLength is cols x rows, ff is 
 echo $IMGsideLength $IMGsideLength >> PPMheader.txt
 echo ff >> PPMheader.txt
 
-echo impoarting data from $1 to local variable..
-hexMonolith=`xxd -ps $inputDataFile`
-# remove spaces (and line breaks?) from that:
-hexMonolith=`echo $hexMonolith | tr -d ' \n'`
+# Make P3 PPM body:
+# Dump file to one-byte hex columns $valsPerRow per row, via od
+od -t x1 -w$valsPerRow $inputDataFile > PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+# strip off the byte offset count (I think it is) info at the start of each row, via sed:
+sed -i 's/^[0-9]\{1,\} \(.*\)/\1/g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 
-# Values used by the following for loop:
-hexPairIndexCounter=0
-colsCount=0
-printf "" > PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
-dataCutoff=$(( $valsPerRow * $IMGsideLength))   # For where there is more data than can fit in an image IMGsideLength x IMGsideLength
-valsRowTXT=
-
-echo Creating PPM $IMGsideLength x $IMGsideLength . . .
-for i in $( seq $dataCutoff )
-do
-      HEXval=${hexMonolith:$hexPairIndexCounter:2}
-      valsRowTXT="$valsRowTXT $HEXval"
-      colsCount=$((colsCount + 1))
-      if (($colsCount == $valsPerRow))
-      then
-        # append valsRowTXT row to PPM body buildup file, and reset colsCount and valsRowTXT for next row accumulation:
-        echo $valsRowTXT >> PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
-        echo wrote new row at offset $i\ of $dataCutoff\:
-		echo $valsRowTXT
-        colsCount=0
-        valsRowTXT=
-      fi
-      hexPairIndexCounter=$((hexPairIndexCounter + 2))
-done
-
+# Concatenate the header and body into a new, complete PPM format file:
 cat PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt > $ppmDestFileName
 rm PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 
 echo . . .
 echo creation of $ppmDestFileName DONE. Undergoing any further optional steps . . .
 
-# Optional and preferred to make the ppm file useable to all image converters that I've found besides IrfanView: convert result to spec-compliance (it would seem?) via IrfanView; the only thing I *don't* like about this is it can make column counts no longer match--which I call a bug and yet other programs seem to convert the result ok--BIG BREATH--comment out the next line if you don't want this:
+	# Optional and preferred to make the ppm file useable to all image converters that I've found besides IrfanView: convert result to spec-compliance (it would seem?) via IrfanView; the only thing I *don't* like about this is it can make column counts no longer match--which I call a bug and yet other programs seem to convert the result ok--BIG BREATH--comment out the next line if you don't want this:
 # i_view32.exe $ppmDestFileName /convert=tmp_Zfrffb9Zbp2VdN.ppm && rm $ppmDestFileName && mv tmp_Zfrffb9Zbp2VdN.ppm $ppmDestFileName
 
-# Optionally open the file in the default associated program (Windows) :
+	# Optionally open the file in the default associated program (Windows) :
 # cygstart $ppmDestFileName
 
-# optionally scale up by NN method by N pix, saving to png format:
+	# optionally scale up by NN method by N pix, saving to png format:
 upscaleX=$((IMGsideLength * 36)) && irfanView2imgNN.sh $ppmDestFileName png $upscaleX
 
 echo DONE.
+
+
+# DEV NOTES
+# Far better options than rev. x of this script, where I contrived a needlessly elaborate control block to create and format data in a way that exiting tools in my path already (?!) already do! :
+# Use od for hex output instead? Ex. command that outputs 5 1-byte hex values per row:
+# od -t x1 -w5 input.dat
+# OR an xxd command that does more formatting for me up front; 1 byte per column, 9 columns:
+# xxd -g 1 -c 9 TREACHERY1.7.fountain
