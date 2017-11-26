@@ -7,9 +7,11 @@
 # DEPENDENCIES
 # a 'nix environment, xxd, optionally IrfanView and irfanView2imgNN.sh
 
+# NOTES
+# You cannot use this to obfuscate data reliably, or the process usually is not reversible. This is because a relatively very small amount of zero-padding or data chop off can occur where data usually doesn't align with an image size where one length N = square root of (data size / 3), and the image size is NxN (a square).
+
 
 # CODE
-
 # pseudo-code:
 # get data size
 		# bcse 3 vals per px, sqrt(data size / 3) = x and y dim. of img
@@ -75,4 +77,4 @@ rm PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 # cygstart $ppmDestFileName
 
 # optionally scale up by NN method by N pix, saving to png format:
-# upscaleX=$((IMGsideLength * 160)) && irfanView2imgNN.sh $ppmDestFileName png $upscaleX
+upscaleX=$((IMGsideLength * 160)) && irfanView2imgNN.sh $ppmDestFileName png $upscaleX
