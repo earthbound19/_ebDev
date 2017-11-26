@@ -11,6 +11,9 @@
 # CODE
 # Command switches used to build up command; re: http://www.robvanderwoude.com/files/iviewcli.txt
 # /resize_long=X        - resize input image: set long side to X
+	# RELATED options not used here:
+	# /resize=(w,h)         - resize input image to w (width) and h (height)
+	# /resize_short=X       - resize input image: set short side to X
 # /aspectratio          - used for resizes: keep image proportions
 # /convert=filename     - convert input file(s) to "filename" and CLOSE IrfanView
 # example for resize:
