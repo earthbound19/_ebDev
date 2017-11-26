@@ -10,6 +10,9 @@
 # NOTES
 # You *may* be able to reliably reverse the process to recreate an original file a PPM was made from: all of the hex values for a source file are recorded in a resulting PPM via this script. In other words, this may be a way to obfuscate data (but note that the obfuscation is easily unmaked or reversed).
 
+# TO DO
+# Data padding to align bytes more representationally with RGB values, e.g. pad one byte (two hex) with four zeros where [(R G) B], [R (G B)], or [(R) G (B)] values would be; so [(00 00) val] for the first case, etc.
+
 
 # CODE
 # pseudo-code:
@@ -58,7 +61,7 @@ echo creation of $ppmDestFileName DONE. Undergoing any further optional steps . 
 # cygstart $ppmDestFileName
 
 	# optionally scale up by NN method by N pix, saving to png format:
-upscaleX=$((IMGsideLength * 36)) && irfanView2imgNN.sh $ppmDestFileName png $upscaleX
+# upscaleX=$((IMGsideLength * 36)) && irfanView2imgNN.sh $ppmDestFileName png $upscaleX
 
 echo DONE.
 
