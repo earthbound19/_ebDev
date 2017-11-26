@@ -10,6 +10,10 @@
 # NOTES
 # You cannot use this to obfuscate data reliably, or the process usually is not reversible. This is because a relatively very small amount of zero-padding or data chop off can occur where data usually doesn't align with an image size where one length N = square root of (data size / 3), and the image size is NxN (a square).
 
+# TO DO
+# Use od for hex output instead? Ex. command that outputs 5 1-byte hex values per row:
+# od -t x1 -w5 input.dat
+
 
 # CODE
 # pseudo-code:
@@ -60,7 +64,8 @@ do
       then
         # append valsRowTXT row to PPM body buildup file, and reset colsCount and valsRowTXT for next row accumulation:
         echo $valsRowTXT >> PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
-        echo wrote new row at offset $1\: $valsRowTXT
+        echo wrote new row at offset $i\ of $dataCutoff\:
+		echo $valsRowTXT
         colsCount=0
         valsRowTXT=
       fi
@@ -68,13 +73,18 @@ do
 done
 
 cat PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt > $ppmDestFileName
+rm PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+
+echo . . .
+echo creation of $ppmDestFileName DONE. Undergoing any further optional steps . . .
+
 # Optional and preferred to make the ppm file useable to all image converters that I've found besides IrfanView: convert result to spec-compliance (it would seem?) via IrfanView; the only thing I *don't* like about this is it can make column counts no longer match--which I call a bug and yet other programs seem to convert the result ok--BIG BREATH--comment out the next line if you don't want this:
 # i_view32.exe $ppmDestFileName /convert=tmp_Zfrffb9Zbp2VdN.ppm && rm $ppmDestFileName && mv tmp_Zfrffb9Zbp2VdN.ppm $ppmDestFileName
-
-rm PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 
 # Optionally open the file in the default associated program (Windows) :
 # cygstart $ppmDestFileName
 
 # optionally scale up by NN method by N pix, saving to png format:
-upscaleX=$((IMGsideLength * 160)) && irfanView2imgNN.sh $ppmDestFileName png $upscaleX
+upscaleX=$((IMGsideLength * 36)) && irfanView2imgNN.sh $ppmDestFileName png $upscaleX
+
+echo DONE.
