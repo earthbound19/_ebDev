@@ -19,7 +19,7 @@ find *.$1 > all_$1.txt
 while read img
 do
 			# echo img is $img
-	imgFileNoExt=`echo $img | sed 's/\(.*\)\..\{1,4\}/\1/g'`
+	imgFileNoExt=`echo $img | gsed 's/\(.*\)\..\{1,4\}/\1/g'`
 	if [ ! -f $imgFileNoExt.$2 ]; then
 		echo ~~
 		echo RENDERING target file $imgFileNoExt.$2 as it does not exist . . .
