@@ -13,6 +13,9 @@
 # TO DO
 # Various data mapping, signal processing/pattern matching type things to data to more meaningfully map it to color values. e.g. for every  raw RGB (three values from 0 to 255)-aligned datum map to fewer values approximating the range of that datum?
 
+imgFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
+ppmDestFileName="$imgFileNoExt"_asBMP.bmp
+
 fileToMakeCorruptedCopyOf=$1
 __ln=( $( ls -Lon "$fileToMakeCorruptedCopyOf" ) )
 __size=${__ln[3]}
@@ -24,6 +27,6 @@ gm convert -compress none -size "$side"x"$side" xc:gray stub.bmp
 		# NOTE that we want 2 x 27 bytes (count=2, bs=27) for 54 bytes, the size of the header as I'm seeing it in a hex editor:
 		# Byte size of header figured from http://www.dragonwins.com/domains/getteched/bmp/bmpfileformat.htm (file header + image header size) and observing color values white FF FF FF and gray 7E 7E 7E at offset 0x36 (hex for decimal 54) in a hex editor.
 dd bs=27 count=2 if=stub.bmp of=stubHeader.dat
-cat stubHeader.dat $fileToMakeCorruptedCopyOf > "$fileToMakeCorruptedCopyOf"_asBMP.bmp
+cat stubHeader.dat $fileToMakeCorruptedCopyOf > $ppmDestFileName
 
 rm stub.bmp stubHeader.dat
