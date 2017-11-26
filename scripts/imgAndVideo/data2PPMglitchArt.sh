@@ -67,17 +67,12 @@ done
 
 cat PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt > $ppmDestFileName
 # Optional and preferred to make the ppm file useable to all image converters that I've found besides IrfanView: convert result to spec-compliance (it would seem?) via IrfanView; the only thing I *don't* like about this is it can make column counts no longer match--which I call a bug and yet other programs seem to convert the result ok--BIG BREATH--comment out the next line if you don't want this:
-i_view32.exe $ppmDestFileName /convert=tmp_Zfrffb9Zbp2VdN.ppm && rm $ppmDestFileName && mv tmp_Zfrffb9Zbp2VdN.ppm $ppmDestFileName
+# i_view32.exe $ppmDestFileName /convert=tmp_Zfrffb9Zbp2VdN.ppm && rm $ppmDestFileName && mv tmp_Zfrffb9Zbp2VdN.ppm $ppmDestFileName
 
 rm PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 
 # Optionally open the file in the default associated program (Windows) :
 # cygstart $ppmDestFileName
 
-# optionally scale up by NN method by N pix:
-# $1 input file
-# $2 output format
-# $3 px wide to resize to by nearest neighbor method, maintaining aspect
-upscaleX=$((IMGsideLength * 36))
-		# echo upscaleX val is $upscaleX where orig was $IMGsideLength
-irfanView2imgNN.sh $ppmDestFileName png $upscaleX
+# optionally scale up by NN method by N pix, saving to png format:
+# upscaleX=$((IMGsideLength * 160)) && irfanView2imgNN.sh $ppmDestFileName png $upscaleX
