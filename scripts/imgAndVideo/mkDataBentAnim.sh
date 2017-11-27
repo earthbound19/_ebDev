@@ -22,7 +22,7 @@ cd ppm
 imgs2imgsNN.sh ppm png 550
 mkNumberedLinks.sh png
 cd numberedLinks
-ffmpegAnim.sh 2 2 13 png
+ffmpegAnim.sh 3 3 13 png
 # If you're on windows:
 cygstart _out.gif
 # OR if you're on mac:
