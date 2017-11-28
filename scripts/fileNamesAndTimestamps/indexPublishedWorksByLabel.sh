@@ -1,15 +1,18 @@
 # DESCRIPTION
-# Indexes all text files in a directory tree with a file name of pattern .*_EXPORTED_.*_MD_ADDS.txt (case-sensitive). Such file names which contain the string:
-# -EXIF:ImageHistory=".*publication.*
-# -- will be written to __EXPORTED_PUBLISHED_WORKS.txt, BY OVERWRITE (the file contents will be replaced). Such file names which do *not* contain that string will be written to __EXPORTED_UNPUBLISHED_WORKS.txt, also by overwrite.
-# These files are reference for publishing my art work (determining what to publish next).
+# Indexes all text files in a directory tree with a file name of pattern .*_EXPORTED_.*_MD_ADDS.txt (case-sensitive) which contain an EXIF ImageHistory tag containing the string $1 (first parameter to this script). See USAGE for further explanation.
 
 # DEPENDENCIES
 # Cygwin (and gsed), Everything search engine CLI (and an install of Everything search engine tool).
 
 # USAGE
-# Invoke this script from the root of a directory tree with so many so name-patterned text files you wish to index; e.g.:
-# ./thisScript.sh
+# Invoke this script from the root of a directory tree with so many so $1 -patterned text files you wish to index; e.g.:
+# ./thisScript.sh earthbound
+# The script will write the full path of all file names with the pattern .*_EXPORTED_.*_MD_ADDS.txt which contain the string "earthound" (in an EXIF ImageHistory tag metadata prep. line) to __EXPORTED_PUBLISHED_WORKS.txt, BY OVERWRITE (the file contents will be replaced). Such file names which do *not* contain that string will be written to __EXPORTED_UNPUBLISHED_WORKS.txt, also by overwrite.
+# These files are reference for publishing my art work (determining what to publish next).
+# More specifically, it searches for the string:
+# -EXIF:ImageHistory=".*publication.*
+# -- in all so named text files it finds. 
+
 
 # DEV NOTES
 # This is a ghastly mutant of various text processing tools, and tied to the Windows platform (you can find code commented out with "DEPRECATED" comments, code which will make it work on a 'nix platform), but it works.
@@ -20,6 +23,7 @@
 
 
 # CODE
+label=$1
 		# DEPRECATED, use if on non-Windows platform:
 		# echo Listing to temp file all files matching pattern \.\*_EXPORTED_.\*_MD_ADDS.txt . . .
 		# gfind . -regex .*_EXPORTED_.*_MD_ADDS.txt -type f > _tmp_JnhPUNahaRA5BdZdWx_EXPORTED_works_MD_ADDS_files.txt
@@ -53,7 +57,8 @@ done < _tmp_4UFKgbkrnpDvZK.txt
 printf "" > __EXPORTED_PUBLISHED_WORKS.txt
 printf "" > __EXPORTED_UNPUBLISHED_WORKS.txt
 
-echo Scanning all files in prepared list for a line matching pattern \-EXIF\:ImageHistory\=\"\.\*\published \(case-insensitive\)
+# TO DO: fix that this doesn't echo the value of $label:
+echo Scanning all files in prepared list for a line matching pattern \-EXIF\:ImageHistory\=\"\.\*\$label \(case-insensitive\)
 echo . . .
 # Read the lines in that temp file in a loop, run a grep operation on each file searching for a pattern, and log whether the pattern was found in the two described files:
 while read element
@@ -67,7 +72,7 @@ do
 	echo checking file\: $element . . .
 	echo ~~~~
 	# Command that matches the desired pattern, and sets errorlevel as a result to 0 if the pattern is found:
-	grep -i '\-EXIF\:ImageHistory=".*published' "$element"
+	grep -i "\-EXIF\:ImageHistory=\".*$label" "$element"
 	# After that command, errorlevel will be 0 if a match was found, and 1 if a match was not found. Exploit this. Store state of errorlevel after that command, in a variable:
 	thisErrorLevel=`echo $?`
 	if [ "$thisErrorLevel" == "0" ]
@@ -81,6 +86,7 @@ do
 done < _tmp_JnhPUNahaRA5BdZdWx_EXPORTED_works_MD_ADDS_files.txt
 
 rm -f _tmp_JnhPUNahaRA5BdZdWx_EXPORTED_works_MD_ADDS_files.txt _tmp_4UFKgbkrnpDvZK.txt _tmp_f4UvzEv8XXBhju.txt
-rm tmp_k6wttBxcPAxjXS7j7c6jknrfMxwkuR35x9.txt
+			# Cleanup of file from now DEPRECATED code:
+			# rm tmp_k6wttBxcPAxjXS7j7c6jknrfMxwkuR35x9.txt
 
 echo DONE. Results are in __EXPORTED_PUBLISHED_WORKS.txt and __EXPORTED_UNPUBLISHED_WORKS.txt in this directory.
