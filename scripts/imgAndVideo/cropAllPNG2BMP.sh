@@ -8,8 +8,7 @@
 find . -iname \*.png > crop_imgs.txt
 
 i=0
-mapfile -t imgs < crop_imgs.txt
-for element in "${imgs[@]}"
+while read element
 do
 	imgFileNoExt=`echo $element | sed 's/\(.*\)\..\{1,4\}/\1/g'`
 	if [ -a $imgFileNoExt.bmp ]
@@ -28,7 +27,7 @@ rm $element
 # ! --------
 	i=$[ $i+1 ]
 	fi
-done
+done < crop_imgs.txt
 
 echo Cropped $i images. Done.
 
