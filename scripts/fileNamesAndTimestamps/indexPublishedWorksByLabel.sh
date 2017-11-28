@@ -24,14 +24,19 @@
 		# echo Listing to temp file all files matching pattern \.\*_EXPORTED_.\*_MD_ADDS.txt . . .
 		# gfind . -regex .*_EXPORTED_.*_MD_ADDS.txt -type f > _tmp_JnhPUNahaRA5BdZdWx_EXPORTED_works_MD_ADDS_files.txt
 # To get the current directory in Windows path form to prefix to the search query for everythingCLI, to avoid matches outside of the current path.
+echo Finding all files in this directory tree that match file name pattern \.\*_EXPORTED_.\*_MD_ADDS.txt\, to index . . .
 thisDir=`pwd`
-# Gah. Gergh. Bergh. Bleh.
-cygpath -w "$thisDir" > tmp_f4UvzEv8XXBhju.txt
-thisDir=$( < tmp_f4UvzEv8XXBhju.txt)
+# Gah. Gergh. Bergh. Bleh. Save that to a text file and read it back to a variable because otherwise meddling newline dumpth interferes:
+cygpath -w "$thisDir" > _tmp_f4UvzEv8XXBhju.txt
+sed -i 's/\(.*\)\\$/\1/g' _tmp_f4UvzEv8XXBhju.txt
+thisDir=$( < _tmp_f4UvzEv8XXBhju.txt)
+# Strip any \ char off the end of that (from a root dir it shows, but not in other dirs--we always want it not there) :
+thisDir=`echo $thisDir | sed 's/\(.*\)\\$/\1/g'`
 everythingCLI "$thisDir\*_EXPORTED_*_MD_ADDS.txt" > _tmp_4UFKgbkrnpDvZK.txt
 		# ALTERNATE which will catch matches outside the directory tree from which this script is run:
 		# everythingCLI *_EXPORTED_*_MD_ADDS.txt > _tmp_4UFKgbkrnpDvZK.txt
 # else the following tools get gummed up by windows newlines:
+echo Adapting list of found files for processing . . .
 dos2unix _tmp_4UFKgbkrnpDvZK.txt
 # This is ghastly. Ugh. The cygpath run in the following loop fails unless windows path characters in the strings are escaped. Ugh. Ugh. I'm so glad I have a DOS escaping tool developed and at hand already for this, though. 11/17/2017 09:23:12 PM -RAH
 escapeTextFileString.bat _tmp_4UFKgbkrnpDvZK.txt
@@ -48,7 +53,7 @@ done < _tmp_4UFKgbkrnpDvZK.txt
 printf "" > __EXPORTED_PUBLISHED_WORKS.txt
 printf "" > __EXPORTED_UNPUBLISHED_WORKS.txt
 
-echo Scanning all files in this directory tree that match file name pattern \.\*_EXPORTED_.\*_MD_ADDS.txt\, each for a line matching pattern \-EXIF\:ImageHistory\=\"\.\*\published \(case-insensitive\)
+echo Scanning all files in prepared list for a line matching pattern \-EXIF\:ImageHistory\=\"\.\*\published \(case-insensitive\)
 echo . . .
 # Read the lines in that temp file in a loop, run a grep operation on each file searching for a pattern, and log whether the pattern was found in the two described files:
 while read element
@@ -75,5 +80,7 @@ do
 	# echo thisErrorLevel value is $thisErrorLevel
 done < _tmp_JnhPUNahaRA5BdZdWx_EXPORTED_works_MD_ADDS_files.txt
 
-rm _tmp_JnhPUNahaRA5BdZdWx_EXPORTED_works_MD_ADDS_files.txt _tmp_4UFKgbkrnpDvZK.txt tmp_f4UvzEv8XXBhju.txt
-# rm tmp_k6wttBxcPAxjXS7j7c6jknrfMxwkuR35x9.txt
+rm -f _tmp_JnhPUNahaRA5BdZdWx_EXPORTED_works_MD_ADDS_files.txt _tmp_4UFKgbkrnpDvZK.txt _tmp_f4UvzEv8XXBhju.txt
+rm tmp_k6wttBxcPAxjXS7j7c6jknrfMxwkuR35x9.txt
+
+echo DONE. Results are in __EXPORTED_PUBLISHED_WORKS.txt and __EXPORTED_UNPUBLISHED_WORKS.txt in this directory.
