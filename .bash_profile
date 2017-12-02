@@ -1,5 +1,9 @@
 # TO INSTALL THIS FILE, run this command:
 # cp ./bash_profile ~/.bash_profile
+
+# Custom prompt: dir only (I already know what user I'm running as, even if I elevate to root, so no need to display that) ; systems that have no idea what a hamster emoji is :) may just display a garbage or "unknown unicode" character:
+export PS1="$(buzzphrase) /\W 🐹 $ "
+
 # Number of lines to keep (1000 in this example)
 export HISTFILESIZE=2100
 
@@ -25,7 +29,8 @@ export PATH=/Users/earthbound/Documents/breakTime/_ebDev:$PATH
 
 echo "APPLIED CUSTOM .bash_profile settings. Also $(buzzphrase)."
 
-# DEPRECATED? :
+
+# DEPRECATED:
 # export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
