@@ -7,6 +7,15 @@
 # DEPENDENCIES
 # publish-markdown-style.sh and its dependencies (see the comments therein). An image published at a wordpress blog using the "WP REST API filter fields" (maybe? maybe not needed) plugin installed, the image bearing the same name in the wordpress media database as in the ~MD_ADDS.txt file $(1) this script reads from.
 
+# TO DO
+# - make image link to original resolution upload
+	# - that means retrieving the original resolution URL via wp-json
+# - turn linked stylesheets into inline via some tool? font references into google or other fonts? :/
+# - AND/OR strip styles and unused html info from html via some tool?
+# - turn plain URL texts in markdown into links? Already done for HTML conversion, because when converted to HTML via markdown-styles (generate-md), it automatically makes them URLs.
+
+
+# CODE
 # Get object name (title) from ~MD_ADDS.txt metadata prep file:
 title=`sed -n 's/.*ObjectName="\(.*\)".*/\1/p' $1`
 description=`gsed -n 's/.*Description="\(.*\)".*/\1/p' $1`
@@ -18,7 +27,8 @@ echo Creating markdown and HTML publication-ready text for work titled\:
 echo $title
 echo . . .
 
-echo "## $title" > $tmp_md_fileName
+# WRITE TITLE to markdown file
+printf "## $title\n\n" > $tmp_md_fileName
 # get medium image by that title from wp-json plugin query of media database (image must be already uploaded to wordpress media manager) :
 		# DEV NOTES:
 		# ex. query that returns something (not what I want) from the wp-json api:
@@ -39,10 +49,18 @@ echo "## $title" > $tmp_md_fileName
 # URLencode title else the curl query gets messed up by any spaces in the title:
 # PROBLEM at blog to be aware of: the various thumbnail sizes for some images are not returned by queries; I need the medium one. For example work 00010 returns all thumbnail sizes from a query, but work 00088 does not. This could be a bug or problem in the wordpress install; TO DO: check if the UI says those images exist. Either way, find a way to force them to exist (force regenerate? I thought I've already got a plugin that does that; maybe the plugin is broken) -- SOLUTION that fixed at least one missing query return: use media library's built-in (?) thumbnail regeneration (after that, 00088 returns thumbnail sizes).
 titleURLencoded=`echo "$title" | sed -f /cygdrive/c/_ebdev/scripts/urlencode.sed`
-# curl -g --request GET --url "earthbound.io/blog/wp-json/wp/v2/media?filter[image]&fields=media_details.image_meta.title,media_details.sizes.medium_large.source_url&search=00010" > tmp_MD_ADDS2md_JSON_AG2FesS3dkNV7W56gxMy8fdQ.txt
-curl -g --request GET --url "earthbound.io/blog/wp-json/wp/v2/media?filter[image]&fields=media_details.image_meta.title,media_details.sizes.medium_large.source_url&search=00088"
+curl -g --request GET --url "earthbound.io/blog/wp-json/wp/v2/media?filter[image]&fields=media_details.image_meta.title,media_details.sizes.medium_large.source_url&search=$titleURLencoded" > tmp_MD_ADDS2md_JSON_AG2FesS3dkNV7W56gxMy8fdQ.txt
+# Extract source_url value from that result:
+sourceURL=`sed 's/.*source_url":"\([^"]\{1,\}\).*/\1/g' tmp_MD_ADDS2md_JSON_AG2FesS3dkNV7W56gxMy8fdQ.txt`
+# Remove \ escapes from that result; here double-escaped because from a terminal it needs an escape and from a script streaming to terminal it needs another escape:
+sourceURL=`echo "$sourceURL" | tr -d '\\\\'`
 
-echo "$description" >> $tmp_md_fileName
-# publish-markdown-style.sh $tmp_md_fileName
+# WRITE IMAGE AND URL markdown to markdown file
+# reference image markdown: ![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+printf "![$title, by RAH]($sourceURL)\n\n" >> $tmp_md_fileName
 
-# rm tmp_AxXHR6dzAy9BZQQKA95FARpY.md tmp_MD_ADDS2md_JSON_AG2FesS3dkNV7W56gxMy8fdQ.txt
+# WRITE DESCRIPTION to markdown file
+printf "$description\n\n" >> $tmp_md_fileName
+publish-markdown-style.sh $tmp_md_fileName
+
+rm tmp_AxXHR6dzAy9BZQQKA95FARpY.md tmp_MD_ADDS2md_JSON_AG2FesS3dkNV7W56gxMy8fdQ.txt
