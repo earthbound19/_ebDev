@@ -4,14 +4,14 @@
 # NOTE: fer mystic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
 
 # TO DO; * = done, / = in progress:
+# FIND OUT: can the problem of sed not searching paths for the urlencode.sed file be fixed without a kludge absolute path hard-coded? If not, store that path in a text file in ~./
 # Don't do any copying and metadata then copy again operations if the target file in _dist already exists (it's recreating them but shouldn't--maybe this is a bug, as I already coded for that.)
 # Figure out why this updates metadata ok to __tagAndDistPrepImage.jpg with e.g. 9000x6000 px jpgs, but chokes on copying them to _dist; fix that. WAIT: I think the real problem was I couldn't rename a file to a duplicate target file name. Catch errors when that happens? Verify this is what happens (the "WAIT" hypothesis).
 # ? Don't update metadata template with a shortened URL (and retrieve a short URL) if one already exists.
 # Check: is it proper or does it work to use the -IPTC:ObjectName in this script? Should that be -MWG:Description?
 # - Document workings and use; ack. or fix clunky weaknesses in design.
 # ? - Implement keyword heirarchies re: http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/MWG.html
-# * DOUBLE CHECK that the s.earthbound.io~ link is formatted correctly and works in result.
-# * Implement self-hosted polr url shortening for looong titles/self-hosted title search URLS. e.g. like http://polr.me/w9g or http://polr.me/11q3 ; dev code that works or doesn't depending on authentication; the following are for polr_cli_polrAcct.py : C:\Python27\Lib\site-packages\polr_cli\polr_cli.py --shorten http://earthbound\.io/q -- NOTES:
+# */ DONE BUT MOVE TO COMMENT NEAR RELEVANT CODE: Implement self-hosted polr url shortening for looong titles/self-hosted title search URLS. e.g. like http://polr.me/w9g or http://polr.me/11q3 ; dev code that works or doesn't depending on authentication; the following are for polr_cli_polrAcct.py : C:\Python27\Lib\site-packages\polr_cli\polr_cli.py --shorten http://earthbound\.io/q -- NOTES:
 				#	Command that looks up target of shortened link, but relies on faulty dependency:
 				# 	Python polr_cli.py --lookup w9g
 				# 	Command that does NOT work at this writing at my self-hosted Polr install:

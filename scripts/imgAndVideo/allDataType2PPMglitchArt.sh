@@ -7,6 +7,9 @@
 # Example:
 # ./thisScript.sh txt
 
+# TO DO
+# Check if target file exists and do not overwrite if it does.
+
 img_format_1=$1
 
 find . -iname \*.$img_format_1 > all_"$img_format_1".txt
