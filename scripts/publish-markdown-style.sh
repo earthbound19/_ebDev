@@ -13,7 +13,7 @@
 generate-md --lagenerate-md --layout witex-invert --input ./$1
 
 # Dirty hack; copy necessary images (change the *.extension list for your needs) into the ./output folder:
-cp *.gif ./output
+# cp *.gif ./output
 
 # OPTIONAL; launch result index.html file in default html viewer (cygwin--for Mac, change `cygstart` to `open`):
 srcFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
