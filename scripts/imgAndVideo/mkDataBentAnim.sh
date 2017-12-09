@@ -11,6 +11,9 @@
 # NOTES
 # You will afterward have a numberedLinks subdirectory, which is full of numbered junction links to *.png files in the path above it. You may safely discard this subdirectory.
 
+# TO DO
+# Parameterize "bak".
+# Bug fix whichever of these scripts can take care of file name not always representing date . . . or do I already have a script that does that I think so -- but optionally order/rename the .bak files by creation date, not just name. Hm. It looks like `renumberFiles.sh bak` may sometimes do the trick?
 
 # CODE
 pushd .
@@ -22,9 +25,9 @@ cd ppm
 imgs2imgsNN.sh ppm png 550
 mkNumberedLinks.sh png
 cd numberedLinks
-ffmpegAnim.sh 3 3 13 png
+ffmpegAnim.sh 23 29.97 13 png
 # If you're on windows:
-cygstart _out.gif
+cygstart _out.mp4
 # OR if you're on mac:
 # open _out.gif
 
