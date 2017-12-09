@@ -18,8 +18,12 @@
 title=`sed -n 's/.*ObjectName="\(.*\)".*/\1/p' $1`
 description=`gsed -n 's/.*Description="\(.*\)".*/\1/p' $1`
 
+# Replace any terminal unfriendly characters from that title--including spaces--with underscores; code adapted from ftun.sh:
+titleFileNameTFC=$(echo $title | tr \=\@\`~\!#$%^\&\(\)+[{]}\;\ , _)
+HTMLintermediaryFileName="$titleFileNameTFC.md"
+HTMLfinalFileName="$titleFileNameTFC.html"
+
 tmp_md_fileName=tmp_AxXHR6dzAy9BZQQKA95FARpY.md
-HTMLfileName="$title.md"
 
 echo Creating markdown and HTML publication-ready text for work titled\:
 echo $title
@@ -62,7 +66,18 @@ printf "*Tap or click image to open largest available resolution.*\n\n" >> $tmp_
 printf "$description\n\n" >> $tmp_md_fileName
 
 # CONVERT MARKDOWN TO HTML
-publish-markdown-style.sh $tmp_md_fileName
+cp $tmp_md_fileName $HTMLintermediaryFileName
+publish-markdown-style.sh $HTMLintermediaryFileName
+
+# MOVE ALL RESULT files into ./_dist
+# Create _dist folder if it doesn't exist:
+if [ ! -d ./_dist ]; then mkdir ./_dist; fi
+# move results from publish-markdown-style.sh script-specific folder name to _dist:
+mv ./publish_markdown_tmp_qJtm3M8rGBpm2Q2WX5d4bKCm/* ./_dist
+mv $HTMLintermediaryFileName ./_dist
+
+# OPTIONAL open of resultant html file, assuming the result file name matches that produced by publish-markdown-style.sh:
+cygstart ./_dist/$HTMLfinalFileName
 
 # DELETE THIS SCRIPTS' TEMP FILES
-rm tmp_AxXHR6dzAy9BZQQKA95FARpY.md tmp_MD_ADDS2md_JSON_AG2FesS3dkNV7W56gxMy8fdQ.txt
+rm -rf tmp_AxXHR6dzAy9BZQQKA95FARpY.md tmp_MD_ADDS2md_JSON_AG2FesS3dkNV7W56gxMy8fdQ.txt publish_markdown_tmp_qJtm3M8rGBpm2Q2WX5d4bKCm
