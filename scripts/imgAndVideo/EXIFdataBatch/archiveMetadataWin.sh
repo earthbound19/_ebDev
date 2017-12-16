@@ -24,7 +24,7 @@ for element in ${imageFilesArray[@]}
 
 # CALL DOS batch \(I know, the inconsistency of it all!\) which creates/updates an all_originalMetaData.7z (in this path), with everything in all _originalMetaData folders in this path \(meaning, including all _originalMetaData folders in all subfolders in this path\). See comments in the following invoked DOS batch for details:
 
-# imgMDto7z.bat
+imgMetaDataTo7z.bat
 
 # TO DO:
 # EXCEPT NO; DO THAT DER IN ANOTHER SCRIPT; BUT: MAKE CODE HERE TO NORK ALL DEM _originalMetaData FOLDERS IN THE PATH THIS SCRIPT IS EXECUTED FROM. Der.
