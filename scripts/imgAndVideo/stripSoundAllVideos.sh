@@ -1,12 +1,18 @@
-# Invoke this with one paramater, being the extension of videos you wish to strip of sound. WARNING: this wipes the sound off ALL videos of that format, permanently.
+# Invoke this with one paramater, being the extension of videos you wish to strip of sound.
 
-find ./*.$1 > all$1
-mapfile -t allvids < all$1
-rm all$1
+fileExt=$1
+allFilesTXTfile="all_""$fileExt"
 
-for filename in ${allvids[@]}
+find ./*.$1 > $allFilesTXTfile
+
+while read filename
 do
+	fileBasename=`basename $filename ".""$fileExt"`
 	ffmpeg -y -i "$filename" -map 0:v -vcodec copy "filename"_temp.mp4
-	rm "$filename"
+	mv "$filename" "$filename""_backup"."$fileExt"
 	mv "filename"_temp.mp4 "$filename"
-done
+done < $allFilesTXTfile
+
+rm $allFilesTXTfile
+
+echo DONE. Check all the converted videos for errors. If there were any conversion errors, you can restore from the originals which were renamed \<filename\>_original.$fileExt. To save space you may want to delete originals after verifying the sound-stripped video stream copy files are okay.
