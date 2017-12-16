@@ -29,11 +29,6 @@ Clone ane make use of _setBinBaths.bat from https://github.com/earthbound19/_ebP
 
 The tools and scripts in this repository are subject to high flux, because I edit and develop them as I use them, and/or because I freely add or remove utilities from this archive.
 
-## TO DO
-- Move this TO DO list to project tracker at gitHub.
-- Update all scripts that could use it to exploit the method of reading from $HOME/_devToolsPath.txt used in randomVerticalColorStripes.sh
-- Update getDevEnv.sh to use the same mechanism
-
 ## ARCHIVE HISTORY
 - 03/13/2016 04:20:39 PM Dramatically expanded/reorganized to include a lot more that I'm using, and have developed and/or moved. -RAH
 - 09/02/2015 08:42:48 PM This was initially a project of only font development scripts. I upgraded it to be a repository of executables and scripts I use (and wrote). -RAH
