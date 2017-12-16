@@ -10,12 +10,17 @@
 # $3 desired constant quality (crf)
 # $4 the file extension of the input images.
 # Optional: $5 rescale target resolution expressed as N[NN..]xN[NN..], for example 200x112; OR to scale to one target dimension and calculate the other automatically (to maintain aspect), give e.g. 1280:-1 (to produce an image that is 1280 pix wide by whatever the other dimension should be). Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution.
-# TO DO; Optional: padding re https://superuser.com/a/690211
+# EXAMPLE
+# thisScript.sh 29.97 29.97 13 png
 
 # NOTE: You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).
 
-# TO DO? : make it name the output file after the ../.. parent folder name?
+# TO DO
+# - Optional: padding re https://superuser.com/a/690211
+# - Make it name the output file after the ../.. parent folder name?
 
+
+# CODE
 if [ ! -z ${5+x} ]
 then
 	rescaleParams="-vf scale=$5:-1:flags=neighbor"
