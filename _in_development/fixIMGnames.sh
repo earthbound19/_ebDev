@@ -1,5 +1,5 @@
 # DESCRIPTION:
-# DOES STUFF, in conjunction with getCorrectedImageName.ahk/exe, to rename image file names for 'nix/Windows/web compatibility.
+# DOES STUFF, in conjunction with getCorrectedImageName.ahk/exe, to rename image file names for 'nix/Windows/web compatibility. POSSIBLE FUNCTIONAL DUPLICATE of ftun.sh, which at this writing I've used for some while for this function. This script and the .ahk/exe dependency I may deprecate.
 
 # FIX IMAGE NAMES
 
