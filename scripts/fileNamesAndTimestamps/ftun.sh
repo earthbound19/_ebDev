@@ -5,6 +5,7 @@
 # From a terminal, in a folder with terminal-processing-unfriendly names, execute this script and follow the prompts.
 
 # TO DO
+# Finish development of ftun2.sh, deprecate this functionality, and move that functionality here.
 # Eliminate "rename" commands that would attempt to rename a directory or file to itself.
 # NOT TO DO
 # Use the elegant means I found somewhere of eliminating lines that are identical between alles and alles2.txt etc. (as this would avoid time-wasting and error-trowing renames of a file to itself) before further marking up and pasting them.

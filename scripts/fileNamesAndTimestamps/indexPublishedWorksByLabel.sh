@@ -18,8 +18,7 @@
 # This is a ghastly mutant of various text processing tools, and tied to the Windows platform (you can find code commented out with "DEPRECATED" comments, code which will make it work on a 'nix platform), but it works.
 
 # TO DO
-# Parameterize label so I can index works by keyword indicating publication at e.g. Flickr, Diaspora*, or email list. The grep -i flag which is in place already makes the search for that label case-insensitive. When you do this, update the documentation under DESCRIPTION.
-# Index MD_ADDS-~named text file names that do not also have the label _EXPORTED_ (to find and fix up anything so erroneously named). How can I do non-matches with Everything CLI? There is a general expression option. Use a general expression?
+# Index MD_ADDS-~named text file names that do not also have the label _EXPORTED_ (to find and fix up anything so erroneously named). How can I do non-matches with Everything-CLI? There is a general expression option. Use a general expression?
 
 
 # CODE

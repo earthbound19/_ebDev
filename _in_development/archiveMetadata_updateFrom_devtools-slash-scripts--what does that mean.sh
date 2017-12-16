@@ -2,6 +2,12 @@
 # Create XMP (metadata) sidecar file in a subdirectory; the -r option causes sub-directories to be recursively processed:
 # Thanks to: http://stackoverflow.com/a/4909968 and http://stackoverflow.com/a/4040324
 
+# TO DO
+# - What?
+# If I revive use of this, make it not automatically overwrite existing files, including in archives (and only add files to an archive if they don't already exist).
+
+
+# CODE
 echo "!============================================================"
 	echo "WARNINGS: This script may fail to archive metadata from file names which include spaces or other terminal-unfriendly characters. It writes .xmp metadata backups into (a) new ./_originalMetaData subfolder(s) in the directory and subdirectories for which it backs up image metadata. It will also overwrite any existing metadata .xmp backup files without prompting. NOTE: if you want to preserve already backed up metatada .xmp files, wrap them all up in a .zip or .7z archive and keep that in a safe folder. ALSO NOTE: before running this script, run fixIMGnames.sh in this same directory, and mind the NOTE it gives you before running this script. As this script invokes exiftool so many times, it will say that it creates images files, which is kinda inaccurate. It creates .xmp sidecar files which are backups of all the metadata in all the images this script finds--which includes very many file types. Edit the script to add further types."
 	echo "Do you wish to run this script?"
