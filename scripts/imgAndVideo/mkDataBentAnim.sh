@@ -26,9 +26,12 @@ imgs2imgsNN.sh ppm png 550
 mkNumberedLinks.sh png
 cd numberedLinks
 ffmpegAnim.sh 23 29.97 13 png
-# If you're on windows:
-cygstart _out.mp4
-# OR if you're on mac:
-# open _out.gif
+# move the result file up to the path we launched this script from:
+mv _out* ../../
 
 popd
+
+# OPTIONAL: launch the result media file; if you're on windows:
+cygstart _out.mp4 _out.gif
+# OR if you're on mac:
+# open _out.mp4 _out.gif
