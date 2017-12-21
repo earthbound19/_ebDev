@@ -1,9 +1,10 @@
 # DESCRIPTION
-# Uses several other scripts to make animated bent data art from any series of *.bak files (Notepad Plus Plus auto-backups, or from any other program that makes automatic backups so named). in a /progress subdir of whatever path this script is run from. The resulting _out.gif (or out.mp4) animation visually represents (as animated data bent art) changes made in a file over time.
+# Uses several other scripts to make animated bent data art from any series of files of a given extension. The resulting _out.gif (or out.mp4) animation visually represents (as animated data bent art) changes made in a file over time.
 
 # USAGE
-# From a path containing so many incremental (or otherwise saved!) *.bak files, invoke this script:
-# ./thisScript.sh
+# From a path containing so many incremental (or otherwise saved!) *.bak files, invoke this script with one parameter $1, being the file extension of so many files to make an animation from. Do not include a . character in the extension. Example:
+# ./thisScript.sh txt
+# NOTE that you may wish to isolate all such source files as copies in .e.g a /progress subdirectory, and run this script from that.
 
 # DEPENDENCIES
 # allDataType2PPMglitchArt.sh, imgs2imgsNN.sh, mkNumberedLinks.sh, ffmpegAnim.sh, and their various dependencies; a series of automatically backed up files from a file that was edited.
@@ -12,13 +13,15 @@
 # You will afterward have a numberedLinks subdirectory, which is full of numbered junction links to *.png files in the path above it. You may safely discard this subdirectory.
 
 # TO DO
-# Parameterize "bak".
-# Bug fix whichever of these scripts can take care of file name not always representing date . . . or do I already have a script that does that I think so -- but optionally order/rename the .bak files by creation date, not just name. Hm. It looks like `renumberFiles.sh bak` may sometimes do the trick?
+# Bug fix whichever of these scripts can take care of file name not always representing date . . . or do I already have a script that does that? I think so -- but optionally order/rename the .bak files by creation date, not just name. Hm. It looks like `renumberFiles.sh bak` may sometimes do the trick?
 
 # CODE
+
+if [ -z ${1+x} ]; then echo No paramater one \(input files extension e.g. txt\)\. Will exit.; exit; else fileExt=$1; echo SET fileExt to $1; fi
+
 pushd .
 
-allDataType2PPMglitchArt.sh bak
+allDataType2PPMglitchArt.sh $fileExt
 mkdir ppm
 mv *.ppm ./ppm
 cd ppm
