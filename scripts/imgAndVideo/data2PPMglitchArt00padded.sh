@@ -36,9 +36,11 @@ echo ff >> PPMheader.txt
 od -t x1 -w$IMGsideLength $inputDataFile > PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 # NOTE: to make a green tint any other color you can make with only blue and red (whatever sense it makes to say green tint here), you can change the zeros in the following sed regex to anything from 00 to ff hex; 00 would look like: ..  00 \1 00  ..
 # some options;
-# "green tints" of medium dark, dimmish purple:		68 \1 b6
-# "blue tints" of dim green:						00 5b \1
-sed -i 's/ \([0-9a-z]\{2\}\)/ 00 5b \1 /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+# "green tints" of medium dark, dimmish purple:												68 \1 b6
+# "blue tints" of dim green:																00 5b \1
+# varied pink or purple bordering a slightly greenish dimmish shade of eggshell blue:		\1 7f ff
+# For other possibilities, see: RGB_combos_of_255_127_and_0_repetition_allowed.hexplt
+sed -i 's/ \([0-9a-z]\{2\}\)/ \1 7f ff /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 # strip off the byte offset count (I think it is) info at the start of each row, via sed:
 sed -i 's/^[0-9]\{1,\} \(.*\)/\1/g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 # reduce any double-spaces (which may result from earlier text processing) to single:
