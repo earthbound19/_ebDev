@@ -17,6 +17,7 @@
 # renderHexPalette-gm.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
 
 # TO DO
+# NEXT DEVELOPMENT STEP: Find .hexplt source file at start of script, then pass it to various tools (awk and everything after) in the necessary path/to /not format.
 # Adapt this to do double-wide half-down ratios by multiples of two, e.g. 4:2, 8:4, 16:8 etc. (not just 2:1).
 # Allow handling of a hex color on any line with or without # in front of it.
 # Allow comments in .hexplt files (decide on a parse demarker for them and ignore all whitespace before that demarker, and also ignore the demarker itself and everything after it on the line).
@@ -24,7 +25,7 @@
 
 
 # CODE
-# SETUP GLOBAL VARIABLES
+# BEGIN SETUP GLOBAL VARIABLES
 paletteFile=$1
 tileEdgeLen=$2
 # WHETHER TO SHUFFLE COLORS
@@ -44,9 +45,9 @@ then
 	# Works around potential incorrect line count; re: https://stackoverflow.com/a/28038682/1397555 :
 	numColors=`awk 'END{print NR}' $paletteFile`
 	sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
-			# echo sqrtOfColorCount is $sqrtOfColorCount \(first check\)
+			echo sqrtOfColorCount is $sqrtOfColorCount \(first check\)
 	tilesAcross=$(( $sqrtOfColorCount * 2 ))
-			# echo tilesAcross is $tilesAcross.
+			echo tilesAcross is $tilesAcross\.
 else
 	tilesAcross=$4
 fi
@@ -54,22 +55,21 @@ fi
 if [ -z ${5+x} ]
 then
 	# Get number of lines (colors, yes again, if so). Square root of that / 2 will be the number of rows in the rendered palette.
-
 # TO DO: Update all scripts that count lines with the following form of fix:
 	numColors=`awk 'END{print NR}' $paletteFile`
-			# echo numColors is $numColors.
+			echo numColors is $numColors\.
 	sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
-			# echo sqrtOfColorCount is $sqrtOfColorCount
+			echo sqrtOfColorCount is $sqrtOfColorCount
 	tilesDown=$(( $sqrtOfColorCount / 2 ))
 	# If the value of ($tilesAcross times $tilesDown) is less than $numColors (the total number of colors), we will fail to print all colors in the palette; add rows to the print queue for as long as necessary:
 	tilesToRender=$(( $tilesAcross * $tilesDown ))
-	# echo tilesToRender is $tilesToRender.
+	echo tilesToRender is $tilesToRender\.
 	if [ $tilesToRender -lt $numColors ]
 	then
-		# echo tilesDown was $tilesDown.
+		echo tilesDown was $tilesDown.
 		tilesDown=$(( $tilesDown + 1 ))
 	fi
-			# echo tilesDown is $tilesDown.
+			echo tilesDown is $tilesDown\.
 else
 	tilesDown=$5
 fi
@@ -82,14 +82,14 @@ then
 			echo palettesRootDir.txt found\;
 			echo searching in path $palettesRootDir --
 			echo for file $paletteFile . . .
-	hexColorSrcFullPath=`find "$palettesRootDir" -iname *$paletteFile`
+	hexColorSrcFullPath=`gfind "$palettesRootDir" -iname *$paletteFile`
 	echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 	if [ "$hexColorSrcFullPath" == "" ]
 		then
 			echo No file of name $paletteFile found in path \"$palettesRootDir\" \! ABORTING script.
 			exit
-		# else
-			# echo File name $paletteFile found in path \"$palettesRootDir\" \! PROCEEDING. IN ALL CAPS.
+		else
+			echo File name $paletteFile found in path \"$palettesRootDir\" \! PROCEEDING. IN ALL CAPS.
 	fi
 else
 	echo !--------------------------------------------------------!
@@ -101,12 +101,13 @@ else
 	echo !--------------------------------------------------------!
 	exit
 fi
-
+exit
 # IF RENDER TARGET already exists, abort script. Otherwise continue.
 if [ -f ./$paletteFile.png ]
 then
 	echo Render target $paletteFile.png already exists\; SKIPPING render.
-	exit
+	# FOR DEVELOPMENT: EXCEPT NOT. Comment out the next line if you want to render anyway:
+	# exit
 else
 	echo Render target $paletteFile.png does not exist\; WILL RENDER.
 fi
@@ -138,13 +139,10 @@ done < $hexColorSrcFullPath
 # e.g. gm montage colors/5A6D40.png colors/757F26.png colors/C68C15.png colors/8F322F.png colors/954B29.png out.png
 
 # TO DO? : implement e.g. -tile 8x40 flag depending on desired aspect, etc. (will determine values of $tilesAcross and $tilesDown depending on desired aspect?)
-unescapeTileXtileParam="$tilesAcross"x"$tilesDown"
-tileParam="-tile $unescapeTileXtileParam"
 
 # make temporary script to create a grid montage of the colors:
-  # -- and make a variable containing some of the parameters in the invocation in the script so they aren't clobbered by terminal parsing:
-tileEdgeLenParams="$tileEdgeLen"x"$tileEdgeLen"+0+0
-gm montage $tileParam -background gray -geometry $tileEdgeLenParams \\ > mkGridHead.txt
+echo "gm montage -tile $tilesAcross"x"$tilesDown -background gray -geometry $tileEdgeLen"x"$tileEdgeLen+0+0 \\" > mkGridHead.txt
+exit
   # convert hex color scheme text list file to parameter list for ~magick:
 sed 's/.*#\(.*\)$/_hexPaletteIMGgenTMP_2bbVyVxD\/\1.png \\/' $hexColorSrcFullPath > ./mkGridSRCimgs.txt
 # IF $shuffleValues is nonzero, randomly sort that list:
@@ -152,7 +150,7 @@ sed 's/.*#\(.*\)$/_hexPaletteIMGgenTMP_2bbVyVxD\/\1.png \\/' $hexColorSrcFullPat
 echo $paletteFile.png > mkGridTail.txt
 cat mkGridHead.txt mkGridSRCimgs.txt mkGridTail.txt > mkColorPaletteGrid.sh
 
-rm mkGridHead.txt mkGridSRCimgs.txt mkGridTail.txt
+# rm mkGridHead.txt mkGridSRCimgs.txt mkGridTail.txt
 chmod 777 ./mkColorPaletteGrid.sh
 
 ./mkColorPaletteGrid.sh
