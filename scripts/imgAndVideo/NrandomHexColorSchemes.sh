@@ -8,7 +8,7 @@
 # NOTE: at this writing, this script must be executed from the /scripts/imgAndVideo folder.
 # TO DO? : Make an unsynced local folder with the absolute path to _ebdev root, and reference that? Could be for many scripts, not just this.
 
-colorsPerScheme=12		# This may be overruled by a numeric parameter $1.
+colorsPerScheme=7		# This may be overruled by a numeric parameter $1.
 rndFileNameLen=34
 
 if [ ! -z ${2+x} ];	then howManySchemesToCreate=$2;	else howManySchemesToCreate=1; fi
