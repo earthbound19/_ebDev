@@ -108,11 +108,13 @@ then
 	# If the value of ($tilesAcross times $tilesDown) is less than $numColors (the total number of colors), we will fail to print all colors in the palette; add rows to the print queue for as long as necessary:
 	tilesToRender=$(( $tilesAcross * $tilesDown ))
 	echo tilesToRender is $tilesToRender\.
-	if [ $tilesToRender -lt $numColors ]
-	then
+	while [ $tilesToRender -lt $numColors ]
+	do
 		echo tilesDown was $tilesDown.
 		tilesDown=$(( $tilesDown + 1 ))
-	fi
+		tilesToRender=$(( $tilesAcross * $tilesDown ))
+				# TO DO: checking that twice . . . is that a code smell? Rework for more concise/elegant/sensical logic?
+	done
 			echo tilesDown is $tilesDown\.
 else
 	tilesDown=$5
