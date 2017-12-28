@@ -13,6 +13,8 @@ MozillaMaintenance"
 
 for element in ${deleteServices[@]}
 do
+	echo RUNNING COMMAND\:
+	echo SC DELETE $element
 	SC DELETE $element
 done
 
@@ -39,13 +41,12 @@ WMPNetworkSvc \
 FontCache3.0.0.0 \
 BITS"
 
-printf "" > tmp_YjAEjvnb.bat
 for element in ${disableServices[@]}
 do
-	printf "SC CONFIG \"$element\" start= disabled\n" >> tmp_YjAEjvnb.bat
+	echo RUNNING COMMAND\:
+	echo SC CONFIG $element start= disabled
+	SC CONFIG $element start= disabled
 done
-chmod +x tmp_YjAEjvnb.bat
-tmp_YjAEjvnb.bat
 
 
 onDemandServices="
@@ -62,12 +63,10 @@ WinDefend \
 WinRM \
 WPCSvc"
 
-printf "" > tmp_YjAEjvnb.bat
-for element in ${disableServices[@]}
+for element in ${onDemandServices[@]}
 do
-	printf "SC CONFIG \"$element\" start= demand\n" >> tmp_YjAEjvnb.bat
+	echo RUNNING COMMAND\:
+	echo SC CONFIG $element start= demand
+	SC CONFIG $element start= demand
 done
-chmod +x tmp_YjAEjvnb.bat
-tmp_YjAEjvnb.bat
 
-rm tmp_YjAEjvnb.bat
