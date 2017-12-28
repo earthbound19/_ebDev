@@ -7,6 +7,8 @@
 # $1 : The length of random characters to rename the file with. If you don't specify any number for the first parameter, it defaults to 4.
 # $2 : Optional: a file extension (without any . in it) to restrict random renames to. It will not rename any other file types. If this is not provided, it will rename all file types in the current path.
 # WARNING: very bad things might happen (e.g. permanent data loss!) if you do not pass parameters as instructed here under USAGE.
+# EXAMPLE; rename all files with the extension .hexplt to 20-character random strings:
+# ./thisScript.sh 20 hexplt
 
 # TO DO
 # Throw an error and exit if non-numeric first parameter passed.
