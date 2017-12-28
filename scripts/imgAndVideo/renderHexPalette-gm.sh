@@ -20,7 +20,7 @@
 # Sometimes Cygwin awk throws errors as invoked by this script. Not sure why. I run it twice and one time awk throws an error, another it doesn't.
 
 # TO DO
-# UM. WOULDN'T THIS BE A TON FASTER creating a ppm and then upscaling it by nearest neighbor method?! Redo script (or make variant method script) for that?!
+# UM. WOULDN'T THIS BE A TON FASTER creating a ppm and then upscaling it by nearest neighbor method?! Redo script (or make variant method script) for that?! -- trying that in hexplt2ppm.sh.
 # Adapt this to do double-wide half-down ratios by multiples of two, e.g. 4:2, 8:4, 16:8 etc. (not just 2:1).
 # Allow handling of a hex color on any line with or without # in front of it.
 # Allow comments in .hexplt files (decide on a parse demarker for them and ignore all whitespace before that demarker, and also ignore the demarker itself and everything after it on the line).
@@ -126,7 +126,7 @@ if [ -f ./$paletteFile.png ]
 then
 	echo Render target $paletteFile.png already exists\; SKIPPING render.
 	# FOR DEVELOPMENT: Comment out the next line if you want to render anyway:
-	# exit
+	exit
 else
 	echo Render target $paletteFile.png does not exist\; WILL RENDER.
 fi
