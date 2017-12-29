@@ -1,7 +1,9 @@
-# IN DEVELOPMENT. Will get the same result as hexplt2ppm.sh far more efficiently (I hope) by creating a ppm (text file, not slowly rendered and slowly composited images), which can be quickly blown up by nearest neighbor method to a .png.
-
+# DESCRIPTION
+# Makes a (non-standard?) teensy ppm palette image (one pixel per color) from a hex palette .hexplt source file. Result is (somewhat?) useable as a bases for a scaled up palette image via e.g.:
+# imgs2imgsNN.sh ppm png 640
 
 # USAGE
+# NOTE first that you may wish to use hexplt2ppm.sh instead of this; see notes under KNOWN ISSUES.
 # Invoke this script with the following parameters:
 # $1 hex color palette flat file list (input file).
 # $2 edge length of each square tile to be composited into final image.
@@ -12,16 +14,16 @@
 # renderHexPalette-gm.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
 
 # KNOWN ISSUES
-# Sometimes Cygwin awk throws errors as invoked by this script. Not sure why. I run it twice and one time awk throws an error, another it doesn't.
-
-# TO DO
-# Rename confused (is it?) variable name tilesToRender? Should it be columns something something?
+# - It seems that hex as value sources for ppm isn't officially supported in any converter I know; graphicsMagick is doing it, but the results are off what you would expect when converted to png.
+# - Sometimes Cygwin awk throws errors as invoked by this script. Not sure why. I run it twice and one time awk throws an error, another it doesn't.
 
 
 # CODE
+
 # =============
 # BEGIN SETUP GLOBAL VARIABLES
 paletteFile=$1
+renderTargetFile=$paletteFile.ppm
 
 # Search current path for $1; if it exists set hexColorSrcFullPath to just $1 (we don't need the full path). If it doesn't exist in the local path, search the path in palettesRootDir.txt and make decisions based on that result:
 if [ -e ./$1 ]
@@ -87,15 +89,15 @@ if [ -z ${4+x} ]
 then
 	# Get number of lines (colors). Square root of that x2 will be the number of columns in the rendered palette:
 	# Works around potential incorrect line count; re: https://stackoverflow.com/a/28038682/1397555 :
-echo attempting awk command\:
+		# echo attempting awk command\:
 echo "awk 'END{print NR}' $hexColorSrcFullPath"
 	# numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
 	numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
-			echo number of colors found in $paletteFile is $numColors.
+			# echo number of colors found in $paletteFile is $numColors.
 	sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
-			echo sqrtOfColorCount is $sqrtOfColorCount \(first check\)
+			# echo sqrtOfColorCount is $sqrtOfColorCount \(first check\)
 	tilesAcross=$(( $sqrtOfColorCount * 2 ))
-			echo tilesAcross is $tilesAcross\.
+			# echo tilesAcross is $tilesAcross\.
 else
 	tilesAcross=$4
 fi
@@ -111,14 +113,14 @@ then
 	tilesDown=$(( $sqrtOfColorCount / 2 ))
 	# If the value of ($tilesAcross times $tilesDown) is less than $numColors (the total number of colors), we will fail to print all colors in the palette; add rows to the print queue for as long as necessary:
 	tilesToRender=$(( $tilesAcross * $tilesDown ))
-	echo tilesToRender is $tilesToRender\.
+			# echo tilesToRender is $tilesToRender\.
 	while [ $tilesToRender -lt $numColors ]
 	do
-		echo tilesDown was $tilesDown.
+			# echo tilesDown was $tilesDown.
 		tilesDown=$(( $tilesDown + 1 ))
 		tilesToRender=$(( $tilesAcross * $tilesDown ))
 	done
-			echo tilesDown is $tilesDown\.
+			# echo tilesDown is $tilesDown\.
 else
 	tilesDown=$5
 fi
@@ -127,40 +129,34 @@ fi
 
 
 # IF RENDER TARGET already exists, abort script. Otherwise continue.
-if [ -f ./$paletteFile.png ]
+if [ -f ./$renderTargetFile ]
 then
-	echo Render target $paletteFile.png already exists\; SKIPPING render.
+	echo Render target $renderTargetFile already exists\; SKIPPING render.
 	# FOR DEVELOPMENT: Comment out the next line if you want to render anyway:
 	# exit
 else
-	echo Render target $paletteFile.png does not exist\; WILL RENDER.
+	echo Render target $renderTargetFile does not exist\; WILL RENDER.
 	# CODE HERE things magic with tmp_djEAM2XJ9w.hexplt:
 
 	# Make P3 PPM format header:
 	echo "P3" > PPMheader.txt
 	echo "# P3 means text file, $tilesAcross $tilesDown is cols x rows, ff is max color (hex 255), triplets of hex vals per RGB val." >> PPMheader.txt
 	echo $tilesAcross $tilesDown >> PPMheader.txt
-	echo "255" >> PPMheader.txt
-	
+	echo "ff" >> PPMheader.txt
+
 	# each hex color is a triplet of hex pairs (corresponding to 0-255 RGB values) ; concatenate temp hexplt file to uninterrupted hex pairs (no newlines) to parse as one long string into the ppm body:
-	ppmBodyHexValues=`tr -d '\n' < tmp_djEAM2XJ9w.hexplt`
-			# echo ppmBodyHexValues val\: $ppmBodyHexValues
-	# echo $ppmBodyHexValues > tmp_9RBKDG8aUe.txt
-			# less efficient route I almost went down; grab the chars I need from that superstring iteratively:
-			# hexCharToPrint=${ppmBodyHexValues:6:6}
-					# echo hexCharToPrint val is\: $hexCharToPrint
+	ppmBodyValues=`tr -d '\n' < tmp_djEAM2XJ9w.hexplt`
+			rm tmp_djEAM2XJ9w.hexplt
+			# echo ppmBodyValues val\: $ppmBodyValues
 	# Split that superstring with spaces every two hex chars:
-	ppmBodyHexValues=`echo $ppmBodyHexValues | sed 's/../& /g'`
-	# Convert that to decimal:
-	ppmBodyDecimalValues=`echo $((16#"$ppmBodyHexValues"))`
-	echo UWTTT is\:
-	echo $ppmBodyDecimalValues
-	# where e.g. \{6\} would be two hex pairs; the value in \{n\} will be columns times 3:
-	hexPairsPerRow=$(( $tilesAcross * 9 ))		# but why is that 9? I'm just seeing that's what it should be.
-	echo $ppmBodyDecimalValues | sed "s/.\{$ppmBodyDecimalValues\}/&\n/g" > ppmBody.txt
+	ppmBodyValues=`echo $ppmBodyValues | sed 's/../& /g'`
+	# TO DO for hexplt2ppm.sh: convert that to decimal; first work it up into a string formatted for echo in base-16, e.g.
+	# ppmBodyValues=`echo $((16#"$thisHexString")) $((16#"$thatHexString"))`
+	hexPairsPerRow=$(( $tilesAcross * 9 ))		# Why is that 9? I'm just seeing that's what it should be.
+	echo $ppmBodyValues | sed "s/.\{$hexPairsPerRow\}/&\n/g" > ppmBody.txt
+	cat PPMheader.txt ppmBody.txt > $renderTargetFile
+			rm PPMheader.txt ppmBody.txt
 fi
 
-cat PPMheader.txt ppmBody.txt > oot.ppm
 
 # Cleanup of temp files:
-# rm tmp_djEAM2XJ9w.hexplt PPMheader.txt
