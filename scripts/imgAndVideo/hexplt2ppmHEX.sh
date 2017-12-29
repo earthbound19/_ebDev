@@ -1,17 +1,17 @@
 # DESCRIPTION
-# Makes a (non-standard?) teensy ppm palette image (one pixel per color) from a hex palette .hexplt source file. Result is (somewhat?) useable as a bases for a scaled up palette image via e.g.:
+# Makes a (non-standard?) teensy ppm palette image (one pixel per color) from a hex palette .hexplt source file. Result is (somewhat?) useable as a basis for a scaled up palette image via e.g.:
 # imgs2imgsNN.sh ppm png 640
 
 # USAGE
 # NOTE first that you may wish to use hexplt2ppm.sh instead of this; see notes under KNOWN ISSUES.
 # Invoke this script with the following parameters:
-# $1 hex color palette flat file list (input file).
-# $2 edge length of each square tile to be composited into final image.
-# $3 MUST HAVE VALUE 0 or nonzero (anything other than 0). If nonzero, the script will randomly shuffle the hex color files before compositing them to one image. PREVIOUSLY WAS $5, PREVIOUSLY WAS OPTIONAL; NOW REQUIRED. OVERWRITES different previous parameter position (from a prior version of this script).
-# $4 OPTIONAL. number of tiles accross of tiles-assembled image (columns). PREVIOUSLY WAS $3.
-# $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows). PREVIOUSLY WAS $4.
-# EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, the palette image being 5 columns wide and 6 rows down, with squares in the palette rendered in random order:
-# renderHexPalette-gm.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
+#  $1 hex color palette flat file list (input file).
+#  $2 edge length of each square tile to be composited into final image.
+#  $3 MUST HAVE VALUE 0 or nonzero (anything other than 0). If nonzero, the script will randomly shuffle the hex color files before compositing them to one image. REQUIRED. OVERWRITES different previous parameter position (from a prior version of this script).
+#  $4 OPTIONAL. number of tiles accross of tiles-assembled image (columns).
+#  $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).
+#  EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, the palette image being 5 columns wide and 6 rows down, with squares in the palette rendered in random order:
+#  ./thisScript.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
 
 # KNOWN ISSUES
 # - It seems that hex as value sources for ppm isn't officially supported in any converter I know; graphicsMagick is doing it, but the results are off what you would expect when converted to png.
@@ -132,12 +132,9 @@ fi
 if [ -f ./$renderTargetFile ]
 then
 	echo Render target $renderTargetFile already exists\; SKIPPING render.
-	# FOR DEVELOPMENT: Comment out the next line if you want to render anyway:
-	# exit
+	exit
 else
 	echo Render target $renderTargetFile does not exist\; WILL RENDER.
-	# CODE HERE things magic with tmp_djEAM2XJ9w.hexplt:
-
 	# Make P3 PPM format header:
 	echo "P3" > PPMheader.txt
 	echo "# P3 means text file, $tilesAcross $tilesDown is cols x rows, ff is max color (hex 255), triplets of hex vals per RGB val." >> PPMheader.txt
@@ -149,12 +146,10 @@ else
 			rm tmp_djEAM2XJ9w.hexplt
 	# Split that superstring with spaces every two hex chars:
 	ppmBodyValues=`echo $ppmBodyValues | sed 's/../& /g'`
-	# TO DO for hexplt2ppm.sh: convert that to decimal; first work it up into a string formatted for echo in base-16, e.g.
-			# echo ppmBodyValues val\: $ppmBodyValues
-	# ppmBodyValues=`echo $((16#"$thisHexString")) $((16#"$thatHexString"))`
 	hexPairsPerRow=$(( $tilesAcross * 9 ))		# Why is that 9? I'm just seeing that's what it should be.
+	# Further split that into newlines every N columns (to match hex val triplets to num colors per row) :
 	echo $ppmBodyValues | sed "s/.\{$hexPairsPerRow\}/&\n/g" > ppmBody.txt
+	# Concatenate temp files into final ppm file:
 	cat PPMheader.txt ppmBody.txt > $renderTargetFile
 			rm PPMheader.txt ppmBody.txt
 fi
-
