@@ -147,10 +147,10 @@ else
 	# each hex color is a triplet of hex pairs (corresponding to 0-255 RGB values) ; concatenate temp hexplt file to uninterrupted hex pairs (no newlines) to parse as one long string into the ppm body:
 	ppmBodyValues=`tr -d '\n' < tmp_djEAM2XJ9w.hexplt`
 			rm tmp_djEAM2XJ9w.hexplt
-			# echo ppmBodyValues val\: $ppmBodyValues
 	# Split that superstring with spaces every two hex chars:
 	ppmBodyValues=`echo $ppmBodyValues | sed 's/../& /g'`
 	# TO DO for hexplt2ppm.sh: convert that to decimal; first work it up into a string formatted for echo in base-16, e.g.
+			# echo ppmBodyValues val\: $ppmBodyValues
 	# ppmBodyValues=`echo $((16#"$thisHexString")) $((16#"$thatHexString"))`
 	hexPairsPerRow=$(( $tilesAcross * 9 ))		# Why is that 9? I'm just seeing that's what it should be.
 	echo $ppmBodyValues | sed "s/.\{$hexPairsPerRow\}/&\n/g" > ppmBody.txt
@@ -158,5 +158,3 @@ else
 			rm PPMheader.txt ppmBody.txt
 fi
 
-
-# Cleanup of temp files:
