@@ -5,6 +5,11 @@
 # Run the scripts under DESCRIPTION first. Delete any rendered palette (png) images for which you have distaste. Then run this script--it will delete all corresponding .hexplt files:
 # ./thisScript.sh
 
+
+# CODE
+echo UNTIL I IMPLEMENT a check whether there are any png files at all in the current path \(and\/or a warning prompt\)\, you must manually comment out this and the next line of code in this script before running it. THIS IS TO PREVENT you from accidentally running this script against a directory of \.hexplt files you have never rendered\, thereby deleting all of them\! BE SURE to uncomment these lines again after running this script\!
+exit
+
 gfind *.hexplt > all_hexplt.txt
 dos2unix all_hexplt.txt
 
