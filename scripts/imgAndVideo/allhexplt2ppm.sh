@@ -13,14 +13,31 @@
 
 echo "finding all *.hexplt files in the current path and subpaths . . ."
 gfind *.hexplt > all_hexplt.txt
-dos2unix all_hexplt.txt
+		dos2unix all_hexplt.txt
+		HEXPLTfilesCount=$(wc -l < all_hexplt.txt)
+gfind *.ppm > all_ppm.txt
+		dos2unix all_hexplt.txt
+		PPMfilesCount=$(wc -l < all_ppm.txt)
+rm all_ppm.txt
+		echo Number of ppm rendered palette files found\: $PPMfilesCount
+		filesToRender=$(( $HEXPLTfilesCount - $PPMfilesCount ))
 
+renderedCount=0
 while read fileName
 do
 	echo ~~~~
-	echo invoking hexplt2ppm.sh for $fileName . . .
+	# NOTE: Notwithstanding the following check is redundant (it is also done in the script this script calls), it will save time of needlessly invoking the script this calls:
+	if [ ! -f $fileName.ppm ]
+	then
+				echo Target file $fileName.ppm not found\; WILL RENDER.
+				renderedCount=$(( $renderedCount + 1 ))
+				echo Rendering ppm file \#$renderedCount of \#$filesToRender
+				echo invoking hexplt2ppm.sh for $fileName . . .
 	# If parameters 1-4 weren't passed to the script, the variables will print nothing, and therefore pass no parameters to hexplt2ppm.sh:
 	hexplt2ppm.sh $fileName $1 $2 $3 $4
+	else
+				echo Target file $fileName.ppm found\; WILL SKIP RENDER.
+	fi
 done < all_hexplt.txt
 
 rm all_hexplt.txt
