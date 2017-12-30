@@ -14,6 +14,11 @@
 
 # KNOWN ISSUES
 # - Sometimes Cygwin awk throws errors as invoked by this script. Not sure why. I run it twice and one time awk throws an error, another it doesn't.
+# - ppm files resulting from this may not convert cleanly to png via irfanview CLI, not until I pad any empty space not lined up with columns at the end of the last ppm line (pad it with gray).
+
+# TO DO
+# Fix that last described known issue by padding. printf can repeat print vals this way:
+# printf "ha "%.0s {1..5}
 
 
 # CODE
