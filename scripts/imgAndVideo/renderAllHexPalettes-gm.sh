@@ -1,11 +1,8 @@
 # DESCRIPTION
-# Calls renderHexPalette-gm.sh for every .hexplt file in the path from which this script is invoked (non-recusrive). Result: all hex palette files in the current path (and subpaths!) are rendered.
+# Calls renderHexPalette-gm.sh for every .hexplt file in the path from which this script is invoked (non-recusrive). Result: all hex palette files in the current path is rendered.
 
 # USAGE
 # thisScript.sh
-
-# DEV NOTE
-# This is geared for a new developing version of the script it invokes; which script takes a different parameter order.
 
 
 # CODE
@@ -17,7 +14,7 @@ while read fileName
 do
 	echo ~~~~
 	echo invoking renderHexPalette-gm.sh for $fileName . . .
-	renderHexPalette-gm.sh $fileName 36 0
+	renderHexPalette-gm.sh $fileName 80 0
 done < all_hexplt.txt
 
 rm all_hexplt.txt
