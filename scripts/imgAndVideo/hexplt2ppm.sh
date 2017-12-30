@@ -5,8 +5,8 @@
 # USAGE
 # Invoke this script with the following parameters:
 #  $1 hex color palette flat file list (input file).
-#  $2 edge length of each square tile to be composited into final image.
-#  $3 MUST HAVE VALUE 0 or nonzero (anything other than 0). If nonzero, the script will randomly shuffle the hex color files before compositing them to one image. REQUIRED. OVERWRITES different previous parameter position (from a prior version of this script).
+#  $3 OPTIONAL. MUST HAVE VALUE 0 or nonzero (anything other than 0). If nonzero, the script will randomly shuffle the hex color files before compositing them to one image. REQUIRED. OVERWRITES different previous parameter position (from a prior version of this script).
+#  $2 OPTIONAL. Edge length of each square tile to be composited into final (png) image.
 #  $4 OPTIONAL. number of tiles accross of tiles-assembled image (columns).
 #  $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).
 #  EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, the palette image being 5 columns wide and 6 rows down, with squares in the palette rendered in random order:
@@ -17,8 +17,8 @@
 # - ppm files resulting from this may not convert cleanly to png via irfanview CLI, not until I pad any empty space not lined up with columns at the end of the last ppm line (pad it with gray).
 
 # TO DO
-# Fix that last described known issue by padding. printf can repeat print vals this way:
-# printf "ha "%.0s {1..5}
+# - TO DO reuse vistigal parameter $3 to make image size from edge length * width and * height
+# - Reorder parameters as listed (instead of as numbered).
 
 
 # CODE
@@ -84,7 +84,7 @@ then
 	echo Value of paramater \$3 is zero\; will not shuffle read values.
 else
 	shuffleValues=1
-	echo echo Value of paramater \$3 is NONZERO\; WILL SHUFFLE read values.
+	echo Value of paramater \$3 is NONZERO\; WILL SHUFFLE read values.
 fi
 # WHETHER NUM tiles across (and down) is specified; if so, use as specified, if not so, do some math to figure for a 2:1 aspect;
 # $4 is across. If $4 is not specified, do some math. Otherwise use $4:
@@ -110,9 +110,9 @@ then
 	# Get number of lines (colors, yes again, if so). Square root of that / 2 will be the number of rows in the rendered palette.
 # TO DO: Update all scripts that count lines with the following form of fix:
 	numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
-			echo numColors is $numColors\.
+			# echo numColors is $numColors\.
 	sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
-			echo sqrtOfColorCount is $sqrtOfColorCount
+			# echo sqrtOfColorCount is $sqrtOfColorCount
 	tilesDown=$(( $sqrtOfColorCount / 2 ))
 	# If the value of ($tilesAcross times $tilesDown) is less than $numColors (the total number of colors), we will fail to print all colors in the palette; add rows to the print queue for as long as necessary:
 	tilesToRender=$(( $tilesAcross * $tilesDown ))
@@ -171,6 +171,38 @@ else
 	echo $ppmBodyValues | gsed "s/\( \{0,1\}[0-9]\{1,\}\)\{$splitAtCount\}/&\n/g" > ppmBody.txt
 	# Strip resultant leading spaces off that, in place (in file):
 	gsed -i 's/^ \(.*\)/\1/g' ppmBody.txt
+# CONTINUE CODING HERE; NOTE copied from above:
+	echo Padding any empty columns on last row of .ppm file with middle gray pixels . . .
+	# Fill in any empty columns on the last line with gray:
+	# - Count number of value triplets on last line, and subtract that tilesAcross; if the result is nonzero, add that many to the row.
+	#  - Isolate last line of ppmBody.txt to count those values; re http://www.theunixschool.com/2012/05/7-different-ways-to-print-last-line-of.html :
+	#  - pipe the last line of ppmBody to grep and search for number pattern, then pipe to word count (wc), and store all that in the variable lastLineValuesCount:
+	# Because AGAIN windows line endings created by one ported gnu utility are conflicting with unix line endings created by another ported gnu utility:
+	dos2unix ppmBody.txt
+	lastLineString=`tail -1 ppmBody.txt`
+	lastLineValuesCount=`echo $lastLineString | grep -o '[0-9]\{1,\}' | wc -l`
+	#  - Divide that result by 3 because each pixel is three numeric values (RGB) :
+	lastLineTilesCount=$(( $lastLineValuesCount / 3))
+			# echo lastLineTilesCount is\: $lastLineTilesCount
+	#  - Which gives is our value to subtract from tilesAcross as described above:
+	tilesToAdd=$(( $tilesAcross - $lastLineTilesCount ))
+			# echo tilesToAdd is\: $tilesToAdd
+	valuesToAdd=$(( $tilesToAdd * "3"))
+			# echo valuesToAdd is\: $valuesToAdd
+	#  - Alas this can't be done as elegantly as printf "ha "%.0s {1..5} with a variable in the range, re https://stackoverflow.com/questions/19432753/brace-expansion-with-variable :
+	for i in $(seq 1 $valuesToAdd)
+	do
+		lastLineValuesPadString="$lastLineValuesPadString 127"
+	done
+	lastLineValuesPadString="$lastLineString $lastLineValuesPadString"
+	# remove last line from ppmBody.txt, then append the replacement line to it:
+	sed -i '$ d' ppmBody.txt
+	echo $lastLineValuesPadString >> ppmBody.txt
+	# concatenate the header and body to create the final ppm file:
 	cat PPMheader.txt ppmBody.txt > $renderTargetFile
-			rm PPMheader.txt ppmBody.txt
+	# remove temp files:
+	rm PPMheader.txt ppmBody.txt
 fi
+
+# When edge length parameter implemented:
+# imgs2imgsNN.sh ppm png $blowUpToXpixPNG
