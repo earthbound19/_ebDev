@@ -14,10 +14,9 @@
 
 # KNOWN ISSUES
 # - Sometimes Cygwin awk throws errors as invoked by this script. Not sure why. I run it twice and one time awk throws an error, another it doesn't.
-# - ppm files resulting from this may not convert cleanly to png via irfanview CLI, not until I pad any empty space not lined up with columns at the end of the last ppm line (pad it with gray).
 
 # TO DO
-# - TO DO reuse vistigal parameter $3 to make image size from edge length * width and * height
+# Make gray padding optional, as it substantially slows down ppm creation.
 
 
 # CODE
