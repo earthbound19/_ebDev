@@ -5,11 +5,11 @@
 # USAGE
 # Invoke this script with the following parameters:
 #  $1 hex color palette flat file list (input file).
-#  $3 OPTIONAL. MUST HAVE VALUE 0 or nonzero (anything other than 0). If nonzero, the script will randomly shuffle the hex color files before compositing them to one image. REQUIRED. OVERWRITES different previous parameter position (from a prior version of this script).
 #  $2 OPTIONAL. Edge length of each square tile to be composited into final (png) image.
+#  $3 OPTIONAL. MUST HAVE VALUE 0 or nonzero (anything other than 0). If nonzero, the script will randomly shuffle the hex color files before compositing them to one image.
 #  $4 OPTIONAL. number of tiles accross of tiles-assembled image (columns).
 #  $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).
-#  EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, the palette image being 5 columns wide and 6 rows down, with squares in the palette rendered in random order:
+#  EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, squares in the palette rendered in random order, and the palette image being 5 columns wide and 6 rows down:
 #  ./thisScript.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
 
 # KNOWN ISSUES
@@ -18,7 +18,6 @@
 
 # TO DO
 # - TO DO reuse vistigal parameter $3 to make image size from edge length * width and * height
-# - Reorder parameters as listed (instead of as numbered).
 
 
 # CODE
@@ -75,16 +74,18 @@ sed -n -e "s/^\s\{1,\}//g" -n -e "s/#\([0-9a-fA-F]\{6\}\).*/\L\1/p" $hexColorSrc
 # Reassign name of that temp file to hexColorSrcFullPath to work from:
 hexColorSrcFullPath=tmp_djEAM2XJ9w.hexplt
 
-
-tileEdgeLen=$2
 # Whether to shuffle colors:
 if [[ $3 == 0 ]]
 then
-	shuffleValues=0
-	echo Value of paramater \$3 is zero\; will not shuffle read values.
+	echo Value of paramater \$3 is zero\; WILL NOT shuffle read values.
+	# Don't do any shuffling of tmp_djEAM2XJ9w.hexplt.
 else
-	shuffleValues=1
 	echo Value of paramater \$3 is NONZERO\; WILL SHUFFLE read values.
+	# Shuffle the values (lines) in tmp_djEAM2XJ9w.hexplt into a new temp file:
+	shuf ./tmp_djEAM2XJ9w.hexplt > ./tmp_NpKH7mFEHg58UsNQ5JX3.txt
+	# Assign the name of this new shuffled temp file to hexColorSrcFullPath, and remove the previous temp file:
+	hexColorSrcFullPath=tmp_NpKH7mFEHg58UsNQ5JX3.txt
+	rm ./tmp_djEAM2XJ9w.hexplt
 fi
 # WHETHER NUM tiles across (and down) is specified; if so, use as specified, if not so, do some math to figure for a 2:1 aspect;
 # $4 is across. If $4 is not specified, do some math. Otherwise use $4:
@@ -146,8 +147,8 @@ else
 	echo "255" >> PPMheader.txt
 
 	# each hex color is a triplet of hex pairs (corresponding to 0-255 RGB values) ; concatenate temp hexplt file to uninterrupted hex pairs (no newlines) to parse as one long string into the ppm body:
-	ppmBodyValues=`tr -d '\n' < tmp_djEAM2XJ9w.hexplt`
-			rm tmp_djEAM2XJ9w.hexplt
+	ppmBodyValues=`tr -d '\n' < $hexColorSrcFullPath`
+			rm $hexColorSrcFullPath
 	# Split that superstring with spaces every two hex chars:
 	ppmBodyValues=`echo $ppmBodyValues | sed 's/../& /g'`
 	# TO DO for hexplt2ppm.sh: convert that to decimal; first work it up into a string formatted for echo in base-16, e.g.:
@@ -204,5 +205,10 @@ else
 	rm PPMheader.txt ppmBody.txt
 fi
 
-# When edge length parameter implemented:
-# imgs2imgsNN.sh ppm png $blowUpToXpixPNG
+# If $2 (tile size) parameter passed, blow up the image via mathy math and another script:
+if [ ${2+x} ]
+then
+	tileEdgeLen=$2
+	blowupIMGtoXpix=$(( $tileEdgeLen * $tilesAcross ))
+irfanView2imgNN.sh $renderTargetFile png $blowupIMGtoXpix
+fi
