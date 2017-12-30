@@ -25,4 +25,4 @@ done < all_hexplt.txt
 
 rm all_hexplt.txt
 
-echo "DONE. Color palettes have been rendered from all *.hexplt files in the current path and subpaths. Palette images are named after the source *.hexplt files."
+echo "DONE. Color palettes have been rendered from all *.hexplt files in the current path and subpaths. Palette images are named after the source *.hexplt files. If you used parameter \$2, then blown up png images by the same base file name were created also."
