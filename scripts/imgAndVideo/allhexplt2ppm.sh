@@ -7,14 +7,6 @@
 # If you provide no parameter $1, it wil default to 640.
 
 
-# CODE
-if [ -z ${1+x} ]		# Checks for NON-value, ergo non-value returns true. Superfluous? Would checking for value without that -z *always* return false if no parameter $1 is passed to a script?
-then
-	blowUpToXpixPNG=640
-else
-	blowUpToXpixPNG=$1
-fi
-
 echo "finding all *.hexplt files in the current path and subpaths . . ."
 gfind *.hexplt > all_hexplt.txt
 dos2unix all_hexplt.txt
@@ -27,8 +19,5 @@ do
 done < all_hexplt.txt
 
 rm all_hexplt.txt
-
-# OPTIONAL, on by default:
-imgs2imgsNN.sh ppm png $blowUpToXpixPNG
 
 echo "DONE. Color palettes have been rendered from all *.hexplt files in the current path and subpaths. Palette images are named after the source *.hexplt files."
