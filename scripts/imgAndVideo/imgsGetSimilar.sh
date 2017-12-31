@@ -50,6 +50,8 @@ done
 
 # Prepend everything in allIMGs.txt with that wonky string file name identifier before running comparison via the next block;
 sed -i 's/^\(.*\)/__superShrunkRc6d__\1/g' allIMGs.txt
+# Reinitialize allIMGs array from that file which now lists __superShrunk.. images! For a long time this script lacked that and so ran slower (it compared original images and missed the entire point of all of the above code)! :
+allIMGs=( $( < allIMGs.txt) )
 
 i_count=0
 j_count=0
