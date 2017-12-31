@@ -76,8 +76,11 @@ do
 	done
 done
 
-# Reverse the sed operation before that block:
-sed -i 's/__superShrunkRc6d__//' allIMGs.txt
+# Reverse the sed operations before and in that block:
+sed -i 's/__superShrunkRc6d__//g' allIMGs.txt
+sed -i 's/__superShrunkRc6d__//g' compare__superShrunkRc6d__col1.txt
+sed -i 's/__superShrunkRc6d__//g' compare__superShrunkRc6d__col2.txt
+# exit
 
 # Re prevous comment in nested loop blocks:
 dos2unix compare__superShrunkRc6d__col1.txt
