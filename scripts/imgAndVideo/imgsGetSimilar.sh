@@ -111,8 +111,9 @@ done < allIMGs.txt
 # replace | with newlines to produce final frame list for e.g. ffmpeg to use:
 tr '|' '\n' < comparisons__superShrunkRc6d__cols_sorted.txt > IMGlistByMostSimilar.txt
 rm comparisons__superShrunkRc6d__cols_sorted.txt
-# --or, that's ready after one more tweak for file list format ffmpeg demands:
+# --or, that's ready after two more tweaks for file list format ffmpeg demands and correct file names:
 sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
+sed -i "s/__superShrunkRc6d__//g" IMGlistByMostSimilar.txt
 
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with ffmpegAnimFromFileList.sh \(see comments of that script\) to produce an animation of these images arranged by most similar to nearest list neighbor \(roughly\, with some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list\)\.
