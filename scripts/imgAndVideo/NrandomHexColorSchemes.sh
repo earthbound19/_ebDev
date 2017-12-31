@@ -1,15 +1,15 @@
-# GENERATES RANDOM HEX COLOR SCHEMES.
-# Parameters:
+# DESCRIPTION
+# Generates random hex color schemes of file format .hexplt (randomly named), which are plain text files with one hex color per line.
+
+# USAGE
+# Invoke this script with 1 or optionally 2 parameters:
 # $1 REQUIRED. The number of colors to have in the generated color scheme. OR to have the script randomly pick a number between 2 and N (first variable assignment hard-coded into script), make this paramater simply the letter r (for random).
-# Outputs to randomly named file in e.g.
-# ColorSchemesHex/random/Zqev73VvHyv_HexColors.hexplt
-# $2 Optional: how many such color schemes to generate. If not provided, two will be made.
+# $2 OPTIONAL. How many such color schemes to generate. If not provided, two will be made.
 
-# NOTE: at this writing, this script must be executed from the /scripts/imgAndVideo folder.
-# TO DO? : Make an unsynced local folder with the absolute path to _ebdev root, and reference that? Could be for many scripts, not just this.
 
+# CODE
 colorsPerScheme=7		# This may be overruled by a numeric parameter $1.
-rndFileNameLen=34
+rndFileNameLen=14
 
 if [ ! -z ${2+x} ];	then howManySchemesToCreate=$2;	else howManySchemesToCreate=1; fi
 
@@ -43,7 +43,7 @@ do
 				colorsPerScheme=$1
 						echo Will generate $colorsPerScheme random hex colors for the generated color scheme.
 			fi
-	paddedNumColors=$(printf %016d $colorsPerScheme)
+	paddedNumColors=$(printf %05d $colorsPerScheme)
 	outfile=./"$paddedNumColors"_"$rndFileNameChars"_HexColors.hexplt
 	# printf "" > $outfile
 	echo Generating $colorsPerScheme random hex colors for $outfile . . .
