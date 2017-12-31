@@ -110,6 +110,8 @@ done < allIMGs.txt
 
 # replace | with newlines to produce final frame list for e.g. ffmpeg to use:
 tr '|' '\n' < comparisons__superShrunkRc6d__cols_sorted.txt > IMGlistByMostSimilar.txt
+# strip __superShrunk.. part of file names out of that file (which were used for faster comparison) :
+sed -i "s/__superShrunkRc6d__//g" comparisons__superShrunkRc6d__cols_unsorted.txt
 rm comparisons__superShrunkRc6d__cols_sorted.txt
 # --or, that's ready after two more tweaks for file list format ffmpeg demands and correct file names:
 sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
