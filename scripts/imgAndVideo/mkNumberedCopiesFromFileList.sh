@@ -1,9 +1,14 @@
 # USAGE
 # Invoke this cript with one parameter:
-# $1 The file list name, for which every file name in the list there will be numbered junction (file names which are junctions) in a subdir.
+# $1 The file list name, for which every file name in the list there will have numbered copies made in a subdir. Preparation for other scripts which must operate on numbered files.
 
 # WARNING: this script perhaps dangerously assumes all file names provided in the list have the same extension.
 
+# USAGE
+# TO DO :) Document how to use this script.
+
+
+# CODE
 # IF NO list file provided, assume it is IMGlistByMostSimilar.txt:
 if [ -z ${1+x} ]
 then
@@ -24,6 +29,8 @@ sed "s/file '\(.*\)'/\1/g" $fileList > tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.tx
 numElements=`wc -l < $fileList`
 digitsCount=${#numElements}
 
+# create new IMGlistByMostSimilar.txt in the subdir the copies will be written to, only with the new file names (as those file names will be appended to that file in the following block) :
+printf "" > ./numberedCopies/$fileList
 counter=0
 while read element
 do
@@ -32,6 +39,7 @@ do
 			# var=`printf "%05d\n" $element`
 	paddedNum=`printf "%0"$digitsCount"d\n" $counter`
 	command="cp ./$element ./numberedCopies/$paddedNum.$fileNameExt"
+	echo "file '$paddedNum.$fileNameExt'" >> ./numberedCopies/$fileList
 	echo executing command\:
 	echo $command
 	$command
