@@ -15,17 +15,26 @@
 
 # TO DO
 # - Document what the heck this is and how the heck to use it; e.g. detail how two passes are needed, which will result in a series of output videos that can be concatenated into a longer anim by another script. NOTE that documentation must change when I code the following:
-# - Parameterize source image extension.
-# - Parameterize crossfade duration.
-# - Parameterize padding duration.
+# - Parameterize source image extension. (?)
 
+
+# CODE
+
+# ====
+# START GLOBALS
+
+# UNCOMMENT THE VALUE ASSIGNMENTS you'd like to try:
 # crossFadeDuration=1.68
-crossFadeDuration=2.4
+# crossFadeDuration=2.4
+crossFadeDuration=3.57
 # crossFadeDuration=4.36
 # crossFadeDuration=5.8
 # crossFadeDuration=7.2
-padding=0.31
+padding=0.17
 # padding=2.04
+
+# END GLOBALS
+# ====
 
 echo ~~~~
 echo Creating image crossfade pairs list . . .
@@ -79,5 +88,5 @@ do
 			# echo imgTwo is\: $imgTwo
 	echo command is\:
 	echo ffmpegCrossfadeIMGsToAnim.sh $imgOne $imgTwo $crossFadeDuration $padding
-	ffmpegCrossfadeIMGsToAnim.sh $imgOne $imgTwo $crossFadeDuration
+	ffmpegCrossfadeIMGsToAnim.sh $imgOne $imgTwo $crossFadeDuration $padding
 done < allCrossfadePairs.txt
