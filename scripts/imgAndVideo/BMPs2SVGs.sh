@@ -4,6 +4,8 @@
 
 # USAGE: ensure that this script and potrace are both in your $PATH, and open a terminal in the directory of .bmp images. Invoke this script by name from the terminal. WARNING: depending on whether the relevant code line is commented out, this will delete the original .bmp images! NOTES: It will not trace a bmp image if the target svg file already exists. To retrace, delete the target svg file, and invoke this script again. Also, the script considers white a background color and black the line/trace area color.
 
+
+# CODE
 find . -iname \*.bmp > bmp_imgs.txt
 mapfile -t imgs < bmp_imgs.txt
 i=0
