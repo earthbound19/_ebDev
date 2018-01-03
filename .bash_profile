@@ -27,6 +27,10 @@ export LANG=en_US.UTF-8
 export PATH=/Users/earthbound/Documents/breakTime/_ebPathMan:$PATH
 export PATH=/Users/earthbound/Documents/breakTime/_ebDev:$PATH
 
+# Try uncommenting these next two lines to troubleshoot mangled variables resulting from assigning the output of an expression to a variable in Cygwin:
+export SHELLOPTS
+set -o igncr
+
 echo "APPLIED CUSTOM .bash_profile settings. Also $(buzzphrase)."
 
 
