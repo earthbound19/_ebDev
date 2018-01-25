@@ -14,6 +14,7 @@
 # concatVidFiles.sh avi
 
 # TO DO
+# - Figure out why its not allowing less than one second of padding; I thought it did before?
 # - Document what the heck this is and how the heck to use it; e.g. detail how two passes are needed, which will result in a series of output videos that can be concatenated into a longer anim by another script. NOTE that documentation must change when I code the following:
 # - Parameterize source image extension. (?)
 
@@ -26,11 +27,12 @@
 # UNCOMMENT THE VALUE ASSIGNMENTS you'd like to try:
 # crossFadeDuration=1.68
 # crossFadeDuration=2.4
-crossFadeDuration=3.57
-# crossFadeDuration=4.36
+# crossFadeDuration=3.57
+crossFadeDuration=4.36
 # crossFadeDuration=5.8
 # crossFadeDuration=7.2
-padding=0.17
+# NOTE: padding less than 1 (e.g. 0.17) will throw an error, apparently.
+padding=1
 # padding=2.04
 
 # END GLOBALS
