@@ -11,6 +11,8 @@
 # DEV NOTE: template command: gm -size 850 test.svg result.tif
 # NOTE that for the -size parameter, it scales the images so that the longest side is that many pixels.
 
+
+# CODE
 img_size=$1
 img_format=$2
 
@@ -37,9 +39,12 @@ do
 		echo target already exists\; will not render.
 		echo . . .
 	else
+		# Have I already tried e.g. -size 1000x1000 as described here? :  
 		echo rendering $element . . .
-		echo COMMAND\: gm convert $param3 -scale $1 $element $svgFilenameNoExtension.$img_format
-		gm convert $param3 -scale $1 $element $svgFilenameNoExtension.$img_format
+				# DEPRECATED, as it causes the problem described at this question: https://stackoverflow.com/a/27919097/1397555 -- for which the active solution is also given:
+				# gm convert $param3 -scale $1 $element $svgFilenameNoExtension.$img_format
+		echo COMMAND\: convert -size $1 $param3 $element $svgFilenameNoExtension.$img_format
+		gm convert -size $1 $param3 $element $svgFilenameNoExtension.$img_format
 	fi
 done < all_svgs.txt
 
