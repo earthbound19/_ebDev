@@ -59,9 +59,13 @@ then
 else
 	echo target file $targetFile does not exist\; will render.
 	# CREATE input static image (looped) video files from the two input images.
-	ffmpeg -y -loop 1 -i $imgOne -t $srcClipLengths -codec:v utvideo "$fadeSRConeFileName".avi
-	ffmpeg -y -loop 1 -i $imgTwo -t $srcClipLengths -codec:v utvideo "$fadeSRCtwoFileName".avi
-
+# TO DO move codec options to start of script? Make file extension parameter?
+			# CODEC options:
+			# codecParam=""
+			# codecParam="-vcodec rawvideo"
+			codecParam="-codec:v utvideo"
+	ffmpeg -y -loop 1 -i $imgOne -t $srcClipLengths $codecParam "$fadeSRConeFileName".avi
+	ffmpeg -y -loop 1 -i $imgTwo -t $srcClipLengths $codecParam "$fadeSRCtwoFileName".avi
 	# CREATE the video crossfade from those two static image (looped) video files we just made.
 	# The following complex filter taken and adapted from https://superuser.com/a/1001040/130772
 					# DEPRECATED:
@@ -91,7 +95,7 @@ else
 		[fadeoutfifo][fadeinfifo]overlay[crossfade]; \
 		[clip1cut][crossfade][clip2cut]concat=n=3[output] \
 		" \
-	-map "[output]" $targetFile
+	-map "[output]" $codecParam $targetFile
 
 	# OPTIONAL: comment out either or both of the next two delete commands, depending on what you may want to keep:
 	rm ./"$fadeSRConeFileName".avi
