@@ -38,11 +38,11 @@ do
 			# ex. to pad numbers to number of digits in %0n:
 			# var=`printf "%05d\n" $element`
 	paddedNum=`printf "%0"$digitsCount"d\n" $counter`
-	command="cp ./$element ./numberedCopies/$paddedNum.$fileNameExt"
+	echo "executing command: cp ./$element ./numberedCopies/$paddedNum.$fileNameExt"
+	cp ./$element ./numberedCopies/$paddedNum.$fileNameExt
+	# Because Cygwin can be STUPID with permissions (I can't use the .png images afterward without special access!) :
+	chmod 777 ./numberedCopies/$paddedNum.$fileNameExt
 	echo "file '$paddedNum.$fileNameExt'" >> ./numberedCopies/$fileList
-	echo executing command\:
-	echo $command
-	$command
 done < ./tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
 
 rm ./tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt

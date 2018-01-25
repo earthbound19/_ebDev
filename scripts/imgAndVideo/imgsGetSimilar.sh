@@ -44,7 +44,8 @@ do
 		echo COMPARISON SOURCE FILE "__superShrunkRc6d__""$element" already exists\; assuming comparisons against it were already run\; skipping comparison.
 	else
 		echo copying $element to shrunken "__superShrunkRc6d__""$element" to make image comparison much faster . . .
-		gm convert $element -scale 7 __superShrunkRc6d__$element
+		# gm convert $element -scale 7 __superShrunkRc6d__$element
+		gm convert $element -scale 11 __superShrunkRc6d__$element
 	fi
 done
 

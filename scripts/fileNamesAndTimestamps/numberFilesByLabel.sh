@@ -1,14 +1,16 @@
 # DESCRIPTION
 # Incremental file number naming by tag utility. Finds the highest numbered file having both the phrase _FINAL_ and a five-padded number (nnnnn) in the file name, and renames file names which have _FINAL_ in them but no five-padded numbers; *adding* incremented five-padded numbers to those file names (to number all such _FINAL_ files by incrementing numbers). Handy for incrementally numbering e.g. a lot of new original abstract art work master image file names; or numbering e.g. abstract works.
 
-# TO DO: fix bug where file names which mistakenly have _FINAL_ twice in the name don't register (apparently) as a five-padded number. OR: warn this should never be.
-# TO DO: determine whether any sed flag will make e.g. _[fF][iI][nN][aA][lL] unecessary as a search pattern (case-insenstitive search). My first searches for this said no . . .
-
-# TO DO: In this script, make the following variables actually do anything :) which will mean case-insensitive regexes in sed maybe, or which whuh i dunno? :
+# TO DO
+# - deprecate sections of this relying on slow (not database of a monitored file system driven) 'nix search commands, and use everythingCLI instead (as in indexWorksByLabel.sh).
+# - break the deprecated sections out into if blocks that run depending on detected platform (windows or 'nixy system).
+# - improve the following description in the line of code starting with 'echo WARNING\:'.
+# - fix bug where file names which mistakenly have _FINAL_ twice in the name don't register (apparently) as a five-padded number. OR: warn this should never be.
+# - determine whether any sed flag will make e.g. _[fF][iI][nN][aA][lL] unecessary as a search pattern (case-insenstitive search). My first searches for this said no . . .
+# - In this script, make the following variables actually do anything :) which will mean case-insensitive regexes in sed maybe, or which whuh i dunno? :
 labelOne=_FINAL_
 labelTwo=_work_
 
-# TO DO: Improve the following description.
 echo WARNING\: This script will produce undesired results if any file names in the directory tree you run it from include the phrase var\, variant\, or variation. Nope\, you have to rename those files to avoid problems\, sorry. IMPORTANT NOTES\: This script will find\, and build a script to optionally batch rename files for this goal\: incrementally number files which include the full phrase $labelOne in their file name \(it must have underscores on both sides of it\)\. The incremental numbering will start off the highest found five-padded number \(format nnnnn\) alongside $labelOne *and* the full phrase $labelTwo\, followed by a five-digit number \(e\.g\. "$labelTwo"_00088\)\. ALSO NOTE\: filenames must be properly named with underscores _ instead of spaces\, and also any nnnnn numbers must be surrounded by underscores\, for this to work. To get files nearer to or at that standard\, see the notes at the start of __DigitalImagePress.sh.
 
 echo Finding files to number by tag . . .
@@ -85,7 +87,7 @@ echo Proposed renames are in the file $builtBatchScript \-\- examine that script
 echo The new highest file label number would be\: $fileLabelNumber
 echo Boinfliberjeyabe\!
 
+
 # DEVELOPMENT LOG
 # 01/24/2016 12:42:00 AM re-check and bugfix session of this batch script DONE. Mind what is left in the TO DO comments.
 # 2017-01-14__06-05-32_AM VERY GREATLY simplified (and made more truly functional as intended, I think) this script. Prior version copied to ./_deprecated/numberFilesByLabel_v0.9.17.sh
-
