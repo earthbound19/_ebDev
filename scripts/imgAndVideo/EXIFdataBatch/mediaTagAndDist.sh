@@ -1,7 +1,12 @@
-# DESCRIPTION: Tags images with easily customizable metadata; Customizable via a simple editable text file template. Must run prepMediaMetaData.sh and/or other scripts before.
+# DESCRIPTION
+# Tags images with easily customizable metadata; Customizable via a simple editable text file template. Must run prepMediaMetaData.sh and/or other scripts before.
 
-# USAGE: NOTE that a run of prepMediaMetaData.sh must precede this script, or this script will not work. ALSO: correct. (MEAGER) NOTES: This expects all images it works upon to be .tif images, and won't work with anything else. Maybe I'll change it to also do non-standard tags in .png files, and do other source formats also.
+# USAGE
+# NOTE that a run of prepMediaMetaData.sh must precede this script, or this script will not work. ALSO: correct. (MEAGER) NOTES: This expects all images it works upon to be .tif images, and won't work with anything else. Maybe I'll change it to also do non-standard tags in .png files, and do other source formats also.
 # NOTE: fer mystic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
+
+# DEPENDENCIES
+# A self-hosted intstall of polr URL shortener and the API key for it saved to ~/PolrAPIkey.txt, wget, exiftool, cygwin (this is tied to windows at the moment) . . ?
 
 # TO DO; * = done, / = in progress:
 # FIND OUT: can the problem of sed not searching paths for the urlencode.sed file be fixed without a kludge absolute path hard-coded? If not, store that path in a text file in ~./
@@ -20,6 +25,8 @@
 	# 	wget -O shortened_URL.txt "http://s.earthbound.io/api/v2/action/shorten?key=3108e9a45e9f6edcf9eeaa1ca9712d&url=https://google.com&is_secret=false&response_type=plain_text"
 #	NOTE that when logged in, it won't show the new link unless you reload the page.
 
+
+# CODE
 # GLOBAL API key for Polr URL shortener; stored in a private file outside repository ;) and here imported therefrom (will only work per local install of _ebdev)
 PolrAPIkey=$( < ~/PolrAPIkey.txt)
 		# echo PolrAPIkey value is\: $PolrAPIkey
