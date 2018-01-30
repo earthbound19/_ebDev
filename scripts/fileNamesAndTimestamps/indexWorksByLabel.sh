@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Indexes all text files in a directory tree with a file name of pattern .*_EXPORTED_.*_MD_ADDS.txt (case-sensitive) which contain an EXIF ImageHistory tag containing the string $1 (first parameter to this script). See USAGE for further explanation.
+# Indexes all text files in a directory tree with a file name of pattern .*_EXPORTED_.*_MD_ADDS.txt (case-sensitive) which contain an EXIF ImageHistory label (or tag or keyword) containing the string $1 (first parameter to this script). See USAGE for further explanation.
 
 # DEPENDENCIES
 # Cygwin (and gsed), Everything search engine CLI (and an install of Everything search engine tool).
@@ -7,7 +7,7 @@
 # USAGE
 # Invoke this script from the root of a directory tree with so many so $1 -patterned text files you wish to index; e.g.:
 # ./thisScript.sh earthbound
-# The script will write the full path of all file names with the pattern .*_EXPORTED_.*_MD_ADDS.txt which contain the string "earthound" (in an EXIF ImageHistory tag metadata prep. line) to __KEYWORD_MATCHED_WORKS.txt, BY OVERWRITE (the file contents will be replaced). Such file names which do *not* contain that string will be written to __KEYWORD_NOT_MATCHED_WORKS.txt, also by overwrite.
+# The script will write the full path of all file names with the pattern .*_EXPORTED_.*_MD_ADDS.txt which contain the string "earthound" (in an EXIF ImageHistory tag metadata prep. line) to __LABEL_MATCHED_WORKS.txt, BY OVERWRITE (the file contents will be replaced). Such file names which do *not* contain that string will be written to __LABEL_NOT_MATCHED_WORKS.txt, also by overwrite.
 # These files are reference for publishing my art work (determining what to publish next).
 # More specifically, it searches for the string:
 # -EXIF:ImageHistory=".*publication.*
@@ -33,9 +33,10 @@ echo Finding all files in this directory tree that match file name pattern \.\*_
 		# tr piped commands re: https://github.com/earthbound19/_ebDev/issues/6
 thisDir=`pwd | tr -d '\15\32'`
 thisDir=`cygpath -w $thisDir | tr -d '\15\32'`
+echo $thisDir
 		# DEPRECATED; resurrect if necessary for a 'nixy system case:
 		# Strip any \ char off the end of that (from a root dir it shows, but not in other dirs--we always want it not there) :
-thisDir=`echo $thisDir | gsed 's/\(.*\)\\$/\1/g'`
+thisDir=`echo $thisDir | gsed 's/\(.*\)\\$/\1/g' | tr -d '\15\32'`
 everythingCLI "$thisDir\*_EXPORTED_*_MD_ADDS.txt" > _tmp_4UFKgbkrnpDvZK.txt
 		# ALTERNATE which will catch matches outside the directory tree from which this script is run:
 		# everythingCLI *_EXPORTED_*_MD_ADDS.txt > _tmp_4UFKgbkrnpDvZK.txt
@@ -58,8 +59,8 @@ done < _tmp_4UFKgbkrnpDvZK.txt
 echo 'Scanning all files in prepared list for a line matching pattern \-EXIF\:ImageHistory\=\"\.\*\$label \(case-insensitive\)'
 echo . . .
 # Read the lines in that temp file in a loop, run a grep operation on each file searching for a pattern, and log whether the pattern was found in the two described files:
-printf "" > __KEYWORD_MATCHED_WORKS.txt
-printf "" > __KEYWORD_NOT_MATCHED_WORKS.txt
+printf "Metadata preparation ~_MD_ADDS.txt files with ImageHistory field match for label $label" > __LABEL_MATCHED_WORKS.txt
+printf "" > __LABEL_NOT_MATCHED_WORKS.txt
 while read element
 do
 			# DEPRECATED on account making list via everything CLI, but may be revived if you use a half-baked "nix" environment on windows using gsed which makes windows newlines (ergo half-baked) :
@@ -78,18 +79,17 @@ do
 	if [ "$thisErrorLevel" == "0" ]
 	then
 		echo MATCH\: thisErrorLevel \= \"0\"
-		echo $element >> __KEYWORD_MATCHED_WORKS.txt
+		echo $element >> __LABEL_MATCHED_WORKS.txt
 	else
 		echo NO MATCH\: thisErrorLevel \!\= \"0\"
-		echo $element >> __KEYWORD_NOT_MATCHED_WORKS.txt
+		echo $element >> __LABEL_NOT_MATCHED_WORKS.txt
 	fi
 	
 	# echo thisErrorLevel value is $thisErrorLevel
 done < _tmp_JnhPUNahaRA5BdZdWx_EXPORTED_works_MD_ADDS_files.txt
-exit
 
 rm -f _tmp_JnhPUNahaRA5BdZdWx_EXPORTED_works_MD_ADDS_files.txt _tmp_4UFKgbkrnpDvZK.txt _tmp_f4UvzEv8XXBhju.txt
 			# Cleanup of file from now DEPRECATED code:
 			# rm tmp_k6wttBxcPAxjXS7j7c6jknrfMxwkuR35x9.txt
 
-echo DONE. Results are in __KEYWORD_MATCHED_WORKS.txt and __KEYWORD_NOT_MATCHED_WORKS.txt in this directory.
+echo DONE. Results are in __LABEL_MATCHED_WORKS.txt and __LABEL_NOT_MATCHED_WORKS.txt in this directory.
