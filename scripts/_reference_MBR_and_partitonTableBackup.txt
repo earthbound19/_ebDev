@@ -6,14 +6,14 @@ http://unix.stackexchange.com/q/12986
 
 # to backup and restore the boot sector:
 # backup:
-dd if=/dev/sda of=/cygdrive/c/bootsector.bin bs=1 count=446
+dd bs=1 count=446 if=/dev/sda of=/cygdrive/c/bootsector.bin
 # restore:
-dd if=/cygdrive/c/bootsector.bin of=/dev/sda bs=1 count=446
+dd bs=1 count=446 if=/cygdrive/c/bootsector.bin of=/dev/sda
 
 # to backup and restore the partition table:
 # backup:
-dd if=/dev/sda of=/cygdrive/c/partitiontable.bin bs=1 skip=446 count=64
+dd bs=1 skip=446 count=64 if=/cygdrive/c/partitiontable.bin of=/dev/sda
 # restore:
-dd if=/cygdrive/c/partitiontable.bin of=/dev/sda bs=1 seek=446 count=64
+dd bs=1 seek=446 count=64 if=/cygdrive/c/partitiontable.bin of=/dev/sda
 
 to do both, backup and restore 64+446 bytes?
