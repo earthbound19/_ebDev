@@ -1,0 +1,10 @@
+SUBMIT:
+https://www.deviantart.com/developers/http/v1/20160316/stash_submit/0f1832daa6b58a05841ec6058520c4f3
+PUBLISH a previously submitted work:
+https://www.deviantart.com/developers/http/v1/20160316/stash_publish/a799a5c0967dca14e854286df9746793
+
+https://hq.deviantart.com/blog/44578909/
+https://www.deviantart.com/developers/http/v1/20160316
+https://sta.sh/
+https://www.deviantart.com/submit/?deviationids=729326372
+https://www.programmableweb.com/api/deviantart-rss

@@ -1,0 +1,46 @@
+These first two list parameters upon execution from command line:
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\AppleMobileBackup.exe"
+	Usage: AppleMobileBackup.exe
+	Action (one required):
+	  -b, --backup             perform a backup
+	  -r, --restore            perform a restore
+	  -E, --erase              erase target device
+	  -C, --change password    change backup password from the given old password
+	  -e, --extract path       extracts a relative path to the current directory
+	  -R, --remove path        removes a relative path from the backup
+	  -f, --filename path      prints the filename in a backup of a relative path
+	  -i, --info               display info about a backup
+	  -I, --create-info        create a placeholder Info.plist file
+	  -l, --list               list the contents of the backup
+	Options:
+	  -d, --device deviceid    device identifier (defaults to lockdown)
+	  -t, --target deviceid    target device identifier
+	  -s, --source deviceid    source device identifier
+	  -P, --password password  optional password when changing password or extracting files
+	  -N, --no-pass-prompt     ignore terminal prompt for password
+	  -D, --domain name        domain name for --extract (default "HomeDomain")
+	  -q, --root path          root backup directory
+	  -o, --output path        output file for action (not logging)
+	  -h, --help               print this message and exit
+
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\AppleMobileSync.exe"
+Usage:
+AppleMobileSync.exe --device device_identifier --target target_identifier [--entitynames name[,name,...]] [--reset]
+AppleMobileSync.exe --device device_identifier --target target_identifier [--dataclassnames name[,name,...]] [--reset]
+
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\upgradedb.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\AppleMobileDeviceHelper.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\AppleSyncMapiInterfaceHelper_x64.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\ATH.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\com.apple.IE.client.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\com.apple.Outlook.client.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\com.apple.Safari.client.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\com.apple.WindowsContacts.client.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\com.apple.WindowsMail.client.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\MDCrashReportTool.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\Mingler.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\SyncDiagnostics.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\syncli.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\SyncPlanObserver.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\SyncServer.exe"
+"C:\Program Files (x86)\Common Files\Apple\Mobile Device Support\SyncUIHandler.exe"
