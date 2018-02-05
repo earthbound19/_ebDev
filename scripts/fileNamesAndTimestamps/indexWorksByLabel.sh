@@ -59,8 +59,8 @@ done < _tmp_4UFKgbkrnpDvZK.txt
 echo 'Scanning all files in prepared list for a line matching pattern \-EXIF\:ImageHistory\=\"\.\*\$label \(case-insensitive\)'
 echo . . .
 # Read the lines in that temp file in a loop, run a grep operation on each file searching for a pattern, and log whether the pattern was found in the two described files:
-printf "Metadata preparation ~_MD_ADDS.txt files with ImageHistory field match for label $label" > __LABEL_MATCHED_WORKS.txt
-printf "" > __LABEL_NOT_MATCHED_WORKS.txt
+printf "LIST OF Metadata preparation ~_MD_ADDS.txt files that have a label $label match in the ImageHistory field:\n\n" > __LABEL_MATCHED_WORKS.txt
+printf "LIST OF Metadata preparation ~_MD_ADDS.txt files that do *not* have a label $label match in the ImageHistory field:\n\n" > __LABEL_NOT_MATCHED_WORKS.txt
 while read element
 do
 			# DEPRECATED on account making list via everything CLI, but may be revived if you use a half-baked "nix" environment on windows using gsed which makes windows newlines (ergo half-baked) :
