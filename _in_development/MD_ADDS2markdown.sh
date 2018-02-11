@@ -8,6 +8,8 @@
 # publish-markdown-style.sh and its dependencies (see the comments therein). An image published at a wordpress blog using the "WP REST API filter fields" (maybe? maybe not needed) plugin installed, the image bearing the same name in the wordpress media database as in the ~MD_ADDS.txt file $(1) this script reads from.
 
 # TO DO
+# - Correct markdown inline image code? I don't even know where I was going with this when I left off and FORGOT about it and started solving the same (or a similar) problem with WPmedia2gallery.sh :(
+# - Rework to more elegantly use jq re WPmedia2gallery.sh?
 # - turn linked stylesheets into inline via some tool? font references into google or other fonts? :/
 # - AND/OR strip styles and unused html info from html via some tool?
 # - turn plain URL texts in markdown into links? Already done for HTML conversion, because when converted to HTML via markdown-styles (generate-md), it automatically makes them URLs.
@@ -21,7 +23,7 @@ then
 	echo File \"$1\" found\; will proceed.
 	# Get object name (title) from ~MD_ADDS.txt metadata prep file:
 	title=`sed -n 's/.*ObjectName="\(.*\)".*/\1/p' $1`
-	description=`gsed -n 's/.*Description="\(.*\)".*/\1/p' $1`
+	description=`sed -n 's/.*Description="\(.*\)".*/\1/p' $1`
 
 	# Replace any terminal unfriendly characters from that title--including spaces--with underscores; code adapted from ftun.sh:
 	titleFileNameTFC=$(echo $title | tr \=\@\`~\!#$%^\&\(\)+[{]}\;\ , _)
@@ -41,16 +43,15 @@ then
 		titleURLencoded=`echo "$title" | sed -f /cygdrive/c/_ebdev/scripts/urlencode.sed`
 	# QUERY wp-json for image information by title string match:
 		# -g removes globbing and thereby allows a bracket in the URL.
-	curl -g --request GET --url "earthbound.io/blog/wp-json/wp/v2/media?filter[image]&fields=media_details.image_meta.title,media_details.sizes.medium_large.source_url,media_details.sizes.full.source_url&search=$titleURLencoded" > tmp_MD_ADDS2md_JSON_AG2FesS3dkNV7W56gxMy8fdQ.txt
+# EXTREMELY PAINFUL bug found (took hours) : jq produces a "Segmentation fault" error if you pass it a command line and/or file name that is too long; shortening the ~.json file I output to fixed it:
+	curl -g --request GET --url "earthbound.io/blog/wp-json/wp/v2/media?filter[image]&fields=media_details.image_meta.title,media_details.sizes.medium_large.source_url,media_details.sizes.full.source_url&search=$titleURLencoded" > tmp_MD_ADDS2md_JSON_AG2FesS3.json
 	# NOTE: if various thumbnail sizes are not returned for queries, try using the wordpress media library's built-in (?) thumbnail regeneration function (after that, e.g. 00088 returns thumbnail sizes).
 
 	# EXTRACT MEDIUM LARGE source_url value from that result:
-	medium_largeIMGsourceURL=`sed 's/.*medium_large":{"source_url":"\([^"]\{1,\}\).*/\1/g' tmp_MD_ADDS2md_JSON_AG2FesS3dkNV7W56gxMy8fdQ.txt`
-		# Remove \ escapes from that result; here double-escaped because from a terminal it needs an escape and from a script streaming to terminal it needs another escape:
-		medium_largeIMGsourceURL=`echo "$medium_largeIMGsourceURL" | tr -d '\\\\'`
+	jq -r '.[] | "# \(.media_details.sizes.medium_large.source_url)" ' tmp_MD_ADDS2md_JSON_AG2FesS3.json
 
 	# EXTRACT FULL IMAGE source_url value from that result, then strip \ escapes from it:
-	fullIMGsourceURL=`sed 's/.*full":{"source_url":"\([^"]\{1,\}\).*/\1/g' tmp_MD_ADDS2md_JSON_AG2FesS3dkNV7W56gxMy8fdQ.txt`
+	fullIMGsourceURL=`sed 's/.*full":{"source_url":"\([^"]\{1,\}\).*/\1/g' tmp_MD_ADDS2md_JSON_AG2FesS3.json`
 		fullIMGsourceURL=`echo "$fullIMGsourceURL" | tr -d '\\\\'`
 
 	# WRITE IMAGE AS ANCHOR link to largest available resolution image to markdown file:
@@ -63,6 +64,8 @@ then
 			# That structure condensed into psuedo-code:
 			# [ ![Alt text](addr of med large image to load) ](URL of full res image to make that img a link)
 	printf "[ ![$title, by RAH]($medium_largeIMGsourceURL) ]( $fullIMGsourceURL )\n\n" >> $tmp_md_fileName
+exit
+CONTINUE CODING HERE	
 
 	# WRITE TAP OR CLICK to open largest available resolution prompt to markdown file
 	printf "*Tap or click image to open largest available resolution.*\n\n" >> $tmp_md_fileName
@@ -93,7 +96,7 @@ then
 	cygstart ./_dist/$HTMLfinalFileName
 
 	# DELETE THIS SCRIPTS' TEMP FILES
-	rm -rf tmp_AxXHR6dzAy9BZQQKA95FARpY.md tmp_MD_ADDS2md_JSON_AG2FesS3dkNV7W56gxMy8fdQ.txt publish_markdown_tmp_qJtm3M8rGBpm2Q2WX5d4bKCm
+	rm -rf tmp_AxXHR6dzAy9BZQQKA95FARpY.md tmp_MD_ADDS2md_JSON_AG2FesS3.json publish_markdown_tmp_qJtm3M8rGBpm2Q2WX5d4bKCm
 else
 	echo File \"$1\" not found\; functions skipped.
 fi
