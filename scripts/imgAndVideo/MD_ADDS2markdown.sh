@@ -48,7 +48,7 @@ then
 	# NOTE: if various thumbnail sizes are not returned for queries, try using the wordpress media library's built-in (?) thumbnail regeneration function (after that, e.g. 00088 returns thumbnail sizes).
 
 	# EXTRACT MEDIUM LARGE source_url value from that result:
-	jq -r '.[] | "# \(.media_details.sizes.medium_large.source_url)" ' tmp_MD_ADDS2md_JSON_AG2FesS3.json
+	medium_largeIMGsourceURL=`jq -r '.[] | "\(.media_details.sizes.medium_large.source_url)" ' tmp_MD_ADDS2md_JSON_AG2FesS3.json`
 
 	# EXTRACT FULL IMAGE source_url value from that result, then strip \ escapes from it:
 	fullIMGsourceURL=`sed 's/.*full":{"source_url":"\([^"]\{1,\}\).*/\1/g' tmp_MD_ADDS2md_JSON_AG2FesS3.json`
@@ -64,8 +64,6 @@ then
 			# That structure condensed into psuedo-code:
 			# [ ![Alt text](addr of med large image to load) ](URL of full res image to make that img a link)
 	printf "[ ![$title, by RAH]($medium_largeIMGsourceURL) ]( $fullIMGsourceURL )\n\n" >> $tmp_md_fileName
-exit
-CONTINUE CODING HERE	
 
 	# WRITE TAP OR CLICK to open largest available resolution prompt to markdown file
 	printf "*Tap or click image to open largest available resolution.*\n\n" >> $tmp_md_fileName
