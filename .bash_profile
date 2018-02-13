@@ -48,7 +48,7 @@ export PATH=$PATH:/Users/${USER}/Library/Android/sdk/platform-tools
 
 # Save future pain by backing up the current .bash_profile to a time-stamp-named file in a folder:
   # - Create the folder if it does not exist:
-  if [ ! -d bash_profile_bak ]; then mkdir bash_profile_bak; fi
+  if [ ! -d ~/bash_profile_bak ]; then mkdir bash_profile_bak; fi
 timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
 cat ~/.bash_profile > ~/bash_profile_bak/"$timestamp"_bash_profile_backup.txt
 echo foo > bar.txt
