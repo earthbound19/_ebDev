@@ -6,8 +6,4 @@ scripts/iconConverter
 scripts/imgAndVideo
 scripts/imgAndVideo/EXIFdataBatch
 scripts/imgAndVideo/EXIFdataBatch/metaDataTemplates
-scripts/imgAndVideo/fractalFlame
-scripts/imgAndVideo/imgGetSimilar
-scripts/imgGetSimilar
-scripts/lit/gibberish
-scripts/lit/gibberish/python-Backus-Naur-poetry-generator
+scripts/imgAndVideo/virtualDub
