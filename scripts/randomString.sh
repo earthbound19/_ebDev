@@ -1,4 +1,4 @@
-# DESCRIPTION: returns one random string of length 88 characters or per paramaters you pass to the script.
+# DESCRIPTION: returns one random string of length 9 characters or per paramaters you pass to the script.
 
 # USAGE: pass this script two paramaters, the first being how many strings you want it to return, the second being the length of each string.
 
@@ -25,7 +25,7 @@
 # OPTION 2: uncomment if you prefer (and comment out the others) :
 # howMany=$1
 if [[ $1 == "" ]]; then howMany=1; else howMany=$1; fi
-if [[ $2 == "" ]]; then length=88; else length=$2; fi
+if [[ $2 == "" ]]; then length=9; else length=$2; fi
 for (( i=1; i<=$howMany; i++ ))
 do
 		# 103 wide for Fira Mono standard (not medium or bold) 16-pt.
