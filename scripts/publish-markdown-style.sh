@@ -6,7 +6,7 @@
 # ./thisScript.sh inputFile.md
 
 # DEPENDENCES
-# Nodejs with markdown-styles (generate-md) installed, and an *.md file to convert.
+# Nodejs with markdown-styles (generate-md) installed, my custom witex-invert style installed to that (copy from my source folder for that (find it..TO DO: archive that somewhere public) into summat node_modules/markdown-styles/layouts), and an *.md file to convert.
 
 
 # CODE
