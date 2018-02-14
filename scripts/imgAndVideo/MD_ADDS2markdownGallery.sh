@@ -5,10 +5,10 @@
 # Pass this script one parameter, being a correctly populated ~MD_ADDS.txt metadata prep file name (which file this script will process).
 
 # DEPENDENCIES
-# publish-markdown-style.sh and its dependencies (see the comments therein). An image published at a wordpress blog using the "WP REST API filter fields" (maybe? maybe not needed) plugin installed, the image bearing the same name in the wordpress media database as in the ~MD_ADDS.txt file $(1) this script reads from.
+# publish-markdown-style.sh and its dependencies (see the comments therein), an image published at a wordpress blog using the "WP REST API filter fields" plugin installed (maybe not needed?), and the image bearing the same name in the wordpress media database as in the ~MD_ADDS.txt file $(1) which this script reads from.
 
 # TO DO
-# - turn linked stylesheets into inline via some tool? font references into google or other fonts? :/
+# - turn linked stylesheets into inline via some tool? Font references into google or other fonts? :/
 # - AND/OR strip styles and unused html info from html via some tool?
 # - turn plain URL texts in markdown into links? Already done for HTML conversion, because when converted to HTML via markdown-styles (generate-md), it automatically makes them URLs.
 
