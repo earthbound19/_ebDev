@@ -1,13 +1,22 @@
-# TO DO
-# - Reverse media query results sort? Wordpress is returning newest first; I want oldest first. Can I tell the rest API query to do that? Do that with jq?
-# - Name file after first result of query.
-# - Have MD_ADD2markdownGallery call this after extracting a title from an ~MD_ADDS.txt file? Adapt code for that here?
-
 # DESCRIPTION
 # Makes a markdown gallery of remote images from a title query to the Wordpress JSON REST API.
 
 # USAGE
 # $1 "query string"
+
+# TO DO
+# - Turn any URL in the text pattern "See http://replaceThisURL for original, print and usage" into a markdown URL. OR turn all URLs into markdown links?
+# - Have MD_ADD2markdownGallery call this after extracting a title from an ~MD_ADDS.txt file? Adapt code for that here?
+
+# DEVELOPER NOTES
+# The WP-JSON REST API, it seems, forcibly farts if you set per_page greater than 100. If it ever comes to wanting more than 100 results per query, I'll have to hack Wordpress to overcome that or make this script paginate. Ugh.
+
+
+# CODE
+target_md_fileName="$1"_gallery.md
+
+# Before building markdown gallery, write user directions in the header:
+printf "*Tap or click any image to open the largest available resolution.*\n\n" > $target_md_fileName
 
 # reference REST API queries:
 # - Get image by title:
@@ -23,9 +32,10 @@ queryString=`echo "$queryString" | sed -f /cygdrive/c/_ebdev/scripts/urlencode.s
 	# Retrieves all json data related to any media matching query:
 	# queryString="earthbound.io/blog/wp-json/wp/v2/media?filter\[image\]&search=\"$queryString\""
 # Embed the urlencoded query string in a REST API query; query filters results for media title and medium large thumbnail URL; help via wp-api docs, postman and https://jqplay.org/ :
-queryString="earthbound.io/blog/wp-json/wp/v2/media?filter\[image\]&search=\"$queryString\"&fields=media_details.image_meta.title,media_details.sizes.medium_large.source_url,media_details.sizes.full.source_url"
+queryString="earthbound.io/blog/wp-json/wp/v2/media?filter\[image\]&search=\"$queryString\"&per_page=100&order=asc&fields=media_details.image_meta.title,media_details.sizes.medium_large.source_url,media_details.sizes.full.source_url,alt_text"
 # Make use of that query string with curl and redirect the output to a temp .json file:
-# curl $queryString > tmp_DVGXNAUaQe9298.json
+# UNCOMMENT THE NEXT LINE after development:
+curl $queryString > tmp_DVGXNAUaQe9298.json
 		# For legible working with in development:
 		jq -r '.[]' tmp_DVGXNAUaQe9298.json > tmp_DVGXNAUaQe9298_prettyPrinted.json
 		# REFERENCE string interpolation from another script:
@@ -35,4 +45,6 @@ queryString="earthbound.io/blog/wp-json/wp/v2/media?filter\[image\]&search=\"$qu
 		# MARKDOWN REFERENCE psuedo-code of img linking to full img size:
 		# [ ![Alt text](addr of med large image to load) ](URL of full res image to make that img a link)
 # Write title header and medium image linking to full image with alt text of image title to temp markdown file:
-jq -r '.[] | "# \(.media_details.image_meta.title)\n\n[ ![\(.media_details.image_meta.title)](\(.media_details.sizes.medium_large.source_url)) ](\(.media_details.sizes.full.source_url))\n\n" ' tmp_DVGXNAUaQe9298.json > tmp_wdNZgFrpg.md
+jq -r '.[] | "## \(.media_details.image_meta.title)\n\n[ ![\(.media_details.image_meta.title)](\(.media_details.sizes.medium_large.source_url)) ](\(.media_details.sizes.full.source_url))\n\n\(.alt_text)\n\n" ' tmp_DVGXNAUaQe9298.json >> $target_md_fileName
+
+rm tmp_DVGXNAUaQe9298.json tmp_DVGXNAUaQe9298_prettyPrinted.json
