@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Generates markdown and HTML for web publication of media from ~MD_ADDS.txt metadata prep files. Relies on the wp-json REST API to query published media by name at wordpress blog.
+# Generates markdown and HTML for web publication of media from ~MD_ADDS.txt metadata prep files. Relies on the wp-json REST API to query published media by name at a wordpress blog.
 
 # USAGE
 # Pass this script one parameter, being a correctly populated ~MD_ADDS.txt metadata prep file name (which file this script will process).
@@ -29,8 +29,11 @@ echo Creating markdown and HTML publication-ready text for work titled\:
 echo $title
 echo . . .
 
+# WRITE INSTRUCTIONS about links at start of markdown file:
+printf "*Tap or click images to open largest available resolution.*\n\n" > $tmp_md_fileName
+
 # WRITE TITLE to markdown file
-printf "## $title\n\n" > $tmp_md_fileName
+printf "## $title\n\n" >> $tmp_md_fileName
 
 	# URLencode title else the curl query gets messed up by any spaces in the title:
 	titleURLencoded=`echo "$title" | sed -f /cygdrive/c/_ebdev/scripts/urlencode.sed`
