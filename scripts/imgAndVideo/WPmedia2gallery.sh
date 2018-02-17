@@ -4,16 +4,23 @@
 # USAGE
 # $1 "query string"
 
+# DEPENDENCIES
+# Unix-y environment, jq CLI json parser
+
 # TO DO
+# - Have MD_ADDS2markdownGallery.sh call this after extracting a title from an ~MD_ADDS.txt file? Adapt code for that here?
 # - Turn any URL in the text pattern "See http://replaceThisURL for original, print and usage" into a markdown URL. OR turn all URLs into markdown links?
-# - Have MD_ADD2markdownGallery call this after extracting a title from an ~MD_ADDS.txt file? Adapt code for that here?
 
 # DEVELOPER NOTES
 # The WP-JSON REST API, it seems, forcibly farts if you set per_page greater than 100. If it ever comes to wanting more than 100 results per query, I'll have to hack Wordpress to overcome that or make this script paginate. Ugh.
 
 
 # CODE
-target_md_fileName="$1"_gallery.md
+# Make $1 bash-filename-friendly if it isn't:
+fileNameFriendlyString=`ftunStr.sh "$1"`
+# Build gallery target markdown file name from that:
+target_md_fileName=$fileNameFriendlyString
+target_md_fileName="$target_md_fileName"_gallery.md
 
 # Before building markdown gallery, write user directions in the header:
 printf "*Tap or click any image to open the largest available resolution.*\n\n" > $target_md_fileName
