@@ -1,18 +1,19 @@
-To build on mac:
-gcc ttf2eps.c -o ttf2eps
+Help:
+./ttfeps --help
+Output:
+Usage: ttf2eps [-all] {-glyph num | -name name | -unicode hex | -uni hex} truetypefile
 
-bare example:
+Usage examples:
 ./ttf2eps -unicode 0021 arial.ttf
-
 --may produce e.g. glyph4.eps (an exclamation mark)! :)
 
+./ttf2eps.exe -all Aetherfox.TTF
+-- will extract all glyphs from the font to .eps files named after each glyph.
+
+To build on mac and cygwin:
+gcc ttf2eps.c -o ttf2eps
+
+OLD NOTE:
 run script on mac, with e.g. arial.ttf in the same path as ttf2eps:
 chmod 777 ./ttf2epsLatin.sh && ./ttf2epsLatin.sh arial.ttf
-
-To build on Windows via cygwin / mingw32:
-
-good luck. I tried:
-
-x86_64-pc-cygwin-gcc.exe ttf2eps.c -o ttf2eps
-
---or maybe try using whatever cygwin gcc compiler could be used--there are at least two that I see in /usr/bin--but when I ran it from e.g. the cygwin /usr/bin dir with the above bare example command and the given .ttf file in the same directory, it did nothing.
+-- but where is ttf2epsLatin.sh? Did I delete it? Is it buried in git history somewhere?
