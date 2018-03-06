@@ -2,7 +2,7 @@
 # Optimizes an svg input file (writing the result to <originalFileName>_opt.svg) including color code conversion suited for random recoloring via BWsvgRandomColorFill.sh.
 
 # DEPENDENCIES
-# A nodejs install with the svgo package installed
+# A nodejs install with the svgo (svgomg) package installed
 
 # INSTALLATION
 # 1) install the prerequisites ;) and invoke svgo via command line without any parameters (just run it once, as this creates a default convertColors.js file).
