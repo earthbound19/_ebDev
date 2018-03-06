@@ -13,7 +13,13 @@
 # EXAMPLE: the following creates a video of a 7-second crossfade from one image to another, with 4.36 seconds padding before and after:
 # ./thisScript.sh inputImageOne.png inputImageTwo.png 7 4.36
 
+# NOTES
+# If this script is called thus from another script:
+# source ./thisScript.sh
+# -- the variable this script sets named $targetRenderFile will persist in the shell after this script terminates (for a calling script to make use of). The script ffmpegCrossfadeIMGsToAnimFromFileList.sh does this.
+
 # TO DO:
+# - Do not use `exit`. Instead, elegantly skip main logic if no paramaters passed, because `exit` will terminate this script *and* a calling script if the calling script invokes this via `source ./thisScript`.
 # - Test with many image pairs, and if necessary fix complex filter timings math (in ffmpeg command). It seems that the crossfade starts and ends later than it should.
 # - Add fps param?
 # - Option to adapt this to automatically detect the duration of two pre-existing input clips and crossfade almost the whole length of the shorter over the longer?
@@ -51,21 +57,34 @@ fadeSRCtwoFileName="${imgTwo%.*}"
 # ====
 
 # ONLY DO THE INTENDED WORK if the target file does not already exist; if it does exist warn the user and skip:
-targetFile="$fadeSRConeFileName"_xFade_"$fadeSRCtwoFileName"_"$xFadeLen"s_"$clipPaddingSeconds"p_.avi
-if [ -e $targetFile ]
+targetRenderFile="$fadeSRConeFileName"_xFade_"$fadeSRCtwoFileName"_"$xFadeLen"s_"$clipPaddingSeconds"p_.avi
+if [ -e $targetRenderFile ]
 then
-	echo target file $targetFile already exists\; will not render. To recreate it\, delete the file and run this script again.
-	exit
+	echo target file $targetRenderFile already exists\; will not render. To recreate it\, delete the file and run this script again.
 else
-	echo target file $targetFile does not exist\; will render.
+	echo target file $targetRenderFile does not exist\; will render.
 	# CREATE input static image (looped) video files from the two input images.
 # TO DO move codec options to start of script? Make file extension parameter?
 			# CODEC options:
 			# codecParam=""
 			# codecParam="-vcodec rawvideo"
-			codecParam="-codec:v utvideo"
-	ffmpeg -y -loop 1 -i $imgOne -t $srcClipLengths $codecParam "$fadeSRConeFileName".avi
-	ffmpeg -y -loop 1 -i $imgTwo -t $srcClipLengths $codecParam "$fadeSRCtwoFileName".avi
+			codecParam="-codec:v utvideo -r 29.97"
+			# codecParam="$codecParam -vf scale=1280:1280"		# Cannot be used with that last it seems.
+
+	# To avoid repeating work, render still image video (source for later crossfade) only if it does not already exist:
+	if [ ! -e "$fadeSRConeFileName"".avi" ]
+	then
+				echo target render image for still image video fade source "$fadeSRConeFileName".avi doesn\'t exist\; RENDERING\; render command is\:
+				echo ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $codecParam "$fadeSRConeFileName".avi
+		ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $codecParam "$fadeSRConeFileName".avi
+	fi
+	# This also avoids repeat work:
+	if [ ! -e "$fadeSRCtwoFileName"".avi" ]
+	then
+				echo target render image for still image video fade source "$fadeSRCtwoFileName".avi doesn\'t exist\; RENDERING\; render command is\:
+				echo ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $codecParam "$fadeSRCtwoFileName".avi
+		ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $codecParam "$fadeSRCtwoFileName".avi
+	fi
 	# CREATE the video crossfade from those two static image (looped) video files we just made.
 	# The following complex filter taken and adapted from https://superuser.com/a/1001040/130772
 					# DEPRECATED:
@@ -78,9 +97,9 @@ else
 			# - In practice you can probably usually eliminate the end= from both clip1fadeOut and clip2cut.
 			# - In the filter subcomplex section, st (e.g. st=0) means start, d (e.g. d=4) means duration.
 			# - You will probably always want to set d= to the duration of the first clip MINUS clip1cut's end=<n>. So if the duration of source 1 is 5 seconds, and clip1cut's end=1, that's 5-1=4, so d=4.
-	# New variables which are copies of existing ones (or not), for brevity:
 	clip1CutAt=`echo "scale=2; $srcClipLengths - $xFadeLen" | bc`
-	ffmpeg -y -i "$fadeSRConeFileName".avi -i "$fadeSRCtwoFileName".avi -an \
+			echo RENDERING target crossfade file $targetRenderFile . . .
+	ffmpeg -i "$fadeSRConeFileName".avi -i "$fadeSRCtwoFileName".avi -an \
 	-filter_complex "\
 		[0:v]trim=start=0:end=$clip1CutAt,setpts=PTS-STARTPTS[clip1cut]; \
 		[0:v]trim=start=$clip1CutAt,setpts=PTS-STARTPTS[clip1fadeOut]; \
@@ -95,11 +114,8 @@ else
 		[fadeoutfifo][fadeinfifo]overlay[crossfade]; \
 		[clip1cut][crossfade][clip2cut]concat=n=3[output] \
 		" \
-	-map "[output]" $codecParam $targetFile
+	-map "[output]" $codecParam $targetRenderFile
 
-	# OPTIONAL: comment out either or both of the next two delete commands, depending on what you may want to keep:
-	rm ./"$fadeSRConeFileName".avi
-	rm ./"$fadeSRCtwoFileName".avi
 	# Cygwin option: auto-launch the completed cross-faded video:
-	# cygstart $targetFile
+	# cygstart $targetRenderFile
 fi
