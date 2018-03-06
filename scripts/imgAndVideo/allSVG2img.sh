@@ -29,7 +29,7 @@ if [ -z ${3+x} ]; then param3="-background none"; echo SET parameter DEFAULT \"-
 if [ -z ${3+x} ]; then param3="-background #39383b"; fi		# Medium-dark purplish-gray
 # potentially good black line color change options: #2fd5fe #bde4e4
 
-find . -iname \*.svg > all_svgs.txt
+find . -name '*.svg' | sed 's|^./||' > all_svgs.txt
 while read element
 do
 		svgFilenameNoExtension=`echo $element | sed 's/\(.*\)\.svg/\1/g'`
@@ -43,8 +43,8 @@ do
 		echo rendering $element . . .
 				# DEPRECATED, as it causes the problem described at this question: https://stackoverflow.com/a/27919097/1397555 -- for which the active solution is also given:
 				# gm convert $param3 -scale $1 $element $svgFilenameNoExtension.$img_format
-		echo COMMAND\: convert -size $1 $param3 $element $svgFilenameNoExtension.$img_format
-		gm convert -size $1 $param3 $element $svgFilenameNoExtension.$img_format
+		echo COMMAND\: convert -size $img_size $param3 $element $svgFilenameNoExtension.$img_format
+		gm convert -size $img_size $param3 $element $svgFilenameNoExtension.$img_format
 	fi
 done < all_svgs.txt
 
