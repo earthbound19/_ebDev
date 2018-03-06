@@ -11,12 +11,13 @@ _MTPL=_EXPORTED_
 # NOTE: cygpath use else err next:
 metaDataTemplatePath=`cygpath -u "C:\_ebdev\scripts\imgAndVideo\EXIFdataBatch\metaDataTemplates"`
 	# Pick and uncomment one:
-	# metaDataTemplateFile=customImageMetadataTemplate.txt
+	metaDataTemplateFile=customImageMetadataTemplate.txt
 	# metaDataTemplateFile=electricSheep_CC_by_sa_template.txt
 	# metaDataTemplateFile=fractalFlame_template.txt
-	metaDataTemplateFile=DrawnColorVectorArtMetadataTemplate.txt
+	# metaDataTemplateFile=DrawnColorVectorArtMetadataTemplate.txt
 	# metaDataTemplateFile=vectorRandomColorAnimTemplate.txt
 	# metaDataTemplateFile=TFTMdraftMetadataTemplate.txt
+	# metaDataTemplateFile=nextMostSimilarIMGanimTemplate.txt
 metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 
 # IN DEVELOPMENT; to retrieve crypto donation address one from each of following file for each artwork (and simply remove the first line of each as they are used; NOTE that this assumes the address list is backed up somewhere else!) :
