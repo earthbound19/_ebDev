@@ -6,6 +6,8 @@
 # ./thisScript.sh
 
 # DEPENDENCIES
+# ?
+
 # RECIPE
 # Before running this script, several other scripts must be run against a series of images. Examine the comments of each script to learn how they work. They are:
 # imgsGetSimilar.sh -- run this first. Then run:
@@ -19,6 +21,8 @@
 # -- to string together all the crossfade videos into one contiguous video. This will produce a file named _mp4sConcatenated.mp4, which is the final series of crossfaded stills.
 
 # TO DO
+# - Interrupted run handling / resume? What to do with fadeSRCvideosList.txt in that case?
+# - Fill out dependencis documentation.
 # - Let this script take parameters.
 # - Move and expand the above recipe/comments into a script in the _ebArt repo.
 # - Figure out why its not allowing less than one second of padding; I thought it did before?
