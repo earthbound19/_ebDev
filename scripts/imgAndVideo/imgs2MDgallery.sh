@@ -23,4 +23,4 @@ done < all_imgs.txt
 
 rm all_imgs.txt
 
-printf "*Created with [img2MDgallery.sh](https://github.com/earthbound19/_ebDev/blob/master/scripts/imgs2MDgallery.sh).*" >> README.md
+printf "*Created with [img2MDgallery.sh](https://github.com/earthbound19/_ebDev/blob/master/scripts/imgAndVideo/imgs2MDgallery.sh).*" >> README.md
