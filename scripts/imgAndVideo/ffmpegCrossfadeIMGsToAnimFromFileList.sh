@@ -40,9 +40,10 @@
 # crossFadeDuration=3.57
 # crossFadeDuration=4.36
 # crossFadeDuration=5.8
-crossFadeDuration=6.35
+# crossFadeDuration=6.35
 # crossFadeDuration=7.2
-# crossFadeDuration=11.7
+# crossFadeDuration=8
+crossFadeDuration=11.7
 # NOTE: padding less than 1 (e.g. 0.17) will throw an error, apparently.
 # padding=1.1
 # padding=2.04
