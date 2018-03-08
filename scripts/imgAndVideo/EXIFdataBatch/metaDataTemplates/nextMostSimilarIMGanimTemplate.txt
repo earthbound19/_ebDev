@@ -1,0 +1,4 @@
+-MWG:Description="See http://replaceThisURL for original, print and usage. ~ This animation crossfades between images ranked roughly by most similar (crossfades are generally between images that are most similar to each other). Accomplished with scripts listed at http://s.earthbound.io/nextMostSimilarXfade ~ A hoity-toity robot talks about this at http://s.earthbound.io/artgib"
+-MWG:Keywords="art, digital, abstract, contemporary, animation, anim, video, myWork"
+-MWG:Copyright="Richard Alexander Hall http://earthbound.io/contact"
+-MWG:Creator="Richard Alexander Hall"
