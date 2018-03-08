@@ -11,7 +11,11 @@
 
 # CODE
 # Note the _publish_MD_tmp_qJt5d4bKCm folder with a random string in the name: THIS MAY BE CONSISTENTLY REFERENCED from other scripts; the random string is to avoid clobbering any pre-existing ./output folder (./output being generate-md's default output folder) :
-generate-md --lagenerate-md --layout witex-invert --input ./$1 --output ./_publish_MD_tmp_qJt5d4bKCm
+
+# CHOOSE A LAYOUT and comment out the other options:
+# layoutString=witex-invert   # That's a custom tweak I made, not published at this writing
+layoutString=jasonm23-dark
+generate-md --lagenerate-md --layout $layoutString --input ./$1 --output ./_publish_MD_tmp_qJt5d4bKCm
 
 # Dirty hack; copy necessary images (change the *.extension list for your needs) into the ./_publish_MD_tmp_qJt5d4bKCm folder:
 # cp *.gif ./_publish_MD_tmp_qJt5d4bKCm
