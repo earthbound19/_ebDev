@@ -9,7 +9,8 @@ srcIMGformat=$1
 destIMGformat=$2
 	# Option which I haven't gotten to work yet (it works if I paste it into the command in the loop, but not as stored in the variable additonalParams) :
 	# Pad video to a given size, with the video in the center:
-	# additionalParams=-vf \"scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2\"
+	additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2"
+			# Tossed: -vf scale=-1:1080:force_original_aspect_ratio=1
 
 if [ ! -a $5 ]
 then
@@ -30,7 +31,7 @@ do
 		echo . . .
 	else
 		echo converting $element . . .
-		ffmpeg -i $IMGfilenameNoExt.$srcIMGformat -crf 13 $IMGfilenameNoExt.$destIMGformat
+		ffmpeg -i $IMGfilenameNoExt.$srcIMGformat $additionalParams -crf 13 $IMGfilenameNoExt.$destIMGformat
 	fi
 done
 

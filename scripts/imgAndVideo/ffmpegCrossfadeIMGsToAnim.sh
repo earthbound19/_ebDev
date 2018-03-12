@@ -68,8 +68,7 @@ else
 			# CODEC options:
 			# codecParam=""
 			# codecParam="-vcodec rawvideo"
-			codecParam="-codec:v utvideo -r 29.97"
-			# codecParam="$codecParam -vf scale=1280:1280"		# Cannot be used with that last it seems.
+			codecParam="-codec:v utvideo -r 30"
 
 	# To avoid repeating work, render still image video (source for later crossfade) only if it does not already exist:
 	if [ ! -e "$fadeSRConeFileName"".avi" ]

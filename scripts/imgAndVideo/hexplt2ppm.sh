@@ -7,7 +7,7 @@
 #  $1 hex color palette flat file list (input file).
 #  $2 OPTIONAL. Edge length of each square tile to be composited into final (png) image.
 #  $3 OPTIONAL. MUST HAVE VALUE 0 or nonzero (anything other than 0). If nonzero, the script will randomly shuffle the hex color files before compositing them to one image.
-#  $4 OPTIONAL. number of tiles accross of tiles-assembled image (columns).
+#  $4 OPTIONAL. number of tiles across of tiles-assembled image (columns).
 #  $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).
 #  EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, squares in the palette rendered in random order, and the palette image being 5 columns wide and 6 rows down:
 #  ./thisScript.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
