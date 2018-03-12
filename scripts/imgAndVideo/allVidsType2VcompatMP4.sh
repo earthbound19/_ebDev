@@ -5,15 +5,15 @@
 # Re encoding quality: -q 0 is lossless, -q 23 is default, and -q 51 is worst.
 # Re: https://trac.ffmpeg.org/wiki/Encode/H.264
 
-find ./*.$1 > all$1
-mapfile -t allvids < all$1
-rm all$1
+find ./*.$1 > all$1.txt
 
-for filename in ${allvids[@]}
+additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2" 
+
+while IFS= read -r filename || [ -n "$filename" ]
 do
-	ffmpeg -y -i "$filename" -c:v libx264 -crf 6 -c:a aac -strict experimental -tune fastdecode -pix_fmt yuv420p -b:a 192k -ar 48000 "$filename".mp4
+	ffmpeg -y -i "$filename" $additionalParams -c:v libx264 -crf 9 -pix_fmt yuv420p -b:a 192k -ar 48000 "$filename".mp4
 				# ffmpeg -y -i "$filename" -map 0:v -vcodec copy "filename"_temp.mp4
-done
+done < all$1.txt
 
-# NO AUDIO:
+# COMMAND THAT removes audio:
 # ffmpeg -y -i __corrupted_1pct_2016_10_22__03_23_54__639469500__out.mp4_utvideo.avi -map 0:v -c:v libx264 -crf 12 -pix_fmt yuv420p __corrupted_1pct_2016_10_22__03_23_54__639469500__out.mp4_utvideo.mp4
