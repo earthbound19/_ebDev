@@ -43,8 +43,11 @@ do
 		echo rendering $element . . .
 				# DEPRECATED, as it causes the problem described at this question: https://stackoverflow.com/a/27919097/1397555 -- for which the active solution is also given:
 				# gm convert $param3 -scale $1 $element $svgFilenameNoExtension.$img_format
-		echo COMMAND\: convert -size $img_size $param3 $element $svgFilenameNoExtension.$img_format
-		gm convert -size $img_size $param3 $element $svgFilenameNoExtension.$img_format
+		# UNCOMMENT EITHER the `gm convert` or `magick` option:
+		# GRAPHICSMAGICK OPTION, which breaks on some svgs optimized via svgo :(  :
+		# gm convert -size $img_size $param3 $element $svgFilenameNoExtension.$img_format
+		# IMAGEMAGICK OPTION (which doesn't break that way) :
+		magick -size $img_size $param3 $element $svgFilenameNoExtension.$img_format
 	fi
 done < all_svgs.txt
 
