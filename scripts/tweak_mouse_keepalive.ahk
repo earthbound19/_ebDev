@@ -4,20 +4,13 @@ SetWorkingDir %A_ScriptDir%
 #Persistent
 #SingleInstance force
 #NoTrayIcon
-; OnExit, ExitSub
-; MsgBox %A_ScriptName%
+
+MsgBox Sending one pixel left/right mouse movement every 50 seconds so the computer will not go to screensaver, sleep, or hibernate.
 
 loop
 {
-MouseMove, 2, 0, 0, R
-Sleep, 600
-MouseMove, -2, 0, 0, R
-Sleep, 4500
+MouseMove, 1, 0, 0, R
+Sleep, 50000
+MouseMove, -1, 0, 0, R
+Sleep, 50000
 }
-
-; Doesn't work for a compiled .exe:
-; ExitSub:
-; {
-; FileDelete, %A_ScriptName%
-; ExitApp		; A script with an OnExit subroutine will not terminate unless the subroutine uses ExitApp.
-; }
