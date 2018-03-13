@@ -7,12 +7,15 @@
 # ./thisScript.sh inputVideo.mp4
 # etc.
 
+# TO DO
+# - Copy metadata from old file to new via exiftool
+# - Optionally overwrite old file with new (destroy original)
+
 
 # CODE
-
 # Extract base file name and extension into variables.
 fileName="${1%.*}"
-fileExt=`echo "${1##*.}"`
+fileExt="${1##*.}"
 
 ffmpeg -y -i "$1" -codec:a flac -codec:v utvideo "$fileName"_losslessCompress."$fileExt"
 
