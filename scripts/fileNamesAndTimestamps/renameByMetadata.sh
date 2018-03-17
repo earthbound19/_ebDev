@@ -34,7 +34,7 @@ exiftool -v -overwrite_original '-Filename<${createDate}.%e' -d "%Y_%m_%d__%H_%M
 # renames all .m4v files in current directory:
 exiftool -v -overwrite_original '-Filename<${createDate}.%e' -d "%Y_%m_%d__%H_%M_%S" *.m4v
 # It's important that these next commands are run last:
-# rename all JPEG format files that which lack a dateTimeOriginal metadata field by file creation date, with a %%c counter against any potential duplicate resulting file names (making unique file names where the time stamp is identical) ; re https://sno.phy.queensu.ca/~phil/exiftool/exiftool_pod.html#Advanced-formatting-feature :
+# rename all JPEG format files which lack a dateTimeOriginal metadata field by file creation date, with a %%c counter against any potential duplicate resulting file names (making unique file names where the time stamp is identical) ; re https://sno.phy.queensu.ca/~phil/exiftool/exiftool_pod.html#Advanced-formatting-feature :
 # perl expressions can be done on tags in this format:
 # ${TAG;EXPR}
 # (e.g. ) ${-FileName;somePerlExprThatMakesRandomCharacters}
