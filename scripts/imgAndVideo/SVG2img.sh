@@ -9,7 +9,7 @@
 # $4 A hex color code (format ffffff, no pound/hex symbol) which will be used to render the svg background (if it has a transparent background). If it does not match the regex [a-f0-9]{6} (you can pass anything as this parameter), a hard-coded hex color will be used. See the BACKGROUND COLOR OPTIONS comment to hack that. IF OMMITTED, the background will be transparent.
 
 # TO DO
-# Check if the optional parameter actually works as intended (I think it's reversed?)
+# Add an rnd bg color option?
 
 
 # CODE
@@ -41,9 +41,10 @@ if ! [ -z ${1+x} ]; then echo input file parameter \$1 is\: $1\. Proceeding . . 
 			# bgHEXcolorCode=584560		# Darkish plum?
 			bgHEXcolorCode=39383b		# Medium-dark purplish-gray
 					# Other potentially good black line color change options: #2fd5fe #bde4e4
-			param3="-background $bgHEXcolorCode"
 			echo $4 is not a hex color code\! Background was set to default $bgHEXcolorCode\!
 		fi
+		# Whichever option was set, use it:
+		param3="-background "#"$bgHEXcolorCode"
 	fi
 	# ==== END SET GLOBALS
 
