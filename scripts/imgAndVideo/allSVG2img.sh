@@ -5,9 +5,9 @@
 # invoke this script with the following parameters:
 # $1 the number of pixels you wish the longest side of the output image to be.
 # $2 the target file format e.g. png or jpg -- defaults to jpg if not provided.
-# $3 optional--include this parameter (it can be anything) to make the background transparent; otherwise it defaults to an opaque background of a color hard-coded (hack the script--see the commented out background colors section--to change the background color).
+# $3 optional--see parameter $4 description in SVG2img.sh.
 # e.g.:
-# ./thisScript.sh 4200 png foo
+# ./thisScript.sh 4200 png 000066
 
 
 # CODE
