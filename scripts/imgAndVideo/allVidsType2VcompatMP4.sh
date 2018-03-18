@@ -7,7 +7,7 @@
 
 find ./*.$1 > all$1.txt
 
-additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2" 
+# additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=39383b"
 
 while IFS= read -r filename || [ -n "$filename" ]
 do
