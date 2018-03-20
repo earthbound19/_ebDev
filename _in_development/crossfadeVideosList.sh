@@ -1,3 +1,7 @@
+# POSSIBLE DUPLICATE FUNCTIONALITY SCRIPT
+# The functionality of this script is probably completed in a script mentioned in the comments.
+# TO DO: check that and delete or continue work on this script accordingly.
+
 # USAGE
 # Pass this script three parameters, being:
 # $1 the first video
