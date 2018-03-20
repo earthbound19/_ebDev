@@ -12,14 +12,14 @@ find ./*.$1 > all$1.txt
 
 while IFS= read -r filename || [ -n "$filename" ]
 do
-	# CHECK if target render already exists. If it does not, render. If it does, skip render and notify user.
-	if [ -e "$filename" ]
+	# CHECK if target render already exists. If it does, skip render and notify user. Otherwise render.
+	if [ -e "$filename".mp4 ]
 	then
-		echo Target render file "$filename" does not exist\; RENDERING.
+				echo Target render file "$filename".mp4 already exists\; will not overwrite\; SKIPPING RENDER.
+	else
+				echo Target render file "$filename".mp4 does not exist\; RENDERING.
 		ffmpeg -i "$filename" $additionalParams -c:v libx264 -crf 9 -pix_fmt yuv420p -b:a 192k -ar 48000 "$filename".mp4
 				# ffmpeg -y -i "$filename" -map 0:v -vcodec copy "filename"_temp.mp4
-	else
-		echo Target render file "$filename" already exists\; will not overwrite\; SKIPPING RENDER.
 	fi
 done < all$1.txt
 
