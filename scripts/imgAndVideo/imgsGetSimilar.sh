@@ -122,7 +122,11 @@ sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
 sed -i "s/__superShrunkRc6d__//g" IMGlistByMostSimilar.txt
 
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
-echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with ffmpegAnimFromFileList.sh \(see comments of that script\) to produce an animation of these images arranged by most similar to nearest list neighbor \(roughly\, with some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list\)\.
+echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with e.g. any of these scripts\:
+echo mkNumberedCopiesFromFileList.sh
+echo ffmpegCrossfadeIMGsToAnimFromFileList.sh
+echo ffmpegAnimFromFileList.sh
+echo See comments in any of them. That last will produce an animation of these images in a series of stills of each cutting to the next\, arranged by most similar to nearest list neighbor \(roughly\. There will be some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list\)\.
 
 rm allIMGs.txt compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt tmp_fx49V6cdmuFp.txt comparisons__superShrunkRc6d__cols.txt
 rm __superShrunkRc6d__*
