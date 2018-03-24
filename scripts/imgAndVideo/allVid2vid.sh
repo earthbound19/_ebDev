@@ -31,7 +31,7 @@ do
 		echo . . .
 	else
 		echo converting $element . . .
-		ffmpeg -i $IMGfilenameNoExt.$srcIMGformat $additionalParams -crf 13 $IMGfilenameNoExt.$destIMGformat
+		ffmpeg -i $IMGfilenameNoExt.$srcIMGformat $additionalParams -crf 17 $IMGfilenameNoExt.$destIMGformat
 	fi
 done
 

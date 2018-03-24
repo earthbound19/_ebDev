@@ -65,4 +65,4 @@ ffmpeg -y -f image2 -framerate $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescalePara
 # to enable simple interpolation to up the framerate to 30, use this tag in the codec/output flags section:
 # -vf fps=30
 
-# ex. OLD command: ffmpeg -y -r 18 -f image2 -i %05d.png -crf 13 -vf fps=30 out.mp4
+# ex. OLD command: ffmpeg -y -r 18 -f image2 -i %05d.png -crf 17 -vf fps=30 out.mp4
