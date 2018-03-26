@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Deletes all files with a given extension (e.g. .png) that have no companion file with the same base file name and a different extension (e.g. .ppm, .hexplt, anything). Useful for discarding undesired source format files whose undesirability have been ascertained by converting them to a target format
+# Deletes all files with a given extension (e.g. .png) that have no companion file with the same base file name and a different extension (e.g. .ppm, .hexplt, anything). Useful for discarding undesired source format files whose undesirability have been ascertained by converting them to a target format and viewing, then deleting the rendered target image.
 
 # USAGE
 # ./thisScript.sh sourceFileToDeleteThatHasThisExtension ifNoMatchedFileNameWithThisExtension, e.g.:
