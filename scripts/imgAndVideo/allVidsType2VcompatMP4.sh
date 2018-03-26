@@ -9,6 +9,7 @@ find ./*.$1 > all$1.txt
 
 # Makes a video matte by scaling down a bit and placing on a dark dark violet background:
 # additionalParams="-vf scale=-1:1054:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=1a171e"
+# additionalParams="$additionalParams -preset slow -tune animation"
 
 while IFS= read -r filename || [ -n "$filename" ]
 do
@@ -18,7 +19,7 @@ do
 				echo Target render file "$filename".mp4 already exists\; will not overwrite\; SKIPPING RENDER.
 	else
 				echo Target render file "$filename".mp4 does not exist\; RENDERING.
-		ffmpeg -i "$filename" $additionalParams -c:v libx264 -crf 9 -pix_fmt yuv420p -b:a 192k -ar 48000 "$filename".mp4
+		ffmpeg -i "$filename" $additionalParams -c:v libx264 -crf 17 -pix_fmt yuv420p -b:a 192k -ar 48000 "$filename".mp4
 				# ffmpeg -y -i "$filename" -map 0:v -vcodec copy "filename"_temp.mp4
 	fi
 done < all$1.txt

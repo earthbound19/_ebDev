@@ -28,7 +28,7 @@ do
 	else
 		echo converting $element . . .
 		# gm convert $param3 -scale $img_size $element $IMGfilenameNoExt.$destIMGformat
-		ffmpeg -i $IMGfilenameNoExt.$srcIMGformat -crf 13 $IMGfilenameNoExt.$destIMGformat
+		ffmpeg -i $IMGfilenameNoExt.$srcIMGformat -crf 17 $IMGfilenameNoExt.$destIMGformat
 	fi
 done
 

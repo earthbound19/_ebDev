@@ -29,7 +29,7 @@ ffmpeg -y -i $inputVideoOne -i $inputVideoTwo -filter_complex \
 -map [over] _vid.mp4
 
 # Mux the two; sound is shorter at this writing :(  :
-ffmpeg -y -i _aud.aac -i _vid.mp4 -crf 38 "$inputVideoOne"_xFade_"$inputVideoTwo".mp4
+ffmpeg -y -i _aud.aac -i _vid.mp4 -crf 17 "$inputVideoOne"_xFade_"$inputVideoTwo".mp4
 rm _aud.aac _vid.mp4
 
 # Cygwin option: auto-launch the completed cross-faded video:
