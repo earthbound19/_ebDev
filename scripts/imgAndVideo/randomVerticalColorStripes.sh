@@ -9,25 +9,19 @@
 # $4 How many pixels tall to scale the final image
 # $5 How many such random images you want to create
 # $6 Randomly vary max. number of columns by subtraction between 0 and the number given in this variable. SET THIS TO 0 if no variation desired.
-# $7 Optional. A file list of hex color values to randomly pick from. If not provided, every stripe is a pseudo-randomly selected color.
+# $7 Optional. A file list of hex color values to randomly pick from. If not provided, every stripe is a pseudo-randomly generated color (the color created from entropy at run time).
 
-# NOTES
 # TO DO
-# See comments to that effect throughout code.
+# Invoke imgs2imgsNN.sh for ppm to png conversion, passing resize params.
 
+
+# CODE
 # In case of interrupted run, clean up first:
 if [ -e temp.txt ]; then rm temp.txt; fi
 if [ -e *.temp ]; then rm *.temp; fi
 rm *.temp temp.txt
 
 # GLOBAL VARIABLES
-
-# SEE README.md in https://github.com/earthbound19/_ebdev.git :
-if [ -e $HOME/_ebdevPath.txt ]; then devToolsPath=`< $HOME/_ebdevPath.txt`; fi
-devToolsPath=`cygpath -u "\$devToolsPath"`
-		# echo devToolsPath val is\:
-		# echo $devToolsPath
-# the path in _ebdev where all hex color scheme text files are stored:
 hexColorSchemesRootSubPath="/scripts/imgAndVideo/ColorSchemesHex"
 hexColorListsRootPath="$devToolsPath""$hexColorSchemesRootSubPath"
 minColorColumnRepeat=$1
@@ -36,27 +30,28 @@ scalePixX=$3
 scalePixY=$4
 howManyImages=$5
 maxColorColumnsVariation=$6
-maxPossibleColumns=$(( $maxColorColumnRepeat + $maxColorColumnsVariation))
+		# what is this for? :
+		# maxPossibleColumns=$(( $maxColorColumnRepeat + $maxColorColumnsVariation))
 padDigitsTo=${#maxPossibleColumns}
-
-# PURE INFURIATING NONSENSE, again appeased by a genius breath yon: http://stackoverflow.com/a/23207966
-colorSelectionList=`find $hexColorListsRootPath -name $7 -type f`
+# set hexColorSrcFullPath environment variable via the following script:
+source findHEXPLT.sh $7
+		# echo hexColorSrcFullPath value is\:
+		# echo $hexColorSrcFullPath
 
 # The logic of this variable check is: if not no value for this var, do something (in other words, if there is this var with a value, do something) ;
 # UNFORTUNATELY, it seems this type of check only works with environment parameter variables, not assigned variables that have no value, WHICH MEANS that the following must be hard-coded for the parameter:
 if [ ! -z ${7+x} ]
 	then
 	echo IMPORTING FROM COLOR LIST from file name\:
-	echo $colorSelectionList
-	mapfile -t hexColorsArray < $colorSelectionList
+	echo $hexColorSrcFullPath
+	mapfile -t hexColorsArray < $hexColorSrcFullPath
 	sizeOf_hexColorsArray=${#hexColorsArray[@]}
 	sizeOf_hexColorsArray=$(( $sizeOf_hexColorsArray - 1))		# Else we get an out of range error for the zero-based index of arrays.
 fi
 
 # Create a subdir based on the hex color scheme file name, and move into it for this run (move out of it at the end of this run):
 pushd
-newDirName=`echo $7 | sed 's/\.txt//g'`
-# if [ ! -e $newDirName ]; then mkdir $newDirName; else exit; fi
+newDirName=${7%.*}-randomVerticalColorStripes
 if [ ! -e $newDirName ]; then mkdir $newDirName; fi
 cd $newDirName
 
@@ -138,9 +133,9 @@ do
 	echo wrote new ppm file $ppmFileName.ppm
 	rm ppmheader.txt grid.ppm
 
-# OPTIONAL:
-echo Creating enlarged png version with hard edges maintained . . .
-nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png $ppmFileName.ppm
+# OPTIONAL -- TO DO: invoke what is given in TO DO above instead:
+# echo Creating enlarged png version with hard edges maintained . . .
+# nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png $ppmFileName.ppm
 	# OPTION THAT OVERRIDES X dimension to be half of what the parameter gives:
 	# scalePixY=$(( $scalePixX / 2 ))
 	# nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png $ppmFileName.ppm
