@@ -15,6 +15,11 @@
 # DEPENDENCIES
 # GraphicsMagick, possibly IrfanView, both in your $PATH.
 
+# TO DO
+# Make irfanvew call alter if $4 parameter present.
+
+
+# CODE
 	# DEPRECATED command for unexpected behavior; it may be that the following command somehow caused nconvert to iterate over every source file format by wildcard? Removing the . from the command, it iterates over the list; whereas with the . it did so twice:
 	# find . *.$1 > all_$1.txt
 find *.$1 > all_$1.txt
@@ -28,6 +33,7 @@ do
 		echo RENDERING target file $targetFileName as it does not exist . . .
 		# If the source file format is ppm, use Irfanview to do the conversion (at this writing, I find that only IrfanView reads ppm format). Otherwise, use GraphicsMagick.
 		if [ $imgFileExt == "ppm" ]; then
+# DEVELOPMENT command that fails: i_view32.exe $img /resize=\(1280\,720\) /convert=$targetFileName
 			i_view32.exe $img /resize_long=$3 /aspectratio /convert=$targetFileName
 		else
 				# ex. GraphicsMagick command:
