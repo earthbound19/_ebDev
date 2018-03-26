@@ -2,7 +2,7 @@
 # Invoke this cript with one parameter:
 # $1 The file list name, for which every file name in the list there will have numbered copies made in a subdir. Preparation for other scripts which must operate on numbered files.
 
-# WARNING: this script perhaps dangerously assumes all file names provided in the list have the same extension.
+# WARNING: this script perhaps dangerously assumes all file names provided in the list have the same extension. Also, it clobbers any files that already exist when it copies (overwrites without prompt).
 
 # USAGE
 # TO DO :) Document how to use this script.
@@ -38,8 +38,8 @@ do
 			# ex. to pad numbers to number of digits in %0n:
 			# var=`printf "%05d\n" $element`
 	paddedNum=`printf "%0"$digitsCount"d\n" $counter`
-	echo "executing command: cp ./$element ./numberedCopies/$paddedNum.$fileNameExt"
-	cp ./$element ./numberedCopies/$paddedNum.$fileNameExt
+	echo "executing command: cp -f ./$element ./numberedCopies/$paddedNum.$fileNameExt"
+	cp -f ./$element ./numberedCopies/$paddedNum.$fileNameExt
 	# Because Cygwin can be STUPID with permissions (I can't use the .png images afterward without special access!) :
 	chmod 777 ./numberedCopies/$paddedNum.$fileNameExt
 	echo "file '$paddedNum.$fileNameExt'" >> ./numberedCopies/$fileList
