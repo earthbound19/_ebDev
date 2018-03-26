@@ -28,7 +28,7 @@ fi
 	# OPTIONAL wipe of all leftover files from previous run; comment out everything in the following block if you don't want that:
 	rm __superShrunkRc6d__*
 
-find ./* -type f -iregex ".*\.$1" > allIMGs.txt
+gfind ./* -type f -iregex ".*\.$1" -maxdepth 0 | tr -d '\15\32' > allIMGs.txt
 # because gfind produces windows line-endings, convert them to unix:
 dos2unix allIMGs.txt
 sed -i 's/^\(\.\/\)\(.*\)/\2/g' allIMGs.txt
