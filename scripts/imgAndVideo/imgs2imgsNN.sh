@@ -17,6 +17,7 @@
 
 # TO DO
 # Make irfanvew call alter if $4 parameter present.
+# Assign script paramaters to named variables and use the named variables.
 
 
 # CODE
@@ -26,15 +27,17 @@ find *.$1 > all_$1.txt
 
 while read img
 do
-	imgFileNoExt=`echo $img | sed 's/\(.*\)\..\{1,4\}/\1/g'`
-	imgFileExt=`echo $img | sed 's/.*\.\(.\{1,4\}\)/\1/g'`
+	imgFileNoExt=${img%.*}
+	imgFileExt=${img##*.}
 	targetFileName=$imgFileNoExt.$2
 	if [ ! -f $targetFileName ]; then
 		echo RENDERING target file $targetFileName as it does not exist . . .
 		# If the source file format is ppm, use Irfanview to do the conversion (at this writing, I find that only IrfanView reads ppm format). Otherwise, use GraphicsMagick.
 		if [ $imgFileExt == "ppm" ]; then
-# DEVELOPMENT command that fails: i_view32.exe $img /resize=\(1280\,720\) /convert=$targetFileName
-			i_view32.exe $img /resize_long=$3 /aspectratio /convert=$targetFileName
+			# option that forces a given size:
+			i_view32.exe $img /resize=\($3,$4\) /convert=$targetFileName
+			# option that preserves aspect setting dimension for longest side:
+			# i_view32.exe $img /resize_long=$3 /aspectratio /convert=$targetFileName
 		else
 				# ex. GraphicsMagick command:
 				# gm convert 6x5gridRND_2017_05_06__01_51_14__099842100.ppm -scale 1200 out.png
@@ -42,8 +45,6 @@ do
 			gm convert $img -scale $3 $4 $targetFileName
 		fi
 		echo ~~
-	else
-			echo Target file $targetFileName already exists\; delete the file if you wish to re-render it\; SKIPPING RENDER . . .
 	fi
 done < all_$1.txt
 
