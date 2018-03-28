@@ -1,8 +1,8 @@
 # USAGE
-# Invoke this cript with one paramter $1 being the file type (e.g. png) you wish to create a $fileType_links subdir full of numbered junction links for.
+# Invoke this script with one paramter $1 being the file type (e.g. png) you wish to create a $fileType_links subdir full of numbered junction links for.
 # TO DO: $2 any parameter, flag to randomly reorder file names array (in memory or temp file) before creating numbered junction links for them.
 
-if [ -a numberedLinks ]; then rm -d -r numberedLinks; mkdir numberedLinks; else mkdir numberedLinks; fi
+if [ -d numberedLinks ]; then rm -rf numberedLinks; mkdir numberedLinks; else mkdir numberedLinks; fi
 
 	# TESTING ONLY: create test files:
 	# for element in {1..5}

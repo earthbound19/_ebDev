@@ -7,7 +7,7 @@
 # $2 the target file format e.g. tif or jpg
 
 # DEV NOTE: template command: gm -size 850 test.svg result.tif
-# NOTE that for the -size parameter, it scales the imagesso that the longest side is that many pixels.
+# NOTE that for the -size parameter, it scales the images so that the longest side is that many pixels.
 
 img_format_1=$1
 img_format_2=$2
