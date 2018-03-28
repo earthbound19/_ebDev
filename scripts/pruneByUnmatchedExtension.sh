@@ -42,8 +42,7 @@
 echo UNTIL I IMPLEMENT a check whether there are any png files at all in the current path \(and\/or a warning prompt\)\, you must manually comment out this and the next line of code in this script before running it. THIS IS TO PREVENT you from accidentally running this script against a directory of \.hexplt files you have never rendered\, thereby deleting all of them\! BE SURE to uncomment these lines again after running this script\!
 exit
 
-gfind *.$1 > "all_""$1".txt
-dos2unix "all_""$1".txt
+find ./*.$1 > files_list.txt
 
 while read element
 do
@@ -54,6 +53,6 @@ do
 		echo File name with extension $2 matching source file $element NOT FOUND\; will DELETE source file\!
 		rm $element
 	fi
-done < "all_""$1".txt
+done < files_list.txt
 
-rm "all_""$1".txt
+rm files_list.txt
