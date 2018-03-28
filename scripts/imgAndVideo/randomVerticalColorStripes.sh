@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates a .ppm (plain text file bitmap format) image of a random number of color columns, each column repeating one color a random number of times, to effectively make a vertical stripe of a random width. Colors used can be random or configurable via input file parameter (of a list of hex color values). Converts the resultant .ppm to a .png image with hard edges preserved (to preserve hard-edged stripes), of dimensions NxN. Generates Z such images. All random ranges, dimensions, and colors to use configurable; see USAGE for script parameters and example.
+# Creates a .ppm (plain text file bitmap format) image of a random number of color columns, each column repeating one color a random number of times, to effectively make a vertical stripe of a random width. Colors used can be random or configurable via input file parameter (of a list of hex color values). Converts the resultant .ppm to a .png image with hard edges preserved (to preserve hard-edged stripes), of dimensions NxN. (EXCEPT NOT at this writing, if ever.) Generates Z such images. All random ranges, dimensions, and colors to use configurable; see USAGE for script parameters and example.
 
 # USAGE
 # Pass this script the following parameters; the last being optional.
@@ -13,13 +13,13 @@
 
 # TO DO
 # Invoke imgs2imgsNN.sh for ppm to png conversion, passing resize params.
+# Set new subfolder name "RND" or summat if no .hexplt file name passed to script.
 
 
 # CODE
 # In case of interrupted run, clean up first:
 if [ -e temp.txt ]; then rm temp.txt; fi
 if [ -e *.temp ]; then rm *.temp; fi
-rm *.temp temp.txt
 
 # GLOBAL VARIABLES
 hexColorSchemesRootSubPath="/scripts/imgAndVideo/ColorSchemesHex"
@@ -30,8 +30,7 @@ scalePixX=$3
 scalePixY=$4
 howManyImages=$5
 maxColorColumnsVariation=$6
-		# what is this for? :
-		# maxPossibleColumns=$(( $maxColorColumnRepeat + $maxColorColumnsVariation))
+maxPossibleColumns=$(( $maxColorColumnRepeat + $maxColorColumnsVariation))
 padDigitsTo=${#maxPossibleColumns}
 # set hexColorSrcFullPath environment variable via the following script:
 source findHEXPLT.sh $7
@@ -39,22 +38,15 @@ source findHEXPLT.sh $7
 		# echo $hexColorSrcFullPath
 
 # The logic of this variable check is: if not no value for this var, do something (in other words, if there is this var with a value, do something) ;
-# UNFORTUNATELY, it seems this type of check only works with environment parameter variables, not assigned variables that have no value, WHICH MEANS that the following must be hard-coded for the parameter:
+# UNFORTUNATELY, it seems this type of check only works with environment parameter variables [by this do I mean e.g. $1, $2, $3 etc.?], not assigned [script or named?] variables that have no value, WHICH MEANS that the following must be hard-coded for the parameter:
 if [ ! -z ${7+x} ]
 	then
-	echo IMPORTING FROM COLOR LIST from file name\:
+	echo IMPORTING COLOR LIST from file name\:
 	echo $hexColorSrcFullPath
 	mapfile -t hexColorsArray < $hexColorSrcFullPath
 	sizeOf_hexColorsArray=${#hexColorsArray[@]}
 	sizeOf_hexColorsArray=$(( $sizeOf_hexColorsArray - 1))		# Else we get an out of range error for the zero-based index of arrays.
 fi
-
-# Create a subdir based on the hex color scheme file name, and move into it for this run (move out of it at the end of this run):
-pushd
-newDirName=${7%.*}-randomVerticalColorStripes
-if [ ! -e $newDirName ]; then mkdir $newDirName; fi
-cd $newDirName
-
 	# IN DEVELOPMENT:
 	# ? Pregenerate a long string which is so many random hex colors smushed together (without any delimiters), to pull hex colors from in chuncks of six characters for greater efficiency; re: http://stackoverflow.com/a/1405641
 	# WUT FIX VAR NAMES
@@ -62,6 +54,14 @@ cd $newDirName
 		# echo numRandomCharsToGet val is $numRandomCharsToGet
 	# randomCharsString=`cat /dev/urandom | tr -cd 'a-km-np-zA-KM-NP-Z2-9' | head -c $numRandomCharsToGet`
 		# echo randomCharsString val is $randomCharsString
+	# SAME/SIMILAR (?) IN DEVELOPMENT NOTES:
+	# Initialize counter at negative the number of getNrandChars, so that the first iteration in the following loop will set it to 0, which is where we need it to start:
+	# multCounter=-$getNrandChars
+		# echo multCounter val is $multCounter
+	# for filename in ${array[@]}
+	# do
+			# multCounter=$(($multCounter + $getNrandChars))
+			# newFileBaseName=${randomCharsString:$multCounter:$getNrandChars}
 
 for a in $( seq $howManyImages )
 do
@@ -141,17 +141,3 @@ do
 	# nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png $ppmFileName.ppm
 
 done
-
-popd
-
-
-
-	# IN DEVELOPMENT:
-	# WUT FIX VAR NAMES and adapt
-	# Initialize counter at negative the number of getNrandChars, so that the first iteration in the following loop will set it to 0, which is where we need it to start:
-	# multCounter=-$getNrandChars
-		# echo multCounter val is $multCounter
-	# for filename in ${array[@]}
-	# do
-			# multCounter=$(($multCounter + $getNrandChars))
-			# newFileBaseName=${randomCharsString:$multCounter:$getNrandChars}
