@@ -2,51 +2,27 @@
 # Optimizes an svg input file (writing the result to <originalFileName>_opt.svg) including color code conversion suited for random recoloring via BWsvgRandomColorFill.sh.
 
 # DEPENDENCIES
-# A nodejs install with the svgo (svgomg) package installed
-
-# INSTALLATION
-# 1) install the prerequisites ;) and invoke svgo via command line without any parameters (just run it once, as this creates a default convertColors.js file).
-# EITHER overwrite convertColors.js with the contents of svgo_config_convertColors.js (which is in the same PATH as this script) or, if you can (I couldn't), get svgo to recognize this as a legitimate config file.
+# A nodejs install with the svgo (svgomg) package installed.
 
 # USAGE
-# REQUIRES one parameter $1, being the name of the svg file for which you want an ~_opt.svg file produced in the same directory; e.g.:
+# First examine and if you wish to copy the file .svgo.yml in this distribution over the .svgo.yml file that comes with svgo. Among other things it preserves path IDs and long hex color form.
+# Invoke this script with one parameter $1 (required), being the name of the svg file for which you want an ~_opt.svg file produced in the same directory; e.g.:
 # thisScript.sh inputFile.svg
+# NOTE that the CLIopts variables, if you uncomment them, override the .svgo.yml config file.
+# ALSO NOTE that this may misbehave when invoked via cygwin. I've at times found that if I copy and paste the printed command to a cmd prompt, it works ok . . . except the result displays wonky in Internet Explorer and inkscape. :(
 
-# NOTES
-# At this writing, misbehaving when invoked via cygwin. If I copy and paste the printed command to a cmd prompt, it works ok . . . except the result displays wonky in Internet Explorer and inkscape. :(
+fileNameNoExt=${1%.}
 
+# CLIopts="--enable=convertColors --enable=collapseGroups --disable=convertPathData"
 
-# ==== GLOBALS
-fileNameNoExt=`echo $1 | sed 's/\(.*\)\.svg/\1/g'`
-		# echo fileNameNoExt val is\: $fileNameNoExt
-# I wish I had thought of this trick to get an executable or script path into a variable long ago! ; another project is going to use paletteFile=`which flam3-palettes.xml` :
-# TO DO: make the following detected and automatically parametrically changed;
-# ALSO TO DO: use a cross-platform tool instead of cygpath to figure this.
-				# AT THE MOMENT, FAIL; dunno why; maybe it needs the config file to be in the same path as convertColors.js from the svgo package?
-				# configFileName='convertColors_noShortHex.js'
-				# OS=WINDOWS
-				# if [[ $OS == "WINDOWS" ]]
-				# then
-					# OS_SVGO_CONFIG_FILE_FULL_PATH=`which $configFileName`		# this produces a full path and file name result.
-				# cp $OS_SVGO_CONFIG_FILE_FULL_PATH ./
-				# fi
-				# WANT TO MAKE THIS WORK: --config=""$configFileName" e.g. :
-				# svgoCLIopts="--disable=mergePaths --enable=removeRasterImages --disable=convertShapeToPath --config=$configFileName"
-CLIopts="--disable=mergePaths --enable=removeRasterImages --disable=convertShapeToPath"
-# UNUSED option(s):
-# OTHER ADDITIONAL OPTIONS; comment out if you don't want them:
-moreCLIopts="--enable=removeDimensions --enable=removeUnknownsAndDefaults --enable=removeViewBox"
-# UNUSED option(s):  
-# ==== END GLOBALS
-
-SVGOcommand="svgo -i $1 --pretty $CLIopts $moreCLIopts -o "$fileNameNoExt"_opt.svg"
+SVGOcommand="svgo -i $1 --pretty $CLIopts -o "$fileNameNoExt"_opt.svg"
 echo Running command\:
 echo $SVGOcommand
 echo . . .
 $SVGOcommand
 
 # OPTIONAL and DANGER: will toast original file--comment out if you do not want that! :
-# rm $1 && mv "$fileNameNoExt"_opt.svg $1
+rm $1 && mv "$fileNameNoExt"_opt.svg $1
 
 
 # SVGO CLI OPTIONS NOTES
