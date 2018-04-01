@@ -40,7 +40,7 @@
 
 # CODE
 echo UNTIL I IMPLEMENT a check whether there are any png files at all in the current path \(and\/or a warning prompt\)\, you must manually comment out this and the next line of code in this script before running it. THIS IS TO PREVENT you from accidentally running this script against a directory of \.hexplt files you have never rendered\, thereby deleting all of them\! BE SURE to uncomment these lines again after running this script\!
-exit
+# exit
 
 find ./*.$1 > files_list.txt
 
@@ -50,7 +50,7 @@ do
 	searchFileName="$fileNameNoExt"."$2"
 	if ! [ -f $searchFileName ]
 	then
-		echo File name with extension $2 matching source file $element NOT FOUND\; will DELETE source file\!
+		echo File matching source file name $element but with $2 extension NOT FOUND\; will DELETE source file\!
 		rm $element
 	fi
 done < files_list.txt
