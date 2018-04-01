@@ -26,6 +26,7 @@
 
 
 # CODE
+vidExt=mov
 
 # ====
 # SET GLOBALS START
@@ -57,7 +58,7 @@ fadeSRCtwoFileName="${imgTwo%.*}"
 # ====
 
 # ONLY DO THE INTENDED WORK if the target file does not already exist; if it does exist warn the user and skip:
-targetRenderFile="$fadeSRConeFileName"_xFade_"$fadeSRCtwoFileName"_"$xFadeLen"s_"$clipPaddingSeconds"p_.avi
+targetRenderFile="$fadeSRConeFileName"_xFade_"$fadeSRCtwoFileName"_"$xFadeLen"s_"$clipPaddingSeconds"p_."$vidExt"
 if [ -e $targetRenderFile ]
 then
 	echo target file $targetRenderFile already exists\; will not render. To recreate it\, delete the file and run this script again.
@@ -68,21 +69,24 @@ else
 			# CODEC options:
 			# codecParam=""
 			# codecParam="-vcodec rawvideo"
-			codecParam="-codec:v utvideo -r 30"
+			# codecParam="-codec:v utvideo -r 30"
+			codecParam="-codec:v qtrle -r 30"
+					# looks horrible at video start for animations! :
+					# codecParam="-codec:v libvpx-vp9 -lossless 1 -r 30"
 
 	# To avoid repeating work, render still image video (source for later crossfade) only if it does not already exist:
-	if [ ! -e "$fadeSRConeFileName"".avi" ]
+	if [ ! -e "$fadeSRConeFileName"."$vidExt" ]
 	then
-				echo target render image for still image video fade source "$fadeSRConeFileName".avi doesn\'t exist\; RENDERING\; render command is\:
-				echo ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $codecParam "$fadeSRConeFileName".avi
-		ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $codecParam "$fadeSRConeFileName".avi
+				echo target render image for still image video fade source "$fadeSRConeFileName"."$vidExt" doesn\'t exist\; RENDERING\; render command is\:
+				echo ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $codecParam "$fadeSRConeFileName"."$vidExt"
+		ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $codecParam "$fadeSRConeFileName"."$vidExt"
 	fi
 	# This also avoids repeat work:
-	if [ ! -e "$fadeSRCtwoFileName"".avi" ]
+	if [ ! -e "$fadeSRCtwoFileName"."$vidExt" ]
 	then
-				echo target render image for still image video fade source "$fadeSRCtwoFileName".avi doesn\'t exist\; RENDERING\; render command is\:
-				echo ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $codecParam "$fadeSRCtwoFileName".avi
-		ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $codecParam "$fadeSRCtwoFileName".avi
+				echo target render image for still image video fade source "$fadeSRCtwoFileName"."$vidExt" doesn\'t exist\; RENDERING\; render command is\:
+				echo ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $codecParam "$fadeSRCtwoFileName"."$vidExt"
+		ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $codecParam "$fadeSRCtwoFileName"."$vidExt"
 	fi
 	# CREATE the video crossfade from those two static image (looped) video files we just made.
 	# The following complex filter taken and adapted from https://superuser.com/a/1001040/130772
@@ -98,7 +102,7 @@ else
 			# - You will probably always want to set d= to the duration of the first clip MINUS clip1cut's end=<n>. So if the duration of source 1 is 5 seconds, and clip1cut's end=1, that's 5-1=4, so d=4.
 	clip1CutAt=`echo "scale=2; $srcClipLengths - $xFadeLen" | bc`
 			echo RENDERING target crossfade file $targetRenderFile . . .
-	ffmpeg -i "$fadeSRConeFileName".avi -i "$fadeSRCtwoFileName".avi -an \
+	ffmpeg -i "$fadeSRConeFileName"."$vidExt" -i "$fadeSRCtwoFileName"."$vidExt" -an \
 	-filter_complex "\
 		[0:v]trim=start=0:end=$clip1CutAt,setpts=PTS-STARTPTS[clip1cut]; \
 		[0:v]trim=start=$clip1CutAt,setpts=PTS-STARTPTS[clip1fadeOut]; \
