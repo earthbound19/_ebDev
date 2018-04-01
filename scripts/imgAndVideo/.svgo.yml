@@ -1,0 +1,70 @@
+# Custom svgo configuration replacement by RAH / earthbound.io
+
+# multipass: true
+# full: true
+
+plugins:
+
+  # - name
+  #
+  # or:
+  # - name: false
+  # - name: true
+  #
+  # or:
+  # - name:
+  #     param1: 1
+  #     param2: 2
+
+  - removeComments : true
+  - removeXMLProcInst : true
+  - removeMetadata : true
+  - removeEditorsNSData : true
+  - cleanupAttrs : true
+  - removeRasterImages : true
+  - removeUselessDefs : true
+  - removeUnknownsAndDefaults : true
+  - removeNonInheritableGroupAttrs : true
+  - removeUselessStrokeAndFill : true
+  - removeViewBox : true
+  - removeHiddenElems : true
+  - removeEmptyText : true
+  - removeEmptyAttrs : true
+  - removeEmptyContainers : true
+  - removeUnusedNS : true
+  - removeTitle : true
+  - removeDesc : true
+  - removeDimensions : true
+  - convertStyleToAttrs : true
+  - sortAttrs : true
+  - convertPathData : false
+  - convertTransform : false
+  - removeDoctype : false
+  - removeXMLNS : false
+  - inlineStyles : false
+  - minifyStyles : false
+  - cleanupIDs : false
+  - prefixIds : false
+  - cleanupNumericValues : false
+  - cleanupListOfValues : false
+  - convertColors : false
+  - cleanupEnableBackground : false
+  - convertShapeToPath : false
+  - moveElemsAttrsToGroup : false
+  - moveGroupAttrsToElems : false
+  - collapseGroups : false
+  - mergePaths : false
+  - removeAttrs : false
+  - removeElementsByAttr : false
+  - addClassesToSVGElement : false
+  - removeStyleElement : false
+  - removeScriptElement : false
+  - addAttributesToSVGElement : false
+
+# configure the indent (default 4 spaces) used by `--pretty` here:
+#
+# @see https://github.com/svg/svgo/blob/master/lib/svgo/js2svg.js#L6 for more config options
+#
+# js2svg:
+#  pretty: true
+#  indent: '  '
