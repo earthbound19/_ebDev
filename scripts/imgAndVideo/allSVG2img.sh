@@ -11,7 +11,8 @@
 
 
 # CODE
-find . -name '*.svg' | sed 's|^./||' > all_svgs.txt
+# NOTE: to render svgs in subdirectories as well, remove "-maxdepth 1" from the following command:
+find . -maxdepth 1 -name '*.svg' | sed 's|^./||' > all_svgs.txt
 while read element
 do
 	SVG2img.sh $element $1 $2 $3
