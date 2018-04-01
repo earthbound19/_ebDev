@@ -13,7 +13,7 @@
 # The comparison algorithm never compares the same image pair more than once.
 
 # TO DO:
-# Refactor to allow continuation of interrupted runs (do not erase temp files; rather append to them.)
+# Refactor to allow continuation of interrupted runs (do not erase temp files; rather append to them.) This means not resizing for comparision any pre-existing files of the pattern __superShrunkRc6d__*, not wiping comparision result temp files, picking up where comparisons left off, and . . . ?
 
 # change search regex depending on presence or absense of parameter $1:
 if [ -z ${1+x} ]
@@ -28,9 +28,9 @@ fi
 	# OPTIONAL wipe of all leftover files from previous run; comment out everything in the following block if you don't want that:
 	rm __superShrunkRc6d__*
 
-gfind ./* -type f -iregex ".*\.$1" -maxdepth 0 | tr -d '\15\32' > allIMGs.txt
-# because gfind produces windows line-endings, convert them to unix:
-dos2unix allIMGs.txt
+# Because on stupid platforms find produces windows line-endings, convert them to unix after pipe |
+find . -maxdepth 1 -iname \*.$1 > allIMGs.txt
+# Strip leading ./ from listing:
 sed -i 's/^\(\.\/\)\(.*\)/\2/g' allIMGs.txt
 
 # Create heavily shrunken image copies to run comparison on.
@@ -41,9 +41,10 @@ for element in "${allIMGs[@]}"
 do
 	if [ -f "__superShrunkRc6d__""$element" ]
 	then
-		echo COMPARISON SOURCE FILE "__superShrunkRc6d__""$element" already exists\; assuming comparisons against it were already run\; skipping comparison.
+farf=for
+				echo COMPARISON SOURCE FILE "__superShrunkRc6d__""$element" already exists\; assuming comparisons against it were already run\; skipping comparison.
 	else
-		echo copying $element to shrunken "__superShrunkRc6d__""$element" to make image comparison much faster . . .
+				echo copying $element to shrunken "__superShrunkRc6d__""$element" to make image comparison much faster . . .
 		# gm convert $element -scale 7 __superShrunkRc6d__$element
 		gm convert $element -scale 11 __superShrunkRc6d__$element
 	fi
@@ -52,7 +53,7 @@ done
 # Prepend everything in allIMGs.txt with that wonky string file name identifier before running comparison via the next block;
 sed -i 's/^\(.*\)/__superShrunkRc6d__\1/g' allIMGs.txt
 # Reinitialize allIMGs array from that file which now lists __superShrunk.. images! For a long time this script lacked that and so ran slower (it compared original images and missed the entire point of all of the above code)! :
-allIMGs=( $( < allIMGs.txt) )
+allIMGs=$( < allIMGs.txt)
 
 i_count=0
 j_count=0
@@ -81,7 +82,6 @@ done
 sed -i 's/__superShrunkRc6d__//g' allIMGs.txt
 sed -i 's/__superShrunkRc6d__//g' compare__superShrunkRc6d__col1.txt
 sed -i 's/__superShrunkRc6d__//g' compare__superShrunkRc6d__col2.txt
-# exit
 
 # Re prevous comment in nested loop blocks:
 dos2unix compare__superShrunkRc6d__col1.txt
