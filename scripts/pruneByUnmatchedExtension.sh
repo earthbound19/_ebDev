@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Deletes all files in the current folder (non-recursive) with a given extension (e.g. .png) that have no companion file with the same base file name and a different extension (e.g. .ppm, .hexplt, anything). Useful for discarding e.g. undesired source format files whose undesirability have been ascertained by converting them to a target format and viewing, then deleting the rendered target image.
+# Deletes all files in the current folder (non-recursive) with a given extension (e.g. .png) that have no companion file with the same base file name and a different extension (e.g. .ppm, .hexplt, anything). Useful for discarding e.g. undesired source format files whose undesirability have been ascertained by converting them to a target format and viewing, then deleting the rendered target image. NOTE that this will not actually execute any delete commands: rather, it makes a proposed script for the delete commands, with instructions on how to run it.
 
 # WARNING
 # If you use this on files with unintented dissimilar base file names such as thisFractalRenderFlame.flame.png, you will lose work!
