@@ -42,22 +42,19 @@
 
 
 # CODE
-find ./*.$1 > files_list.txt
+list=`gfind . -maxdepth 1 -iname \*.$1`
 
-echo "# PROPOSED DELETES" >> tmp_Dn6M_proposed_deletes.sh.txt
-echo "# THE FOLLOWING COMMANDS will delete the given files. If you approve of this, rename this script from tmp_Dn6M_proposed_deletes.sh.txt to iKnowThisIsWhatIwantToDo.sh, chmod +x it, and execute it." >> tmp_Dn6M_proposed_deletes.sh.txt
-
-while read element
+for element in ${list[@]}
 do
 	fileNameNoExt=${element%.*}
 	searchFileName="$fileNameNoExt"."$2"
+  echo searchFileName is\: $searchFileName
 	if ! [ -f $searchFileName ]
 	then
-		echo File matching source file name $element but with $2 extension NOT FOUND\; will PROPOSE TO DELETE source file\!
-		echo "rm $element" >> tmp_Dn6M_proposed_deletes.sh.txt
+    # FOR SAFE MODE, uncomment the next line and comment out the line after it! For DANGER MODE, reverse those directions!
+		echo File matching source file name $element but with $2 extension NOT FOUND\; will PROPOSE TO DELETE source file\! && echo "rm $element" >> tmp_Dn6M_proposed_deletes.sh.txt
+    # echo File matching source file name $element but with $2 extension NOT FOUND\: DELETING\! && rm $element
 	fi
-done < files_list.txt
+done
 
-rm files_list.txt
-
-echo DONE. Open the file tmp_Dn6M_proposed_deletes.sh.txt and follow the instructions therein.
+echo DONE. If you ran this script in SAFE MODE, open the file tmp_Dn6M_proposed_deletes.sh.txt and\, if the delete commands in it are agreeable, rename the file to a .sh script, give it execute permissions, and run it. Otherwise, this script may have permanently deleting things you want to keep, and you are a fool.
