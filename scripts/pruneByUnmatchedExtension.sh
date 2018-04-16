@@ -57,4 +57,5 @@ do
 	fi
 done
 
+echo ~-
 echo DONE. If you ran this script in SAFE MODE, open the file tmp_Dn6M_proposed_deletes.sh.txt and\, if the delete commands in it are agreeable, rename the file to a .sh script, give it execute permissions, and run it. Otherwise, this script may have permanently deleting things you want to keep, and you are a fool.
