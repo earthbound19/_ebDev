@@ -32,5 +32,7 @@ sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with ffmpegAnimFromFileList.sh \(see comments of that script\) to produce an animation of these images arranged by most similar to nearest list neighbor \(roughly\, with some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list\)\.
 
+rm ./tmp_fx49V6cdmuFp.txt
+
 # option for cygwin:
 cygstart ./IMGlistByMostSimilar.txt
