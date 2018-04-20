@@ -42,8 +42,10 @@
 
 
 # CODE
-list=`gfind . -maxdepth 1 -iname \*.$1`
+list=`find . -maxdepth 1 -iname \*.$1`
 
+# empty tmp_Dn6M_proposed_deletes.sh.txt whether it exists or not (recreate it blank) :
+printf "" > tmp_Dn6M_proposed_deletes.sh.txt
 for element in ${list[@]}
 do
 	fileNameNoExt=${element%.*}
@@ -52,7 +54,7 @@ do
 	if ! [ -f $searchFileName ]
 	then
     # FOR SAFE MODE, uncomment the next line and comment out the line after it! For DANGER MODE, reverse those directions!
-		echo File matching source file name $element but with $2 extension NOT FOUND\; will PROPOSE TO DELETE source file\! && echo "rm $element" >> tmp_Dn6M_proposed_deletes.sh.txt
+#		echo File matching source file name $element but with $2 extension NOT FOUND\; will PROPOSE TO DELETE source file\! && echo "rm $element" >> tmp_Dn6M_proposed_deletes.sh.txt
     # echo File matching source file name $element but with $2 extension NOT FOUND\: DELETING\! && rm $element
 	fi
 done
