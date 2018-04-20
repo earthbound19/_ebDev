@@ -4,8 +4,14 @@
 
 # WARNING: this script perhaps dangerously assumes all file names provided in the list have the same extension. Also, it clobbers any files that already exist when it copies (overwrites without prompt).
 
+# DEPENDENCIES
+# IMGlistByMostSimilar.txt as prepared by imgsGetSimilar.sh and/or re_sort_imgsMostSimilar.sh
+
 # USAGE
-# TO DO :) Document how to use this script.
+# TO DO
+# - detail usage
+# - BUG FIX: on copy it is overwriting the last image with the second-to-last. ?
+# - Document how to use this script :)
 
 
 # CODE
@@ -21,7 +27,7 @@ tempStr=`head -n 1 $fileList`
 # NOTE that this script also assumes a closing apostraphe or single quote in the input file! :
 fileNameExt=`echo $tempStr | sed "s/.*\.\([^\.]\{1,5\}\)'.*/\1/g"`
 
-if [ -a numberedCopies ]; then rm -rf numberedCopies; mkdir numberedCopies; else mkdir numberedCopies; fi
+if ! [ -a numberedCopies ]; then mkdir numberedCopies; fi
 
 # NOTE ALSO that this script assumes a list formatted for concatenation by ffmpeg, and makes a temp copy of the list removing that syntax:
 sed "s/file '\(.*\)'/\1/g" $fileList > tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
