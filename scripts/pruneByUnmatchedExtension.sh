@@ -1,8 +1,11 @@
 # DESCRIPTION
-# Deletes all files with a given extension (e.g. .png) that have no companion file with the same base file name and a different extension (e.g. .ppm, .hexplt, anything). Useful for discarding undesired source format files whose undesirability have been ascertained by converting them to a target format and viewing, then deleting the rendered target image.
+# Deletes all files in the current folder (non-recursive) with a given extension (e.g. .png) that have no companion file with the same base file name and a different extension (e.g. .ppm, .hexplt, anything). Useful for discarding e.g. undesired source format files whose undesirability have been ascertained by converting them to a target format and viewing, then deleting the rendered target image. NOTE that this will not actually execute any delete commands: rather, it makes a proposed script for the delete commands, with instructions on how to run it.
+
+# WARNING
+# If you use this on files with unintented dissimilar base file names such as thisFractalRenderFlame.flame.png, you will lose work!
 
 # USAGE
-# ./thisScript.sh sourceFileToDeleteThatHasThisExtension ifNoMatchedFileNameWithThisExtension, e.g.:
+# ./thisScript.sh extensionOfSourceFilesToDelete ifNoMatchedFileNameWithThisExtension, e.g.:
 # ./thisScript.sh hexplt png
 # -- will result in the delete of every file with an extension .hexplt that has no same-named file with a .png extension. NOTE that extensions passed as parameters must not include the dot (.).
 # READ ON for a detailed explanation.
@@ -39,20 +42,22 @@
 
 
 # CODE
-echo UNTIL I IMPLEMENT a check whether there are any png files at all in the current path \(and\/or a warning prompt\)\, you must manually comment out this and the next line of code in this script before running it. THIS IS TO PREVENT you from accidentally running this script against a directory of \.hexplt files you have never rendered\, thereby deleting all of them\! BE SURE to uncomment these lines again after running this script\!
-# exit
+list=`find . -maxdepth 1 -iname \*.$1`
 
-find ./*.$1 > files_list.txt
-
-while read element
+# empty tmp_Dn6M_proposed_deletes.sh.txt whether it exists or not (recreate it blank) :
+printf "" > tmp_Dn6M_proposed_deletes.sh.txt
+for element in ${list[@]}
 do
 	fileNameNoExt=${element%.*}
 	searchFileName="$fileNameNoExt"."$2"
+  echo searchFileName is\: $searchFileName
 	if ! [ -f $searchFileName ]
 	then
-		echo File matching source file name $element but with $2 extension NOT FOUND\; will DELETE source file\!
-		rm $element
+    # FOR SAFE MODE, uncomment the next line and comment out the line after it! For DANGER MODE, reverse those directions!
+#		echo File matching source file name $element but with $2 extension NOT FOUND\; will PROPOSE TO DELETE source file\! && echo "rm $element" >> tmp_Dn6M_proposed_deletes.sh.txt
+    # echo File matching source file name $element but with $2 extension NOT FOUND\: DELETING\! && rm $element
 	fi
-done < files_list.txt
+done
 
-rm files_list.txt
+echo ~-
+echo DONE. If you ran this script in SAFE MODE, open the file tmp_Dn6M_proposed_deletes.sh.txt and\, if the delete commands in it are agreeable, rename the file to a .sh script, give it execute permissions, and run it. Otherwise, this script may have permanently deleting things you want to keep, and you are a fool.
