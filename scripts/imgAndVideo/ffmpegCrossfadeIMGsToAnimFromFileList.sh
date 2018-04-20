@@ -35,9 +35,11 @@
 # START GLOBALS
 
 # UNCOMMENT THE VALUE ASSIGNMENTS you'd like to try:
+crossFadeDuration=0.23
 # crossFadeDuration=1.68
+# crossFadeDuration=1.28
 # crossFadeDuration=2.4
-crossFadeDuration=3.28
+# crossFadeDuration=3.28
 # crossFadeDuration=3.92
 # crossFadeDuration=4.36
 # crossFadeDuration=5.8
@@ -48,8 +50,9 @@ crossFadeDuration=3.28
 # NOTE: padding less than 1 (e.g. 0.17) will throw an error, apparently.
 # padding=1.1
 # padding=1.54
-padding=1.65
+# padding=1.65
 # padding=1.78
+padding=1.91
 # padding=2.24
 # padding=2.81
 # padding=3.2
