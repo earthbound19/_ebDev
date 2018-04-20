@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Splits all files in the current directory of type $1 into subdirectories by multiples of $2 (axe files into folders), with folder prefix name $3.
+# Splits all files in the current directory of type $1 into subdirectories by multiples of $2 (axe files into folders), with folder prefix name $3. If a IMGlistByMostSimilar.txt file (used by some scripts in _ebDev) is present, splits that into copies in the subfolders, these partitioned text file copies reflecting the files in the subfolders.
 
 # USAGE
 # ./thisScript.sh fileExtension numberOfFilesToAxePerFolder _folderPrefixName_
@@ -35,7 +35,7 @@ else
 fi
 
 # Count number of files so we can figure out how many 0 columns to pad numbers with via printf:
-numberOfFiles=$(find . -maxdepth 1 -iname "*.$fileExt" | wc -l)
+numberOfFiles=$(find . -maxdepth 1 -iname "*.$fileExt" | wc -l | tr -d ' ')
 		echo Found $numberOfFiles files of type $fileExt.
 padToDigits=${#numberOfFiles}
 		echo Will pad numbers in folder names to $padToDigits digits.
@@ -44,31 +44,27 @@ padToDigits=${#numberOfFiles}
 
 # MAIN LOGIC
 # Adapted from and thanks to a genius breath yon; https://stackoverflow.com/a/29118145 -- for axing files in subdirs into subdirs by count, check another answer there:
-n=$((`find . -maxdepth 1 -iname "*.$fileExt" | wc -l`/$numberToAxeOn))
+n=$((`find . -maxdepth 1 -iname "*.$fileExt" | wc -l`/$numberToAxeOn+1))
+# Variables used in the coming control block to break up lines of a text file (created by and useful for other scripts) into partitioned copies of it in created subfolders:
+linesCPmultiplier=1
+linesCPStartAtMultiple=1
 for i in `seq 1 $n`;
 do
 	zeroPaddedNumber=`printf "%0"$padToDigits"d" $i`
 			# echo padded number for folder name is $zeroPaddedNumber . . .
     if ! [ -d $folderPrefix"$zeroPaddedNumber" ]; then mkdir $folderPrefix"$zeroPaddedNumber"; fi
     find . -maxdepth 1 -iname "*.$fileExt" | head -n $numberToAxeOn | xargs -i mv "{}" $folderPrefix"$zeroPaddedNumber"
+			# Only do anything with IMGlistByMostSimilar.txt if it exists:
+			if [ -f ./IMGlistByMostSimilar.txt ]
+			# re: https://unix.stackexchange.com/a/47423/110338
+			then
+				tail -n+$linesCPStartAtMultiple IMGlistByMostSimilar.txt | head -n$numberToAxeOn > $folderPrefix"$zeroPaddedNumber"/IMGlistByMostSimilar.txt
+				linesCPStartAtMultiple=$(( ($linesCPmultiplier * $numberToAxeOn) + 1))
+				linesCPmultiplier=$(($linesCPmultiplier + 1))
+						# echo werf $linesCPmultiplier
+						# echo worf $linesCPStartAtMultiple
+			fi
 done
 
-echo Checking for remainder files that weren\'t sorted into a numbered folder:
-stragglerCount=`find . -maxdepth 1 -iname "*.$fileExt" | wc -l`
-		echo Stragglers found\: $stragglerCount
-if [ $stragglerCount -ne 0 ]
-then
-			echo Because that\'s nonzero I\'ll make another folder and move stragglers into it.
-			# echo i was $i
-	i=$(($i + 1))
-			# echo i is now $i . . .
-	zeroPaddedNumber=`printf "%0"$padToDigits"d" $i`
-			# echo padded number for folder name is $zeroPaddedNumber . . .
-    if ! [ -d $folderPrefix"$zeroPaddedNumber" ]; then mkdir $folderPrefix"$zeroPaddedNumber"; fi
-	mv *.$fileExt ./$folderPrefix"$zeroPaddedNumber"/
-else
-			echo Because there are no stragglers\, I\'ll do nothing more.
-fi
-
 numeralOneToPadToDigits=`printf "%0"$padToDigits"d" 1`
-echo DONE. All files in this folder of type $fileExt have been axed by count $numberToAxeOn into folders named starting $folderPrefix"$numeralOneToPadToDigits" and ending $folderPrefix"$zeroPaddedNumber" \(if those are both the same folder name\, they are all in that one folder\)\.
+echo DONE. All files in this folder of type $fileExt have been axed by count $numberToAxeOn into folders named starting $folderPrefix"$numeralOneToPadToDigits" and ending $folderPrefix"$zeroPaddedNumber" \(if those are both the same folder name\, they are all in that one folder\)\. If the number of files of type $fileExt evenly divided by $numberToAxeOn\, the highest numbered folder will be empty\, so you know.
