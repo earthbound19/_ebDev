@@ -1,5 +1,5 @@
-# DESCRIPTION
-# Generates random hex color schemes of file format .hexplt (randomly named), which are plain text files with one hex color per line.
+# IN PROGRESS.
+# Reworking another script for tweaked purposes. This script will make colors by starting with gray and making secondary, tertiary etc. colors by substracting form or adding to gray (going toward 0 or 255), after theories Itten exposed that pleasing color combinations sum to (or substract from?) gray.
 
 # USAGE
 # Invoke this script with 1 or optionally 2 parameters:
@@ -13,27 +13,19 @@ rndFileNameLen=14
 
 if [ ! -z ${2+x} ];	then howManySchemesToCreate=$2;	else howManySchemesToCreate=1; fi
 
-# Pregenerate all random hex colors in memory:
-			# First calculate the maximum possible number of hex colors to pick if every roll of a virtual die rolled the highest range number per parameter 1 as value 'r'; OR per paramater 1 as numeric value--and use that to set the size of allRndHexChars (in the assignment that follows this block), so there's no chance of running out of pregenerated hex characters:
-			if [ ! $1 == 'r' ]
-			then
-				colorsPerScheme=$1
-				# else nothing; just go with the value of $colorsPerScheme as assigned above for the following allRndHexChars assignment.
-			fi
+if [ ! $1 == 'r' ]
+then
+	colorsPerScheme=$1
+	# else nothing; just go with the value of $colorsPerScheme as assigned above for the following allRndHexChars assignment.
+fi
 
 allRndHexChars=$(( $howManySchemesToCreate * $colorsPerScheme * 6 ))
-rndHexStrings=`cat /dev/urandom | tr -cd 'a-f0-9' | head -c $allRndHexChars`
-		# echo rndHexStrings val is $rndHexStrings . . .
-# Pregenerate all random characters to be used in random file name strings for saved, generated hex color schemes:
-howManyRNDchars=$(( $howManySchemesToCreate * $rndFileNameLen ))
+
 allRndFileNameChars=`cat /dev/urandom | tr -cd 'a-km-np-zA-KM-NP-Z2-9' | head -c $howManyRNDchars`
 rndCharsMultiCount=-$rndFileNameLen		# So that the following loop will grab the 0th (1st) item in the string on the first iteration, instead of skipping the first 6 chars--because I'd code increments at the start of a loop then the end.
-rndHexMultiCount=-6		# See comment on rndCharsMultiCount initialization.
 
 for howMany in $( seq $howManySchemesToCreate )
 do
-	rndCharsMultiCount=$(($rndCharsMultiCount + $rndFileNameLen))
-	rndFileNameChars=${allRndFileNameChars:$rndCharsMultiCount:$rndFileNameLen}		# Yoink!
 			# respect directive to randomly choose how many colors to make per scheme if so directed:
 			if [ $1 == 'r' ]
 			then
@@ -45,15 +37,18 @@ do
 			fi
 	paddedNumColors=$(printf %05d $colorsPerScheme)
 	outfile=./"$paddedNumColors"_"$rndFileNameChars"_HexColors.hexplt
-	# printf "" > $outfile
+	
 	echo Generating $colorsPerScheme random hex colors for $outfile . . .
 	
 	for element in $( seq $colorsPerScheme )
 		do
-			rndHexMultiCount=$(($rndHexMultiCount + 6))
-			rndHexColorString=${rndHexStrings:$rndHexMultiCount:6}
-			echo hex color generated is \#$rndHexColorString . . .
-			echo \#$rndHexColorString >> $outfile
+			# Ex. bc command that does hex substraction:
+			# echo 'obase=16;ibase=16;FF-10' | bc
+			# to get a random number between 0 and 127; using 256 because the operation is zero-index based, so it substracts 1. For example doing the following with 3 always returns a number between 0 and 2:
+			rndNum=`echo $(($RANDOM % 127))`
+			echo rndNum is $rndNum
+			# But gray in RGB is 127 + 127 + 127 which is 381 or hex 17D; we will substract from 381 decimal OR 17D hex (and if decimal convert to hex).
+			exit
 		done
 done
 
