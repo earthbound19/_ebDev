@@ -4,7 +4,7 @@
 # USAGE
 # Invoke this script with 1 or optionally 2 parameters:
 # $1 REQUIRED. The number of colors to have in the generated color scheme. OR to have the script randomly pick a number between 2 and N (first variable assignment hard-coded into script), make this paramater simply the letter r (for random).
-# $2 OPTIONAL. How many such color schemes to generate. If not provided, two will be made.
+# $2 OPTIONAL. How many such color schemes to generate. If not provided, one will be made.
 
 
 # CODE
