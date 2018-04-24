@@ -1,21 +1,16 @@
 REM READ THESE FIRST COMMENTS IF NOTHING ELSE: I do not guarantee that this batch file will not blow up your computer. Use at your own risk, and before any sweeping operations of any kind (like this), BACKUP YOUR CRITICAL DATA.
 
-REM DESCRIPTION:
-REM Cleans unnecessary junk files--often anywhere between ~1-16 GB or more!--from a typical fully updated and well-used Windows installation. You may wish to read all of the REM comments in this file before running it; for example, it will delete all *.dmp files off a drive (which you can prevent by commenting out the relevant lines), which files you will only need if . . . never. Unless you're paying somebody $60/h to figure out why a crash happened, which will almost never help you anyway. WINDOWS CRASHES. It's not preventable. Deletes all temp files in every folder named "temp" on an entire drive, by "tricking" robocopy to sync them with an empty folder. Also removes all Windows Update backup files via Windows built-in command, and deletes all *.dmp, *.temp, *.tmp, and optionally all *.bak files on the drive. (Side note: NTLite will get you still ~4GB more garbage cleanup!)--but use that cautiously.)
+REM DESCRIPTION
+REM Cleans unnecessary junk files--often anywhere between ~1-16 GB or more!--from a typical fully updated and well-used Windows installation. It does this by way of the built-in robocopy command, intructed to sync temp folders with an empty folder in multiple threads (faster than rd/rmdir). You may wish to read all of the REM comments in this file before running it. By junk I mean files which will not ever be used; e.g. *.dmp *.temp, *.tmp, and optionally all *.bak files on the drive. (Side note: NTLite will get you still ~4GB more garbage cleanup!)--but use that cautiously.)
 
-REM USAGE:
+REM USAGE
 REM Run this as an Administrator, or from a console with Administrator rights. This is designed for Windows 7, untested on prior and newer versions of Windows (it may or may not work on those; I don't know).
 
-REM DETAILS: Where the RM/RMDIR command will not delete junk directories that have any files in them (I thought?!--as I look back at this again, they seem to?!--it may have been a conflict with gnuWin32 coreutils' rmdir . . .), this script removes junk folders by syncing them with an empty folder by way of the ROBOCOPY command.
-
-REM WARNING:
+REM WARNING
 REM This script errs on the side of clearing possibly too much unused junk on your computer. If you've examined the contents of this batch, and you know what you're doing, and/or you're doing this in a test environment, press <enter> If you actually don't need to clear a ton of space, CLOSE THIS CONSOLE.
 
-REM TO DO? Change this to execute from any directory yet clear all temp files from the drive root directory down.
 REM eh, probably as well or better: for /D %d in (*) do rmdir /S /Q "%d"
 REM re (can't seem to link to comment directly!) : https://social.technet.microsoft.com/Forums/windows/en-US/6b8d5a57-2929-44d1-93ef-a9d825d9e17a/how-can-i-disable-this-folder-is-shared-with-other-people-message?forum=w7itprogeneral
-
-REM 02/08/2015 01:17:31 PM RAH CRITICAL BUG FIX: The FINDSTR search string \temp was not escaped as \\temp; consequently any path at all containing that word would have been listed and wiped. FIXED. It only lists directories that _only_ say "temp" (the entire word and nothing less or more). Erm, better add a disclaimer to this :/ Frustrating, but it seems other command-line contexts don't require that \ be escaped as \\.
 
 REM 06/20/2015 12:08:03 PM RAH Added Cache and cache2 folders to list of folders to wipe clean via robowipeTempDirList.txt
 
