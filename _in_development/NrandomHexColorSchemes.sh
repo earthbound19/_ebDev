@@ -3,32 +3,34 @@
 
 # USAGE
 # Invoke this script with 1 or optionally 2 parameters:
-# $1 REQUIRED. The number of colors to have in the generated color scheme. OR to have the script randomly pick a number between 2 and N (first variable assignment hard-coded into script), make this paramater simply the letter r (for random).
+# The number of colors to have in the generated color scheme. If omitted, the script will randomly pick a color between 2 and 7.
 # $2 OPTIONAL. How many such color schemes to generate. If not provided, one will be made.
 
+# TO DO
+# Fix up code here based on changes in ~GrayMath.sh
 
 # CODE
-colorsPerScheme=7		# This may be overruled by a numeric parameter $1.
-rndFileNameLen=14
+rndFileNameLen=10
 
-if [ ! -z ${2+x} ];	then howManySchemesToCreate=$2;	else howManySchemesToCreate=1; fi
 
-# Pregenerate all random hex colors in memory:
-			# First calculate the maximum possible number of hex colors to pick if every roll of a virtual die rolled the highest range number per parameter 1 as value 'r'; OR per paramater 1 as numeric value--and use that to set the size of allRndHexChars (in the assignment that follows this block), so there's no chance of running out of pregenerated hex characters:
-			if [ ! $1 == 'r' ]
-			then
-				colorsPerScheme=$1
-				# else nothing; just go with the value of $colorsPerScheme as assigned above for the following allRndHexChars assignment.
-			fi
+# If no paramater $1 passed, set a string that later is used to instruct to randomly pick a number between 1 and 7:
+if [ -z ${1+x} ]; then rndNumColorsPerScheme="r"; else colorsPerScheme=$1; fi
+echo colorsPerScheme value is $colorsPerScheme
 
+if [ -z ${2+x} ];	then howManySchemesToCreate=1; else howManySchemesToCreate=$2; fi
+echo howManySchemesToCreate val is $howManySchemesToCreate
+
+# Pregenerate random hex chars to be used in palettes:
 allRndHexChars=$(( $howManySchemesToCreate * $colorsPerScheme * 6 ))
 rndHexStrings=`cat /dev/urandom | tr -cd 'a-f0-9' | head -c $allRndHexChars`
 		# echo rndHexStrings val is $rndHexStrings . . .
+rndHexMultiCount=-6		# See comment on later rndCharsMultiCount initialization.
+
 # Pregenerate all random characters to be used in random file name strings for saved, generated hex color schemes:
 howManyRNDchars=$(( $howManySchemesToCreate * $rndFileNameLen ))
 allRndFileNameChars=`cat /dev/urandom | tr -cd 'a-km-np-zA-KM-NP-Z2-9' | head -c $howManyRNDchars`
-rndCharsMultiCount=-$rndFileNameLen		# So that the following loop will grab the 0th (1st) item in the string on the first iteration, instead of skipping the first 6 chars--because I'd code increments at the start of a loop then the end.
-rndHexMultiCount=-6		# See comment on rndCharsMultiCount initialization.
+rndCharsMultiCount=-$rndFileNameLen		# So that the following loop will grab the 0th (1st) item in the string on the first iteration, instead of skipping the first rndFileNameLen (n) chars--because I'd code increments at the start of a loop, then the end.
+
 
 for howMany in $( seq $howManySchemesToCreate )
 do
@@ -37,7 +39,7 @@ do
 			# respect directive to randomly choose how many colors to make per scheme if so directed:
 			if [ $1 == 'r' ]
 			then
-				colorsPerScheme=`shuf -i 2-11 -n 1`
+				colorsPerScheme=`shuf -i 2-7 -n 1`
 						echo Randomly chose to have $colorsPerScheme colors in the generated hex color scheme.
 				else
 				colorsPerScheme=$1
