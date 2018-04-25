@@ -38,11 +38,11 @@
 # img_03.png
 
 # NOTES
-# This script intended to run e.g. after NrandomHexColorSchemes.sh and renderAllHexPalettes-gm.sh (which invokes renderHexPalette-gm.sh repeatedly for every .hexplt file in a directory), or after autobrood fractorium renders to prune undesired fractal flame genomes.
+# This script intended to run e.g. after NrandomHexColorSchemes.sh and renderAllHexPalettes-gm.sh (which invokes renderHexPalette-gm.sh repeatedly for every .hexplt file in a directory), and renders and deletes of not desired converted pngs of those palettes, or after autobrood fractorium renders to prune undesired fractal flame genomes.
 
 
 # CODE
-list=`find . -maxdepth 1 -iname \*.$1`
+list=`find . -maxdepth 1 -iname "*.$1" | gsed 's/^\.\///g'`
 
 # empty tmp_Dn6M_proposed_deletes.sh.txt whether it exists or not (recreate it blank) :
 printf "" > tmp_Dn6M_proposed_deletes.sh.txt
@@ -50,14 +50,14 @@ for element in ${list[@]}
 do
 	fileNameNoExt=${element%.*}
 	searchFileName="$fileNameNoExt"."$2"
-  echo searchFileName is\: $searchFileName
+			echo searchFileName is\: $searchFileName
 	if ! [ -f $searchFileName ]
 	then
-    # FOR SAFE MODE, uncomment the next line and comment out the line after it! For DANGER MODE, reverse those directions!
-#		echo File matching source file name $element but with $2 extension NOT FOUND\; will PROPOSE TO DELETE source file\! && echo "rm $element" >> tmp_Dn6M_proposed_deletes.sh.txt
-    # echo File matching source file name $element but with $2 extension NOT FOUND\: DELETING\! && rm $element
+# FOR SAFE MODE, uncomment the next line and comment out the line after it! For DANGER MODE, reverse those directions!
+	echo File matching source file name $element but with $2 extension NOT FOUND\; will PROPOSE TO DELETE source file\! && echo "rm $element" >> tmp_Dn6M_proposed_deletes.sh.txt
+    # echo "File matching source file name $element but with $2 extension NOT FOUND\: DELETING\!" && rm $element
 	fi
 done
 
 echo ~-
-echo DONE. If you ran this script in SAFE MODE, open the file tmp_Dn6M_proposed_deletes.sh.txt and\, if the delete commands in it are agreeable, rename the file to a .sh script, give it execute permissions, and run it. Otherwise, this script may have permanently deleting things you want to keep, and you are a fool.
+echo "DONE. If you ran this script in SAFE MODE, open the file tmp_Dn6M_proposed_deletes.sh.txt and\, if the delete commands in it are agreeable, rename the file to a .sh script, give it execute permissions, and run it. Otherwise, this script may have permanently deleting things you want to keep, and you are a fool. If you ran this in danger mode you may want to delete the empty, extraneous tmp_Dn6M_proposed_deletes.sh.txt file."
