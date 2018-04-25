@@ -6,17 +6,15 @@
 #  $1 OPTIONAL. Edge length of each square tile to be composited into final (png) image.
 #  $2 OPTIONAL. MUST HAVE VALUE 0 or nonzero (anything other than 0). If nonzero, the script will randomly shuffle the hex color files before compositing them to one image.
 #  $3 OPTIONAL. number of tiles accross of tiles-assembled image (columns).
-#  $4 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).
+#  $4 OPTIONAL. IF $3 IS PROVIDED (?), you probably want to provide this also, as the script does math you may not want if you don't provide (?) [Edit: I don't remember which parameter that is but it isn't $5, as I had written here--$5 is no longer a script option). Number of tiles down of tiles-assembled image (rows).
 #  EXAMPLE COMMAND; for every ppm file in the current directory, create a palette image, where each tile is a square 250px wide, squares in the palette rendered in random order, and the palette image being 5 columns wide and 6 rows down:
 #  ./thisScript.sh 250 foo 5 6
 
 
 echo "finding all *.hexplt files in the current path and subpaths . . ."
-gfind *.hexplt > all_hexplt.txt
-		dos2unix all_hexplt.txt
+find . -maxdepth 1 -iname "*.hexplt" > all_hexplt.txt
 		HEXPLTfilesCount=$(wc -l < all_hexplt.txt)
-gfind *.ppm > all_ppm.txt
-		dos2unix all_hexplt.txt
+find . -maxdepth 1 -iname "*.ppm" > all_ppm.txt
 		PPMfilesCount=$(wc -l < all_ppm.txt)
 rm all_ppm.txt
 		echo Number of ppm rendered palette files found\: $PPMfilesCount
