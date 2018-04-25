@@ -19,5 +19,5 @@
 # example for resize:
 # i_view32.exe c:\test.jpg /resize=(300,300) /resample
 
-imgFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
+imgFileNoExt=`echo "${1%.*}"`
 i_view32.exe $1 /resize_long=$3 /aspectratio /convert=$imgFileNoExt.$2
