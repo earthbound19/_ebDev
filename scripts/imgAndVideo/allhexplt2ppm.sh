@@ -11,6 +11,7 @@
 #  ./thisScript.sh 250 foo 5 6
 
 
+# CODE
 echo "finding all *.hexplt files in the current path and subpaths . . ."
 find . -maxdepth 1 -iname "*.hexplt" > all_hexplt.txt
 		HEXPLTfilesCount=$(wc -l < all_hexplt.txt)
@@ -23,18 +24,19 @@ rm all_ppm.txt
 renderedCount=0
 while read fileName
 do
+	targetFileName=`echo "${fileName%.*}.ppm"`	# removes .hexplt extension from filename and adds .ppm
 	echo ~~~~
 	# NOTE: Notwithstanding the following check is redundant (it is also done in the script this script calls), it will save time of needlessly invoking the script this calls:
-	if [ ! -f $fileName.ppm ]
+	if [ ! -f $targetFileName ]
 	then
-				echo Target file $fileName.ppm not found\; WILL RENDER.
+				echo Target file $targetFileName not found\; WILL RENDER.
 				renderedCount=$(( $renderedCount + 1 ))
 				echo Rendering ppm file \#$renderedCount of \#$filesToRender
 				echo invoking hexplt2ppm.sh for $fileName . . .
 	# If parameters 1-4 weren't passed to the script, the variables will print nothing, and therefore pass no parameters to hexplt2ppm.sh:
 	hexplt2ppm.sh $fileName $1 $2 $3 $4
 	else
-				echo Target file $fileName.ppm found\; WILL SKIP RENDER.
+				echo Target file $targetFileName found\; WILL SKIP RENDER.
 	fi
 done < all_hexplt.txt
 
