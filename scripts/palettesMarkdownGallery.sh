@@ -16,11 +16,11 @@ printf "# Palettes\n\nClick any image to go to the source image; the text line a
 
 while read element
 do
-	echo current image is\: $element
 	hexpltName=${element::-5}
 	printf "### [$hexpltName]($hexpltName)\n\n" >> README.md
 	printf "[ ![$element]($element) ]($element)\n\n" >> README.md
-	# printf "bruh\n\n" >> README.md
 done < all_png.txt
+
+printf "Created with [palettesMarkdownGallery.sh](https://github.com/earthbound19/_ebDev/blob/master/scripts/palettesMarkdownGallery.sh)." >> README.md
 
 rm all_png.txt
