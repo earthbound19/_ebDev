@@ -16,6 +16,7 @@
 # - Sometimes Cygwin awk throws errors as invoked by this script. Not sure why. I run it twice and one time awk throws an error, another it doesn't.
 
 # TO DO
+# Fix that the `if [ ${2+x} ]` -conditioned block at the end of the script isn't doing anything--or maybe just don't do that? Other scripts can.
 # Make gray padding optional, as it substantially slows down ppm creation.
 
 
@@ -24,7 +25,8 @@
 # =============
 # BEGIN SETUP GLOBAL VARIABLES
 paletteFile=$1
-renderTargetFile=$paletteFile.ppm
+paletteFileNoExt=`echo "${1%.*}"`
+renderTargetFile=$paletteFileNoExt.ppm
 
 # Search current path for $1; if it exists set hexColorSrcFullPath to just $1 (we don't need the full path). If it doesn't exist in the local path, search the path in palettesRootDir.txt and make decisions based on that result:
 if [ -e ./$1 ]
