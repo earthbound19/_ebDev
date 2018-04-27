@@ -16,9 +16,10 @@ if [ -z ${1+x} ]; then howManySchemesToCreate=1; else howManySchemesToCreate=$1;
 if [ -z ${2+x} ]; then pickNcolorsPerScheme="r"; else pickNcolorsPerScheme=$2; colorsInThisScheme=$pickNcolorsPerScheme; fi
 
 # Pregenerate random hex chars to be used in palettes:
-allRndHexChars=$(( $howManySchemesToCreate * $colorsInThisScheme * 6 ))	# some waste here, because if pickNcolorsPerScheme == r, a number of colors in a range will be selected for each generated scheme, and the number of hex characters generated against allRndHexChars won't all be used. 
+allRndHexChars=$(( $howManySchemesToCreate * $colorsInThisScheme * 6 ))	# some waste here, because if pickNcolorsPerScheme == r, a number of colors in a range will be selected for each generated scheme, and the number of hex characters generated against allRndHexChars won't all be used.
+# TO DO: add the following line to every script that uses tr such as the following, because Mac terminal throws an error without it, re: https://unix.stackexchange.com/a/141434/110338
+export LC_CTYPE=C
 rndHexStrings=`cat /dev/urandom | tr -cd 'a-f0-9' | head -c $allRndHexChars`
-
 # Counter variables incremented by N in loops to partition where to grab random characters from a string:
 rndHexMultiCount=0
 rndCharsMultiCount=0
@@ -26,7 +27,6 @@ rndCharsMultiCount=0
 # Pregenerate all random characters to be used in random file name strings for saved, generated hex color schemes:
 howManyRNDchars=$(( $howManySchemesToCreate * $rndFileNameLen ))
 allRndFileNameChars=`cat /dev/urandom | tr -cd 'a-km-np-zA-KM-NP-Z2-9' | head -c $howManyRNDchars`
-echo allRndFileNameChars val is $allRndFileNameChars
 
 for howMany in $( seq $howManySchemesToCreate )
 do

@@ -1,1 +1,0 @@
-# adapting after rework of NrandomHexColorSchemes.sh . . .
