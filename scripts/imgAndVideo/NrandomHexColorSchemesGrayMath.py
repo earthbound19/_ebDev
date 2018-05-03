@@ -5,23 +5,20 @@
 # Run this script with the --help parameter or examine the parser = argparse.. code in this script.
 
 # TO DO
-# Fix bug: if high threshold values become lower than low threshold, randint throws an error. Solution: swap values of low threshold and high thresholds.
+# Fix design problem: are you kidding me?! All variable assignments in python are actually references to the other variable?! I have to work around this with the copy library, apparently; re: https://stackoverflow.com/a/5511239/1397555
 
 
 # CODE
-import datetime, random, os.path, argparse, sys
+import datetime, random, os.path, argparse
 
-parser = argparse.ArgumentParser(description="Generates a random hex color scheme of file format .hexplt (named after the date and time and a few random characters), which is a plain text file with one hex color per line. Modeled after a color theory given in Itten's \"ELEMENTS OF COLOR,\" which states that color combinations tend to be more pleasing to the human eye if, when the colors are mixed (by substractive color mixing), they make gray.")
+parser = argparse.ArgumentParser(description="Generates a random hex color scheme of file format .hexplt, which is a plain text file with one hex color per line. The generated colors are constrained after a color theory given in Itten's \"ELEMENTS OF COLOR,\" which states that color combinations tend to be more pleasing to the human eye if, when the colors are mixed (by substractive color mixing), they make gray. This script makes colors that are mixed by additive light (RGB), but the principle is the same and the results have generally verified the theory.")
 parser.add_argument("-n", "--numschemes", type=int, default=36, help="NOT ACTIVE at this writing. How many color schemes to generate. Default 36.")
-parser.add_argument("-c", "--numcolors", type=int, default=5, help="How many colors to generate per scheme. Default 5.")
 parser.add_argument("-g", "--grayhigh", type=int, default=222, help="Gray high threshold. No RGB-256 value will be higher than this number. Default 222. Range 0-255.")
-parser.add_argument("-l", "--graylow", type=int, default=60, help="Gray low threshold. No RGB-256 value will be lower than this number. Default 60. Range 0-255.")
+parser.add_argument("-l", "--graylow", type=int, default=60, help="Gray low threshold. No RGB-256 value will be lower than this number. Default 60. Range 0-255. When the sum of any generated RGB values is less than this number, this script will stop generating colors.")
 
 args = parser.parse_args()
 
 nSchemes = args.numschemes; print 'Will generate ', nSchemes, ' color schemes.'
-
-numColors = args.numcolors; print 'Will generate ', numColors, ' per scheme.'
 
 grayHighThreshold = args.grayhigh
 if grayHighThreshold > 255:
@@ -59,43 +56,55 @@ while h < nSchemes:
 	redLowThreshold=grayLowThreshold
 	greenLowThreshold=grayLowThreshold
 	blueLowThreshold=grayLowThreshold
-	print '~~outer loop iteration started; redHighThreshold value is ', redHighThreshold
+	print 'GENERATING new color sheme. redHighThreshold value is ', redHighThreshold
 	
-	i = 0
-	while (i < numColors):
+	colorsCount = 0
+	while 1:		# I'm certain a condition will be met that triggers a break statement in this otherwise infinite loop.
 		# RED
-		print '~~~~~~ ', redLowThreshold, ' ', redHighThreshold
+		# If the value for redHighThreshold is less than redLowThreshold, swap them to avoid an error from the random.randint() call:
+		if redHighThreshold < redLowThreshold:
+			redHighThreshold, redLowThreshold = redLowThreshold, redHighThreshold
 		newRedVal = random.randint(redLowThreshold,redHighThreshold)
 		redHighThreshold = redHighThreshold - newRedVal
-		# print '\tnewRedVal is ', newRedVal, ' redHighThreshold is ', redHighThreshold
+		print 'redHighThreshold is ', redHighThreshold
 		
 		# GREEN
-		print '~~~~~~ ', greenLowThreshold, ' ', greenHighThreshold
+		if greenHighThreshold < greenLowThreshold:
+			greenHighThreshold, greenLowThreshold = greenLowThreshold, greenHighThreshold
 		newGreenVal = random.randint(greenLowThreshold,greenHighThreshold)
 		greenHighThreshold=(greenHighThreshold - newGreenVal)
-		# print '\tnewGreenVal is ', newGreenVal, ' greenHighThreshold is ', greenHighThreshold
+		print 'greenHighThreshold is ', greenHighThreshold
 
 		# BLUE
-		print '~~~~~~ ', blueLowThreshold, ' ', blueHighThreshold
+		if blueHighThreshold < blueLowThreshold:
+			blueHighThreshold, blueLowThreshold = blueLowThreshold, blueHighThreshold
 		newBlueVal = random.randint(blueLowThreshold,blueHighThreshold)
 		blueHighThreshold=(blueHighThreshold - newBlueVal)
-		# print '\tnewBlueVal is ', newBlueVal, ' blueHighThreshold is ', blueHighThreshold
-
+		print 'blueHighThreshold is ', blueHighThreshold
+		
+		# If the sum of newRedVal, newGreenVal and newBlueVal is less than or equal to grayLowThreshold, break out of this loop, as we have reached our lower desired light limit for colors; this means effectively don't generate colors anymore:
+		RGBvalsList = [newRedVal, newGreenVal, newBlueVal]
+		sumOfRGBvals = sum(RGBvalsList)
+		# using args.graylow effectively as a constant--maybe it literally is? :	
+		if sumOfRGBvals <= args.graylow:
+			print 'Sum of RGB values, ', sumOfRGBvals, ' is lower than -l or --graylow parameter (low gray threshold), ', args.graylow, '. Will stop generating colors. Made ', str(colorsCount), ' colors in this scheme.'
+			break
+		
 		# Print color 1 RGB values in decimal to screen (for debugging):
-		print 'color ', str(i), ' RGB values: ', str(newRedVal), ' ', str(newGreenVal), ' ', str(newBlueVal)
+		print 'color ', str(colorsCount), ' RGB values: ', str(newRedVal), ' ', str(newGreenVal), ' ', str(newBlueVal)
 		# Formatting converts decimal value to hex:
 		newColorOneHEX = "#" + str.lower("%0.2X" % newRedVal) + str.lower("%0.2X" % newGreenVal) + str.lower("%0.2X" % newBlueVal)
 		HEXColors.append(newColorOneHEX)
-		i += 1
+		colorsCount += 1
 	# Create unique, date-time informative .hexplt file name.
 	# The start of the file name is three-padded digits indicating how many colors are in the palette.
-	numColorsStr = str(numColors)
-	paddedNum = numColorsStr.zfill(3)
+	# colorsCountStr = str(colorsCount)
 	now = datetime.datetime.now()
 	timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__%f')
 	# Get a random string of lenght 3 with numbers and lowercase; re: https://stackoverflow.com/a/20688431/1397555
 	rndStr = ('%03x' % random.randrange(16**3)).lower()
-	hexpltFileName = paddedNum + "__" + timeStamp + "__" + rndStr + ".hexplt"
+	colorsCountStr = str(colorsCount)
+	hexpltFileName = colorsCountStr + "__" + timeStamp + "__" + rndStr + ".hexplt"
 	print("hexpltFileName is: "); print(hexpltFileName)
 
 	# Puts the full immediate path into a string; with help from: https://stackoverflow.com/a/2725195/1397555
