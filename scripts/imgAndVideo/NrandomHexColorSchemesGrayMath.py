@@ -9,8 +9,8 @@
 import datetime, random, os.path, argparse, sys
 
 parser = argparse.ArgumentParser(description="Generates a random hex color scheme of file format .hexplt (named after the date and time and a few random characters), which is a plain text file with one hex color per line. Modeled after a color theory given in Itten's \"ELEMENTS OF COLOR,\" which states that color combinations tend to be more pleasing to the human eye if, when the colors are mixed (by substractive color mixing), they make gray.")
-parser.add_argument("-n", "--numschemes", type=int, default=28, help="How many color schemes to generate. Default 28.")
-parser.add_argument("-c", "--numcolorpairs", type=int, default=2, help="How many colors to generate per scheme (2 pairs would be 2x2 = 4). Default 2.")
+parser.add_argument("-n", "--numschemes", type=int, default=36, help="NOT ACTIVE at this writing. How many color schemes to generate. Default 36.")
+parser.add_argument("-c", "--numcolors", type=int, default=5, help="How many colors to generate per scheme. Default 5.")
 parser.add_argument("-g", "--grayhigh", type=int, default=222, help="Gray high threshold. No RGB-256 value will be higher than this number. Default 222. Range 0-255.")
 parser.add_argument("-l", "--graylow", type=int, default=60, help="Gray low threshold. No RGB-256 value will be lower than this number. Default 60. Range 0-255.")
 
@@ -18,7 +18,7 @@ args = parser.parse_args()
 
 nSchemes = args.numschemes; print 'Will generate ', nSchemes, ' color schemes.'
 
-numColorPairs = args.numcolorpairs; print 'Will generate ', (args.numcolorpairs * 2), ' colors (', numColorPairs, ' pairs) per scheme.'
+numColors = args.numcolors; print 'Will generate ', numColors, ' per scheme.'
 
 grayHighThreshold = args.grayhigh
 if grayHighThreshold > 255:
@@ -43,11 +43,56 @@ print 'Gray low threshold is ', grayLowThreshold
 	# Lower light range:
 	# grayHighThreshold = 154; grayLowThreshold = 40
 
+HEXColors = []
+
 h = 0
 while h < nSchemes:
-	# Create unique, date-time informative .hexplt file name, and open a new handle to it for writing.
+	# Reset these (they are altered in the inner loop) :
+	redHighThreshold=grayHighThreshold
+	greenHighThreshold=grayHighThreshold
+	blueHighThreshold=grayHighThreshold
+
+	# Although this code at this writing doesn't ever change these:
+	redLowThreshold=grayLowThreshold
+	greenLowThreshold=grayLowThreshold
+	blueLowThreshold=grayLowThreshold
+	print '~~outer loop iteration started; redHighThreshold value is ', redHighThreshold
+	
+	i = 0
+	while (i < numColors):
+
+		# REDS
+		newRedLowVal = random.randint(redLowThreshold,redHighThreshold)
+		newRedHighVal=(redHighThreshold - newRedLowVal)
+		# The new red high threshold is the boundary of the red partition:
+		redHighThreshold=newRedLowVal
+
+		# GREENS
+		newGreenLowVal = random.randint(greenLowThreshold,greenHighThreshold)
+		newGreenHighVal=(greenHighThreshold - newGreenLowVal)
+		greenHighThreshold=newGreenLowVal
+
+		# BLUES
+		newBlueLowVal = random.randint(blueLowThreshold,blueHighThreshold)
+		newBlueHighVal=(blueHighThreshold - newBlueLowVal)
+		blueHighThreshold=newBlueLowVal
+
+		# Print color 1 RGB values in decimal to screen (for debugging):
+		print 'color ', str(i), ' RGB values: ', str(newRedLowVal), ' ', str(newGreenLowVal), ' ', str(newBlueLowVal)
+		# Formatting converts decimal value to hex:
+		newColorOneHEX = "#" + str.lower("%0.2X" % newRedLowVal) + str.lower("%0.2X" % newGreenLowVal) + str.lower("%0.2X" % newBlueLowVal)
+		HEXColors.append(newColorOneHEX)
+		i += 1
+		# Only create and append second generated color (from this loop iteration) to array if the count of it with all other as-yet generated colors does not exceed intended number of colors in scheme:
+		if not (i + 1) > numColors:
+			# Print color 2 RGB values in decimal:
+			print 'color ', str(i + 1), ' RGB values: ', str(newRedHighVal), ' ', str(newGreenHighVal), ' ', str(newBlueHighVal)
+			newColorTwoHEX = "#" + str.lower("%0.2X" % newRedHighVal) + str.lower("%0.2X" % newGreenHighVal) + str.lower("%0.2X" % newBlueHighVal)
+			HEXColors.append(newColorTwoHEX)
+			i += 1
+	# Create unique, date-time informative .hexplt file name.
 	# The start of the file name is three-padded digits indicating how many colors are in the palette.
-	numColorsStr = str(numColorPairs * 2)
+	numColorsStr = str(numColors)
 	paddedNum = numColorsStr.zfill(3)
 	now = datetime.datetime.now()
 	timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__%f')
@@ -55,53 +100,22 @@ while h < nSchemes:
 	rndStr = ('%03x' % random.randrange(16**3)).lower()
 	hexpltFileName = paddedNum + "__" + timeStamp + "__" + rndStr + ".hexplt"
 	print("hexpltFileName is: "); print(hexpltFileName)
-	
+
 	# Puts the full immediate path into a string; with help from: https://stackoverflow.com/a/2725195/1397555
 	curDir=os.path.realpath('.')
-	# Halleluja that the following automagically changes to a backslash when working with Windows' backwards ;) path conventions! :
 	fullFilePath = curDir + "/" + hexpltFileName
 
 	# OPEN file for writing:
 	f = open(fullFilePath,"w+")
-	
-	redHighThreshold=grayHighThreshold
-	greenHighThreshold=grayHighThreshold
-	blueHighThreshold=grayHighThreshold
 
-	redLowThreshold=grayLowThreshold
-	greenLowThreshold=grayLowThreshold
-	blueLowThreshold=grayLowThreshold
-	i = 0
-	# Create colors under constraints and write them to that opened .hexplt file.
-	while (i < numColorPairs):
-		# print("~~loop iteration started; redHighThreshold value is: "); print(redHighThreshold)
-		# REDS
-		newRedLowVal = random.randint(redLowThreshold,redHighThreshold)
-		newRedHighVal=(redHighThreshold - newRedLowVal)
-		# The new red high threshold is the boundary of the red partition:
-		redHighThreshold=newRedLowVal
-		# GREENS
-		newGreenLowVal = random.randint(greenLowThreshold,greenHighThreshold)
-		newGreenHighVal=(greenHighThreshold - newGreenLowVal)
-		greenHighThreshold=newGreenLowVal
-		# BLUES
-		newBlueLowVal = random.randint(blueLowThreshold,blueHighThreshold)
-		newBlueHighVal=(blueHighThreshold - newBlueLowVal)
-		blueHighThreshold=newBlueLowVal
-		# Print color 1 RGB values in decimal to screen (for debugging):
-		print 'color 1 RGB vals: ', str(i), ' ', str(newRedLowVal), ' ', str(newGreenLowVal), ' ', str(newBlueLowVal)
-		# Formatting converts decimal value to hex:
-		newColorOneHEX = "#" + str("%0.2X" % newRedLowVal) + str("%0.2X" % newGreenLowVal) + str("%0.2X" % newBlueLowVal)
-		# Print color 2 RGB values in decimal:
-		print 'color 2 RGB vals: ', str(i + 1), '  ', str(newRedHighVal), ' ', str(newGreenHighVal), ' ', str(newBlueHighVal)
-		newColorTwoHEX = "#" + str("%0.2X" % newRedHighVal) + str("%0.2X" % newGreenHighVal) + str("%0.2X" % newBlueHighVal)
-
-		f.write(newColorOneHEX)
+	print("Colors written to that file are:")
+	for color in HEXColors:
+		# WRITE to file:
+		print(color)
+		f.write(color)
 		f.write("\n")
-		f.write(newColorTwoHEX)
-		f.write("\n")
-
-		i += 1
+	# Empty the list:
+	HEXColors[:] = []
 
 	# CLOSE file:
 	f.close()
