@@ -4,6 +4,9 @@
 # USAGE
 # Run this script with the --help parameter or examine the parser = argparse.. code in this script.
 
+# TO DO
+# Fix bug: if high threshold values become lower than low threshold, randint throws an error. Solution: swap values of low threshold and high thresholds.
+
 
 # CODE
 import datetime, random, os.path, argparse, sys
@@ -60,36 +63,30 @@ while h < nSchemes:
 	
 	i = 0
 	while (i < numColors):
+		# RED
+		print '~~~~~~ ', redLowThreshold, ' ', redHighThreshold
+		newRedVal = random.randint(redLowThreshold,redHighThreshold)
+		redHighThreshold = redHighThreshold - newRedVal
+		# print '\tnewRedVal is ', newRedVal, ' redHighThreshold is ', redHighThreshold
+		
+		# GREEN
+		print '~~~~~~ ', greenLowThreshold, ' ', greenHighThreshold
+		newGreenVal = random.randint(greenLowThreshold,greenHighThreshold)
+		greenHighThreshold=(greenHighThreshold - newGreenVal)
+		# print '\tnewGreenVal is ', newGreenVal, ' greenHighThreshold is ', greenHighThreshold
 
-		# REDS
-		newRedLowVal = random.randint(redLowThreshold,redHighThreshold)
-		newRedHighVal=(redHighThreshold - newRedLowVal)
-		# The new red high threshold is the boundary of the red partition:
-		redHighThreshold=newRedLowVal
-
-		# GREENS
-		newGreenLowVal = random.randint(greenLowThreshold,greenHighThreshold)
-		newGreenHighVal=(greenHighThreshold - newGreenLowVal)
-		greenHighThreshold=newGreenLowVal
-
-		# BLUES
-		newBlueLowVal = random.randint(blueLowThreshold,blueHighThreshold)
-		newBlueHighVal=(blueHighThreshold - newBlueLowVal)
-		blueHighThreshold=newBlueLowVal
+		# BLUE
+		print '~~~~~~ ', blueLowThreshold, ' ', blueHighThreshold
+		newBlueVal = random.randint(blueLowThreshold,blueHighThreshold)
+		blueHighThreshold=(blueHighThreshold - newBlueVal)
+		# print '\tnewBlueVal is ', newBlueVal, ' blueHighThreshold is ', blueHighThreshold
 
 		# Print color 1 RGB values in decimal to screen (for debugging):
-		print 'color ', str(i), ' RGB values: ', str(newRedLowVal), ' ', str(newGreenLowVal), ' ', str(newBlueLowVal)
+		print 'color ', str(i), ' RGB values: ', str(newRedVal), ' ', str(newGreenVal), ' ', str(newBlueVal)
 		# Formatting converts decimal value to hex:
-		newColorOneHEX = "#" + str.lower("%0.2X" % newRedLowVal) + str.lower("%0.2X" % newGreenLowVal) + str.lower("%0.2X" % newBlueLowVal)
+		newColorOneHEX = "#" + str.lower("%0.2X" % newRedVal) + str.lower("%0.2X" % newGreenVal) + str.lower("%0.2X" % newBlueVal)
 		HEXColors.append(newColorOneHEX)
 		i += 1
-		# Only create and append second generated color (from this loop iteration) to array if the count of it with all other as-yet generated colors does not exceed intended number of colors in scheme:
-		if not (i + 1) > numColors:
-			# Print color 2 RGB values in decimal:
-			print 'color ', str(i + 1), ' RGB values: ', str(newRedHighVal), ' ', str(newGreenHighVal), ' ', str(newBlueHighVal)
-			newColorTwoHEX = "#" + str.lower("%0.2X" % newRedHighVal) + str.lower("%0.2X" % newGreenHighVal) + str.lower("%0.2X" % newBlueHighVal)
-			HEXColors.append(newColorTwoHEX)
-			i += 1
 	# Create unique, date-time informative .hexplt file name.
 	# The start of the file name is three-padded digits indicating how many colors are in the palette.
 	numColorsStr = str(numColors)
