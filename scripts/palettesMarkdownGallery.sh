@@ -17,7 +17,7 @@ printf "# Palettes\n\nClick any image to go to the source image; the text line a
 while read element
 do
 	hexpltName=${element::-5}
-	printf "### [$hexpltName]($hexpltName)\n\n" >> README.md
+	printf "### [$hexpltName]($hexpltName.hexplt)\n\n" >> README.md
 	printf "[ ![$element]($element) ]($element)\n\n" >> README.md
 done < all_png.txt
 
