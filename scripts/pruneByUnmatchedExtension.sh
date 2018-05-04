@@ -42,7 +42,7 @@
 
 
 # CODE
-list=`find . -maxdepth 1 -iname "*.$1" | gsed 's/^\.\///g'`
+list=`find . -maxdepth 1 -iname "*.$1" | gsed 's/^\.\///g' | tr -d '\15\32'`
 
 # empty tmp_Dn6M_proposed_deletes.sh.txt whether it exists or not (recreate it blank) :
 printf "" > tmp_Dn6M_proposed_deletes.sh.txt
