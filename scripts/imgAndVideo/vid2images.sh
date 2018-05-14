@@ -6,7 +6,7 @@
 
 
 # CODE
-TO DO: fix this. ffmpeg throws 
+# TO DO: fix this. [wut happen?]
 
 if [ ! -d "./$1""_frames" ]
 then
