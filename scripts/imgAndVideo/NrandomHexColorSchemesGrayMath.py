@@ -4,15 +4,12 @@
 # USAGE
 # Run this script with the --help parameter or examine the parser = argparse.. code in this script.
 
-# TO DO
-# Fix design problem: are you kidding me?! All variable assignments in python are actually references to the other variable?! I have to work around this with the copy library, apparently; re: https://stackoverflow.com/a/5511239/1397555
-
 
 # CODE
 import datetime, random, os.path, argparse
 
 parser = argparse.ArgumentParser(description='Generates a random hex color scheme of file format .hexplt, which is a plain text file with one hex color per line. The generated colors are constrained after a color theory given in Itten\'s "ELEMENTS OF COLOR," which states that color combinations tend to be more pleasing to the human eye if, when the colors are mixed (by substractive color mixing), they make gray. This script makes colors that are mixed by additive light (RGB), but the principle is the same and the results have generally verified the theory.')
-parser.add_argument('-n', '--numschemes', type=int, default=36, help='NOT ACTIVE at this writing. How many color schemes to generate. Default 36.')
+parser.add_argument('-n', '--numschemes', type=int, default=36, help='How many color schemes to generate. Default 36.')
 parser.add_argument('-g', '--grayhigh', type=int, default=222, help='Gray high threshold. No RGB-256 value will be higher than this number. Default 222. Range 0-255.')
 parser.add_argument('-l', '--graylow', type=int, default=60, help='Gray low threshold. No RGB-256 value will be lower than this number. Default 60. Range 0-255. When the sum of any generated RGB values is less than this number, this script will stop generating colors.')
 
