@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Renders an image like colored horizontal plasma fibers via python's numpy and PIL modules.
+# Renders a PNG image like colored horizontal plasma fibers via python's numpy and PIL modules. Output file names are random. Horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
 # USAGE
 # python thisScript.py
@@ -7,16 +7,13 @@
 # DEPENDENCIES
 # python 3 with numpy and PIL modules
 
-# SOURCE
-# Horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
-
 
 # CODE
 import datetime, random, argparse, ast, os.path
 import numpy as np
 from PIL import Image
 
-parser = argparse.ArgumentParser(description='Renders an image like colored horizontal plasma fibers via python\'s numpy and PIL modules. The output image name(s) is (are) random.')
+parser = argparse.ArgumentParser(description='Renders an image like colored horizontal plasma fibers via python\'s numpy and PIL modules. Output file names are random. Horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
 parser.add_argument('-n', '--numimages', type=int, default=7, help='How many images to generate. Default 7.')
 parser.add_argument('-w', '--width', type=int, default=1200, help='Width of output image(s). Default 1200.')
 parser.add_argument('-t', '--height', type=int, default=600, help='Height of output image(s). Default 600.')
@@ -51,7 +48,7 @@ while i < numIMGsToMake:
 		for y in range(1, height-1):	# Algo. step 3
 			arr[y, x] =	(arr[y-1, x-1] + arr[y, x-1] + arr[y+1, x-1]) / 3 + np.random.randint(-rshift, rshift+1, size=3)
 			
-	im = Image.fromarray(arr.astype(np.uint8)).convert('RGBA')
+	im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
 	im.save(imgFileName)
 	print('Generated and saved image ', imgFileName)
 
