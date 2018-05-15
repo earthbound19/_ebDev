@@ -13,6 +13,7 @@
 # The comparison algorithm never compares the same image pair more than once.
 
 # TO DO:
+# Fix that this is comparing non *__superShrunk* images to those?
 # Refactor to allow continuation of interrupted runs (do not erase temp files; rather append to them.) This means not resizing for comparision any pre-existing files of the pattern __superShrunkRc6d__*, not wiping comparision result temp files, picking up where comparisons left off, and . . . ?
 
 # change search regex depending on presence or absense of parameter $1:
