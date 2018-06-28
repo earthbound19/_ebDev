@@ -56,4 +56,4 @@ while i < numIMGsToMake:
 # IMAGE GENERATION ALGORITHM description in steps:
 # 1. For the first pixel (column) on every row, randomly shift the RGB in the range negative rshift to positive rshift:
 # 2. For every column (except the first),
-# 3. On every row in that column, perform the following operation: give the pixel the value from the operation: (one row up, one col left + this row, one col left + next row, one col left) / 3 . . (That means: average of R, G, and B per channel one pixel up, this pixel, and one pixel down) plus 
+# 3. On every row in that column, perform the following operation: give the pixel the value from the operation: (one row up, one col left + this row, one col left + next row, one col left) / 3 . . (That means: average of R, G, and B per channel one pixel up, this pixel, and one pixel down), ? plus . . . ?
