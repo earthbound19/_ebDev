@@ -10,7 +10,7 @@
 # python 3 with numpy and PIL modules
 
 # TO DO
-# - Instead of checking whether a coordinate has been used, SUBTRACT used coordinates from a list of coordinates, then randomly select coordinates from that reduced list! Except that I have to select a coordinate near the previous used coordinate--how do I use this subtractive approach yet still do that? Hmm..that may require serious data structure refactoring.
+# - Instead of checking whether a coordinate has been used, SUBTRACT used coordinates from a list of coordinates, then randomly select coordinates from that reduced list! Except that I have to select a coordinate near the previous used coordinate--how do I use this subtractive approach yet still do that? Hmm..that may require serious data structure refactoring. Here's how I can do it: convert arr to a list of coordinate pairs (a list of lists instead of a list of lists of lists), then substract items (coordinate pairs) from that list as I go, and do coordinate mutation the same way, but the search space is appropriately reduced. I am no longer searching the entire space (whether used or unused) ; only the usable space. Hrmm...maybe I can just do this with the list of lists of lists. POSSIBLE REFERENCE (subtract items in list x from list y) : OR delete list elements: https://campus.datacamp.com/courses/intro-to-python-for-data-science/chapter-2-python-lists?ex=15 https://stackoverflow.com/questions/3428536/python-list-subtraction-operation
 # - Clamp randomly generated colors that are out of gamut (back into the gamut) and/or select a new random walk origin when this happens.
 # - Verify this makes pixels go up to the edge but not past.
 
