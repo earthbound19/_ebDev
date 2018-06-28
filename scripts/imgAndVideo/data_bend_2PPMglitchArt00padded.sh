@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Makes glitch art from any data source by creating a ppm header approximating a defined image size (at this writing square) into which that data would fit; takes that image header and slaps raw copied hex value pairs (converted to decimal) into an RGB value array which composes the remainder of the PPM format file. The result may be converted to any other image format, apparently only by IrfanView (GraphicsMagick and NConvert choke on ppm files with hex values; IrfanView doesn't). SEE ALTERNATE script data2PPMglitchArt00padded.sh for a better data representation option.
+# Variant of data_bend_2PPMglitchArt.sh. Makes glitch art from any data source by creating a ppm header approximating a defined image size (at this writing square) into which that data would fit; takes that image header and slaps raw copied hex value pairs (converted to decimal) into an RGB value array which composes the remainder of the PPM format file. However, this variant pads those hex values with 00 in what would be the R and B of RGB values in the result, to produce a monochrome image of varying shades of green to "display" varying data values. (Actually, it may pad with arbitrary values I've hard coded for any other color; the commends explain how to set those values to anything *you* want.) The result may be converted to any other image format, apparently only by IrfanView (GraphicsMagick and NConvert choke on ppm files with hex values; IrfanView doesn't).
 
 # USAGE
 # ./thisScript.sh dataSource.file
@@ -11,29 +11,20 @@
 # You *may* be able to reliably reverse the process to recreate an original file a PPM was made from: all of the hex values for a source file are recorded in a resulting PPM via this script. In other words, this may be a way to obfuscate data (but note that the obfuscation is easily unmaked or reversed).
 
 # TO DO
-# Data padding to align bytes more representationally with RGB values, e.g. pad one byte (two hex) with four zeros where [(R G) B], [R (G B)], or [(R) G (B)] values would be; so [(00 00) val] for the first case, etc.
+# Alternative padding of the R or B values with zeros, OR copying a value to the other two unused RGB vals to produce a shade of gray.
+# Once that's done, reintegrate those options into the original as options.
+# Option to pad with any value you may want from 00-ff (also including in whichever column?), not just 00.
 
 
 # CODE
-# pseudo-code:
-# get data size
-		# bcse 3 vals per px, sqrt(data size / 3) = x and y dim. of img
-# ex. if data size is 27:
-# sqrt (27 / 3) = 3
-# x and y ppx dim. = that (3)
-		# check:
-		# f f f f f f f f f = triplet of pix (3 px wide); 9 vals
-		# f f f f f f f f f
-		# f f f f f f f f f = 3 rows of 9 vals = 27 = orig. data length.
-
 imgFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
 ppmDestFileName="$imgFileNoExt""_asPPM.ppm"
 
 inputDataFile=$1
 __ln=( $( ls -Lon "$inputDataFile" ) )
 __size=${__ln[3]}
-IMGsideLength=`echo "sqrt ($__size / 3)" | bc`		# / 3 because three vals per pixel
-valsPerRow=$((IMGsideLength * 3))
+IMGsideLength=`echo "sqrt ($__size)" | bc`		# / 3 because three vals per pixel
+echo will create image of dimensions $IMGsideLength x $IMGsideLength.
 
 # Make P3 PPM format header:
 echo "P3" > PPMheader.txt
@@ -42,10 +33,18 @@ echo $IMGsideLength $IMGsideLength >> PPMheader.txt
 echo ff >> PPMheader.txt
 
 # Make P3 PPM body:
-# Dump file to one-byte hex columns $valsPerRow per row, via od
-od -t x1 -w$valsPerRow $inputDataFile > PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+od -t x1 -w$IMGsideLength $inputDataFile > PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+# NOTE: to make a green tint any other color you can make with only blue and red (whatever sense it makes to say green tint here), you can change the zeros in the following sed regex to anything from 00 to ff hex; 00 would look like: ..  00 \1 00  ..
+# some options;
+# "green tints" of medium dark, dimmish purple:												68 \1 b6
+# "blue tints" of dim green:																00 5b \1
+# varied pink or purple bordering a slightly greenish dimmish shade of eggshell blue:		\1 7f ff
+# For other possibilities, see: RGB_combos_of_255_127_and_0_repetition_allowed.hexplt
+sed -i 's/ \([0-9a-z]\{2\}\)/ 00 5b \1 /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 # strip off the byte offset count (I think it is) info at the start of each row, via sed:
 sed -i 's/^[0-9]\{1,\} \(.*\)/\1/g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+# reduce any double-spaces (which may result from earlier text processing) to single:
+sed -i 's/  / /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 
 # Concatenate the header and body into a new, complete PPM format file:
 cat PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt > $ppmDestFileName
@@ -64,11 +63,3 @@ echo creation of $ppmDestFileName DONE. Undergoing any further optional steps . 
 # upscaleX=$((IMGsideLength * 36)) && irfanView2imgNN.sh $ppmDestFileName png $upscaleX
 
 echo DONE.
-
-
-# DEV NOTES
-# Far better options than rev. x of this script, where I contrived a needlessly elaborate control block to create and format data in a way that exiting tools in my path already (?!) already do! :
-# Use od for hex output instead? Ex. command that outputs 5 1-byte hex values per row:
-# od -t x1 -w5 input.dat
-# OR an xxd command that does more formatting for me up front; 1 byte per column, 9 columns:
-# xxd -g 1 -c 9 TREACHERY1.7.fountain
