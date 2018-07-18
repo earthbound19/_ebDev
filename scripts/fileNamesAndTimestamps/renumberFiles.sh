@@ -16,9 +16,10 @@ echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
 
 # Get count of files we want, and from that digits to pad to.
 # The necessity of deleting leading blank space is because of Mac. Re: https://stackoverflow.com/a/30927885 : GYAH! This doom was had 2018-04-19 Thursday 07:33 PM:
-filesCount=`find . -maxdepth 1 -iname \*.$1 | wc -l | tr -d ' '`
+filesCount=`gfind \*.$1 -maxdepth 1 | wc -l | tr -d ' '`
 digitsToPadTo=${#filesCount}
-# Create array to run through of files.
+
+# Create array to use to loop over files.
 filesArray=`find . -maxdepth 1 -iname \*.$1`
 
 counter=0
