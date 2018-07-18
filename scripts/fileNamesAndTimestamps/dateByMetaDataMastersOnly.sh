@@ -7,8 +7,8 @@ echo BEGINNING correcting of timestamps to match any EXIF data . . .
 # TO DO: remove file extensions from the following list which will never contain metadata.
 # Another (easier to read and change?) way to do the following: find . -type f -iregex '\.\/.*.\(tif\|tiff\|png\|.psd\|ora\|kra\|rif\|riff\|jpg\|jpeg\|gif\|bmp\|cr2\|crw\|pdf\|ptg\)' -printf '%TY %Tm %Td %TH %TM %TS %p\n' | sort -g > _batchNumbering/fileNamesWithNumberTags.txt
 find . -iname \*.tif -o -iname \*.tiff -o -iname \*.psd -o -iname \*.mov -o -iname \*.mp4 -o -iname \*.m4a > dateByImageInfoFilesListTemp.txt
-mapfile -t imageFiles < ./dateByImageInfoFilesListTemp.txt
-for filename in ${imageFiles[@]}
+
+while read filename
 do
 			# echo filename is:
 			# echo $filename
@@ -22,10 +22,10 @@ do
 # Metadata Date              : 2016:09:13 06:26:04-06:00		Exif access time?
 # Modify Date                : 2016:09:13 06:26:04				ModifyDate; EXIF metadata modify date+time, more reliable
 
-	# With thanks to smart folks who wrote at: http://photo.stackexchange.com/a/27246/44663 and http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html :
+	# With thanks to smart folks who wrote at: http://photo.stackexchange.com/a/27246/44663 and http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html ; I *think* the > means "write the date stamp found in the data on the left to the data on the right:"
 	exiftool -overwrite_original "-CreateDate>FileCreateDate" "$filename"
 	exiftool -overwrite_original "-ModifyDate>FileModifyDate" "$filename"
-done
+done < dateByImageInfoFilesListTemp.txt
 
 echo DONE updating image file timestamps to match metadata.
 
