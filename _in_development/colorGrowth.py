@@ -9,8 +9,7 @@
 # DEPENDENCIES
 # python 3 with numpy and PIL modules
 
-# TO DO
-# - Instead of checking whether a coordinate has been used, SUBTRACT used coordinates from a list of coordinates, then randomly select coordinates from that reduced list! Except that I have to select a coordinate near the previous used coordinate--how do I use this subtractive approach yet still do that? Hmm..that may require serious data structure refactoring. Here's how I can do it: convert arr to a list of coordinate pairs (a list of lists instead of a list of lists of lists), then substract items (coordinate pairs) from that list as I go, and do coordinate mutation the same way, but the search space is appropriately reduced. I am no longer searching the entire space (whether used or unused) ; only the usable space. Hrmm...maybe I can just do this with the list of lists of lists. POSSIBLE REFERENCE (subtract items in list x from list y) : OR delete list elements: https://campus.datacamp.com/courses/intro-to-python-for-data-science/chapter-2-python-lists?ex=15 https://stackoverflow.com/questions/3428536/python-list-subtraction-operation
+# TO DO:
 # - Clamp randomly generated colors that are out of gamut (back into the gamut) and/or select a new random walk origin when this happens.
 # - Verify this makes pixels go up to the edge but not past.
 
@@ -31,24 +30,62 @@ colorbase = [157, 140, 157]		# A list of three values, or a "triplet" (purple gr
 arr = np.ones((height, width, 3)) * colorbase
 noir = [0, 0, 0]	# Black
 
-# NOTES
-# print(arr) prints 4 elements, each with 14 elements, each a triplet
-# len(arr) returns 4 (the list is 4 elements long)
 
-# print(arr[0]) prints list 0, with 14 elements of triplet values
-# len(arr[0]) prints list 0 of 14 elements of triplet values
+	# DEBUGGING / REFERENCE:
+	# Iterates through every datum in the three-dimensional list (array) :
+	# for a, b in enumerate(arr):
+	# 	print('- arr[', a, ']:\n', b)		# [ [0. 0. 0.] [0. 0. 0.] . . ]
+	# 	for i, j in enumerate(b):
+	# 		print('-- arr[', a, '][', i, ']:\n', arr[a][i])		# [0. 0. 0.]
+	# 		for x, y in enumerate(j):
+	# 			print('--- arr[', a, '][', i, '][', x, ']:\n', y)
+	# 			felf = 'nor'
+	# sys.exit()
 
-# print(arr[0][0]) prints a triplet of values
-# print(len(arr[0][0])) prints 3, the number of elements in that list (a triplet)
+	# delete list elements, re: https://campus.datacamp.com/courses/intro-to-python-for-data-science/chapter-2-python-lists?ex=15
+	# x = ["a", "b", "c", "d"]
+	# del(x[1])
 
-# print(arr[0][0][1]) returns 140 (second value of triplet in list 0 of list 0)
+	# remove list item re: https://www.quora.com/How-do-I-remove-an-item-from-a-python-list
+	# The cleanest one might be your_list.remove(item), quite close to your_list.pop(item_index). -- remove item removes any (all?) matching elements: https://www.tutorialspoint.com/python/list_remove.htm
+	# aList = [123, 'xyz', 'zara', 'abc', 'xyz'];
+	# aList.remove('xyz');
+	# print "List : ", aList
+	# aList.remove('abc');
+	# print "List : ", aList
+	# elucidated more simply here: https://stackoverflow.com/questions/2793324/is-there-a-simple-way-to-delete-a-list-element-by-value
 
-# TESTING ONLY:
-# for x in arr:
-# 	print('x')
-# 	for y in x:
-# 		print('y in x:', y[0], ' ', y[1], ' ', y[2])
 
+	# SPECULATIVE RE-WORKING DESCRIPTION OF ALGORITHM:
+	#
+	# init list of lists of lists with RGB triplet?
+	# initialize an unused coordinates list for desired size of image. make it mappable to that list of lists of lists of RGB triplets?
+	# initialize empty used coordinates list
+	# set base color from script param
+	# set prev. base color from same script param
+
+	# in a loop:
+	# check if unused coordinates list empty, and if not:
+	# get a random coordinate from that list (from function that gives that from a range) to start at
+	# mutate coordinate:
+		# check if coordinate is in unused coordinates list
+		# if so return to mutate color step
+		# if not mutate again
+		# if mutate fails N times return to get a random coordinate from that list step
+	# on mutate coordinate success:
+	# mutate color		(by rnd and avg rnd with prev. coord. color)
+	# set prev color to that new color
+	# write that new color to array of used coords
+	# REMOVE that coordinate from the unused coordinates list
+
+	# ADVANCED ALGO will spawn coordinates that spawn other coordinates until they die (and iterate all existing living coordinates at once in the loop.
+
+
+	# WHEN I START RE-WORKING THIS: END SCRIPT RUN before so much former version of script reference to follow:
+	# sys.exit()
+
+
+# ALGORITHM.
 # I could make these functions take and return tuples, but no. Syntaxy bleh. Re: https://stackoverflow.com/questions/1993727/expanding-tuples-into-arguments
 # Function takes two int range parameters and returns two random ints within that range
 def getRandomCoordinate(height, width):
@@ -114,4 +151,3 @@ im.save('tst.png')
 
 # Optionally print the RGB values array:
 # print('RGB values array:\n', arr)
-
