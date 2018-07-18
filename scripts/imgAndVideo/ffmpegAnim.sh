@@ -9,7 +9,7 @@
 # $2 desired output framerate
 # $3 desired constant quality (crf)
 # $4 the file extension of the input images.
-# Optional: $5 rescale target resolution expressed as N[NN..]xN[NN..], for example 200x112; OR to scale to one target dimension and calculate the other automatically (to maintain aspect), give e.g. 1280:-1 (to produce an image that is 1280 pix wide by whatever the other dimension should be). Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution.
+# Optional: $5 nearest neighbor method rescale target resolution expressed as N[NN..]xN[NN..], for example 200x112; OR to scale to one target dimension and calculate the other automatically (to maintain aspect), give e.g. 1280:-1 (to produce an image that is 1280 pix wide by whatever the other dimension should be). Nearest-neighbor keeps hard edges.
 # EXAMPLE
 # thisScript.sh 29.97 29.97 13 png
 
