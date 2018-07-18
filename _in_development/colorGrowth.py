@@ -1,4 +1,4 @@
-# IN DEVELOPMENT.
+# IN DEVELOPMENT. AT THIS WRITING, the core algorithm is in redevelopment, between headers so labeled, with the script exiting before the fully functional former algorithm starts.
 
 # DESCRIPTION
 # Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Output file names are random. Original colorFibers.py (of which this is an evolution) horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
@@ -58,34 +58,55 @@ noir = [0, 0, 0]	# Black
 
 	# SPECULATIVE RE-WORKING DESCRIPTION OF ALGORITHM:
 	#
-	# init list of lists of lists with RGB triplet?
-	# initialize an unused coordinates list for desired size of image. make it mappable to that list of lists of lists of RGB triplets?
-	# initialize empty used coordinates list
-	# set base color from script param
-	# set prev. base color from same script param
+	# - init list of lists of lists with RGB triplet
+	# - initialize an unused coordinates list for desired size of image. make it mappable to that list of lists of lists of RGB triplets
+	# - initialize empty used coordinates list
+	# - set base color from script param
+	# - set prev. base color from same script param
 
 	# in a loop:
-	# check if unused coordinates list empty, and if not:
-	# get a random coordinate from that list (from function that gives that from a range) to start at
-	# mutate coordinate:
-		# check if coordinate is in unused coordinates list
-		# if so return to mutate color step
-		# if not mutate again
-		# if mutate fails N times return to get a random coordinate from that list step
-	# on mutate coordinate success:
-	# mutate color		(by rnd and avg rnd with prev. coord. color)
-	# set prev color to that new color
-	# write that new color to array of used coords
-	# REMOVE that coordinate from the unused coordinates list
+	# - check if unused coordinates list empty, and if not:
+	# - get a random coordinate from that list (from function that gives that from a range) to start at
+	# - mutate coordinate:
+		# - check if coordinate is in unused coordinates list
+		# - if so return to mutate color step
+		# - if not mutate again
+		# - if mutate fails N times return to get a random coordinate from that list step
+	# - on mutate coordinate success:
+	# - mutate color		(by rnd and avg rnd with prev. coord. color)
+	# - set prev color to that new color
+	# - write that new color to array of used coords
+	# - REMOVE that coordinate from the unused coordinates list
 
 	# ADVANCED ALGO will spawn coordinates that spawn other coordinates until they die (and iterate all existing living coordinates at once in the loop.
 
 
-	# WHEN I START RE-WORKING THIS: END SCRIPT RUN before so much former version of script reference to follow:
-	# sys.exit()
+# BEGIN REDEVELOPMENT (NEW ALGORITHM).
+
+# - init list of lists of lists with RGB triplet ALREADY DONE, ABOVE.
+# - initialize an unused coordinates list for desired size of image. make it mappable to that list of lists of lists of RGB triplets
+# IDLE session copy-paste demonstrating use of append and remove for arrays (or lists?), where remove() takes an element out of the list that matches a certain value (here, a certain set of values in a list in the list) :
+# foo = []
+# >>> foo.append([1,1])
+# >>> foo
+# [[1, 1]]
+# >>> foo.append([1,2])
+# >>> foo
+# [[1, 1], [1, 2]]
+# >>> foo.append([4,8])
+# >>> foo
+# [[1, 1], [1, 2], [4, 8]]
+# >>> foo.remove([1,2])
+# >>> foo
+# [[1, 1], [4, 8]]
+
+# END REDEVELOPMENT (NEW ALGORITHM).
 
 
-# ALGORITHM.
+# END SCRIPT RUN before so much former version of script reference to follow:
+sys.exit()
+
+# OLD, INEFFICIENT ALGORITHM.
 # I could make these functions take and return tuples, but no. Syntaxy bleh. Re: https://stackoverflow.com/questions/1993727/expanding-tuples-into-arguments
 # Function takes two int range parameters and returns two random ints within that range
 def getRandomCoordinate(height, width):
