@@ -20,13 +20,21 @@ import numpy as np
 from PIL import Image
 import sys		# Testing only: DELETE THIS LINE or comment out on commit!
 
-# print('debug output:')
-# GLOBAL VARIABLES
-rshift = 23
-height = 4
-width = 8
-colorbase = [157, 140, 157]		# A list of three values, or a "triplet" (purple gray)
-# ((height, width, rgb_triplet)) :
+parser = argparse.ArgumentParser(description='Renders an image like colored horizontal plasma fibers via python\'s numpy and PIL modules. Output file names are random. Horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
+parser.add_argument('-n', '--numimages', type=int, default=7, help='How many images to generate. Default 7.')
+parser.add_argument('-w', '--width', type=int, default=1200, help='Width of output image(s). Default 1200.')
+parser.add_argument('-t', '--height', type=int, default=600, help='Height of output image(s). Default 600.')
+parser.add_argument('-r', '--rshift', type=int, default=4, help='Vary R, G and B channel values randomly in the range negative this value or positive this value. Note that this means the range is rshift times two. Defaut 4. Ripped or torn looking color streaks are more likely toward 6 or higher.')
+parser.add_argument('-c', '--colorbase', default='[157, 140, 157]', help='Base color that the image is initialized with, expressed as a python list or single number that will be assigned to every RGB value. If a list, put the parameter in quotes and give the RGB values in the format e.g. \'[256, 70, 70]\' for a deep red (Red = 256, Green = 70, Blue = 70). If a single number e.g. just 150, it will result in a medium-light gray of [150, 150, 150] where 150 is assigned to every Red, Green and Blue channel in every pixel in the first column of the image. All RGB channel values must be between 0 and 256. Default [157, 140, 157] (a medium-medium light, slightly violet gray). NOTE: unless until the color tearing problem is fixed, you are more likely to get a look of torn dramatically different colors the further away from nuetral gray your base color is.')
+
+args = parser.parse_args()		# When this function is called, if -h or --help was passed to the script, it will print the description and all defined help messages.
+
+numIMGsToMake, rshift, width, height = args.numimages, args.rshift, args.width, args.height
+# Interpreting -c (or --colorbase) argument as python literal and assigning that to a variable, re: https://stackoverflow.com/a/1894296/1397555
+colorbase = ast.literal_eval(args.colorbase)
+
+print('Will generate ', numIMGsToMake, ' image(s).')
+
 arr = np.ones((height, width, 3)) * colorbase
 noir = [0, 0, 0]	# Black
 
@@ -61,10 +69,10 @@ noir = [0, 0, 0]	# Black
 	# - initialize an unused coordinates flat list for desired size of image. make it mappable to that list of lists of lists of RGB triplets
 	# - initialize empty used coordinates list
 	# - set base color from script param
-	# - set prev. base color from same script param
+	# - initialize "previous" base color from same script param
 
 	# in a loop:
-	# - check if unused coordinates list empty, and if not:
+	# - check if unused coordinates list still has anything in it. if it does:
 	# - get a random coordinate from that list (from function that gives that from a range) to start at
 	# - mutate coordinate:
 		# - check if coordinate is in unused coordinates list
@@ -85,19 +93,31 @@ noir = [0, 0, 0]	# Black
 # - init list of lists of lists with RGB triplet ALREADY DONE, ABOVE.
 # - initialize an unused coordinates flat list for desired size of image. make it mappable to that list of lists of lists of RGB triplets
 unusedCoords = []
-# list funtions I'll use are unusedCoords.append and unusedCoords.remove([1,2]) (where the parameter to .remove is a list to match and remove.
+		# list funtions I'll use are unusedCoords.append and unusedCoords.remove([1,2]) (where the parameter to .remove is a list to match and remove.
 for yCoord in range(0, width):
 	for xCoord in range(0, height):
 		# print('yCoord ', yCoord, ' xCoord ', xCoord)
 		unusedCoords.append([yCoord, xCoord])
-# - . .
-# - check if unused coord. list empty, and if not..
-# - get a random coordinate..
-unusedCoordsListSize = len(unusedCoords)
-print('list size is ', unusedCoordsListSize)
-randomIndex = np.random.randint(0, unusedCoordsListSize)	# range is zero to unusedCoordsListSize-1 (not inclusive, but if we make it inclusive (+1) we can get a number that is out of index range).
-print(unusedCoords[randomIndex])
+# - initialize empty used coords list
 usedCoords = []
+# - initialize base color form script param
+color = colorbase
+# - initialize "previous" base color from script param
+previousColor = color
+# - . .
+# - check if unused coordinates list still has anything in it.
+while unusedCoords:
+# - .. if it does:
+# - get a random coordinate..
+	unusedCoordsListSize = len(unusedCoords)
+	randomIndex = np.random.randint(0, unusedCoordsListSize)	# range is zero to unusedCoordsListSize-1 (not inclusive, and for zero-indexing we need that).
+	# - write that new color to array of used coords:
+	usedCoords.append(unusedCoords[randomIndex])
+	# - REMOVE that coordinate from the unused coordinates list
+	unusedCoords.remove(unusedCoords[randomIndex])
+
+print('usedCoords array contains: ', usedCoords)
+print('unusedCoords array contains: ', unusedCoords)
 
 # END REDEVELOPMENT (NEW ALGORITHM).
 
