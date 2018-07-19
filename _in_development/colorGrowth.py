@@ -23,8 +23,8 @@ import sys		# Testing only: DELETE THIS LINE or comment out on commit!
 # print('debug output:')
 # GLOBAL VARIABLES
 rshift = 23
-height = 200
-width = 400
+height = 4
+width = 8
 colorbase = [157, 140, 157]		# A list of three values, or a "triplet" (purple gray)
 # ((height, width, rgb_triplet)) :
 arr = np.ones((height, width, 3)) * colorbase
@@ -42,11 +42,10 @@ noir = [0, 0, 0]	# Black
 	# 			felf = 'nor'
 	# sys.exit()
 
-	# delete list elements, re: https://campus.datacamp.com/courses/intro-to-python-for-data-science/chapter-2-python-lists?ex=15
+	# delete list elements by index, re: https://campus.datacamp.com/courses/intro-to-python-for-data-science/chapter-2-python-lists?ex=15
 	# x = ["a", "b", "c", "d"]
 	# del(x[1])
-
-	# remove list item re: https://www.quora.com/How-do-I-remove-an-item-from-a-python-list
+	# remove list item by index re: https://www.quora.com/How-do-I-remove-an-item-from-a-python-list
 	# The cleanest one might be your_list.remove(item), quite close to your_list.pop(item_index). -- remove item removes any (all?) matching elements: https://www.tutorialspoint.com/python/list_remove.htm
 	# aList = [123, 'xyz', 'zara', 'abc', 'xyz'];
 	# aList.remove('xyz');
@@ -59,7 +58,7 @@ noir = [0, 0, 0]	# Black
 	# SPECULATIVE RE-WORKING DESCRIPTION OF ALGORITHM:
 	#
 	# - init list of lists of lists with RGB triplet
-	# - initialize an unused coordinates list for desired size of image. make it mappable to that list of lists of lists of RGB triplets
+	# - initialize an unused coordinates flat list for desired size of image. make it mappable to that list of lists of lists of RGB triplets
 	# - initialize empty used coordinates list
 	# - set base color from script param
 	# - set prev. base color from same script param
@@ -84,21 +83,21 @@ noir = [0, 0, 0]	# Black
 # BEGIN REDEVELOPMENT (NEW ALGORITHM).
 
 # - init list of lists of lists with RGB triplet ALREADY DONE, ABOVE.
-# - initialize an unused coordinates list for desired size of image. make it mappable to that list of lists of lists of RGB triplets
-# IDLE session copy-paste demonstrating use of append and remove for arrays (or lists?), where remove() takes an element out of the list that matches a certain value (here, a certain set of values in a list in the list) :
-# foo = []
-# >>> foo.append([1,1])
-# >>> foo
-# [[1, 1]]
-# >>> foo.append([1,2])
-# >>> foo
-# [[1, 1], [1, 2]]
-# >>> foo.append([4,8])
-# >>> foo
-# [[1, 1], [1, 2], [4, 8]]
-# >>> foo.remove([1,2])
-# >>> foo
-# [[1, 1], [4, 8]]
+# - initialize an unused coordinates flat list for desired size of image. make it mappable to that list of lists of lists of RGB triplets
+unusedCoords = []
+# list funtions I'll use are unusedCoords.append and unusedCoords.remove([1,2]) (where the parameter to .remove is a list to match and remove.
+for yCoord in range(0, width):
+	for xCoord in range(0, height):
+		# print('yCoord ', yCoord, ' xCoord ', xCoord)
+		unusedCoords.append([yCoord, xCoord])
+# - . .
+# - check if unused coord. list empty, and if not..
+# - get a random coordinate..
+unusedCoordsListSize = len(unusedCoords)
+print('list size is ', unusedCoordsListSize)
+randomIndex = np.random.randint(0, unusedCoordsListSize)	# range is zero to unusedCoordsListSize-1 (not inclusive, but if we make it inclusive (+1) we can get a number that is out of index range).
+print(unusedCoords[randomIndex])
+usedCoords = []
 
 # END REDEVELOPMENT (NEW ALGORITHM).
 
