@@ -62,29 +62,6 @@ noir = [0, 0, 0]	# Black
 	# print "List : ", aList
 	# elucidated more simply here: https://stackoverflow.com/questions/2793324/is-there-a-simple-way-to-delete-a-list-element-by-value
 
-
-	# SPECULATIVE RE-WORKING DESCRIPTION OF ALGORITHM:
-	#
-	# - init list of lists of lists with RGB triplet
-	# - initialize an unused coordinates flat list for desired size of image. make it mappable to that list of lists of lists of RGB triplets
-	# - initialize empty used coordinates list
-	# - set base color from script param
-	# - initialize "previous" base color from same script param
-
-	# in a loop:
-	# - check if unused coordinates list still has anything in it. if it does:
-	# - get a random coordinate from that list (from function that gives that from a range) to start at
-	# - mutate coordinate:
-		# - check if coordinate is in unused coordinates list
-		# - if so return to mutate color step
-		# - if not mutate again
-		# - if mutate fails N times return to get a random coordinate from that list step
-	# - on mutate coordinate success:
-	# - mutate color		(by rnd and avg rnd with prev. coord. color)
-	# - set prev color to that new color
-	# - write that new color to array of used coords
-	# - REMOVE that coordinate from the unused coordinates list
-
 	# ADVANCED ALGO will spawn coordinates that spawn other coordinates until they die (and iterate all existing living coordinates at once in the loop.
 
 
@@ -100,24 +77,51 @@ for yCoord in range(0, width):
 		unusedCoords.append([yCoord, xCoord])
 # - initialize empty used coords list
 usedCoords = []
-# - initialize base color form script param
+# - initialize base color from script param
 color = colorbase
 # - initialize "previous" base color from script param
 previousColor = color
-# - . .
 # - check if unused coordinates list still has anything in it.
 while unusedCoords:
 # - .. if it does:
-# - get a random coordinate..
+# - get a random coordinate:
 	unusedCoordsListSize = len(unusedCoords)
 	randomIndex = np.random.randint(0, unusedCoordsListSize)	# range is zero to unusedCoordsListSize-1 (not inclusive, and for zero-indexing we need that).
-	# - write that new color to array of used coords:
-	usedCoords.append(unusedCoords[randomIndex])
+	# - TO DO: mutate coordinate . .
+		# - check if coordinate is in unused coordinates list
+		# - if so return to mutate color step
+		# - if not mutate again
+		# - if mutate fails N times return to get a random coordinate from that list step
+	# - TO DO: on mutate coordinate success:
+	# - write that coordinate to list of used coordinates
+	# DEV MORE SIMPLE FEASIBILITY ALGO check step:
+	chosenCoord = unusedCoords[randomIndex]
+	print('Randomly chosen coordinate is: ', chosenCoord)
+	arrYidx = chosenCoord[0]
+	arrXidx = chosenCoord[1]
+	print('~[0]: ', arrYidx, ' ~[1]: ', arrXidx)
+	print('RGB color triplet at randomly chosen index is: ', arr[arrYidx][arrXidx])
+	usedCoords.append(chosenCoord)
+	# - IN PROGRESS: mutate color		(by rnd and avg rnd with prev. coord. color)
+	arr[arrYidx][arrXidx] = arr[arrYidx][arrXidx] + np.random.randint(-rshift, rshift+1, size=3)
+	# - TO DO: set prev color to that new color
+	# - TO DO: write that color data to corresponding datum in list of lists of lists of RGB triplets
 	# - REMOVE that coordinate from the unused coordinates list
-	unusedCoords.remove(unusedCoords[randomIndex])
+	unusedCoords.remove(chosenCoord)
 
 print('usedCoords array contains: ', usedCoords)
 print('unusedCoords array contains: ', unusedCoords)
+
+print('painting array is:\n', arr)
+
+# Create unique, date-time informative image file name.
+now = datetime.datetime.now()
+timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__%f')
+rndStr = ('%03x' % random.randrange(16**3)).lower()
+imgFileName = timeStamp + '-' + rndStr + '-colorGrowth-Py-rshift' + str(rshift) + '.png'
+
+im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
+im.save(imgFileName)
 
 # END REDEVELOPMENT (NEW ALGORITHM).
 
