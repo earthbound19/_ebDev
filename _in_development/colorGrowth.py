@@ -86,7 +86,9 @@ while unusedCoords:
 # - .. if it does:
 # - get a random coordinate:
 	unusedCoordsListSize = len(unusedCoords)
+	# The next two lines should be moved outside the while loop when coordinate mutation is working (or else the mutation will be effectively destroyed):
 	randomIndex = np.random.randint(0, unusedCoordsListSize)	# range is zero to unusedCoordsListSize-1 (not inclusive, and for zero-indexing we need that).
+	chosenCoord = unusedCoords[randomIndex]
 	# - TO DO: mutate coordinate . .
 		# - check if coordinate is in unused coordinates list
 		# - if so return to mutate color step
@@ -94,18 +96,15 @@ while unusedCoords:
 		# - if mutate fails N times return to get a random coordinate from that list step
 	# - TO DO: on mutate coordinate success:
 	# - write that coordinate to list of used coordinates
-	# DEV MORE SIMPLE FEASIBILITY ALGO check step:
-	chosenCoord = unusedCoords[randomIndex]
-	print('Randomly chosen coordinate is: ', chosenCoord)
+	usedCoords.append(chosenCoord)
+	# - IN PROGRESS: mutate color		(by rnd and avg rnd with prev. coord. color):
 	arrYidx = chosenCoord[0]
 	arrXidx = chosenCoord[1]
-	print('~[0]: ', arrYidx, ' ~[1]: ', arrXidx)
-	print('RGB color triplet at randomly chosen index is: ', arr[arrYidx][arrXidx])
-	usedCoords.append(chosenCoord)
-	# - IN PROGRESS: mutate color		(by rnd and avg rnd with prev. coord. color)
-	arr[arrYidx][arrXidx] = arr[arrYidx][arrXidx] + np.random.randint(-rshift, rshift+1, size=3)
-	# - TO DO: set prev color to that new color
-	# - TO DO: write that color data to corresponding datum in list of lists of lists of RGB triplets
+	newColor = previousColor + np.random.randint(-rshift, rshift+1, size=3) / 2
+	# - write that color data to corresponding datum in list of lists of lists of RGB triplets
+	arr[arrYidx][arrXidx] = newColor
+	# - set prev color to that new color
+	previousColor = newColor
 	# - REMOVE that coordinate from the unused coordinates list
 	unusedCoords.remove(chosenCoord)
 
