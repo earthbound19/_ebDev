@@ -38,6 +38,21 @@ print('Will generate ', numIMGsToMake, ' image(s).')
 arr = np.ones((height, width, 3)) * colorbase
 noir = [0, 0, 0]	# Black
 
+# Function takes two ints and shifts each up or down one or not at all.
+def mutateCoordinate(xCoordParam, yCoordParam):
+	xCoord = np.random.randint((xCoordParam - 1), xCoordParam + 2)
+	yCoord = np.random.randint((yCoordParam - 1), yCoordParam + 2)
+	# if necessary, move results back in range:
+	if (yCoord < 0):
+		yCoord = 0
+	if (yCoord > (width - 1)):
+		yCoord = (width - 1)
+	if (xCoord < 0):
+		xCoord = 0
+	if (xCoord > (height - 1)):
+		xCoord = (height - 1)
+	return [xCoord, yCoord]
+
 
 	# DEBUGGING / REFERENCE:
 	# Iterates through every datum in the three-dimensional list (array) :
@@ -89,29 +104,37 @@ while unusedCoords:
 	# The next two lines should be moved outside the while loop when coordinate mutation is working (or else the mutation will be effectively destroyed):
 	randomIndex = np.random.randint(0, unusedCoordsListSize)	# range is zero to unusedCoordsListSize-1 (not inclusive, and for zero-indexing we need that).
 	chosenCoord = unusedCoords[randomIndex]
-	# - TO DO: mutate coordinate . .
-		# - check if coordinate is in unused coordinates list
-		# - if so return to mutate color step
-		# - if not mutate again
-		# - if mutate fails N times return to get a random coordinate from that list step
-	# - TO DO: on mutate coordinate success:
+	mutatedCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])
+	# print(chosenCoord, ' : ', mutatedCoord)
+	# - TO DO: mutate coordinate, then:
+		# - check if coordinate is in used coordinates list
+	boolIsInUsedCoords = mutatedCoord in usedCoords		# Searches usedCoords for mutatedCoord and returns True/False depending on whether its in it
+	# - if it is, mutate again (jump to the next iteration of this while loop, via continue)
+	if boolIsInUsedCoords:
+		print('mutatedCoord ', mutatedCoord, ' is in usedCoords, will not use (will break this loop iteration and start over with a new loop iteration).')
+		print('usedCoords: ', usedCoords)
+		next
+	print('mutatedCoord ', mutatedCoord, ' is NOT in usedCoords, will USE')
+	print('usedCoords before append: ', usedCoords)
+	# if mutate succeeds:
 	# - write that coordinate to list of used coordinates
-	usedCoords.append(chosenCoord)
-	# - IN PROGRESS: mutate color		(by rnd and avg rnd with prev. coord. color):
-	arrYidx = chosenCoord[0]
-	arrXidx = chosenCoord[1]
+	usedCoords.append(mutatedCoord)
+	print('usedCoords AFTER append: ', usedCoords)
+	# - mutate color (by avg of rnd and prev. coord. color); I thought x and y would be 1 and 0 here because of how arr[] is structured? Crashes say otherwise:
+	arrXidx = chosenCoord[0]
+	arrYidx = chosenCoord[1]
 	newColor = previousColor + np.random.randint(-rshift, rshift+1, size=3) / 2
-	# - write that color data to corresponding datum in list of lists of lists of RGB triplets
+	# - write that color data to corresponding datum in list of lists of lists of RGB triplets:
 	arr[arrYidx][arrXidx] = newColor
 	# - set prev color to that new color
 	previousColor = newColor
 	# - REMOVE that coordinate from the unused coordinates list
 	unusedCoords.remove(chosenCoord)
 
-print('usedCoords array contains: ', usedCoords)
+# print('usedCoords array contains: ', usedCoords)
 print('unusedCoords array contains: ', unusedCoords)
 
-print('painting array is:\n', arr)
+# print('painting array is:\n', arr)
 
 # Create unique, date-time informative image file name.
 now = datetime.datetime.now()
@@ -128,9 +151,11 @@ im.save(imgFileName)
 # END SCRIPT RUN before so much former version of script reference to follow:
 sys.exit()
 
-# OLD, INEFFICIENT ALGORITHM.
+
+# FROM PRIOR ALGORITHM:
 # I could make these functions take and return tuples, but no. Syntaxy bleh. Re: https://stackoverflow.com/questions/1993727/expanding-tuples-into-arguments
 # Function takes two int range parameters and returns two random ints within that range
+# FUNCTION NOT NECESSARY in new algorithm? :
 def getRandomCoordinate(height, width):
 	# Create a coordinate pair (of values) and initialize a used coordinate list with it; this will be our start point for "bacterial growth:"
 	# range is zero to height-1 (not inclusive) :
@@ -138,59 +163,7 @@ def getRandomCoordinate(height, width):
 	xCoord = np.random.randint(0, width)
 	return yCoord, xCoord
 
-# Function takes two ints and shifts them up or down one or not at all.
-def mutateCoordinate(yCoordParam, xCoordParam):
-	# Clamp range to what will prevent going past ceiling or floor:
-	if yCoordParam < 1:
-		yCoordParam = 1
-	if yCoordParam > (height - 2):
-		yCoordParam = (height - 2)
-	yCoord = np.random.randint((yCoordParam - 1), (yCoordParam + 2))	#(upper range not inclusive)
-	# Clamp range to either wall if it would go past either:
-	if xCoordParam < 1:
-		xCoordParam = 1
-	if xCoordParam > (width - 2):
-		xCoordParam = (width - 2)
-	xCoord = np.random.randint((xCoordParam - 1), (xCoordParam + 2))	#(upper range not inclusive)
-	return yCoord, xCoord
-	
-
-coordinate = getRandomCoordinate(height, width)		# Uh, I think python is dynamically making a tuple there.
-previousCoordinate = coordinate
-usedPixelsList = [coordinate]
-
-# Searches n times for new coordinates, only adding ones to the used coordinate array which are not already in it; also pick a new random coordinate when we're stuck:
-pixelAlreadyUsedCount = 0
-for i in range(0, 80000):
-	# print('Previous coordinate is ', previousCoordinate)
-	# Mutate coordinate off previous coordinate:
-	yCoord, xCoord = mutateCoordinate(previousCoordinate[0], previousCoordinate[1])
-	coordinate = [yCoord, xCoord]
-	# print('New prospective coordinate is ', coordinate)
-	# Screen candidate new coordinate against array to see if it's already been used:
-	pixelAlreadyUsed = False
-	for j in usedPixelsList:
-		if coordinate == j:
-			pixelAlreadyUsed = True
-			pixelAlreadyUsedCount += 1
-			# print('pixelAlreadyUsedCount: ', pixelAlreadyUsedCount)
-			# If we've tried and failed to find an unused coordinate 42 times, we're clearly stuck, so pick a new random origin:
-			if pixelAlreadyUsedCount >= 42:
-				coordinate = getRandomCoordinate(height, width)
-				previousCoordinate = coordinate
-			# matchedCoordinate = coordinate
-	# If the randomly chosen coordinate has not been used before, use it and add it to the used array; otherwise do nothing and the outer loop will continue the search:
-	if pixelAlreadyUsed == False:
-		usedPixelsList.append(coordinate)
-		previousCoordinate = coordinate
-		arr[yCoord][xCoord] = arr[yCoord][xCoord] + np.random.randint(-rshift, rshift+1, size=3)
-		# print(arr[yCoord][xCoord])
-		# print('Appended new unused coordinate ', coordinate, ' to usedPixelsList.')
-	# else:
-		# print('Already used coordinate found was ', matchedCoordinate)
-
-im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-im.save('tst.png')
+# DELETED!
 
 # Optionally print the RGB values array:
 # print('RGB values array:\n', arr)
