@@ -1,4 +1,4 @@
-# THIS IS A REFERENCE SNAPSHOT of working development state of colorGrowth.py.
+# DEV SNAPSHOT of colorGrowth.py in working state (which randomly selects and fills pixels with a series of mutating colors; the next thing to do is a random pixel walk instead of random selection series)
 
 import datetime, random, argparse, ast, os.path
 import numpy as np
@@ -15,6 +15,7 @@ parser.add_argument('-c', '--colorbase', default='[157, 140, 157]', help='Base c
 args = parser.parse_args()		# When this function is called, if -h or --help was passed to the script, it will print the description and all defined help messages.
 
 numIMGsToMake, rshift, width, height = args.numimages, args.rshift, args.width, args.height
+# Interpreting -c (or --colorbase) argument as python literal and assigning that to a variable, re: https://stackoverflow.com/a/1894296/1397555
 colorbase = ast.literal_eval(args.colorbase)
 
 print('Will generate ', numIMGsToMake, ' image(s).')
@@ -22,9 +23,11 @@ print('Will generate ', numIMGsToMake, ' image(s).')
 arr = np.ones((height, width, 3)) * colorbase
 noir = [0, 0, 0]	# Black
 
+# Function takes two ints and shifts each up or down one or not at all.
 def mutateCoordinate(xCoordParam, yCoordParam):
 	xCoord = np.random.randint((xCoordParam - 1), xCoordParam + 2)
 	yCoord = np.random.randint((yCoordParam - 1), yCoordParam + 2)
+	# if necessary, move results back in range:
 	if (yCoord < 0):
 		yCoord = 0
 	if (yCoord > (width - 1)):
@@ -47,6 +50,7 @@ while unusedCoords:
 	randomIndex = np.random.randint(0, unusedCoordsListSize)
 	chosenCoord = unusedCoords[randomIndex]
 	mutatedCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])
+	boolIsInUsedCoords = mutatedCoord in usedCoords
 	if boolIsInUsedCoords:
 		print('mutatedCoord ', mutatedCoord, ' is in usedCoords, will not use (will break this loop iteration and start over with a new loop iteration).')
 		print('usedCoords: ', usedCoords)
@@ -61,7 +65,10 @@ while unusedCoords:
 	arr[arrYidx][arrXidx] = newColor
 	previousColor = newColor
 	unusedCoords.remove(chosenCoord)
+	# WHY DOES THAT BREAK if I remove mutatedCoord from that?
+	# ALSO why does it hang with params -w 20 -t 10?
 
+# print('usedCoords array contains: ', usedCoords)
 print('unusedCoords array contains: ', unusedCoords)
 
 now = datetime.datetime.now()
