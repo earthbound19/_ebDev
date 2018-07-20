@@ -23,20 +23,28 @@ print('Will generate ', numIMGsToMake, ' image(s).')
 print('Initializing uniform color canvas array . . .')
 arr = np.ones((height, width, 3)) * colorbase
 
-# Function takes two ints and shifts each up or down one or not at all.
+# Function takes two ints and shifts each up or down one or not at all. I know, it doesn't recieve a tuple as input but it gives one as output:
 def mutateCoordinate(xCoordParam, yCoordParam):
 	xCoord = np.random.randint((xCoordParam - 1), xCoordParam + 2)
 	yCoord = np.random.randint((yCoordParam - 1), yCoordParam + 2)
-	# if necessary, move results back in range:
-	if (yCoord < 0):
-		yCoord = 0
-	if (yCoord > (width - 1)):
-		yCoord = (width - 1)
+	# if necessary, move results back in range of the array indices this is intended to be used with (zero-based indexing, so maximum (n - 1) and never less than 0) :
 	if (xCoord < 0):
+		# print('xCoord < !; is: ', xCoord)
 		xCoord = 0
-	if (xCoord > (height - 1)):
-		xCoord = (height - 1)
-	return xCoord, yCoord
+		# print('now xCoord ', xCoord)
+	if (xCoord > (width - 1)):
+		# print('xCoord > (width - 1) (', (width - 1), ')!; xCoord is: ', xCoord)
+		xCoord = (width - 1)
+		# print('now xCoord ', xCoord)
+	if (yCoord < 0):
+		# print('yCoord < !; is: ', yCoord)
+		yCoord = 0
+		# print('now yCoord ', yCoord)
+	if (yCoord > (height - 1)):
+		# print('yCoord > (height - 1) (', (height - 1), ')!; yCoord is: ', yCoord)
+		yCoord = (height - 1)
+		# print('now yCoord ', yCoord)
+	return [xCoord, yCoord]
 
 unusedCoords = []
 for yCoord in range(0, width):
@@ -57,32 +65,27 @@ while unusedCoords:
 	randomIndex = np.random.randint(0, unusedCoordsListSize)
 	# print('randomIndex: ', randomIndex)
 	chosenCoord = unusedCoords[randomIndex]
-	# mutatedCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])
-	print(chosenCoord)
-	# print(chosenCoord, ' : ', mutatedCoord)
-	unusedCoords.pop()		# DEBUG ONLY--comment out this line in production (not part of algorithm)!
-	# print(chosenCoord, ' (', chosenCoord[0], ', ', chosenCoord[1], ') : ', mutatedCoord)
-	# boolIsInUsedCoords = mutatedCoord in usedCoords
-	# if boolIsInUsedCoords:
+	mutatedCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])
+	# print(chosenCoord)
+	# print(chosenCoord[0], ',', mutatedCoord[0], ' : ', chosenCoord[1], ',', mutatedCoord[1])
+	boolIsInUsedCoords = mutatedCoord in usedCoords
+	if not boolIsInUsedCoords:		# If the coordinate is NOT in usedCoords, use it.
+		# print('mutatedCoord ', mutatedCoord, ' is NOT in usedCoords. Will use.')
+		# print('usedCoords before append: ', usedCoords)
+		usedCoords.append(mutatedCoord)
+		# print('usedCoords AFTER append: ', usedCoords)
+		arrXidx = chosenCoord[0]
+		arrYidx = chosenCoord[1]
+		newColor = previousColor + np.random.randint(-rshift, rshift+1, size=3) / 2
+		arr[arrYidx][arrXidx] = newColor
+		previousColor = newColor
+		unusedCoords.remove(mutatedCoord)
+	# else:		# If the coordinate is NOT NOT used (is used), print a debug message saying so. When this else clause is uncommented. This else clause should be commented out in the final script.
 		# print('mutatedCoord ', mutatedCoord, ' is in usedCoords. Will not re-use.')
 		# print('usedCoords: ', usedCoords)
-		# Do nothing; this loop will start over and look for another suitable mutated coordinate.
-	# else:
-		# print('mutatedCoord ', mutatedCoord, ' is NOT in usedCoords. Will use.')
-		# print('usedCoords: ', usedCoords)
-		# print('usedCoords before append: ', usedCoords)
-		# usedCoords.append(mutatedCoord)
-		# print('usedCoords AFTER append: ', usedCoords)
-		# arrXidx = chosenCoord[0]
-		# arrYidx = chosenCoord[1]
-		# newColor = previousColor + np.random.randint(-rshift, rshift+1, size=3) / 2
-		# arr[arrYidx][arrXidx] = newColor
-		# previousColor = newColor
-		# unusedCoords.remove(mutatedCoord)
-		# WHY DOES THAT BREAK if I remove mutatedCoord from that?
 
 # print('usedCoords array contains: ', usedCoords)
-# print('unusedCoords array contains: ', unusedCoords)
+print('unusedCoords array contains: ', unusedCoords)
 
 now = datetime.datetime.now()
 timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__%f')
