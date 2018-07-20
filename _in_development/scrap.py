@@ -20,8 +20,8 @@ colorbase = ast.literal_eval(args.colorbase)
 
 print('Will generate ', numIMGsToMake, ' image(s).')
 
+print('Initializing uniform color canvas array . . .')
 arr = np.ones((height, width, 3)) * colorbase
-noir = [0, 0, 0]	# Black
 
 # Function takes two ints and shifts each up or down one or not at all.
 def mutateCoordinate(xCoordParam, yCoordParam):
@@ -36,45 +36,61 @@ def mutateCoordinate(xCoordParam, yCoordParam):
 		xCoord = 0
 	if (xCoord > (height - 1)):
 		xCoord = (height - 1)
-	return [xCoord, yCoord]
+	return xCoord, yCoord
 
 unusedCoords = []
 for yCoord in range(0, width):
 	for xCoord in range(0, height):
 		unusedCoords.append([yCoord, xCoord])
+
+# print('unusedCoords: \n', unusedCoords)
+# sys.exit()
+
 usedCoords = []
 color = colorbase
 previousColor = color
+
+print('Generating image . . .')
 while unusedCoords:
 	unusedCoordsListSize = len(unusedCoords)
+	# print('unusedCoordsListSize: ', unusedCoordsListSize)
 	randomIndex = np.random.randint(0, unusedCoordsListSize)
+	# print('randomIndex: ', randomIndex)
 	chosenCoord = unusedCoords[randomIndex]
-	mutatedCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])
-	boolIsInUsedCoords = mutatedCoord in usedCoords
-	if boolIsInUsedCoords:
-		print('mutatedCoord ', mutatedCoord, ' is in usedCoords, will not use (will break this loop iteration and start over with a new loop iteration).')
-		print('usedCoords: ', usedCoords)
-		next
-	print('mutatedCoord ', mutatedCoord, ' is NOT in usedCoords, will USE')
-	print('usedCoords before append: ', usedCoords)
-	usedCoords.append(mutatedCoord)
-	print('usedCoords AFTER append: ', usedCoords)
-	arrXidx = chosenCoord[0]
-	arrYidx = chosenCoord[1]
-	newColor = previousColor + np.random.randint(-rshift, rshift+1, size=3) / 2
-	arr[arrYidx][arrXidx] = newColor
-	previousColor = newColor
-	unusedCoords.remove(chosenCoord)
-	# WHY DOES THAT BREAK if I remove mutatedCoord from that?
-	# ALSO why does it hang with params -w 20 -t 10?
+	# mutatedCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])
+	print(chosenCoord)
+	# print(chosenCoord, ' : ', mutatedCoord)
+	unusedCoords.pop()		# DEBUG ONLY--comment out this line in production (not part of algorithm)!
+	# print(chosenCoord, ' (', chosenCoord[0], ', ', chosenCoord[1], ') : ', mutatedCoord)
+	# boolIsInUsedCoords = mutatedCoord in usedCoords
+	# if boolIsInUsedCoords:
+		# print('mutatedCoord ', mutatedCoord, ' is in usedCoords. Will not re-use.')
+		# print('usedCoords: ', usedCoords)
+		# Do nothing; this loop will start over and look for another suitable mutated coordinate.
+	# else:
+		# print('mutatedCoord ', mutatedCoord, ' is NOT in usedCoords. Will use.')
+		# print('usedCoords: ', usedCoords)
+		# print('usedCoords before append: ', usedCoords)
+		# usedCoords.append(mutatedCoord)
+		# print('usedCoords AFTER append: ', usedCoords)
+		# arrXidx = chosenCoord[0]
+		# arrYidx = chosenCoord[1]
+		# newColor = previousColor + np.random.randint(-rshift, rshift+1, size=3) / 2
+		# arr[arrYidx][arrXidx] = newColor
+		# previousColor = newColor
+		# unusedCoords.remove(mutatedCoord)
+		# WHY DOES THAT BREAK if I remove mutatedCoord from that?
 
 # print('usedCoords array contains: ', usedCoords)
-print('unusedCoords array contains: ', unusedCoords)
+# print('unusedCoords array contains: ', unusedCoords)
 
 now = datetime.datetime.now()
 timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__%f')
 rndStr = ('%03x' % random.randrange(16**3)).lower()
 imgFileName = timeStamp + '-' + rndStr + '-colorGrowth-Py-rshift' + str(rshift) + '.png'
 
+# Oddly, the terminal may hang (on Windows only) unless we pad the following operations with print statements:
+print('saving image ', imgFileName, ' . . .')
 im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
 im.save(imgFileName)
+print('done.')
