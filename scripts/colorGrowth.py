@@ -118,7 +118,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			# If coordiante mutation fails mutationFailureThreshold times, get a new random coordinate, and print a message saying so.
 			if failedCoordMutationCount == mutationFailureThreshold:
 				chosenCoord = getRNDunusedCoord()
-				print('New random coordinate mutation threshold met at ', mutationFailureThreshold, ' failed coordinate mutations. Selected new random coordinate: ', chosenCoord)
+				print('Coordinate mutation failure threshold met at ', mutationFailureThreshold, '. New random, unused coordinate selected: ', chosenCoord)
 				printProgress()
 				failedCoordMutationCount = 0
 		# Running progress report:
