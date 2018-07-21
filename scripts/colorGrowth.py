@@ -20,13 +20,14 @@ from PIL import Image
 import sys		# Testing only: DELETE THIS LINE or comment out on commit!
 
 # mutationFailureThresholdAreaPercentDefault = 0.008		# For a 100x50 image, this becomes 40.
-mutationFailureThresholdAreaPercentDefault = 0.00008		# For a 1000x500 image, this becomes 40.
+mutationFailureThresholdAreaPercentDefault = 0.00124
+# mutationFailureThresholdAreaPercentDefault = 0.00008		# For a 1000x500 image, this becomes 40.
 
 parser = argparse.ArgumentParser(description='Renders an image like colored horizontal plasma fibers via python\'s numpy and PIL modules. Output file names are random. Horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
 parser.add_argument('-n', '--numimages', type=int, default=7, help='How many images to generate. Default 7.')
-parser.add_argument('-w', '--width', type=int, default=1200, help='Width of output image(s). Default 1200.')
-parser.add_argument('-t', '--height', type=int, default=600, help='Height of output image(s). Default 600.')
-parser.add_argument('-r', '--rshift', type=int, default=4, help='Vary R, G and B channel values randomly in the range negative this value or positive this value. Note that this means the range is rshift times two. Defaut 4. Ripped or torn looking color streaks are more likely toward 6 or higher.')
+parser.add_argument('-w', '--width', type=int, default=250, help='Width of output image(s). Default 1200.')
+parser.add_argument('-t', '--height', type=int, default=125, help='Height of output image(s). Default 600.')
+parser.add_argument('-r', '--rshift', type=int, default=2, help='Vary R, G and B channel values randomly in the range negative this value or positive this value. Note that this means the range is rshift times two. Defaut 4. Ripped or torn looking color streaks are more likely toward 6 or higher.')
 parser.add_argument('-c', '--colorbase', default='[157, 140, 157]', help='Base color that the image is initialized with, expressed as a python list or single number that will be assigned to every RGB value. If a list, put the parameter in quotes and give the RGB values in the format e.g. \'[255, 70, 70]\' for a deep red (Red = 255, Green = 70, Blue = 70). If a single number e.g. just 150, it will result in a medium-light gray of [150, 150, 150] where 150 is assigned to every Red, Green and Blue channel in every pixel in the first column of the image. All RGB channel values must be between 0 and 255. Default [157, 140, 157] (a medium-medium light, slightly violet gray). NOTE: unless until the color tearing problem is fixed, you are more likely to get a look of torn dramatically different colors the further away from nuetral gray your base color is.')
 parser.add_argument('-m', '--mutationFailureThreshold', type=int, default=-1, help='How many times coordinate mutation must fail to trigger selection of a random new available unplotted coordinate. Default value in script is -1, which if the script sees as a value, it will calculate a new value based on the formula: (width * height * int(mutationFailureThresholdAreaPercentDefault) (or, mutationFailureThresholdAreaPercentDefault percent of surface area) (see the declaration of that variable near the top of this script).')
 
@@ -116,7 +117,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		else:		# If the coordinate is NOT NOT used (is used), print a progress message. If you have infinite patience and don't want it slowed down by a progress message, comment out this else clause and the next indented lines of code.
 			failedCoordMutationCount += 1
 			# If coordiante mutation fails mutationFailureThreshold times, get a new random coordinate, and print a message saying so.
-			if failedCoordMutationCount == mutationFailureThreshold:
+			if failedCoordMutationCount == 1:
 				chosenCoord = getRNDunusedCoord()
 				print('Coordinate mutation failure threshold met at ', mutationFailureThreshold, '. New random, unused coordinate selected: ', chosenCoord)
 				printProgress()
