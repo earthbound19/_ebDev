@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Output file names are random. Original colorFibers.py (of which this is an evolution) horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
+# Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Or I hope eventually it will. Right now it is actually just one undead bacterium which poops mutated colors. Output file names are random. Original colorFibers.py (of which this is an evolution) horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
 # USAGE
 Run this script without any paramaters, or for CLI options:
