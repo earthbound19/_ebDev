@@ -19,9 +19,11 @@ import numpy as np
 from PIL import Image
 import sys		# Testing only: DELETE THIS LINE or comment out on commit!
 
+# Note that this variable must be a decimal between 0 and 1:
 # mutationFailureThresholdAreaPercentDefault = 0.008		# For a 100x50 image, this becomes 40.
-mutationFailureThresholdAreaPercentDefault = 0.00124
+mutationFailureThresholdAreaPercentDefault = 0.00248
 # mutationFailureThresholdAreaPercentDefault = 0.00008		# For a 1000x500 image, this becomes 40.
+# mutationFailureThresholdAreaPercentDefault = 0.00013
 
 parser = argparse.ArgumentParser(description='Renders an image like colored horizontal plasma fibers via python\'s numpy and PIL modules. Output file names are random. Horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
 parser.add_argument('-n', '--numimages', type=int, default=7, help='How many images to generate. Default 7.')
@@ -117,7 +119,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		else:		# If the coordinate is NOT NOT used (is used), print a progress message. If you have infinite patience and don't want it slowed down by a progress message, comment out this else clause and the next indented lines of code.
 			failedCoordMutationCount += 1
 			# If coordiante mutation fails mutationFailureThreshold times, get a new random coordinate, and print a message saying so.
-			if failedCoordMutationCount == 1:
+			if failedCoordMutationCount == mutationFailureThreshold:
 				chosenCoord = getRNDunusedCoord()
 				print('Coordinate mutation failure threshold met at ', mutationFailureThreshold, '. New random, unused coordinate selected: ', chosenCoord)
 				printProgress()
@@ -125,6 +127,10 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		# Running progress report:
 		reportStatsNthLoopCounter += 1
 		if reportStatsNthLoopCounter == reportStatsEveryNthLoop:
+			# Save a progress snapshot image.
+			print('Saving prograss snapshot image colorGrowthState.png . . .')
+			im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
+			im.save('colorGrowthState.png')
 			printProgress()
 			reportStatsNthLoopCounter = 0
 		# Optional lines of code that will terminate all coordinate and color mutation at an arbitary number of mutations:
@@ -142,7 +148,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	now = datetime.datetime.now()
 	timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__%f')
 	rndStr = ('%03x' % random.randrange(16**3)).lower()
-	imgFileName = timeStamp + '-' + rndStr + '-colorGrowth-Py-rshift' + str(rshift) + '.png'
+	imgFileName = timeStamp + '-' + rndStr + '-colorGrowth-Py-r' + str(rshift) + '-m' + str(mutationFailureThreshold) + '.png'
 
 	print('Saving image ', imgFileName, ' . . .')
 	im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
