@@ -2,7 +2,8 @@
 # Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Output file names are random. Original colorFibers.py (of which this is an evolution) horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
 # USAGE
-# python thisScript.py
+Run this script without any paramaters, or for CLI options:
+# python thisScript.py -h
 
 # DEPENDENCIES
 # python 3 with numpy and PIL modules, also other modules you'll see in the import statements here near the start of this script.
@@ -17,7 +18,6 @@
 import datetime, random, argparse, ast, os.path
 import numpy as np
 from PIL import Image
-import sys		# Testing only: DELETE THIS LINE or comment out on commit!
 
 # Note that this variable must be a decimal between 0 and 1:
 # mutationFailureThresholdAreaPercentDefault = 0.008		# For a 100x50 image, this becomes 40.
