@@ -1,8 +1,10 @@
+print('IN FURTHER DEVELOPMENT. Only some tweaks of unused CLI options to implement.')
+
 # DESCRIPTION
 # Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Or I hope eventually it will. Right now it is actually just one undead bacterium which poops mutated colors. Output file names are random. Original colorFibers.py (of which this is an evolution) horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
 # USAGE
-Run this script without any paramaters, or for CLI options:
+# Run this script without any paramaters, or for CLI options:
 # python thisScript.py -h
 
 # DEPENDENCIES
@@ -19,28 +21,21 @@ import datetime, random, argparse, ast, os.path
 import numpy as np
 from PIL import Image
 
-# Note that this variable must be a decimal between 0 and 1:
-# mutationFailureThresholdAreaPercentDefault = 0.008		# For a 100x50 image, this becomes 40.
-mutationFailureThresholdAreaPercentDefault = 0.00248
-# mutationFailureThresholdAreaPercentDefault = 0.00008		# For a 1000x500 image, this becomes 40.
-# mutationFailureThresholdAreaPercentDefault = 0.00013
-
 parser = argparse.ArgumentParser(description='Renders an image like colored horizontal plasma fibers via python\'s numpy and PIL modules. Output file names are random. Horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
 parser.add_argument('-n', '--numimages', type=int, default=7, help='How many images to generate. Default 7.')
 parser.add_argument('-w', '--width', type=int, default=250, help='Width of output image(s). Default 1200.')
 parser.add_argument('-t', '--height', type=int, default=125, help='Height of output image(s). Default 600.')
 parser.add_argument('-r', '--rshift', type=int, default=2, help='Vary R, G and B channel values randomly in the range negative this value or positive this value. Note that this means the range is rshift times two. Defaut 4. Ripped or torn looking color streaks are more likely toward 6 or higher.')
 parser.add_argument('-c', '--colorbase', default='[157, 140, 157]', help='Base color that the image is initialized with, expressed as a python list or single number that will be assigned to every RGB value. If a list, put the parameter in quotes and give the RGB values in the format e.g. \'[255, 70, 70]\' for a deep red (Red = 255, Green = 70, Blue = 70). If a single number e.g. just 150, it will result in a medium-light gray of [150, 150, 150] where 150 is assigned to every Red, Green and Blue channel in every pixel in the first column of the image. All RGB channel values must be between 0 and 255. Default [157, 140, 157] (a medium-medium light, slightly violet gray). NOTE: unless until the color tearing problem is fixed, you are more likely to get a look of torn dramatically different colors the further away from nuetral gray your base color is.')
-parser.add_argument('-m', '--mutationFailureThreshold', type=int, default=-1, help='How many times coordinate mutation must fail to trigger selection of a random new available unplotted coordinate. Default value in script is -1, which if the script sees as a value, it will calculate a new value based on the formula: (width * height * int(mutationFailureThresholdAreaPercentDefault) (or, mutationFailureThresholdAreaPercentDefault percent of surface area) (see the declaration of that variable near the top of this script).')
+parser.add_argument('-m', '--mutationFailureThreshold', type=int, help='How many times coordinate mutation must fail to trigger selection of a random new available unplotted coordinate.')
+parser.add_argument('-p', '--percentMutation', type=float, default=0.00248, help='(Alternate for -m) What percent of the canvas would have been covered by failed mutation before it triggers selection of a random new available unplotted coordinate. Percent expressed as a decimal between 0 and 1. Overrides -m | --mutationFailureThreshold.')
+parser.add_argument('-s', '--stopPaintingPercent', type=int, default=65, help='What percent canvas fill to stop painting at.')
+parser.add_argument('-e', '--eternalMutation', help='(Alternate for -s) Mutate coordinates eternally until the canvas is filled. If used, everrides -s | --stopPaintingPercent.')
 
 args = parser.parse_args()		# When this function is called, if -h or --help was passed to the script, it will print the description and all defined help messages.
 
-numIMGsToMake, rshift, width, height, mutationFailureThreshold = args.numimages, args.rshift, args.width, args.height, args.mutationFailureThreshold
-if mutationFailureThreshold == (-1):
-	mutationFailureThreshold = int(width * height * mutationFailureThresholdAreaPercentDefault)
-	print('No -m or --mutationFailureThreshold value was passed to the script (was at default -1). That value has been set to int(width * height * ', mutationFailureThresholdAreaPercentDefault, '), or ', mutationFailureThreshold)
+numIMGsToMake, rshift, width, height, mutationFailureThreshold, percentMutation, stopPaintingPercent, eternalMutation = args.numimages, args.rshift, args.width, args.height, args.mutationFailureThreshold, args.percentMutation, args.stopPaintingPercent, args.eternalMutation
 # Interpreting -c (or --colorbase) argument as python literal and assigning that to a variable, re: https://stackoverflow.com/a/1894296/1397555
-
 colorbase = ast.literal_eval(args.colorbase)
 purple = [255, 0, 255]	# Purple
 
