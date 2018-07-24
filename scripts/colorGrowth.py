@@ -31,7 +31,7 @@ parser.add_argument('-r', '--rshift', type=int, default=2, help='Vary R, G and B
 parser.add_argument('-c', '--colorbase', default='[157, 140, 157]', help='Base color that the image is initialized with, expressed as a python list or single number that will be assigned to every RGB value. If a list, put the parameter in quotes and give the RGB values in the format e.g. \'[255, 70, 70]\' for a deep red (Red = 255, Green = 70, Blue = 70). If a single number e.g. just 150, it will result in a medium-light gray of [150, 150, 150] where 150 is assigned to every Red, Green and Blue channel in every pixel in the first column of the image. All RGB channel values must be between 0 and 255. Default [157, 140, 157] (a medium-medium light, slightly violet gray). NOTE: unless until the color tearing problem is fixed, you are more likely to get a look of torn dramatically different colors the further away from nuetral gray your base color is.')
 parser.add_argument('-p', '--percentMutation', type=float, default=0.00248, help='(Alternate for -m) What percent of the canvas would have been covered by failed mutation before it triggers selection of a random new available unplotted coordinate. Percent expressed as a decimal (float) between 0 and 1.')
 parser.add_argument('-f', '--failedMutationsThreshold', type=int, help='How many times coordinate mutation must fail to trigger selection of a random new available unplotted coordinate. Overrides -p | --percentMutation if present.')
-parser.add_argument('-s', '--stopPaintingPercent', type=float, default=0.65, help='What percent canvas fill to stop painting at. To paint until the canvas is filled (which is infeasible for higher resolutions, pass 1. If not 1, value should be a percent expressed as a decimal (float) between 0 and 1.')
+parser.add_argument('-s', '--stopPaintingPercent', type=float, default=0.65, help='What percent canvas fill to stop painting at. To paint until the canvas is filled (which is infeasible for higher resolutions), pass 1 (for 100 percent) If not 1, value should be a percent expressed as a decimal (float) between 0 and 1.')
 
 args = parser.parse_args()		# When this function is called, if -h or --help was passed to the script, it will print the description and all defined help messages.
 
@@ -88,7 +88,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		for xCoord in range(0, height):
 			unusedCoords.append([yCoord, xCoord])
 
-	totalDesiredCoords = width * height
+	totalPixels = width * height
 
 	# function gets random unused coordinate:
 	def getRNDunusedCoord():
@@ -108,7 +108,15 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 
 	# function prints coordinate plotting statistics (progress report):
 	def printProgress():
-		print('Unused coordinates: ', len(unusedCoords), ' Have plotted ', len(usedCoords), 'of ', totalDesiredCoords, ' desired coordinates.')
+		print('Unused coordinates: ', len(unusedCoords), ' Have plotted ', len(usedCoords), 'of ', terminatePaintingAtFillCount, ' desired coordinates (on a canvas of', totalPixels, ' pixels).')
+
+	# Create unique, date-time informative image file name. Note that this will represent when the painting began, not when it ended (~State filename will be based off this).
+	now = datetime.datetime.now()
+	timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__%f')
+	rndStr = ('%03x' % random.randrange(16**3)).lower()
+	imgFileBaseName = timeStamp + '-' + rndStr + '-colorGrowth-Py-r' + str(rshift) + '-f' + str(failedMutationsThreshold)
+	imgFileName = imgFileBaseName + '.png'
+	stateIMGfileName = imgFileBaseName + '-state.png' 
 
 	print('Generating image . . .')
 	while unusedCoords:
@@ -140,7 +148,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			# Save a progress snapshot image.
 			print('Saving prograss snapshot image colorGrowthState.png . . .')
 			im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-			im.save('colorGrowthState.png')
+			im.save(stateIMGfileName)
 			printProgress()
 			reportStatsNthLoopCounter = 0
 		# This will terminate all coordinate and color mutation at an arbitary number of mutations.
@@ -149,18 +157,9 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			print('Pixel fill (successful mutation) termination count ', terminatePaintingAtFillCount, ' reached. Ending algorithm and painting.')
 			break
 
-	# print('usedCoords array contains: ', usedCoords)
-	# print('unusedCoords array contains: ', unusedCoords)
-	# print('painting array is:\n', arr)
-
-	# Create unique, date-time informative image file name.
-	now = datetime.datetime.now()
-	timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__%f')
-	rndStr = ('%03x' % random.randrange(16**3)).lower()
-	imgFileName = timeStamp + '-' + rndStr + '-colorGrowth-Py-r' + str(rshift) + '-m' + str(failedMutationsThreshold) + '.png'
-
+	# Save result and delete state image file.
 	print('Saving image ', imgFileName, ' . . .')
 	im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
 	im.save(imgFileName)
 	print('Created ', n, ' of ', numIMGsToMake, ' images.')
-
+	os.remove(stateIMGfileName)
