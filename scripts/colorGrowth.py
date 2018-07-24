@@ -11,6 +11,7 @@
 # TO DO:
 # - Option to save an output frame from every successful mutation (to make an animation from all frames).
 # - Option to use a parameter preset (which would be literally just an input file of desired parameters?). Is this a standardized nixy' CLI thing to do?
+# - Make the canvas color base optionally different than the pixel mutation base color. In fact maybe make the canvas default white.
 # - Clamp randomly generated colors that are out of gamut (back into the gamut).
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
 # - Have more than one bacterium alive at a time (and have all their colors evolve on creating new bacterium).
