@@ -1,5 +1,3 @@
-print('IN FURTHER DEVELOPMENT. Only some tweaks of unused CLI options to implement.')
-
 # DESCRIPTION
 # Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Or I hope eventually it will. Right now it is actually just one undead bacterium which poops mutated colors. Output file names are random. Original colorFibers.py (of which this is an evolution) horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
@@ -11,15 +9,18 @@ print('IN FURTHER DEVELOPMENT. Only some tweaks of unused CLI options to impleme
 # python 3 with numpy and PIL modules, also other modules you'll see in the import statements here near the start of this script.
 
 # TO DO:
+# - Option to save an output frame from every successful mutation (to make an animation from all frames).
 # - Clamp randomly generated colors that are out of gamut (back into the gamut).
+# - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
 # - Have more than one bacterium alive at a time (and have all their colors evolve on creating new bacterium).
-# - Have optional random new color selection when mutationFailureThreshold is met (coordination mutation fails)?
+# - Have optional random new color selection when failedMutationsThreshold is met (coordination mutation fails)?
 
 
 # CODE
 import datetime, random, argparse, ast, os.path
 import numpy as np
 from PIL import Image
+import sys
 
 parser = argparse.ArgumentParser(description='Renders an image like colored horizontal plasma fibers via python\'s numpy and PIL modules. Output file names are random. Horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
 parser.add_argument('-n', '--numimages', type=int, default=7, help='How many images to generate. Default 7.')
@@ -27,17 +28,30 @@ parser.add_argument('-w', '--width', type=int, default=250, help='Width of outpu
 parser.add_argument('-t', '--height', type=int, default=125, help='Height of output image(s). Default 600.')
 parser.add_argument('-r', '--rshift', type=int, default=2, help='Vary R, G and B channel values randomly in the range negative this value or positive this value. Note that this means the range is rshift times two. Defaut 4. Ripped or torn looking color streaks are more likely toward 6 or higher.')
 parser.add_argument('-c', '--colorbase', default='[157, 140, 157]', help='Base color that the image is initialized with, expressed as a python list or single number that will be assigned to every RGB value. If a list, put the parameter in quotes and give the RGB values in the format e.g. \'[255, 70, 70]\' for a deep red (Red = 255, Green = 70, Blue = 70). If a single number e.g. just 150, it will result in a medium-light gray of [150, 150, 150] where 150 is assigned to every Red, Green and Blue channel in every pixel in the first column of the image. All RGB channel values must be between 0 and 255. Default [157, 140, 157] (a medium-medium light, slightly violet gray). NOTE: unless until the color tearing problem is fixed, you are more likely to get a look of torn dramatically different colors the further away from nuetral gray your base color is.')
-parser.add_argument('-m', '--mutationFailureThreshold', type=int, help='How many times coordinate mutation must fail to trigger selection of a random new available unplotted coordinate.')
-parser.add_argument('-p', '--percentMutation', type=float, default=0.00248, help='(Alternate for -m) What percent of the canvas would have been covered by failed mutation before it triggers selection of a random new available unplotted coordinate. Percent expressed as a decimal between 0 and 1. Overrides -m | --mutationFailureThreshold.')
-parser.add_argument('-s', '--stopPaintingPercent', type=int, default=65, help='What percent canvas fill to stop painting at.')
-parser.add_argument('-e', '--eternalMutation', help='(Alternate for -s) Mutate coordinates eternally until the canvas is filled. If used, everrides -s | --stopPaintingPercent.')
+parser.add_argument('-p', '--percentMutation', type=float, default=0.00248, help='(Alternate for -m) What percent of the canvas would have been covered by failed mutation before it triggers selection of a random new available unplotted coordinate. Percent expressed as a decimal (float) between 0 and 1.')
+parser.add_argument('-f', '--failedMutationsThreshold', type=int, help='How many times coordinate mutation must fail to trigger selection of a random new available unplotted coordinate. Overrides -p | --percentMutation if present.')
+parser.add_argument('-s', '--stopPaintingPercent', type=float, default=0.65, help='What percent canvas fill to stop painting at. To paint until the canvas is filled (which is infeasible for higher resolutions, pass 1. If not 1, value should be a percent expressed as a decimal (float) between 0 and 1.')
 
 args = parser.parse_args()		# When this function is called, if -h or --help was passed to the script, it will print the description and all defined help messages.
 
-numIMGsToMake, rshift, width, height, mutationFailureThreshold, percentMutation, stopPaintingPercent, eternalMutation = args.numimages, args.rshift, args.width, args.height, args.mutationFailureThreshold, args.percentMutation, args.stopPaintingPercent, args.eternalMutation
+numIMGsToMake = args.numimages
+rshift = args.rshift
+width = args.width
+height = args.height
+percentMutation = args.percentMutation
+failedMutationsThreshold = args.failedMutationsThreshold
+stopPaintingPercent = args.stopPaintingPercent
 # Interpreting -c (or --colorbase) argument as python literal and assigning that to a variable, re: https://stackoverflow.com/a/1894296/1397555
 colorbase = ast.literal_eval(args.colorbase)
 purple = [255, 0, 255]	# Purple
+
+allesPixelCount = width * height
+
+# Conditional argument overrides logic.
+# If no specific threshold given, calculate it. Otherwise what is given will be used (it will not be altered):
+if failedMutationsThreshold == None:
+	failedMutationsThreshold = int(allesPixelCount * percentMutation)
+terminatePaintingAtFillCount = int(allesPixelCount * stopPaintingPercent)
 
 print('Will generate ', numIMGsToMake, ' image(s).')
 
@@ -113,10 +127,10 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			unusedCoords.remove(chosenCoord)
 		else:		# If the coordinate is NOT NOT used (is used), print a progress message. If you have infinite patience and don't want it slowed down by a progress message, comment out this else clause and the next indented lines of code.
 			failedCoordMutationCount += 1
-			# If coordiante mutation fails mutationFailureThreshold times, get a new random coordinate, and print a message saying so.
-			if failedCoordMutationCount == mutationFailureThreshold:
+			# If coordiante mutation fails failedMutationsThreshold times, get a new random coordinate, and print a message saying so.
+			if failedCoordMutationCount == failedMutationsThreshold:
 				chosenCoord = getRNDunusedCoord()
-				print('Coordinate mutation failure threshold met at ', mutationFailureThreshold, '. New random, unused coordinate selected: ', chosenCoord)
+				print('Coordinate mutation failure threshold met at ', failedMutationsThreshold, '. New random, unused coordinate selected: ', chosenCoord)
 				printProgress()
 				failedCoordMutationCount = 0
 		# Running progress report:
@@ -128,12 +142,11 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			im.save('colorGrowthState.png')
 			printProgress()
 			reportStatsNthLoopCounter = 0
-		# Optional lines of code that will terminate all coordinate and color mutation at an arbitary number of mutations:
-		# terminateMutationsAt = 500
-		# debugCount = len(usedCoords)
-		# if debugCount == terminateMutationsAt:
-		# 	print('Arbitrary mutation termination count reached. Ending algorithm.')
-		# 	break
+		# This will terminate all coordinate and color mutation at an arbitary number of mutations.
+		usedCoordsCount = len(usedCoords)
+		if usedCoordsCount == terminatePaintingAtFillCount:
+			print('Pixel fill (successful mutation) termination count ', terminatePaintingAtFillCount, ' reached. Ending algorithm and painting.')
+			break
 
 	# print('usedCoords array contains: ', usedCoords)
 	# print('unusedCoords array contains: ', unusedCoords)
@@ -143,7 +156,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	now = datetime.datetime.now()
 	timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__%f')
 	rndStr = ('%03x' % random.randrange(16**3)).lower()
-	imgFileName = timeStamp + '-' + rndStr + '-colorGrowth-Py-r' + str(rshift) + '-m' + str(mutationFailureThreshold) + '.png'
+	imgFileName = timeStamp + '-' + rndStr + '-colorGrowth-Py-r' + str(rshift) + '-m' + str(failedMutationsThreshold) + '.png'
 
 	print('Saving image ', imgFileName, ' . . .')
 	im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
