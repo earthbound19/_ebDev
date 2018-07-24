@@ -1,49 +1,56 @@
 # DESCRIPTION
-# Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Or I hope eventually it will. Right now it is actually just one undead bacterium which poops mutated colors. Output file names are random. Original colorFibers.py (of which this is an evolution) horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
+# Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Right now it is one virtual, undead bacterium which randomly walks and poops mutated colors. A possible future update will manage multiple bacteria. Output file names are random. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
 # USAGE
-# Run this script without any paramaters, or for CLI options:
+# Run this script without any paramaters, and it will use a default set of parameters:
+# python thisScript.py
+# To see available parameters, run this script with the -h switch:
 # python thisScript.py -h
 
 # DEPENDENCIES
-# python 3 with numpy and PIL modules, also other modules you'll see in the import statements here near the start of this script.
+# python 3 with the various modules installed that you see in the import statements here near the start of this script.
 
 # TO DO:
+# - For coordinate mutation, pick from an array of possible mutation states which dwindles (shrink the array of reference states every time a mutation against one of them fails). This avoids redundant failed mutations, and could extremely help efficiency, and has implications for altering use of the -f parameter).
 # - Option to save an output frame from every successful mutation (to make an animation from all frames).
 # - Option to use a parameter preset (which would be literally just an input file of desired parameters?). Is this a standardized nixy' CLI thing to do?
-# - Make the canvas color base optionally different than the pixel mutation base color. In fact maybe make the canvas default white.
 # - Clamp randomly generated colors that are out of gamut (back into the gamut).
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
 # - Have more than one bacterium alive at a time (and have all their colors evolve on creating new bacterium).
+# - Initialize mutationColorbase by random selection from a .hexplt color scheme
 # - Have optional random new color selection when failedMutationsThreshold is met (coordination mutation fails)?
+#  - Do random new color selection from a .hexplt color scheme
 
 
 # CODE
 import datetime, random, argparse, ast, os.path
 import numpy as np
 from PIL import Image
+import sys
 
-parser = argparse.ArgumentParser(description='Renders an image like colored horizontal plasma fibers via python\'s numpy and PIL modules. Output file names are random. Horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
-parser.add_argument('-n', '--numimages', type=int, default=7, help='How many images to generate. Default 7.')
+parser = argparse.ArgumentParser(description='Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Right now it is one virtual, undead bacterium which randomly walks and poops mutated colors. A possible future update will manage multiple bacteria. Output file names are random. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
+parser.add_argument('-n', '--numberOfImages', type=int, default=7, help='How many images to generate. Default 7.')
 parser.add_argument('-w', '--width', type=int, default=250, help='Width of output image(s). Default 1200.')
 parser.add_argument('-t', '--height', type=int, default=125, help='Height of output image(s). Default 600.')
 parser.add_argument('-r', '--rshift', type=int, default=2, help='Vary R, G and B channel values randomly in the range negative this value or positive this value. Note that this means the range is rshift times two. Defaut 4. Ripped or torn looking color streaks are more likely toward 6 or higher.')
-parser.add_argument('-c', '--colorbase', default='[157, 140, 157]', help='Base color that the image is initialized with, expressed as a python list or single number that will be assigned to every RGB value. If a list, put the parameter in quotes and give the RGB values in the format e.g. \'[255, 70, 70]\' for a deep red (Red = 255, Green = 70, Blue = 70). If a single number e.g. just 150, it will result in a medium-light gray of [150, 150, 150] where 150 is assigned to every Red, Green and Blue channel in every pixel in the first column of the image. All RGB channel values must be between 0 and 255. Default [157, 140, 157] (a medium-medium light, slightly violet gray). NOTE: unless until the color tearing problem is fixed, you are more likely to get a look of torn dramatically different colors the further away from nuetral gray your base color is.')
+parser.add_argument('-m', '--mutationColorbase', default='[157, 140, 157]', help='Base initialization color for pixels, which randomly mutates as painting proceeds. Expressed as a python list or single number that will be assigned to every RGB value. If a list, put the parameter in quotes and give the RGB values in the format e.g. \'[255, 70, 70]\' (this example would produce a deep red, as Red = 255, Green = 70, Blue = 70). A single number example like just 150 will result in a medium-light gray of [150, 150, 150] (Red = 150, Green = 150, Blue = 150). All values must be between 0 and 255. Default [157, 140, 157] (a medium-medium light, slightly violet gray).')
+parser.add_argument('-c', '--canvasColor', default='[157, 140, 157]', help='Canvas color. If omitted, defaults to whatever mutationColorbase is. If included, may differ from mutationColorbase. This option must be given in the same format as mutationColorbase.')
 parser.add_argument('-p', '--percentMutation', type=float, default=0.00248, help='(Alternate for -m) What percent of the canvas would have been covered by failed mutation before it triggers selection of a random new available unplotted coordinate. Percent expressed as a decimal (float) between 0 and 1.')
 parser.add_argument('-f', '--failedMutationsThreshold', type=int, help='How many times coordinate mutation must fail to trigger selection of a random new available unplotted coordinate. Overrides -p | --percentMutation if present.')
 parser.add_argument('-s', '--stopPaintingPercent', type=float, default=0.65, help='What percent canvas fill to stop painting at. To paint until the canvas is filled (which is infeasible for higher resolutions), pass 1 (for 100 percent) If not 1, value should be a percent expressed as a decimal (float) between 0 and 1.')
 
 args = parser.parse_args()		# When this function is called, if -h or --help was passed to the script, it will print the description and all defined help messages.
 
-numIMGsToMake = args.numimages
+numIMGsToMake = args.numberOfImages
 rshift = args.rshift
 width = args.width
 height = args.height
 percentMutation = args.percentMutation
 failedMutationsThreshold = args.failedMutationsThreshold
 stopPaintingPercent = args.stopPaintingPercent
-# Interpreting -c (or --colorbase) argument as python literal and assigning that to a variable, re: https://stackoverflow.com/a/1894296/1397555
-colorbase = ast.literal_eval(args.colorbase)
+# Interpreting -c (or --mutationColorbase) argument as python literal and assigning that to a variable, re: https://stackoverflow.com/a/1894296/1397555
+mutationColorbase = ast.literal_eval(args.mutationColorbase)
+canvasColor = ast.literal_eval(args.canvasColor)
 purple = [255, 0, 255]	# Purple
 
 allesPixelCount = width * height
@@ -53,11 +60,16 @@ allesPixelCount = width * height
 if failedMutationsThreshold == None:
 	failedMutationsThreshold = int(allesPixelCount * percentMutation)
 terminatePaintingAtFillCount = int(allesPixelCount * stopPaintingPercent)
+# If no canvas color given, use mutationColorbase:
+if canvasColor == None:
+	canvasColor = mutationColorbase
 
 print('Will generate ', numIMGsToMake, ' image(s).')
 
+# Loop making N (-n | numimages) images.
+# "Initialize" (paint over entire) the "canvas" with the chosen base canvas color:
 for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* the loop.
-	arr = np.ones((height, width, 3)) * colorbase
+	arr = np.ones((height, width, 3)) * canvasColor
 		# DEBUGGING / REFERENCE:
 		# Iterates through every datum in the three-dimensional list (array) :
 		# for a, b in enumerate(arr):
@@ -100,7 +112,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# Initialize chosenCoord:
 	chosenCoord = getRNDunusedCoord()
 	usedCoords = []
-	color = colorbase
+	color = mutationColorbase
 	previousColor = color
 	failedCoordMutationCount = 0
 	reportStatsEveryNthLoop = 1800
