@@ -10,6 +10,7 @@
 
 # TO DO:
 # - Option to save an output frame from every successful mutation (to make an animation from all frames).
+# - Option to use a parameter preset (which would be literally just an input file of desired parameters?). Is this a standardized nixy' CLI thing to do?
 # - Clamp randomly generated colors that are out of gamut (back into the gamut).
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
 # - Have more than one bacterium alive at a time (and have all their colors evolve on creating new bacterium).
@@ -20,7 +21,6 @@
 import datetime, random, argparse, ast, os.path
 import numpy as np
 from PIL import Image
-import sys
 
 parser = argparse.ArgumentParser(description='Renders an image like colored horizontal plasma fibers via python\'s numpy and PIL modules. Output file names are random. Horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
 parser.add_argument('-n', '--numimages', type=int, default=7, help='How many images to generate. Default 7.')
