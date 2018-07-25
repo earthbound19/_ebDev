@@ -11,7 +11,6 @@
 # python 3 with the various modules installed that you see in the import statements here near the start of this script.
 
 # TO DO:
-# - For coordinate mutation, pick from an array of possible mutation states which dwindles (shrink the array of reference states every time a mutation against one of them fails). This avoids redundant failed mutations, and could extremely help efficiency, and has implications for altering use of the -f parameter).
 # - Option to save an output frame from every successful mutation (to make an animation from all frames).
 # - Option to use a parameter preset (which would be literally just an input file of desired parameters?). Is this a standardized nixy' CLI thing to do?
 # - Clamp randomly generated colors that are out of gamut (back into the gamut).
@@ -20,6 +19,7 @@
 # - Initialize mutationColorbase by random selection from a .hexplt color scheme
 # - Have optional random new color selection when failedMutationsThreshold is met (coordination mutation fails)?
 #  - Do random new color selection from a .hexplt color scheme
+# - Major new feature? : Initialize arr[] from an image, pick a random coordinate from the image, and use the color at that coordinate both as the origin coordinate and the color at that coordinate as mutationColorbase
 
 
 # CODE
@@ -134,11 +134,9 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	while unusedCoords:
 		chosenCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])
 		boolIsInUsedCoords = chosenCoord in usedCoords
-		if not boolIsInUsedCoords:		# If the coordinate is NOT in usedCoords, use it.
+		if not boolIsInUsedCoords:		# If the coordinate is NOT in usedCoords, use it (whether or not it is, the coordinate is still mutated; this loop keeps mutating the coordinate (and pooping colors on newly arrived at unused coordinates) until terminate conditions are met).
 			# print('chosenCoord ', chosenCoord, ' is NOT in usedCoords. Will use.')
-			# print('usedCoords before append: ', usedCoords)
 			usedCoords.append(chosenCoord)
-			# print('usedCoords AFTER append: ', usedCoords)
 			previousCoord = chosenCoord
 			arrXidx = chosenCoord[0]
 			arrYidx = chosenCoord[1]
@@ -146,7 +144,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			arr[arrYidx][arrXidx] = newColor
 			previousColor = newColor
 			unusedCoords.remove(chosenCoord)
-		else:		# If the coordinate is NOT NOT used (is used), print a progress message. If you have infinite patience and don't want it slowed down by a progress message, comment out this else clause and the next indented lines of code.
+		else:		# If the coordinate is NOT NOT used (is used), print a progress message.
 			failedCoordMutationCount += 1
 			# If coordiante mutation fails failedMutationsThreshold times, get a new random coordinate, and print a message saying so.
 			if failedCoordMutationCount == failedMutationsThreshold:
