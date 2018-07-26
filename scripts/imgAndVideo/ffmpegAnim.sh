@@ -41,17 +41,15 @@ fi
 # ex commands to fetch and parse src pix dimensions is in getDoesIMGinstagram.sh.
 # an example command wut does some math as would be needer per this algo: echo "scale=5; 3298 / 1296" | bc
 
-# horked from renumberFiles.sh:
-gfind *.$4 > allFiles.txt
-dos2unix allFiles.txt
-arraySize=$(wc -l < allFiles.txt)
-numDigitsOf_arraySize=${#arraySize}
-rm allFiles.txt
+# Assumes that all input files have the same character count in the file base name:
+lastFoundTypeFile=`gfind *.png | tail -n 1`
+lastFoundTypeFileNameNoExt=${lastFoundTypeFile%.*}
+digitsPadCount=${#lastFoundTypeFileNameNoExt}
 
 echo executing ffmpeg command . . .
 # default codec for file type and UTvideo options both follow; comment out whatever you don't want; for the first you can change the _out.ttt file type to e.g. .mp4, .gif, etc.:
-ffmpeg -y -f image2 -framerate $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -vf fps=$2 -crf $3 _out.mp4
-# ffmpeg -y -f image2 -framerate $1 -i %0"$numDigitsOf_arraySize"d.$4 $rescaleParams -vf fps=$2 -crf $3 -codec:v utvideo _out.avi
+ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $rescaleParams -vf fps=$2 -crf $3 _out.mp4
+# ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $rescaleParams -vf fps=$2 -crf $3 -codec:v utvideo _out.avi
 
 		# EXPERIMENT re: https://stackoverflow.com/a/45465730
 		# ffmpeg -y -i seeing_noaudio.mp4 -c copy -f h264 seeing_noaudio.h264
