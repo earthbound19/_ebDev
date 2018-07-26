@@ -11,7 +11,6 @@
 # python 3 with the various modules installed that you see in the import statements here near the start of this script.
 
 # TO DO:
-# - Option to save an output frame from every successful mutation (to make an animation from all frames).
 # - Option to use a parameter preset (which would be literally just an input file of desired parameters?). Is this a standardized nixy' CLI thing to do?
 # - Clamp randomly generated colors that are out of gamut (back into the gamut).
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
@@ -38,6 +37,7 @@ parser.add_argument('-c', '--canvasColor', default='[157, 140, 157]', help='Canv
 parser.add_argument('-p', '--percentMutation', type=float, default=0.00248, help='(Alternate for -m) What percent of the canvas would have been covered by failed mutation before it triggers selection of a random new available unplotted coordinate. Percent expressed as a decimal (float) between 0 and 1.')
 parser.add_argument('-f', '--failedMutationsThreshold', type=int, help='How many times coordinate mutation must fail to trigger selection of a random new available unplotted coordinate. Overrides -p | --percentMutation if present.')
 parser.add_argument('-s', '--stopPaintingPercent', type=float, default=0.65, help='What percent canvas fill to stop painting at. To paint until the canvas is filled (which is infeasible for higher resolutions), pass 1 (for 100 percent) If not 1, value should be a percent expressed as a decimal (float) between 0 and 1.')
+parser.add_argument('-a', '--animationSaveEveryNframes', type=int, help='Every N successful coordinate and color mutations, save an animation frame into a subfolder named after the intended final art file. To save every frame, set this to 1, or to save every 3rd frame set it to 3, etc. Saves zero-padded numbered frames to a subfolder which may be strung together into an animation of the entire painting process (for example via ffmpegAnim.sh). May substantially slow down render, and can also create many, many gigabytes of data, depending. Off by default. To switch it on, use it (with a number).')
 
 args = parser.parse_args()		# When this function is called, if -h or --help was passed to the script, it will print the description and all defined help messages.
 
@@ -48,6 +48,7 @@ height = args.height
 percentMutation = args.percentMutation
 failedMutationsThreshold = args.failedMutationsThreshold
 stopPaintingPercent = args.stopPaintingPercent
+animationSaveEveryNframes = args.animationSaveEveryNframes
 # Interpreting -c (or --mutationColorbase) argument as python literal and assigning that to a variable, re: https://stackoverflow.com/a/1894296/1397555
 mutationColorbase = ast.literal_eval(args.mutationColorbase)
 canvasColor = ast.literal_eval(args.canvasColor)
@@ -69,6 +70,8 @@ print('Will generate ', numIMGsToMake, ' image(s).')
 # Loop making N (-n | numimages) images.
 # "Initialize" (paint over entire) the "canvas" with the chosen base canvas color:
 for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* the loop.
+	animationSaveNFramesCounter = 0
+	animationFrameCounter = 0
 	arr = np.ones((height, width, 3)) * canvasColor
 		# DEBUGGING / REFERENCE:
 		# Iterates through every datum in the three-dimensional list (array) :
@@ -128,7 +131,13 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	rndStr = ('%03x' % random.randrange(16**3)).lower()
 	imgFileBaseName = timeStamp + '-' + rndStr + '-colorGrowth-Py-r' + str(rshift) + '-f' + str(failedMutationsThreshold)
 	imgFileName = imgFileBaseName + '.png'
-	stateIMGfileName = imgFileBaseName + '-state.png' 
+	stateIMGfileName = imgFileBaseName + '-state.png'
+	animFramesFolderName = imgFileBaseName + '_frames'
+
+	if animationSaveEveryNframes:	# If that has a value that isn't None, create a subfolder to write frames to:
+		# Also, initailize a varialbe which is how many zeros to pad animation save frame file (numbers) to, based on how many frames will be rendered:
+		padAnimationSaveFramesNumbersTo = len(str(terminatePaintingAtFillCount))
+		os.mkdir(animFramesFolderName)
 
 	print('Generating image . . .')
 	while unusedCoords:
@@ -144,6 +153,16 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			arr[arrYidx][arrXidx] = newColor
 			previousColor = newColor
 			unusedCoords.remove(chosenCoord)
+			# Also, if a parameter was passed saying to do so, save an animation frame (if we are at the Nth (-a) mutation:
+			if animationSaveEveryNframes:
+				if (animationSaveNFramesCounter % animationSaveEveryNframes) == 0:
+					strOfThat = str(animationFrameCounter)
+					frameFilePathAndFileName = animFramesFolderName + '/' + strOfThat.zfill(padAnimationSaveFramesNumbersTo) + '.png'
+					im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
+					im.save(frameFilePathAndFileName)
+				animationSaveNFramesCounter += 1
+				animationFrameCounter += 1		# Increment that *after* because by default ffmpeg expects frame count to start at 0.
+
 		else:		# If the coordinate is NOT NOT used (is used), print a progress message.
 			failedCoordMutationCount += 1
 			# If coordiante mutation fails failedMutationsThreshold times, get a new random coordinate, and print a message saying so.
