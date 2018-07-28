@@ -34,8 +34,8 @@ parser.add_argument('-n', '--numberOfImages', type=int, default=7, help='How man
 parser.add_argument('-w', '--width', type=int, default=250, help='Width of output image(s). Default 1200.')
 parser.add_argument('-t', '--height', type=int, default=125, help='Height of output image(s). Default 600.')
 parser.add_argument('-r', '--rshift', type=int, default=2, help='Vary R, G and B channel values randomly in the range negative this value or positive this value. Note that this means the range is rshift times two. Defaut 4. Ripped or torn looking color streaks are more likely toward 6 or higher.')
-parser.add_argument('-m', '--mutationColorbase', default='[157, 140, 157]', help='Base initialization color for pixels, which randomly mutates as painting proceeds. Expressed as a python list or single number that will be assigned to every RGB value. If a list, put the parameter in quotes and give the RGB values in the format e.g. \'[255, 70, 70]\' (this example would produce a deep red, as Red = 255, Green = 70, Blue = 70). A single number example like just 150 will result in a medium-light gray of [150, 150, 150] (Red = 150, Green = 150, Blue = 150). All values must be between 0 and 255. Default [157, 140, 157] (a medium-medium light, slightly violet gray).')
-parser.add_argument('-c', '--canvasColor', default='[157, 140, 157]', help='Canvas color. If omitted, defaults to whatever mutationColorbase is. If included, may differ from mutationColorbase. This option must be given in the same format as mutationColorbase.')
+parser.add_argument('-c', '--colorMutationBase', default='[157, 140, 157]', help='Base initialization color for pixels, which randomly mutates as painting proceeds. Expressed as a python list or single number that will be assigned to every RGB value. If a list, put the parameter in quotes and give the RGB values in the format e.g. \'[255, 70, 70]\' (this example would produce a deep red, as Red = 255, Green = 70, Blue = 70). A single number example like just 150 will result in a medium-light gray of [150, 150, 150] (Red = 150, Green = 150, Blue = 150). All values must be between 0 and 255. Default [157, 140, 157] (a medium-medium light, slightly violet gray).')
+parser.add_argument('-b', '--backgroundColor', default='[157, 140, 157]', help='Canvas color. If omitted, defaults to whatever colorMutationBase is. If included, may differ from colorMutationBase. This option must be given in the same format as colorMutationBase.')
 parser.add_argument('-p', '--percentMutation', type=float, default=0.00248, help='(Alternate for -m) What percent of the canvas would have been covered by failed mutation before it triggers selection of a random new available unplotted coordinate. Percent expressed as a decimal (float) between 0 and 1.')
 parser.add_argument('-f', '--failedMutationsThreshold', type=int, help='How many times coordinate mutation must fail to trigger selection of a random new available unplotted coordinate. Overrides -p | --percentMutation if present.')
 parser.add_argument('-s', '--stopPaintingPercent', type=float, default=0.65, help='What percent canvas fill to stop painting at. To paint until the canvas is filled (which is infeasible for higher resolutions), pass 1 (for 100 percent) If not 1, value should be a percent expressed as a decimal (float) between 0 and 1.')
@@ -51,9 +51,9 @@ percentMutation = args.percentMutation
 failedMutationsThreshold = args.failedMutationsThreshold
 stopPaintingPercent = args.stopPaintingPercent
 animationSaveEveryNframes = args.animationSaveEveryNframes
-# Interpreting -c (or --mutationColorbase) argument as python literal and assigning that to a variable, re: https://stackoverflow.com/a/1894296/1397555
-mutationColorbase = ast.literal_eval(args.mutationColorbase)
-canvasColor = ast.literal_eval(args.canvasColor)
+# Interpreting -c (or --colorMutationBase) argument as python literal and assigning that to a variable, re: https://stackoverflow.com/a/1894296/1397555
+colorMutationBase = ast.literal_eval(args.colorMutationBase)
+backgroundColor = ast.literal_eval(args.backgroundColor)
 purple = [255, 0, 255]	# Purple
 
 allesPixelCount = width * height
@@ -63,9 +63,9 @@ allesPixelCount = width * height
 if failedMutationsThreshold == None:
 	failedMutationsThreshold = int(allesPixelCount * percentMutation)
 terminatePaintingAtFillCount = int(allesPixelCount * stopPaintingPercent)
-# If no canvas color given, use mutationColorbase:
-if canvasColor == None:
-	canvasColor = mutationColorbase
+# If no canvas color given, use colorMutationBase:
+if backgroundColor == None:
+	backgroundColor = colorMutationBase
 
 print('Will generate ', numIMGsToMake, ' image(s).')
 
@@ -74,7 +74,7 @@ print('Will generate ', numIMGsToMake, ' image(s).')
 for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* the loop.
 	animationSaveNFramesCounter = 0
 	animationFrameCounter = 0
-	arr = np.ones((height, width, 3)) * canvasColor
+	arr = np.ones((height, width, 3)) * backgroundColor
 		# DEBUGGING / REFERENCE:
 		# Iterates through every datum in the three-dimensional list (array) :
 		# for a, b in enumerate(arr):
@@ -117,7 +117,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# Initialize chosenCoord:
 	chosenCoord = getRNDunusedCoord()
 	usedCoords = []
-	color = mutationColorbase
+	color = colorMutationBase
 	previousColor = color
 	failedCoordMutationCount = 0
 	reportStatsEveryNthLoop = 1800
