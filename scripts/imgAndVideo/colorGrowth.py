@@ -25,7 +25,7 @@
 import datetime, random, argparse, ast, os.path
 import numpy as np
 from PIL import Image
-# import sys
+import sys
 
 parser = argparse.ArgumentParser(description='Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Right now it is one virtual, undead bacterium which randomly walks and poops mutated colors. A possible future update will manage multiple bacteria. Output file names are random. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
 parser.add_argument('-n', '--numberOfImages', type=int, default=7, help='How many images to generate. Default 7.')
@@ -36,6 +36,7 @@ parser.add_argument('-b', '--backgroundColor', default='[157, 140, 157]', help='
 parser.add_argument('-c', '--colorMutationBase', help='Base initialization color for pixels, which randomly mutates as painting proceeds. If omitted, defaults to whatever backgroundColor is. If included, may differ from backgroundColor. This option must be given in the same format as backgroundColor.')
 parser.add_argument('-p', '--percentMutation', type=float, default=0.02, help='(Alternate for -m) What percent of the canvas would have been covered by failed mutation before it triggers selection of a random new available unplotted coordinate. Percent expressed as a decimal (float) between 0 and 1. Default 0.043 (about 4 percent).')
 parser.add_argument('-f', '--failedMutationsThreshold', type=int, help='How many times coordinate mutation must fail to trigger selection of a random new available unplotted coordinate. Overrides -p | --percentMutation if present.')
+parser.add_argument('-d', '--revertColorOnMutationFail', type=int, default=1, help='If (-f | --failedMutationsThreshold) is reached, revert color to color mutation base (-c | --colorMutationBase). Default 1 (true). If you use this at all you want to change the default 1 (true) by passing 0 (false). If false, color will change more in the painting. If true, color will only evolve as much as coordinates successfully evolve.')
 parser.add_argument('-s', '--stopPaintingPercent', type=float, default=0.475, help='What percent canvas fill to stop painting at. To paint until the canvas is filled (which is infeasible for higher resolutions), pass 1 (for 100 percent) If not 1, value should be a percent expressed as a decimal (float) between 0 and 1. Default 0.475 (about 48 percent).')
 parser.add_argument('-a', '--animationSaveEveryNframes', type=int, help='Every N successful coordinate and color mutations, save an animation frame into a subfolder named after the intended final art file. To save every frame, set this to 1, or to save every 3rd frame set it to 3, etc. Saves zero-padded numbered frames to a subfolder which may be strung together into an animation of the entire painting process (for example via ffmpegAnim.sh). May substantially slow down render, and can also create many, many gigabytes of data, depending. Off by default. To switch it on, use it (with a number).')
 
@@ -47,6 +48,7 @@ width = args.width
 height = args.height
 percentMutation = args.percentMutation
 failedMutationsThreshold = args.failedMutationsThreshold
+revertColorOnMutationFail = args.revertColorOnMutationFail
 stopPaintingPercent = args.stopPaintingPercent
 animationSaveEveryNframes = args.animationSaveEveryNframes
 # Interpreting -c (or --colorMutationBase) argument as python literal and assigning that to a variable, re: https://stackoverflow.com/a/1894296/1397555
@@ -82,7 +84,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		# 			print('--- arr[', a, '][', i, '][', x, ']:\n', y)
 		# 			felf = 'nor'
 
-	# function takes two ints and shifts each up or down one or not at all. I know, it doesn't recieve a tuple as input but it gives one as output:
+	# function takes two ints and shifts each up or down one or not at all. I know, it doesn't receive a tuple as input but it gives one as output:
 	def mutateCoordinate(xCoordParam, yCoordParam):
 		xCoord = np.random.randint((xCoordParam - 1), xCoordParam + 2)
 		yCoord = np.random.randint((yCoordParam - 1), yCoordParam + 2)
@@ -170,6 +172,9 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 				print('Coordinate mutation failure threshold met at ', failedMutationsThreshold, '. New random, unused coordinate selected: ', chosenCoord)
 				printProgress()
 				failedCoordMutationCount = 0
+				# if a switch was passed saying to revert or randomise the color mutation base when we reach revertColorOnMutationFail, do so (actually, change the "previous color" to the mutation color base, and the next color mutation will be off that) :
+				if revertColorOnMutationFail == 1:
+					previousColor = colorMutationBase
 		# Running progress report:
 		reportStatsNthLoopCounter += 1
 		if reportStatsNthLoopCounter == reportStatsEveryNthLoop:
