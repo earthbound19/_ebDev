@@ -35,7 +35,7 @@ else
 fi
 
 # Count number of files so we can figure out how many 0 columns to pad numbers with via printf:
-numberOfFiles=$(find . -maxdepth 1 -iname "*.$fileExt" | wc -l | tr -d ' ')
+numberOfFiles=$(gfind . -maxdepth 1 -iname "*.$fileExt" | wc -l | tr -d ' ')
 		echo Found $numberOfFiles files of type $fileExt.
 padToDigits=${#numberOfFiles}
 		echo Will pad numbers in folder names to $padToDigits digits.
@@ -44,21 +44,24 @@ padToDigits=${#numberOfFiles}
 
 # MAIN LOGIC
 # Adapted from and thanks to a genius breath yon; https://stackoverflow.com/a/29118145 -- for axing files in subdirs into subdirs by count, check another answer there:
-n=$((`find . -maxdepth 1 -iname "*.$fileExt" | wc -l`/$numberToAxeOn+1))
+n=$((`gfind . -maxdepth 1 -iname "*.$fileExt" | wc -l`/$numberToAxeOn+1))
 # Variables used in the coming control block to break up lines of a text file (created by and useful for other scripts) into partitioned copies of it in created subfolders:
 linesCPmultiplier=1
 linesCPStartAtMultiple=1
 for i in `seq 1 $n`;
 do
 	zeroPaddedNumber=`printf "%0"$padToDigits"d" $i`
-			# echo padded number for folder name is $zeroPaddedNumber . . .
-    if ! [ -d $folderPrefix"$zeroPaddedNumber" ]; then mkdir $folderPrefix"$zeroPaddedNumber"; fi
-    find . -maxdepth 1 -iname "*.$fileExt" | head -n $numberToAxeOn | xargs -i mv "{}" $folderPrefix"$zeroPaddedNumber"
+		folderName=$folderPrefix"$zeroPaddedNumber"
+    if ! [ -d $folderName ]; then mkdir $folderName; fi
+		# WORKS ON CYGWIN:
+    # gfind . -maxdepth 1 -iname "*.$fileExt" | head -n $numberToAxeOn | xargs -i mv "{}" $folderName
+		# WORKS ON MAC where the cygwin command *doesn't* work--! will it work on cygwin also? :
+		gfind . -maxdepth 1 -iname "*.$fileExt" | head -n $numberToAxeOn | xargs -I {} mv {} $folderName
 			# Only do anything with IMGlistByMostSimilar.txt if it exists:
 			if [ -f ./IMGlistByMostSimilar.txt ]
 			# re: https://unix.stackexchange.com/a/47423/110338
 			then
-				tail -n+$linesCPStartAtMultiple IMGlistByMostSimilar.txt | head -n$numberToAxeOn > $folderPrefix"$zeroPaddedNumber"/IMGlistByMostSimilar.txt
+				tail -n+$linesCPStartAtMultiple IMGlistByMostSimilar.txt | head -n$numberToAxeOn > $folderName/IMGlistByMostSimilar.txt
 				linesCPStartAtMultiple=$(( ($linesCPmultiplier * $numberToAxeOn) + 1))
 				linesCPmultiplier=$(($linesCPmultiplier + 1))
 						# echo werf $linesCPmultiplier
