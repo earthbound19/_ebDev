@@ -18,6 +18,7 @@
 # - Initialize mutationColorbase by random selection from a .hexplt color scheme
 # - Have optional random new color selection when failedMutationsThreshold is met (coordination mutation fails)?
 #  - Do random new color selection from a .hexplt color scheme
+# - Optionally revert to coordinate before last known successful mutation on coordinate mutation fail (instead of continuing random walk)
 # - Major new feature? : Initialize arr[] from an image, pick a random coordinate from the image, and use the color at that coordinate both as the origin coordinate and the color at that coordinate as mutationColorbase
 
 
