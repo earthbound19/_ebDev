@@ -42,7 +42,8 @@ fi
 # an example command wut does some math as would be needer per this algo: echo "scale=5; 3298 / 1296" | bc
 
 # Assumes that all input files have the same character count in the file base name; xargs is to handle extremely long file lists, and gsed is to remove the leading ./ from the listing:
-lastFoundTypeFile=`gfind -name "*.png" -print0 | xargs | gsed 's/\.\/\(.*\)/\1/g'`
+# gfind \*.$1 -maxdepth 1 
+lastFoundTypeFile=`gfind \*.$4 -maxdepth 1 -print0 | xargs | gsed 's/\.\/\(.*\)/\1/g'`
 lastFoundTypeFileNameNoExt=${lastFoundTypeFile%.*}
 digitsPadCount=${#lastFoundTypeFileNameNoExt}
 
