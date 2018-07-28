@@ -11,6 +11,7 @@
 # python 3 with the various modules installed that you see in the import statements here near the start of this script.
 
 # TO DO:
+# - If -a is greater than 1 are saved frames numbered by multiples of a or a+1? If not the latter fix it so it's the latter.
 # - Option to use a parameter preset (which would be literally just an input file of desired parameters?). Is this a standardized nixy' CLI thing to do?
 # - Clamp randomly generated colors that are out of gamut (back into the gamut).
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
