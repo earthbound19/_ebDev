@@ -41,9 +41,9 @@ fi
 # ex commands to fetch and parse src pix dimensions is in getDoesIMGinstagram.sh.
 # an example command wut does some math as would be needer per this algo: echo "scale=5; 3298 / 1296" | bc
 
-# Assumes that all input files have the same character count in the file base name; xargs is to handle extremely long file lists, and gsed is to remove the leading ./ from the listing:
-# gfind \*.$1 -maxdepth 1 
-lastFoundTypeFile=`gfind \*.$4 -maxdepth 1 -print0 | xargs | gsed 's/\.\/\(.*\)/\1/g'`
+# Assumes that all input files have the same character count in the file base name; revised from command given in comment on the line after it which uses xargs (as *that* command choked on cygwin) ; maybe it will break again on Mac, argh:
+lastFoundTypeFile=`gfind \*.$4 -maxdepth 1 | tail -n 1`
+# deprecated (or maybe just alternate on mac :( command:		lastFoundTypeFile=`gfind \*.$4 -maxdepth 1 -print0 | xargs | gsed 's/\.\/\(.*\)/\1/g'`
 lastFoundTypeFileNameNoExt=${lastFoundTypeFile%.*}
 digitsPadCount=${#lastFoundTypeFileNameNoExt}
 
