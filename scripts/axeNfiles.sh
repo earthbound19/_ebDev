@@ -48,26 +48,33 @@ n=$((`gfind . -maxdepth 1 -iname "*.$fileExt" | wc -l`/$numberToAxeOn+1))
 # Variables used in the coming control block to break up lines of a text file (created by and useful for other scripts) into partitioned copies of it in created subfolders:
 linesCPmultiplier=1
 linesCPStartAtMultiple=1
+# For folder name by number zero-padding digits:
+highestAxeFolderNumberWillBe=$(($n * $numberToAxeOn))
+folderNumberDigitsPadding=${#highestAxeFolderNumberWillBe}
 for i in `seq 1 $n`;
 do
 	zeroPaddedNumber=`printf "%0"$padToDigits"d" $i`
-		folderName=$folderPrefix"$zeroPaddedNumber"
-    if ! [ -d $folderName ]; then mkdir $folderName; fi
-		# WORKS ON CYGWIN:
-    # gfind . -maxdepth 1 -iname "*.$fileExt" | head -n $numberToAxeOn | xargs -i mv "{}" $folderName
-		# WORKS ON MAC where the cygwin command *doesn't* work--! will it work on cygwin also? :
-		gfind . -maxdepth 1 -iname "*.$fileExt" | head -n $numberToAxeOn | xargs -I {} mv {} $folderName
-			# Only do anything with IMGlistByMostSimilar.txt if it exists:
-			if [ -f ./IMGlistByMostSimilar.txt ]
-			# re: https://unix.stackexchange.com/a/47423/110338
-			then
-				tail -n+$linesCPStartAtMultiple IMGlistByMostSimilar.txt | head -n$numberToAxeOn > $folderName/IMGlistByMostSimilar.txt
-				linesCPStartAtMultiple=$(( ($linesCPmultiplier * $numberToAxeOn) + 1))
-				linesCPmultiplier=$(($linesCPmultiplier + 1))
-						# echo werf $linesCPmultiplier
-						# echo worf $linesCPStartAtMultiple
-			fi
+	toEndFrameMultiple=$(($i * $numberToAxeOn))
+	paddedToEndFrameMultiple=`printf "%0"$folderNumberDigitsPadding"d" $toEndFrameMultiple`
+	folderName=$folderPrefix"$paddedToEndFrameMultiple"
+	if [ $i == 1 ]; then helpFirstFolderName=$folderName; fi    # Store first folder name in variable for later help text.
+	if [ $i == $n ]; then helpLastFolderName=$folderName; fi    # Store last folder name in variable for later help text.
+	if ! [ -d $folderName ]; then mkdir $folderName; fi
+	# WORKS ON CYGWIN:	
+	# gfind . -maxdepth 1 -iname "*.$fileExt" | head -n $numberToAxeOn | xargs -i mv "{}" $folderName
+	# WORKS ON MAC where the cygwin command *doesn't* work--! will it work on cygwin also? :
+	gfind . -maxdepth 1 -iname "*.$fileExt" | head -n $numberToAxeOn | xargs -I {} mv {} $folderName
+		# Only do anything with IMGlistByMostSimilar.txt if it exists:
+	if [ -f ./IMGlistByMostSimilar.txt ]
+	# re: https://unix.stackexchange.com/a/47423/110338
+	then
+		tail -n+$linesCPStartAtMultiple IMGlistByMostSimilar.txt | head -n$numberToAxeOn > $folderName/IMGlistByMostSimilar.txt
+		linesCPStartAtMultiple=$(( ($linesCPmultiplier * $numberToAxeOn) + 1))
+		linesCPmultiplier=$(($linesCPmultiplier + 1))
+				# echo werf $linesCPmultiplier
+				# echo worf $linesCPStartAtMultiple
+	fi
 done
 
 numeralOneToPadToDigits=`printf "%0"$padToDigits"d" 1`
-echo DONE. All files in this folder of type $fileExt have been axed by count $numberToAxeOn into folders named starting $folderPrefix"$numeralOneToPadToDigits" and ending $folderPrefix"$zeroPaddedNumber" \(if those are both the same folder name\, they are all in that one folder\)\. If the number of files of type $fileExt evenly divided by $numberToAxeOn\, the highest numbered folder will be empty\, so you know.
+echo DONE. All files in this folder of type $fileExt have been axed by count $numberToAxeOn into folders named starting $helpFirstFolderName and ending $helpLastFolderName \(if those are both the same folder name\, they are all in that one folder\)\. If the number of files of type $fileExt evenly divided by $numberToAxeOn\, the highest numbered folder will be empty\, so you know.
