@@ -16,7 +16,6 @@
 # - Initialize colorMutationBase by random selection from a .hexplt color scheme
 # - Coordinate mutation: optionally revert to coordinate before last known successful mutation on coordinate mutation fail (instead of continuing random walk)
 # - Color mutation: on coordinate mutation fail (and selection of new random coordinate), revert to colorMutationBase, OR select random new color (including from a .hexplt color scheme), OR continue with default behavior (continue color mutation from last reference color). Maybe make these options based on a string or letter value given for a switch.
-# - Clamp randomly generated colors that are out of gamut (back into the gamut).
 # - Have more than one bacterium alive at a time (and have all their colors evolve on creating new bacterium).
 # - Major new feature? : Initialize arr[] from an image, pick a random coordinate from the image, and use the color at that coordinate both as the origin coordinate and the color at that coordinate as colorMutationBase. Could also be used to continue terminated runs with the same or different parameters.
 
@@ -151,6 +150,8 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			arrXidx = chosenCoord[0]
 			arrYidx = chosenCoord[1]
 			newColor = previousColor + np.random.randint(-rshift, rshift+1, size=3) / 2
+			# Clip that within RGB range if it wandered outside of that range. If this slows it down too much and you don't care if colors randomly freak out (bitmap conversion seems to take colors outside range as wrapping around?) comment the next line out:
+			newColor = np.clip(newColor, 0, 255)
 			arr[arrYidx][arrXidx] = newColor
 			previousColor = newColor
 			unusedCoords.remove(chosenCoord)
