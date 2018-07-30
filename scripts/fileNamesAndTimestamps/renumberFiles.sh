@@ -14,13 +14,12 @@
 # CODE
 echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
 
-# Get count of files we want, and from that digits to pad to.
-# The necessity of deleting leading blank space is because of Mac. Re: https://stackoverflow.com/a/30927885 : GYAH! This doom was had 2018-04-19 Thursday 07:33 PM:
-filesCount=`gfind \*.$1 -maxdepth 1 | wc -l | tr -d ' '`
-digitsToPadTo=${#filesCount}
+# Get count of files we want, and from that digits to pad to. The following lines adapted in this revision of this script to work on Mac (the previous revision didn't) ; untested with Cygwin (windows).
+filesCount=`gfind . -maxdepth 1 -name "*.$1" | wc -l`
+digitsToPadTo=`expr $filesCount : '.*'`
 
 # Create array to use to loop over files.
-filesArray=`find . -maxdepth 1 -iname \*.$1`
+filesArray=`gfind . -maxdepth 1 -name "*.$1"`
 
 counter=0
 for filename in ${filesArray[@]}
