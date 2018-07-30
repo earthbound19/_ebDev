@@ -20,8 +20,8 @@
 
 # CODE
 # Kludge for titles having spaces in names:
-cp "$1" ./tmp.mp4
-eval "$(ffprobe -v error -of flat=s=_ -show_entries format=duration tmp.mp4)"
+cp "$1" ./tmp_bbE9pWyXSVshTm.mp4
+eval "$(ffprobe -v error -of flat=s=_ -show_entries format=duration tmp_bbE9pWyXSVshTm.mp4)"
 	# Stupid data wrangling necessary on Windows (which produces windows newlines that muck up intended functionality of the Cygwin echo command:
 	echo $format_duration > tmp_eHmZQ2YtWKr8ZV7YpU3MUn3nrMV2tPT8Ge.txt
 # NOTE: THE *0.9 means 90 percent, which is what bc will multiply the total seconds of the video by, which will give us a time (in seconds) ninety percent into the video, from which a later ffmpeg command will grab a frame from:
@@ -34,5 +34,5 @@ eval "$(ffprobe -v error -of flat=s=_ -show_entries format=duration tmp.mp4)"
 selectSecond=`echo "scale=0; $format_duration" | bc`
 
 # re: https://stackoverflow.com/a/1198191/1397555
-ffmpeg -ss $selectSecond -i tmp.mp4 -crf 1 -frames:v 1 oot.jpg
-rm tmp.mp4
+ffmpeg -ss $selectSecond -i tmp_bbE9pWyXSVshTm.mp4 -crf 1 -frames:v 1 oot.jpg
+rm tmp_bbE9pWyXSVshTm.mp4
