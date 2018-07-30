@@ -16,7 +16,7 @@
 # - Initialize colorMutationBase by random selection from a .hexplt color scheme
 # - Coordinate mutation: optionally revert to coordinate before last known successful mutation on coordinate mutation fail (instead of continuing random walk)
 # - Color mutation: on coordinate mutation fail (and selection of new random coordinate), revert to colorMutationBase, OR select random new color (including from a .hexplt color scheme), OR continue with default behavior (continue color mutation from last reference color). Maybe make these options based on a string or letter value given for a switch.
-# - Clamp randomly generated colors that are out of gamut (back into the gamut).
+# - Clamp randomly generated colors that are out of gamut (back into the gamut). For purposes of not letting colors dwindle at the edge of the gamut, this is ideally done (if less efficiently, because it checks at every mutation) at mutation time. POSSIBLE SOLUTION: https://docs.scipy.org/doc/numpy-1.14.0/reference/generated/numpy.clip.html
 # - Have more than one bacterium alive at a time (and have all their colors evolve on creating new bacterium).
 # - Major new feature? : Initialize arr[] from an image, pick a random coordinate from the image, and use the color at that coordinate both as the origin coordinate and the color at that coordinate as colorMutationBase. Could also be used to continue terminated runs with the same or different parameters.
 
