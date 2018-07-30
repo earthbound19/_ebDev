@@ -26,11 +26,11 @@ import numpy as np
 from PIL import Image
 import sys
 
-parser = argparse.ArgumentParser(description='Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Right now it is one virtual, undead bacterium which randomly walks and poops mutated colors. A possible future update will manage multiple bacteria. Output file names are random. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
+parser = argparse.ArgumentParser(description='Renders a PNG image like bacteria that produce random color mutations as they grow over a surface. Right now it is one virtual, undead bacterium. A planned update will host multiple virtual bacteria. Output file names are after the date plus random characters. Inspired by and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
 parser.add_argument('-n', '--numberOfImages', type=int, default=7, help='How many images to generate. Default 7.')
 parser.add_argument('-w', '--width', type=int, default=1200, help='Width of output image(s). Default 1200.')
 parser.add_argument('-t', '--height', type=int, default=400, help='Height of output image(s). Default 400.')
-parser.add_argument('-r', '--rshift', type=int, default=2, help='Vary R, G and B channel values randomly in the range negative this value or positive this value. Note that this means the range is rshift times two. Defaut 4. Ripped or torn looking color streaks are more likely toward 6 or higher. Default 2.')
+parser.add_argument('-r', '--rshift', type=int, default=2, help='Vary R, G and B channel values randomly in the range negative this value or positive this value. Note that this means the range is rshift times two. Defaut 2. Ripped or torn looking color streaks are more likely toward 6 or higher. Default 2.')
 parser.add_argument('-b', '--backgroundColor', default='[157, 140, 157]', help='Canvas color. Expressed as a python list or single number that will be assigned to every value in an RGB triplet. If a list, give the RGB values in the format \'[255,70,70]\' (if you add spaces after the commas, you must surround the parameter in single or double quotes). This example would produce a deep red, as Red = 255, Green = 70, Blue = 70). A single number example like just 150 will result in a medium-light gray of [150, 150, 150] (Red = 150, Green = 150, Blue = 150). All values must be between 0 and 255. Default [157, 140, 157] (a medium-medium light, slightly violet gray).')
 parser.add_argument('-c', '--colorMutationBase', help='Base initialization color for pixels, which randomly mutates as painting proceeds. If omitted, defaults to whatever backgroundColor is. If included, may differ from backgroundColor. This option must be given in the same format as backgroundColor.')
 parser.add_argument('-p', '--percentMutation', type=float, default=0.02, help='(Alternate for -m) What percent of the canvas would have been covered by failed mutation before it triggers selection of a random new available unplotted coordinate. Percent expressed as a decimal (float) between 0 and 1. Default 0.043 (about 4 percent).')
@@ -180,7 +180,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		reportStatsNthLoopCounter += 1
 		if reportStatsNthLoopCounter == reportStatsEveryNthLoop:
 			# Save a progress snapshot image.
-			print('Saving prograss snapshot image colorGrowthState.png . . .')
+			print('Saving prograss snapshot image ', stateIMGfileName, ' . . .')
 			im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
 			im.save(stateIMGfileName)
 			printProgress()
@@ -191,7 +191,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			print('Pixel fill (successful mutation) termination count ', terminatePaintingAtFillCount, ' reached. Ending algorithm and painting.')
 			break
 
-	# Save result and delete state image file.
+	# Save final image file and delete progress (state, temp) image file.
 	print('Saving image ', imgFileName, ' . . .')
 	im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
 	im.save(imgFileName)
