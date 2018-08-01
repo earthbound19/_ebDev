@@ -14,12 +14,12 @@
 # CODE
 echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
 
-# Get count of files we want, and from that digits to pad to. The following lines adapted in this revision of this script to work on Mac (the previous revision didn't) ; untested with Cygwin (windows).
-filesCount=`gfind . -maxdepth 1 -name "*.$1" | wc -l`
+# Get count of files we want, and from that digits to pad to. Use sort because ls doesn't do sensible sorting on some platforms:
+filesCount=`find . -maxdepth 1 -iname \*.$1 | sort | wc -l`
 digitsToPadTo=`expr $filesCount : '.*'`
 
 # Create array to use to loop over files.
-filesArray=`gfind . -maxdepth 1 -name "*.$1"`
+filesArray=`find . -maxdepth 1 -iname "*.$1" | sort`
 
 counter=0
 for filename in ${filesArray[@]}
