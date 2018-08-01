@@ -14,8 +14,8 @@
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
 # - Option to use a parameter preset (which would be literally just an input file of desired parameters?). Is this a standardized nixy' CLI thing to do?
 # - Initialize colorMutationBase by random selection from a .hexplt color scheme
-# - Coordinate mutation: optionally revert to coordinate before last known successful mutation on coordinate mutation fail (instead of continuing random walk)
-# - Color mutation: on coordinate mutation fail (and selection of new random coordinate), revert to colorMutationBase, OR select random new color (including from a .hexplt color scheme), OR continue with default behavior (continue color mutation from last reference color). Maybe make these options based on a string or letter value given for a switch.
+# - Coordinate mutation: optionally revert to coordinate before last known successful mutation on coordinate mutation fail (instead of continuing random walk). This would still need the failsafe of failedMutationsThreshold.
+# - Color mutation option: on coordinate mutation fail, select random new color (including from a .hexplt color scheme). If this and -d are present, -d wins.
 # - Have more than one bacterium alive at a time (and have all their colors evolve on creating new bacterium).
 # - Major new feature? : Initialize arr[] from an image, pick a random coordinate from the image, and use the color at that coordinate both as the origin coordinate and the color at that coordinate as colorMutationBase. Could also be used to continue terminated runs with the same or different parameters.
 
