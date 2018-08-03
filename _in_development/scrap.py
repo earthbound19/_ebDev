@@ -1,3 +1,4 @@
+import datetime, random, argparse, ast, os.path
 import numpy as np
 from PIL import Image
 import sys
@@ -24,12 +25,12 @@ class Coordinate:
 # p1.unoccupiedNeighbors.remove([4,32]); p1.unoccupiedNeighbors.pop(); p1.unoccupiedNeighbors.pop()
 # print('wut', p1.unoccupiedNeighbors)
 
-height = 4; width = 5; allCoordinates = []
+height = 14; width = 56; allCoordinates = []
 mediumPurplishGray = [157, 140, 157]
 
 # init. allCoordinates array:
-for yCoord in range(0, width):
-	for xCoord in range(0, height):
+for yCoord in range(0, height):
+	for xCoord in range(0, width):
 		allCoordinates.append(Coordinate(yCoord, xCoord, width, height, np.random.randint(0, 255, size=3), False, False, None))
 
 # print('Intended bitmap width: ', width, '\nIntended bitmap height: ', height, '\nCoordinate objects in array allCoordinates:')
@@ -39,15 +40,34 @@ for loopCoord in allCoordinates:
 	# print(loopCoord.x, loopCoord.y, loopCoord.unoccupiedNeighbors)
 	# print(loopCoord.x, loopCoord.y, loopCoord.RGBcolor, loopCoord.isAlive, loopCoord.isConsumed, loopCoord.unoccupiedNeighbors)
 
-# arr = np.ones((height, width, 3)) * mediumPurplishGray
-# im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-# im.save('tstScrap-py.png')
-# print(arr)
-
-print('check what was just printed to match the following:')
 imgArray = []
-# Relies on this script never making allCoordinates longer than width * height (so, never an out of index error) :
-for i in range(0, len(allCoordinates), width-1):
-	for j in range(0, height):
-		print(allCoordinates[i+j].x, allCoordinates[i+j].y, allCoordinates[i+j].RGBcolor)
+# # # Relies on this script never making allCoordinates longer than width * height (so, never an out of index error) :
+for i in range(0, height):
+	print('foo')
+	coordsRow = []
+	for j in range(0, width):
+		print(' fee')
+		R = allCoordinates[i*width+j].RGBcolor[0]		# Somehow if I just use .RGBcolor it's wrapped in something that prints out as "array(..", so splitting out the elements of the list here.
+		G = allCoordinates[i*width+j].RGBcolor[1]
+		B = allCoordinates[i*width+j].RGBcolor[2]
+		thisList = [R, G, B]
+		coordsRow.append(thisList)
+	print(coordsRow)
+	imgArray.append(coordsRow)
+# 
+print('check what was just printed to match the following:')
+print(imgArray)
+# 
+arr = np.ones((height, width, 3)) * mediumPurplishGray
+# # print(arr)
+im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
+im.save('tstScrap-pyComp1.png')
+# 
+# # print(type(imgArray))
+# # print(type(arr))
 
+arr2 = np.asarray(imgArray)
+# print(type(arr2))
+# # 
+im = Image.fromarray(arr2.astype(np.uint8)).convert('RGB')
+im.save('tstScrap-pyComp2.png')
