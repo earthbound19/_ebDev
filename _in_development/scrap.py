@@ -38,6 +38,14 @@ class Coordinate:
 			tmpList.remove(no)
 		# finallu initialize the intended object member from that built list:
 		self.emptyNeighbors = list(tmpList)
+	def getRNDemptyNeighbors(self):
+		random.shuffle(self.emptyNeighbors)		# shuffle the list of empty neighbor coordinates
+		nNeighborsToReturn = np.random.random_integers(0, len(self.emptyNeighbors))		# Decide how many to pick
+		rndNeighborsToReturn = []		# init an empty array we'll populate with neighbors and return
+		# iterate over nNeighborsToReturn items in shuffled self.emptyNeighbors and add them to a list to return:
+		for pick in range(0, nNeighborsToReturn):
+			rndNeighborsToReturn.append(self.emptyNeighbors[pick])
+		return rndNeighborsToReturn
 
 height = 3; width = 5; allCoordinates = []
 mediumPurplishGray = [157, 140, 157]
@@ -71,3 +79,9 @@ for i in range(0, height):
 arr = np.asarray(imgArray)
 im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
 im.save('scrap-py-test.png')
+
+print('moar test prints:')
+# print( allCoordinates[3].emptyNeighbors )
+
+thisThing = allCoordinates[3].getRNDemptyNeighbors()
+print(thisThing)
