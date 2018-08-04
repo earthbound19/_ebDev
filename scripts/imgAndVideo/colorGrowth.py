@@ -11,6 +11,7 @@
 # python 3 with the various modules installed that you see in the import statements here near the start of this script.
 
 # TO DO:
+# - Refactor to use e.g. np.random.random_integers(0,2), which returns numbers between 0 and 2 inclusive (maybe someone had compelling reason to create the exclusive random range function this script uses right now, but to me it is confusion).
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
 # - Option to use a parameter preset (which would be literally just an input file of desired parameters?). Is this a standardized nixy' CLI thing to do?
 # - Initialize colorMutationBase by random selection from a .hexplt color scheme
@@ -128,7 +129,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# Create unique, date-time informative image file name. Note that this will represent when the painting began, not when it ended (~State filename will be based off this).
 	now = datetime.datetime.now()
 	timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__%f')
-	rndStr = ('%03x' % random.randrange(16**3)).lower()
+	rndStr = ('%03x' % random.randrange(16**3))		# Returns three random lowercase hex characters. Wherever I horked that from originally appended .lower() to it, pointless because it already returns lowercase characters.
 	imgFileBaseName = timeStamp + '-' + rndStr + '-colorGrowth-Py-r' + str(rshift) + '-f' + str(failedMutationsThreshold)
 	imgFileName = imgFileBaseName + '.png'
 	stateIMGfileName = imgFileBaseName + '-state.png'
