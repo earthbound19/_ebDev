@@ -1,5 +1,9 @@
 # IN DEVELOPMENT. Intended for use in colorGrowth.py, but could be imported into any other python file.
 
+# USAGE
+# import colorpoop
+# Then create and manipulate class objects etc. defined here as usual for python classes.
+
 import random
 import numpy as np
 
