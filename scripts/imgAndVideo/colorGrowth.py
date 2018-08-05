@@ -86,8 +86,8 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 
 	# function takes two ints and shifts each up or down one or not at all. I know, it doesn't receive a tuple as input but it gives one as output:
 	def mutateCoordinate(xCoordParam, yCoordParam):
-		xCoord = np.random.randint((xCoordParam - 1), xCoordParam + 2)
-		yCoord = np.random.randint((yCoordParam - 1), yCoordParam + 2)
+		xCoord = np.random.random_integers((xCoordParam - 1), xCoordParam + 1)
+		yCoord = np.random.random_integers((yCoordParam - 1), yCoordParam + 1)
 		# if necessary, move results back in range of the array indices this is intended to be used with (zero-based indexing, so maximum (n - 1) and never less than 0) :
 		if (xCoord < 0):
 			xCoord = 0
@@ -109,7 +109,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# function gets random unused coordinate:
 	def getRNDunusedCoord():
 		unusedCoordsListSize = len(unusedCoords)
-		randomIndex = np.random.randint(0, unusedCoordsListSize)
+		randomIndex = np.random.random_integers(0, unusedCoordsListSize-1)
 		chosenCoord = unusedCoords[randomIndex]
 		return chosenCoord
 
@@ -150,7 +150,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			previousCoord = chosenCoord
 			arrXidx = chosenCoord[0]
 			arrYidx = chosenCoord[1]
-			newColor = previousColor + np.random.randint(-rshift, rshift+1, size=3) / 2
+			newColor = previousColor + np.random.random_integers(-rshift, rshift, size=3) / 2
 			# Clip that within RGB range if it wandered outside of that range. If this slows it down too much and you don't care if colors randomly freak out (bitmap conversion seems to take colors outside range as wrapping around?) comment the next line out:
 			newColor = np.clip(newColor, 0, 255)
 			arr[arrYidx][arrXidx] = newColor
