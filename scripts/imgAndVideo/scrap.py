@@ -17,7 +17,7 @@ for xCoord in range(0, width):
 print('Intended bitmap width: ', width, '\nIntended bitmap height: ', height, '\nCoordinate objects in array allCoordinates:')
 for loopCoord in allCoordinates:
 	# print(loopCoord.x, loopCoord.y, loopCoord.RGBcolor)
-	print(loopCoord.x, loopCoord.y, loopCoord.emptyNeighbors)
+	print(loopCoord.XYtuple, loopCoord.emptyNeighbors)
 	# print(loopCoord.x, loopCoord.y, loopCoord.RGBcolor, loopCoord.isAlive, loopCoord.isConsumed, loopCoord.emptyNeighbors)
 
 # create numpy-compatible array (nparray is it called?) from allCoordinates:
