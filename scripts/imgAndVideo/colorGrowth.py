@@ -24,6 +24,7 @@
 import datetime, random, argparse, ast, os.path
 import numpy as np
 from PIL import Image
+import colorpoop as cp		# Uses my custom class in colorpoop.py
 # import sys
 
 parser = argparse.ArgumentParser(description='Renders a PNG image like bacteria that produce random color mutations as they grow over a surface. Right now it is one virtual, undead bacterium. A planned update will host multiple virtual bacteria. Output file names are after the date plus random characters. Inspired by and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
@@ -72,18 +73,19 @@ print('Will generate ', numIMGsToMake, ' image(s).')
 for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* the loop.
 	animationSaveNFramesCounter = 0
 	animationFrameCounter = 0
-	arr = np.ones((height, width, 3)) * backgroundColor
-		# DEBUGGING / REFERENCE:
-		# Iterates through every datum in the three-dimensional list (array) :
-		# for a, b in enumerate(arr):
-		# 	print('- arr[', a, ']:\n', b)		# [ [0. 0. 0.] [0. 0. 0.] . . ]
-		# 	for i, j in enumerate(b):
-		# 		print('-- arr[', a, '][', i, ']:\n', arr[a][i])		# [0. 0. 0.]
-		# 		for x, y in enumerate(j):
-		# 			print('--- arr[', a, '][', i, '][', x, ']:\n', y)
-		# 			felf = 'nor'
+
+	arr = []	# list of Coordinate objects
+	for xCoord in range(0, width):
+		for yCoord in range(0, height):	# RGBcolor can also be initialized with: np.random.randint(0, 255, size=3)
+			arr.append(cp.coordinate(xCoord, yCoord, width, height, np.random.randint(0, 255, size=3), False, False, None))
+
+	unusedCoords = []		# list of tuples of unused coordinates
+	for coord in arr:
+		unusedCoords.append( (coord.x, coord.y) )
+# TO DO: fix the places that are using y, x to use x, y?
 
 	# function takes two ints and shifts each up or down one or not at all. I know, it doesn't receive a tuple as input but it gives one as output:
+# TO DO: use the following repeatedly only if Coordinate.getRNDemptyNeighbors() fails:
 	def mutateCoordinate(xCoordParam, yCoordParam):
 		xCoord = np.random.random_integers((xCoordParam - 1), xCoordParam + 1)
 		yCoord = np.random.random_integers((yCoordParam - 1), yCoordParam + 1)
@@ -96,12 +98,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			yCoord = 0
 		if (yCoord > (height - 1)):
 			yCoord = (height - 1)
-		return [xCoord, yCoord]
-
-	unusedCoords = []
-	for yCoord in range(0, width):
-		for xCoord in range(0, height):
-			unusedCoords.append([yCoord, xCoord])
+		return (xCoord, yCoord)
 
 	totalPixels = width * height
 
@@ -197,3 +194,16 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	im.save(imgFileName)
 	print('Created ', n, ' of ', numIMGsToMake, ' images.')
 	os.remove(stateIMGfileName)
+	
+	
+# Deprecated scraps from prior version of script:
+# arr = np.ones((height, width, 3)) * backgroundColor
+	# DEBUGGING / REFERENCE:
+	# Iterates through every datum in the three-dimensional list (array) :
+	# for a, b in enumerate(arr):
+	# 	print('- arr[', a, ']:\n', b)		# [ [0. 0. 0.] [0. 0. 0.] . . ]
+	# 	for i, j in enumerate(b):
+	# 		print('-- arr[', a, '][', i, ']:\n', arr[a][i])		# [0. 0. 0.]
+	# 		for x, y in enumerate(j):
+	# 			print('--- arr[', a, '][', i, '][', x, ']:\n', y)
+	# 			felf = 'nor'
