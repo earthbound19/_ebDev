@@ -157,8 +157,8 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 				# else: print(False)
 				loopCoord.RGBcolor = newColor
 				previousColor = newColor
-# CONTINUE DEVELOPMENT HERE: why does the following line break? :
-				unusedCoords.remove(chosenCoord)
+# CONTINUE DEVELOPMENT HERE: why does the following line break if I use chosenCoord instead of loopCoord.XYtuple? :
+				unusedCoords.remove(loopCoord.XYtuple)
 			# Also, if a parameter was passed saying to do so, save an animation frame (if we are at the Nth (-a) mutation:
 			if animationSaveEveryNframes:
 				if (animationSaveNFramesCounter % animationSaveEveryNframes) == 0:
