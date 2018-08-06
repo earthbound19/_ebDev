@@ -149,6 +149,13 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			newColor = previousColor + np.random.random_integers(-rshift, rshift, size=3) / 2
 			# Clip that within RGB range if it wandered outside of that range. If this slows it down too much and you don't care if colors randomly freak out (bitmap conversion seems to take colors outside range as wrapping around?) comment the next line out:
 			newColor = np.clip(newColor, 0, 255)
+			# Find the element in arr[] that has an XYtuple matching chosenCoord, and change the color member in that element:
+# TO DO: collect empty neighbors into a list while we have that element in hand.
+			for loopCoord in arr:
+				testVal = loopCoord.XYtuple
+# CONTINUE DEVELOPMENT HERE:
+				if testVal == chosenCoord: print(True)
+				else: print(False)
 			arr[arrYidx][arrXidx] = newColor
 			previousColor = newColor
 			unusedCoords.remove(chosenCoord)
