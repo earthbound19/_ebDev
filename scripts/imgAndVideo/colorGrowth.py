@@ -81,7 +81,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 
 	unusedCoords = []		# list of tuples of unused coordinates
 	for coord in arr:
-		unusedCoords.append( (coord.x, coord.y) )
+		unusedCoords.append( coord.XYtuple )
 # TO DO: fix the places that are using y, x to use x, y?
 
 	# function takes two ints and shifts each up or down one or not at all. I know, it doesn't receive a tuple as input but it gives one as output:
@@ -153,12 +153,12 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 # TO DO: collect empty neighbors into a list while we have that element in hand.
 			for loopCoord in arr:
 				testVal = loopCoord.XYtuple
-# CONTINUE DEVELOPMENT HERE:
 				if testVal == chosenCoord: print(True)
-				else: print(False)
-			arr[arrYidx][arrXidx] = newColor
-			previousColor = newColor
-			unusedCoords.remove(chosenCoord)
+				# else: print(False)
+				loopCoord.RGBcolor = newColor
+				previousColor = newColor
+# CONTINUE DEVELOPMENT HERE: why does the following line break? :
+				unusedCoords.remove(chosenCoord)
 			# Also, if a parameter was passed saying to do so, save an animation frame (if we are at the Nth (-a) mutation:
 			if animationSaveEveryNframes:
 				if (animationSaveNFramesCounter % animationSaveEveryNframes) == 0:
