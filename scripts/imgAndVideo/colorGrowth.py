@@ -27,6 +27,7 @@ from PIL import Image
 import colorpoop as cp		# Uses my custom class in colorpoop.py
 # import sys
 
+# ARGUMENT PARSING AND GLOBALS.
 parser = argparse.ArgumentParser(description='Renders a PNG image like bacteria that produce random color mutations as they grow over a surface. Right now it is one virtual, undead bacterium. A planned update will host multiple virtual bacteria. Output file names are after the date plus random characters. Inspired by and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
 parser.add_argument('-n', '--numberOfImages', type=int, default=7, help='How many images to generate. Default 7.')
 parser.add_argument('-w', '--width', type=int, default=1200, help='Width of output image(s). Default 1200.')
@@ -67,7 +68,25 @@ if failedMutationsThreshold == None:
 terminatePaintingAtFillCount = int(allesPixelCount * stopPaintingPercent)
 
 print('Will generate ', numIMGsToMake, ' image(s).')
+# END ARGUMENT PARSING AND GLOBALS.
 
+# GLOBAL FUNCTIONS (DEVELOPMENT STUB).
+# def getNParrayCompatRGBvals():
+	# imgArray = []
+	Relies on this script never making allCoordinates longer than width * height (so, never an out of index error) :
+	# for i in range(0, height):
+		# coordsRow = []
+		# for j in range(0, width):
+			# R = allCoordinates[i*width+j].RGBcolor[0]		# Somehow if I just use .RGBcolor it's wrapped in something that prints out as "array(..", so splitting out the elements of the list here.
+			# G = allCoordinates[i*width+j].RGBcolor[1]
+			# B = allCoordinates[i*width+j].RGBcolor[2]
+			# thisList = [R, G, B]
+			# coordsRow.append(thisList)
+		# imgArray.append(coordsRow)
+# END GLOBAL FUNCTIONS (DEVELOPMENT STUB).
+
+
+# IMAGE GENERATION.
 # Loop making N (-n | numimages) images.
 # "Initialize" (paint over entire) the "canvas" with the chosen base canvas color:
 for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* the loop.
@@ -192,12 +211,13 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			print('Pixel fill (successful mutation) termination count ', terminatePaintingAtFillCount, ' reached. Ending algorithm and painting.')
 			break
 
-	# Save final image file and delete progress (state, temp) image file.
+	# Save final image file and delete progress (state) image file.
 	print('Saving image ', imgFileName, ' . . .')
 	im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
 	im.save(imgFileName)
 	print('Created ', n, ' of ', numIMGsToMake, ' images.')
 	os.remove(stateIMGfileName)
+# END IMAGE GENERATION.
 	
 	
 # Deprecated scraps from prior version of script:
