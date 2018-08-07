@@ -152,12 +152,9 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			# Find the element in arr[] that has an XYtuple matching chosenCoord, and change the color member in that element:
 # TO DO: collect empty neighbors into a list while we have that element in hand.
 			for loopCoord in arr:
-				testVal = loopCoord.XYtuple
-				if testVal == chosenCoord: print(True)
-				# else: print(False)
-				loopCoord.RGBcolor = newColor
+				if loopCoord.XYtuple == chosenCoord: print('chosenCoord value', chosenCoord, '== loopCoord.XYtuple value', loopCoord.XYtuple)
+				loopCoord.RGBcolor = newColor		# That's the actual mutated color assignment
 				previousColor = newColor
-# CONTINUE DEVELOPMENT HERE: why does the following line break if I use chosenCoord instead of loopCoord.XYtuple? :
 				unusedCoords.remove(loopCoord.XYtuple)
 			# Also, if a parameter was passed saying to do so, save an animation frame (if we are at the Nth (-a) mutation:
 			if animationSaveEveryNframes:
