@@ -21,7 +21,7 @@ for loopCoord in allCoordinates:
 
 # create numpy-compatible array (nparray is it called?) from allCoordinates:
 imgArray = []
-# # # Relies on this script never making allCoordinates longer than width * height (so, never an out of index error) :
+# Relies on this script never making allCoordinates longer than width * height (so, never an out of index error) :
 for i in range(0, height):
 	coordsRow = []
 	for j in range(0, width):
