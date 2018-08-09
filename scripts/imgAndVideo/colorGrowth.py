@@ -1,3 +1,7 @@
+# IN REVISION.
+# Revision test command that invokes this:
+# clear && python path/to/this/colorGrowth.py -n 1 -w 100 -t 50 -b [127,127,127] -r 13
+
 # DESCRIPTION
 # Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Right now it is one virtual, undead bacterium which randomly walks and poops mutated colors. A possible future update will manage multiple bacteria. Output file names are random. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
@@ -25,7 +29,7 @@ import datetime, random, argparse, ast, os.path
 import numpy as np
 from PIL import Image
 import colorpoop as cp		# Uses my custom class in colorpoop.py
-# import sys
+import sys
 
 # ARGUMENT PARSING AND GLOBALS.
 parser = argparse.ArgumentParser(description='Renders a PNG image like bacteria that produce random color mutations as they grow over a surface. Right now it is one virtual, undead bacterium. A planned update will host multiple virtual bacteria. Output file names are after the date plus random characters. Inspired by and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
@@ -73,7 +77,7 @@ print('Will generate ', numIMGsToMake, ' image(s).')
 # GLOBAL FUNCTIONS (DEVELOPMENT STUB).
 # def getNParrayCompatRGBvals():
 	# imgArray = []
-	Relies on this script never making allCoordinates longer than width * height (so, never an out of index error) :
+	# Relies on this script never making allCoordinates longer than width * height (so, never an out of index error) :
 	# for i in range(0, height):
 		# coordsRow = []
 		# for j in range(0, width):
@@ -96,7 +100,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	arr = []	# list of Coordinate objects
 	for xCoord in range(0, width):
 		for yCoord in range(0, height):	# RGBcolor can also be initialized with: np.random.randint(0, 255, size=3)
-			arr.append(cp.coordinate(xCoord, yCoord, width, height, np.random.randint(0, 255, size=3), False, False, None))
+			arr.append(cp.coordinate(xCoord, yCoord, width, height, backgroundColor, False, False, None))
 
 	unusedCoords = []		# list of tuples of unused coordinates
 	for coord in arr:
@@ -167,21 +171,23 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			arrYidx = chosenCoord[1]
 			newColor = previousColor + np.random.random_integers(-rshift, rshift, size=3) / 2
 			# Clip that within RGB range if it wandered outside of that range. If this slows it down too much and you don't care if colors randomly freak out (bitmap conversion seems to take colors outside range as wrapping around?) comment the next line out:
+			newColor = newColor.astype(int)		# Without this conversion we can get floats (decimals).
 			newColor = np.clip(newColor, 0, 255)
 			# Find the element in arr[] that has an XYtuple matching chosenCoord, and change the color member in that element:
 # TO DO: collect empty neighbors into a list while we have that element in hand.
 			for loopCoord in arr:
-				if loopCoord.XYtuple == chosenCoord: print('chosenCoord value', chosenCoord, '== loopCoord.XYtuple value', loopCoord.XYtuple)
-				loopCoord.RGBcolor = newColor		# That's the actual mutated color assignment
-				previousColor = newColor
-				unusedCoords.remove(loopCoord.XYtuple)
+				if loopCoord.XYtuple == chosenCoord:
+					loopCoord.RGBcolor = (newColor)		# That's the actual mutated color assignment
+					previousColor = newColor
+					unusedCoords.remove(loopCoord.XYtuple)
 			# Also, if a parameter was passed saying to do so, save an animation frame (if we are at the Nth (-a) mutation:
 			if animationSaveEveryNframes:
 				if (animationSaveNFramesCounter % animationSaveEveryNframes) == 0:
 					strOfThat = str(animationFrameCounter)
 					frameFilePathAndFileName = animFramesFolderName + '/' + strOfThat.zfill(padAnimationSaveFramesNumbersTo) + '.png'
-					im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-					im.save(frameFilePathAndFileName)
+# TO DO: bug fix and uncomment the next two lines:
+					# im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
+					# im.save(frameFilePathAndFileName)
 					animationFrameCounter += 1		# Increment that *after* because by default ffmpeg expects frame count to start at 0.
 				animationSaveNFramesCounter += 1
 
@@ -201,8 +207,9 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		if reportStatsNthLoopCounter == reportStatsEveryNthLoop:
 			# Save a progress snapshot image.
 			print('Saving prograss snapshot image ', stateIMGfileName, ' . . .')
-			im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-			im.save(stateIMGfileName)
+# TO DO: bug fix and then uncomment the next two lines:
+#			im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
+#			im.save(stateIMGfileName)
 			printProgress()
 			reportStatsNthLoopCounter = 0
 		# This will terminate all coordinate and color mutation at an arbitary number of mutations.
@@ -213,10 +220,28 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 
 	# Save final image file and delete progress (state) image file.
 	print('Saving image ', imgFileName, ' . . .')
-	im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
+	
+	
+	imgArray = []
+	for i in range(0, height):
+		coordsRow = []
+		for j in range(0, width):
+			R = arr[i*width+j].RGBcolor[0]
+			G = arr[i*width+j].RGBcolor[1]
+			B = arr[i*width+j].RGBcolor[2]
+			thisList = [R, G, B]
+			coordsRow.append(thisList)
+		imgArray.append(coordsRow)
+		
+#	print('Value of imgArray:', imgArray)
+	
+# TO DO? rename arrTwo or reuse . . . can I reuse anything else?
+	arrTwo = np.asarray(imgArray)
+	im = Image.fromarray(arrTwo.astype(np.uint8)).convert('RGB')
 	im.save(imgFileName)
 	print('Created ', n, ' of ', numIMGsToMake, ' images.')
-	os.remove(stateIMGfileName)
+# TO DO: uncomment the following line after development complete:
+	# os.remove(stateIMGfileName)
 # END IMAGE GENERATION.
 	
 	
