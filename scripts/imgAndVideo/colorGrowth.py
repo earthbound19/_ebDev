@@ -5,14 +5,14 @@
 # DESCRIPTION
 # Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Right now it is one virtual, undead bacterium which randomly walks and poops mutated colors. A possible future update will manage multiple bacteria. Output file names are random. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
+# DEPENDENCIES
+# python 3 with the various modules installed that you see in the import statements here near the start of this script, ONE OF WHICH is a local file, colorpoop.py.
+
 # USAGE
 # Run this script without any paramaters, and it will use a default set of parameters:
 # python thisScript.py
 # To see available parameters, run this script with the -h switch:
 # python thisScript.py -h
-
-# DEPENDENCIES
-# python 3 with the various modules installed that you see in the import statements here near the start of this script, ONE OF WHICH is a local file, colorpoop.py.
 
 # TO DO:
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
@@ -29,7 +29,7 @@ import datetime, random, argparse, ast, os.path
 import numpy as np
 from PIL import Image
 import colorpoop as cp		# Uses my custom class in colorpoop.py
-import sys
+# import sys
 
 # ARGUMENT PARSING AND GLOBALS.
 parser = argparse.ArgumentParser(description='Renders a PNG image like bacteria that produce random color mutations as they grow over a surface. Right now it is one virtual, undead bacterium. A planned update will host multiple virtual bacteria. Output file names are after the date plus random characters. Inspired by and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
@@ -72,6 +72,46 @@ if failedMutationsThreshold == None:
 terminatePaintingAtFillCount = int(allesPixelCount * stopPaintingPercent)
 
 print('Will generate ', numIMGsToMake, ' image(s).')
+
+	# function takes two ints and shifts each up or down one or not at all. I know, it doesn't receive a tuple as input but it gives one as output:
+# TO DO: use the following repeatedly only if Coordinate.getRNDemptyNeighbors() fails:
+def mutateCoordinate(xCoordParam, yCoordParam):
+	xCoord = np.random.random_integers((xCoordParam - 1), xCoordParam + 1)
+	yCoord = np.random.random_integers((yCoordParam - 1), yCoordParam + 1)
+	# if necessary, move results back in range of the array indices this is intended to be used with (zero-based indexing, so maximum (n - 1) and never less than 0) :
+	if (xCoord < 0):
+		xCoord = 0
+	if (xCoord > (width - 1)):
+		xCoord = (width - 1)
+	if (yCoord < 0):
+		yCoord = 0
+	if (yCoord > (height - 1)):
+		yCoord = (height - 1)
+	return (xCoord, yCoord)
+
+
+# function gets random unused coordinate:
+def getRNDunusedCoord():
+	unusedCoordsListSize = len(unusedCoords)
+	randomIndex = np.random.random_integers(0, unusedCoordsListSize-1)
+	chosenCoord = unusedCoords[randomIndex]
+	return chosenCoord
+
+# function creates image from list of Coordinate objects, heigh and width definitions, and a filename string:
+def coordinatesListToSavedImage(arr, height, width, imgFileName):
+	imgArray = []
+	for i in range(0, height):
+		coordsRow = []
+		for j in range(0, width):
+			coordsRow.append(arr[i*width+j].RGBcolor)
+		imgArray.append(coordsRow)
+	imgArray = np.asarray(imgArray)
+	im = Image.fromarray(imgArray.astype(np.uint8)).convert('RGB')
+	im.save(imgFileName)
+
+# function prints coordinate plotting statistics (progress report):
+def printProgress():
+	print('Unused coordinates: ', len(unusedCoords), ' Have plotted ', len(usedCoords), 'of ', terminatePaintingAtFillCount, ' desired coordinates (on a canvas of', totalPixels, ' pixels).')
 # END ARGUMENT PARSING AND GLOBALS.
 
 
@@ -90,44 +130,9 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	unusedCoords = []		# list of tuples of unused coordinates
 	for coord in arr:
 		unusedCoords.append( coord.XYtuple )
-# TO DO: fix the places that are using y, x to use x, y?
-
-	# function takes two ints and shifts each up or down one or not at all. I know, it doesn't receive a tuple as input but it gives one as output:
-# TO DO: use the following repeatedly only if Coordinate.getRNDemptyNeighbors() fails:
-	def mutateCoordinate(xCoordParam, yCoordParam):
-		xCoord = np.random.random_integers((xCoordParam - 1), xCoordParam + 1)
-		yCoord = np.random.random_integers((yCoordParam - 1), yCoordParam + 1)
-		# if necessary, move results back in range of the array indices this is intended to be used with (zero-based indexing, so maximum (n - 1) and never less than 0) :
-		if (xCoord < 0):
-			xCoord = 0
-		if (xCoord > (width - 1)):
-			xCoord = (width - 1)
-		if (yCoord < 0):
-			yCoord = 0
-		if (yCoord > (height - 1)):
-			yCoord = (height - 1)
-		return (xCoord, yCoord)
+# TO DO: fix the places that are using y, x to use x, y--are there (still?) any?
 
 	totalPixels = width * height
-
-	# function gets random unused coordinate:
-	def getRNDunusedCoord():
-		unusedCoordsListSize = len(unusedCoords)
-		randomIndex = np.random.random_integers(0, unusedCoordsListSize-1)
-		chosenCoord = unusedCoords[randomIndex]
-		return chosenCoord
-
-	# function creates image from list of Coordinate objects, heigh and width definitions, and a filename string:
-	def coordinatesListToSavedImage(arr, height, width, imgFileName):
-		imgArray = []
-		for i in range(0, height):
-			coordsRow = []
-			for j in range(0, width):
-				coordsRow.append(arr[i*width+j].RGBcolor)
-			imgArray.append(coordsRow)
-		imgArray = np.asarray(imgArray)
-		im = Image.fromarray(imgArray.astype(np.uint8)).convert('RGB')
-		im.save(imgFileName)
 
 	# Initialize chosenCoord:
 	chosenCoord = getRNDunusedCoord()
@@ -137,10 +142,6 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	failedCoordMutationCount = 0
 	reportStatsEveryNthLoop = 1800
 	reportStatsNthLoopCounter = 0
-
-	# function prints coordinate plotting statistics (progress report):
-	def printProgress():
-		print('Unused coordinates: ', len(unusedCoords), ' Have plotted ', len(usedCoords), 'of ', terminatePaintingAtFillCount, ' desired coordinates (on a canvas of', totalPixels, ' pixels).')
 
 	# Create unique, date-time informative image file name. Note that this will represent when the painting began, not when it ended (~State filename will be based off this).
 	now = datetime.datetime.now()
