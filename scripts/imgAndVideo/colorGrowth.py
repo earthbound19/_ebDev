@@ -1,14 +1,14 @@
 # DESCRIPTION
 # Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Right now it is one virtual, undead bacterium which randomly walks and poops mutated colors. A possible future update will manage multiple bacteria. Output file names are random. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
+# DEPENDENCIES
+# python 3 with the various modules installed that you see in the import statements here near the start of this script, ONE OF WHICH is a local file, colorpoop.py.
+
 # USAGE
 # Run this script without any paramaters, and it will use a default set of parameters:
 # python thisScript.py
 # To see available parameters, run this script with the -h switch:
 # python thisScript.py -h
-
-# DEPENDENCIES
-# python 3 with the various modules installed that you see in the import statements here near the start of this script.
 
 # TO DO:
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
@@ -26,6 +26,7 @@ import numpy as np
 from PIL import Image
 # import sys
 
+# ARGUMENT PARSING AND GLOBALS.
 parser = argparse.ArgumentParser(description='Renders a PNG image like bacteria that produce random color mutations as they grow over a surface. Right now it is one virtual, undead bacterium. A planned update will host multiple virtual bacteria. Output file names are after the date plus random characters. Inspired by and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
 parser.add_argument('-n', '--numberOfImages', type=int, default=7, help='How many images to generate. Default 7.')
 parser.add_argument('-w', '--width', type=int, default=1200, help='Width of output image(s). Default 1200.')
@@ -67,50 +68,100 @@ terminatePaintingAtFillCount = int(allesPixelCount * stopPaintingPercent)
 
 print('Will generate ', numIMGsToMake, ' image(s).')
 
+class coordinate:	# for "color poop," formerly "Coordinate:"
+	# slots for allegedly higher efficiency re: https://stackoverflow.com/a/49789270
+	__slots__ = ["XYtuple", "maxX", "maxY", "RGBcolor", "isAlive", "isConsumed", "emptyNeighbors"]
+	def __init__(self, x, y, maxX, maxY, RGBcolor, isAlive, isConsumed, emptyNeighbors):
+		self.XYtuple = (x, y)
+		self.RGBcolor = RGBcolor; self.isAlive = isAlive;	self.isConsumed = isConsumed
+		# Adding all possible empty neighbor values even if they would result in values out of bounds of image (negative or past maxX or maxY), and will check for and clean up pairs with out of bounds values after:
+		tmpList = [ (x-1, y-1), (x-1, y), (x-1, y+1), (x, y-1), (x, y+1), (x+1, y-1), (x+1, y), (x+1, y+1) ]
+		deleteList = []
+		for element in tmpList:
+			if -1 in element:
+				deleteList.append(element)
+		for element in tmpList:		# TO DO: debug whether I even need this; the print never happens:
+			if (maxX+1) in element:
+				deleteList.append(element)
+		for element in tmpList:
+			if (maxY+1) in element:
+				deleteList.append(element)
+		# reduce deleteList to a list of unique tuples (in case of duplicates, which can lead us to attempt to remove something that ins't there, which throws an exception and stops the script) :
+		deleteList = list(set(deleteList))
+		# the deletions:
+		for no in deleteList:
+			tmpList.remove(no)
+		# finallu initialize the intended object member from that built list:
+		self.emptyNeighbors = list(tmpList)
+	def getRNDemptyNeighbors(self):
+		random.shuffle(self.emptyNeighbors)		# shuffle the list of empty neighbor coordinates
+		nNeighborsToReturn = np.random.random_integers(0, len(self.emptyNeighbors))		# Decide how many to pick
+		rndNeighborsToReturn = []		# init an empty array we'll populate with neighbors and return
+		# iterate over nNeighborsToReturn items in shuffled self.emptyNeighbors and add them to a list to return:
+		for pick in range(0, nNeighborsToReturn):
+			rndNeighborsToReturn.append(self.emptyNeighbors[pick])
+		return rndNeighborsToReturn
+
+	# function takes two ints and shifts each up or down one or not at all. I know, it doesn't receive a tuple as input but it gives one as output:
+# TO DO: use the following repeatedly only if Coordinate.getRNDemptyNeighbors() fails:
+def mutateCoordinate(xCoordParam, yCoordParam):
+	xCoord = np.random.random_integers((xCoordParam - 1), xCoordParam + 1)
+	yCoord = np.random.random_integers((yCoordParam - 1), yCoordParam + 1)
+	# if necessary, move results back in range of the array indices this is intended to be used with (zero-based indexing, so maximum (n - 1) and never less than 0) :
+	if (xCoord < 0):
+		xCoord = 0
+	if (xCoord > (width - 1)):
+		xCoord = (width - 1)
+	if (yCoord < 0):
+		yCoord = 0
+	if (yCoord > (height - 1)):
+		yCoord = (height - 1)
+	return (xCoord, yCoord)
+
+
+# function gets random unused coordinate:
+def getRNDunusedCoord():
+	unusedCoordsListSize = len(unusedCoords)
+	randomIndex = np.random.random_integers(0, unusedCoordsListSize-1)
+	chosenCoord = unusedCoords[randomIndex]
+	return chosenCoord
+
+# function creates image from list of Coordinate objects, heigh and width definitions, and a filename string:
+def coordinatesListToSavedImage(arr, height, width, imgFileName):
+	imgArray = []
+	for i in range(0, height):
+		coordsRow = []
+		for j in range(0, width):
+			coordsRow.append(arr[i*width+j].RGBcolor)
+		imgArray.append(coordsRow)
+	imgArray = np.asarray(imgArray)
+	im = Image.fromarray(imgArray.astype(np.uint8)).convert('RGB')
+	im.save(imgFileName)
+
+# function prints coordinate plotting statistics (progress report):
+def printProgress():
+	print('Unused coordinates: ', len(unusedCoords), ' Have plotted ', len(usedCoords), 'of ', terminatePaintingAtFillCount, ' desired coordinates (on a canvas of', totalPixels, ' pixels).')
+# END ARGUMENT PARSING AND GLOBALS.
+
+
+# IMAGE GENERATION.
 # Loop making N (-n | numimages) images.
 # "Initialize" (paint over entire) the "canvas" with the chosen base canvas color:
 for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* the loop.
 	animationSaveNFramesCounter = 0
 	animationFrameCounter = 0
-	arr = np.ones((height, width, 3)) * backgroundColor
-		# DEBUGGING / REFERENCE:
-		# Iterates through every datum in the three-dimensional list (array) :
-		# for a, b in enumerate(arr):
-		# 	print('- arr[', a, ']:\n', b)		# [ [0. 0. 0.] [0. 0. 0.] . . ]
-		# 	for i, j in enumerate(b):
-		# 		print('-- arr[', a, '][', i, ']:\n', arr[a][i])		# [0. 0. 0.]
-		# 		for x, y in enumerate(j):
-		# 			print('--- arr[', a, '][', i, '][', x, ']:\n', y)
-		# 			felf = 'nor'
 
-	# function takes two ints and shifts each up or down one or not at all. I know, it doesn't receive a tuple as input but it gives one as output:
-	def mutateCoordinate(xCoordParam, yCoordParam):
-		xCoord = np.random.random_integers((xCoordParam - 1), xCoordParam + 1)
-		yCoord = np.random.random_integers((yCoordParam - 1), yCoordParam + 1)
-		# if necessary, move results back in range of the array indices this is intended to be used with (zero-based indexing, so maximum (n - 1) and never less than 0) :
-		if (xCoord < 0):
-			xCoord = 0
-		if (xCoord > (width - 1)):
-			xCoord = (width - 1)
-		if (yCoord < 0):
-			yCoord = 0
-		if (yCoord > (height - 1)):
-			yCoord = (height - 1)
-		return [xCoord, yCoord]
+	arr = []	# list of Coordinate objects
+	for xCoord in range(0, width):
+		for yCoord in range(0, height):	# RGBcolor can also be initialized with: np.random.randint(0, 255, size=3)
+			arr.append(coordinate(xCoord, yCoord, width, height, backgroundColor, False, False, None))
 
-	unusedCoords = []
-	for yCoord in range(0, width):
-		for xCoord in range(0, height):
-			unusedCoords.append([yCoord, xCoord])
+	unusedCoords = []		# list of tuples of unused coordinates
+	for coord in arr:
+		unusedCoords.append( coord.XYtuple )
+# TO DO: fix the places that are using y, x to use x, y--are there (still?) any?
 
 	totalPixels = width * height
-
-	# function gets random unused coordinate:
-	def getRNDunusedCoord():
-		unusedCoordsListSize = len(unusedCoords)
-		randomIndex = np.random.random_integers(0, unusedCoordsListSize-1)
-		chosenCoord = unusedCoords[randomIndex]
-		return chosenCoord
 
 	# Initialize chosenCoord:
 	chosenCoord = getRNDunusedCoord()
@@ -120,10 +171,6 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	failedCoordMutationCount = 0
 	reportStatsEveryNthLoop = 1800
 	reportStatsNthLoopCounter = 0
-
-	# function prints coordinate plotting statistics (progress report):
-	def printProgress():
-		print('Unused coordinates: ', len(unusedCoords), ' Have plotted ', len(usedCoords), 'of ', terminatePaintingAtFillCount, ' desired coordinates (on a canvas of', totalPixels, ' pixels).')
 
 	# Create unique, date-time informative image file name. Note that this will represent when the painting began, not when it ended (~State filename will be based off this).
 	now = datetime.datetime.now()
@@ -151,17 +198,21 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			arrYidx = chosenCoord[1]
 			newColor = previousColor + np.random.random_integers(-rshift, rshift, size=3) / 2
 			# Clip that within RGB range if it wandered outside of that range. If this slows it down too much and you don't care if colors randomly freak out (bitmap conversion seems to take colors outside range as wrapping around?) comment the next line out:
+			newColor = newColor.astype(int)		# Without this conversion we can get floats (decimals).
 			newColor = np.clip(newColor, 0, 255)
-			arr[arrYidx][arrXidx] = newColor
-			previousColor = newColor
-			unusedCoords.remove(chosenCoord)
+			# Find the element in arr[] that has an XYtuple matching chosenCoord, and change the color member in that element:
+# TO DO: collect empty neighbors into a list while we have that element in hand.
+			for loopCoord in arr:
+				if loopCoord.XYtuple == chosenCoord:
+					loopCoord.RGBcolor = (newColor)		# That's the actual mutated color assignment
+					previousColor = newColor
+					unusedCoords.remove(loopCoord.XYtuple)
 			# Also, if a parameter was passed saying to do so, save an animation frame (if we are at the Nth (-a) mutation:
 			if animationSaveEveryNframes:
 				if (animationSaveNFramesCounter % animationSaveEveryNframes) == 0:
 					strOfThat = str(animationFrameCounter)
 					frameFilePathAndFileName = animFramesFolderName + '/' + strOfThat.zfill(padAnimationSaveFramesNumbersTo) + '.png'
-					im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-					im.save(frameFilePathAndFileName)
+					coordinatesListToSavedImage(arr, height, width, frameFilePathAndFileName)
 					animationFrameCounter += 1		# Increment that *after* because by default ffmpeg expects frame count to start at 0.
 				animationSaveNFramesCounter += 1
 
@@ -181,8 +232,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		if reportStatsNthLoopCounter == reportStatsEveryNthLoop:
 			# Save a progress snapshot image.
 			print('Saving prograss snapshot image ', stateIMGfileName, ' . . .')
-			im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-			im.save(stateIMGfileName)
+			coordinatesListToSavedImage(arr, height, width, stateIMGfileName)
 			printProgress()
 			reportStatsNthLoopCounter = 0
 		# This will terminate all coordinate and color mutation at an arbitary number of mutations.
@@ -191,9 +241,22 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			print('Pixel fill (successful mutation) termination count ', terminatePaintingAtFillCount, ' reached. Ending algorithm and painting.')
 			break
 
-	# Save final image file and delete progress (state, temp) image file.
+	# Save final image file and delete progress (state) image file.
 	print('Saving image ', imgFileName, ' . . .')
-	im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-	im.save(imgFileName)
+	coordinatesListToSavedImage(arr, height, width, imgFileName)
 	print('Created ', n, ' of ', numIMGsToMake, ' images.')
 	os.remove(stateIMGfileName)
+# END IMAGE GENERATION.
+	
+	
+# Deprecated scraps from prior version of script:
+# arr = np.ones((height, width, 3)) * backgroundColor
+	# DEBUGGING / REFERENCE:
+	# Iterates through every datum in the three-dimensional list (array) :
+	# for a, b in enumerate(arr):
+	# 	print('- arr[', a, ']:\n', b)		# [ [0. 0. 0.] [0. 0. 0.] . . ]
+	# 	for i, j in enumerate(b):
+	# 		print('-- arr[', a, '][', i, ']:\n', arr[a][i])		# [0. 0. 0.]
+	# 		for x, y in enumerate(j):
+	# 			print('--- arr[', a, '][', i, '][', x, ']:\n', y)
+	# 			felf = 'nor'
