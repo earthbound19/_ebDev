@@ -1,7 +1,3 @@
-# IN REVISION.
-# Revision test command that invokes this:
-# clear && python path/to/this/colorGrowth.py -n 1 -w 100 -t 50 -b [127,127,127] -r 13
-
 # DESCRIPTION
 # Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Right now it is one virtual, undead bacterium which randomly walks and poops mutated colors. A possible future update will manage multiple bacteria. Output file names are random. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
