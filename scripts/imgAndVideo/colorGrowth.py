@@ -163,7 +163,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	color = colorMutationBase
 	previousColor = color
 	failedCoordMutationCount = 0
-	reportStatsEveryNthLoop = 1800
+	reportStatsEveryNthLoop = 426
 	reportStatsNthLoopCounter = 0
 
 	# Create unique, date-time informative image file name. Note that this will represent when the painting began, not when it ended (~state filename will be based off this).
@@ -183,7 +183,18 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	print('Generating image . . .')
 	while unusedCoords:
 # TO DO: use Coordinate.getRNDemptyNeighbors() here instead (with everything else that may entail) :
-		chosenCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])
+# DEV CODING HERE
+		for loopCoord in arr:
+			if loopCoord.XYtuple == chosenCoord:
+				emptyNeighborsList = loopCoord.getRNDemptyNeighbors()
+				if emptyNeighborsList:		# If we got a list that isn't empty,
+					# print('Empty neighbors here:', emptyNeighborsList)
+					chosenCoord = random.choice(emptyNeighborsList)		# Use one of the items in that list.
+				else:		# Otherwise,
+					chosenCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])		# Pick any other random coordinate.
+					# print('Empty neighbors (not) here:', emptyNeighborsList)
+				break
+# END DEV CODING HERE
 		boolIsInUsedCoords = chosenCoord in usedCoords
 		if not boolIsInUsedCoords:		# If the coordinate is NOT in usedCoords, use it (whether or not it is, the coordinate is still mutated; this loop keeps mutating the coordinate (and pooping colors on newly arrived at unused coordinates) until terminate conditions are met).
 			# print('chosenCoord ', chosenCoord, ' is NOT in usedCoords. Will use.')
