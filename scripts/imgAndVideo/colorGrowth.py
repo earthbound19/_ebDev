@@ -82,7 +82,8 @@ class Coordinate:
 		for element in tmpList:
 			if -1 in element:
 				deleteList.append(element)
-		for element in tmpList:		# TO DO: debug whether I even need this; the print never happens:
+# TO DO: debug whether I even need this; the print never happens:
+		for element in tmpList:
 			if (maxX+1) in element:
 				deleteList.append(element)
 		for element in tmpList:
@@ -184,20 +185,24 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	while unusedCoords:
 # TO DO: use Coordinate.getRNDemptyNeighbors() here instead (with everything else that may entail) :
 # DEV CODING HERE
-		candidateCoord = ()
-		for loopCoord in arr:
-			if loopCoord.XYtuple == chosenCoord:
-				emptyNeighborsList = loopCoord.getRNDemptyNeighbors()
-				if emptyNeighborsList:		# Only do anything if this has a value (is not None)
-					candidateCoord = random.choice(emptyNeighborsList)		# TO DO: revise when handling multiple coords
-					loopCoord.emptyNeighbors.remove(candidateCoord)		# Remove that coord from available neighbors.
-					break		# Cancel this loop because we found a coord (avoid futile loops)
+#		candidateCoord = ()
+#		for loopCoord in arr:
+			# clean up all coordinates in all empty neighbor lists for each coord based off usedCoords as we go.
+# TO DO: No, do I know I always want to do that?
+#			if chosenCoord in loopCoord.emptyNeighbors:
+#				loopCoord.emptyNeighbors.remove(chosenCoord)
+#			if loopCoord.XYtuple == chosenCoord:
+#				emptyNeighborsList = loopCoord.getRNDemptyNeighbors()
+#				if emptyNeighborsList:		# Only do anything if this has a value (is not None)
+# TO DO: revise when handling multiple coords:
+#					candidateCoord = random.choice(emptyNeighborsList)
 		# If we found an empty neighbor (candidate coord), use it. Otherwise use a random coordinate:
-		if candidateCoord:
-			chosenCoord = candidateCoord
-		else:
-			chosenCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])		# Pick any other random coordinate.
+#		if candidateCoord:
+#			chosenCoord = candidateCoord
+#		else:
+#			chosenCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])		# Pick any other random coordinate.
 # END DEV CODING HERE
+		chosenCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])
 		boolIsInUsedCoords = chosenCoord in usedCoords
 		if not boolIsInUsedCoords:		# If the coordinate is NOT in usedCoords, use it (whether or not it is, the coordinate is still mutated; this loop keeps mutating the coordinate (and pooping colors on newly arrived at unused coordinates) until terminate conditions are met).
 			# print('chosenCoord ', chosenCoord, ' is NOT in usedCoords. Will use.')
@@ -237,13 +242,13 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 				if revertColorOnMutationFail == 1:
 					previousColor = colorMutationBase
 		# Running progress report:
-		reportStatsNthLoopCounter += 1
-		if reportStatsNthLoopCounter == reportStatsEveryNthLoop:
+		if reportStatsNthLoopCounter == 0 or reportStatsNthLoopCounter == reportStatsEveryNthLoop:
 			# Save a progress snapshot image.
 			print('Saving prograss snapshot image ', stateIMGfileName, ' . . .')
 			CoordinatesListToSavedImage(arr, height, width, stateIMGfileName)
 			printProgress()
-			reportStatsNthLoopCounter = 0
+			reportStatsNthLoopCounter = 1
+		reportStatsNthLoopCounter += 1
 		# This will terminate all coordinate and color mutation at an arbitary number of mutations.
 		usedCoordsCount = len(usedCoords)
 		if usedCoordsCount == terminatePaintingAtFillCount:
@@ -254,6 +259,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	print('Saving image ', imgFileName, ' . . .')
 	CoordinatesListToSavedImage(arr, height, width, imgFileName)
 	print('Created ', n, ' of ', numIMGsToMake, ' images.')
+# TO DO: fix that this file may not exist (if the number is never met that makes it save. just save to start and then every N:
 	os.remove(stateIMGfileName)
 # END IMAGE GENERATION.
 	
