@@ -26,6 +26,7 @@ import numpy as np
 from PIL import Image
 # import sys
 
+# START OPTIONS AND GLOBALS
 parser = argparse.ArgumentParser(description='Renders a PNG image like bacteria that produce random color mutations as they grow over a surface. Right now it is one virtual, undead bacterium. A planned update will host multiple virtual bacteria. Output file names are after the date plus random characters. Inspired by and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
 parser.add_argument('-n', '--numberOfImages', type=int, default=7, help='How many images to generate. Default 7.')
 parser.add_argument('-w', '--width', type=int, default=1200, help='Width of output image(s). Default 1200.')
@@ -64,6 +65,44 @@ allesPixelCount = width * height
 if failedMutationsThreshold == None:
 	failedMutationsThreshold = int(allesPixelCount * percentMutation)
 terminatePaintingAtFillCount = int(allesPixelCount * stopPaintingPercent)
+
+# START COORDINATE CLASS
+class Coordinate:
+	# slots for allegedly higher efficiency re: https://stackoverflow.com/a/49789270
+	__slots__ = ["XYtuple", "maxX", "maxY", "RGBcolor", "isAlive", "isConsumed", "emptyNeighbors"]
+	def __init__(self, x, y, maxX, maxY, RGBcolor, isAlive, isConsumed, emptyNeighbors):
+		self.XYtuple = (x, y)
+		self.RGBcolor = RGBcolor; self.isAlive = isAlive;	self.isConsumed = isConsumed
+		# Adding all possible empty neighbor values even if they would result in values out of bounds of image (negative or past maxX or maxY), and will check for and clean up pairs with out of bounds values after:
+		tmpList = [ (x-1, y-1), (x-1, y), (x-1, y+1), (x, y-1), (x, y+1), (x+1, y-1), (x+1, y), (x+1, y+1) ]
+		deleteList = []
+		for element in tmpList:
+			if -1 in element:
+				deleteList.append(element)
+# TO DO: debug whether I even need this; the print never happens:
+		for element in tmpList:
+			if (maxX+1) in element:
+				deleteList.append(element)
+		for element in tmpList:
+			if (maxY+1) in element:
+				deleteList.append(element)
+		# reduce deleteList to a list of unique tuples (in case of duplicates, where duplicates could lead us to attempt to remove something that ins't there, which would throw an exception and stop the script) :
+		deleteList = list(set(deleteList))
+		# the deletions:
+		for no in deleteList:
+			tmpList.remove(no)
+		# finallu initialize the intended object member from that built list:
+		self.emptyNeighbors = list(tmpList)
+	def getRNDemptyNeighbors(self):
+		random.shuffle(self.emptyNeighbors)		# shuffle the list of empty neighbor Coordinates
+		nNeighborsToReturn = np.random.random_integers(0, len(self.emptyNeighbors))		# Decide how many to pick
+		rndNeighborsToReturn = []		# init an empty array we'll populate with neighbors and return
+		# iterate over nNeighborsToReturn items in shuffled self.emptyNeighbors and add them to a list to return:
+		for pick in range(0, nNeighborsToReturn):
+			rndNeighborsToReturn.append(self.emptyNeighbors[pick])
+		return rndNeighborsToReturn
+# END COORDINATE CLASS
+# END OPTIONS AND GLOBALS
 
 print('Will generate ', numIMGsToMake, ' image(s).')
 
