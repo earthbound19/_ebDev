@@ -12,7 +12,7 @@
 # python thisScript.py -h
 
 # DEPENDENCIES
-# python 3 with the various modules installed that you see in the import statements here near the start of this script.
+# python 3 with the various modules installed that you see in the import statements here near the start of this script, ONE OF WHICH is a local file, colorpoop.py.
 
 # TO DO:
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
@@ -74,21 +74,6 @@ terminatePaintingAtFillCount = int(allesPixelCount * stopPaintingPercent)
 print('Will generate ', numIMGsToMake, ' image(s).')
 # END ARGUMENT PARSING AND GLOBALS.
 
-# GLOBAL FUNCTIONS (DEVELOPMENT STUB).
-# def getNParrayCompatRGBvals():
-	# imgArray = []
-	# Relies on this script never making allCoordinates longer than width * height (so, never an out of index error) :
-	# for i in range(0, height):
-		# coordsRow = []
-		# for j in range(0, width):
-			# R = allCoordinates[i*width+j].RGBcolor[0]		# Somehow if I just use .RGBcolor it's wrapped in something that prints out as "array(..", so splitting out the elements of the list here.
-			# G = allCoordinates[i*width+j].RGBcolor[1]
-			# B = allCoordinates[i*width+j].RGBcolor[2]
-			# thisList = [R, G, B]
-			# coordsRow.append(thisList)
-		# imgArray.append(coordsRow)
-# END GLOBAL FUNCTIONS (DEVELOPMENT STUB).
-
 
 # IMAGE GENERATION.
 # Loop making N (-n | numimages) images.
@@ -131,6 +116,18 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		randomIndex = np.random.random_integers(0, unusedCoordsListSize-1)
 		chosenCoord = unusedCoords[randomIndex]
 		return chosenCoord
+
+	# function creates image from list of Coordinate objects, heigh and width definitions, and a filename string:
+	def coordinatesListToSavedImage(arr, height, width, imgFileName):
+		imgArray = []
+		for i in range(0, height):
+			coordsRow = []
+			for j in range(0, width):
+				coordsRow.append(arr[i*width+j].RGBcolor)
+			imgArray.append(coordsRow)
+		imgArray = np.asarray(imgArray)
+		im = Image.fromarray(imgArray.astype(np.uint8)).convert('RGB')
+		im.save(imgFileName)
 
 	# Initialize chosenCoord:
 	chosenCoord = getRNDunusedCoord()
@@ -185,9 +182,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 				if (animationSaveNFramesCounter % animationSaveEveryNframes) == 0:
 					strOfThat = str(animationFrameCounter)
 					frameFilePathAndFileName = animFramesFolderName + '/' + strOfThat.zfill(padAnimationSaveFramesNumbersTo) + '.png'
-# TO DO: bug fix and uncomment the next two lines:
-					# im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-					# im.save(frameFilePathAndFileName)
+					coordinatesListToSavedImage(arr, height, width, frameFilePathAndFileName)
 					animationFrameCounter += 1		# Increment that *after* because by default ffmpeg expects frame count to start at 0.
 				animationSaveNFramesCounter += 1
 
@@ -207,9 +202,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		if reportStatsNthLoopCounter == reportStatsEveryNthLoop:
 			# Save a progress snapshot image.
 			print('Saving prograss snapshot image ', stateIMGfileName, ' . . .')
-# TO DO: bug fix and then uncomment the next two lines:
-#			im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-#			im.save(stateIMGfileName)
+			coordinatesListToSavedImage(arr, height, width, stateIMGfileName)
 			printProgress()
 			reportStatsNthLoopCounter = 0
 		# This will terminate all coordinate and color mutation at an arbitary number of mutations.
@@ -220,28 +213,9 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 
 	# Save final image file and delete progress (state) image file.
 	print('Saving image ', imgFileName, ' . . .')
-	
-	
-	imgArray = []
-	for i in range(0, height):
-		coordsRow = []
-		for j in range(0, width):
-			R = arr[i*width+j].RGBcolor[0]
-			G = arr[i*width+j].RGBcolor[1]
-			B = arr[i*width+j].RGBcolor[2]
-			thisList = [R, G, B]
-			coordsRow.append(thisList)
-		imgArray.append(coordsRow)
-		
-#	print('Value of imgArray:', imgArray)
-	
-# TO DO? rename arrTwo or reuse . . . can I reuse anything else?
-	arrTwo = np.asarray(imgArray)
-	im = Image.fromarray(arrTwo.astype(np.uint8)).convert('RGB')
-	im.save(imgFileName)
+	coordinatesListToSavedImage(arr, height, width, imgFileName)
 	print('Created ', n, ' of ', numIMGsToMake, ' images.')
-# TO DO: uncomment the following line after development complete:
-	# os.remove(stateIMGfileName)
+	os.remove(stateIMGfileName)
 # END IMAGE GENERATION.
 	
 	
