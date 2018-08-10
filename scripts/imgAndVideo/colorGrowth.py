@@ -11,6 +11,8 @@
 # python thisScript.py -h
 
 # TO DO:
+# - All items listed in comments in this script labeled "TO DO."
+# - Not have functions rely on global variables (which are defined after functions in this script, but used by those functions)? Make functions require such variables as parameters (to control values better), and return copies of them, and use those returned copies if necessary?
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
 # - Option to use a parameter preset (which would be literally just an input file of desired parameters?). Is this a standardized nixy' CLI thing to do?
 # - Initialize colorMutationBase by random selection from a .hexplt color scheme
@@ -119,13 +121,6 @@ def mutateCoordinate(xCoordParam, yCoordParam):
 	return (xCoord, yCoord)
 
 
-# function gets random unused coordinate (position, not Coordinate object!) :
-def getRNDunusedCoord():
-	unusedCoordsListSize = len(unusedCoords)
-	randomIndex = np.random.random_integers(0, unusedCoordsListSize-1)
-	chosenCoord = unusedCoords[randomIndex]
-	return chosenCoord
-
 # function creates image from list of Coordinate objects, heigh and width definitions, and a filename string:
 def CoordinatesListToSavedImage(arr, height, width, imgFileName):
 	imgArray = []
@@ -163,7 +158,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	totalPixels = width * height
 
 	# Initialize chosenCoord:
-	chosenCoord = getRNDunusedCoord()
+	chosenCoord = random.choice(unusedCoords)
 	usedCoords = []
 	color = colorMutationBase
 	previousColor = color
@@ -220,7 +215,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			failedCoordMutationCount += 1
 			# If coordiante mutation fails failedMutationsThreshold times, get a new random coordinate, and print a message saying so.
 			if failedCoordMutationCount == failedMutationsThreshold:
-				chosenCoord = getRNDunusedCoord()
+				chosenCoord = random.choice(unusedCoords)
 				print('Coordinate mutation failure threshold met at ', failedMutationsThreshold, '. New random, unused coordinate selected: ', chosenCoord)
 				printProgress()
 				failedCoordMutationCount = 0
