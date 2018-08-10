@@ -88,7 +88,7 @@ class Coordinate:
 		for element in tmpList:
 			if (maxY+1) in element:
 				deleteList.append(element)
-		# reduce deleteList to a list of unique tuples (in case of duplicates, which can lead us to attempt to remove something that ins't there, which throws an exception and stops the script) :
+		# reduce deleteList to a list of unique tuples (in case of duplicates, where duplicates could lead us to attempt to remove something that ins't there, which would throw an exception and stop the script) :
 		deleteList = list(set(deleteList))
 		# the deletions:
 		for no in deleteList:
@@ -184,30 +184,34 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	while unusedCoords:
 # TO DO: use Coordinate.getRNDemptyNeighbors() here instead (with everything else that may entail) :
 # DEV CODING HERE
+		candidateCoord = ()
 		for loopCoord in arr:
 			if loopCoord.XYtuple == chosenCoord:
 				emptyNeighborsList = loopCoord.getRNDemptyNeighbors()
-				if emptyNeighborsList:		# If we got a list that isn't empty,
-					# print('Empty neighbors here:', emptyNeighborsList)
-					chosenCoord = random.choice(emptyNeighborsList)		# Use one of the items in that list.
-				else:		# Otherwise,
-					chosenCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])		# Pick any other random coordinate.
-					# print('Empty neighbors (not) here:', emptyNeighborsList)
-				break
+				if emptyNeighborsList:		# Only do anything if this has a value (is not None)
+					candidateCoord = random.choice(emptyNeighborsList)		# TO DO: revise when handling multiple coords
+					loopCoord.emptyNeighbors.remove(candidateCoord)		# Remove that coord from available neighbors.
+					break		# Cancel this loop because we found a coord (avoid futile loops)
+		# If we found an empty neighbor (candidate coord), use it. Otherwise use a random coordinate:
+		if candidateCoord:
+			chosenCoord = candidateCoord
+		else:
+			chosenCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])		# Pick any other random coordinate.
 # END DEV CODING HERE
 		boolIsInUsedCoords = chosenCoord in usedCoords
 		if not boolIsInUsedCoords:		# If the coordinate is NOT in usedCoords, use it (whether or not it is, the coordinate is still mutated; this loop keeps mutating the coordinate (and pooping colors on newly arrived at unused coordinates) until terminate conditions are met).
 			# print('chosenCoord ', chosenCoord, ' is NOT in usedCoords. Will use.')
 			usedCoords.append(chosenCoord)
-			previousCoord = chosenCoord
-			arrXidx = chosenCoord[0]
-			arrYidx = chosenCoord[1]
+#			previousCoord = chosenCoord
+#			arrXidx = chosenCoord[0]
+#			arrYidx = chosenCoord[1]
 			newColor = previousColor + np.random.random_integers(-rshift, rshift, size=3) / 2
 			# Clip that within RGB range if it wandered outside of that range. If this slows it down too much and you don't care if colors randomly freak out (bitmap conversion seems to take colors outside range as wrapping around?) comment the next line out:
 			newColor = newColor.astype(int)		# Without this conversion we can get floats (decimals).
 			newColor = np.clip(newColor, 0, 255)
 			# Find the element in arr[] that has an XYtuple matching chosenCoord, and change the color member in that element:
 # TO DO: collect empty neighbors into a list while we have that element in hand.
+			# Mutate color at chosen coordinate, then remove coordinate from unusedCoords array:
 			for loopCoord in arr:
 				if loopCoord.XYtuple == chosenCoord:
 					loopCoord.RGBcolor = (newColor)		# That's the actual mutated color assignment
@@ -221,7 +225,6 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 					CoordinatesListToSavedImage(arr, height, width, frameFilePathAndFileName)
 					animationFrameCounter += 1		# Increment that *after* because by default ffmpeg expects frame count to start at 0.
 				animationSaveNFramesCounter += 1
-
 		else:		# If the coordinate is NOT NOT used (is used), print a progress message.
 			failedCoordMutationCount += 1
 			# If coordiante mutation fails failedMutationsThreshold times, get a new random coordinate, and print a message saying so.
