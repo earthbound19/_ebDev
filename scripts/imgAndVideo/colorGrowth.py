@@ -188,21 +188,21 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	print('Generating image . . .')
 	while unusedCoords:
 # START DEV CODING HERE
-		candidateCoord = ()
-		for loopCoord in devTMParr:
-			if loopCoord.XYtuple == chosenCoord:
-				emptyNeighborsList = loopCoord.getRNDemptyNeighbors()
-				if emptyNeighborsList:		# Only do anything if this has a value (is not None)
-					candidateCoord = random.choice(emptyNeighborsList)		# TO DO: revise when handling multiple coords
+#		candidateCoord = ()
+#		for loopCoord in devTMParr:
+#			if loopCoord.XYtuple == chosenCoord:
+#				emptyNeighborsList = loopCoord.getRNDemptyNeighbors()
+#				if emptyNeighborsList:		# Only do anything if this has a value (is not None)
+#					candidateCoord = random.choice(emptyNeighborsList)		# TO DO: revise when handling multiple coords
 	#				loopCoord.emptyNeighbors.remove(candidateCoord)		# Remove that coord from available neighbors.
-					break		# Cancel this loop because we found a coord (avoid futile loops)
+#					break		# Cancel this loop because we found a coord (avoid futile loops)
 		# If we found an empty neighbor (candidate coord), use it. Otherwise use a random coordinate:
-		if candidateCoord:
-			chosenCoord = candidateCoord
-		else:
-			chosenCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])		# Pick any other random coordinate.
+#		if candidateCoord:
+#			chosenCoord = candidateCoord
+#		else:
+#			chosenCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])		# Pick any other random coordinate.
 # Before introducing everything above in this DEV CODING section, it was just the next line:
-#		chosenCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])
+		chosenCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])
 # END DEV CODING HERE
 		boolIsInUsedCoords = chosenCoord in usedCoords
 		if not boolIsInUsedCoords:		# If the coordinate is NOT in usedCoords, use it (whether or not it is, the coordinate is still mutated; this loop keeps mutating the coordinate (and pooping colors on newly arrived at unused coordinates) until terminate conditions are met).
