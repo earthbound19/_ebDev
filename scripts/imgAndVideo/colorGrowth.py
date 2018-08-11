@@ -168,7 +168,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	color = colorMutationBase
 	previousColor = color
 	failedCoordMutationCount = 0
-	reportStatsEveryNthLoop = 1800
+	reportStatsEveryNthLoop = 370
 	reportStatsNthLoopCounter = 0
 
 	# Create unique, date-time informative image file name. Note that this will represent when the painting began, not when it ended (~State filename will be based off this).
@@ -208,7 +208,6 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		if not boolIsInUsedCoords:		# If the coordinate is NOT in usedCoords, use it (whether or not it is, the coordinate is still mutated; this loop keeps mutating the coordinate (and pooping colors on newly arrived at unused coordinates) until terminate conditions are met).
 			# print('chosenCoord ', chosenCoord, ' is NOT in usedCoords. Will use.')
 			usedCoords.append(chosenCoord)
-			previousCoord = chosenCoord
 			arrXidx = chosenCoord[0]
 			arrYidx = chosenCoord[1]
 			newColor = previousColor + np.random.random_integers(-rshift, rshift, size=3) / 2
