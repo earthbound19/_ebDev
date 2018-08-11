@@ -140,15 +140,6 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	animationSaveNFramesCounter = 0
 	animationFrameCounter = 0
 	arr = np.ones((height, width, 3)) * backgroundColor
-		# DEBUGGING / REFERENCE:
-		# Iterates through every datum in the three-dimensional list (array) :
-		# for a, b in enumerate(arr):
-		# 	print('- arr[', a, ']:\n', b)		# [ [0. 0. 0.] [0. 0. 0.] . . ]
-		# 	for i, j in enumerate(b):
-		# 		print('-- arr[', a, '][', i, ']:\n', arr[a][i])		# [0. 0. 0.]
-		# 		for x, y in enumerate(j):
-		# 			print('--- arr[', a, '][', i, '][', x, ']:\n', y)
-		# 			felf = 'nor'
 
 	unusedCoords = []
 	for yCoord in range(0, width):
@@ -235,3 +226,15 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	im.save(imgFileName)
 	print('Created ', n, ' of ', numIMGsToMake, ' images.')
 	os.remove(stateIMGfileName)
+
+
+# numpy / PIL image-compatible structural reference:
+# DEBUGGING / REFERENCE:
+# Iterates through every datum in the three-dimensional list (array) :
+# for a, b in enumerate(arr):
+# 	print('- arr[', a, ']:\n', b)		# [ [0. 0. 0.] [0. 0. 0.] . . ]
+# 	for i, j in enumerate(b):
+# 		print('-- arr[', a, '][', i, ']:\n', arr[a][i])		# [0. 0. 0.]
+# 		for x, y in enumerate(j):
+# 			print('--- arr[', a, '][', i, '][', x, ']:\n', y)
+# 			felf = 'nor'
