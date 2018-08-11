@@ -24,7 +24,7 @@
 import datetime, random, argparse, ast, os.path
 import numpy as np
 from PIL import Image
-# import sys
+import sys
 
 # START OPTIONS AND GLOBALS
 parser = argparse.ArgumentParser(description='Renders a PNG image like bacteria that produce random color mutations as they grow over a surface. Right now it is one virtual, undead bacterium. A planned update will host multiple virtual bacteria. Output file names are after the date plus random characters. Inspired by and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
@@ -69,10 +69,10 @@ terminatePaintingAtFillCount = int(allesPixelCount * stopPaintingPercent)
 # START COORDINATE CLASS
 class Coordinate:
 	# slots for allegedly higher efficiency re: https://stackoverflow.com/a/49789270
-	__slots__ = ["XYtuple", "maxX", "maxY", "RGBcolor", "isAlive", "isConsumed", "emptyNeighbors"]
+	__slots__ = ["XYtuple", "x", "y", "maxX", "maxY", "RGBcolor", "isAlive", "isConsumed", "emptyNeighbors"]
 	def __init__(self, x, y, maxX, maxY, RGBcolor, isAlive, isConsumed, emptyNeighbors):
 		self.XYtuple = (x, y)
-		self.RGBcolor = RGBcolor; self.isAlive = isAlive;	self.isConsumed = isConsumed
+		self.x = x; self.y = y; self.RGBcolor = RGBcolor; self.isAlive = isAlive;	self.isConsumed = isConsumed
 		# Adding all possible empty neighbor values even if they would result in values out of bounds of image (negative or past maxX or maxY), and will check for and clean up pairs with out of bounds values after:
 		tmpList = [ (x-1, y-1), (x-1, y), (x-1, y+1), (x, y-1), (x, y+1), (x+1, y-1), (x+1, y), (x+1, y+1) ]
 		deleteList = []
@@ -140,6 +140,14 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	animationSaveNFramesCounter = 0
 	animationFrameCounter = 0
 	arr = np.ones((height, width, 3)) * backgroundColor
+	compArr = []
+	for xCoord in range(0, width):
+		for yCoord in range(0, height):	# RGBcolor can also be initialized with: np.random.randint(0, 255, size=3)
+			compArr.append(Coordinate(xCoord, yCoord, width, height, backgroundColor, False, False, None))
+	print('arr:', arr)
+	for element in compArr:
+		print(element.x, element.y, element.XYtuple)
+	sys.exit()
 
 	unusedCoords = []
 	for yCoord in range(0, width):
