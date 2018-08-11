@@ -151,10 +151,10 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		# 			felf = 'nor'
 
 # START DEV TEMP CODE
-	devTMParr = []	# list of Coordinate objects
-	for xCoord in range(0, width):
-		for yCoord in range(0, height):	# RGBcolor can also be initialized with: np.random.randint(0, 255, size=3)
-			devTMParr.append(Coordinate(xCoord, yCoord, width, height, backgroundColor, False, False, None))
+	# devTMParr = []	# list of Coordinate objects
+	# for xCoord in range(0, width):
+	# 	for yCoord in range(0, height):	# RGBcolor can also be initialized with: np.random.randint(0, 255, size=3)
+	# 		devTMParr.append(Coordinate(xCoord, yCoord, width, height, backgroundColor, False, False, None))
 # END DEV TEMP CODE
 
 	unusedCoords = []
