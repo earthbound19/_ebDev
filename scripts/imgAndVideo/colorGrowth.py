@@ -141,8 +141,8 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	animationFrameCounter = 0
 	arr = np.ones((height, width, 3)) * backgroundColor
 	compArr = []
-	for xCoord in range(0, width):
-		for yCoord in range(0, height):	# RGBcolor can also be initialized with: np.random.randint(0, 255, size=3)
+	for xCoord in range(0, height):
+		for yCoord in range(0, width):	# RGBcolor can also be initialized with: np.random.randint(0, 255, size=3)
 			compArr.append(Coordinate(xCoord, yCoord, width, height, backgroundColor, False, False, None))
 	print('arr:', arr)
 	for element in compArr:
