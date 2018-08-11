@@ -71,12 +71,12 @@ terminatePaintingAtFillCount = int(allesPixelCount * stopPaintingPercent)
 # START COORDINATE CLASS
 class Coordinate:
 	# slots for allegedly higher efficiency re: https://stackoverflow.com/a/49789270
-	__slots__ = ["XYtuple", "x", "y", "maxX", "maxY", "RGBcolor", "isAlive", "isConsumed", "emptyNeighbors"]
+	__slots__ = ["YXtuple", "x", "y", "maxX", "maxY", "RGBcolor", "isAlive", "isConsumed", "emptyNeighbors"]
 	def __init__(self, x, y, maxX, maxY, RGBcolor, isAlive, isConsumed, emptyNeighbors):
-		self.XYtuple = (x, y)
+		self.YXtuple = (y, x)
 		self.x = x; self.y = y; self.RGBcolor = RGBcolor; self.isAlive = isAlive;	self.isConsumed = isConsumed
 		# Adding all possible empty neighbor values even if they would result in values out of bounds of image (negative or past maxX or maxY), and will check for and clean up pairs with out of bounds values after:
-		tmpList = [ (x-1, y-1), (x-1, y), (x-1, y+1), (x, y-1), (x, y+1), (x+1, y-1), (x+1, y), (x+1, y+1) ]
+		tmpList = [ (y-1, x-1), (y, x-1), (y+1, x-1), (y-1, x), (y+1, x), (y-1, x+1), (y, x+1), (y+1, x+1) ]
 		deleteList = []
 		for element in tmpList:
 			if -1 in element:
