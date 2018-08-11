@@ -102,6 +102,34 @@ class Coordinate:
 			rndNeighborsToReturn.append(self.emptyNeighbors[pick])
 		return rndNeighborsToReturn
 # END COORDINATE CLASS
+
+# START GLOBAL FUNCTIONS
+# function takes two ints and shifts each up or down one or not at all. I know, it doesn't receive a tuple as input but it gives one as output:
+def mutateCoordinate(xCoordParam, yCoordParam):
+	xCoord = np.random.random_integers((xCoordParam - 1), xCoordParam + 1)
+	yCoord = np.random.random_integers((yCoordParam - 1), yCoordParam + 1)
+	# if necessary, move results back in range of the array indices this is intended to be used with (zero-based indexing, so maximum (n - 1) and never less than 0) :
+	if (xCoord < 0):
+		xCoord = 0
+	if (xCoord > (width - 1)):
+		xCoord = (width - 1)
+	if (yCoord < 0):
+		yCoord = 0
+	if (yCoord > (height - 1)):
+		yCoord = (height - 1)
+	return [xCoord, yCoord]
+
+# function gets random unused coordinate:
+def getRNDunusedCoord():
+	unusedCoordsListSize = len(unusedCoords)
+	randomIndex = np.random.random_integers(0, unusedCoordsListSize-1)
+	chosenCoord = unusedCoords[randomIndex]
+	return chosenCoord
+
+# function prints coordinate plotting statistics (progress report):
+def printProgress():
+	print('Unused coordinates: ', len(unusedCoords), ' Have plotted ', len(usedCoords), 'of ', terminatePaintingAtFillCount, ' desired coordinates (on a canvas of', allesPixelCount, ' pixels).')
+# END GLOBAL FUNCTIONS
 # END OPTIONS AND GLOBALS
 
 print('Will generate ', numIMGsToMake, ' image(s).')
@@ -122,34 +150,10 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		# 			print('--- arr[', a, '][', i, '][', x, ']:\n', y)
 		# 			felf = 'nor'
 
-	# function takes two ints and shifts each up or down one or not at all. I know, it doesn't receive a tuple as input but it gives one as output:
-	def mutateCoordinate(xCoordParam, yCoordParam):
-		xCoord = np.random.random_integers((xCoordParam - 1), xCoordParam + 1)
-		yCoord = np.random.random_integers((yCoordParam - 1), yCoordParam + 1)
-		# if necessary, move results back in range of the array indices this is intended to be used with (zero-based indexing, so maximum (n - 1) and never less than 0) :
-		if (xCoord < 0):
-			xCoord = 0
-		if (xCoord > (width - 1)):
-			xCoord = (width - 1)
-		if (yCoord < 0):
-			yCoord = 0
-		if (yCoord > (height - 1)):
-			yCoord = (height - 1)
-		return [xCoord, yCoord]
-
 	unusedCoords = []
 	for yCoord in range(0, width):
 		for xCoord in range(0, height):
 			unusedCoords.append([yCoord, xCoord])
-
-	totalPixels = width * height
-
-	# function gets random unused coordinate:
-	def getRNDunusedCoord():
-		unusedCoordsListSize = len(unusedCoords)
-		randomIndex = np.random.random_integers(0, unusedCoordsListSize-1)
-		chosenCoord = unusedCoords[randomIndex]
-		return chosenCoord
 
 	# Initialize chosenCoord:
 	chosenCoord = getRNDunusedCoord()
@@ -159,10 +163,6 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	failedCoordMutationCount = 0
 	reportStatsEveryNthLoop = 1800
 	reportStatsNthLoopCounter = 0
-
-	# function prints coordinate plotting statistics (progress report):
-	def printProgress():
-		print('Unused coordinates: ', len(unusedCoords), ' Have plotted ', len(usedCoords), 'of ', terminatePaintingAtFillCount, ' desired coordinates (on a canvas of', totalPixels, ' pixels).')
 
 	# Create unique, date-time informative image file name. Note that this will represent when the painting began, not when it ended (~State filename will be based off this).
 	now = datetime.datetime.now()
@@ -216,14 +216,14 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 				if revertColorOnMutationFail == 1:
 					previousColor = colorMutationBase
 		# Running progress report:
-		reportStatsNthLoopCounter += 1
-		if reportStatsNthLoopCounter == reportStatsEveryNthLoop:
+		if reportStatsNthLoopCounter == 0 or reportStatsNthLoopCounter == reportStatsEveryNthLoop:
 			# Save a progress snapshot image.
 			print('Saving prograss snapshot image ', stateIMGfileName, ' . . .')
 			im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
 			im.save(stateIMGfileName)
 			printProgress()
-			reportStatsNthLoopCounter = 0
+			reportStatsNthLoopCounter = 1
+		reportStatsNthLoopCounter += 1
 		# This will terminate all coordinate and color mutation at an arbitary number of mutations.
 		usedCoordsCount = len(usedCoords)
 		if usedCoordsCount == terminatePaintingAtFillCount:
