@@ -11,6 +11,8 @@
 # python 3 with the various modules installed that you see in the import statements here near the start of this script.
 
 # TO DO:
+# - ADAPT Coordinates object (and use?) here from learnings which at this moment are only in scrap.py
+# - Option to suppress progress print to save time
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
 # - Option to use a parameter preset (which would be literally just an input file of desired parameters?). Is this a standardized nixy' CLI thing to do?
 # - Initialize colorMutationBase by random selection from a .hexplt color scheme
@@ -238,13 +240,31 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	os.remove(stateIMGfileName)
 
 
-# numpy / PIL image-compatible structural reference:
-# DEBUGGING / REFERENCE:
-# Iterates through every datum in the three-dimensional list (array) :
-# for a, b in enumerate(arr):
-# 	print('- arr[', a, ']:\n', b)		# [ [0. 0. 0.] [0. 0. 0.] . . ]
-# 	for i, j in enumerate(b):
-# 		print('-- arr[', a, '][', i, ']:\n', arr[a][i])		# [0. 0. 0.]
-# 		for x, y in enumerate(j):
-# 			print('--- arr[', a, '][', i, '][', x, ']:\n', y)
-# 			felf = 'nor'
+
+
+# MUCH BETTERER REFERENCE:
+# arr = np.ones((height, width, 3)) * backgroundColor
+# # THAT ARRAY is organized as [down][across] OR [y][x] OR [height - n][width - n] OR [row][column]; re the following numpy / PIL-compatible list of lists of lists of numbers and debug print to help understand the structure:
+# arr[2][3] = [255,0,255]		# y (down) = 1, x (across) = 2 (actual coordinates are +1 each because of zero-based indexing)
+# for y in range(0, height):
+# 	print('- y height (', height, ') iterator ', y, 'in arr[', y, '] gives:\n', arr[y])
+# 	for x in range(0, width):
+# 		print(' -- x width (', width, ') iterator ', x, 'in arr[', y, '][', x, '] gives:', arr[y][x])
+
+# Duplicating that structure with a list of lists:
+# imgArr = []		# Intended to be a list of lists
+# for y in range(0, height):		# for columns (x) in row)
+# 	tmpList = []
+# 	for x in range(0, width):		# over the columns, prep and add:
+# 		tmpList.append(Coordinate(x, y, width, height, backgroundColor, False, False, None))
+# 	imgArr.append(tmpList)
+
+# Printing the second to compare to the first for comprehension:
+# print('------------')
+# for y in range(0, height):
+# 	print('-')
+# 	for x in range(0, width):
+# 		print(' -- imgArr[y][x].YXtuple (imgArr[', y, '][', x, '].YXtuple) is:', imgArr[y][x].YXtuple)
+# 		print(' ALSO I think the empty neighbor coordinate list in the Coordinate object at [y][x] can be used with this list of lists structure for instant access of neighbor coordinates?! That list here is:', imgArr[y][x].emptyNeighbors, ' . . .')
+# 		rndEmptyNeighborList = imgArr[y][x].getRNDemptyNeighbors()
+# 		print(' HERE ALSO is a random selection of those neighbors:', rndEmptyNeighborList)
