@@ -141,15 +141,15 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	animationFrameCounter = 0
 	arr = np.ones((height, width, 3)) * backgroundColor
 # DEV NOTE: CORRECTION OF WHAT WAS WRONG in prior incarnation of script using a list of Coordinate objects for color mutation; that list should have been initialized like:
-	compArr = []
-	for yCoord in range(0, height):
-		for xCoord in range(0, width):	# RGBcolor can also be initialized with: np.random.randint(0, 255, size=3)
-			compArr.append(Coordinate(xCoord, yCoord, width, height, backgroundColor, False, False, None))
-	print('arr:', arr)
-	for element in compArr:
-		print(element.x, element.y, element.XYtuple)
-	sys.exit()
-# END CORRECTION NOTE
+	# compArr = []
+	# for yCoord in range(0, height):
+	# 	for xCoord in range(0, width):	# RGBcolor can also be initialized with: np.random.randint(0, 255, size=3)
+	# 		compArr.append(Coordinate(xCoord, yCoord, width, height, backgroundColor, False, False, None))
+	# print('arr:', arr)
+	# for element in compArr:
+	# 	print(element.x, element.y, element.XYtuple)
+	# sys.exit()
+# END CORRECTION NOTE--DELETE THIS after I decide whether to use it (take that approach of color mutation via Coordinate objects again).
 
 	unusedCoords = []
 	for yCoord in range(0, width):
