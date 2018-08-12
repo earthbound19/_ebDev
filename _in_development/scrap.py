@@ -62,7 +62,7 @@ def mutateCoordinate(xCoordParam, yCoordParam):
 		yCoord = (height - 1)
 	return [xCoord, yCoord]
 
-arr = np.ones((height, width, 3)) * backgroundColor
+arr = np.ones((height, width, 3)) * backgroundColor		# A numpy list of lists of integer (RGB value-range) triplets
 # THAT ARRAY is organized as [down][across] OR [y][x] OR [height - n][width - n] OR [row][column]; re the following numpy / PIL-compatible list of lists of lists of numbers and debug print to help understand the structure:
 arr[2][3] = [255,0,255]		# y (down) = 1, x (across) = 2 (actual coordinates are +1 each because of zero-based indexing)
 for y in range(0, height):
@@ -79,8 +79,9 @@ for y in range(0, height):		# for columns (x) in row)
 	imgArr.append(tmpList)
 
 # Printing the second to compare to the first for comprehension:
+# After we print values from imgArr, we'll use them to overwirte all RGB triplet values in arr with RGBcolor values from list of Coordinate objects:
 print('------------')
-imgArr[2][3].RGBcolor = [255,0,255]		# y (down) = 1, x (across) = 2 (actual coordinates are +1 each because of zero-based indexing)
+imgArr[2][4].RGBcolor = [0,255,255]		# y (down) = 1, x (across) = 2 (actual coordinates are +1 each because of zero-based indexing)
 for y in range(0, height):
 	print('- y height (', height, ') iterator ', y, 'in imgArr[', y, '] gives:\n', imgArr[y])
 	for x in range(0, width):
@@ -88,5 +89,11 @@ for y in range(0, height):
 		# print(' -- imgArr[y][x].YXtuple (imgArr[', y, '][', x, '].YXtuple) is:', imgArr[y][x].YXtuple)
 		# print(' ALSO I think the empty neighbor coordinate list in the Coordinate object at [y][x] can be used with this list of lists structure for instant access of neighbor coordinates?! That list here is:', imgArr[y][x].emptyNeighbors, ' . . .')
 		# rndEmptyNeighborList = imgArr[y][x].getRNDemptyNeighbors()
-		# print(' HERE ALSO is a random selection of those neighbors:', rndEmptyNeighborList)
+		# print(' HERE ALSO is a random selection of those neighbors:', rndEmptyNeighborList
+		arr[y][x] = imgArr[y][x].RGBcolor
+
+
+
+im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
+im.save('tstScrap-pyComp2.png')
 
