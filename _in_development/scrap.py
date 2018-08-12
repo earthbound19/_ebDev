@@ -1,99 +1,61 @@
-# doodle coding for colorGrowth.py development.
-
-import datetime, random, argparse, ast, os.path
-import numpy as np
-from PIL import Image
+# cut and paste for reference as I totally redo the algorithm in colorGrowth.py to handle multiple Coordinates:
 import sys
 
-width = 5
-height = 4
-backgroundColor = [0,0,0]
+sys.exit()
 
-# START COORDINATE CLASS
-class Coordinate:
-	# slots for allegedly higher efficiency re: https://stackoverflow.com/a/49789270
-	__slots__ = ["YXtuple", "x", "y", "maxX", "maxY", "RGBcolor", "isAlive", "isConsumed", "emptyNeighbors"]
-	def __init__(self, x, y, maxX, maxY, RGBcolor, isAlive, isConsumed, emptyNeighbors):
-		self.YXtuple = (y, x)
-		self.x = x; self.y = y; self.RGBcolor = RGBcolor; self.isAlive = isAlive;	self.isConsumed = isConsumed
-		# Adding all possible empty neighbor values even if they would result in values out of bounds of image (negative or past maxX or maxY), and will check for and clean up pairs with out of bounds values after:
-		tmpList = [ (y-1, x-1), (y, x-1), (y+1, x-1), (y-1, x), (y+1, x), (y-1, x+1), (y, x+1), (y+1, x+1) ]
-		deleteList = []
-		for element in tmpList:
-			if -1 in element:
-				deleteList.append(element)
-# TO DO: debug whether I even need this; the print never happens:
-		for element in tmpList:
-			if (maxX+1) in element:
-				deleteList.append(element)
-		for element in tmpList:
-			if (maxY+1) in element:
-				deleteList.append(element)
-		# reduce deleteList to a list of unique tuples (in case of duplicates, where duplicates could lead us to attempt to remove something that ins't there, which would throw an exception and stop the script) :
-		deleteList = list(set(deleteList))
-		# the deletions:
-		for no in deleteList:
-			tmpList.remove(no)
-		# finallu initialize the intended object member from that built list:
-		self.emptyNeighbors = list(tmpList)
-	def getRNDemptyNeighbors(self):
-		random.shuffle(self.emptyNeighbors)		# shuffle the list of empty neighbor Coordinates
-		nNeighborsToReturn = np.random.random_integers(0, len(self.emptyNeighbors))		# Decide how many to pick
-		rndNeighborsToReturn = []		# init an empty array we'll populate with neighbors and return
-		# iterate over nNeighborsToReturn items in shuffled self.emptyNeighbors and add them to a list to return:
-		for pick in range(0, nNeighborsToReturn):
-			rndNeighborsToReturn.append(self.emptyNeighbors[pick])
-		return rndNeighborsToReturn
-# END COORDINATE CLASS
+while unusedCoords:
+	chosenCoord = mutateCoordinate(chosenCoord[0], chosenCoord[1])
+	boolIsInUsedCoords = chosenCoord in usedCoords
+	if not boolIsInUsedCoords:		# If the coordinate is NOT in usedCoords, use it (whether or not it is, the coordinate is still mutated; this loop keeps mutating the coordinate (and pooping colors on newly arrived at unused coordinates) until terminate conditions are met).
+		# print('chosenCoord ', chosenCoord, ' is NOT in usedCoords. Will use.')
+		usedCoords.append(chosenCoord)
+		arrXidx = chosenCoord[0]
+		arrYidx = chosenCoord[1]
+		newColor = previousColor + np.random.random_integers(-rshift, rshift, size=3) / 2
+		# Clip that within RGB range if it wandered outside of that range. If this slows it down too much and you don't care if colors randomly freak out (bitmap conversion seems to take colors outside range as wrapping around?) comment the next line out:
+		newColor = np.clip(newColor, 0, 255)
+		arr[arrYidx][arrXidx] = newColor
+		previousColor = newColor
+		unusedCoords.remove(chosenCoord)
+		# Also, if a parameter was passed saying to do so, save an animation frame (if we are at the Nth (-a) mutation:
+		if animationSaveEveryNframes:
+			if (animationSaveNFramesCounter % animationSaveEveryNframes) == 0:
+				strOfThat = str(animationFrameCounter)
+				frameFilePathAndFileName = animFramesFolderName + '/' + strOfThat.zfill(padAnimationSaveFramesNumbersTo) + '.png'
+				im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
+				im.save(frameFilePathAndFileName)
+				animationFrameCounter += 1		# Increment that *after* because by default ffmpeg expects frame count to start at 0.
+			animationSaveNFramesCounter += 1
 
-# START GLOBAL FUNCTIONS
-# function takes two ints and shifts each up or down one or not at all. I know, it doesn't receive a tuple as input but it gives one as output:
-def mutateCoordinate(xCoordParam, yCoordParam):
-	xCoord = np.random.random_integers((xCoordParam - 1), xCoordParam + 1)
-	yCoord = np.random.random_integers((yCoordParam - 1), yCoordParam + 1)
-	# if necessary, move results back in range of the array indices this is intended to be used with (zero-based indexing, so maximum (n - 1) and never less than 0) :
-	if (xCoord < 0):
-		xCoord = 0
-	if (xCoord > (width - 1)):
-		xCoord = (width - 1)
-	if (yCoord < 0):
-		yCoord = 0
-	if (yCoord > (height - 1)):
-		yCoord = (height - 1)
-	return [xCoord, yCoord]
+	else:		# If the coordinate is NOT NOT used (is used), print a progress message.
+		failedCoordMutationCount += 1
+		# If coordiante mutation fails failedMutationsThreshold times, get a new random coordinate, and print a message saying so.
+		if failedCoordMutationCount == failedMutationsThreshold:
+			chosenCoord = getRNDunusedCoord()
+			print('Coordinate mutation failure threshold met at ', failedMutationsThreshold, '. New random, unused coordinate selected: ', chosenCoord)
+			printProgress()
+			failedCoordMutationCount = 0
+			# if a switch was passed saying to revert or randomise the color mutation base when we reach revertColorOnMutationFail, do so (actually, change the "previous color" to the mutation color base, and the next color mutation will be off that) :
+			if revertColorOnMutationFail == 1:
+				previousColor = colorMutationBase
+	# Running progress report:
+	if reportStatsNthLoopCounter == 0 or reportStatsNthLoopCounter == reportStatsEveryNthLoop:
+		# Save a progress snapshot image.
+		print('Saving prograss snapshot image ', stateIMGfileName, ' . . .')
+		im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
+		im.save(stateIMGfileName)
+		printProgress()
+		reportStatsNthLoopCounter = 1
+	reportStatsNthLoopCounter += 1
+	# This will terminate all coordinate and color mutation at an arbitary number of mutations.
+	usedCoordsCount = len(usedCoords)
+	if usedCoordsCount == terminatePaintingAtFillCount:
+		print('Pixel fill (successful mutation) termination count ', terminatePaintingAtFillCount, ' reached. Ending algorithm and painting.')
+		break
 
-arr = np.ones((height, width, 3)) * backgroundColor		# A numpy list of lists of integer (RGB value-range) triplets
-# THAT ARRAY is organized as [down][across] OR [y][x] OR [height - n][width - n] OR [row][column]; re the following numpy / PIL-compatible list of lists of lists of numbers and debug print to help understand the structure:
-arr[2][3] = [255,0,255]		# y (down) = 1, x (across) = 2 (actual coordinates are +1 each because of zero-based indexing)
-for y in range(0, height):
-	print('- y height (', height, ') iterator ', y, 'in arr[', y, '] gives:\n', arr[y])
-	for x in range(0, width):
-		print(' -- x width (', width, ') iterator ', x, 'in arr[', y, '][', x, '] gives:', arr[y][x])
-
-# Duplicating that structure with a list of lists:
-imgArr = []		# Intended to be a list of lists
-for y in range(0, height):		# for columns (x) in row)
-	tmpList = []
-	for x in range(0, width):		# over the columns, prep and add:
-		tmpList.append(Coordinate(x, y, width, height, backgroundColor, False, False, None))
-	imgArr.append(tmpList)
-
-# Printing the second to compare to the first for comprehension:
-# After we print values from imgArr, we'll use them to overwirte all RGB triplet values in arr with RGBcolor values from list of Coordinate objects:
-print('------------')
-imgArr[2][4].RGBcolor = [0,255,255]		# y (down) = 1, x (across) = 2 (actual coordinates are +1 each because of zero-based indexing)
-for y in range(0, height):
-	print('- y height (', height, ') iterator ', y, 'in imgArr[', y, '] gives:\n', imgArr[y])
-	for x in range(0, width):
-		print(' -- x width (', width, ') iterator ', x, 'in imgArr[', y, '][', x, '].RGBcolor gives:', imgArr[y][x].RGBcolor)
-		# print(' -- imgArr[y][x].YXtuple (imgArr[', y, '][', x, '].YXtuple) is:', imgArr[y][x].YXtuple)
-		# print(' ALSO I think the empty neighbor coordinate list in the Coordinate object at [y][x] can be used with this list of lists structure for instant access of neighbor coordinates?! That list here is:', imgArr[y][x].emptyNeighbors, ' . . .')
-		# rndEmptyNeighborList = imgArr[y][x].getRNDemptyNeighbors()
-		# print(' HERE ALSO is a random selection of those neighbors:', rndEmptyNeighborList
-		arr[y][x] = imgArr[y][x].RGBcolor
-
-
-
+# Save final image file and delete progress (state, temp) image file.
+print('Saving image ', imgFileName, ' . . .')
 im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-im.save('tstScrap-pyComp2.png')
-
+im.save(imgFileName)
+print('Created ', n, ' of ', numIMGsToMake, ' images.')
+os.remove(stateIMGfileName)
