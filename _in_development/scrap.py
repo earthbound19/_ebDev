@@ -80,11 +80,13 @@ for y in range(0, height):		# for columns (x) in row)
 
 # Printing the second to compare to the first for comprehension:
 print('------------')
+imgArr[2][3].RGBcolor = [255,0,255]		# y (down) = 1, x (across) = 2 (actual coordinates are +1 each because of zero-based indexing)
 for y in range(0, height):
-	print('-')
+	print('- y height (', height, ') iterator ', y, 'in imgArr[', y, '] gives:\n', imgArr[y])
 	for x in range(0, width):
-		print(' -- imgArr[y][x].YXtuple (imgArr[', y, '][', x, '].YXtuple) is:', imgArr[y][x].YXtuple)
-		print(' ALSO I think the empty neighbor coordinate list in the Coordinate object at [y][x] can be used with this list of lists structure for instant access of neighbor coordinates?! That list here is:', imgArr[y][x].emptyNeighbors, ' . . .')
-		rndEmptyNeighborList = imgArr[y][x].getRNDemptyNeighbors()
-		print(' HERE ALSO is a random selection of those neighbors:', rndEmptyNeighborList)
+		print(' -- x width (', width, ') iterator ', x, 'in imgArr[', y, '][', x, '].RGBcolor gives:', imgArr[y][x].RGBcolor)
+		# print(' -- imgArr[y][x].YXtuple (imgArr[', y, '][', x, '].YXtuple) is:', imgArr[y][x].YXtuple)
+		# print(' ALSO I think the empty neighbor coordinate list in the Coordinate object at [y][x] can be used with this list of lists structure for instant access of neighbor coordinates?! That list here is:', imgArr[y][x].emptyNeighbors, ' . . .')
+		# rndEmptyNeighborList = imgArr[y][x].getRNDemptyNeighbors()
+		# print(' HERE ALSO is a random selection of those neighbors:', rndEmptyNeighborList)
 
