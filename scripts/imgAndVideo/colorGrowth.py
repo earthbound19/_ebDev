@@ -121,7 +121,7 @@ class Coordinate:
 # 		yCoord = (height - 1)
 # 	return [xCoord, yCoord]
 
-# function requires lists of Coordinates as parameters, manipulates them directly (because in Python, these arguments are passed by reference--it doesn't make local copies of them, so I won't need to return copies of them; when they are changed in the function, they are changed outside of it), and returns nothing. Moves Coordinate objects out of unusedCoords and into livingCoords. ALSO removes chosen init living coords from empty neighbor lists of all Coordinates adjacent to all new livingCoords (so that the new livingCoords won't erroneously be attempted to be reused, so THIS FUNCTION MOREOVER directly manipulates the third required passed list, arr[]:
+# function requires lists of Coordinates as parameters, manipulates them directly (because in Python, these arguments are passed by reference--it doesn't make local copies of them, so I won't need to return copies of them; when they are changed in the function, they are changed outside of it). Moves an integer tuple out of unusedCoords and into livingCoords, and returns a copy of that tuple (for reference purposes). ALSO removes tuples with the same value from empty neighbor lists of all Coordinates adjacent to all new livingCoords (so that in later use of those empty neighbor lists, the new livingCoords won't erroneously be attempted to be reused; so, THIS FUNCTION MOREOVER directly manipulates the third required passed list, arr[]:
 def getNewRNDlivingCoords(howMany, unusedCoords, livingCoords, arr):	# Those last three parameters are lists!	
 	RNDcoord = random.choice(unusedCoords); unusedCoords.remove(RNDcoord); livingCoords.append(RNDcoord)
 	# print('RNDcoord is', RNDcoord)
@@ -134,7 +134,7 @@ def getNewRNDlivingCoords(howMany, unusedCoords, livingCoords, arr):	# Those las
 		# print('before:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
 		arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors.remove(RNDcoord)
 		# print('after:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
-	return None
+	return RNDcoord
 
 # function prints coordinate plotting statistics (progress report):
 def printProgress():
@@ -167,7 +167,8 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# print('livingCoords before:', livingCoords)
 	startCoordsN = 3
 	for i in range(0, startCoordsN):
-		getNewRNDlivingCoords(startCoordsN, unusedCoords, livingCoords, arr)
+		RNDnewCoord = getNewRNDlivingCoords(startCoordsN, unusedCoords, livingCoords, arr)
+		print('Moved tuple of value', RNDnewCoord, 'out of unusedCoords and into livingCoords.')
 	# print('unusedCoords after:', unusedCoords)
 	# print('livingCoords after:', livingCoords)
 
