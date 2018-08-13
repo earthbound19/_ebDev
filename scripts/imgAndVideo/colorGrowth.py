@@ -74,60 +74,52 @@ class Coordinate:
 	__slots__ = ["YXtuple", "x", "y", "maxX", "maxY", "RGBcolor", "isAlive", "isConsumed", "emptyNeighbors"]
 	def __init__(self, x, y, maxX, maxY, RGBcolor, isAlive, isConsumed, emptyNeighbors):
 		self.YXtuple = (y, x)
-		self.x = x; self.y = y; self.RGBcolor = RGBcolor; self.isAlive = isAlive;	self.isConsumed = isConsumed
+		self.x = x; self.y = y; self.RGBcolor = RGBcolor; self.isAlive = isAlive; self.isConsumed = isConsumed
 		# Adding all possible empty neighbor values even if they would result in values out of bounds of image (negative or past maxX or maxY), and will check for and clean up pairs with out of bounds values after:
 		tmpList = [ (y-1, x-1), (y, x-1), (y+1, x-1), (y-1, x), (y+1, x), (y-1, x+1), (y, x+1), (y+1, x+1) ]
 		deleteList = []
 		for element in tmpList:
 			if -1 in element:
 				deleteList.append(element)
-# TO DO: debug whether I even need this; the print never happens:
 		for element in tmpList:
-			if (maxX+1) in element:
+			if element[1] == maxX:
 				deleteList.append(element)
 		for element in tmpList:
-			if (maxY+1) in element:
+			if element[0] == maxY:
 				deleteList.append(element)
 		# reduce deleteList to a list of unique tuples (in case of duplicates, where duplicates could lead us to attempt to remove something that ins't there, which would throw an exception and stop the script) :
 		deleteList = list(set(deleteList))
 		# the deletions:
 		for no in deleteList:
 			tmpList.remove(no)
-		# finallu initialize the intended object member from that built list:
+		# finally initialize the intended object member from that built list:
 		self.emptyNeighbors = list(tmpList)
 	def getRNDemptyNeighbors(self):
 		random.shuffle(self.emptyNeighbors)		# shuffle the list of empty neighbor Coordinates
-		nNeighborsToReturn = np.random.random_integers(0, len(self.emptyNeighbors))		# Decide how many to pick
+		nNeighborsToReturn = np.random.random_integers(1, len(self.emptyNeighbors))		# Decide how many to pick
 		rndNeighborsToReturn = []		# init an empty array we'll populate with neighbors and return
 		# iterate over nNeighborsToReturn items in shuffled self.emptyNeighbors and add them to a list to return:
 		for pick in range(0, nNeighborsToReturn):
 			rndNeighborsToReturn.append(self.emptyNeighbors[pick])
-		return rndNeighborsToReturn
+		return list(rndNeighborsToReturn)	# If you don't call that with list(), it returns a reference instead of copy (we want a copy).
 # END COORDINATE CLASS
 
 # START GLOBAL FUNCTIONS
+# TO DO: REINTEGRATE AS NECESSARY, ELSE DELETE:
 # function takes two ints and shifts each up or down one or not at all. I know, it doesn't receive a tuple as input but it gives one as output:
-def mutateCoordinate(xCoordParam, yCoordParam):
-	xCoord = np.random.random_integers((xCoordParam - 1), xCoordParam + 1)
-	yCoord = np.random.random_integers((yCoordParam - 1), yCoordParam + 1)
-	# if necessary, move results back in range of the array indices this is intended to be used with (zero-based indexing, so maximum (n - 1) and never less than 0) :
-	if (xCoord < 0):
-		xCoord = 0
-	if (xCoord > (width - 1)):
-		xCoord = (width - 1)
-	if (yCoord < 0):
-		yCoord = 0
-	if (yCoord > (height - 1)):
-		yCoord = (height - 1)
-	return [xCoord, yCoord]
-
-# TO DO: REINTEGRATE AS NECESSARY:
-# function gets random unused coordinate:
-# def getRNDunusedCoord():
-# 	unusedCoordsListSize = len(unusedCoords)
-# 	randomIndex = np.random.random_integers(0, unusedCoordsListSize-1)
-# 	initCoord = unusedCoords[randomIndex]
-# 	return initCoord
+# def mutateCoordinate(xCoordParam, yCoordParam):
+# 	xCoord = np.random.random_integers((xCoordParam - 1), xCoordParam + 1)
+# 	yCoord = np.random.random_integers((yCoordParam - 1), yCoordParam + 1)
+# 	# if necessary, move results back in range of the array indices this is intended to be used with (zero-based indexing, so maximum (n - 1) and never less than 0) :
+# 	if (xCoord < 0):
+# 		xCoord = 0
+# 	if (xCoord > (width - 1)):
+# 		xCoord = (width - 1)
+# 	if (yCoord < 0):
+# 		yCoord = 0
+# 	if (yCoord > (height - 1)):
+# 		yCoord = (height - 1)
+# 	return [xCoord, yCoord]
 
 # function prints coordinate plotting statistics (progress report):
 def printProgress():
@@ -142,14 +134,39 @@ print('Will generate ', numIMGsToMake, ' image(s).')
 for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* the loop.
 	animationSaveNFramesCounter = 0
 	animationFrameCounter = 0
-	arr = np.ones((height, width, 3)) * backgroundColor
-# TO DO: redefine that as a list of lists of Coordinates.
-
+	
 	unusedCoords = []
-# TO DO: define this as a list of lists mappable to a list of lists of coordinates.
+	livingCoords = []
+	
+	# Initialize canvas array (list of lists of Coordinates), and init unusedCoords with grid int tuples along the way:
+	arr = []
+	for y in range(0, height):		# for columns (x) in row)
+		tmpList = []
+		for x in range(0, width):		# over the columns, prep and add:
+			tmpList.append(Coordinate(x, y, width, height, backgroundColor, False, False, None))
+			unusedCoords.append( (y, x) )
+		arr.append(tmpList)
 
-# TO DO: REINTEGRATE AS NECESSARY:
-	# initCoord = getRNDunusedCoord()		# First coordinate to be used
+	# print('unusedCoords before:', unusedCoords)
+	# print('livingCoords before:', livingCoords)
+	# Initialize first living Coordinates by random selection from unusedCoords (and remove from unusedCoords); until I add an argsparse argument to control the number of starting coords, this is hard-coded:
+	startCoordsN = 3
+	for i in range(0, startCoordsN):
+		RNDcoord = random.choice(unusedCoords); unusedCoords.remove(RNDcoord); livingCoords.append(RNDcoord)
+		# print('RNDcoord is', RNDcoord, '\nemptyNeighbors are:')
+# TO DO: decide whether to use list() in the following assignment (gives a copy, but do I want a reference (no list())? :
+		tmpListOne = list(arr[RNDcoord[0]][RNDcoord[1]].emptyNeighbors)
+		# print(tmpListOne)
+		for toFindSelfIn in tmpListOne:
+			# print('toFindSelfIn value is', toFindSelfIn, 'searching that\'s emptyNeighors for', RNDcoord, ':')
+			# print('removing', RNDcoord, ':')
+			# print('before:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
+			arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors.remove(RNDcoord)
+			# print('after:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
+	# print('unusedCoords after:', unusedCoords)
+	# print('livingCoords after:', livingCoords)
+	sys.exit()
+
 	color = colorMutationBase
 	previousColor = color
 	failedCoordMutationCount = 0
@@ -171,8 +188,26 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		os.mkdir(animFramesFolderName)
 
 	print('Generating image . . .')
-	continuePainting = True
-	while continuePainting:
+	while unusedCoords:
+		for coords in livingCoords:
+			print('-- checking for empty neighbor Coordinates for "coords"', coords, ' . . .')
+			newLivingCoords = arr[coords[0]][coords[1]].getRNDemptyNeighbors()
+			if newLivingCoords:		# If that has a value,
+				print('newLivingCoords has a value!')
+				for LVC in newLivingCoords:		# Remove everything in the newLivingCoords list from unusedCoords:
+					print(':: moving LVC', LVC, 'from one array to another!')
+					print('unusedCoords before:', unusedCoords)
+					print('livingCoords before:', livingCoords)
+					livingCoords.append(LVC); unusedCoords.remove(LVC)
+					print('unusedCoords after:', unusedCoords)
+					print('livingCoords after:', livingCoords)
+			else:
+				print('newLivingCoords does _not_ have a value!')
+# NOTE: THIS CLAUSE can make the above LVC in unusedCoords test fail! :
+			# else:		# If that had no value, get a new random value:
+				# initCoord = random.choice(unusedCoords); unusedCoords.remove(initCoord); livingCoords.append(initCoord)
+# TO DO: debug why the above sometimes attempts to delete a coord not in unusedCoords.
+
 # TO DO: REINTEGRATE AS NECESSARY:
 			# newColor = previousColor + np.random.random_integers(-rshift, rshift, size=3) / 2
 			# newColor = np.clip(newColor, 0, 255)		# Clip that within RGB range if it wandered outside of that range.
@@ -224,7 +259,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# print('Created ', n, ' of ', numIMGsToMake, ' images.')
 	# os.remove(stateIMGfileName)
 # TO DO: set a condition for the following to turn false:
-		continuePainting = False
+		unusedCoords = []
 
 
 
