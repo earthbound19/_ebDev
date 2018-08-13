@@ -193,14 +193,23 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 
 	print('Generating image . . .')
 	while unusedCoords:
-		for coords in livingCoords:
-			print('-- checking for empty neighbor Coordinates for "coords"', coords, ' . . .')
-			newLivingCoords = arr[coords[0]][coords[1]].getRNDemptyNeighbors()
-			if newLivingCoords:		# If that has a value,
-				print('newLivingCoords has a value! :', newLivingCoords)
+# START DEV DOODLES--may or may not be used in final code!
+# DOODLE 1.
+		# Get 7 new living coords. This while loop should repeat until unusedCoords is resultantly empty.
+# TO DO; BUG FIX: If I try to get a new living Coordinate but there are none available, it throws. Handle that case (by returning an empty tuple, or whatever else may be necessary) ; an example invocation that will cause a throw is `python /path/to/colorGrowth.py -w 7 -t 2 -n 1`
+		for i in range(0, 3):
+			newRNDcoord = getNewRNDlivingCoord(startCoordsN, unusedCoords, livingCoords, arr)
+			print('Got new living coordinate (or not),', newRNDcoord, '.')
+# DOODLE 2.
+#		for coords in livingCoords:
+#			print('-- checking for empty neighbor Coordinates for "coords"', coords, ' . . .')
+#			newLivingCoords = arr[coords[0]][coords[1]].getRNDemptyNeighbors()
+#			if newLivingCoords:		# If that has a value,
+#				print('newLivingCoords has a value! :', newLivingCoords)
 # TO DO: Coordinate color manipulation, adding new coords to livingCoords, removing coords from that which have no more empty neighbors, etc.
-			else:
-				print('newLivingCoords does _not_ have a value!')
+#			else:
+#				print('newLivingCoords does _not_ have a value!')
+# END DEV DOODLES--may or may not be used in final code!
 # NOTE: THIS CLAUSE can make the above LVC in unusedCoords test fail! :
 			# else:		# If that had no value, get a new random value:
 				# initCoord = random.choice(unusedCoords); unusedCoords.remove(initCoord); livingCoords.append(initCoord)
@@ -256,8 +265,8 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# im.save(imgFileName)
 	# print('Created ', n, ' of ', numIMGsToMake, ' images.')
 	# os.remove(stateIMGfileName)
-# TO DO: set a condition for the following to turn false:
-		unusedCoords = []
+# NO LONGER TO DO; MAYBE DELETE THIS AND THE NEXT LINE OF CODE: set a condition for the following to turn false:
+		# unusedCoords = []
 
 
 
