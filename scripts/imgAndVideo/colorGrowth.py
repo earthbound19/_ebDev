@@ -152,6 +152,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# print('livingCoords before:', livingCoords)
 	startCoordsN = 3
 	for i in range(0, startCoordsN):
+# TO DO: make the following a function? I think I'm going to do the same things again in `while unusedCoords`..
 		RNDcoord = random.choice(unusedCoords); unusedCoords.remove(RNDcoord); livingCoords.append(RNDcoord)
 		# print('RNDcoord is', RNDcoord)
 # TO DO: decide whether to use list() in the following assignment (gives a copy, but do I want a reference (no list())? :
