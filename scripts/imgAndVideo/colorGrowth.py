@@ -147,16 +147,16 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			unusedCoords.append( (y, x) )
 		arr.append(tmpList)
 
+	# Initialize first living Coordinates by random selection from unusedCoords (and remove from unusedCoords); until I add an argsparse argument to control the number of starting coords, this is hard-coded; ALSO remove chosen init living coords from empty neighbor list of all adjacent coordinates:
 	# print('unusedCoords before:', unusedCoords)
 	# print('livingCoords before:', livingCoords)
-	# Initialize first living Coordinates by random selection from unusedCoords (and remove from unusedCoords); until I add an argsparse argument to control the number of starting coords, this is hard-coded:
 	startCoordsN = 3
 	for i in range(0, startCoordsN):
 		RNDcoord = random.choice(unusedCoords); unusedCoords.remove(RNDcoord); livingCoords.append(RNDcoord)
-		# print('RNDcoord is', RNDcoord, '\nemptyNeighbors are:')
+		# print('RNDcoord is', RNDcoord)
 # TO DO: decide whether to use list() in the following assignment (gives a copy, but do I want a reference (no list())? :
 		tmpListOne = list(arr[RNDcoord[0]][RNDcoord[1]].emptyNeighbors)
-		# print(tmpListOne)
+		# print('emptyNeighbors are:', tmpListOne)
 		for toFindSelfIn in tmpListOne:
 			# print('toFindSelfIn value is', toFindSelfIn, 'searching that\'s emptyNeighors for', RNDcoord, ':')
 			# print('removing', RNDcoord, ':')
@@ -165,7 +165,6 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			# print('after:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
 	# print('unusedCoords after:', unusedCoords)
 	# print('livingCoords after:', livingCoords)
-	sys.exit()
 
 	color = colorMutationBase
 	previousColor = color
@@ -193,14 +192,8 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			print('-- checking for empty neighbor Coordinates for "coords"', coords, ' . . .')
 			newLivingCoords = arr[coords[0]][coords[1]].getRNDemptyNeighbors()
 			if newLivingCoords:		# If that has a value,
-				print('newLivingCoords has a value!')
-				for LVC in newLivingCoords:		# Remove everything in the newLivingCoords list from unusedCoords:
-					print(':: moving LVC', LVC, 'from one array to another!')
-					print('unusedCoords before:', unusedCoords)
-					print('livingCoords before:', livingCoords)
-					livingCoords.append(LVC); unusedCoords.remove(LVC)
-					print('unusedCoords after:', unusedCoords)
-					print('livingCoords after:', livingCoords)
+				print('newLivingCoords has a value! :', newLivingCoords)
+# TO DO: Coordinate color manipulation, adding new coords to livingCoords, removing coords from that which have no more empty neighbors, etc.
 			else:
 				print('newLivingCoords does _not_ have a value!')
 # NOTE: THIS CLAUSE can make the above LVC in unusedCoords test fail! :
