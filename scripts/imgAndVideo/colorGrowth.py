@@ -121,23 +121,28 @@ class Coordinate:
 # 		yCoord = (height - 1)
 # 	return [xCoord, yCoord]
 
-# function requires lists of Coordinates as parameters, manipulates them directly (because in Python, these arguments are passed by reference--it doesn't make local copies of them, so I won't need to return copies of them; when they are changed in the function, they are changed outside of it). Moves an integer tuple out of unusedCoords and into livingCoords, and returns a copy of that tuple (for reference purposes). ALSO removes tuples with the same value from empty neighbor lists of all Coordinates adjacent to all new livingCoords (so that in later use of those empty neighbor lists, the new livingCoords won't erroneously be attempted to be reused; so, THIS FUNCTION MOREOVER directly manipulates the third required passed list, arr[]:
-def getNewRNDlivingCoord(howMany, unusedCoords, livingCoords, arr):	# Those last three parameters are lists!
+# function requires lists of Coordinates as parameters, manipulates (which it directly manipulates). Moves an integer tuple out of unusedCoords and into livingCoords, and returns a copy of that tuple (for reference purposes). ALSO removes tuples with the same value from empty neighbor lists of all Coordinates adjacent to all new livingCoords (so that in later use of those empty neighbor lists, the new livingCoords won't erroneously be attempted to be reused; so, THIS FUNCTION MOREOVER directly manipulates the third required passed list, arr[]:
+def getNewRNDlivingCoord(unusedCoords, livingCoords, arr):	# Those last three parameters are lists!
 	if unusedCoords:		# If there are any values in that list, get a new random one
 		RNDcoord = random.choice(unusedCoords); unusedCoords.remove(RNDcoord); livingCoords.append(RNDcoord)
-		# print('RNDcoord is', RNDcoord)
-	# TO DO: decide whether to use list() in the following assignment (gives a copy, but do I want a reference (no list())? :
-		tmpListOne = list(arr[RNDcoord[0]][RNDcoord[1]].emptyNeighbors)
-		# print('emptyNeighbors are:', tmpListOne)
+		tmpListOne = list(arr[RNDcoord[0]][RNDcoord[1]].emptyNeighbors)		# Making a copy via list() on purpose
 		for toFindSelfIn in tmpListOne:
-			# print('toFindSelfIn value is', toFindSelfIn, 'searching that\'s emptyNeighors for', RNDcoord, ':')
-			# print('removing', RNDcoord, ':')
-			# print('before:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
 			arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors.remove(RNDcoord)
-			# print('after:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
 	else:		# If there are _not_ any values in that list, assign RNDcoord the value of an empty tuple:
 		RNDcoord = ()
 	return RNDcoord
+
+# function moves any coordinate tuple out of unusedCoords, into livingCoords, and deletes the tuple out of the emptyNeighbors list of neighboring Coordinate objects in arr[]
+def getNewLivingCoord(tupleToAllocate, unusedCoords, livingCoords, arr):	# Those last three parameters are lists!
+	if tupleToAllocate:		# If that tuple has a value, do the function's work.
+		unusedCoords.remove(tupleToAllocate); livingCoords.append(tupleToAllocate)
+		tmpListOne = list(arr[tupleToAllocate[0]][tupleToAllocate[1]].emptyNeighbors)
+		for toFindSelfIn in tmpListOne:
+			arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors.remove(tupleToAllocate)
+	else:		# If that tuple doesn't have a value, print a warning and return an empty tuple:
+		print("Warning: empty tuple passed to function getNewLivingCoord().")
+		tupleToAllocate = ()
+	return tupleToAllocate
 
 # function creates image from list of Coordinate objects, heigh and width definitions, and a filename string:
 def coordinatesListToSavedImage(arr, height, width, imgFileName):
@@ -182,7 +187,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# print('livingCoords before:', livingCoords)
 	startCoordsN = 3
 	for i in range(0, startCoordsN):
-		getNewRNDlivingCoord(startCoordsN, unusedCoords, livingCoords, arr)
+		getNewRNDlivingCoord(unusedCoords, livingCoords, arr)
 	# print('unusedCoords after:', unusedCoords)
 	# print('livingCoords after:', livingCoords)
 
@@ -210,13 +215,10 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	while unusedCoords:
 # START DEV DOODLES--may or may not be used in final code!
 # DOODLE 1.
-		# Get 7 new living coords. This while loop should repeat until unusedCoords is resultantly empty.
-# TO DO; BUG FIX: the following will result in filling _all but_ the last three coordinates:
-		for i in range(0, 3):
-			newRNDcoord = getNewRNDlivingCoord(startCoordsN, unusedCoords, livingCoords, arr)
-			print('Got new living coordinate (or not),', newRNDcoord, '.')
-			if newRNDcoord:		# If that is a non-empty tuple (has a value) :
-				arr[newRNDcoord[0]][newRNDcoord[1]].RGBcolor = [255,255,255]
+		# Get N new living coords. This while loop should repeat until unusedCoords is resultantly empty.
+		# for i in range(0, 12):
+		# 	newRNDcoord = getNewRNDlivingCoord(unusedCoords, livingCoords, arr)
+		# 	print('Got new living coordinate (or not),', newRNDcoord, '.')
 # DOODLE 2.
 #		for coords in livingCoords:
 #			print('-- checking for empty neighbor Coordinates for "coords"', coords, ' . . .')
@@ -224,14 +226,14 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 #			if newLivingCoords:		# If that has a value,
 #				print('newLivingCoords has a value! :', newLivingCoords)
 # TO DO: Coordinate color manipulation, adding new coords to livingCoords, removing coords from that which have no more empty neighbors, etc.
-#			else:
-#				print('newLivingCoords does _not_ have a value!')
-# END DEV DOODLES--may or may not be used in final code!
-# NOTE: THIS CLAUSE can make the above LVC in unusedCoords test fail! :
-			# else:		# If that had no value, get a new random value:
-				# initCoord = random.choice(unusedCoords); unusedCoords.remove(initCoord); livingCoords.append(initCoord)
-# TO DO: debug why the above sometimes attempts to delete a coord not in unusedCoords.
+		
+		newLivingCoords = []
+		for coord in livingCoords:
+			arr[coord[0]][coord[1]].RGBcolor = [0,0,0]
+			newLivingCoords = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
 
+		for coord in newLivingCoords:
+			getNewLivingCoord(coord, unusedCoords, livingCoords, arr)
 # TO DO: REINTEGRATE AS NECESSARY:
 			# newColor = previousColor + np.random.random_integers(-rshift, rshift, size=3) / 2
 			# newColor = np.clip(newColor, 0, 255)		# Clip that within RGB range if it wandered outside of that range.
