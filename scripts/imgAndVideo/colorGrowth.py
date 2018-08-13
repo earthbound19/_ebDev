@@ -139,6 +139,18 @@ def getNewRNDlivingCoord(howMany, unusedCoords, livingCoords, arr):	# Those last
 		RNDcoord = ()
 	return RNDcoord
 
+# function creates image from list of Coordinate objects, heigh and width definitions, and a filename string:
+def coordinatesListToSavedImage(arr, height, width, imgFileName):
+	tmpArray = []
+	for i in range(0, height):
+		coordsRow = []
+		for j in range(0, width):
+			coordsRow.append(arr[i][j].RGBcolor)
+		tmpArray.append(coordsRow)
+	tmpArray = np.asarray(tmpArray)
+	im = Image.fromarray(tmpArray.astype(np.uint8)).convert('RGB')
+	im.save(imgFileName)
+
 # function prints coordinate plotting statistics (progress report):
 def printProgress():
 	print('Unused coordinates: ', len(unusedCoords), ' Have plotted ', len(usedCoords), 'of ', terminatePaintingAtFillCount, ' desired coordinates (on a canvas of', allesPixelCount, ' pixels).')
@@ -199,7 +211,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 # START DEV DOODLES--may or may not be used in final code!
 # DOODLE 1.
 		# Get 7 new living coords. This while loop should repeat until unusedCoords is resultantly empty.
-# TO DO; BUG FIX: If I try to get a new living Coordinate but there are none available, it throws. Handle that case (by returning an empty tuple, or whatever else may be necessary) ; an example invocation that will cause a throw is `python /path/to/colorGrowth.py -w 7 -t 2 -n 1`
+# TO DO; BUG FIX: the following will result in filling _all but_ the last three coordinates:
 		for i in range(0, 3):
 			newRNDcoord = getNewRNDlivingCoord(startCoordsN, unusedCoords, livingCoords, arr)
 			print('Got new living coordinate (or not),', newRNDcoord, '.')
@@ -226,16 +238,17 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			# arr[arrYidx][arrXidx] = newColor
 			# previousColor = newColor
 
+# START DEV DOODLES--may or may not be used in final code!
 # TO DO: REINTEGRATE AS NECESSARY:
-			# Save an animation frame if that variable has a value:
-			if animationSaveEveryNframes:
-				if (animationSaveNFramesCounter % animationSaveEveryNframes) == 0:
-					strOfThat = str(animationFrameCounter)
-					frameFilePathAndFileName = animFramesFolderName + '/' + strOfThat.zfill(padAnimationSaveFramesNumbersTo) + '.png'
-					im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-					im.save(frameFilePathAndFileName)
-					animationFrameCounter += 1		# Increment that *after*, for image tools expecting series starting at 0.
-				animationSaveNFramesCounter += 1
+		# Save an animation frame if that variable has a value:
+		if animationSaveEveryNframes:
+			if (animationSaveNFramesCounter % animationSaveEveryNframes) == 0:
+				strOfThat = str(animationFrameCounter)
+				imgFileName = animFramesFolderName + '/' + strOfThat.zfill(padAnimationSaveFramesNumbersTo) + '.png'
+				coordinatesListToSavedImage(arr, height, width, imgFileName)
+				animationFrameCounter += 1		# Increment that *after*, for image tools expecting series starting at 0.
+			animationSaveNFramesCounter += 1
+# END DEV DOODLES--may or may not be used in final code!
 
 # TO DO: REINTEGRATE AS NECESSARY:
 		# If the coordinate is NOT NOT used (is used), print a progress message.
