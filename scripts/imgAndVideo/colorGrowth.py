@@ -121,6 +121,21 @@ class Coordinate:
 # 		yCoord = (height - 1)
 # 	return [xCoord, yCoord]
 
+# function requires lists of Coordinates as parameters, manipulates them directly (because in Python, these arguments are passed by reference--it doesn't make local copies of them, so I won't need to return copies of them; when they are changed in the function, they are changed outside of it), and returns nothing. Moves Coordinate objects out of unusedCoords and into livingCoords. ALSO removes chosen init living coords from empty neighbor lists of all Coordinates adjacent to all new livingCoords (so that the new livingCoords won't erroneously be attempted to be reused, so THIS FUNCTION MOREOVER directly manipulates the third required passed list, arr[]:
+def getNewRNDlivingCoords(howMany, unusedCoords, livingCoords, arr):	# Those last three parameters are lists!	
+	RNDcoord = random.choice(unusedCoords); unusedCoords.remove(RNDcoord); livingCoords.append(RNDcoord)
+	# print('RNDcoord is', RNDcoord)
+# TO DO: decide whether to use list() in the following assignment (gives a copy, but do I want a reference (no list())? :
+	tmpListOne = list(arr[RNDcoord[0]][RNDcoord[1]].emptyNeighbors)
+	# print('emptyNeighbors are:', tmpListOne)
+	for toFindSelfIn in tmpListOne:
+		# print('toFindSelfIn value is', toFindSelfIn, 'searching that\'s emptyNeighors for', RNDcoord, ':')
+		# print('removing', RNDcoord, ':')
+		# print('before:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
+		arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors.remove(RNDcoord)
+		# print('after:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
+	return None
+
 # function prints coordinate plotting statistics (progress report):
 def printProgress():
 	print('Unused coordinates: ', len(unusedCoords), ' Have plotted ', len(usedCoords), 'of ', terminatePaintingAtFillCount, ' desired coordinates (on a canvas of', allesPixelCount, ' pixels).')
@@ -134,10 +149,8 @@ print('Will generate ', numIMGsToMake, ' image(s).')
 for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* the loop.
 	animationSaveNFramesCounter = 0
 	animationFrameCounter = 0
-	
-	unusedCoords = []
-	livingCoords = []
-	
+
+	unusedCoords = []		# A list of Coordinate objects which are free for the taking.
 	# Initialize canvas array (list of lists of Coordinates), and init unusedCoords with grid int tuples along the way:
 	arr = []
 	for y in range(0, height):		# for columns (x) in row)
@@ -147,23 +160,14 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			unusedCoords.append( (y, x) )
 		arr.append(tmpList)
 
-	# Initialize first living Coordinates by random selection from unusedCoords (and remove from unusedCoords); until I add an argsparse argument to control the number of starting coords, this is hard-coded; ALSO remove chosen init living coords from empty neighbor list of all adjacent coordinates:
+	livingCoords = []		# A list of Coordinate objects which are set aside for use (coloring, etc.)
+	# Initialize first living Coordinates (livingCoords list) by random selection from unusedCoords (and remove from unusedCoords):
+# TO DO: add an argsparse argument for startCoordsN (the number of starting coords) ; until then this is hard-coded:
 	# print('unusedCoords before:', unusedCoords)
 	# print('livingCoords before:', livingCoords)
 	startCoordsN = 3
 	for i in range(0, startCoordsN):
-# TO DO: make the following a function? I think I'm going to do the same things again in `while unusedCoords`..
-		RNDcoord = random.choice(unusedCoords); unusedCoords.remove(RNDcoord); livingCoords.append(RNDcoord)
-		# print('RNDcoord is', RNDcoord)
-# TO DO: decide whether to use list() in the following assignment (gives a copy, but do I want a reference (no list())? :
-		tmpListOne = list(arr[RNDcoord[0]][RNDcoord[1]].emptyNeighbors)
-		# print('emptyNeighbors are:', tmpListOne)
-		for toFindSelfIn in tmpListOne:
-			# print('toFindSelfIn value is', toFindSelfIn, 'searching that\'s emptyNeighors for', RNDcoord, ':')
-			# print('removing', RNDcoord, ':')
-			# print('before:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
-			arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors.remove(RNDcoord)
-			# print('after:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
+		getNewRNDlivingCoords(startCoordsN, unusedCoords, livingCoords, arr)
 	# print('unusedCoords after:', unusedCoords)
 	# print('livingCoords after:', livingCoords)
 
