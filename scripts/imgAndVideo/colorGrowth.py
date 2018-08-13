@@ -122,18 +122,21 @@ class Coordinate:
 # 	return [xCoord, yCoord]
 
 # function requires lists of Coordinates as parameters, manipulates them directly (because in Python, these arguments are passed by reference--it doesn't make local copies of them, so I won't need to return copies of them; when they are changed in the function, they are changed outside of it). Moves an integer tuple out of unusedCoords and into livingCoords, and returns a copy of that tuple (for reference purposes). ALSO removes tuples with the same value from empty neighbor lists of all Coordinates adjacent to all new livingCoords (so that in later use of those empty neighbor lists, the new livingCoords won't erroneously be attempted to be reused; so, THIS FUNCTION MOREOVER directly manipulates the third required passed list, arr[]:
-def getNewRNDlivingCoord(howMany, unusedCoords, livingCoords, arr):	# Those last three parameters are lists!	
-	RNDcoord = random.choice(unusedCoords); unusedCoords.remove(RNDcoord); livingCoords.append(RNDcoord)
-	# print('RNDcoord is', RNDcoord)
-# TO DO: decide whether to use list() in the following assignment (gives a copy, but do I want a reference (no list())? :
-	tmpListOne = list(arr[RNDcoord[0]][RNDcoord[1]].emptyNeighbors)
-	# print('emptyNeighbors are:', tmpListOne)
-	for toFindSelfIn in tmpListOne:
-		# print('toFindSelfIn value is', toFindSelfIn, 'searching that\'s emptyNeighors for', RNDcoord, ':')
-		# print('removing', RNDcoord, ':')
-		# print('before:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
-		arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors.remove(RNDcoord)
-		# print('after:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
+def getNewRNDlivingCoord(howMany, unusedCoords, livingCoords, arr):	# Those last three parameters are lists!
+	if unusedCoords:		# If there are any values in that list, get a new random one
+		RNDcoord = random.choice(unusedCoords); unusedCoords.remove(RNDcoord); livingCoords.append(RNDcoord)
+		# print('RNDcoord is', RNDcoord)
+	# TO DO: decide whether to use list() in the following assignment (gives a copy, but do I want a reference (no list())? :
+		tmpListOne = list(arr[RNDcoord[0]][RNDcoord[1]].emptyNeighbors)
+		# print('emptyNeighbors are:', tmpListOne)
+		for toFindSelfIn in tmpListOne:
+			# print('toFindSelfIn value is', toFindSelfIn, 'searching that\'s emptyNeighors for', RNDcoord, ':')
+			# print('removing', RNDcoord, ':')
+			# print('before:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
+			arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors.remove(RNDcoord)
+			# print('after:', arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors)
+	else:		# If there are _not_ any values in that list, assign RNDcoord the value of an empty tuple:
+		RNDcoord = ()
 	return RNDcoord
 
 # function prints coordinate plotting statistics (progress report):
