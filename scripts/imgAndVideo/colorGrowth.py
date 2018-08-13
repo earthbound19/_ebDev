@@ -203,6 +203,8 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		for i in range(0, 3):
 			newRNDcoord = getNewRNDlivingCoord(startCoordsN, unusedCoords, livingCoords, arr)
 			print('Got new living coordinate (or not),', newRNDcoord, '.')
+			if newRNDcoord:		# If that is a non-empty tuple (has a value) :
+				arr[newRNDcoord[0]][newRNDcoord[1]].RGBcolor = [255,255,255]
 # DOODLE 2.
 #		for coords in livingCoords:
 #			print('-- checking for empty neighbor Coordinates for "coords"', coords, ' . . .')
@@ -226,14 +228,14 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 
 # TO DO: REINTEGRATE AS NECESSARY:
 			# Save an animation frame if that variable has a value:
-			# if animationSaveEveryNframes:
-			# 	if (animationSaveNFramesCounter % animationSaveEveryNframes) == 0:
-			# 		strOfThat = str(animationFrameCounter)
-			# 		frameFilePathAndFileName = animFramesFolderName + '/' + strOfThat.zfill(padAnimationSaveFramesNumbersTo) + '.png'
-			# 		im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-			# 		im.save(frameFilePathAndFileName)
-			# 		animationFrameCounter += 1		# Increment that *after*, for image tools expecting series starting at 0.
-			# 	animationSaveNFramesCounter += 1
+			if animationSaveEveryNframes:
+				if (animationSaveNFramesCounter % animationSaveEveryNframes) == 0:
+					strOfThat = str(animationFrameCounter)
+					frameFilePathAndFileName = animFramesFolderName + '/' + strOfThat.zfill(padAnimationSaveFramesNumbersTo) + '.png'
+					im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
+					im.save(frameFilePathAndFileName)
+					animationFrameCounter += 1		# Increment that *after*, for image tools expecting series starting at 0.
+				animationSaveNFramesCounter += 1
 
 # TO DO: REINTEGRATE AS NECESSARY:
 		# If the coordinate is NOT NOT used (is used), print a progress message.
@@ -270,8 +272,6 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# os.remove(stateIMGfileName)
 # NO LONGER TO DO; MAYBE DELETE THIS AND THE NEXT LINE OF CODE: set a condition for the following to turn false:
 		# unusedCoords = []
-
-
 
 
 # MUCH BETTERER REFERENCE:
