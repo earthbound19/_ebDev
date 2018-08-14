@@ -95,12 +95,15 @@ class Coordinate:
 		# finally initialize the intended object member from that built list:
 		self.emptyNeighbors = list(tmpList)
 	def getRNDemptyNeighbors(self):
-		random.shuffle(self.emptyNeighbors)		# shuffle the list of empty neighbor Coordinates
-		nNeighborsToReturn = np.random.random_integers(1, len(self.emptyNeighbors))		# Decide how many to pick
-		rndNeighborsToReturn = []		# init an empty array we'll populate with neighbors and return
-		# iterate over nNeighborsToReturn items in shuffled self.emptyNeighbors and add them to a list to return:
-		for pick in range(0, nNeighborsToReturn):
-			rndNeighborsToReturn.append(self.emptyNeighbors[pick])
+		rndNeighborsToReturn = []		# init an empty array we'll populate with neighbors (int tuples) and return
+		if len(self.emptyNeighbors) > 0:		# If there is anything left in emptyNeighbors:
+			nNeighborsToReturn = np.random.random_integers(1, len(self.emptyNeighbors))		# Decide how many to pick
+			for pick in range(0, nNeighborsToReturn):
+				RNDneighbor = random.choice(self.emptyNeighbors)
+				rndNeighborsToReturn.append(RNDneighbor)
+				self.emptyNeighbors.remove(RNDneighbor)
+		else:		# If there is _not_ anything left in emptyNeighbors:
+			rndNeighborsToReturn.append( () )		# Append an empty tuple, which is all that will be in rndNeighborsToReturn.
 		return list(rndNeighborsToReturn)	# If you don't call that with list(), it returns a reference instead of copy (we want a copy).
 # END COORDINATE CLASS
 
@@ -124,7 +127,9 @@ class Coordinate:
 # function requires lists of Coordinates as parameters, manipulates (which it directly manipulates). Moves an integer tuple out of unusedCoords and into livingCoords, and returns a copy of that tuple (for reference purposes). ALSO removes tuples with the same value from empty neighbor lists of all Coordinates adjacent to all new livingCoords (so that in later use of those empty neighbor lists, the new livingCoords won't erroneously be attempted to be reused; so, THIS FUNCTION MOREOVER directly manipulates the third required passed list, arr[]:
 def getNewRNDlivingCoord(unusedCoords, livingCoords, arr):	# Those last three parameters are lists!
 	if unusedCoords:		# If there are any values in that list, get a new random one
-		RNDcoord = random.choice(unusedCoords); unusedCoords.remove(RNDcoord); livingCoords.append(RNDcoord)
+		RNDcoord = random.choice(unusedCoords)
+		unusedCoords.remove(RNDcoord)
+		livingCoords.append(RNDcoord)
 		tmpListOne = list(arr[RNDcoord[0]][RNDcoord[1]].emptyNeighbors)		# Making a copy via list() on purpose
 		for toFindSelfIn in tmpListOne:
 			arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors.remove(RNDcoord)
@@ -135,7 +140,9 @@ def getNewRNDlivingCoord(unusedCoords, livingCoords, arr):	# Those last three pa
 # function moves any coordinate tuple out of unusedCoords, into livingCoords, and deletes the tuple out of the emptyNeighbors list of neighboring Coordinate objects in arr[]
 def getNewLivingCoord(tupleToAllocate, unusedCoords, livingCoords, arr):	# Those last three parameters are lists!
 	if tupleToAllocate:		# If that tuple has a value, do the function's work.
-		unusedCoords.remove(tupleToAllocate); livingCoords.append(tupleToAllocate)
+		print ('Allocating tupleToCallocate', tupleToAllocate)
+		unusedCoords.remove(tupleToAllocate)
+		livingCoords.append(tupleToAllocate)
 		tmpListOne = list(arr[tupleToAllocate[0]][tupleToAllocate[1]].emptyNeighbors)
 		for toFindSelfIn in tmpListOne:
 			arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors.remove(tupleToAllocate)
@@ -185,7 +192,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 # TO DO: add an argsparse argument for startCoordsN (the number of starting coords) ; until then this is hard-coded:
 	# print('unusedCoords before:', unusedCoords)
 	# print('livingCoords before:', livingCoords)
-	startCoordsN = 3
+	startCoordsN = 2
 	for i in range(0, startCoordsN):
 		getNewRNDlivingCoord(unusedCoords, livingCoords, arr)
 	# print('unusedCoords after:', unusedCoords)
@@ -213,35 +220,30 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 
 	print('Generating image . . .')
 	while unusedCoords:
-# START DEV DOODLES--may or may not be used in final code!
-# DOODLE 1.
-		# Get N new living coords. This while loop should repeat until unusedCoords is resultantly empty.
-		# for i in range(0, 12):
-		# 	newRNDcoord = getNewRNDlivingCoord(unusedCoords, livingCoords, arr)
-		# 	print('Got new living coordinate (or not),', newRNDcoord, '.')
-# DOODLE 2.
-#		for coords in livingCoords:
-#			print('-- checking for empty neighbor Coordinates for "coords"', coords, ' . . .')
-#			newLivingCoords = arr[coords[0]][coords[1]].getRNDemptyNeighbors()
-#			if newLivingCoords:		# If that has a value,
-#				print('newLivingCoords has a value! :', newLivingCoords)
-# TO DO: Coordinate color manipulation, adding new coords to livingCoords, removing coords from that which have no more empty neighbors, etc.
-		
 		newLivingCoords = []
 		for coord in livingCoords:
-			arr[coord[0]][coord[1]].RGBcolor = [0,0,0]
-			newLivingCoords = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
+# TO DO: mutating color, e.g.
+# newColor = previousColor + np.random.random_integers(-rshift, rshift, size=3) / 2
+# newColor = np.clip(newColor, 0, 255)		# Clip that within RGB range if it wandered outside of that range.
+# arr[arrYidx][arrXidx] = newColor
+# previousColor = newColor
+			print('for coord in livinCoords loop, coord value', coord)
+			arr[coord[0]][coord[1]].RGBcolor = [0,0,0]		# Coloration
+			RNDemptyCoordsList = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
+			newLivingCoords += list(RNDemptyCoordsList)		# Add items in the list on the left to the list on the right
+			newLivingCoords = list(set(newLivingCoords))	# Remove duplicate items (via set(), and reassign to list via list())
 
 		for coord in newLivingCoords:
-			getNewLivingCoord(coord, unusedCoords, livingCoords, arr)
-# TO DO: REINTEGRATE AS NECESSARY:
-			# newColor = previousColor + np.random.random_integers(-rshift, rshift, size=3) / 2
-			# newColor = np.clip(newColor, 0, 255)		# Clip that within RGB range if it wandered outside of that range.
-			# arr[arrYidx][arrXidx] = newColor
-			# previousColor = newColor
+			print('-- newLivingCoords loop on value', coord)
+			if coord:		# If there's a value in coord:
+				getNewLivingCoord(coord, unusedCoords, livingCoords, arr)
+#			else:
+#				print('stopped calling getNewLivingCoord(coord, unusedCoords, livingCoords, arr) where:')
+#				print('coord ==', coord)
+				# print('unusedCoords ==', unusedCoords)
+#				print('newLivingCoords ==', newLivingCoords)
+				# print('arr == many tuples')
 
-# START DEV DOODLES--may or may not be used in final code!
-# TO DO: REINTEGRATE AS NECESSARY:
 		# Save an animation frame if that variable has a value:
 		if animationSaveEveryNframes:
 			if (animationSaveNFramesCounter % animationSaveEveryNframes) == 0:
@@ -250,7 +252,6 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 				coordinatesListToSavedImage(arr, height, width, imgFileName)
 				animationFrameCounter += 1		# Increment that *after*, for image tools expecting series starting at 0.
 			animationSaveNFramesCounter += 1
-# END DEV DOODLES--may or may not be used in final code!
 
 # TO DO: REINTEGRATE AS NECESSARY:
 		# If the coordinate is NOT NOT used (is used), print a progress message.
@@ -263,14 +264,15 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 				# On color mutation fail, revert color to base.
 				# if revertColorOnMutationFail == 1:
 				# 	previousColor = colorMutationBase
-		# Save a snapshot/progress image:
-		# if reportStatsNthLoopCounter == 0 or reportStatsNthLoopCounter == reportStatsEveryNthLoop:
-		# 	print('Saving prograss snapshot image ', stateIMGfileName, ' . . .')
-		# 	im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-		# 	im.save(stateIMGfileName)
-		# 	printProgress()
-		# 	reportStatsNthLoopCounter = 1
-		# reportStatsNthLoopCounter += 1
+
+		# Save a snapshot/progress image and print progress:
+		if reportStatsNthLoopCounter == 0 or reportStatsNthLoopCounter == reportStatsEveryNthLoop:
+			print('Saving prograss snapshot image ', stateIMGfileName, ' . . .')
+			coordinatesListToSavedImage(arr, height, width, stateIMGfileName)
+# TO DO: uncomment and fix errors originating from the next line of code:
+			# printProgress()
+			reportStatsNthLoopCounter = 1
+		reportStatsNthLoopCounter += 1
 # TO DO: REINTEGRATE AS NECESSARY:
 		# TO DO: PUT a terminate at arbitrary number of mutations control code here.
 		# This will terminate all coordinate and color mutation at an arbitary number of mutations.
