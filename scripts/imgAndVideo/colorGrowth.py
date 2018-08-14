@@ -97,7 +97,19 @@ class Coordinate:
 	def getRNDemptyNeighbors(self):
 		rndNeighborsToReturn = []		# init an empty array we'll populate with neighbors (int tuples) and return
 		if len(self.emptyNeighbors) > 0:		# If there is anything left in emptyNeighbors:
-			nNeighborsToReturn = np.random.random_integers(1, len(self.emptyNeighbors))		# Decide how many to pick
+			# START VISCOSITY CONTROL.
+# TO DO: add a viscosity control parameter (via argsparse, using a range 0-6, default 4 (see next comments), to be used by this section.
+			# Conditionally throttle maxRNDrange (for random selection of empty neighbors).
+			# NOTE: If viscosity is higher, coordinate growth will appear to follow a more stringy/meandering/splatty path/form (it will spread less uniformly) ; viscosity must be between 0 (very liquid--viscosity check will always be bypassed) to 6 (thick):			
+			viscosity = 4
+			if len(self.emptyNeighbors) - viscosity > 1 and viscosity != 0:		# If we can subtract the highest possiible number (of random selection count) of available neighbors by viscosity and still have 1 left (and if viscosity is nonzero), do that:
+				# print('--------VISCOSITY CHECK PASSED---------)')
+				maxRNDrange = len(self.emptyNeighbors) - viscosity
+				# print('maxRNDrange selected of', maxRNDrange, 'where len is', len(self.emptyNeighbors))
+			else:		# Otherwise take a random selection of available neighbors from the full number range of available neighbors:
+				maxRNDrange = len(self.emptyNeighbors)
+			# END VISCOSITY CONTROL.
+			nNeighborsToReturn = np.random.random_integers(1, maxRNDrange)		# Decide how many to pick
 			for pick in range(0, nNeighborsToReturn):
 				RNDneighbor = random.choice(self.emptyNeighbors)
 				rndNeighborsToReturn.append(RNDneighbor)
@@ -108,7 +120,7 @@ class Coordinate:
 # END COORDINATE CLASS
 
 # START GLOBAL FUNCTIONS
-# TO DO: REINTEGRATE AS NECESSARY, ELSE DELETE:
+# TO DO: REINTEGRATE AS DESIRED, ELSE DELETE:
 # function takes two ints and shifts each up or down one or not at all. I know, it doesn't receive a tuple as input but it gives one as output:
 # def mutateCoordinate(xCoordParam, yCoordParam):
 # 	xCoord = np.random.random_integers((xCoordParam - 1), xCoordParam + 1)
@@ -155,7 +167,7 @@ def getNewLivingCoord(tupleToAllocate, unusedCoords, livingCoords, arr):	# Those
 		tupleToAllocate = ()
 	return tupleToAllocate
 
-# function creates image from list of Coordinate objects, heigh and width definitions, and a filename string:
+# function creates image from list of Coordinate objects, height and width definitions, and a filename string:
 def coordinatesListToSavedImage(arr, height, width, imgFileName):
 	tmpArray = []
 	for i in range(0, height):
@@ -196,7 +208,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 # TO DO: add an argsparse argument for startCoordsN (the number of starting coords) ; until then this is hard-coded:
 	# print('unusedCoords before:', unusedCoords)
 	# print('livingCoords before:', livingCoords)
-	startCoordsN = 2
+	startCoordsN = 3
 	for i in range(0, startCoordsN):
 		getNewRNDlivingCoord(unusedCoords, livingCoords, arr)
 	# print('unusedCoords after:', unusedCoords)
@@ -205,7 +217,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	color = colorMutationBase
 	previousColor = color
 	failedCoordMutationCount = 0
-	reportStatsEveryNthLoop = 370
+	reportStatsEveryNthLoop = 15
 	reportStatsNthLoopCounter = 0
 
 	# Create unique, date-time informative image file name. Note that this will represent when the painting began, not when it ended (~State filename will be based off this).
@@ -222,9 +234,10 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		padAnimationSaveFramesNumbersTo = len(str(terminatePaintingAtFillCount))
 		os.mkdir(animFramesFolderName)
 
-	# THE FUNCTIONAL CORE
+	# ----
+	# START IMAGE MAPPING
 	print('Generating image . . .')
-	while unusedCoords:
+	while livingCoords:
 		newCoordsToBirth = []
 		# Operate on copy of livingCoords (not livingCoords itself), because this loop changes livingCoords (I don't know whether it copies the list in memory and operates from that or responds to it changing; I would do the former if I designed a language).
 		copyOfLivingCoords = list(livingCoords)
@@ -238,7 +251,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			arr[coord[0]][coord[1]].RGBcolor = [255,0,255]		# Coloration
 # TO DO: remove tuples from livingCoords which have been filled (are dead), if I am not (I think I'm not)
 			RNDemptyCoordsList = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
-			livingCoords.remove(coord)		# Remove that to avoid wasted calculations (so many empty tuples passed to getNewLivingCoord
+			livingCoords.remove(coord)		# Remove that to avoid wasted calculations (so many empty tuples passed to getNewLivingCoord)
 			newCoordsToBirth += list(RNDemptyCoordsList)		# Add items in the list on the left to the list on the right
 			newCoordsToBirth = list(set(newCoordsToBirth))		# Remove duplicates (via set(), and reassign to list via list())
 
@@ -247,23 +260,24 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			if coord:		# If there's a value in coord:
 				getNewLivingCoord(coord, unusedCoords, livingCoords, arr)
 
+# TO DO: I might like it if this stopped saving new frames after every coordinate was colored (it can (always does?) save extra redundant frames at the end:
 		# Save an animation frame if that variable has a value:
 		if animationSaveEveryNframes:
 			if (animationSaveNFramesCounter % animationSaveEveryNframes) == 0:
 				strOfThat = str(animationFrameCounter)
-				imgFileName = animFramesFolderName + '/' + strOfThat.zfill(padAnimationSaveFramesNumbersTo) + '.png'
-				coordinatesListToSavedImage(arr, height, width, imgFileName)
+				animIMGFileName = animFramesFolderName + '/' + strOfThat.zfill(padAnimationSaveFramesNumbersTo) + '.png'
+				coordinatesListToSavedImage(arr, height, width, animIMGFileName)
 				animationFrameCounter += 1		# Increment that *after*, for image tools expecting series starting at 0.
 			animationSaveNFramesCounter += 1
 
-# TO DO: REINTEGRATE AS NECESSARY:
+# TO DO: REINTEGRATE AS WANTED for a more stringy (more walking than spreading) mode:
 		# If the coordinate is NOT NOT used (is used), print a progress message.
 		# 	failedCoordMutationCount += 1
 		# Get a new random coordinate if failedMutationsThreshold met.
 		# 	if failedCoordMutationCount == failedMutationsThreshold:
 		# 		printProgress()
 		# 		failedCoordMutationCount = 0
-# TO DO: REINTEGRATE AS NECESSARY:
+# TO DO: REINTEGRATE AS WANTED (how do I track color mutation fail now with multiple living coordinates?) :
 				# On color mutation fail, revert color to base.
 				# if revertColorOnMutationFail == 1:
 				# 	previousColor = colorMutationBase
@@ -282,16 +296,18 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		# if THAT:
 			# print('Pixel fill (successful mutation) termination count ', terminatePaintingAtFillCount, ' reached. Ending algorithm and painting.')
 			# break
+	# END IMAGE MAPPING
+	# ----
 
-# TO DO: REINTEGRATE:
-	# Save final image file and delete progress (state, temp) image file.
-	# print('Saving image ', imgFileName, ' . . .')
-	# im = Image.fromarray(arr.astype(np.uint8)).convert('RGB')
-	# im.save(imgFileName)
-	# print('Created ', n, ' of ', numIMGsToMake, ' images.')
-	# os.remove(stateIMGfileName)
-# NO LONGER TO DO; MAYBE DELETE THIS AND THE NEXT LINE OF CODE: set a condition for the following to turn false:
-		# unusedCoords = []
+# print('state of arrays after that loop:')
+# print('unusedCoords:', unusedCoords)
+# print('livingCoords:', livingCoords)
+
+# Save final image file and delete progress (state, temp) image file:
+print('Saving image ', imgFileName, ' . . .')
+coordinatesListToSavedImage(arr, height, width, imgFileName)
+print('Created ', n, ' of ', numIMGsToMake, ' images.')
+os.remove(stateIMGfileName)
 
 
 # MUCH BETTERER REFERENCE:
