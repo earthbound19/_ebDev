@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Right now it is one virtual, undead bacterium which randomly walks and poops mutated colors. A possible future update will manage multiple bacteria. Output file names are random. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
+# Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Output file names are based on the date and add random characters. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
 # USAGE
 # Run this script without any paramaters, and it will use a default set of parameters:
@@ -36,10 +36,14 @@ parser.add_argument('-t', '--height', type=int, default=400, help='Height of out
 parser.add_argument('-r', '--rshift', type=int, default=2, help='Vary R, G and B channel values randomly in the range negative this value or positive this value. Note that this means the range is rshift times two. Defaut 2. Ripped or torn looking color streaks are more likely toward 6 or higher. Default 2.')
 parser.add_argument('-b', '--backgroundColor', default='[157, 140, 157]', help='Canvas color. Expressed as a python list or single number that will be assigned to every value in an RGB triplet. If a list, give the RGB values in the format \'[255,70,70]\' (if you add spaces after the commas, you must surround the parameter in single or double quotes). This example would produce a deep red, as Red = 255, Green = 70, Blue = 70). A single number example like just 150 will result in a medium-light gray of [150, 150, 150] (Red = 150, Green = 150, Blue = 150). All values must be between 0 and 255. Default [157, 140, 157] (a medium-medium light, slightly violet gray).')
 parser.add_argument('-c', '--colorMutationBase', help='Base initialization color for pixels, which randomly mutates as painting proceeds. If omitted, defaults to whatever backgroundColor is. If included, may differ from backgroundColor. This option must be given in the same format as backgroundColor.')
-parser.add_argument('-p', '--percentMutation', type=float, default=0.02, help='(Alternate for -m) What percent of the canvas would have been covered by failed mutation before it triggers selection of a random new available unplotted coordinate. Percent expressed as a decimal (float) between 0 and 1. Default 0.043 (about 4 percent).')
-parser.add_argument('-f', '--failedMutationsThreshold', type=int, help='How many times coordinate mutation must fail to trigger selection of a random new available unplotted coordinate. Overrides -p | --percentMutation if present.')
-parser.add_argument('-d', '--revertColorOnMutationFail', type=int, default=1, help='If (-f | --failedMutationsThreshold) is reached, revert color to color mutation base (-c | --colorMutationBase). Default 1 (true). If you use this at all you want to change the default 1 (true) by passing 0 (false). If false, color will change more in the painting. If true, color will only evolve as much as coordinates successfully evolve.')
-parser.add_argument('-s', '--stopPaintingPercent', type=float, default=0.475, help='What percent canvas fill to stop painting at. To paint until the canvas is filled (which is infeasible for higher resolutions), pass 1 (for 100 percent) If not 1, value should be a percent expressed as a decimal (float) between 0 and 1. Default 0.475 (about 48 percent).')
+# NOTES: at this writing (with sucessful coordinates growth instead of only one coordinate wandering), the following will virtually never be needed; they may be needed again if I add random coordinate death (fail to continue growing at all) :
+# TO DO? : UNCOMMENT and reintegrate associated code:
+# parser.add_argument('-p', '--percentMutation', type=float, default=0.02, help='(Alternate for -m) What percent of the canvas would have been covered by failed mutation before it triggers selection of a random new available unplotted coordinate. Percent expressed as a decimal (float) between 0 and 1. Default 0.043 (about 4 percent).')
+# TO DO? : UNCOMMENT and reintegrate associated code:
+# parser.add_argument('-f', '--failedMutationsThreshold', type=int, help='How many times coordinate mutation must fail to trigger selection of a random new available unplotted coordinate. Overrides -p | --percentMutation if present.')
+# TO DO? : UNCOMMENT and reintegrate associated code:
+# parser.add_argument('-d', '--revertColorOnMutationFail', type=int, default=1, help='If (-f | --failedMutationsThreshold) is reached, revert color to color mutation base (-c | --colorMutationBase). Default 1 (true). If you use this at all you want to change the default 1 (true) by passing 0 (false). If false, color will change more in the painting. If true, color will only evolve as much as coordinates successfully evolve.')
+parser.add_argument('-s', '--stopPaintingPercent', type=float, default=1, help='What percent canvas fill to stop painting at. To paint until the canvas is filled (which is infeasible for higher resolutions), pass 1 (for 100 percent) If not 1, value should be a percent expressed as a decimal (float) between 0 and 1. Default 1 (100 percent). For high failedMutationsThreshold or random walk (random walk not implemented at this writing), 0.475 (around 48 percent) is recommended.')
 parser.add_argument('-a', '--animationSaveEveryNframes', type=int, help='Every N successful coordinate and color mutations, save an animation frame into a subfolder named after the intended final art file. To save every frame, set this to 1, or to save every 3rd frame set it to 3, etc. Saves zero-padded numbered frames to a subfolder which may be strung together into an animation of the entire painting process (for example via ffmpegAnim.sh). May substantially slow down render, and can also create many, many gigabytes of data, depending. Off by default. To switch it on, use it (with a number).')
 
 args = parser.parse_args()		# When this function is called, if -h or --help was passed to the script, it will print the description and all defined help messages.
@@ -48,9 +52,9 @@ numIMGsToMake = args.numberOfImages
 rshift = args.rshift
 width = args.width
 height = args.height
-percentMutation = args.percentMutation
-failedMutationsThreshold = args.failedMutationsThreshold
-revertColorOnMutationFail = args.revertColorOnMutationFail
+# percentMutation = args.percentMutation
+# failedMutationsThreshold = args.failedMutationsThreshold
+# revertColorOnMutationFail = args.revertColorOnMutationFail
 stopPaintingPercent = args.stopPaintingPercent
 animationSaveEveryNframes = args.animationSaveEveryNframes
 # Interpreting -c (or --colorMutationBase) argument as python literal and assigning that to a variable, re: https://stackoverflow.com/a/1894296/1397555
@@ -64,17 +68,19 @@ else:
 # purple = [255, 0, 255]	# Purple. In prior commits of this script, this has been defined and unused, just like in real life. Now, it is commented out or not even defined, just like it is in real life.
 allesPixelCount = width * height
 # If no specific threshold given, calculate it. Otherwise what is given will be used (it will not be altered):
-if failedMutationsThreshold == None:
-	failedMutationsThreshold = int(allesPixelCount * percentMutation)
+# if failedMutationsThreshold == None:
+	# failedMutationsThreshold = int(allesPixelCount * percentMutation)
+
 terminatePaintingAtFillCount = int(allesPixelCount * stopPaintingPercent)
 
 # START COORDINATE CLASS
 class Coordinate:
 	# slots for allegedly higher efficiency re: https://stackoverflow.com/a/49789270
-	__slots__ = ["YXtuple", "x", "y", "maxX", "maxY", "RGBcolor", "isAlive", "isConsumed", "emptyNeighbors"]
-	def __init__(self, x, y, maxX, maxY, RGBcolor, isAlive, isConsumed, emptyNeighbors):
+	__slots__ = ["YXtuple", "x", "y", "maxX", "maxY", "parentRGBcolor", "mutatedRGBcolor", "emptyNeighbors"]
+	def __init__(self, x, y, maxX, maxY):
 		self.YXtuple = (y, x)
-		self.x = x; self.y = y; self.RGBcolor = RGBcolor; self.isAlive = isAlive; self.isConsumed = isConsumed
+		self.parentRGBcolor = None; self.mutatedRGBcolor = None
+		self.x = x; self.y = y; self.parentRGBcolor = parentRGBcolor
 		# Adding all possible empty neighbor values even if they would result in values out of bounds of image (negative or past maxX or maxY), and will check for and clean up pairs with out of bounds values after:
 		tmpList = [ (y-1, x-1), (y, x-1), (y+1, x-1), (y-1, x), (y+1, x), (y-1, x+1), (y, x+1), (y+1, x+1) ]
 		deleteList = []
@@ -136,28 +142,20 @@ class Coordinate:
 # 		yCoord = (height - 1)
 # 	return [xCoord, yCoord]
 
-# function requires lists of Coordinates as parameters, manipulates (which it directly manipulates). Moves an integer tuple out of unusedCoords and into livingCoords, and returns a copy of that tuple (for reference purposes). ALSO removes tuples with the same value from empty neighbor lists of all Coordinates adjacent to all new livingCoords (so that in later use of those empty neighbor lists, the new livingCoords won't erroneously be attempted to be reused; so, THIS FUNCTION MOREOVER directly manipulates the third required passed list, arr[]:
-def getNewRNDlivingCoord(unusedCoords, livingCoords, arr):	# Those last three parameters are lists!
-	if unusedCoords:		# If there are any values in that list, get a new random one
-		RNDcoord = random.choice(unusedCoords)
-		unusedCoords.remove(RNDcoord)
-		livingCoords.append(RNDcoord)
-		tmpListOne = list(arr[RNDcoord[0]][RNDcoord[1]].emptyNeighbors)		# Making a copy via list() on purpose
-		for toFindSelfIn in tmpListOne:
-			arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors.remove(RNDcoord)
-	else:		# If there are _not_ any values in that list, assign RNDcoord the value of an empty tuple:
-		RNDcoord = ()
-	return RNDcoord
 
-# function moves any coordinate tuple out of unusedCoords, into livingCoords, and deletes the tuple out of the emptyNeighbors list of neighboring Coordinate objects in arr[]
-def getNewLivingCoord(tupleToAllocate, unusedCoords, livingCoords, arr):	# Those last three parameters are lists!
+# function requires lists of Coordinates as parameters, and it directly maniuplates those lists (which are passed by reference). parentColor should be a list of RGB colors in the format [255,0,255].
+def getNewLivingCoord(parentRGBColor, tupleToAllocate, unusedCoords, livingCoords, arr):	# Those last three parameters are lists!
 	if tupleToAllocate:		# If that tuple has a value, do the function's work.
-		# print ('Allocating tupleToAllocate', tupleToAllocate)
+# TO DO: shift that burden of checking for emptiness out of this function?
+		# (Maybe) move that tuple out of unusedCoords and into livingCoords:
 		if tupleToAllocate in unusedCoords:		# Only execute the following remove line of code if it's in that:
 			unusedCoords.remove(tupleToAllocate)
 		if tupleToAllocate not in livingCoords:		# Only execute the following add line of code if it's not in that:
 			livingCoords.append(tupleToAllocate)
+			# Give that new living coord, IN arr[], a parent color (to later mutate from):
+			arr[tupleToAllocate[0]][tupleToAllocate[1]].parentRGBcolor = parentRGBColor
 			# All the following will also only be done if that was not found in livingCoords:
+			# Using list of empty neighbors, remove that newly chosen RNDcoord from the emptyNeighbors lists of all empty neighbor coords (so that in later use of those empty neighbor lists, the new livingCoords won't erroneously be attempted to be reused) :
 			tmpListOne = list(arr[tupleToAllocate[0]][tupleToAllocate[1]].emptyNeighbors)
 			for toFindSelfIn in tmpListOne:
 				if toFindSelfIn in arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors:		# Only execute the following remove line of code if toFindSelfIn is in that:
@@ -173,7 +171,7 @@ def coordinatesListToSavedImage(arr, height, width, imgFileName):
 	for i in range(0, height):
 		coordsRow = []
 		for j in range(0, width):
-			coordsRow.append(arr[i][j].RGBcolor)
+			coordsRow.append(arr[i][j].parentRGBcolor)
 		tmpArray.append(coordsRow)
 	tmpArray = np.asarray(tmpArray)
 	im = Image.fromarray(tmpArray.astype(np.uint8)).convert('RGB')
@@ -181,7 +179,7 @@ def coordinatesListToSavedImage(arr, height, width, imgFileName):
 
 # function prints coordinate plotting statistics (progress report):
 def printProgress():
-	print('Unused coordinates: ', len(unusedCoords), ' Have plotted ', len(usedCoords), 'of ', terminatePaintingAtFillCount, ' desired coordinates (on a canvas of', allesPixelCount, ' pixels).')
+	print('Painted', paintedCoordinates, 'of desired', terminatePaintingAtFillCount, 'coordinates (on a canvas of', allesPixelCount, ' pixels).')
 # END GLOBAL FUNCTIONS
 # END OPTIONS AND GLOBALS
 
@@ -199,7 +197,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	for y in range(0, height):		# for columns (x) in row)
 		tmpList = []
 		for x in range(0, width):		# over the columns, prep and add:
-			tmpList.append(Coordinate(x, y, width, height, backgroundColor, False, False, None))
+			tmpList.append( Coordinate(x, y, width, height) )
 			unusedCoords.append( (y, x) )
 		arr.append(tmpList)
 
@@ -210,7 +208,8 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# print('livingCoords before:', livingCoords)
 	startCoordsN = 3
 	for i in range(0, startCoordsN):
-		getNewRNDlivingCoord(unusedCoords, livingCoords, arr)
+		RNDcoord = random.choice(unusedCoords)
+		getNewLivingCoord(colorMutationBase, RNDcoord, unusedCoords, livingCoords, arr)
 	# print('unusedCoords after:', unusedCoords)
 	# print('livingCoords after:', livingCoords)
 
@@ -223,8 +222,10 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# Create unique, date-time informative image file name. Note that this will represent when the painting began, not when it ended (~State filename will be based off this).
 	now = datetime.datetime.now()
 	timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__%f')
-	rndStr = ('%03x' % random.randrange(16**3))		# Returns three random lowercase hex characters. Wherever I horked that from originally appended .lower() to it, pointless because it already returns lowercase characters.
-	imgFileBaseName = timeStamp + '-' + rndStr + '-colorGrowth-Py-r' + str(rshift) + '-f' + str(failedMutationsThreshold)
+	rndStr = ('%03x' % random.randrange(16**3))		# Returns three random lowercase hex characters.
+# TO DO: reactivate this file name string format if/when failedMutationsThreshold is reintegrated:
+	# imgFileBaseName = timeStamp + '-' + rndStr + '-colorGrowth-Py-r' + str(rshift) + '-f' + str(failedMutationsThreshold)
+	imgFileBaseName = timeStamp + '-' + rndStr + '-colorGrowth-Py-r' + str(rshift)
 	imgFileName = imgFileBaseName + '.png'
 	stateIMGfileName = imgFileBaseName + '-state.png'
 	animFramesFolderName = imgFileBaseName + '_frames'
@@ -236,6 +237,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 
 	# ----
 	# START IMAGE MAPPING
+	paintedCoordinates = 0
 	print('Generating image . . .')
 	while livingCoords:
 		newCoordsToBirth = []
@@ -245,10 +247,10 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 # TO DO: mutating color, e.g.
 # newColor = previousColor + np.random.random_integers(-rshift, rshift, size=3) / 2
 # newColor = np.clip(newColor, 0, 255)		# Clip that within RGB range if it wandered outside of that range.
-# arr[arrYidx][arrXidx] = newColor
-# previousColor = newColor
-			# print('for coord in copyOfLivingCoords loop, coord value', coord)
-			arr[coord[0]][coord[1]].RGBcolor = [255,0,255]		# Coloration
+# DO THAT COLOR MUTATION by evolving parentRGBcolor to mutatedRGBcolor, here:
+			arr[coord[0]][coord[1]].parentRGBcolor = [255,0,255]		# Coloration
+# TO DO: DEBUG and if necessary fix: why is paintedCoordinates arriving at a number far greater than allesPixelCount?
+			paintedCoordinates += 1
 # TO DO: remove tuples from livingCoords which have been filled (are dead), if I am not (I think I'm not)
 			RNDemptyCoordsList = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
 			livingCoords.remove(coord)		# Remove that to avoid wasted calculations (so many empty tuples passed to getNewLivingCoord)
@@ -258,9 +260,11 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		# print('--DONE populating newCoordsToBirth. Will make use of it:')
 		for coord in newCoordsToBirth:
 			if coord:		# If there's a value in coord:
+CONTINUE CODING HERE
+NOTE that here we must accomodoate for the new function signature that takes a parent color--maybe we have to change the looping structure, because this may be out of sync with what we would get from parentRGBcolor in the `for coord in copyOfLivingCoords:` loop above!
 				getNewLivingCoord(coord, unusedCoords, livingCoords, arr)
 
-# TO DO: I might like it if this stopped saving new frames after every coordinate was colored (it can (always does?) save extra redundant frames at the end:
+# TO DO: I might like it if this stopped saving new frames after every coordinate was colored (it can (always does?) save extra redundant frames at the end;
 		# Save an animation frame if that variable has a value:
 		if animationSaveEveryNframes:
 			if (animationSaveNFramesCounter % animationSaveEveryNframes) == 0:
@@ -287,15 +291,14 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			print('Saving prograss snapshot image ', stateIMGfileName, ' . . .')
 			coordinatesListToSavedImage(arr, height, width, stateIMGfileName)
 # TO DO: uncomment and fix errors originating from the next line of code:
-			# printProgress()
+			printProgress()
 			reportStatsNthLoopCounter = 1
 		reportStatsNthLoopCounter += 1
-# TO DO: REINTEGRATE AS NECESSARY:
-		# TO DO: PUT a terminate at arbitrary number of mutations control code here.
+
 		# This will terminate all coordinate and color mutation at an arbitary number of mutations.
-		# if THAT:
-			# print('Pixel fill (successful mutation) termination count ', terminatePaintingAtFillCount, ' reached. Ending algorithm and painting.')
-			# break
+		if paintedCoordinates == terminatePaintingAtFillCount:
+			print('Painted coordinate termination count', paintedCoordinates, 'reached. Ending paint algorithm.')
+			break
 	# END IMAGE MAPPING
 	# ----
 
