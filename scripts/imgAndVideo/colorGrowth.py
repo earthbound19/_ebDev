@@ -236,26 +236,16 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 # previousColor = newColor
 			# print('for coord in copyOfLivingCoords loop, coord value', coord)
 			arr[coord[0]][coord[1]].RGBcolor = [255,0,255]		# Coloration
-# TO DO remove tuples from livingCoords which have been filled (are dead), if I am not (I think I'm not)
+# TO DO: remove tuples from livingCoords which have been filled (are dead), if I am not (I think I'm not)
 			RNDemptyCoordsList = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
+			livingCoords.remove(coord)		# Remove that to avoid wasted calculations (so many empty tuples passed to getNewLivingCoord
 			newCoordsToBirth += list(RNDemptyCoordsList)		# Add items in the list on the left to the list on the right
 			newCoordsToBirth = list(set(newCoordsToBirth))		# Remove duplicates (via set(), and reassign to list via list())
 
 		# print('--DONE populating newCoordsToBirth. Will make use of it:')
 		for coord in newCoordsToBirth:
 			if coord:		# If there's a value in coord:
-				# print('unusedCoords:', unusedCoords)
-				# print('livingCoords:', livingCoords)
-				# print('newCoordsToBirth:', newCoordsToBirth)
-				for coord in newCoordsToBirth:
-					# print('Trying call getNewLivingCoord(coord, unusedCoords, livingCoords, arr):')
-					getNewLivingCoord(coord, unusedCoords, livingCoords, arr)
-#			else:
-#				print('stopped calling getNewLivingCoord(coord, unusedCoords, livingCoords, arr) where:')
-#				print('coord ==', coord)
-				# print('unusedCoords ==', unusedCoords)
-#				print('newCoordsToBirth ==', newCoordsToBirth)
-				# print('arr == many tuples')
+				getNewLivingCoord(coord, unusedCoords, livingCoords, arr)
 
 		# Save an animation frame if that variable has a value:
 		if animationSaveEveryNframes:
