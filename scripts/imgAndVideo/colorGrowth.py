@@ -11,7 +11,7 @@
 # python 3 with the various modules installed that you see in the import statements here near the start of this script.
 
 # TO DO:
-# - ADAPT Coordinates object (and use?) here from learnings which at this moment are only in scrap.py
+# - Things listed in development code with TO DO comments
 # - Option to suppress progress print to save time
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
 # - Option to use a parameter preset (which would be literally just an input file of desired parameters?). Is this a standardized nixy' CLI thing to do?
@@ -222,6 +222,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		padAnimationSaveFramesNumbersTo = len(str(terminatePaintingAtFillCount))
 		os.mkdir(animFramesFolderName)
 
+	# THE FUNCTIONAL CORE
 	print('Generating image . . .')
 	while unusedCoords:
 		newCoordsToBirth = []
@@ -235,11 +236,12 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 # previousColor = newColor
 			# print('for coord in copyOfLivingCoords loop, coord value', coord)
 			arr[coord[0]][coord[1]].RGBcolor = [255,0,255]		# Coloration
+# TO DO remove tuples from livingCoords which have been filled (are dead), if I am not (I think I'm not)
 			RNDemptyCoordsList = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
 			newCoordsToBirth += list(RNDemptyCoordsList)		# Add items in the list on the left to the list on the right
 			newCoordsToBirth = list(set(newCoordsToBirth))		# Remove duplicates (via set(), and reassign to list via list())
 
-		print('--DONE populating newCoordsToBirth. Will make use of it:')
+		# print('--DONE populating newCoordsToBirth. Will make use of it:')
 		for coord in newCoordsToBirth:
 			if coord:		# If there's a value in coord:
 				# print('unusedCoords:', unusedCoords)
