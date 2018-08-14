@@ -77,10 +77,9 @@ terminatePaintingAtFillCount = int(allesPixelCount * stopPaintingPercent)
 class Coordinate:
 	# slots for allegedly higher efficiency re: https://stackoverflow.com/a/49789270
 	__slots__ = ["YXtuple", "x", "y", "maxX", "maxY", "parentRGBcolor", "mutatedRGBcolor", "emptyNeighbors"]
-	def __init__(self, x, y, maxX, maxY):
+	def __init__(self, x, y, maxX, maxY, parentRGBcolor):
 		self.YXtuple = (y, x)
-		self.parentRGBcolor = None; self.mutatedRGBcolor = None
-		self.x = x; self.y = y; self.parentRGBcolor = parentRGBcolor
+		self.x = x; self.y = y;	self.parentRGBcolor = parentRGBcolor; self.mutatedRGBcolor = parentRGBcolor
 		# Adding all possible empty neighbor values even if they would result in values out of bounds of image (negative or past maxX or maxY), and will check for and clean up pairs with out of bounds values after:
 		tmpList = [ (y-1, x-1), (y, x-1), (y+1, x-1), (y-1, x), (y+1, x), (y-1, x+1), (y, x+1), (y+1, x+1) ]
 		deleteList = []
@@ -161,7 +160,8 @@ def getNewLivingCoord(parentRGBColor, tupleToAllocate, unusedCoords, livingCoord
 				if toFindSelfIn in arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors:		# Only execute the following remove line of code if toFindSelfIn is in that:
 					arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors.remove(tupleToAllocate)
 	else:		# If that tuple doesn't have a value, print a warning and return an empty tuple:
-		print("Warning: empty tuple passed to function getNewLivingCoord().")
+# TO DO: fix, if possible, what is causing this script to print this warning a lot:
+		# print("Warning: empty tuple passed to function getNewLivingCoord().")
 		tupleToAllocate = ()
 	return tupleToAllocate
 
@@ -171,7 +171,7 @@ def coordinatesListToSavedImage(arr, height, width, imgFileName):
 	for i in range(0, height):
 		coordsRow = []
 		for j in range(0, width):
-			coordsRow.append(arr[i][j].parentRGBcolor)
+			coordsRow.append(arr[i][j].mutatedRGBcolor)
 		tmpArray.append(coordsRow)
 	tmpArray = np.asarray(tmpArray)
 	im = Image.fromarray(tmpArray.astype(np.uint8)).convert('RGB')
@@ -197,7 +197,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	for y in range(0, height):		# for columns (x) in row)
 		tmpList = []
 		for x in range(0, width):		# over the columns, prep and add:
-			tmpList.append( Coordinate(x, y, width, height) )
+			tmpList.append( Coordinate(x, y, width, height, colorMutationBase) )
 			unusedCoords.append( (y, x) )
 		arr.append(tmpList)
 
@@ -216,7 +216,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	color = colorMutationBase
 	previousColor = color
 	failedCoordMutationCount = 0
-	reportStatsEveryNthLoop = 15
+	reportStatsEveryNthLoop = 3
 	reportStatsNthLoopCounter = 0
 
 	# Create unique, date-time informative image file name. Note that this will represent when the painting began, not when it ended (~State filename will be based off this).
@@ -240,29 +240,20 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	paintedCoordinates = 0
 	print('Generating image . . .')
 	while livingCoords:
-		newCoordsToBirth = []
 		# Operate on copy of livingCoords (not livingCoords itself), because this loop changes livingCoords (I don't know whether it copies the list in memory and operates from that or responds to it changing; I would do the former if I designed a language).
 		copyOfLivingCoords = list(livingCoords)
 		for coord in copyOfLivingCoords:
-# TO DO: mutating color, e.g.
-# newColor = previousColor + np.random.random_integers(-rshift, rshift, size=3) / 2
-# newColor = np.clip(newColor, 0, 255)		# Clip that within RGB range if it wandered outside of that range.
-# DO THAT COLOR MUTATION by evolving parentRGBcolor to mutatedRGBcolor, here:
-			arr[coord[0]][coord[1]].parentRGBcolor = [255,0,255]		# Coloration
+			livingCoords.remove(coord)		# Remove that to avoid wasted calculations (so many empty tuples passed to getNewLivingCoord)
+			# Mutate color--! and assign it to the mutatedRGBcolor in the Coordinate object:
+			RGBcolorTMP = arr[coord[0]][coord[1]].parentRGBcolor + np.random.random_integers(-rshift, rshift, size=3) / 2
+			RGBcolorTMP = np.clip(RGBcolorTMP, 0, 255)
+			arr[coord[0]][coord[1]].mutatedRGBcolor = RGBcolorTMP
+			newLivingCoordsParentRGBcolor = arr[coord[0]][coord[1]].mutatedRGBcolor
 # TO DO: DEBUG and if necessary fix: why is paintedCoordinates arriving at a number far greater than allesPixelCount?
 			paintedCoordinates += 1
-# TO DO: remove tuples from livingCoords which have been filled (are dead), if I am not (I think I'm not)
 			RNDemptyCoordsList = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
-			livingCoords.remove(coord)		# Remove that to avoid wasted calculations (so many empty tuples passed to getNewLivingCoord)
-			newCoordsToBirth += list(RNDemptyCoordsList)		# Add items in the list on the left to the list on the right
-			newCoordsToBirth = list(set(newCoordsToBirth))		# Remove duplicates (via set(), and reassign to list via list())
-
-		# print('--DONE populating newCoordsToBirth. Will make use of it:')
-		for coord in newCoordsToBirth:
-			if coord:		# If there's a value in coord:
-CONTINUE CODING HERE
-NOTE that here we must accomodoate for the new function signature that takes a parent color--maybe we have to change the looping structure, because this may be out of sync with what we would get from parentRGBcolor in the `for coord in copyOfLivingCoords:` loop above!
-				getNewLivingCoord(coord, unusedCoords, livingCoords, arr)
+			for coord in RNDemptyCoordsList:
+				getNewLivingCoord(newLivingCoordsParentRGBcolor, coord, unusedCoords, livingCoords, arr)
 
 # TO DO: I might like it if this stopped saving new frames after every coordinate was colored (it can (always does?) save extra redundant frames at the end;
 		# Save an animation frame if that variable has a value:
