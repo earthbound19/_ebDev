@@ -140,12 +140,16 @@ def getNewRNDlivingCoord(unusedCoords, livingCoords, arr):	# Those last three pa
 # function moves any coordinate tuple out of unusedCoords, into livingCoords, and deletes the tuple out of the emptyNeighbors list of neighboring Coordinate objects in arr[]
 def getNewLivingCoord(tupleToAllocate, unusedCoords, livingCoords, arr):	# Those last three parameters are lists!
 	if tupleToAllocate:		# If that tuple has a value, do the function's work.
-		print ('Allocating tupleToCallocate', tupleToAllocate)
-		unusedCoords.remove(tupleToAllocate)
-		livingCoords.append(tupleToAllocate)
-		tmpListOne = list(arr[tupleToAllocate[0]][tupleToAllocate[1]].emptyNeighbors)
-		for toFindSelfIn in tmpListOne:
-			arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors.remove(tupleToAllocate)
+		# print ('Allocating tupleToAllocate', tupleToAllocate)
+		if tupleToAllocate in unusedCoords:		# Only execute the following remove line of code if it's in that:
+			unusedCoords.remove(tupleToAllocate)
+		if tupleToAllocate not in livingCoords:		# Only execute the following add line of code if it's not in that:
+			livingCoords.append(tupleToAllocate)
+			# All the following will also only be done if that was not found in livingCoords:
+			tmpListOne = list(arr[tupleToAllocate[0]][tupleToAllocate[1]].emptyNeighbors)
+			for toFindSelfIn in tmpListOne:
+				if toFindSelfIn in arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors:		# Only execute the following remove line of code if toFindSelfIn is in that:
+					arr[toFindSelfIn[0]][toFindSelfIn[1]].emptyNeighbors.remove(tupleToAllocate)
 	else:		# If that tuple doesn't have a value, print a warning and return an empty tuple:
 		print("Warning: empty tuple passed to function getNewLivingCoord().")
 		tupleToAllocate = ()
@@ -220,28 +224,35 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 
 	print('Generating image . . .')
 	while unusedCoords:
-		newLivingCoords = []
-		for coord in livingCoords:
+		newCoordsToBirth = []
+		# Operate on copy of livingCoords (not livingCoords itself), because this loop changes livingCoords (I don't know whether it copies the list in memory and operates from that or responds to it changing; I would do the former if I designed a language).
+		copyOfLivingCoords = list(livingCoords)
+		for coord in copyOfLivingCoords:
 # TO DO: mutating color, e.g.
 # newColor = previousColor + np.random.random_integers(-rshift, rshift, size=3) / 2
 # newColor = np.clip(newColor, 0, 255)		# Clip that within RGB range if it wandered outside of that range.
 # arr[arrYidx][arrXidx] = newColor
 # previousColor = newColor
-			print('for coord in livinCoords loop, coord value', coord)
-			arr[coord[0]][coord[1]].RGBcolor = [0,0,0]		# Coloration
+			# print('for coord in copyOfLivingCoords loop, coord value', coord)
+			arr[coord[0]][coord[1]].RGBcolor = [255,0,255]		# Coloration
 			RNDemptyCoordsList = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
-			newLivingCoords += list(RNDemptyCoordsList)		# Add items in the list on the left to the list on the right
-			newLivingCoords = list(set(newLivingCoords))	# Remove duplicate items (via set(), and reassign to list via list())
+			newCoordsToBirth += list(RNDemptyCoordsList)		# Add items in the list on the left to the list on the right
+			newCoordsToBirth = list(set(newCoordsToBirth))		# Remove duplicates (via set(), and reassign to list via list())
 
-		for coord in newLivingCoords:
-			print('-- newLivingCoords loop on value', coord)
+		print('--DONE populating newCoordsToBirth. Will make use of it:')
+		for coord in newCoordsToBirth:
 			if coord:		# If there's a value in coord:
-				getNewLivingCoord(coord, unusedCoords, livingCoords, arr)
+				# print('unusedCoords:', unusedCoords)
+				# print('livingCoords:', livingCoords)
+				# print('newCoordsToBirth:', newCoordsToBirth)
+				for coord in newCoordsToBirth:
+					# print('Trying call getNewLivingCoord(coord, unusedCoords, livingCoords, arr):')
+					getNewLivingCoord(coord, unusedCoords, livingCoords, arr)
 #			else:
 #				print('stopped calling getNewLivingCoord(coord, unusedCoords, livingCoords, arr) where:')
 #				print('coord ==', coord)
 				# print('unusedCoords ==', unusedCoords)
-#				print('newLivingCoords ==', newLivingCoords)
+#				print('newCoordsToBirth ==', newCoordsToBirth)
 				# print('arr == many tuples')
 
 		# Save an animation frame if that variable has a value:
