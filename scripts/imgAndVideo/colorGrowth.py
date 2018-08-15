@@ -44,7 +44,7 @@ parser.add_argument('-c', '--colorMutationBase', help='Base initialization color
 # TO DO? : UNCOMMENT and reintegrate associated code:
 # parser.add_argument('-d', '--revertColorOnMutationFail', type=int, default=1, help='If (-f | --failedMutationsThreshold) is reached, revert color to color mutation base (-c | --colorMutationBase). Default 1 (true). If you use this at all you want to change the default 1 (true) by passing 0 (false). If false, color will change more in the painting. If true, color will only evolve as much as coordinates successfully evolve.')
 parser.add_argument('-s', '--stopPaintingPercent', type=float, default=1, help='What percent canvas fill to stop painting at. To paint until the canvas is filled (which is infeasible for higher resolutions), pass 1 (for 100 percent) If not 1, value should be a percent expressed as a decimal (float) between 0 and 1. Default 1 (100 percent). For high failedMutationsThreshold or random walk (random walk not implemented at this writing), 0.475 (around 48 percent) is recommended.')
-parser.add_argument('-a', '--animationSaveEveryNframes', type=int, help='Every N successful coordinate and color mutations, save an animation frame into a subfolder named after the intended final art file. To save every frame, set this to 1, or to save every 3rd frame set it to 3, etc. Saves zero-padded numbered frames to a subfolder which may be strung together into an animation of the entire painting process (for example via ffmpegAnim.sh). May substantially slow down render, and can also create many, many gigabytes of data, depending. Off by default. To switch it on, use it (with a number).')
+parser.add_argument('-a', '--animationSaveEveryNframes', type=int, default=1, help='Every N successful coordinate and color mutations, save an animation frame into a subfolder named after the intended final art file. To save every frame, set this to 1, or to save every 3rd frame set it to 3, etc. Saves zero-padded numbered frames to a subfolder which may be strung together into an animation of the entire painting process (for example via ffmpegAnim.sh). May substantially slow down render, and can also create many, many gigabytes of data, depending. 1 by default. To disable, set it to 0 with: -a 0 OR: --animationSaveEveryNframes 0')
 
 args = parser.parse_args()		# When this function is called, if -h or --help was passed to the script, it will print the description and all defined help messages.
 
@@ -115,13 +115,10 @@ class Coordinate:
 				maxRNDrange = len(self.emptyNeighbors)
 			# END VISCOSITY CONTROL.
 			nNeighborsToReturn = np.random.random_integers(1, maxRNDrange)		# Decide how many to pick
-			for pick in range(0, nNeighborsToReturn):
-				RNDneighbor = random.choice(self.emptyNeighbors)
-				rndNeighborsToReturn.append(RNDneighbor)
-				self.emptyNeighbors.remove(RNDneighbor)
+			rndNeighborsToReturn = random.sample(self.emptyNeighbors, nNeighborsToReturn)
 		else:		# If there is _not_ anything left in emptyNeighbors:
-			rndNeighborsToReturn.append( () )		# Append an empty tuple, which is all that will be in rndNeighborsToReturn.
-		return list(rndNeighborsToReturn)	# If you don't call that with list(), it returns a reference instead of copy (we want a copy).
+			rndNeighborsToReturn = [()]		# Return a list with one empty tuple
+		return rndNeighborsToReturn
 # END COORDINATE CLASS
 
 # START GLOBAL FUNCTIONS
@@ -214,8 +211,10 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# print('livingCoords after:', livingCoords)
 
 	color = colorMutationBase
-	previousColor = color
-	failedCoordMutationCount = 0
+# TO DO: UNCOMMENT AS WANTED and reintegrate code that uses it; how do I track color mutation fail now with multiple living coordinates? :
+	# previousColor = color
+# TO DO: REINTEGRATE AS WANTED for a more stringy (more walking than spreading) mode:
+	# failedCoordMutationCount = 0
 	reportStatsEveryNthLoop = 3
 	reportStatsNthLoopCounter = 0
 
@@ -230,7 +229,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	stateIMGfileName = imgFileBaseName + '-state.png'
 	animFramesFolderName = imgFileBaseName + '_frames'
 
-	if animationSaveEveryNframes:	# If that has a value that isn't None, create a subfolder to write frames to:
+	if animationSaveEveryNframes > 0:	# If that has a value greater than zero, create a subfolder to write frames to:
 		# Also, initailize a varialbe which is how many zeros to pad animation save frame file (numbers) to, based on how many frames will be rendered:
 		padAnimationSaveFramesNumbersTo = len(str(terminatePaintingAtFillCount))
 		os.mkdir(animFramesFolderName)
@@ -241,6 +240,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	print('Generating image . . .')
 	while livingCoords:
 		# Operate on copy of livingCoords (not livingCoords itself), because this loop changes livingCoords (I don't know whether it copies the list in memory and operates from that or responds to it changing; I would do the former if I designed a language).
+		RNDemptyCoordsList = []
 		copyOfLivingCoords = list(livingCoords)
 		for coord in copyOfLivingCoords:
 			livingCoords.remove(coord)		# Remove that to avoid wasted calculations (so many empty tuples passed to getNewLivingCoord)
@@ -248,12 +248,13 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 			RGBcolorTMP = arr[coord[0]][coord[1]].parentRGBcolor + np.random.random_integers(-rshift, rshift, size=3) / 2
 			RGBcolorTMP = np.clip(RGBcolorTMP, 0, 255)
 			arr[coord[0]][coord[1]].mutatedRGBcolor = RGBcolorTMP
-			newLivingCoordsParentRGBcolor = arr[coord[0]][coord[1]].mutatedRGBcolor
+			newLivingCoordsParentRGBcolor = RGBcolorTMP
 # TO DO: DEBUG and if necessary fix: why is paintedCoordinates arriving at a number far greater than allesPixelCount?
 			paintedCoordinates += 1
 			RNDemptyCoordsList = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
-			for coord in RNDemptyCoordsList:
-				getNewLivingCoord(newLivingCoordsParentRGBcolor, coord, unusedCoords, livingCoords, arr)
+# TO DO: add those to a list of all coords ever alive, and later subtract those from livingCoords? : 
+			for coordZurg in RNDemptyCoordsList:
+				getNewLivingCoord(newLivingCoordsParentRGBcolor, coordZurg, unusedCoords, livingCoords, arr)
 
 # TO DO: I might like it if this stopped saving new frames after every coordinate was colored (it can (always does?) save extra redundant frames at the end;
 		# Save an animation frame if that variable has a value:
@@ -265,14 +266,12 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 				animationFrameCounter += 1		# Increment that *after*, for image tools expecting series starting at 0.
 			animationSaveNFramesCounter += 1
 
-# TO DO: REINTEGRATE AS WANTED for a more stringy (more walking than spreading) mode:
 		# If the coordinate is NOT NOT used (is used), print a progress message.
 		# 	failedCoordMutationCount += 1
 		# Get a new random coordinate if failedMutationsThreshold met.
 		# 	if failedCoordMutationCount == failedMutationsThreshold:
 		# 		printProgress()
 		# 		failedCoordMutationCount = 0
-# TO DO: REINTEGRATE AS WANTED (how do I track color mutation fail now with multiple living coordinates?) :
 				# On color mutation fail, revert color to base.
 				# if revertColorOnMutationFail == 1:
 				# 	previousColor = colorMutationBase
@@ -281,27 +280,26 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		if reportStatsNthLoopCounter == 0 or reportStatsNthLoopCounter == reportStatsEveryNthLoop:
 			print('Saving prograss snapshot image ', stateIMGfileName, ' . . .')
 			coordinatesListToSavedImage(arr, height, width, stateIMGfileName)
-# TO DO: uncomment and fix errors originating from the next line of code:
 			printProgress()
 			reportStatsNthLoopCounter = 1
 		reportStatsNthLoopCounter += 1
 
 		# This will terminate all coordinate and color mutation at an arbitary number of mutations.
-		if paintedCoordinates == terminatePaintingAtFillCount:
+		if paintedCoordinates >= terminatePaintingAtFillCount:
 			print('Painted coordinate termination count', paintedCoordinates, 'reached. Ending paint algorithm.')
 			break
 	# END IMAGE MAPPING
 	# ----
 
-# print('state of arrays after that loop:')
-# print('unusedCoords:', unusedCoords)
-# print('livingCoords:', livingCoords)
+	# print('state of arrays after that loop:')
+	# print('unusedCoords:', unusedCoords)
+	# print('livingCoords:', livingCoords)
 
-# Save final image file and delete progress (state, temp) image file:
-print('Saving image ', imgFileName, ' . . .')
-coordinatesListToSavedImage(arr, height, width, imgFileName)
-print('Created ', n, ' of ', numIMGsToMake, ' images.')
-os.remove(stateIMGfileName)
+	# Save final image file and delete progress (state, temp) image file:
+	print('Saving image ', imgFileName, ' . . .')
+	coordinatesListToSavedImage(arr, height, width, imgFileName)
+	print('Created ', n, ' of ', numIMGsToMake, ' images.')
+	os.remove(stateIMGfileName)
 
 
 # MUCH BETTERER REFERENCE:
