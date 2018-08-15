@@ -223,8 +223,8 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# END IMAGE MAPPING
 	# ----
 
-# Save final image file and delete progress (state, temp) image file:
-print('Saving image ', imgFileName, ' . . .')
-coordinatesListToSavedImage(arr, height, width, imgFileName)
-print('Created ', n, ' of ', numIMGsToMake, ' images.')
-os.remove(stateIMGfileName)
+	# Save final image file and delete progress (state, temp) image file:
+	print('Saving image ', imgFileName, ' . . .')
+	coordinatesListToSavedImage(arr, height, width, imgFileName)
+	print('Created ', n, ' of ', numIMGsToMake, ' images.')
+	os.remove(stateIMGfileName)
