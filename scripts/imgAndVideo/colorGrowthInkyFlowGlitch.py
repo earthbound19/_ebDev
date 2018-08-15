@@ -10,6 +10,8 @@
 # DEPENDENCIES
 # python 3 with the various modules installed that you see in the import statements here near the start of this script.
 
+# TO DO? fix bugs extant in that this is a dev version.
+
 # CODE
 import datetime, random, argparse, ast, os.path
 import numpy as np
@@ -217,7 +219,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 		reportStatsNthLoopCounter += 1
 
 		# This will terminate all coordinate and color mutation at an arbitary number of mutations.
-		if paintedCoordinates == terminatePaintingAtFillCount:
+		if paintedCoordinates >= terminatePaintingAtFillCount:
 			print('Painted coordinate termination count', paintedCoordinates, 'reached. Ending paint algorithm.')
 			break
 	# END IMAGE MAPPING
