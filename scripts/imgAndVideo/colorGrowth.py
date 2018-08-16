@@ -241,7 +241,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	# START IMAGE MAPPING
 	paintedCoordinates = 0
 	deadCoordsList = []
-	print('Generating image . . .')
+	print('Generating image . . . ')
 	while livingCoords:
 		# Operate on copy of livingCoords (not livingCoords itself), because this loop changes livingCoords (I don't know whether it copies the list in memory and operates from that or responds to it changing; I would do the former if I designed a language).
 		RNDnewEmptyCoordsList = []
