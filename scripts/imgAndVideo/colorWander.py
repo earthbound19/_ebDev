@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Right now it is one virtual, undead bacterium which randomly walks and poops mutated colors. A possible future update will manage multiple bacteria. Output file names are random. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
+# Renders a PNG image like a single colored bacteria which walks randomluy over a surface and randomly mutates (and paints) color as it goes. This is a snapshot of colorGrowth.py which I've decided deserves its own variant script named this. Output file names are random. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
 # USAGE
 # Run this script without any paramaters, and it will use a default set of parameters:
@@ -167,8 +167,8 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 
 	# Create unique, date-time informative image file name. Note that this will represent when the painting began, not when it ended (~State filename will be based off this).
 	now = datetime.datetime.now()
-	timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__%f')
-	rndStr = ('%03x' % random.randrange(16**3))		# Returns three random lowercase hex characters. Wherever I horked that from originally appended .lower() to it, pointless because it already returns lowercase characters.
+	timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__')
+	rndStr = ('%03x' % random.randrange(16**6))		# Returns three random lowercase hex characters. Wherever I horked that from originally appended .lower() to it, pointless because it already returns lowercase characters.
 	imgFileBaseName = timeStamp + '-' + rndStr + '-colorGrowth-Py-r' + str(rshift) + '-f' + str(failedMutationsThreshold)
 	imgFileName = imgFileBaseName + '.png'
 	stateIMGfileName = imgFileBaseName + '-state.png'
