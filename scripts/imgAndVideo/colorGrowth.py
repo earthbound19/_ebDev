@@ -12,73 +12,197 @@
 
 # TO DO:
 # - Things listed in development code with TO DO comments
-# TO DO: and and paramaterize the following, and have the random seed set by random itself if the user provides no seed:
-# random.seed(1976)
-#  - ALSO rework the script to make everything deterministic from that seed. Right now the origin coordinates seem to be, and I don't know about anything else.
 # - Random coordinate death in a frequency range (may make the animation turn anything between trickles to rivers to floods)?
 # - restart main work loop again if unusedCoords has coords in it, but on that round get parentRGBcolor from nearest neighbor?
 # - option to not add to and check against deadCoordsList.append(coord), and test whether _not_ doing that fills in all holes in a flood (where I think doing that leaves those holes, which actually should happen, and which speeds up the render dramatically)?
 # - update deadCoordsList to recentlyFilledCoordsList[], with a "recent" random range to check?
 # - Option to suppress progress print to save time
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
-# - Option to use a parameter preset (which would be literally just an input file of desired parameters?). Is this a standardized nixy' CLI thing to do?
 # - Initialize colorMutationBase by random selection from a .hexplt color scheme
 # - Coordinate mutation: optionally revert to coordinate before last known successful mutation on coordinate mutation fail (instead of continuing random walk). This would still need the failsafe of failedMutationsThreshold.
 # - Color mutation option: on coordinate mutation fail, select random new color (including from a .hexplt color scheme). If this and -d are present, -d wins.
-# - Have more than one bacterium alive at a time (and have all their colors evolve on creating new bacterium).
 # - Major new feature? : Initialize arr[] from an image, pick a random coordinate from the image, and use the color at that coordinate both as the origin coordinate and the color at that coordinate as colorMutationBase. Could also be used to continue terminated runs with the same or different parameters.
 
 
 # CODE
-import datetime, random, argparse, ast, os.path
+import datetime, random, argparse, ast, os.path, sys, re, subprocess, shlex
 import numpy as np
 from PIL import Image
-# import sys
+
+# Defaults which will be overriden if arguments of the same name are provided to the script:
+numberOfImages = 1
+width = 400
+height = 200
+rshift = 8
+stopPaintingPercentAsDecimal = 0.64
+animationSaveEveryNframes = 0
+numberStartCoordinatesRNDrange = (1,13)
+viscosity = 4		# Acceptable defaults: 0 to 5. 6 works, but test output with that was brief and uninteresting.
+savePreset = True
+# BACKGROUND color options;
+# any of these (uncomment only one) are reinterpreted as a list later by ast.literal_eval(backgroundColor) :
+# backgroundColor = '[157,140,157]'		# Medium purplish gray
+backgroundColor = '[252,251,201]'		# Buttery light yellow
+
 
 # START OPTIONS AND GLOBALS
-parser = argparse.ArgumentParser(description='Renders a PNG image like bacteria that produce random color mutations as they grow over a surface. Right now it is one virtual, undead bacterium. A planned update will host multiple virtual bacteria. Output file names are after the date plus random characters. Inspired by and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
-parser.add_argument('-n', '--numberOfImages', type=int, default=4, help='How many images to generate. Default 4.')
-parser.add_argument('-w', '--width', type=int, default=800, help='Width of output image(s). Default 800.')
-parser.add_argument('-t', '--height', type=int, default=400, help='Height of output image(s). Default 400.')
-parser.add_argument('-r', '--rshift', type=int, default=5, help='Vary R, G and B channel values randomly in the range negative this value or positive this value. Note that this means the range is rshift times two. Defaut 5.')
-parser.add_argument('-b', '--backgroundColor', default='[157,140,157]', help='Canvas color. Expressed as a python list or single number that will be assigned to every value in an RGB triplet. If a list, give the RGB values in the format \'[255,70,70]\' (if you add spaces after the commas, you must surround the parameter in single or double quotes). This example would produce a deep red, as Red = 255, Green = 70, Blue = 70). A single number example like just 150 will result in a medium-light gray of [150,150,150] (Red = 150, Green = 150, Blue = 150). All values must be between 0 and 255. Default [157, 140, 157] (a medium-medium light, slightly violet gray).')
-parser.add_argument('-c', '--colorMutationBase', help='Base initialization color for pixels, which randomly mutates as painting proceeds. If omitted, defaults to whatever backgroundColor is. If included, may differ from backgroundColor. This option must be given in the same format as backgroundColor.')
-# NOTES: at this writing (with sucessful coordinates growth instead of only one coordinate wandering), the following will virtually never be needed; they may be needed again if I add random coordinate death (fail to continue growing at all) :
-# TO DO? : UNCOMMENT and reintegrate associated code:
+parser = argparse.ArgumentParser(description='Renders a PNG image like bacteria that produce random color mutations as they grow over a surface. Output file names are after the date plus random characters. Inspired by and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
+parser.add_argument('-n', '--numberOfImages', type=int, help='How many images to generate. Default ' + str(numberOfImages) +'. WARNING: if you want to be able to later deterministially re-create a high resolution image which happens to be e.g. the 40th in a series where n=40 (using this -n switch with the --randomSeed switch), that may be time costly (because the determinant of that 40th image factors all pseudo-randomness used for all prior images), and you may wish to not do that. You may wish to set -n 1 for high resolution images (only make one image per run in that case).')
+parser.add_argument('--width', type=int, help='Width of output image(s). Default ' + str(width) + '.')
+parser.add_argument('--height', type=int, help='Height of output image(s). Default ' + str(height) + '.')
+parser.add_argument('-r', '--rshift', type=int, help='Vary R, G and B channel values randomly in the range negative this value or positive this value. Note that this means the range is rshift times two. Defaut ' + str(rshift) + '.')
+parser.add_argument('-b', '--backgroundColor', type=str, help='Canvas color. Expressed as a python list or single number that will be assigned to every value in an RGB triplet. If a list, give the RGB values in the format \'[255,70,70]\' (if you add spaces after the commas, you must surround the parameter in single or double quotes). This example would produce a deep red, as Red = 255, Green = 70, Blue = 70). A single number example like just 150 will result in a medium-light gray of [150,150,150] (Red = 150, Green = 150, Blue = 150). All values must be between 0 and 255. Default ' + str(backgroundColor) + '.')
+parser.add_argument('-c', '--colorMutationBase', type=str, help='Base initialization color for pixels, which randomly mutates as painting proceeds. If omitted, defaults to whatever backgroundColor is. If included, may differ from backgroundColor. This option must be given in the same format as backgroundColor.')
+# NOTES: at this writing (with successful coordinates growth instead of only one coordinate wandering), the following will virtually never be needed; they may be needed again if I add random coordinate death (fail to continue growing at all) :
+# TO DO? : UNCOMMENT and reintegrate associated code; update default handling to work like the rest of this script though (with defaults set in if args.parameter checks only if args.parameter not provided:
 # parser.add_argument('-p', '--percentMutation', type=float, default=0.02, help='(Alternate for -m) What percent of the canvas would have been covered by failed mutation before it triggers selection of a random new available unplotted coordinate. Percent expressed as a decimal (float) between 0 and 1. Default 0.043 (about 4 percent).')
 # TO DO? : UNCOMMENT and reintegrate associated code:
 # parser.add_argument('-f', '--failedMutationsThreshold', type=int, help='How many times coordinate mutation must fail to trigger selection of a random new available unplotted coordinate. Overrides -p | --percentMutation if present.')
 # TO DO? : UNCOMMENT and reintegrate associated code:
 # parser.add_argument('-d', '--revertColorOnMutationFail', type=int, default=1, help='If (-f | --failedMutationsThreshold) is reached, revert color to color mutation base (-c | --colorMutationBase). Default 1 (true). If you use this at all you want to change the default 1 (true) by passing 0 (false). If false, color will change more in the painting. If true, color will only evolve as much as coordinates successfully evolve.')
-parser.add_argument('-s', '--stopPaintingPercent', type=float, default=1, help='TEMPORARILY DEPRECATED (will affect nothing if you use it) pending a bug fix. What percent canvas fill to stop painting at. To paint until the canvas is filled (which is infeasible for higher resolutions), pass 1 (for 100 percent) If not 1, value should be a percent expressed as a decimal (float) between 0 and 1 (e.g 0.4 for 40 percent or 1 for 100 percent). Default 1. For high failedMutationsThreshold or random walk (random walk not implemented at this writing), 0.475 (around 48 percent) is recommended.')
-parser.add_argument('-a', '--animationSaveEveryNframes', type=int, default=1, help='Every N successful coordinate and color mutations, save an animation frame into a subfolder named after the intended final art file. To save every frame, set this to 1, or to save every 3rd frame set it to 3, etc. Saves zero-padded numbered frames to a subfolder which may be strung together into an animation of the entire painting process (for example via ffmpegAnim.sh). May substantially slow down render, and can also create many, many gigabytes of data, depending. 1 by default. To disable, set it to 0 with: -a 0 OR: --animationSaveEveryNframes 0')
+parser.add_argument('--stopPaintingPercentAsDecimal', type=float, help='What percent canvas fill to stop painting at. To paint until the canvas is filled (which can take extremely long for higher resolutions), pass 1 (for 100 percent). If not 1, value should be a percent expressed as a decimal (float) between 0 and 1 (e.g 0.4 for 40 percent. Default ' + str(stopPaintingPercentAsDecimal) + '. For high --failedMutationsThreshold or random walk (neither of which is implemented at this writing), 0.475 (around 48 percent) is recommended. Stop percent is adhered to approximately (it could be much less efficient to make it exact).')
+parser.add_argument('-a', '--animationSaveEveryNframes', type=int, help='Every N successful coordinate and color mutations, save an animation frame into a subfolder named after the intended final art file. To save every frame, set this to 1, or to save every 3rd frame set it to 3, etc. Saves zero-padded numbered frames to a subfolder which may be strung together into an animation of the entire painting process (for example via ffmpegAnim.sh). May substantially slow down render, and can also create many, many gigabytes of data, depending. ' + str(animationSaveEveryNframes) + ' by default. To disable, set it to 0 with: -a 0 OR: --animationSaveEveryNframes 0')
+parser.add_argument('-s', '--randomSeed', type=int, help='Seed for random number generators (random and numpy.random are used). Default generated by random library itself and added to render file name for reference. Can be any integer in the range 0 to 4294967296 (2^32). If not provided, it will be randomly chosen from that range (meta!). If --savePreset is used, the chosen seed will be saved with the preset .cgp file. Interestingly, functionally different versions of the "random" and "numpy" libraries would theoretically produce different deterministic results (untested).')
+parser.add_argument('-q', '--numberStartCoordinates', type=int, help='How many origin coordinates to begin coordinate and color mutation from. Default randomly chosen from range in --numberStartCoordinatesRNDrange (see). Random selection from that range is performed *after* random seeding by --randomSeed, so that the same random seed will always produce the same number of start coordinates. I haven\'t tested whether this will work if the number exceeds the number of coordinates possible in the image. Maybe it would just overlap itself until they\'re all used?')
+parser.add_argument('--numberStartCoordinatesRNDrange', help='Random integer range to select a random number of --numberStartCoordinates if --numberStartCoordinates is not provided. Default (' + str(numberStartCoordinatesRNDrange[0]) + ',' + str(numberStartCoordinatesRNDrange[1]) + '). Must be provided in that form (a string that can be evaluated to a python tuple), and in the range 0 to 4294967296 (2^32), but I bet that sometimes nothing will render if you choose a max range number orders of magnitude higher than the number of pixels available in the image. I probably would never make the max range higher than (number of pixesl in image) / 62500 (which is 250 squared). Will not be used if [-q | numberStartCoordinates] is provided.')
+parser.add_argument('--viscosity', type=int, help='How "thick" the liquid (if it were liquid) is, or how much difficulty coordinates have growing. Default ' + str(viscosity) + '. If this is higher, free neighbor coordinates are filled less frequently (fewer of them may be randomly selected), which will produce a more stringy/meandering/splatty path or form (as it spreads less uniformly). If this is lower, neighbor coordinates are more often or (if 0) always flooded. Must be between 0 to 5, where 0 is very liquid--viscosity check will always be bypassed, but coordinates will take longer to spread further--and where 5 is very thick (yet smaller streamy/flood things may traverse a distance faster). You can set it to 6, but in tests, that made a few small strings and ended.')
+parser.add_argument('--savePreset', type=str, help='Save all parameters (which are passed to this script) to a .cgp (color growth preset) file. If provided, --savePreset must be a string representing a boolean state (True or False or 1 or 0). Default '+ str(savePreset) +'. The .cgp file can later be loaded with the --loadPreset switch to create either new or identical work from the same parameters (whether it is new or identical depends on the switches, --randomSeed being the most consequential). This with [-a | --animationSaveEveryNframes] can recreate gigabytes of exactly the same animation frames using just a preset. NOTES: --numberStartCoordinatesRNDrange and its accompanying value are not saved to config files, and the resultantly generated [-q | --numberStartCoordinates] is saved instead.')
+parser.add_argument('--loadPreset', type=str, help='A preset file (as first created by --savePreset) to use. Empty (none used) by default. Not saved to any preset. At this writing only a single file name is handled, not a path, and it is assumed the file is in the current directory. NOTE: use of this switch discards all other parameters and loads all parameters from the preset. A .cgp preset file is a plain text file on one line, which is a collection of switches to be passed to this script, written literally the way you would pass them to this script.')
 
+	# START ARGUMENT PARSING
+	# DEVELOPER NOTE: Throughout the below argument checks, wherever a user does not specify an argument and I use a default (as defaults are defined near the start of working code in this script), add that default switch and switch value pair to sys.argv, for use by the --savePreset feature (which saves everything except for the script path ([0]) to a preset). I take this approach because I can't check if a default value was supplied if I do that in the parser.add_argument function -- http://python.6.x6.nabble.com/argparse-tell-if-arg-was-defaulted-td1528162.html -- so what I do is check for None (and then supply a default and add to argv if None is found). The check for None isn't literal: it's in the else: clause after an if (value) check (if the if check fails, that means the value is None, and else: is invoked) :
+print('~-')
+print('~- Processing any arguments to script . . .')
 args = parser.parse_args()		# When this function is called, if -h or --help was passed to the script, it will print the description and all defined help messages.
 
-numIMGsToMake = args.numberOfImages
-rshift = args.rshift
-width = args.width
-height = args.height
-# percentMutation = args.percentMutation
-# failedMutationsThreshold = args.failedMutationsThreshold
-# revertColorOnMutationFail = args.revertColorOnMutationFail
-stopPaintingPercent = args.stopPaintingPercent
-animationSaveEveryNframes = args.animationSaveEveryNframes
-# Interpreting -c (or --colorMutationBase) argument as python literal and assigning that to a variable, re: https://stackoverflow.com/a/1894296/1397555
-backgroundColor = ast.literal_eval(args.backgroundColor)
-colorMutationBase = args.colorMutationBase
-# If no color mutation base given, use backgroundColor; if given, reinitialize colorMutationBase as a list from it:
-if colorMutationBase == None:
-	colorMutationBase = backgroundColor
-else:
-	colorMutationBase = ast.literal_eval(args.colorMutationBase)
-# purple = [255, 0, 255]	# Purple. In prior commits of this script, this has been defined and unused, just like in real life. Now, it is commented out or not even defined, just like it is in real life.
-allesPixelCount = width * height
-# If no specific threshold given, calculate it. Otherwise what is given will be used (it will not be altered):
-# if failedMutationsThreshold == None:
-	# failedMutationsThreshold = int(allesPixelCount * percentMutation)
+# IF A PRESET file is given, load its contents (which should be a collection of CLI switches for this script itself) and pass them to a new running instance of this script, then exit this script:
+if args.loadPreset:
+	loadPreset = args.loadPreset
+	print('loadPreset is', loadPreset)
+	# print('path to this script itself is', sys.argv[0])
+	print('Attempting to load subprocess of this script with the switches in loadPreset . . .')
+	with open(loadPreset) as f:
+		switches = f.readline()
+	subprocess.call(shlex.split('python ' + sys.argv[0] + ' ' + switches))		# sys.argv[0] is the path to this script.
+	print('Subprocess hopefully completed successfully. Will now exit script.')
+	sys.exit()
 
-terminatePaintingAtFillCount = int(allesPixelCount * stopPaintingPercent)
+if args.numberOfImages:		# If a user supplied an argument (so that numberOfImages has a value (is not None), use that:
+	numberOfImages = args.numberOfImages	# It is in argv already, so it will be used by --savePreset.
+else:						# If not, leave the default as it was defined, and add to sys.argv for reasons given above:
+	sys.argv.append('-n'); sys.argv.append(str(numberOfImages))
+
+if args.width:
+	width = args.width
+else:
+	sys.argv.append('--width'); sys.argv.append(str(width))
+
+if args.height:
+	height = args.height
+else:
+	sys.argv.append('--height'); sys.argv.append(str(height))
+
+if args.rshift:
+	rshift = args.rshift
+else:
+	sys.argv.append('--rshift'); sys.argv.append(str(rshift))
+
+# Things here necessarily handled out of order in contrast to other if checks, so visually lumping together without blank lines:
+if args.backgroundColor:
+	# Remove any troublesome spaces and save back directly to sys.argv, so that --savePreset will save working presets:
+	backgroundColor = args.backgroundColor		# Is a string here; will convert to list later
+	backgroundColor = re.sub(' ', '', backgroundColor)
+	idx = sys.argv.index(args.backgroundColor)
+	# print('that points to', sys.argv[idx])
+	sys.argv[idx] = backgroundColor
+	# print('which after manipulation is', sys.argv[idx])
+else:
+	sys.argv.append('-b'); sys.argv.append(backgroundColor)
+if args.colorMutationBase:		# See comments in args.backgroundColor handling. We're handling this the same.
+	colorMutationBase = args.colorMutationBase
+	colorMutationBase = re.sub(' ', '', colorMutationBase)
+	idx = sys.argv.index(args.colorMutationBase)
+	sys.argv[idx] = colorMutationBase
+else:		# Default to same as colorMutationBase:
+	sys.argv.append('-c'); sys.argv.append(str(backgroundColor))
+# Converting backgroundColor (as set from args.backgroundColor or default) string to python literal, re: https://stackoverflow.com/a/1894296/1397555
+backgroundColor = ast.literal_eval(backgroundColor)
+colorMutationBase = list(backgroundColor)		# Although I don't plan to alter either, that's a copy, not a reference.
+
+# purple = [255, 0, 255]	# Purple. In prior commits of this script, this has been defined and unused, just like in real life. Now, it is commented out or not even defined, just like it is in real life.
+
+if args.stopPaintingPercentAsDecimal:
+	stopPaintingPercentAsDecimal = args.stopPaintingPercentAsDecimal
+else:
+	sys.argv.append('--stopPaintingPercentAsDecimal'); sys.argv.append(str(stopPaintingPercentAsDecimal))
+
+if args.animationSaveEveryNframes:
+	animationSaveEveryNframes = args.animationSaveEveryNframes
+else:
+	sys.argv.append('-a'); sys.argv.append(str(animationSaveEveryNframes))
+# TO DO: if/when these next three are reintegrated, handle them the same way: args.percentMutation, args.failedMutationsThreshold, args.revertColorOnMutationFail. Make sure that if failedMutationsThreshold == None then failedMutationsThreshold = int(allesPixelCount * percentMutation)
+if args.randomSeed:
+	randomSeed = args.randomSeed
+else:
+	randomSeed = random.randint(0, 4294967296)
+	sys.argv.append('--randomSeed'); sys.argv.append(str(randomSeed))
+# Use that seed straightway:
+random.seed(randomSeed)
+np.random.seed(randomSeed)
+
+	# BEGIN STATE MACHINE "Megergeberg 5,000."
+	# DOCUMENTATION.
+	# Possible combinations of these variables to handle; "coords" means numberStartCoordinates, RNDcoords means numberStartCoordinatesRNDrange:
+	# --
+	# ('coords', 'RNDcoords') : use coords, delete any RNDcoords
+	# ('coords', 'noRNDcoords') : use coords, no need to delete any RNDcoords. These two: if coords if RNDcoords.
+	# ('noCoords', 'RNDcoords') : assign user-provided RNDcoords for use (overwrite defaults).
+	# ('noCoords', 'noRNDcoords') : continue with RNDcoords defaults (don't overwrite defaults). These two: else if RNDcoords else. Also these two: generate coords independent of (outside) that last if else (by using whatever RNDcoords ends up being (user-provided or default).
+	# --
+	# I COULD just have four different, independent "if" checks explicitly for those four pairs and work from that, but I have opted for the convoluted if: if else: if: else: structure. Two possible paths presented in code, and I, I took the convoluted one, and that has made all the difference. Tenuous justification: it is more compact logic (fewer checks).
+if args.numberStartCoordinates:		# If --numberStartCoordinates is provided by the user, use it..
+	numberStartCoordinates = args.numberStartCoordinates
+	print('Will use the provided --numberStartCoordinates, ', numberStartCoordinates)
+	if args.numberStartCoordinatesRNDrange:		# .. and delete any --numberStartCoordinatesRNDrange and its value from sys.argv (as it will not be used and would best not be stored in the .cgp config file via --savePreset:
+		idx = sys.argv.index(args.numberStartCoordinatesRNDrange)
+		del sys.argv[idx-1]		# Why does index() return a one-based index for a zero-based index list?!
+		del sys.argv[idx-1]		# Note that the element at the same index is deleted twice because after the first is deleted, the second moves to the index of the first.
+		print('** NOTE: ** You provided both [-q | --numberStartCoordinates] and --numberStartCoordinatesRNDrange, but the former overrides the latter (the latter will not be used). This program removed the latter from the sys.argv parameters list.')
+else:		# If --numberStartCoordinates is _not_ provided by the user..
+	if args.numberStartCoordinatesRNDrange:		# .. but if --numberStartCoordinatesRNDrange _is_ provided, assign from that:
+		numberStartCoordinatesRNDrange = ast.literal_eval(args.numberStartCoordinatesRNDrange)
+		decidedToUseSTRpart = 'from user-supplied range ' + str(numberStartCoordinatesRNDrange)
+	else:		# .. otherwise use the default numberStartCoordinatesRNDrange:
+		decidedToUseSTRpart = 'from default range ' + str(numberStartCoordinatesRNDrange)
+	numberStartCoordinates = random.randint(numberStartCoordinatesRNDrange[0], numberStartCoordinatesRNDrange[1])
+	sys.argv.append('-q'); sys.argv.append(str(numberStartCoordinates))
+	print('Using', numberStartCoordinates, 'start coordinates, by random selection ' + decidedToUseSTRpart)
+	# END STATE MACHINE "Megergeberg 5,000."
+
+if args.viscosity:
+	viscosity = args.viscosity
+	# If that is outside accdeptable range, clip it to acceptable range and notify user:
+	if viscosity < 0: viscosity = 0; print('NOTE: viscosity was less than 0. The value was clipped to 0.')
+	if viscosity > 6: viscosity = 6; print('NOTE: viscosity was greater than 6. The value was clipped to 6.')
+	if viscosity == 6: print('NOTE: you\'ll probably get uninteresting results with viscosity at 6. Range 0-6 allowed, 0-5 recommended (with a note that 0 is the slowest).')
+	# Also update that in argv:
+	idx = sys.argv.index('--viscosity')
+	sys.argv[idx+1] = str(viscosity)
+else:
+	sys.argv.append('--viscosity'); sys.argv.append(str(viscosity))
+
+if args.savePreset:
+	savePreset = ast.literal_eval(args.savePreset)
+else:
+	sys.argv.append('--savePreset'); sys.argv.append(str(savePreset))
+
+if savePreset == True:
+	scriptArgsStr = sys.argv[1:]
+	scriptArgsStr = ' '.join(str(element) for element in scriptArgsStr)
+	# END ARGUMENT PARSING
+
+allesPixelCount = width * height
+terminatePaintingAtFillCount = int(allesPixelCount * stopPaintingPercentAsDecimal)
 
 # START COORDINATE CLASS
 class Coordinate:
@@ -110,15 +234,14 @@ class Coordinate:
 		rndNeighborsToReturn = []		# init an empty array we'll populate with neighbors (int tuples) and return
 		if len(self.emptyNeighbors) > 0:		# If there is anything left in emptyNeighbors:
 			# START VISCOSITY CONTROL.
-# TO DO: add a viscosity control parameter (via argsparse, using a range 0-6, default 4 (see next comments), to be used by this section.
-			# Conditionally throttle maxRNDrange (for random selection of empty neighbors).
-			# NOTE: If viscosity is higher, coordinate growth will appear to follow a more stringy/meandering/splatty path/form (it will spread less uniformly) ; viscosity must be between 0 (very liquid--viscosity check will always be bypassed) to 6 (thick):			
-			viscosity = 4
+			# Conditionally throttle maxRNDrange (for random selection of empty neighbors), via viscosity value.
+# TO DO: figure out why viscosity = 6 terminates so fast and whether it should. It works but is very short lived.
 			if len(self.emptyNeighbors) - viscosity > 1 and viscosity != 0:		# If we can subtract the highest possiible number (of random selection count) of available neighbors by viscosity and still have 1 left (and if viscosity is nonzero), do that:
-				# print('--------VISCOSITY CHECK PASSED---------)')
+				# print('--------VISCOSITY CHECK PASSED---------')
 				maxRNDrange = len(self.emptyNeighbors) - viscosity
 				# print('maxRNDrange selected of', maxRNDrange, 'where len is', len(self.emptyNeighbors))
 			else:		# Otherwise take a random selection of available neighbors from the full number range of available neighbors:
+				# print('--------VISCOSITY CHECK BYPASSED-------')
 				maxRNDrange = len(self.emptyNeighbors)
 			# END VISCOSITY CONTROL.
 			nNeighborsToReturn = np.random.random_integers(1, maxRNDrange)		# Decide how many to pick
@@ -182,11 +305,12 @@ def printProgress():
 # END GLOBAL FUNCTIONS
 # END OPTIONS AND GLOBALS
 
-print('Will generate ', numIMGsToMake, ' image(s).')
 
-# Loop making N (-n | numimages) images.
-# "Initialize" (paint over entire) the "canvas" with the chosen base canvas color:
-for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* the loop.
+# START MAIN FUNCTIONALITY.
+print('Will generate ', numberOfImages, ' image(s).')
+
+# Loop making [-n | numberOfImages] images.
+for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* the loop.
 	animationSaveNFramesCounter = 0
 	animationFrameCounter = 0
 
@@ -196,18 +320,15 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	for y in range(0, height):		# for columns (x) in row)
 		tmpList = []
 		for x in range(0, width):		# over the columns, prep and add:
-# TO DO: fix bug: if I init with backgroundColor (as I should, not colorMutationBase), I get a value error:
 			tmpList.append( Coordinate(x, y, width, height, colorMutationBase) )
 			unusedCoords.append( (y, x) )
 		arr.append(tmpList)
 
 	livingCoords = []		# A list of Coordinate objects which are set aside for use (coloring, etc.)
 	# Initialize first living Coordinates (livingCoords list) by random selection from unusedCoords (and remove from unusedCoords):
-# TO DO: add an argsparse argument for startCoordsN (the number of starting coords) ; until then this is hard-coded:
 	# print('unusedCoords before:', unusedCoords)
 	# print('livingCoords before:', livingCoords)
-	startCoordsN = 3
-	for i in range(0, startCoordsN):
+	for i in range(0, numberStartCoordinates):
 		RNDcoord = random.choice(unusedCoords)
 		getNewLivingCoord(colorMutationBase, RNDcoord, unusedCoords, livingCoords, arr)
 	# print('unusedCoords after:', unusedCoords)
@@ -225,9 +346,7 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	now = datetime.datetime.now()
 	timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__')
 	rndStr = ('%03x' % random.randrange(16**6))		# Returns three random lowercase hex characters.
-# TO DO: reactivate this file name string format if/when failedMutationsThreshold is reintegrated:
-	# imgFileBaseName = timeStamp + '-' + rndStr + '-colorGrowth-Py-r' + str(rshift) + '-f' + str(failedMutationsThreshold)
-	imgFileBaseName = timeStamp + '-' + rndStr + '-colorGrowth-Py-r' + str(rshift)
+	imgFileBaseName = timeStamp + rndStr + '_colorGrowth-Py'
 	imgFileName = imgFileBaseName + '.png'
 	stateIMGfileName = imgFileBaseName + '-state.png'
 	animFramesFolderName = imgFileBaseName + '_frames'
@@ -243,6 +362,8 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 	deadCoordsList = []
 	print('Generating image . . . ')
 	while livingCoords:
+		if savePreset:		# If bool set saying so, save arguments to this script to a .cgp file with the same base file name as the render target image:
+			file = open(imgFileBaseName + '.cgp', "w"); file.write(scriptArgsStr); file.close()
 		# Operate on copy of livingCoords (not livingCoords itself), because this loop changes livingCoords (I don't know whether it copies the list in memory and operates from that or responds to it changing; I would do the former if I designed a language).
 		RNDnewEmptyCoordsList = []
 		copyOfLivingCoords = list(livingCoords)
@@ -287,30 +408,29 @@ for n in range(1, (numIMGsToMake + 1) ):		# + 1 because it iterates n *after* th
 
 		# Save a snapshot/progress image and print progress:
 		if reportStatsNthLoopCounter == 0 or reportStatsNthLoopCounter == reportStatsEveryNthLoop:
-			print('Saving prograss snapshot image ', stateIMGfileName, ' . . .')
+#			print('Saving prograss snapshot image ', stateIMGfileName, ' . . .')
 			coordinatesListToSavedImage(arr, height, width, stateIMGfileName)
 			printProgress()
 			reportStatsNthLoopCounter = 1
 		reportStatsNthLoopCounter += 1
 
-# TO DO: fix what breaks this:
-# DEPRECATED until fix of bug that makes paintedCoordinates count wrong (and this if clause fire early):
 		# This will terminate all coordinate and color mutation at an arbitary number of mutations.
-		# if paintedCoordinates >= terminatePaintingAtFillCount:
-		# 	print('Painted coordinate termination count', paintedCoordinates, 'reached. Ending paint algorithm.')
-		# 	break
+		if paintedCoordinates >= terminatePaintingAtFillCount:
+			print('Painted coordinate termination count', paintedCoordinates, 'reached (or recently exceeded). Ending paint algorithm.')
+			break
 	# END IMAGE MAPPING
 	# ----
 
-	print('state of arrays after image generation loop:')
-	print('unusedCoords:', unusedCoords)
-	print('livingCoords:', livingCoords)
+	# print('state of arrays after image generation loop:')
+	# print('unusedCoords:', unusedCoords)
+	# print('livingCoords:', livingCoords)
 
 	# Save final image file and delete progress (state, temp) image file:
 	print('Saving image ', imgFileName, ' . . .')
 	coordinatesListToSavedImage(arr, height, width, imgFileName)
-	print('Created ', n, ' of ', numIMGsToMake, ' images.')
+	print('Created ', n, ' of ', numberOfImages, ' images.')
 	os.remove(stateIMGfileName)
+# END MAIN FUNCTIONALITY.
 
 
 # MUCH BETTERER REFERENCE:
