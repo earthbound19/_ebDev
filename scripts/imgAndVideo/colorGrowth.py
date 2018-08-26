@@ -13,6 +13,9 @@
 # TO DO:
 # - Things listed in development code with TO DO comments
 # - Option: Where some coordinates are painted around (by other coordinates on all sides) but coordinate mutation never actually moves into that coordinate, some coordinates can never be "born." Mitigate this by (optionally) always coralling coordinates that weren't selected during coordinate mutation, and periodically birthing those unbirthed coordinates (give them a color mutation base at the time they are corraled, then at birth simply move them into livingCoords).
+# - Option: instead of randomly mutating color for each individual chosen neighbor coordinate, mutate them all to the same new color. This would be more efficient, and might make colors more banded/ringed/spready than streamy. It would also visually indicate coordinate mutation more clearly. Do this or the other option (mutate each, so each can be different) based on an option check.
+#  - randomly alternate that method as you go
+#  - set a chance for using one or the other randomly
 # - Random coordinate death in a frequency range (may make the animation turn anything between trickles to rivers to floods)?
 # - Option to suppress progress print to save time
 # - Initialize colorMutationBase by random selection from a .hexplt color scheme
