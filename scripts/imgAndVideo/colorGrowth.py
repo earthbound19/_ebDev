@@ -12,15 +12,12 @@
 
 # TO DO:
 # - Things listed in development code with TO DO comments
+# - Option: Where some coordinates are painted around (by other coordinates on all sides) but coordinate mutation never actually moves into that coordinate, some coordinates can never be "born." Mitigate this by (optionally) always coralling coordinates that weren't selected during coordinate mutation, and periodically birthing those unbirthed coordinates (give them a color mutation base at the time they are corraled, then at birth simply move them into livingCoords).
 # - Random coordinate death in a frequency range (may make the animation turn anything between trickles to rivers to floods)?
-# - restart main work loop again if unusedCoords has coords in it, but on that round get parentRGBcolor from nearest neighbor?
-# - option to not add to and check against deadCoordsList.append(coord), and test whether _not_ doing that fills in all holes in a flood (where I think doing that leaves those holes, which actually should happen, and which speeds up the render dramatically)?
-# - update deadCoordsList to recentlyFilledCoordsList[], with a "recent" random range to check?
 # - Option to suppress progress print to save time
-# - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
 # - Initialize colorMutationBase by random selection from a .hexplt color scheme
-# - Coordinate mutation: optionally revert to coordinate before last known successful mutation on coordinate mutation fail (instead of continuing random walk). This would still need the failsafe of failedMutationsThreshold.
-# - Color mutation option: on coordinate mutation fail, select random new color (including from a .hexplt color scheme). If this and -d are present, -d wins.
+# - (Applies to method used in colorWander.py:) Coordinate mutation: optionally revert to coordinate before last known successful mutation on coordinate mutation fail (instead of continuing random walk). This would still need the failsafe of failedMutationsThreshold.
+# - (Applies to method used in colorWander.py:) Color mutation option: on coordinate mutation fail, select random new color (including from a .hexplt color scheme). If this and -d are present, -d wins.
 # - Major new feature? : Initialize arr[] from an image, pick a random coordinate from the image, and use the color at that coordinate both as the origin coordinate and the color at that coordinate as colorMutationBase. Could also be used to continue terminated runs with the same or different parameters.
 
 
@@ -55,7 +52,7 @@ parser.add_argument('-b', '--backgroundColor', type=str, help='Canvas color. Exp
 parser.add_argument('-c', '--colorMutationBase', type=str, help='Base initialization color for pixels, which randomly mutates as painting proceeds. If omitted, defaults to whatever backgroundColor is. If included, may differ from backgroundColor. This option must be given in the same format as backgroundColor.')
 # NOTES: at this writing (with successful coordinates growth instead of only one coordinate wandering), the following will virtually never be needed; they may be needed again if I add random coordinate death (fail to continue growing at all) :
 # TO DO? : UNCOMMENT and reintegrate associated code; update default handling to work like the rest of this script though (with defaults set in if args.parameter checks only if args.parameter not provided:
-# parser.add_argument('-p', '--percentMutation', type=float, default=0.02, help='(Alternate for -m) What percent of the canvas would have been covered by failed mutation before it triggers selection of a random new available unplotted coordinate. Percent expressed as a decimal (float) between 0 and 1. Default 0.043 (about 4 percent).')
+# parser.add_argument('-p', '--percentMutation', type=float, default=0.043, help='(Alternate for -m) What percent of the canvas would have been covered by failed mutation before it triggers selection of a random new available unplotted coordinate. Percent expressed as a decimal (float) between 0 and 1. Default 0.043 (about 4 percent).')
 # TO DO? : UNCOMMENT and reintegrate associated code:
 # parser.add_argument('-f', '--failedMutationsThreshold', type=int, help='How many times coordinate mutation must fail to trigger selection of a random new available unplotted coordinate. Overrides -p | --percentMutation if present.')
 # TO DO? : UNCOMMENT and reintegrate associated code:
@@ -252,7 +249,7 @@ class Coordinate:
 # END COORDINATE CLASS
 
 # START GLOBAL FUNCTIONS
-# TO DO: REINTEGRATE AS DESIRED, ELSE DELETE:
+# TO DO: REINTEGRATE AS DESIRED (applies to method used in colorWander.py), ELSE DELETE:
 # function takes two ints and shifts each up or down one or not at all. I know, it doesn't receive a tuple as input but it gives one as output:
 # def mutateCoordinate(xCoordParam, yCoordParam):
 # 	xCoord = np.random.random_integers((xCoordParam - 1), xCoordParam + 1)
@@ -335,9 +332,9 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 	# print('livingCoords after:', livingCoords)
 
 	color = colorMutationBase
-# TO DO: UNCOMMENT AS WANTED and reintegrate code that uses it; how do I track color mutation fail now with multiple living coordinates? :
+# TO DO: UNCOMMENT AS WANTED (applies to method used in colorWander.py) and reintegrate code that uses it; how do I track color mutation fail now with multiple living coordinates? :
 	# previousColor = color
-# TO DO: REINTEGRATE AS WANTED for a more stringy (more walking than spreading) mode:
+# TO DO: REINTEGRATE AS WANTED (applies to method used in colorWander.py) for a more stringy (more walking than spreading) mode:
 	# failedCoordMutationCount = 0
 	reportStatsEveryNthLoop = 3
 	reportStatsNthLoopCounter = 0
