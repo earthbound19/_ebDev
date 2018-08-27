@@ -13,8 +13,8 @@
 # TO DO:
 # - Things listed in development code with TO DO comments
 # - Option: instead of randomly mutating color for each individual chosen neighbor coordinate, mutate them all to the same new color. This would be more efficient, and might make colors more banded/ringed/spready than streamy. It would also visually indicate coordinate mutation more clearly. Do this or the other option (mutate each, so each can be different) based on an option check.
-#  - randomly alternate that method as you go
-#  - set a chance for using one or the other randomly
+#  - option to randomly alternate that method as you go
+#  - option to set the random chance for using one or the other
 # - Random coordinate death in a frequency range (may make the animation turn anything between trickles to rivers to floods)?
 # - Option to suppress progress print to save time
 # - Initialize colorMutationBase by random selection from a .hexplt color scheme
@@ -106,27 +106,28 @@ if args.rshift:
 else:
 	sys.argv.append('--rshift'); sys.argv.append(str(rshift))
 
-# Things here necessarily handled out of order in contrast to other if checks, so visually lumping together without blank lines:
 if args.backgroundColor:
-	# Remove any troublesome spaces and save back directly to sys.argv, so that --savePreset will save working presets:
+	# For preset saving, remove any troublesome spaces and save back directly to sys.argv, so that --savePreset will save working presets:
 	backgroundColor = args.backgroundColor		# Is a string here; will convert to list later
 	backgroundColor = re.sub(' ', '', backgroundColor)
 	idx = sys.argv.index(args.backgroundColor)
 	# print('that points to', sys.argv[idx])
 	sys.argv[idx] = backgroundColor
-	# print('which after manipulation is', sys.argv[idx])
 else:
 	sys.argv.append('-b'); sys.argv.append(backgroundColor)
+# Convert backgroundColor (as set from args.backgroundColor or default) string to python list for use by this script, re: https://stackoverflow.com/a/1894296/1397555
+backgroundColor = ast.literal_eval(backgroundColor)
+
 if args.colorMutationBase:		# See comments in args.backgroundColor handling. We're handling this the same.
 	colorMutationBase = args.colorMutationBase
 	colorMutationBase = re.sub(' ', '', colorMutationBase)
 	idx = sys.argv.index(args.colorMutationBase)
 	sys.argv[idx] = colorMutationBase
-else:		# Default to same as colorMutationBase:
-	sys.argv.append('-c'); sys.argv.append(str(backgroundColor))
-# Converting backgroundColor (as set from args.backgroundColor or default) string to python literal, re: https://stackoverflow.com/a/1894296/1397555
-backgroundColor = ast.literal_eval(backgroundColor)
-colorMutationBase = list(backgroundColor)		# Although I don't plan to alter either, that's a copy, not a reference.
+	colorMutationBase = ast.literal_eval(colorMutationBase)
+else:		# Default to same as backgroundColor:
+	sys.argv.append('-c'); sys.argv.append(backgroundColor)
+	# In this case we're using a list as already assigned to backgroundColor:
+	colorMutationBase = list(backgroundColor)		# If I hadn't used list(), colorMutationBase would be a reference to backgroundColor (which is default Python list handling behavior with the = operator), and when I changed either, "both" would change (but they would really just be different names for the same list). I want them to be different.
 
 # purple = [255, 0, 255]	# Purple. In prior commits of this script, this has been defined and unused, just like in real life. Now, it is commented out or not even defined, just like it is in real life.
 
@@ -269,7 +270,7 @@ class Coordinate:
 # 	return [xCoord, yCoord]
 
 
-# function requires lists of Coordinates as parameters, and it directly maniuplates those lists (which are passed by reference). parentColor should be a list of RGB colors in the format [255,0,255].
+# function requires lists of Coordinates as parameters, and it directly maniuplates those lists (which are passed by reference). parentRGBColor should be a list of RGB colors in the format [255,0,255].
 def getNewLivingCoord(parentRGBColor, tupleToAllocate, unusedCoords, livingCoords, arr):	# Those last three parameters are lists!
 	# (Maybe) move that tuple out of unusedCoords and into livingCoords:
 	if tupleToAllocate in unusedCoords:		# Only execute the following remove line of code if it's in that:
@@ -320,7 +321,7 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 	for y in range(0, height):		# for columns (x) in row)
 		tmpList = []
 		for x in range(0, width):		# over the columns, prep and add:
-			tmpList.append( Coordinate(x, y, width, height, colorMutationBase) )
+			tmpList.append( Coordinate(x, y, width, height, backgroundColor) )
 			unusedCoords.append( (y, x) )
 		arr.append(tmpList)
 
@@ -366,14 +367,18 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 	paintedCoordinates = 0
 	deadCoordsList = []
 	# In the below while loop, with higher viscosity some coordinates can be painted around (by other coordinates on all sides) but coordinate mutation never actually moves into that coordinate. The result is that some coordinates may never be "born." The next three variables (a list and two ints) mitigate this by always coralling coordinates that weren't selected during coordinate mutation, and periodically birthing those unbirthed coordinates (they are given a color mutation base at the time they are corraled). At birthing, they are screened against deadCoordsList, and only coordinates not in deadCoordsList are birthed.
+# CODE commented at this outdent (right at the start of the line) here is WIP.
 #	delayedBirthCoordsList = []
 #	delayedBirthCoordsBirthingDelay = 256
 #	delayedBirthCoordsBirthingDelayCounter = 0
 	print('Generating image . . . ')
 	while livingCoords:
+#	while livingCoords or delayedBirthCoordsList:
 #		delayedBirthCoordsBirthingDelayCounter += 1
 		RNDnewEmptyCoordsList = []
-#		RNDnewDelayedBirthCoordsList = []
+		# For collecting into delayedBirthCoordsList:
+		RNDnewDelayedBirthCoordsList = []
+		#
 		copyOfLivingCoords = list(livingCoords)
 		for coord in copyOfLivingCoords:
 			livingCoords.remove(coord)		# Remove that to avoid wasted calculations (so many empty tuples passed to getNewLivingCoord)
@@ -386,10 +391,22 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 			deadCoordsList.append(coord)		# When a coordinate has its color mutated, it dies.
 # TO DO: DEBUG and if necessary fix: why is paintedCoordinates arriving at a number far greater than allesPixelCount?
 			paintedCoordinates += 1
+			# The first returned list is used straightway, the second at delays (every delayedBirthCoordsBirthingDelay) :
 			RNDnewEmptyCoordsList, RNDnewDelayedBirthCoordsList = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
 			for coordZurg in RNDnewEmptyCoordsList:
 				if coordZurg not in deadCoordsList:
 					getNewLivingCoord(newLivingCoordsParentRGBcolor, coordZurg, unusedCoords, livingCoords, arr)
+			# Collecting coordinates for delayed birth:
+#			delayedBirthCoordsList += RNDnewDelayedBirthCoordsList		# This may lead to duplicates in list; will set() later
+			# Using delayed birth coordinates at intervals:
+#			if delayedBirthCoordsBirthingDelayCounter == delayedBirthCoordsBirthingDelay:
+#				delayedBirthCoordsBirthingDelayCounter = 0
+#				delayedBirthCoordsList = list(set(delayedBirthCoordsList))	# Removes duplicates
+#				for coordYarg in delayedBirthCoordsList:
+#					if coordYarg not in deadCoordsList:
+#						getNewLivingCoord(newLivingCoordsParentRGBcolor, coordYarg, unusedCoords, livingCoords, arr)
+#				delayedBirthCoordsList = []		# To be built up again via delayedBirthCoordsBirthingDelayCounter += 1 etc.
+			#
 # TO DO: fix, if possible, whatever leads to this else clause (checking for redundant attempts to use a coordinate) to be invoked A LOT if it is uncommented:
 				# else:
 					# print('FUGGETABOUTIT!')
