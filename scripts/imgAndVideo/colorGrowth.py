@@ -12,7 +12,6 @@
 
 # TO DO:
 # - Things listed in development code with TO DO comments
-# - Option: Where some coordinates are painted around (by other coordinates on all sides) but coordinate mutation never actually moves into that coordinate, some coordinates can never be "born." Mitigate this by (optionally) always coralling coordinates that weren't selected during coordinate mutation, and periodically birthing those unbirthed coordinates (give them a color mutation base at the time they are corraled, then at birth simply move them into livingCoords).
 # - Option: instead of randomly mutating color for each individual chosen neighbor coordinate, mutate them all to the same new color. This would be more efficient, and might make colors more banded/ringed/spready than streamy. It would also visually indicate coordinate mutation more clearly. Do this or the other option (mutate each, so each can be different) based on an option check.
 #  - randomly alternate that method as you go
 #  - set a chance for using one or the other randomly
@@ -230,6 +229,7 @@ class Coordinate:
 			tmpList.remove(no)
 		# finally initialize the intended object member from that built list:
 		self.emptyNeighbors = list(tmpList)
+	# function returns both a list of randomly selected empty neighbor coordinates to use immediately, and a list of neighbors to use later:
 	def getRNDemptyNeighbors(self):
 		rndNeighborsToReturn = []		# init an empty array we'll populate with neighbors (int tuples) and return
 		if len(self.emptyNeighbors) > 0:		# If there is anything left in emptyNeighbors:
@@ -248,7 +248,7 @@ class Coordinate:
 			rndNeighborsToReturn = random.sample(self.emptyNeighbors, nNeighborsToReturn)
 		else:		# If there is _not_ anything left in emptyNeighbors:
 			rndNeighborsToReturn = [()]		# Return a list with one empty tuple
-		return rndNeighborsToReturn
+		return rndNeighborsToReturn, self.emptyNeighbors
 # END COORDINATE CLASS
 
 # START GLOBAL FUNCTIONS
@@ -351,6 +351,11 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 	stateIMGfileName = imgFileBaseName + '-state.png'
 	animFramesFolderName = imgFileBaseName + '_frames'
 
+	# If bool set saying so, save arguments to this script to a .cgp file with the same base file name as the render target image:
+	if savePreset:
+		file = open(imgFileBaseName + '.cgp', "w"); file.write(scriptArgsStr); file.close()
+	# Operate on copy of livingCoords (not livingCoords itself), because this loop changes livingCoords (I don't know whether it copies the list in memory and operates from that or responds to it changing; I would do the former if I designed a language).
+
 	if animationSaveEveryNframes > 0:	# If that has a value greater than zero, create a subfolder to write frames to:
 		# Also, initailize a varialbe which is how many zeros to pad animation save frame file (numbers) to, based on how many frames will be rendered:
 		padAnimationSaveFramesNumbersTo = len(str(terminatePaintingAtFillCount))
@@ -360,12 +365,15 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 	# START IMAGE MAPPING
 	paintedCoordinates = 0
 	deadCoordsList = []
+	# In the below while loop, with higher viscosity some coordinates can be painted around (by other coordinates on all sides) but coordinate mutation never actually moves into that coordinate. The result is that some coordinates may never be "born." The next three variables (a list and two ints) mitigate this by always coralling coordinates that weren't selected during coordinate mutation, and periodically birthing those unbirthed coordinates (they are given a color mutation base at the time they are corraled). At birthing, they are screened against deadCoordsList, and only coordinates not in deadCoordsList are birthed.
+#	delayedBirthCoordsList = []
+#	delayedBirthCoordsBirthingDelay = 256
+#	delayedBirthCoordsBirthingDelayCounter = 0
 	print('Generating image . . . ')
 	while livingCoords:
-		if savePreset:		# If bool set saying so, save arguments to this script to a .cgp file with the same base file name as the render target image:
-			file = open(imgFileBaseName + '.cgp', "w"); file.write(scriptArgsStr); file.close()
-		# Operate on copy of livingCoords (not livingCoords itself), because this loop changes livingCoords (I don't know whether it copies the list in memory and operates from that or responds to it changing; I would do the former if I designed a language).
+#		delayedBirthCoordsBirthingDelayCounter += 1
 		RNDnewEmptyCoordsList = []
+#		RNDnewDelayedBirthCoordsList = []
 		copyOfLivingCoords = list(livingCoords)
 		for coord in copyOfLivingCoords:
 			livingCoords.remove(coord)		# Remove that to avoid wasted calculations (so many empty tuples passed to getNewLivingCoord)
@@ -378,7 +386,7 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 			deadCoordsList.append(coord)		# When a coordinate has its color mutated, it dies.
 # TO DO: DEBUG and if necessary fix: why is paintedCoordinates arriving at a number far greater than allesPixelCount?
 			paintedCoordinates += 1
-			RNDnewEmptyCoordsList = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
+			RNDnewEmptyCoordsList, RNDnewDelayedBirthCoordsList = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
 			for coordZurg in RNDnewEmptyCoordsList:
 				if coordZurg not in deadCoordsList:
 					getNewLivingCoord(newLivingCoordsParentRGBcolor, coordZurg, unusedCoords, livingCoords, arr)
