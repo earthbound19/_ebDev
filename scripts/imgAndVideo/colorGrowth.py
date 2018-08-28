@@ -45,7 +45,7 @@ backgroundColor = '[252,251,201]'		# Buttery light yellow
 
 # START OPTIONS AND GLOBALS
 parser = argparse.ArgumentParser(description='Renders a PNG image like bacteria that produce random color mutations as they grow over a surface. Output file names are after the date plus random characters. Inspired by and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
-parser.add_argument('-n', '--numberOfImages', type=int, help='How many images to generate. Default ' + str(numberOfImages) +'. WARNING: if you want to be able to later deterministially re-create a high resolution image which happens to be e.g. the 40th in a series where n=40 (using this -n switch with the --randomSeed switch), that may be time costly (because the determinant of that 40th image factors all pseudo-randomness used for all prior images), and you may wish to not do that. You may wish to set -n 1 for high resolution images (only make one image per run in that case). NOTE: A portion of the code for this script had its "loop mode" changed during development, resulting in different image evolution. If you saved any preset before 2018-08-28, you\'ll have to hack this script to the old loop mode ("mode 0") to get the same result from that preset again. See "LOOP MODE OPTIONS" in the comments in this script.')
+parser.add_argument('-n', '--numberOfImages', type=int, help='How many images to generate. Default ' + str(numberOfImages) +'. WARNING: if you want to be able to later deterministially re-create a high resolution image which happens to be e.g. the 40th in a series where n=40 (using this -n switch with the --randomSeed switch), that may be time costly (because the determinant of that 40th image factors all pseudo-randomness used for all prior images), and you may wish to not do that. You may wish to set -n 1 for high resolution images (only make one image per run in that case). NOTE: A portion of the code for this script may have its "loop mode" altered, resulting in different image evolution either more stringy/meandering coordinate evolution or not). See "LOOP MODE OPTIONS" in the comments in this script.')
 parser.add_argument('--width', type=int, help='Width of output image(s). Default ' + str(width) + '.')
 parser.add_argument('--height', type=int, help='Height of output image(s). Default ' + str(height) + '.')
 parser.add_argument('-r', '--rshift', type=int, help='Vary R, G and B channel values randomly in the range negative this value or positive this value. Note that this means the range is rshift times two. Defaut ' + str(rshift) + '.')
@@ -333,12 +333,12 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 		# For collecting into delayedBirthCoords:
 		orphanCoords = []
 		#
-		# NOTE: There are two options for looping here. Mode 0 (which was the first developed mode) makes a copy of livingCoords, and loops through that. The result is that the loop doesn't continue because of changes to livingCoords (as it is working on a copy which becomes outdates as the loop progresses). Mode 1 loops through livingCoords itself, and since this loop changes livingCoords, it makes the loop run longer. In mode 1 similar color meanders more (runaway streams of color are possible), which I think is a more interesting and beautiful result. It also finishes the image faster. Mode 1 spreads more uniformly (with less possibility of runaway streams.
+		# NOTE: There are two options for looping here. Mode 0 (which was the first developed mode) makes a copy of livingCoords, and loops through that. The result is that the loop doesn't continue because of changes to livingCoords (as it is working on a copy which becomes outdates as the loop progresses). Mode 1 loops through livingCoords itself, and since this loop changes livingCoords, it makes the loop run longer. In mode 1 similar color meanders more (runaway streams of color are possible). It also finishes the image faster. Mode 1 spreads more uniformly (with less possibility of runaway streams. Which mode produces more interesting and beautiful results is subjective and for me depends also on target resolution.
 # LOOP MODE OPTIONS.
 		 # For loop mode 0, uncomment the next two lines of code, and comment out the third line after that. For mode 1, comment out the next two lines, and uncomment the third line after that:
-		# copyOfLivingCoords = list(livingCoords)
-		# for coord in copyOfLivingCoords:	# Mode 0, test run time: 0m34.241s
-		for coord in livingCoords:		# Mode 1, test run time: 0m32.502s
+		copyOfLivingCoords = list(livingCoords)
+		for coord in copyOfLivingCoords:	# Mode 0, test run time: 0m34.241s
+		# for coord in livingCoords:		# Mode 1, test run time: 0m32.502s
 			livingCoords.remove(coord)		# Remove that to avoid wasted calculations (so many empty tuples passed to getNewLivingCoord)
 			if coord not in deadCoords:
 				# Mutate color--! and assign it to the mutatedRGBcolor in the Coordinate object:
