@@ -11,6 +11,7 @@
 # python 3 with the various modules installed that you see in the import statements here near the start of this script.
 
 # TO DO:
+# - See if there are redundant "in deadCoords" checks (in code and in a function) -- I think there are -- and use only one.
 # - Things listed in development code with TO DO comments
 # - Option: instead of randomly mutating color for each individual chosen neighbor coordinate, mutate them all to the same new color. This would be more efficient, and might make colors more banded/ringed/spready than streamy. It would also visually indicate coordinate mutation more clearly. Do this or the other option (mutate each, so each can be different) based on an option check.
 #  - option to randomly alternate that method as you go
@@ -271,11 +272,11 @@ class Coordinate:
 
 
 # function requires lists of Coordinates as parameters, and it directly maniuplates those lists (which are passed by reference). parentRGBColor should be a list of RGB colors in the format [255,0,255].
-def getNewLivingCoord(parentRGBColor, tupleToAllocate, unusedCoords, livingCoords, arr):	# Those last three parameters are lists!
+def getNewLivingCoord(parentRGBColor, tupleToAllocate, unusedCoords, livingCoords, deadCoords, arr):	# Those last three parameters are lists!
 	# (Maybe) move that tuple out of unusedCoords and into livingCoords:
 	if tupleToAllocate in unusedCoords:		# Only execute the following remove line of code if it's in that:
 		unusedCoords.remove(tupleToAllocate)
-	if tupleToAllocate not in livingCoords:		# Only execute the following add line of code if it's not in that:
+	if tupleToAllocate not in livingCoords and tupleToAllocate not in deadCoords:		# Only execute the following add line of code if it's not in that:
 		livingCoords.append(tupleToAllocate)
 		# Give that new living coord, IN arr[], a parent color (to later mutate from):
 		arr[tupleToAllocate[0]][tupleToAllocate[1]].parentRGBcolor = parentRGBColor
@@ -315,9 +316,13 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 	animationSaveNFramesCounter = 0
 	animationFrameCounter = 0
 
-	unusedCoords = []		# A list of Coordinate objects which are free for the taking.
-	# Initialize canvas array (list of lists of Coordinates), and init unusedCoords with grid int tuples along the way:
-	arr = []
+	arr = []					# The canvas that is filled by manipulating the other lists, being:
+	unusedCoords = []			# A list of Coordinate objects which are free for the taking.
+	livingCoords = []			# A list of Coordinate objects which are set aside for use (coloring, etc.)
+	delayedBirthCoords = []		# In the below "while livingCoords:" loop, with higher viscosity some coordinates can be painted around (by other coordinates on all sides) but coordinate mutation never actually moves into that coordinate. The result is that some coordinates may never be "born." this list and associated code revives orphan coordinates
+	deadCoords = []				# A list of coordinates which have been color mutated and may no longer coordinate mutate.
+
+	# Initialize arr canvas and unusedCoords lists (arr being a list of lists of Coordinates):
 	for y in range(0, height):		# for columns (x) in row)
 		tmpList = []
 		for x in range(0, width):		# over the columns, prep and add:
@@ -325,18 +330,13 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 			unusedCoords.append( (y, x) )
 		arr.append(tmpList)
 
-	livingCoords = []		# A list of Coordinate objects which are set aside for use (coloring, etc.)
-	# Initialize first living Coordinates (livingCoords list) by random selection from unusedCoords (and remove from unusedCoords):
-	# print('unusedCoords before:', unusedCoords)
-	# print('livingCoords before:', livingCoords)
+	# Initialize livingCoords list by random selection from unusedCoords (and remove from unusedCoords):
 	for i in range(0, numberStartCoordinates):
 		RNDcoord = random.choice(unusedCoords)
-		getNewLivingCoord(colorMutationBase, RNDcoord, unusedCoords, livingCoords, arr)
-	# print('unusedCoords after:', unusedCoords)
-	# print('livingCoords after:', livingCoords)
+		getNewLivingCoord(colorMutationBase, RNDcoord, unusedCoords, livingCoords, deadCoords, arr)
 
-	color = colorMutationBase
 # TO DO: UNCOMMENT AS WANTED (applies to method used in colorWander.py) and reintegrate code that uses it; how do I track color mutation fail now with multiple living coordinates? :
+	# color = colorMutationBase
 	# previousColor = color
 # TO DO: REINTEGRATE AS WANTED (applies to method used in colorWander.py) for a more stringy (more walking than spreading) mode:
 	# failedCoordMutationCount = 0
@@ -365,49 +365,41 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 	# ----
 	# START IMAGE MAPPING
 	paintedCoordinates = 0
-	deadCoordsList = []
-	# In the below while loop, with higher viscosity some coordinates can be painted around (by other coordinates on all sides) but coordinate mutation never actually moves into that coordinate. The result is that some coordinates may never be "born." The next three variables (a list and two ints) mitigate this by always coralling coordinates that weren't selected during coordinate mutation, and periodically birthing those unbirthed coordinates (they are given a color mutation base at the time they are corraled). At birthing, they are screened against deadCoordsList, and only coordinates not in deadCoordsList are birthed.
-# CODE commented at this outdent (right at the start of the line) here is WIP.
-#	delayedBirthCoordsList = []
-#	delayedBirthCoordsBirthingDelay = 256
-#	delayedBirthCoordsBirthingDelayCounter = 0
 	print('Generating image . . . ')
 	while livingCoords:
-#	while livingCoords or delayedBirthCoordsList:
-#		delayedBirthCoordsBirthingDelayCounter += 1
 		RNDnewEmptyCoordsList = []
-		# For collecting into delayedBirthCoordsList:
-		RNDnewDelayedBirthCoordsList = []
+		# For collecting into delayedBirthCoords:
+		RNDnewdelayedBirthCoords = []
 		#
 		copyOfLivingCoords = list(livingCoords)
 		for coord in copyOfLivingCoords:
 			livingCoords.remove(coord)		# Remove that to avoid wasted calculations (so many empty tuples passed to getNewLivingCoord)
-			# Mutate color--! and assign it to the mutatedRGBcolor in the Coordinate object:
-			RGBcolorTMP = arr[coord[0]][coord[1]].parentRGBcolor + np.random.random_integers(-rshift, rshift, size=3) / 2
-#			print('Colored coordinate (y, x)', coord)
-			RGBcolorTMP = np.clip(RGBcolorTMP, 0, 255)
-			arr[coord[0]][coord[1]].mutatedRGBcolor = RGBcolorTMP
-			newLivingCoordsParentRGBcolor = RGBcolorTMP
-			deadCoordsList.append(coord)		# When a coordinate has its color mutated, it dies.
-# TO DO: DEBUG and if necessary fix: why is paintedCoordinates arriving at a number far greater than allesPixelCount?
-			paintedCoordinates += 1
-			# The first returned list is used straightway, the second at delays (every delayedBirthCoordsBirthingDelay) :
-			RNDnewEmptyCoordsList, RNDnewDelayedBirthCoordsList = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
-			for coordZurg in RNDnewEmptyCoordsList:
-				if coordZurg not in deadCoordsList:
-					getNewLivingCoord(newLivingCoordsParentRGBcolor, coordZurg, unusedCoords, livingCoords, arr)
-			# Collecting coordinates for delayed birth:
-#			delayedBirthCoordsList += RNDnewDelayedBirthCoordsList		# This may lead to duplicates in list; will set() later
-			# Using delayed birth coordinates at intervals:
-#			if delayedBirthCoordsBirthingDelayCounter == delayedBirthCoordsBirthingDelay:
-#				delayedBirthCoordsBirthingDelayCounter = 0
-#				delayedBirthCoordsList = list(set(delayedBirthCoordsList))	# Removes duplicates
-#				for coordYarg in delayedBirthCoordsList:
-#					if coordYarg not in deadCoordsList:
-#						getNewLivingCoord(newLivingCoordsParentRGBcolor, coordYarg, unusedCoords, livingCoords, arr)
-#				delayedBirthCoordsList = []		# To be built up again via delayedBirthCoordsBirthingDelayCounter += 1 etc.
+			if coord not in deadCoords:
+				# Mutate color--! and assign it to the mutatedRGBcolor in the Coordinate object:
+				RGBcolorTMP = arr[coord[0]][coord[1]].parentRGBcolor + np.random.random_integers(-rshift, rshift, size=3) / 2
+				# print('Colored coordinate (y, x)', coord)
+				RGBcolorTMP = np.clip(RGBcolorTMP, 0, 255)
+				arr[coord[0]][coord[1]].mutatedRGBcolor = RGBcolorTMP
+				newLivingCoordsParentRGBcolor = RGBcolorTMP
+				deadCoords.append(coord)		# When a coordinate has its color mutated, it dies.
+	# TO DO: DEBUG and if necessary fix: why is paintedCoordinates arriving at a number far greater than allesPixelCount?
+				paintedCoordinates += 1
+				# The first returned list is used straightway, the second at delays (every delayedBirthCoordsBirthingDelay) :
+				RNDnewEmptyCoordsList, RNDnewdelayedBirthCoords = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
+				for coordZurg in RNDnewEmptyCoordsList:
+					getNewLivingCoord(newLivingCoordsParentRGBcolor, coordZurg, unusedCoords, livingCoords, deadCoords, arr)
+				# Set parentRGBcolor in arr via RNDnewdelayedBirthCoords:
+				for coordYaerf in RNDnewdelayedBirthCoords:
+					arr[coordYaerf[0]][coordYaerf[1]].parentRGBcolor = newLivingCoordsParentRGBcolor
+				# Collect those coordinates for delayed birth, only if we are not within N iterations of delayedBirthCoordsBirthingDelayCounter == delayedBirthCoordsBirthingDelay (to avoid birthing unbirthed coordinates whose parents were recently birthed; it avoids spurts of growth around edges) :
+				# Using delayed birth coordinates at intervals:
+			# if SOME CONDITION:
+#				delayedBirthCoords = list(set(delayedBirthCoords))	# Removes duplicates
+#				for coordYarg in delayedBirthCoords:
+#					getNewLivingCoord(newLivingCoordsParentRGBcolor, coordYarg, unusedCoords, livingCoords, deadCoords, arr)
+#				delayedBirthCoords = []		# To be built up again via delayedBirthCoordsBirthingDelayCounter += 1 etc.
 			#
-# TO DO: fix, if possible, whatever leads to this else clause (checking for redundant attempts to use a coordinate) to be invoked A LOT if it is uncommented:
+# TO DO: fix, if possible, whatever leads to this else clause (checking for redundant attempts to use a coordinate) to be invoked A LOT if it is uncommented (and note that whatever this else clause followed is buried in git history now) :
 				# else:
 					# print('FUGGETABOUTIT!')
 
