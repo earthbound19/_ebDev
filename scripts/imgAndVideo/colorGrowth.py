@@ -294,7 +294,6 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 	arr = []					# A list of Coordinate objects that are used to fill a "canvas" via other lists etc.:
 	unusedCoords = []			# A list of coordinates (tuples, not Coordinate objects) which are free for the taking.
 	livingCoords = []			# A list of coordinates (tuples, not Coordiante objects) which are set aside for use (coloring, etc.)
-	potentialOrphanCoordsTwo = []		# In the (far) below "while livingCoords:" loop, with higher viscosity some coordinates can be painted around (by other coordinates on all sides) but coordinate mutation never actually moves into that coordinate. The result is that some coordinates may never be "born." this list and associated code revives orphan coordinates.
 	deadCoords = []				# A list of coordinates which have been color mutated and may no longer coordinate mutate.
 
 	# Initialize arr canvas and unusedCoords lists (arr being a list of lists of Coordinates):
@@ -334,12 +333,9 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 	# ----
 	# START IMAGE MAPPING
 	paintedCoordinates = 0
+	potentialOrphanCoordsTwo = []		# With higher viscosity some coordinates can be painted around (by other coordinates on all sides) but coordinate mutation never actually moves into that coordinate. The result is that some coordinates may never be "born." this list and associated code revives orphan coordinates.
 	print('Generating image . . . ')
 	while livingCoords:
-		RNDnewEmptyCoordsList = []
-		# For collecting into potentialOrphanCoordsTwo:
-		potentialOrphanCoordsOne = []
-		#
 		# NOTE: There are two options for looping here. Mode 0 (which was the first developed mode) makes a copy of livingCoords, and loops through that. The result is that the loop doesn't continue because of changes to livingCoords (as it is working on a copy which becomes outdates as the loop progresses). Mode 1 loops through livingCoords itself, and since this loop changes livingCoords, it makes the loop run longer. In mode 1 similar color meanders more (runaway streams of color are possible). It also finishes the image faster. Mode 1 spreads more uniformly (with less possibility of runaway streams. Which mode produces more interesting and beautiful results is subjective and for me depends also on target resolution.
 # LOOP MODE OPTIONS.
 		 # For loop mode 0, uncomment the next two lines of code, and comment out the third line after that. For mode 1, comment out the next two lines, and uncomment the third line after that:
