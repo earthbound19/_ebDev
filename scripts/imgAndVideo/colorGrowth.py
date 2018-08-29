@@ -11,6 +11,7 @@
 # python 3 with the various modules installed that you see in the import statements here near the start of this script.
 
 # TO DO:
+# - reduce (percentwise?) the number of coordinates copied from orphanCoords into livingCoords (which would mean setting aside elsewhere the still remaining orphanCoords _or_ never erasing the list and letting it deplete naturally), to reduce the growth spurt effect reported at https://github.com/earthbound19/_ebDev/issues/17 ?
 # - Have reclaimOrphanedCoordinates do its work only once (without reactivating continued painting) when stopPaintingPercentAsDecimal is reached?
 # - Things listed in development code with TO DO comments
 # - Option: instead of randomly mutating color for each individual chosen neighbor coordinate, mutate them all to the same new color. This would be more efficient, and might make colors more banded/ringed/spready than streamy. It would also visually indicate coordinate mutation more clearly. Do this or the other option (mutate each, so each can be different) based on an option check.
