@@ -28,7 +28,7 @@ then
 		# echo $rescaleParams
 fi
 
-# IN DEVELOPMENT: automatic centering of image in blacke matte borders (padding):
+# IN DEVELOPMENT: automatic centering of image in black matte borders (padding):
 # steps:
 # - get matte WxH intended
 # - get src images to anim WxH
@@ -39,7 +39,7 @@ fi
 # - formulate ur paramater to pass to ffmpeg from that; in form:
 # padParams=-vf "pad=width=1920:height=1080:x=0:y=0:color=black"
 # ex commands to fetch and parse src pix dimensions is in getDoesIMGinstagram.sh.
-# an example command wut does some math as would be needer per this algo: echo "scale=5; 3298 / 1296" | bc
+# an example command wut does some math as would be needed per this algo: echo "scale=5; 3298 / 1296" | bc
 
 # Assumes that all input files have the same character count in the file base name; I wonder whether I've gone full circle on going away from and back to the exact form of the following command, but *right now* it's testing ok on Cygwin and Mac; re https://stackoverflow.com/a/40876071 ; ALSO gnuWin32 gfind it seems has a bug; the command throws an error. Here using Cygwin find on Windows and find on Mac; maybe I'll do that everywhere..
 lastFoundTypeFile=`find . -iname \*.$4 | tail -n 1 | sed 's/\.\/\(.*\)/\1/g'`
