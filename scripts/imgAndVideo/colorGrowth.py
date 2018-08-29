@@ -237,11 +237,8 @@ class Coordinate:
 			# Conditionally throttle maxRNDrange (for random selection of empty neighbors), via viscosity value.
 # TO DO: figure out why viscosity = 6 terminates so fast and whether it should. It works but is very short lived.
 			if len(self.emptyNeighbors) - viscosity > 1 and viscosity != 0:		# If we can subtract the highest possiible number (of random selection count) of available neighbors by viscosity and still have 1 left (and if viscosity is nonzero), do that:
-				# print('--------VISCOSITY CHECK PASSED---------')
 				maxRNDrange = len(self.emptyNeighbors) - viscosity
-				# print('maxRNDrange selected of', maxRNDrange, 'where len is', len(self.emptyNeighbors))
 			else:		# Otherwise take a random selection of available neighbors from the full number range of available neighbors:
-				# print('--------VISCOSITY CHECK BYPASSED-------')
 				maxRNDrange = len(self.emptyNeighbors)
 			# END VISCOSITY CONTROL.
 			nNeighborsToReturn = np.random.random_integers(1, maxRNDrange)		# Decide how many to pick
@@ -369,9 +366,7 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 				potentialOrphanCoordsTwo += potentialOrphanCoordsOne
 #		Conditionally reclaim orphaned coordinates:
 		if reclaimOrphanedCoordinates == True:
-			print('reclaimOrphanedCoordinates is true', reclaimOrphanedCoordinates)
 			if not livingCoords:	# When that coords list is emptied, dedup, trim used, and use the orphan list:
-				print('not livingCoords')
 				potentialOrphanCoordsTwo = list(set(potentialOrphanCoordsTwo))	# Removes duplicates from list
 #				removes elements from potentialOrphanCoordsTwo which are in deadCoords (to avoid reusing coordinates) :
 				orphanCoords = [x for x in potentialOrphanCoordsTwo if x not in deadCoords]
