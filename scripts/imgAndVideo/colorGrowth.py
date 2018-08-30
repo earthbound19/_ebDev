@@ -27,6 +27,8 @@
 import datetime, random, argparse, ast, os.path, sys, re, subprocess, shlex
 import numpy as np
 from PIL import Image
+# For optional subprocess calls to render animation frames via ffmpegAnim.sh at end of script; uncomment those lines also if you want this (I'm not going to make this a CLI option, at least not at this writing) :
+# import os
 
 # Defaults which will be overriden if arguments of the same name are provided to the script:
 numberOfImages = 1
@@ -400,6 +402,12 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 	print('Created ', n, ' of ', numberOfImages, ' images.')
 	os.remove(stateIMGfileName)
 # END MAIN FUNCTIONALITY.
+
+
+# Optional sys cd into anim frames subfolder and invoke ffmpegAnim.sh to make an animation from the frames:
+# os.chdir(animFramesFolderName)
+# subprocess.call('ffmpegAnim.sh 30 30 7 png', shell=True)
+# subprocess.call('open _out.mp4', shell=True)
 
 
 # MUCH BETTERER REFERENCE:
