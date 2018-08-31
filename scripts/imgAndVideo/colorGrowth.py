@@ -11,7 +11,7 @@
 # python 3 with the various modules installed that you see in the import statements here near the start of this script.
 
 # TO DO:
-# - reduce (percentwise?) the number of coordinates copied from orphanCoords into livingCoords (which would mean setting aside elsewhere the still remaining orphanCoords _or_ never erasing the list and letting it deplete naturally), to reduce the growth spurt effect reported at https://github.com/earthbound19/_ebDev/issues/17 ?
+# - Control reclaimOrphanCoordsEveryN and baseOrphanCoordsReclaimMultiplier with CLI options of the same name, defaulting to the values hard-coded right now.
 # - Have reclaimOrphanedCoordinates do its work only once (without reactivating continued painting) when stopPaintingPercentAsDecimal is reached?
 # - Things listed in development code with TO DO comments
 # - Option: instead of randomly mutating color for each individual chosen neighbor coordinate, mutate them all to the same new color. This would be more efficient, and might make colors more banded/ringed/spready than streamy. It would also visually indicate coordinate mutation more clearly. Do this or the other option (mutate each, so each can be different) based on an option check.
@@ -336,6 +336,13 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 	# START IMAGE MAPPING
 	paintedCoordinates = 0
 	potentialOrphanCoordsTwo = []		# With higher viscosity some coordinates can be painted around (by other coordinates on all sides) but coordinate mutation never actually moves into that coordinate. The result is that some coordinates may never be "born." this list and associated code revives orphan coordinates.
+	# used to reclaim orphan coordinates every N iterations through the `while livingCoords` loop:
+	reclaimOrphanCoordsEveryN = 7
+	reclaimOrphanCoordsTriggerCounter = 0
+	baseOrphanCoordsReclaimMultiplier = 0.08
+	# These next two variables are used to ramp up orphan coordinate reclamation rate as the render proceeds:
+	multiplierCheck = int(allesPixelCount / reclaimOrphanCoordsEveryN)
+	multiplier = 1
 	print('Generating image . . . ')
 	while livingCoords:
 		# NOTE: There are two options for looping here. Mode 0 (which was the first developed mode) makes a copy of livingCoords, and loops through that. The result is that the loop doesn't continue because of changes to livingCoords (as it is working on a copy which becomes outdates as the loop progresses). Mode 1 loops through livingCoords itself, and since this loop changes livingCoords, it makes the loop run longer. In mode 1 similar color meanders more (runaway streams of color are possible). It also finishes the image faster. Mode 1 spreads more uniformly (with less possibility of runaway streams. Which mode produces more interesting and beautiful results is subjective and for me depends also on target resolution.
@@ -363,13 +370,30 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 				for coordYaerf in potentialOrphanCoordsOne:
 					arr[coordYaerf[0]][coordYaerf[1]].parentRGBcolor = newLivingCoordsParentRGBcolor
 				potentialOrphanCoordsTwo += potentialOrphanCoordsOne
-#		Conditionally reclaim orphaned coordinates:
+#		Conditionally reclaim orphaned coordinates. Code here to reclaim coordinates gradually (not in spurts as at first coded) is harder to read and inelegant. I'm leaving it that way. Because GEH, DONE.
 		if reclaimOrphanedCoordinates == True:
-			if not livingCoords:	# When that coords list is emptied, dedup, trim used, and use the orphan list:
+	# orphan coordinate reclamation rate multiplier ramp check some other noun just for kicks:
+			if paintedCoordinates > (multiplierCheck * multiplier):
+				multiplier += 1
+	# that ends
+			reclaimOrphanCoordsTriggerCounter += 1
+			if reclaimOrphanCoordsTriggerCounter == reclaimOrphanCoordsEveryN:
+				reclaimOrphanCoordsTriggerCounter = 0
 				potentialOrphanCoordsTwo = list(set(potentialOrphanCoordsTwo))	# Removes duplicates from list
-#				removes elements from potentialOrphanCoordsTwo which are in deadCoords (to avoid reusing coordinates) :
+				# removes elements from potentialOrphanCoordsTwo which are in deadCoords (to avoid reusing coordinates) :
 				orphanCoords = [x for x in potentialOrphanCoordsTwo if x not in deadCoords]
-				livingCoords = list(orphanCoords)		# The while loop will continue if there's anything in livingCoords.
+				# decide how many orphans to reclaim:
+				orphansToReclaimNowN = int(len(orphanCoords) * baseOrphanCoordsReclaimMultiplier)
+				orphansToReclaimNowN *= multiplier
+				# clip that to acceptable range if necessary:
+				if orphansToReclaimNowN <= 0:
+					orphansToReclaimNowN = 1
+				if orphansToReclaimNowN > len(orphanCoords):
+					orphansToReclaimNowN = len(orphanCoords)
+				# get those orphans and then move them into livingCoords:
+				tmpList = random.sample(orphanCoords, orphansToReclaimNowN)
+				livingCoords += list(tmpList)		# The while loop will continue if there's anything in livingCoords.
+				print('Reclaimed', orphansToReclaimNowN, 'orphan coordinates.')
 
 # TO DO: I might like it if this stopped saving new frames after every coordinate was colored (it can (always does?) save extra redundant frames at the end;
 		# Save an animation frame if that variable has a value:
