@@ -8,9 +8,12 @@
 # python thisScript.py -h
 
 # DEPENDENCIES
-# python 3 with the various modules installed that you see in the import statements here near the start of this script.
+# python 3 with numpy and pyimage modules installed (and maybe others--see the import statements).
 
 # TO DO:
+# - refactor for speed
+# - see if compiled/transpiled versions of this are faster. In tests:
+#  - pyinstaller compiled packages were on average two hundredths of a second faster for a 100x100 --randomSeed 1 defaults test. Not exciting.
 # - Control reclaimOrphanCoordsEveryN and baseOrphanCoordsReclaimMultiplier with CLI options of the same name, defaulting to the values hard-coded right now.
 # - Have reclaimOrphanedCoordinates do its work only once (without reactivating continued painting) when stopPaintingPercentAsDecimal is reached?
 # - Things listed in development code with TO DO comments
