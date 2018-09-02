@@ -396,7 +396,7 @@ class Coordinate:
 		# of bounds of image (negative or past max_x or max_y), and will check for and clean up
 		# pairs with out of bounds values after:
 		tmp_list = [(y-1, x-1), (y, x-1), (y+1, x-1), (y-1, x), (y+1, x), (y-1, x+1),
-					 (y, x+1), (y+1, x+1)]
+					(y, x+1), (y+1, x+1)]
 		delete_list = []
 		for element in tmp_list:
 			if -1 in element:
