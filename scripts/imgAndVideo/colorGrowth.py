@@ -41,12 +41,12 @@ rshift = 8
 stopPaintingPercentAsDecimal = 0.64
 animationSaveEveryNframes = 0
 numberStartCoordinatesRNDrange = (1,13)
-viscosity = 4		# Acceptable defaults: 0 to 5. 6 works, but test output with that was brief and uninteresting.
+viscosity = 4        # Acceptable defaults: 0 to 5. 6 works, but test output with that was brief and uninteresting.
 savePreset = True
 # BACKGROUND color options;
 # any of these (uncomment only one) are reinterpreted as a list later by ast.literal_eval(backgroundColor) :
-# backgroundColor = '[157,140,157]'		# Medium purplish gray
-backgroundColor = '[252,251,201]'		# Buttery light yellow
+# backgroundColor = '[157,140,157]'        # Medium purplish gray
+backgroundColor = '[252,251,201]'        # Buttery light yellow
 reclaimOrphanedCoordinates = True
 
 
@@ -72,7 +72,7 @@ parser.add_argument('--loadPreset', type=str, help='A preset file (as first crea
 	# DEVELOPER NOTE: Throughout the below argument checks, wherever a user does not specify an argument and I use a default (as defaults are defined near the start of working code in this script), add that default switch and switch value pair to sys.argv, for use by the --savePreset feature (which saves everything except for the script path ([0]) to a preset). I take this approach because I can't check if a default value was supplied if I do that in the parser.add_argument function -- http://python.6.x6.nabble.com/argparse-tell-if-arg-was-defaulted-td1528162.html -- so what I do is check for None (and then supply a default and add to argv if None is found). The check for None isn't literal: it's in the else: clause after an if (value) check (if the if check fails, that means the value is None, and else: is invoked) :
 print('~-')
 print('~- Processing any arguments to script . . .')
-args = parser.parse_args()		# When this function is called, if -h or --help was passed to the script, it will print the description and all defined help messages.
+args = parser.parse_args()        # When this function is called, if -h or --help was passed to the script, it will print the description and all defined help messages.
 
 # IF A PRESET file is given, load its contents (which should be a collection of CLI switches for this script itself) and pass them to a new running instance of this script, then exit this script:
 if args.loadPreset:
@@ -82,13 +82,13 @@ if args.loadPreset:
 	print('Attempting to load subprocess of this script with the switches in loadPreset . . .')
 	with open(loadPreset) as f:
 		switches = f.readline()
-	subprocess.call(shlex.split('python ' + sys.argv[0] + ' ' + switches))		# sys.argv[0] is the path to this script.
+	subprocess.call(shlex.split('python ' + sys.argv[0] + ' ' + switches))        # sys.argv[0] is the path to this script.
 	print('Subprocess hopefully completed successfully. Will now exit script.')
 	sys.exit()
 
-if args.numberOfImages:		# If a user supplied an argument (so that numberOfImages has a value (is not None), use that:
-	numberOfImages = args.numberOfImages	# It is in argv already, so it will be used by --savePreset.
-else:						# If not, leave the default as it was defined, and add to sys.argv for reasons given above:
+if args.numberOfImages:        # If a user supplied an argument (so that numberOfImages has a value (is not None), use that:
+	numberOfImages = args.numberOfImages    # It is in argv already, so it will be used by --savePreset.
+else:                        # If not, leave the default as it was defined, and add to sys.argv for reasons given above:
 	sys.argv.append('-n'); sys.argv.append(str(numberOfImages))
 
 if args.width:
@@ -117,20 +117,20 @@ else:
 # Convert backgroundColor (as set from args.backgroundColor or default) string to python list for use by this script, re: https://stackoverflow.com/a/1894296/1397555
 backgroundColor = ast.literal_eval(backgroundColor)
 
-if args.colorMutationBase:		# See comments in args.backgroundColor handling. We're handling this the same.
+if args.colorMutationBase:        # See comments in args.backgroundColor handling. We're handling this the same.
 	colorMutationBase = args.colorMutationBase
 	colorMutationBase = re.sub(' ', '', colorMutationBase)
 	idx = sys.argv.index(args.colorMutationBase)
 	sys.argv[idx] = colorMutationBase
 	colorMutationBase = ast.literal_eval(colorMutationBase)
-else:		# Write same string as backgroundColor, after the same silly string manipulation as for colorMutationBase, but more ridiculously now _back_ from that to a string again:
+else:        # Write same string as backgroundColor, after the same silly string manipulation as for colorMutationBase, but more ridiculously now _back_ from that to a string again:
 	backgroundColorTmpSTR = str(backgroundColor)
 	backgroundColorTmpSTR = re.sub(' ', '', backgroundColorTmpSTR)
 	sys.argv.append('-c'); sys.argv.append(backgroundColorTmpSTR)
 	# In this case we're using a list as already assigned to backgroundColor:
-	colorMutationBase = list(backgroundColor)		# If I hadn't used list(), colorMutationBase would be a reference to backgroundColor (which is default Python list handling behavior with the = operator), and when I changed either, "both" would change (but they would really just be different names for the same list). I want them to be different.
+	colorMutationBase = list(backgroundColor)        # If I hadn't used list(), colorMutationBase would be a reference to backgroundColor (which is default Python list handling behavior with the = operator), and when I changed either, "both" would change (but they would really just be different names for the same list). I want them to be different.
 
-# purple = [255, 0, 255]	# Purple. In prior commits of this script, this has been defined and unused, just like in real life. Now, it is commented out or not even defined, just like it is in real life.
+# purple = [255, 0, 255]    # Purple. In prior commits of this script, this has been defined and unused, just like in real life. Now, it is commented out or not even defined, just like it is in real life.
 
 if args.reclaimOrphanedCoordinates:
 	reclaimOrphanedCoordinates = ast.literal_eval(args.reclaimOrphanedCoordinates)
@@ -165,19 +165,19 @@ np.random.seed(randomSeed)
 	# ('noCoords', 'noRNDcoords') : continue with RNDcoords defaults (don't overwrite defaults). These two: else if RNDcoords else. Also these two: generate coords independent of (outside) that last if else (by using whatever RNDcoords ends up being (user-provided or default).
 	# --
 	# I COULD just have four different, independent "if" checks explicitly for those four pairs and work from that, but I have opted for the convoluted if: if else: if: else: structure. Two possible paths presented in code, and I, I took the convoluted one, and that has made all the difference. Tenuous justification: it is more compact logic (fewer checks).
-if args.numberStartCoordinates:		# If --numberStartCoordinates is provided by the user, use it..
+if args.numberStartCoordinates:        # If --numberStartCoordinates is provided by the user, use it..
 	numberStartCoordinates = args.numberStartCoordinates
 	print('Will use the provided --numberStartCoordinates, ', numberStartCoordinates)
-	if args.numberStartCoordinatesRNDrange:		# .. and delete any --numberStartCoordinatesRNDrange and its value from sys.argv (as it will not be used and would best not be stored in the .cgp config file via --savePreset:
+	if args.numberStartCoordinatesRNDrange:        # .. and delete any --numberStartCoordinatesRNDrange and its value from sys.argv (as it will not be used and would best not be stored in the .cgp config file via --savePreset:
 		idx = sys.argv.index(args.numberStartCoordinatesRNDrange)
-		del sys.argv[idx-1]		# Why does index() return a one-based index for a zero-based index list?!
-		del sys.argv[idx-1]		# Note that the element at the same index is deleted twice because after the first is deleted, the second moves to the index of the first.
+		del sys.argv[idx-1]        # Why does index() return a one-based index for a zero-based index list?!
+		del sys.argv[idx-1]        # Note that the element at the same index is deleted twice because after the first is deleted, the second moves to the index of the first.
 		print('** NOTE: ** You provided both [-q | --numberStartCoordinates] and --numberStartCoordinatesRNDrange, but the former overrides the latter (the latter will not be used). This program removed the latter from the sys.argv parameters list.')
-else:		# If --numberStartCoordinates is _not_ provided by the user..
-	if args.numberStartCoordinatesRNDrange:		# .. but if --numberStartCoordinatesRNDrange _is_ provided, assign from that:
+else:        # If --numberStartCoordinates is _not_ provided by the user..
+	if args.numberStartCoordinatesRNDrange:        # .. but if --numberStartCoordinatesRNDrange _is_ provided, assign from that:
 		numberStartCoordinatesRNDrange = ast.literal_eval(args.numberStartCoordinatesRNDrange)
 		decidedToUseSTRpart = 'from user-supplied range ' + str(numberStartCoordinatesRNDrange)
-	else:		# .. otherwise use the default numberStartCoordinatesRNDrange:
+	else:        # .. otherwise use the default numberStartCoordinatesRNDrange:
 		decidedToUseSTRpart = 'from default range ' + str(numberStartCoordinatesRNDrange)
 	numberStartCoordinates = random.randint(numberStartCoordinatesRNDrange[0], numberStartCoordinatesRNDrange[1])
 	sys.argv.append('-q'); sys.argv.append(str(numberStartCoordinates))
@@ -215,7 +215,7 @@ class Coordinate:
 	__slots__ = ["YXtuple", "x", "y", "maxX", "maxY", "parentRGBcolor", "mutatedRGBcolor", "emptyNeighbors"]
 	def __init__(self, x, y, maxX, maxY, parentRGBcolor):
 		self.YXtuple = (y, x)
-		self.x = x; self.y = y;	self.parentRGBcolor = parentRGBcolor; self.mutatedRGBcolor = parentRGBcolor
+		self.x = x; self.y = y;    self.parentRGBcolor = parentRGBcolor; self.mutatedRGBcolor = parentRGBcolor
 		# Adding all possible empty neighbor values even if they would result in values out of bounds of image (negative or past maxX or maxY), and will check for and clean up pairs with out of bounds values after:
 		tmpList = [ (y-1, x-1), (y, x-1), (y+1, x-1), (y-1, x), (y+1, x), (y-1, x+1), (y, x+1), (y+1, x+1) ]
 		deleteList = []
@@ -237,25 +237,25 @@ class Coordinate:
 		self.emptyNeighbors = list(tmpList)
 	# function returns both a list of randomly selected empty neighbor coordinates to use immediately, and a list of neighbors to use later:
 	def getRNDemptyNeighbors(self):
-		rndNeighborsToReturn = []		# init an empty array we'll populate with neighbors (int tuples) and return
-		if len(self.emptyNeighbors) > 0:		# If there is anything left in emptyNeighbors:
+		rndNeighborsToReturn = []        # init an empty array we'll populate with neighbors (int tuples) and return
+		if len(self.emptyNeighbors) > 0:        # If there is anything left in emptyNeighbors:
 			# START VISCOSITY CONTROL.
 			# Conditionally throttle maxRNDrange (for random selection of empty neighbors), via viscosity value.
 # TO DO: figure out why viscosity = 6 terminates so fast and whether it should. It works but is very short lived.
-			if len(self.emptyNeighbors) - viscosity > 1 and viscosity != 0:		# If we can subtract the highest possiible number (of random selection count) of available neighbors by viscosity and still have 1 left (and if viscosity is nonzero), do that:
+			if len(self.emptyNeighbors) - viscosity > 1 and viscosity != 0:        # If we can subtract the highest possiible number (of random selection count) of available neighbors by viscosity and still have 1 left (and if viscosity is nonzero), do that:
 				maxRNDrange = len(self.emptyNeighbors) - viscosity
-			else:		# Otherwise take a random selection of available neighbors from the full number range of available neighbors:
+			else:        # Otherwise take a random selection of available neighbors from the full number range of available neighbors:
 				maxRNDrange = len(self.emptyNeighbors)
 			# END VISCOSITY CONTROL.
-			nNeighborsToReturn = np.random.random_integers(1, maxRNDrange)		# Decide how many to pick
+			nNeighborsToReturn = np.random.random_integers(1, maxRNDrange)        # Decide how many to pick
 			rndNeighborsToReturn = random.sample(self.emptyNeighbors, nNeighborsToReturn)
-		else:		# If there is _not_ anything left in emptyNeighbors:
-			rndNeighborsToReturn = [()]		# Return a list with one empty tuple
+		else:        # If there is _not_ anything left in emptyNeighbors:
+			rndNeighborsToReturn = [()]        # Return a list with one empty tuple
 		return rndNeighborsToReturn, self.emptyNeighbors
 # END COORDINATE CLASS
 
 # function requires lists of Coordinates as parameters, and it directly maniuplates those lists (which are passed by reference). parentRGBColor should be a list of RGB colors in the format [255,0,255].
-def getNewLivingCoord(parentRGBColor, tupleToAllocate, unusedCoords, livingCoords, deadCoords, arr):	# Those last three parameters are lists!
+def getNewLivingCoord(parentRGBColor, tupleToAllocate, unusedCoords, livingCoords, deadCoords, arr):    # Those last three parameters are lists!
 	# Move tupleToAllocate out of unusedCoords and into livingCoords, depending:
 	if tupleToAllocate in unusedCoords and tupleToAllocate not in livingCoords and tupleToAllocate not in deadCoords:
 		unusedCoords.remove(tupleToAllocate)
@@ -292,19 +292,19 @@ def printProgress():
 print('Will generate ', numberOfImages, ' image(s).')
 
 # Loop making [-n | numberOfImages] images.
-for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* the loop.
+for n in range(1, (numberOfImages + 1) ):        # + 1 because it iterates n *after* the loop.
 	animationSaveNFramesCounter = 0
 	animationFrameCounter = 0
 
-	arr = []					# A list of Coordinate objects that are used to fill a "canvas" via other lists etc.:
-	unusedCoords = []			# A list of coordinates (tuples, not Coordinate objects) which are free for the taking.
-	livingCoords = []			# A list of coordinates (tuples, not Coordiante objects) which are set aside for use (coloring, etc.)
-	deadCoords = []				# A list of coordinates which have been color mutated and may no longer coordinate mutate.
+	arr = []                    # A list of Coordinate objects that are used to fill a "canvas" via other lists etc.:
+	unusedCoords = []            # A list of coordinates (tuples, not Coordinate objects) which are free for the taking.
+	livingCoords = []            # A list of coordinates (tuples, not Coordiante objects) which are set aside for use (coloring, etc.)
+	deadCoords = []                # A list of coordinates which have been color mutated and may no longer coordinate mutate.
 
 	# Initialize arr canvas and unusedCoords lists (arr being a list of lists of Coordinates):
-	for y in range(0, height):		# for columns (x) in row)
+	for y in range(0, height):        # for columns (x) in row)
 		tmpList = []
-		for x in range(0, width):		# over the columns, prep and add:
+		for x in range(0, width):        # over the columns, prep and add:
 			tmpList.append( Coordinate(x, y, width, height, backgroundColor) )
 			unusedCoords.append( (y, x) )
 		arr.append(tmpList)
@@ -320,13 +320,13 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 	# Create unique, date-time informative image file name. Note that this will represent when the painting began, not when it ended (~State filename will be based off this).
 	now = datetime.datetime.now()
 	timeStamp=now.strftime('%Y_%m_%d__%H_%M_%S__')
-	rndStr = ('%03x' % random.randrange(16**6))		# Returns three random lowercase hex characters.
+	rndStr = ('%03x' % random.randrange(16**6))        # Returns three random lowercase hex characters.
 	imgFileBaseName = timeStamp + rndStr + '_colorGrowth-Py'
 	imgFileName = imgFileBaseName + '.png'
 	stateIMGfileName = imgFileBaseName + '-state.png'
 	animFramesFolderName = imgFileBaseName + '_frames'
 
-	if animationSaveEveryNframes > 0:	# If that has a value greater than zero, create a subfolder to write frames to:
+	if animationSaveEveryNframes > 0:    # If that has a value greater than zero, create a subfolder to write frames to:
 		# Also, initailize a varialbe which is how many zeros to pad animation save frame file (numbers) to, based on how many frames will be rendered:
 		padAnimationSaveFramesNumbersTo = len(str(terminatePaintingAtFillCount))
 		os.mkdir(animFramesFolderName)
@@ -338,7 +338,7 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 	# ----
 	# START IMAGE MAPPING
 	paintedCoordinates = 0
-	potentialOrphanCoordsTwo = []		# With higher viscosity some coordinates can be painted around (by other coordinates on all sides) but coordinate mutation never actually moves into that coordinate. The result is that some coordinates may never be "born." this list and associated code revives orphan coordinates.
+	potentialOrphanCoordsTwo = []        # With higher viscosity some coordinates can be painted around (by other coordinates on all sides) but coordinate mutation never actually moves into that coordinate. The result is that some coordinates may never be "born." this list and associated code revives orphan coordinates.
 	# used to reclaim orphan coordinates every N iterations through the `while livingCoords` loop:
 	reclaimOrphanCoordsEveryN = 7
 	reclaimOrphanCoordsTriggerCounter = 0
@@ -352,9 +352,9 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 # LOOP MODE OPTIONS.
 		 # For loop mode 0, uncomment the next two lines of code, and comment out the third line after that. For mode 1, comment out the next two lines, and uncomment the third line after that:
 		copyOfLivingCoords = list(livingCoords)
-		for coord in copyOfLivingCoords:	# Mode 0, test run time: 0m34.241s
-		# for coord in livingCoords:		# Mode 1, test run time: 0m32.502s
-			livingCoords.remove(coord)		# Remove that to avoid wasted calculations (so many empty tuples passed to getNewLivingCoord)
+		for coord in copyOfLivingCoords:    # Mode 0, test run time: 0m34.241s
+		# for coord in livingCoords:        # Mode 1, test run time: 0m32.502s
+			livingCoords.remove(coord)        # Remove that to avoid wasted calculations (so many empty tuples passed to getNewLivingCoord)
 			if coord not in deadCoords:
 				# Mutate color--! and assign it to the mutatedRGBcolor in the Coordinate object:
 				RGBcolorTMP = arr[coord[0]][coord[1]].parentRGBcolor + np.random.random_integers(-rshift, rshift, size=3) / 2
@@ -362,18 +362,18 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 				RGBcolorTMP = np.clip(RGBcolorTMP, 0, 255)
 				arr[coord[0]][coord[1]].mutatedRGBcolor = RGBcolorTMP
 				newLivingCoordsParentRGBcolor = RGBcolorTMP
-				deadCoords.append(coord)		# When a coordinate has its color mutated, it dies.
+				deadCoords.append(coord)        # When a coordinate has its color mutated, it dies.
 				paintedCoordinates += 1
 				# The first returned list is used straightway, the second optionally shuffles into the first after the first is depleted:
 				RNDnewEmptyCoordsList, potentialOrphanCoordsOne = arr[coord[0]][coord[1]].getRNDemptyNeighbors()
 				for coordZurg in RNDnewEmptyCoordsList:
 					getNewLivingCoord(newLivingCoordsParentRGBcolor, coordZurg, unusedCoords, livingCoords, deadCoords, arr)
 # Potential and actual orphan coordinate handling:
-#				Set parentRGBcolor in arr via potentialOrphanCoordsOne:
+#                Set parentRGBcolor in arr via potentialOrphanCoordsOne:
 				for coordYaerf in potentialOrphanCoordsOne:
 					arr[coordYaerf[0]][coordYaerf[1]].parentRGBcolor = newLivingCoordsParentRGBcolor
 				potentialOrphanCoordsTwo += potentialOrphanCoordsOne
-#		Conditionally reclaim orphaned coordinates. Code here to reclaim coordinates gradually (not in spurts as at first coded) is harder to read and inelegant. I'm leaving it that way. Because GEH, DONE.
+#        Conditionally reclaim orphaned coordinates. Code here to reclaim coordinates gradually (not in spurts as at first coded) is harder to read and inelegant. I'm leaving it that way. Because GEH, DONE.
 		if reclaimOrphanedCoordinates == True:
 	# orphan coordinate reclamation rate multiplier ramp check some other noun just for kicks:
 			if paintedCoordinates > (multiplierCheck * multiplier):
@@ -382,7 +382,7 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 			reclaimOrphanCoordsTriggerCounter += 1
 			if reclaimOrphanCoordsTriggerCounter == reclaimOrphanCoordsEveryN:
 				reclaimOrphanCoordsTriggerCounter = 0
-				potentialOrphanCoordsTwo = list(set(potentialOrphanCoordsTwo))	# Removes duplicates from list
+				potentialOrphanCoordsTwo = list(set(potentialOrphanCoordsTwo))    # Removes duplicates from list
 				# removes elements from potentialOrphanCoordsTwo which are in deadCoords (to avoid reusing coordinates) :
 				orphanCoords = [x for x in potentialOrphanCoordsTwo if x not in deadCoords]
 				# decide how many orphans to reclaim:
@@ -395,7 +395,7 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 					orphansToReclaimNowN = len(orphanCoords)
 				# get those orphans and then move them into livingCoords:
 				tmpList = random.sample(orphanCoords, orphansToReclaimNowN)
-				livingCoords += list(tmpList)		# The while loop will continue if there's anything in livingCoords.
+				livingCoords += list(tmpList)        # The while loop will continue if there's anything in livingCoords.
 				print('Reclaimed', orphansToReclaimNowN, 'orphan coordinates.')
 
 # TO DO: I might like it if this stopped saving new frames after every coordinate was colored (it can (always does?) save extra redundant frames at the end;
@@ -405,7 +405,7 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 				strOfThat = str(animationFrameCounter)
 				animIMGFileName = animFramesFolderName + '/' + strOfThat.zfill(padAnimationSaveFramesNumbersTo) + '.png'
 				coordinatesListToSavedImage(arr, height, width, animIMGFileName)
-				animationFrameCounter += 1		# Increment that *after*, for image tools expecting series starting at 0.
+				animationFrameCounter += 1        # Increment that *after*, for image tools expecting series starting at 0.
 			animationSaveNFramesCounter += 1
 
 		# Save a snapshot/progress image and print progress:
@@ -440,26 +440,26 @@ for n in range(1, (numberOfImages + 1) ):		# + 1 because it iterates n *after* t
 # MUCH BETTERER REFERENCE:
 # arr = np.ones((height, width, 3)) * backgroundColor
 # # THAT ARRAY is organized as [down][across] OR [y][x] OR [height - n][width - n] OR [row][column]; re the following numpy / PIL-compatible list of lists of lists of numbers and debug print to help understand the structure:
-# arr[2][3] = [255,0,255]		# y (down) = 1, x (across) = 2 (actual coordinates are +1 each because of zero-based indexing)
+# arr[2][3] = [255,0,255]        # y (down) = 1, x (across) = 2 (actual coordinates are +1 each because of zero-based indexing)
 # for y in range(0, height):
-# 	print('- y height (', height, ') iterator ', y, 'in arr[', y, '] gives:\n', arr[y])
-# 	for x in range(0, width):
-# 		print(' -- x width (', width, ') iterator ', x, 'in arr[', y, '][', x, '] gives:', arr[y][x])
+#     print('- y height (', height, ') iterator ', y, 'in arr[', y, '] gives:\n', arr[y])
+#     for x in range(0, width):
+#         print(' -- x width (', width, ') iterator ', x, 'in arr[', y, '][', x, '] gives:', arr[y][x])
 
 # Duplicating that structure with a list of lists:
-# imgArr = []		# Intended to be a list of lists
-# for y in range(0, height):		# for columns (x) in row)
-# 	tmpList = []
-# 	for x in range(0, width):		# over the columns, prep and add:
-# 		tmpList.append(Coordinate(x, y, width, height, backgroundColor, False, False, None))
-# 	imgArr.append(tmpList)
+# imgArr = []        # Intended to be a list of lists
+# for y in range(0, height):        # for columns (x) in row)
+#     tmpList = []
+#     for x in range(0, width):        # over the columns, prep and add:
+#         tmpList.append(Coordinate(x, y, width, height, backgroundColor, False, False, None))
+#     imgArr.append(tmpList)
 
 # Printing the second to compare to the first for comprehension:
 # print('------------')
 # for y in range(0, height):
-# 	print('-')
-# 	for x in range(0, width):
-# 		print(' -- imgArr[y][x].YXtuple (imgArr[', y, '][', x, '].YXtuple) is:', imgArr[y][x].YXtuple)
-# 		print(' ALSO I think the empty neighbor coordinate list in the Coordinate object at [y][x] can be used with this list of lists structure for instant access of neighbor coordinates?! That list here is:', imgArr[y][x].emptyNeighbors, ' . . .')
-# 		rndEmptyNeighborList = imgArr[y][x].getRNDemptyNeighbors()
-# 		print(' HERE ALSO is a random selection of those neighbors:', rndEmptyNeighborList)
+#     print('-')
+#     for x in range(0, width):
+#         print(' -- imgArr[y][x].YXtuple (imgArr[', y, '][', x, '].YXtuple) is:', imgArr[y][x].YXtuple)
+#         print(' ALSO I think the empty neighbor coordinate list in the Coordinate object at [y][x] can be used with this list of lists structure for instant access of neighbor coordinates?! That list here is:', imgArr[y][x].emptyNeighbors, ' . . .')
+#         rndEmptyNeighborList = imgArr[y][x].getRNDemptyNeighbors()
+#         print(' HERE ALSO is a random selection of those neighbors:', rndEmptyNeighborList)
