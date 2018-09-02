@@ -373,7 +373,7 @@ else:
 	sys.argv.append('--SAVE_PRESET')
 	sys.argv.append(str(SAVE_PRESET))
 
-if SAVE_PRESET == True:
+if SAVE_PRESET:
 	SCRIPT_ARGS_STR = sys.argv[1:]
 	SCRIPT_ARGS_STR = ' '.join(str(element) for element in SCRIPT_ARGS_STR)
 	# END ARGUMENT PARSING
@@ -421,7 +421,7 @@ class Coordinate:
 	def get_rnd_empty_neighbors(self):
 		# init an empty array we'll populate with neighbors (int tuples) and return:
 		rnd_neighbors_to_ret = []
-		if len(self.empty_neighbors) > 0:        # If there is anything left in empty_neighbors:
+		if self.empty_neighbors:        # If there is anything left in empty_neighbors:
 			# START VISCOSITY CONTROL.
 			# Conditionally throttle max_rnd_range (for random selection of empty neighbors),
 			# via VISCOSITY value.
@@ -604,7 +604,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 					arr[coordYaerf[0]][coordYaerf[1]].parent_rgb_color = new_living_coords_parent_rgb_color
 				potential_orphan_coords_two += potential_orphan_coords_one
 #        Conditionally reclaim orphaned coordinates. Code here to reclaim coordinates gradually (not in spurts as at first coded) is harder to read and inelegant. I'm leaving it that way. Because GEH, DONE.
-		if RECLAIM_ORPHANS == True:
+		if RECLAIM_ORPHANS:
 	# orphan coordinate reclamation rate multiplier ramp check some other noun just for kicks:
 			if painted_coordinates > (multiplier_check * multiplier):
 				multiplier += 1
