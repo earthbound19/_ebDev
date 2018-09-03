@@ -166,7 +166,9 @@ identical work from the same parameters (whether it is new or identical depends 
 switches, --RANDOM_SEED being the most consequential). This with [-a | --SAVE_EVERY_N] can\
 recreate gigabytes of exactly the same animation frames using just a preset. NOTES:\
 --START_COORDS_RANGE and its accompanying value are not saved to config files, and the\
-resultantly generated [-q | --START_COORDS_N] is saved instead.')
+resultantly generated [-q | --START_COORDS_N] is saved instead. Note: you may add arbitrary\
+ text (such as notes) to the second and subsequent lines of a saved preset, as only the first\
+ line is used.')
 PARSER.add_argument('--LOAD_PRESET', type=str, help='A preset file (as first created by\
 --SAVE_PRESET) to use. Empty (none used) by default. Not saved to any preset. At this\
 writing only a single file name is handled, not a path, and it is assumed the file is in\
@@ -395,27 +397,23 @@ class Coordinate:
 		# Adding all possible empty neighbor values even if they would result in values out
 		# of bounds of image (negative or past max_x or max_y), and will check for and clean up
 		# pairs with out of bounds values after:
-		tmp_list = [(y-1, x-1), (y, x-1), (y+1, x-1), (y-1, x), (y+1, x), (y-1, x+1),
-					(y, x+1), (y+1, x+1)]
-		delete_list = []
-		for element in tmp_list:
+		tmp_set = {(y-1, x-1), (y, x-1), (y+1, x-1), (y-1, x), (y+1, x), (y-1, x+1),
+					(y, x+1), (y+1, x+1)}
+		to_remove = set()
+		for element in tmp_set:
 			if -1 in element:
-				delete_list.append(element)
-		for element in tmp_list:
+				to_remove.add(element)
+		for element in tmp_set:
 			if element[1] == max_x:
-				delete_list.append(element)
-		for element in tmp_list:
+				to_remove.add(element)
+		for element in tmp_set:
 			if element[0] == max_y:
-				delete_list.append(element)
-		# reduce delete_list to a list of unique tuples (in case of duplicates,
-		# where duplicates could lead us to attempt to remove something that ins't there,
-		# which would throw an exception and stop the script) :
-		delete_list = list(set(delete_list))
+				to_remove.add(element)
 		# the deletions:
-		for no in delete_list:
-			tmp_list.remove(no)
+		for no in to_remove:
+			tmp_set.remove(no)
 		# finally initialize the intended object member from that built list:
-		self.empty_neighbors = list(tmp_list)
+		self.empty_neighbors = set(tmp_set)
 	# function returns both a list of randomly selected empty neighbor coordinates to use
 	# immediately, and a list of neighbors to use later:
 	def get_rnd_empty_neighbors(self):
@@ -460,8 +458,8 @@ def birth_coord(parent_rgb_color, tuple_to_alloc, unused_coords,
 		# empty_neighbors lists of all empty neighbor coords (so that in later use of those
 		# empty neighbor lists, the new living_coords won't erroneously be attempted to
 		# be reused) :
-		tmp_list_one = list(arr[tuple_to_alloc[0]][tuple_to_alloc[1]].empty_neighbors)
-		for to_find_self_in in tmp_list_one:
+		tmp_set_one = list(arr[tuple_to_alloc[0]][tuple_to_alloc[1]].empty_neighbors)
+		for to_find_self_in in tmp_set_one:
 			if to_find_self_in in arr[to_find_self_in[0]][to_find_self_in[1]].empty_neighbors:
 				arr[to_find_self_in[0]][to_find_self_in[1]].empty_neighbors.remove(tuple_to_alloc)
 	return tuple_to_alloc
@@ -506,11 +504,11 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 
 	# Initialize arr canvas and unused_coords lists (arr being a list of lists of Coordinates):
 	for y in range(0, HEIGHT):        # for columns (x) in row)
-		tmp_list = []
+		tmp_set = []
 		for x in range(0, WIDTH):        # over the columns, prep and add:
-			tmp_list.append(Coordinate(x, y, WIDTH, HEIGHT, BG_COLOR))
+			tmp_set.append(Coordinate(x, y, WIDTH, HEIGHT, BG_COLOR))
 			unused_coords.append((y, x))
-		arr.append(tmp_list)
+		arr.append(tmp_set)
 
 	# Initialize living_coords list by random selection from unused_coords (and remove
 	# from unused_coords):
@@ -626,9 +624,9 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 				if orphans_to_reclaim_n > len(orphanCoords):
 					orphans_to_reclaim_n = len(orphanCoords)
 				# get those orphans and then move them into living_coords:
-				tmp_list = random.sample(orphanCoords, orphans_to_reclaim_n)
+				tmp_set = random.sample(orphanCoords, orphans_to_reclaim_n)
 				# The while loop will continue if there's anything in living_coords:
-				living_coords += list(tmp_list)
+				living_coords += list(tmp_set)
 				print('Reclaimed', orphans_to_reclaim_n, 'orphan coordinates.')
 
 # TO DO: I might like it if this stopped saving new frames after every coordinate was
@@ -684,10 +682,10 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 # Duplicating that structure with a list of lists:
 # imgArr = []        # Intended to be a list of lists
 # for y in range(0, HEIGHT):        # for columns (x) in row)
-#     tmp_list = []
+#     tmp_set = []
 #     for x in range(0, WIDTH):        # over the columns, prep and add:
-#         tmp_list.append(Coordinate(x, y, WIDTH, HEIGHT, BG_COLOR, False, False, None))
-#     imgArr.append(tmp_list)
+#         tmp_set.append(Coordinate(x, y, WIDTH, HEIGHT, BG_COLOR, False, False, None))
+#     imgArr.append(tmp_set)
 
 # Printing the second to compare to the first for comprehension:
 # print('------------')
