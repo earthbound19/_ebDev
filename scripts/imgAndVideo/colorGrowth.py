@@ -34,7 +34,7 @@
 # trickles to rivers to floods)?
 # - Option to suppress progress print to save time
 # - Initialize COLOR_MUTATION_BASE by random selection from a .hexplt color scheme
-# - Major new feature? : Initialize arr[] from an image, pick a random coordinate from the
+# - Major new feature? : Initialize canvas[] from an image, pick a random coordinate from the
 # image, and use the color at that coordinate both as the origin coordinate and the color at
 # that coordinate as COLOR_MUTATION_BASE. Could also be used to continue terminated runs with
 # the same or different parameters.
@@ -397,28 +397,26 @@ class Coordinate:
 		# Adding all possible empty neighbor values even if they would result in values out
 		# of bounds of image (negative or past max_x or max_y), and will check for and clean up
 		# pairs with out of bounds values after:
-		tmp_set = {(y-1, x-1), (y, x-1), (y+1, x-1), (y-1, x), (y+1, x), (y-1, x+1),
+		self.empty_neighbors = {(y-1, x-1), (y, x-1), (y+1, x-1), (y-1, x), (y+1, x), (y-1, x+1),
 					(y, x+1), (y+1, x+1)}
 		to_remove = set()
-		for element in tmp_set:
+		for element in self.empty_neighbors:
 			if -1 in element:
 				to_remove.add(element)
-		for element in tmp_set:
+		for element in self.empty_neighbors:
 			if element[1] == max_x:
 				to_remove.add(element)
-		for element in tmp_set:
+		for element in self.empty_neighbors:
 			if element[0] == max_y:
 				to_remove.add(element)
 		# the deletions:
 		for no in to_remove:
-			tmp_set.remove(no)
-		# finally initialize the intended object member from that built list:
-		self.empty_neighbors = set(tmp_set)
+			self.empty_neighbors.remove(no)
 	# function returns both a list of randomly selected empty neighbor coordinates to use
 	# immediately, and a list of neighbors to use later:
 	def get_rnd_empty_neighbors(self):
 		# init an empty array we'll populate with neighbors (int tuples) and return:
-		rnd_neighbors_to_ret = []
+		rnd_neighbors_to_ret = set()
 		if self.empty_neighbors:        # If there is anything left in empty_neighbors:
 			# START VISCOSITY CONTROL.
 			# Conditionally throttle max_rnd_range (for random selection of empty neighbors),
@@ -437,9 +435,9 @@ class Coordinate:
 			# END VISCOSITY CONTROL.
 			# Decide how many to pick:
 			n_neighbors_to_ret = np.random.random_integers(1, max_rnd_range)
-			rnd_neighbors_to_ret = random.sample(self.empty_neighbors, n_neighbors_to_ret)
+			rnd_neighbors_to_ret = set(random.sample(self.empty_neighbors, n_neighbors_to_ret))
 		else:        # If there is _not_ anything left in empty_neighbors:
-			rnd_neighbors_to_ret = [()]        # Return a list with one empty tuple
+			rnd_neighbors_to_ret = set(())        # Return a set with one empty tuple
 		return rnd_neighbors_to_ret, self.empty_neighbors
 # END COORDINATE CLASS
 
@@ -447,31 +445,31 @@ class Coordinate:
 # lists (which are passed by reference). parent_rgb_color should be a list of RGB colors in
 # the format [255,0,255].
 def birth_coord(parent_rgb_color, tuple_to_alloc, unused_coords,
-				living_coords, dead_coords, arr):    # Those last three parameters are lists!
+				living_coords, dead_coords, canvas):    # Those last three parameters are lists!
 	# Move tuple_to_alloc out of unused_coords and into living_coords, depending:
 	if tuple_to_alloc in unused_coords and tuple_to_alloc not in living_coords and tuple_to_alloc not in dead_coords:
 		unused_coords.remove(tuple_to_alloc)
 		living_coords.append(tuple_to_alloc)
-		# Give that new living coord, IN arr[], a parent color (to later mutate from):
-		arr[tuple_to_alloc[0]][tuple_to_alloc[1]].parent_rgb_color = parent_rgb_color
+		# Give that new living coord, IN canvas[], a parent color (to later mutate from):
+		canvas[tuple_to_alloc[0]][tuple_to_alloc[1]].parent_rgb_color = parent_rgb_color
 		# Using list of empty neighbors, remove that newly chosen RNDcoord from the
 		# empty_neighbors lists of all empty neighbor coords (so that in later use of those
 		# empty neighbor lists, the new living_coords won't erroneously be attempted to
 		# be reused) :
-		tmp_set_one = list(arr[tuple_to_alloc[0]][tuple_to_alloc[1]].empty_neighbors)
+		tmp_set_one = list(canvas[tuple_to_alloc[0]][tuple_to_alloc[1]].empty_neighbors)
 		for to_find_self_in in tmp_set_one:
-			if to_find_self_in in arr[to_find_self_in[0]][to_find_self_in[1]].empty_neighbors:
-				arr[to_find_self_in[0]][to_find_self_in[1]].empty_neighbors.remove(tuple_to_alloc)
+			if to_find_self_in in canvas[to_find_self_in[0]][to_find_self_in[1]].empty_neighbors:
+				canvas[to_find_self_in[0]][to_find_self_in[1]].empty_neighbors.remove(tuple_to_alloc)
 	return tuple_to_alloc
 
 # function creates image from list of Coordinate objects, HEIGHT and WIDTH definitions, and
 # a filename string:
-def coords_list_to_image(arr, HEIGHT, WIDTH, image_file_name):
+def coords_list_to_image(canvas, HEIGHT, WIDTH, image_file_name):
 	tmp_array = []
 	for i in range(0, HEIGHT):
 		coords_row = []
 		for j in range(0, WIDTH):
-			coords_row.append(arr[i][j].mutated_rgb_color)
+			coords_row.append(canvas[i][j].mutated_rgb_color)
 		tmp_array.append(coords_row)
 	tmp_array = np.asarray(tmp_array)
 	image_to_save = Image.fromarray(tmp_array.astype(np.uint8)).convert('RGB')
@@ -494,7 +492,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 	animation_frame_counter = 0
 
 	# A list of Coordinate objects that are used to fill a "canvas" via other lists etc.:
-	arr = []
+	canvas = []
 	# A list of coordinates (tuples, not Coordinate objects) which are free for the taking:
 	unused_coords = []
 	# A list of coordinates (tuples, not Coordiante objects) which are set aside for use:
@@ -502,19 +500,19 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 	# A list of coordinates which have been color mutated and may no longer coordinate mutate.
 	dead_coords = []
 
-	# Initialize arr canvas and unused_coords lists (arr being a list of lists of Coordinates):
+	# Initialize canvas and unused_coords lists (canvas being a list of lists of Coordinates):
 	for y in range(0, HEIGHT):        # for columns (x) in row)
 		tmp_set = []
 		for x in range(0, WIDTH):        # over the columns, prep and add:
 			tmp_set.append(Coordinate(x, y, WIDTH, HEIGHT, BG_COLOR))
 			unused_coords.append((y, x))
-		arr.append(tmp_set)
+		canvas.append(tmp_set)
 
 	# Initialize living_coords list by random selection from unused_coords (and remove
 	# from unused_coords):
 	for i in range(0, START_COORDS_N):
 		RNDcoord = random.choice(unused_coords)
-		birth_coord(COLOR_MUTATION_BASE, RNDcoord, unused_coords, living_coords, dead_coords, arr)
+		birth_coord(COLOR_MUTATION_BASE, RNDcoord, unused_coords, living_coords, dead_coords, canvas)
 
 	report_stats_every_n = 3
 	report_stats_nth_counter = 0
@@ -584,22 +582,22 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 			living_coords.remove(coord)
 			if coord not in dead_coords:
 				# Mutate color--! and assign it to the mutated_rgb_color in the Coordinate object:
-				rgb_color_tmp = arr[coord[0]][coord[1]].parent_rgb_color + np.random.random_integers(-RSHIFT, RSHIFT, size=3) / 2
+				rgb_color_tmp = canvas[coord[0]][coord[1]].parent_rgb_color + np.random.random_integers(-RSHIFT, RSHIFT, size=3) / 2
 				# print('Colored coordinate (y, x)', coord)
 				rgb_color_tmp = np.clip(rgb_color_tmp, 0, 255)
-				arr[coord[0]][coord[1]].mutated_rgb_color = rgb_color_tmp
+				canvas[coord[0]][coord[1]].mutated_rgb_color = rgb_color_tmp
 				new_living_coords_parent_rgb_color = rgb_color_tmp
 				dead_coords.append(coord)        # When a coordinate has its color mutated, it dies.
 				painted_coordinates += 1
 				# The first returned list is used straightway, the second optionally shuffles
 				# into the first after the first is depleted:
-				rnd_new_coords_list, potential_orphan_coords_one = arr[coord[0]][coord[1]].get_rnd_empty_neighbors()
+				rnd_new_coords_list, potential_orphan_coords_one = canvas[coord[0]][coord[1]].get_rnd_empty_neighbors()
 				for coordZurg in rnd_new_coords_list:
-					birth_coord(new_living_coords_parent_rgb_color, coordZurg, unused_coords, living_coords, dead_coords, arr)
+					birth_coord(new_living_coords_parent_rgb_color, coordZurg, unused_coords, living_coords, dead_coords, canvas)
 # Potential and actual orphan coordinate handling:
-#                Set parent_rgb_color in arr via potential_orphan_coords_one:
+#                Set parent_rgb_color in canvas via potential_orphan_coords_one:
 				for coordYaerf in potential_orphan_coords_one:
-					arr[coordYaerf[0]][coordYaerf[1]].parent_rgb_color = new_living_coords_parent_rgb_color
+					canvas[coordYaerf[0]][coordYaerf[1]].parent_rgb_color = new_living_coords_parent_rgb_color
 				potential_orphan_coords_two += potential_orphan_coords_one
 #        Conditionally reclaim orphaned coordinates. Code here to reclaim coordinates gradually (not in spurts as at first coded) is harder to read and inelegant. I'm leaving it that way. Because GEH, DONE.
 		if RECLAIM_ORPHANS:
@@ -636,7 +634,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 			if (animation_save_counter_n % SAVE_EVERY_N) == 0:
 				strOfThat = str(animation_frame_counter)
 				img_frame_file_name = anim_frames_folder_name + '/' + strOfThat.zfill(pad_file_name_numbers_n) + '.png'
-				coords_list_to_image(arr, HEIGHT, WIDTH, img_frame_file_name)
+				coords_list_to_image(canvas, HEIGHT, WIDTH, img_frame_file_name)
 				# Increment that *after*, for image tools expecting series starting at 0:
 				animation_frame_counter += 1
 			animation_save_counter_n += 1
@@ -644,7 +642,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 		# Save a snapshot/progress image and print progress:
 		if report_stats_nth_counter == 0 or report_stats_nth_counter == report_stats_every_n:
 			# print('Saving prograss snapshot image ', state_img_file_name, ' . . .')
-			coords_list_to_image(arr, HEIGHT, WIDTH, state_img_file_name)
+			coords_list_to_image(canvas, HEIGHT, WIDTH, state_img_file_name)
 			print_progress()
 			report_stats_nth_counter = 1
 		report_stats_nth_counter += 1
@@ -658,7 +656,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 
 	# Save final image file and delete progress (state, temp) image file:
 	print('Saving image ', image_file_name, ' . . .')
-	coords_list_to_image(arr, HEIGHT, WIDTH, image_file_name)
+	coords_list_to_image(canvas, HEIGHT, WIDTH, image_file_name)
 	print('Created ', n, ' of ', NUMBER_OF_IMAGES, ' images.')
 	os.remove(state_img_file_name)
 # END MAIN FUNCTIONALITY.
