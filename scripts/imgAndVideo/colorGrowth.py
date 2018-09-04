@@ -453,21 +453,14 @@ def birth_coord(parent_rgb_color, tuple_to_alloc, unused_coords,
 		living_coords.append(tuple_to_alloc)
 		# Give that new living coord, IN canvas[], a parent color (to later mutate from):
 		canvas[tuple_to_alloc].parent_rgb_color = parent_rgb_color
-		# Using list of empty neighbors, remove that newly chosen RNDcoord from the
-		# empty_neighbors lists of all empty neighbor coords (so that in later use of those
-		# empty neighbor lists, the new living_coords won't erroneously be attempted to
-		# be reused) :
-# UPDATE TO set (tmp_set_one--it is actually a list):
-		tmp_set_one = list(canvas[tuple_to_alloc].empty_neighbors)
+		# Remove the coord corresponding to tuple_to_alloc from the empty_neighbors lists
+		# of all empty neighbor coords (if it appears in those lists) (so that in later use
+		# of those empty neighbor lists, the new living_coords won't erroneously be attempted
+		# to be reused) :
+		tmp_set_one = set(canvas[tuple_to_alloc].empty_neighbors)
 		for search_coord in tmp_set_one:
-# TO DO: delete the following extraneous check? It seems the following if check never returns true. Should it? Are things already take care of so it never will return true? Test the version of this script before I began refactoring to sets and dicts:
-			if search_coord in canvas[search_coord].empty_neighbors:
-				print('RARMOVED!')
+			if tuple_to_alloc in canvas[search_coord].empty_neighbors:
 				canvas[search_coord].empty_neighbors.remove(tuple_to_alloc)
-			# PRINT TESTS for comparison:
-			# for search_coord in canvas[search_coord].empty_neighbors:
-				# print('TUPLE IS', search_coord)
-				# print('REMOVING FROM', canvas[search_coord].empty_neighbors)
 	return tuple_to_alloc
 
 # function creates image from list of Coordinate objects, HEIGHT and WIDTH definitions, and
