@@ -18,6 +18,7 @@
 # - see if compiled/transpiled versions of this are faster. In tests:
 #  - pyinstaller compiled packages were on average two hundredths of a second faster for a
 # 100x100 --RANDOM_SEED 1 defaults test. Not exciting.
+#  - see all UPDATE TO comments which are part of refactor process
 # - Control reclaim_orphan_coords_every_n and base_orphan_reclaim_multiplier with CLI options of
 # the same name, defaulting to the values hard-coded right now.
 # - Have RECLAIM_ORPHANS do its work only once (without reactivating continued painting) when
@@ -451,15 +452,22 @@ def birth_coord(parent_rgb_color, tuple_to_alloc, unused_coords,
 		unused_coords.remove(tuple_to_alloc)
 		living_coords.append(tuple_to_alloc)
 		# Give that new living coord, IN canvas[], a parent color (to later mutate from):
-		canvas[tuple_to_alloc[0]][tuple_to_alloc[1]].parent_rgb_color = parent_rgb_color
+		canvas[tuple_to_alloc].parent_rgb_color = parent_rgb_color
 		# Using list of empty neighbors, remove that newly chosen RNDcoord from the
 		# empty_neighbors lists of all empty neighbor coords (so that in later use of those
 		# empty neighbor lists, the new living_coords won't erroneously be attempted to
 		# be reused) :
-		tmp_set_one = list(canvas[tuple_to_alloc[0]][tuple_to_alloc[1]].empty_neighbors)
-		for to_find_self_in in tmp_set_one:
-			if to_find_self_in in canvas[to_find_self_in[0]][to_find_self_in[1]].empty_neighbors:
-				canvas[to_find_self_in[0]][to_find_self_in[1]].empty_neighbors.remove(tuple_to_alloc)
+# UPDATE TO set (tmp_set_one--it is actually a list):
+		tmp_set_one = list(canvas[tuple_to_alloc].empty_neighbors)
+		for search_coord in tmp_set_one:
+# TO DO: delete the following extraneous check? It seems the following if check never returns true. Should it? Are things already take care of so it never will return true? Test the version of this script before I began refactoring to sets and dicts:
+			if search_coord in canvas[search_coord].empty_neighbors:
+				print('RARMOVED!')
+				canvas[search_coord].empty_neighbors.remove(tuple_to_alloc)
+			# PRINT TESTS for comparison:
+			# for search_coord in canvas[search_coord].empty_neighbors:
+				# print('TUPLE IS', search_coord)
+				# print('REMOVING FROM', canvas[search_coord].empty_neighbors)
 	return tuple_to_alloc
 
 # function creates image from list of Coordinate objects, HEIGHT and WIDTH definitions, and
@@ -469,7 +477,7 @@ def coords_list_to_image(canvas, HEIGHT, WIDTH, image_file_name):
 	for i in range(0, HEIGHT):
 		coords_row = []
 		for j in range(0, WIDTH):
-			coords_row.append(canvas[i][j].mutated_rgb_color)
+			coords_row.append(canvas[(i, j)].mutated_rgb_color)
 		tmp_array.append(coords_row)
 	tmp_array = np.asarray(tmp_array)
 	image_to_save = Image.fromarray(tmp_array.astype(np.uint8)).convert('RGB')
@@ -491,28 +499,34 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 	animation_save_counter_n = 0
 	animation_frame_counter = 0
 
-	# A list of Coordinate objects that are used to fill a "canvas" via other lists etc.:
-	canvas = []
+	# A dict of Coordinate objects that are used to fill a "canvas" via other lists etc.:
+	canvas = {}
 	# A list of coordinates (tuples, not Coordinate objects) which are free for the taking:
-	unused_coords = []
+# UPDATE TO set if possible:
+	unused_coords = set()
 	# A list of coordinates (tuples, not Coordiante objects) which are set aside for use:
+# UPDATE TO set if possible:
 	living_coords = []
 	# A list of coordinates which have been color mutated and may no longer coordinate mutate.
+# UPDATE TO set if possible:
 	dead_coords = []
 
-	# Initialize canvas and unused_coords lists (canvas being a list of lists of Coordinates):
+	# Initialize canvas dict and unused_coords list (canvas being a dict of Coordinates with
+	# tuple coordinates as keys:
 	for y in range(0, HEIGHT):        # for columns (x) in row)
-		tmp_set = []
 		for x in range(0, WIDTH):        # over the columns, prep and add:
-			tmp_set.append(Coordinate(x, y, WIDTH, HEIGHT, BG_COLOR))
-			unused_coords.append((y, x))
-		canvas.append(tmp_set)
+			canvas[(y, x)] = Coordinate(x, y, WIDTH, HEIGHT, BG_COLOR)
+			unused_coords.add((y, x))
 
 	# Initialize living_coords list by random selection from unused_coords (and remove
 	# from unused_coords):
-	for i in range(0, START_COORDS_N):
-		RNDcoord = random.choice(unused_coords)
-		birth_coord(COLOR_MUTATION_BASE, RNDcoord, unused_coords, living_coords, dead_coords, canvas)
+	# for i in range(0, START_COORDS_N):
+# TO DO: check if things here and here would be faster for getting a random sample:
+# https://medium.freecodecamp.org/how-to-get-embarrassingly-fast-random-subset-sampling-with-python-da9b27d494d9
+# https://stackoverflow.com/a/15993515/1397555
+	RNDcoord = random.sample(unused_coords, START_COORDS_N)
+	for coordX in RNDcoord:
+		birth_coord(COLOR_MUTATION_BASE, coordX, unused_coords, living_coords, dead_coords, canvas)
 
 	report_stats_every_n = 3
 	report_stats_nth_counter = 0
@@ -582,22 +596,22 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 			living_coords.remove(coord)
 			if coord not in dead_coords:
 				# Mutate color--! and assign it to the mutated_rgb_color in the Coordinate object:
-				rgb_color_tmp = canvas[coord[0]][coord[1]].parent_rgb_color + np.random.random_integers(-RSHIFT, RSHIFT, size=3) / 2
+				rgb_color_tmp = canvas[coord].parent_rgb_color + np.random.random_integers(-RSHIFT, RSHIFT, size=3) / 2
 				# print('Colored coordinate (y, x)', coord)
 				rgb_color_tmp = np.clip(rgb_color_tmp, 0, 255)
-				canvas[coord[0]][coord[1]].mutated_rgb_color = rgb_color_tmp
+				canvas[coord].mutated_rgb_color = rgb_color_tmp
 				new_living_coords_parent_rgb_color = rgb_color_tmp
 				dead_coords.append(coord)        # When a coordinate has its color mutated, it dies.
 				painted_coordinates += 1
 				# The first returned list is used straightway, the second optionally shuffles
 				# into the first after the first is depleted:
-				rnd_new_coords_list, potential_orphan_coords_one = canvas[coord[0]][coord[1]].get_rnd_empty_neighbors()
+				rnd_new_coords_list, potential_orphan_coords_one = canvas[coord].get_rnd_empty_neighbors()
 				for coordZurg in rnd_new_coords_list:
 					birth_coord(new_living_coords_parent_rgb_color, coordZurg, unused_coords, living_coords, dead_coords, canvas)
 # Potential and actual orphan coordinate handling:
 #                Set parent_rgb_color in canvas via potential_orphan_coords_one:
 				for coordYaerf in potential_orphan_coords_one:
-					canvas[coordYaerf[0]][coordYaerf[1]].parent_rgb_color = new_living_coords_parent_rgb_color
+					canvas[coordYaerf].parent_rgb_color = new_living_coords_parent_rgb_color
 				potential_orphan_coords_two += potential_orphan_coords_one
 #        Conditionally reclaim orphaned coordinates. Code here to reclaim coordinates gradually (not in spurts as at first coded) is harder to read and inelegant. I'm leaving it that way. Because GEH, DONE.
 		if RECLAIM_ORPHANS:
