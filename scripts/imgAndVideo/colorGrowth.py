@@ -353,11 +353,11 @@ if ARGS.VISCOSITY:
 	# If that is outside acceptable range, clip it to acceptable range and notify user:
 	if VISCOSITY < 0:
 		VISCOSITY = 0
-	print('NOTE: VISCOSITY was less than 0. The value was \
+		print('NOTE: VISCOSITY was less than 0. The value was \
 clipped to 0.')
 	if VISCOSITY > 6:
 		VISCOSITY = 6
-	print('NOTE: VISCOSITY was greater than 6. The value was \
+		print('NOTE: VISCOSITY was greater than 6. The value was \
 clipped to 6.')
 	if VISCOSITY == 6:
 		print('NOTE: you\'ll probably get uninteresting results with VISCOSITY \
