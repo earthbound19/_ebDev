@@ -18,8 +18,8 @@ from https://scipython.com/blog/computer-generated-contemporary-art/
 # TO DO:
 # - Refactor algorithm for better efficiency if possible
 # - See if compiled/transpiled versions of this are faster. In tests:
-#  - pyinstaller compiled packages were on average two hundredths of a second faster for a
-# 100x100 --RANDOM_SEED 1 defaults test. Not exciting.
+#  - pyinstaller compiled packages were ~the same speed. Not exciting.
+# - Add a --NO_DELIST_NEIGHBORS option to optionally make coords fight for space as mentioned in this commit: https://github.com/earthbound19/_ebDev/commit/16dfa0718fea630c919836c7d2326e2bdcbabb83
 # - Control reclaim_orphan_coords_every_n and base_orphan_reclaim_multiplier with CLI options of
 # the same name, defaulting to the values hard-coded right now?
 # - Have RECLAIM_ORPHANS do its work only once (without reactivating continued painting) when
