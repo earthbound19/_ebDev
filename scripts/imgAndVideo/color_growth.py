@@ -1,7 +1,7 @@
 """Renders a PNG image like bacteria that mutate color as they spread.
 
 Output file names are based on the date and add random characters.
-Inspired and drastically evolved from colorFibers.py, which was horked and adapted
+Inspired and drastically evolved from color_fibers.py, which was horked and adapted
 from https://scipython.com/blog/computer-generated-contemporary-art/
 
 """
