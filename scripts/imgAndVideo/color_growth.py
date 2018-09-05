@@ -1,6 +1,6 @@
 """Renders a PNG image like bacteria that mutate color as they spread.
 
-Output file names are based on the date and add random characters.
+Output file names are based on the date and time and random characters.
 Inspired and drastically evolved from color_fibers.py, which was horked and adapted
 from https://scipython.com/blog/computer-generated-contemporary-art/
 
@@ -33,7 +33,7 @@ from https://scipython.com/blog/computer-generated-contemporary-art/
 #  - option to randomly alternate that method as you go
 #  - option to set the random chance for using one or the other
 # - Random coordinate death in a frequency range (may make the animation turn anything between
-# trickles to rivers to floods)?
+# trickles to rivers to floods)? See "coordinate death" comment later in this script.
 # - Option to suppress progress print to save time
 # - Initialize COLOR_MUTATION_BASE by random selection from a .hexplt color scheme
 # - Major new feature? : Initialize canvas[] from an image, pick a random coordinate from the
@@ -318,10 +318,8 @@ np.random.seed(RANDOM_SEED)
     # or default).
     # --
     # I COULD just have four different, independent "if" checks explicitly for those four
-    # pairs and work from that, but I have opted for the convoluted if: if else: if: else:
-    # structure. Two possible paths presented in code, and I, I took the convoluted one, and
-    # that has made all the difference. Tenuous justification: it is more compact logic
-    # (fewer checks).
+    # pairs and work from that, but this is more compact logic (fewer checks)
+    # (a tenuous justification).
 if ARGS.START_COORDS_N:        # If --START_COORDS_N is provided by the user, use it..
     START_COORDS_N = ARGS.START_COORDS_N
     print('Will use the provided --START_COORDS_N, ', START_COORDS_N)
@@ -444,7 +442,13 @@ class Coordinate:
                 max_rnd_range = len(self.empty_neighbors)
             # END VISCOSITY CONTROL.
             # Decide how many to pick:
-            n_neighbors_to_ret = np.random.random_integers(1, max_rnd_range)
+# TO DO: coordinate death via option of negative number in range, as in:
+#            n_neighbors_to_ret = np.random.randint(-6, max_rnd_range + 1)
+            n_neighbors_to_ret = np.random.randint(1, max_rnd_range + 1)
+# .. AND WITH int that will (I think) force return of empty set:
+#            if n_neighbors_to_ret < 0:
+#                n_neighbors_to_ret = 0
+# .. if this is done, reclaim orphan coords recovers from evolution death it seems!
             rnd_neighbors_to_ret = set(random.sample(self.empty_neighbors, n_neighbors_to_ret))
         else:        # If there is _not_ anything left in empty_neighbors:
             rnd_neighbors_to_ret = set(())        # Return a set with one empty tuple
@@ -463,9 +467,8 @@ def birth_coord(parent_rgb_color, tuple_to_alloc, unused_coords,
         # Give that new living coord, IN canvas[], a parent color (to later mutate from):
         canvas[tuple_to_alloc].parent_rgb_color = parent_rgb_color
         # Remove the coord corresponding to tuple_to_alloc from the empty_neighbors lists
-        # of all empty neighbor coords (if it appears in those lists) (so that in later use
-        # of those empty neighbor lists, the new living_coords won't erroneously be attempted
-        # to be reused) :
+        # of all empty neighbor coords (if it appears in those lists), so that in later use
+        # of those empty neighbor lists, we won't erroneously attempt to be reuse the coord:
         tmp_set_one = set(canvas[tuple_to_alloc].empty_neighbors)
         for search_coord in tmp_set_one:
             if tuple_to_alloc in canvas[search_coord].empty_neighbors:
@@ -474,7 +477,7 @@ def birth_coord(parent_rgb_color, tuple_to_alloc, unused_coords,
 
 def coords_list_to_image(canvas, HEIGHT, WIDTH, image_file_name):
     """Creates and saves image from list of Coordinate objects, HEIGHT and WIDTH definitions,
-    and    a filename string."""
+    and a filename string."""
 # TO DO: see if the image can be generated more efficiently here, including
 # maybe using sets, not lists. See: https://stackoverflow.com/a/42036542/1397555
     tmp_array = []
@@ -598,7 +601,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
             living_coords.remove(coord)
             if coord not in dead_coords:
                 # Mutate color--! and assign it to the mutated_rgb_color in the Coordinate object:
-                rgb_color_tmp = canvas[coord].parent_rgb_color + np.random.random_integers(-RSHIFT, RSHIFT, size=3) / 2
+                rgb_color_tmp = canvas[coord].parent_rgb_color + np.random.randint(-RSHIFT, RSHIFT + 1, size=3) / 2
                 # print('Colored coordinate (y, x)', coord)
                 rgb_color_tmp = np.clip(rgb_color_tmp, 0, 255)
                 canvas[coord].mutated_rgb_color = rgb_color_tmp
