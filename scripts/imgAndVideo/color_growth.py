@@ -327,9 +327,9 @@ if ARGS.START_COORDS_N:        # If --START_COORDS_N is provided by the user, us
         # .. and delete any --START_COORDS_RANGE and its value from sys.argv (as it will
         # not be used and would best not be stored in the .cgp config file via --SAVE_PRESET:
         IDX = sys.argv.index(ARGS.START_COORDS_RANGE)
-        del sys.argv[IDX-1]            # Why does index() return a one-based index for a
+        del sys.argv[IDX-1]         # Why does index() return a one-based index for a
                                     # zero-based index list?!
-        del sys.argv[IDX-1]            # Note that the element at the same index is deleted
+        del sys.argv[IDX-1]         # Note that the element at the same index is deleted
                                     # twice because after the first is deleted, the second
                                     # moves to the index of the first.
         print('** NOTE: ** You provided both [-q | --START_COORDS_N] and --START_COORDS_RANGE,\
@@ -395,7 +395,7 @@ class Coordinate:
 
     # slots for allegedly higher efficiency re: https://stackoverflow.com/a/49789270
     __slots__ = ["yx_tuple", "x", "y", "max_x", "max_y", "parent_rgb_color", "mutated_rgb_color",
-                 "empty_neighbors"]
+                 "avail_neighbors"]
     def __init__(self, x, y, max_x, max_y, parent_rgb_color):
         self.yx_tuple = (y, x)
         self.x = x
@@ -405,41 +405,41 @@ class Coordinate:
         # Adding all possible empty neighbor values even if they would result in values out
         # of bounds of image (negative or past max_x or max_y), and will check for and clean up
         # pairs with out of bounds values after:
-        self.empty_neighbors = {(y-1, x-1), (y, x-1), (y+1, x-1), (y-1, x), (y+1, x), (y-1, x+1),
+        self.avail_neighbors = {(y-1, x-1), (y, x-1), (y+1, x-1), (y-1, x), (y+1, x), (y-1, x+1),
                                 (y, x+1), (y+1, x+1)}
         to_remove = set()
-        for element in self.empty_neighbors:
+        for element in self.avail_neighbors:
             if -1 in element:
                 to_remove.add(element)
-        for element in self.empty_neighbors:
+        for element in self.avail_neighbors:
             if element[1] == max_x:
                 to_remove.add(element)
-        for element in self.empty_neighbors:
+        for element in self.avail_neighbors:
             if element[0] == max_y:
                 to_remove.add(element)
         # the deletions:
-        for no in to_remove:
-            self.empty_neighbors.remove(no)
-    def get_rnd_empty_neighbors(self):
-        """Returns both a list of randomly selected empty neighbor coordinates to use
-        immediately, and a list of neighbors to use later."""
-        # init an empty array we'll populate with neighbors (int tuples) and return:
+        for remove_this in to_remove:
+            self.avail_neighbors.remove(remove_this)
+    def get_rnd_avail_neighbors(self):
+        """Returns both a set() of randomly selected empty neighbor coordinates to use
+        immediately, and a set() of neighbors to use later."""
+        # init an empty set we'll populate with neighbors (int tuples) and return:
         rnd_neighbors_to_ret = set()
-        if self.empty_neighbors:        # If there is anything left in empty_neighbors:
+        if self.avail_neighbors:        # If there is anything left in avail_neighbors:
             # START VISCOSITY CONTROL.
-            # Conditionally throttle max_rnd_range (for random selection of empty neighbors),
+            # Conditionally throttle max_rnd_range (for random selection of available neighbors),
             # via VISCOSITY value.
 # TO DO: figure out why VISCOSITY = 6 terminates so fast and whether it should.
 # It works but is very short lived.
             # If we can subtract the highest possiible number (of random selection count)
             # of available neighbors by VISCOSITY and still have 1 left (and if VISCOSITY
             # is nonzero), do that:
-            if len(self.empty_neighbors) - VISCOSITY > 1 and VISCOSITY != 0:
-                max_rnd_range = len(self.empty_neighbors) - VISCOSITY
+            if len(self.avail_neighbors) - VISCOSITY > 1 and VISCOSITY != 0:
+                max_rnd_range = len(self.avail_neighbors) - VISCOSITY
             # Otherwise take a random selection of available neighbors from the full number
             # range of available neighbors:
             else:
-                max_rnd_range = len(self.empty_neighbors)
+                max_rnd_range = len(self.avail_neighbors)
             # END VISCOSITY CONTROL.
             # Decide how many to pick:
 # TO DO: coordinate death via option of negative number in range, as in:
@@ -449,34 +449,35 @@ class Coordinate:
 #            if n_neighbors_to_ret < 0:
 #                n_neighbors_to_ret = 0
 # .. if this is done, reclaim orphan coords recovers from evolution death it seems!
-            rnd_neighbors_to_ret = set(random.sample(self.empty_neighbors, n_neighbors_to_ret))
-        else:        # If there is _not_ anything left in empty_neighbors:
+            rnd_neighbors_to_ret = set(random.sample(self.avail_neighbors, n_neighbors_to_ret))
+        else:        # If there is _not_ anything left in avail_neighbors:
             rnd_neighbors_to_ret = set(())        # Return a set with one empty tuple
-        return rnd_neighbors_to_ret, self.empty_neighbors
+        return rnd_neighbors_to_ret, self.avail_neighbors
 # END COORDINATE CLASS
 
-def birth_coord(parent_rgb_color, tuple_to_alloc, unused_coords,
-                living_coords, dead_coords, canvas):    # Those last three parameters are lists!
-    """Requires sets of Coordinates as parameters, and it directly manipulates those
-    sets (which are passed by reference). parent_rgb_color should be a list of RGB colors in
-    the format [255,0,255]."""
-    # Move tuple_to_alloc out of unused_coords and into living_coords, depending:
-    if tuple_to_alloc in unused_coords and tuple_to_alloc not in living_coords and tuple_to_alloc not in dead_coords:
-        unused_coords.remove(tuple_to_alloc)
-        living_coords.add(tuple_to_alloc)
+def birth_coord(parent_rgb_color, tuple_to_alloc, avail_coords,
+                unavail_coords, filled_coords, canvas):
+    """parent_rgb_color is a list of RGB values e.g. [255,0,255]. avail_coords,
+    unavail_coords, and filled_coords are sets. canvas is a dict of Coordinate
+    objects. As these are all passed by reference (the default Python way, the
+    sets and dict are manipulated directly by the function."""
+    # Move tuple_to_alloc out of avail_coords and into unavail_coords, depending:
+    if tuple_to_alloc in avail_coords and tuple_to_alloc not in unavail_coords and tuple_to_alloc not in filled_coords:
+        avail_coords.remove(tuple_to_alloc)
+        unavail_coords.add(tuple_to_alloc)
         # Give that new living coord, IN canvas[], a parent color (to later mutate from):
         canvas[tuple_to_alloc].parent_rgb_color = parent_rgb_color
-        # Remove the coord corresponding to tuple_to_alloc from the empty_neighbors lists
-        # of all empty neighbor coords (if it appears in those lists), so that in later use
-        # of those empty neighbor lists, we won't erroneously attempt to be reuse the coord:
-        tmp_set_one = set(canvas[tuple_to_alloc].empty_neighbors)
+        # Remove the coord corresponding to tuple_to_alloc from the avail_neighbors lists
+        # of all available neighbor coords (if it appears in those set()s), so that in later use
+        # of those empty neighbor set()s, we won't erroneously attempt to be reuse the coord:
+        tmp_set_one = set(canvas[tuple_to_alloc].avail_neighbors)
         for search_coord in tmp_set_one:
-            if tuple_to_alloc in canvas[search_coord].empty_neighbors:
-                canvas[search_coord].empty_neighbors.remove(tuple_to_alloc)
+            if tuple_to_alloc in canvas[search_coord].avail_neighbors:
+                canvas[search_coord].avail_neighbors.remove(tuple_to_alloc)
     return tuple_to_alloc
 
-def coords_list_to_image(canvas, HEIGHT, WIDTH, image_file_name):
-    """Creates and saves image from list of Coordinate objects, HEIGHT and WIDTH definitions,
+def coords_set_to_image(canvas, HEIGHT, WIDTH, image_file_name):
+    """Creates and saves image from dict of Coordinate objects, HEIGHT and WIDTH definitions,
     and a filename string."""
 # TO DO: see if the image can be generated more efficiently here, including
 # maybe using sets, not lists. See: https://stackoverflow.com/a/42036542/1397555
@@ -506,32 +507,32 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
     animation_save_counter_n = 0
     animation_frame_counter = 0
 
-    # A dict of Coordinate objects that are used to fill a "canvas" via other lists etc.:
+    # A dict of Coordinate objects which is used with tracking sets to fill a "canvas:"
     canvas = {}
     # A set of coordinates (tuples, not Coordinate objects) which are free for the taking:
-    unused_coords = set()
+    avail_coords = set()
     # A set of coordinates (again tuples) which are set aside for use:
-    living_coords = set()
+    unavail_coords = set()
     # A set of coordinates (again tuples) which have been color mutated and may no longer
     # coordinate mutate:
-    dead_coords = set()
+    filled_coords = set()
 
-    # Initialize canvas dict and unused_coords list (canvas being a dict of Coordinates with
+    # Initialize canvas dict and avail_coords set (canvas being a dict of Coordinates with
     # tuple coordinates as keys:
     for y in range(0, HEIGHT):        # for columns (x) in row)
         for x in range(0, WIDTH):        # over the columns, prep and add:
             canvas[(y, x)] = Coordinate(x, y, WIDTH, HEIGHT, BG_COLOR)
-            unused_coords.add((y, x))
+            avail_coords.add((y, x))
 
-    # Initialize living_coords list by random selection from unused_coords (and remove
-    # from unused_coords):
+    # Initialize unavail_coords set by random selection from avail_coords (and remove
+    # from avail_coords):
     # for i in range(0, START_COORDS_N):
 # TO DO: check if things here and here would be faster for getting a random sample:
 # https://medium.freecodecamp.org/how-to-get-embarrassingly-fast-random-subset-sampling-with-python-da9b27d494d9
 # https://stackoverflow.com/a/15993515/1397555
-    RNDcoord = random.sample(unused_coords, START_COORDS_N)
+    RNDcoord = random.sample(avail_coords, START_COORDS_N)
     for coordX in RNDcoord:
-        birth_coord(COLOR_MUTATION_BASE, coordX, unused_coords, living_coords, dead_coords, canvas)
+        birth_coord(COLOR_MUTATION_BASE, coordX, avail_coords, unavail_coords, filled_coords, canvas)
 
     report_stats_every_n = 3
     report_stats_nth_counter = 0
@@ -566,11 +567,11 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
     painted_coordinates = 0
     # With higher VISCOSITY some coordinates can be painted around (by other coordinates on
     # all sides) but coordinate mutation never actually moves into that coordinate. The
-    # result is that some coordinates may never be "born." this list and associated code
+    # result is that some coordinates may never be "born." this set and associated code
     # revives orphan coordinates:
     potential_orphan_coords_two = set()
     # used to reclaim orphan coordinates every N iterations through the
-    # `while living_coords` loop:
+    # `while unavail_coords` loop:
     reclaim_orphan_coords_every_n = 7
     reclaim_orphan_coords_trigger = 0
     base_orphan_reclaim_multiplier = 0.08
@@ -579,12 +580,12 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
     multiplier_check = int(ALL_PIXELS_N / reclaim_orphan_coords_every_n)
     multiplier = 1
     print('Generating image . . . ')
-    while living_coords:
+    while unavail_coords:
         # NOTE: There are two options for looping here. Mode 0 (which was the first developed
-        # mode) makes a copy of living_coords, and loops through that. The result is that the
-        # loop doesn't continue because of changes to living_coords (as it is working on a
+        # mode) makes a copy of unavail_coords, and loops through that. The result is that the
+        # loop doesn't continue because of changes to unavail_coords (as it is working on a
         # copy which becomes outdates as the loop progresses). Mode 1 loops through
-        # living_coords itself, and since this loop changes living_coords, it makes the
+        # unavail_coords itself, and since this loop changes unavail_coords, it makes the
         # loop run longer. In mode 1 similar color meanders more (runaway streams of color
         # are possible). It also finishes the image faster. Mode 1 spreads more uniformly
         # (with less possibility of runaway streams. Which mode produces more interesting
@@ -593,30 +594,30 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
          # For loop mode 0, uncomment the next two lines of code, and comment out the third
          # line after that. For mode 1, comment out the next two lines, and uncomment the
          # third line after that:
-        copy_of_living_coords = set(living_coords)
-        for coord in copy_of_living_coords:    # Mode 0, test run time: 0m34.241s
-        # for coord in living_coords:       # Mode 1, test run time: 0m32.502s
+        copy_of_unavail_coords = set(unavail_coords)
+        for coord in copy_of_unavail_coords:    # Mode 0, test run time: 0m34.241s
+        # for coord in unavail_coords:       # Mode 1, test run time: 0m32.502s
             # Remove that to avoid wasted calculations (so many empty tuples passed
             # to birth_coord) :
-            living_coords.remove(coord)
-            if coord not in dead_coords:
+            unavail_coords.remove(coord)
+            if coord not in filled_coords:
                 # Mutate color--! and assign it to the mutated_rgb_color in the Coordinate object:
                 rgb_color_tmp = canvas[coord].parent_rgb_color + np.random.randint(-RSHIFT, RSHIFT + 1, size=3) / 2
                 # print('Colored coordinate (y, x)', coord)
                 rgb_color_tmp = np.clip(rgb_color_tmp, 0, 255)
                 canvas[coord].mutated_rgb_color = rgb_color_tmp
-                new_living_coords_parent_rgb_color = rgb_color_tmp
-                dead_coords.add(coord)        # When a coordinate has its color mutated, it dies.
+                new_unavail_coords_parent_rgb_color = rgb_color_tmp
+                filled_coords.add(coord)        # When a coordinate has its color mutated, it dies.
                 painted_coordinates += 1
-                # The first returned list is used straightway, the second optionally shuffles
+                # The first returned set is used straightway, the second optionally shuffles
                 # into the first after the first is depleted:
-                rnd_new_coords_list, potential_orphan_coords_one = canvas[coord].get_rnd_empty_neighbors()
-                for coordZurg in rnd_new_coords_list:
-                    birth_coord(new_living_coords_parent_rgb_color, coordZurg, unused_coords, living_coords, dead_coords, canvas)
+                rnd_new_coords_set, potential_orphan_coords_one = canvas[coord].get_rnd_avail_neighbors()
+                for coordZurg in rnd_new_coords_set:
+                    birth_coord(new_unavail_coords_parent_rgb_color, coordZurg, avail_coords, unavail_coords, filled_coords, canvas)
 # Potential and actual orphan coordinate handling:
 #                Set parent_rgb_color in canvas via potential_orphan_coords_one:
                 for coordGronk in potential_orphan_coords_one:
-                    canvas[coordGronk].parent_rgb_color = new_living_coords_parent_rgb_color
+                    canvas[coordGronk].parent_rgb_color = new_unavail_coords_parent_rgb_color
                 # set union (| "addition," -ish) :
                 potential_orphan_coords_two = potential_orphan_coords_two | potential_orphan_coords_one
 #        Conditionally reclaim orphaned coordinates. Code here to reclaim coordinates gradually (not in spurts as at first coded) is harder to read and inelegant. I'm leaving it that way. Because GEH, DONE.
@@ -628,9 +629,9 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
             reclaim_orphan_coords_trigger += 1
             if reclaim_orphan_coords_trigger == reclaim_orphan_coords_every_n:
                 reclaim_orphan_coords_trigger = 0
-                # removes elements from potential_orphan_coords_two which are in dead_coords
+                # removes elements from potential_orphan_coords_two which are in filled_coords
                 # (to avoid reusing coordinates) ; set subtraction; orphanCoords declared here:
-                orphanCoords = potential_orphan_coords_two - dead_coords
+                orphanCoords = potential_orphan_coords_two - filled_coords
                 # decide how many orphans to reclaim; use int() to avoid decimals:
                 orphans_to_reclaim_n = int(len(orphanCoords) * base_orphan_reclaim_multiplier)
                 orphans_to_reclaim_n *= multiplier
@@ -639,12 +640,12 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
                     orphans_to_reclaim_n = 1
                 if orphans_to_reclaim_n > len(orphanCoords):
                     orphans_to_reclaim_n = len(orphanCoords)
-                # get those orphans and then move them into living_coords:
+                # get those orphans and then move them into unavail_coords:
 # TO DO: more efficient sampling than creating a list here, if possible:
                 tmp_set = set(random.sample(orphanCoords, orphans_to_reclaim_n))
-                # The while loop will continue if there's anything in living_coords;
+                # The while loop will continue if there's anything in unavail_coords;
                 # set "addition" with |  :
-                living_coords = living_coords | tmp_set
+                unavail_coords = unavail_coords | tmp_set
                 print('Reclaimed', orphans_to_reclaim_n, 'orphan coordinates.')
 
 # TO DO: I might like it if this stopped saving new frames after every coordinate was
@@ -654,7 +655,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
             if (animation_save_counter_n % SAVE_EVERY_N) == 0:
                 strOfThat = str(animation_frame_counter)
                 img_frame_file_name = anim_frames_folder_name + '/' + strOfThat.zfill(pad_file_name_numbers_n) + '.png'
-                coords_list_to_image(canvas, HEIGHT, WIDTH, img_frame_file_name)
+                coords_set_to_image(canvas, HEIGHT, WIDTH, img_frame_file_name)
                 # Increment that *after*, for image tools expecting series starting at 0:
                 animation_frame_counter += 1
             animation_save_counter_n += 1
@@ -662,7 +663,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
         # Save a snapshot/progress image and print progress:
         if report_stats_nth_counter == 0 or report_stats_nth_counter == report_stats_every_n:
             # print('Saving prograss snapshot image ', state_img_file_name, ' . . .')
-            coords_list_to_image(canvas, HEIGHT, WIDTH, state_img_file_name)
+            coords_set_to_image(canvas, HEIGHT, WIDTH, state_img_file_name)
             print_progress()
             report_stats_nth_counter = 1
         report_stats_nth_counter += 1
@@ -676,7 +677,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 
     # Save final image file and delete progress (state, temp) image file:
     print('Saving image ', image_file_name, ' . . .')
-    coords_list_to_image(canvas, HEIGHT, WIDTH, image_file_name)
+    coords_set_to_image(canvas, HEIGHT, WIDTH, image_file_name)
     print('Created ', n, ' of ', NUMBER_OF_IMAGES, ' images.')
     os.remove(state_img_file_name)
 # END MAIN FUNCTIONALITY.
@@ -711,16 +712,16 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 #    print('-')
 #    for x in range(0, WIDTH):
 #        print(' -- imgArr[y][x].yx_tuple (imgArr[', y, '][', x, '].yx_tuple) is:', imgArr[y][x].yx_tuple)
-#        print(' ALSO I think the empty neighbor coordinate list in the Coordinate object at [y][x] can be used with this list of lists structure for instant access of neighbor coordinates?! That list here is:', imgArr[y][x].empty_neighbors, ' . . .')
-#        rndEmptyNeighborList = imgArr[y][x].get_rnd_empty_neighbors()
+#        print(' ALSO I think the empty neighbor coordinate list in the Coordinate object at [y][x] can be used with this list of lists structure for instant access of neighbor coordinates?! That list here is:', imgArr[y][x].avail_neighbors, ' . . .')
+#        rndEmptyNeighborList = imgArr[y][x].get_rnd_avail_neighbors()
 #        print(' HERE ALSO is a random selection of those neighbors:', rndEmptyNeighborList)
 
 
 # pylint errors or warnings I care about:
 # color_growth.py:401:26: W0621: Redefining name 'y' from outer scope (line 518) (redefined-outer-name)
 # color_growth.py:401:23: W0621: Redefining name 'x' from outer scope (line 519) (redefined-outer-name)
-# color_growth.py:455:31: W0621: Redefining name 'dead_coords' from outer scope (line 514) (redefined-outer-name)
-# color_growth.py:455:16: W0621: Redefining name 'living_coords' from outer scope (line 511) (redefined-outer-name)
+# color_growth.py:455:31: W0621: Redefining name 'filled_coords' from outer scope (line 514) (redefined-outer-name)
+# color_growth.py:455:16: W0621: Redefining name 'unavail_coords' from outer scope (line 511) (redefined-outer-name)
 # color_growth.py:455:44: W0621: Redefining name 'canvas' from outer scope (line 507) (redefined-outer-name)
 # color_growth.py:475:41: W0621: Redefining name 'WIDTH' from outer scope (line 64) (redefined-outer-name)
 # color_growth.py:475:25: W0621: Redefining name 'canvas' from outer scope (line 507) (redefined-outer-name)
