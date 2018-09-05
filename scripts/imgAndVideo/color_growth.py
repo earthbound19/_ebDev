@@ -1,8 +1,10 @@
-# DESCRIPTION
-# Renders a PNG image like bacteria that mutate color as they spread.
-# Output file names are based on the date and add random characters.
-# Inspired and drastically evolved from colorFibers.py, which was horked and adapted
-# from https://scipython.com/blog/computer-generated-contemporary-art/
+"""Renders a PNG image like bacteria that mutate color as they spread.
+
+Output file names are based on the date and add random characters.
+Inspired and drastically evolved from colorFibers.py, which was horked and adapted
+from https://scipython.com/blog/computer-generated-contemporary-art/
+
+"""
 
 # USAGE
 # Run this script without any paramaters, and it will use a default set of parameters:
@@ -22,7 +24,7 @@
 # the same name, defaulting to the values hard-coded right now?
 # - Have RECLAIM_ORPHANS do its work only once (without reactivating continued painting) when
 # STOP_AT_PERCENT is reached?
-# - Things listed in development code with TO DO comments
+# - Fixes re pylint comments at end, also things listed in development code with TO DO comments
 # - Option: instead of randomly mutating color for each individual chosen neighbor coordinate,
 # mutate them all to the same new color. This would be more efficient, and might make colors
 # more banded/ringed/spready than streamy. It would also visually indicate coordinate mutation
@@ -177,17 +179,17 @@ parameters from the preset. A .cgp preset file is a plain text file on one line,
 collection of SWITCHES to be passed to this script, written literally the way you would pass\
 them to this script.')
 
-    # START ARGUMENT PARSING
-    # DEVELOPER NOTE: Throughout the below argument checks, wherever a user does not specify
-    # an argument and I use a default (as defaults are defined near the start of working code
-    # in this script), add that default switch and switch value pair to sys.argv, for use by
-    # the --SAVE_PRESET feature (which saves everything except for the script path ([0]) to
-    # a preset). I take this approach because I can't check if a default value was supplied
-    # if I do that in the PARSER.add_argument function --
-    # http://python.6.x6.nabble.com/argparse-tell-if-arg-was-defaulted-td1528162.html -- so what
-    # I do is check for None (and then supply a default and add to argv if None is found).
-    # The check for None isn't literal: it's in the else: clause after an if (value) check
-    # (if the if check fails, that means the value is None, and else: is invoked) :
+# START ARGUMENT PARSING
+# DEVELOPER NOTE: Throughout the below argument checks, wherever a user does not specify
+# an argument and I use a default (as defaults are defined near the start of working code
+# in this script), add that default switch and switch value pair to sys.argv, for use by
+# the --SAVE_PRESET feature (which saves everything except for the script path ([0]) to
+# a preset). I take this approach because I can't check if a default value was supplied
+# if I do that in the PARSER.add_argument function --
+# http://python.6.x6.nabble.com/argparse-tell-if-arg-was-defaulted-td1528162.html -- so what
+# I do is check for None (and then supply a default and add to argv if None is found).
+# The check for None isn't literal: it's in the else: clause after an if (value) check
+# (if the if check fails, that means the value is None, and else: is invoked) :
 print('~-')
 print('~- Processing any arguments to script . . .')
 ARGS = PARSER.parse_args()      # When this function is called, if -h or --help was passed
@@ -378,16 +380,24 @@ else:
 if SAVE_PRESET:
     SCRIPT_ARGS_STR = sys.argv[1:]
     SCRIPT_ARGS_STR = ' '.join(str(element) for element in SCRIPT_ARGS_STR)
-    # END ARGUMENT PARSING
+# END ARGUMENT PARSING
 
 ALL_PIXELS_N = WIDTH * HEIGHT
 TERMINATE_PIXELS_N = int(ALL_PIXELS_N * STOP_AT_PERCENT)
 
 # START COORDINATE CLASS
 class Coordinate:
+
+    """
+
+    Intended for use with a dict indexed by tuple coordinates, to generate images as described
+    in this modules' main docstring.
+
+    """
+
     # slots for allegedly higher efficiency re: https://stackoverflow.com/a/49789270
     __slots__ = ["yx_tuple", "x", "y", "max_x", "max_y", "parent_rgb_color", "mutated_rgb_color",
-                "empty_neighbors"]
+                 "empty_neighbors"]
     def __init__(self, x, y, max_x, max_y, parent_rgb_color):
         self.yx_tuple = (y, x)
         self.x = x
@@ -398,7 +408,7 @@ class Coordinate:
         # of bounds of image (negative or past max_x or max_y), and will check for and clean up
         # pairs with out of bounds values after:
         self.empty_neighbors = {(y-1, x-1), (y, x-1), (y+1, x-1), (y-1, x), (y+1, x), (y-1, x+1),
-                    (y, x+1), (y+1, x+1)}
+                                (y, x+1), (y+1, x+1)}
         to_remove = set()
         for element in self.empty_neighbors:
             if -1 in element:
@@ -412,9 +422,9 @@ class Coordinate:
         # the deletions:
         for no in to_remove:
             self.empty_neighbors.remove(no)
-    # function returns both a list of randomly selected empty neighbor coordinates to use
-    # immediately, and a list of neighbors to use later:
     def get_rnd_empty_neighbors(self):
+        """Returns both a list of randomly selected empty neighbor coordinates to use
+        immediately, and a list of neighbors to use later."""
         # init an empty array we'll populate with neighbors (int tuples) and return:
         rnd_neighbors_to_ret = set()
         if self.empty_neighbors:        # If there is anything left in empty_neighbors:
@@ -441,11 +451,11 @@ class Coordinate:
         return rnd_neighbors_to_ret, self.empty_neighbors
 # END COORDINATE CLASS
 
-# function requires lists of Coordinates as parameters, and it directly maniuplates those
-# lists (which are passed by reference). parent_rgb_color should be a list of RGB colors in
-# the format [255,0,255].
 def birth_coord(parent_rgb_color, tuple_to_alloc, unused_coords,
                 living_coords, dead_coords, canvas):    # Those last three parameters are lists!
+    """Requires sets of Coordinates as parameters, and it directly manipulates those
+    sets (which are passed by reference). parent_rgb_color should be a list of RGB colors in
+    the format [255,0,255]."""
     # Move tuple_to_alloc out of unused_coords and into living_coords, depending:
     if tuple_to_alloc in unused_coords and tuple_to_alloc not in living_coords and tuple_to_alloc not in dead_coords:
         unused_coords.remove(tuple_to_alloc)
@@ -462,9 +472,9 @@ def birth_coord(parent_rgb_color, tuple_to_alloc, unused_coords,
                 canvas[search_coord].empty_neighbors.remove(tuple_to_alloc)
     return tuple_to_alloc
 
-# function creates image from list of Coordinate objects, HEIGHT and WIDTH definitions, and
-# a filename string:
 def coords_list_to_image(canvas, HEIGHT, WIDTH, image_file_name):
+    """Creates and saves image from list of Coordinate objects, HEIGHT and WIDTH definitions,
+    and    a filename string."""
 # TO DO: see if the image can be generated more efficiently here, including
 # maybe using sets, not lists. See: https://stackoverflow.com/a/42036542/1397555
     tmp_array = []
@@ -477,15 +487,15 @@ def coords_list_to_image(canvas, HEIGHT, WIDTH, image_file_name):
     image_to_save = Image.fromarray(tmp_array.astype(np.uint8)).convert('RGB')
     image_to_save.save(image_file_name)
 
-# function prints coordinate plotting statistics (progress report):
 def print_progress():
+    """Prints coordinate plotting statistics (progress report)."""
     print('Painted', painted_coordinates, 'of desired', TERMINATE_PIXELS_N,\
     'coordinates (on a canvas of', ALL_PIXELS_N, ' pixels).')
 # END GLOBAL FUNCTIONS
 # END OPTIONS AND GLOBALS
 
 
-# START MAIN FUNCTIONALITY.
+"""START MAIN FUNCTIONALITY."""
 print('Will generate ', NUMBER_OF_IMAGES, ' image(s).')
 
 # Loop making [-n | NUMBER_OF_IMAGES] images.
@@ -701,3 +711,18 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 #        print(' ALSO I think the empty neighbor coordinate list in the Coordinate object at [y][x] can be used with this list of lists structure for instant access of neighbor coordinates?! That list here is:', imgArr[y][x].empty_neighbors, ' . . .')
 #        rndEmptyNeighborList = imgArr[y][x].get_rnd_empty_neighbors()
 #        print(' HERE ALSO is a random selection of those neighbors:', rndEmptyNeighborList)
+
+
+# pylint errors or warnings I care about:
+# color_growth.py:401:26: W0621: Redefining name 'y' from outer scope (line 518) (redefined-outer-name)
+# color_growth.py:401:23: W0621: Redefining name 'x' from outer scope (line 519) (redefined-outer-name)
+# color_growth.py:455:31: W0621: Redefining name 'dead_coords' from outer scope (line 514) (redefined-outer-name)
+# color_growth.py:455:16: W0621: Redefining name 'living_coords' from outer scope (line 511) (redefined-outer-name)
+# color_growth.py:455:44: W0621: Redefining name 'canvas' from outer scope (line 507) (redefined-outer-name)
+# color_growth.py:475:41: W0621: Redefining name 'WIDTH' from outer scope (line 64) (redefined-outer-name)
+# color_growth.py:475:25: W0621: Redefining name 'canvas' from outer scope (line 507) (redefined-outer-name)
+# color_growth.py:475:33: W0621: Redefining name 'HEIGHT' from outer scope (line 65) (redefined-outer-name)
+# color_growth.py:475:48: W0621: Redefining name 'image_file_name' from outer scope (line 543) (redefined-outer-name)
+# color_growth.py:475:0: C0103: Argument name "HEIGHT" doesn't conform to snake_case naming style (invalid-name)
+# color_growth.py:475:0: C0103: Argument name "WIDTH" doesn't conform to snake_case naming style (invalid-name)
+# color_growth.py:498:0: W0105: String statement has no effect (pointless-string-statement)
