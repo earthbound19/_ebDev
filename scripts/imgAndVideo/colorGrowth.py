@@ -14,13 +14,12 @@
 # python 3 with numpy and pyimage modules installed (and maybe others--see the import statements).
 
 # TO DO:
-# - refactor for speed
-# - see if compiled/transpiled versions of this are faster. In tests:
+# - Refactor algorithm for better efficiency if possible
+# - See if compiled/transpiled versions of this are faster. In tests:
 #  - pyinstaller compiled packages were on average two hundredths of a second faster for a
 # 100x100 --RANDOM_SEED 1 defaults test. Not exciting.
-#  - see all UPDATE TO comments which are part of refactor process
 # - Control reclaim_orphan_coords_every_n and base_orphan_reclaim_multiplier with CLI options of
-# the same name, defaulting to the values hard-coded right now.
+# the same name, defaulting to the values hard-coded right now?
 # - Have RECLAIM_ORPHANS do its work only once (without reactivating continued painting) when
 # STOP_AT_PERCENT is reached?
 # - Things listed in development code with TO DO comments
@@ -63,7 +62,7 @@ NUMBER_OF_IMAGES = 1
 WIDTH = 400
 HEIGHT = 200
 RSHIFT = 8
-STOP_AT_PERCENT = 0.64
+STOP_AT_PERCENT = 1
 SAVE_EVERY_N = 0
 START_COORDS_RANGE = (1, 13)
 VISCOSITY = 4        # Acceptable defaults: 0 to 5. 6 works, but generally does little.
@@ -450,7 +449,7 @@ def birth_coord(parent_rgb_color, tuple_to_alloc, unused_coords,
 	# Move tuple_to_alloc out of unused_coords and into living_coords, depending:
 	if tuple_to_alloc in unused_coords and tuple_to_alloc not in living_coords and tuple_to_alloc not in dead_coords:
 		unused_coords.remove(tuple_to_alloc)
-		living_coords.append(tuple_to_alloc)
+		living_coords.add(tuple_to_alloc)
 		# Give that new living coord, IN canvas[], a parent color (to later mutate from):
 		canvas[tuple_to_alloc].parent_rgb_color = parent_rgb_color
 		# Remove the coord corresponding to tuple_to_alloc from the empty_neighbors lists
@@ -466,6 +465,8 @@ def birth_coord(parent_rgb_color, tuple_to_alloc, unused_coords,
 # function creates image from list of Coordinate objects, HEIGHT and WIDTH definitions, and
 # a filename string:
 def coords_list_to_image(canvas, HEIGHT, WIDTH, image_file_name):
+# TO DO: see if the image can be generated more efficiently here, including
+# maybe using sets, not lists. See: https://stackoverflow.com/a/42036542/1397555
 	tmp_array = []
 	for i in range(0, HEIGHT):
 		coords_row = []
@@ -494,15 +495,13 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 
 	# A dict of Coordinate objects that are used to fill a "canvas" via other lists etc.:
 	canvas = {}
-	# A list of coordinates (tuples, not Coordinate objects) which are free for the taking:
-# UPDATE TO set if possible:
+	# A set of coordinates (tuples, not Coordinate objects) which are free for the taking:
 	unused_coords = set()
-	# A list of coordinates (tuples, not Coordiante objects) which are set aside for use:
-# UPDATE TO set if possible:
-	living_coords = []
-	# A list of coordinates which have been color mutated and may no longer coordinate mutate.
-# UPDATE TO set if possible:
-	dead_coords = []
+	# A set of coordinates (again tuples) which are set aside for use:
+	living_coords = set()
+	# A set of coordinates (again tuples) which have been color mutated and may no longer
+	# coordinate mutate:
+	dead_coords = set()
 
 	# Initialize canvas dict and unused_coords list (canvas being a dict of Coordinates with
 	# tuple coordinates as keys:
@@ -556,7 +555,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 	# all sides) but coordinate mutation never actually moves into that coordinate. The
 	# result is that some coordinates may never be "born." this list and associated code
 	# revives orphan coordinates:
-	potential_orphan_coords_two = []
+	potential_orphan_coords_two = set()
 	# used to reclaim orphan coordinates every N iterations through the
 	# `while living_coords` loop:
 	reclaim_orphan_coords_every_n = 7
@@ -581,7 +580,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 		 # For loop mode 0, uncomment the next two lines of code, and comment out the third
 		 # line after that. For mode 1, comment out the next two lines, and uncomment the
 		 # third line after that:
-		copy_of_living_coords = list(living_coords)
+		copy_of_living_coords = set(living_coords)
 		for coord in copy_of_living_coords:    # Mode 0, test run time: 0m34.241s
 		# for coord in living_coords:       # Mode 1, test run time: 0m32.502s
 			# Remove that to avoid wasted calculations (so many empty tuples passed
@@ -594,7 +593,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 				rgb_color_tmp = np.clip(rgb_color_tmp, 0, 255)
 				canvas[coord].mutated_rgb_color = rgb_color_tmp
 				new_living_coords_parent_rgb_color = rgb_color_tmp
-				dead_coords.append(coord)        # When a coordinate has its color mutated, it dies.
+				dead_coords.add(coord)        # When a coordinate has its color mutated, it dies.
 				painted_coordinates += 1
 				# The first returned list is used straightway, the second optionally shuffles
 				# into the first after the first is depleted:
@@ -603,9 +602,10 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 					birth_coord(new_living_coords_parent_rgb_color, coordZurg, unused_coords, living_coords, dead_coords, canvas)
 # Potential and actual orphan coordinate handling:
 #                Set parent_rgb_color in canvas via potential_orphan_coords_one:
-				for coordYaerf in potential_orphan_coords_one:
-					canvas[coordYaerf].parent_rgb_color = new_living_coords_parent_rgb_color
-				potential_orphan_coords_two += potential_orphan_coords_one
+				for coordGronk in potential_orphan_coords_one:
+					canvas[coordGronk].parent_rgb_color = new_living_coords_parent_rgb_color
+				# set union (| "addition," -ish) :
+				potential_orphan_coords_two = potential_orphan_coords_two | potential_orphan_coords_one
 #        Conditionally reclaim orphaned coordinates. Code here to reclaim coordinates gradually (not in spurts as at first coded) is harder to read and inelegant. I'm leaving it that way. Because GEH, DONE.
 		if RECLAIM_ORPHANS:
 	# orphan coordinate reclamation rate multiplier ramp check some other noun just for kicks:
@@ -615,12 +615,10 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 			reclaim_orphan_coords_trigger += 1
 			if reclaim_orphan_coords_trigger == reclaim_orphan_coords_every_n:
 				reclaim_orphan_coords_trigger = 0
-				# Removes duplicates from list:
-				potential_orphan_coords_two = list(set(potential_orphan_coords_two))
 				# removes elements from potential_orphan_coords_two which are in dead_coords
-				# (to avoid reusing coordinates) :
-				orphanCoords = [x for x in potential_orphan_coords_two if x not in dead_coords]
-				# decide how many orphans to reclaim:
+				# (to avoid reusing coordinates) ; set subtraction; orphanCoords declared here:
+				orphanCoords = potential_orphan_coords_two - dead_coords
+				# decide how many orphans to reclaim; use int() to avoid decimals:
 				orphans_to_reclaim_n = int(len(orphanCoords) * base_orphan_reclaim_multiplier)
 				orphans_to_reclaim_n *= multiplier
 				# clip that to acceptable range if necessary:
@@ -629,9 +627,11 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 				if orphans_to_reclaim_n > len(orphanCoords):
 					orphans_to_reclaim_n = len(orphanCoords)
 				# get those orphans and then move them into living_coords:
-				tmp_set = random.sample(orphanCoords, orphans_to_reclaim_n)
-				# The while loop will continue if there's anything in living_coords:
-				living_coords += list(tmp_set)
+# TO DO: more efficient sampling than creating a list here, if possible:
+				tmp_set = set(random.sample(orphanCoords, orphans_to_reclaim_n))
+				# The while loop will continue if there's anything in living_coords;
+				# set "addition" with |  :
+				living_coords = living_coords | tmp_set
 				print('Reclaimed', orphans_to_reclaim_n, 'orphan coordinates.')
 
 # TO DO: I might like it if this stopped saving new frames after every coordinate was
