@@ -40,6 +40,7 @@ from https://scipython.com/blog/computer-generated-contemporary-art/
 # image, and use the color at that coordinate both as the origin coordinate and the color at
 # that coordinate as COLOR_MUTATION_BASE. Could also be used to continue terminated runs with
 # the same or different parameters.
+# - Option and function to explicitly set start coords from set of tuple coordinates
 
 
 # CODE
@@ -258,7 +259,7 @@ if ARGS.COLOR_MUTATION_BASE:        # See comments in ARGS.BG_COLOR handling. Ha
     IDX = sys.argv.index(ARGS.COLOR_MUTATION_BASE)
     sys.argv[IDX] = COLOR_MUTATION_BASE
     COLOR_MUTATION_BASE = ast.literal_eval(COLOR_MUTATION_BASE)
-else:        # Write same string as BG_COLOR, after the same silly string manipulation as
+else:       # Write same string as BG_COLOR, after the same silly string manipulation as
             # for COLOR_MUTATION_BASE, but more ridiculously now _back_ from that to
             # a string again:
     BG_COLOR_TMP_STR = str(BG_COLOR)
