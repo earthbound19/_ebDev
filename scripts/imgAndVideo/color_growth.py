@@ -480,8 +480,6 @@ def birth_coord(color, tuple_to_alloc, unallocd_coords, allocd_coords, canvas):
 def coords_set_to_image(canvas, HEIGHT, WIDTH, image_file_name):
     """Creates and saves image from dict of Coordinate objects, HEIGHT and WIDTH definitions,
     and a filename string."""
-# TO DO: see if the image can be generated more efficiently here, including
-# maybe using sets, not lists. See: https://stackoverflow.com/a/42036542/1397555
     tmp_array = []
     for i in range(0, HEIGHT):
         coords_row = []
