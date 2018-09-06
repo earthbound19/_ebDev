@@ -41,7 +41,6 @@ from https://scipython.com/blog/computer-generated-contemporary-art/
 # that coordinate as COLOR_MUTATION_BASE. Could also be used to continue terminated runs with
 # the same or different parameters.
 # - Option and function to explicitly set start coords from set of tuple coordinates
-# - Couldn't "parent_rgb_color" and "mutated_rgb_color" in the Coordinate class be the same thing?
 
 
 # CODE
@@ -393,22 +392,19 @@ class Coordinate:
     Intended for use with a dict indexed by tuple coordinates, to generate images as described
     in this modules' main docstring. yx_tuple is a tuple representing a Y and X coordinate (in
     the intended final image). x and y are passed to class on init and used to set that tuple.
-    max_x and max_y are the X and Y max dimension of the image (image size). parent_rgb_color
-    is a base color. mutated_rgb_color is used to mutate that and used in the final image.
-    unallocd_neighbors is the set of neighboring coordinates which have never been allocated
-    for use ("use" being filled with a color).
+    max_x and max_y are the X and Y max dimension of the image (image size). color
+    is the rendered color in the final image. unallocd_neighbors is the set of neighboring
+    coordinates which have never been allocated for use ("use" being filled with a color).
 
     """
 
     # slots for allegedly higher efficiency re: https://stackoverflow.com/a/49789270
-    __slots__ = ["yx_tuple", "x", "y", "max_x", "max_y", "parent_rgb_color", "mutated_rgb_color",
-                 "unallocd_neighbors"]
-    def __init__(self, x, y, max_x, max_y, parent_rgb_color):
+    __slots__ = ["yx_tuple", "x", "y", "max_x", "max_y", "color", "unallocd_neighbors"]
+    def __init__(self, x, y, max_x, max_y, color):
         self.yx_tuple = (y, x)
         self.x = x
         self.y = y
-        self.parent_rgb_color = parent_rgb_color
-        self.mutated_rgb_color = parent_rgb_color
+        self.color = color
         # Adding all possible empty neighbor values even if they would result in values out
         # of bounds of image (negative or past max_x or max_y), and will check for and clean up
         # pairs with out of bounds values after:
@@ -462,9 +458,9 @@ class Coordinate:
         return rnd_neighbors_to_ret, self.unallocd_neighbors
 # END COORDINATE CLASS
 
-def birth_coord(parent_rgb_color, tuple_to_alloc, unallocd_coords,
+def birth_coord(color, tuple_to_alloc, unallocd_coords,
                 allocd_coords, filled_coords, canvas):
-    """parent_rgb_color is a list of RGB values e.g. [255,0,255]. unallocd_coords,
+    """color is a list of RGB values e.g. [255,0,255]. unallocd_coords,
     allocd_coords, and filled_coords are sets. canvas is a dict of Coordinate
     objects. As these are all passed by reference (the default Python way, the
     sets and dict are manipulated directly by the function."""
@@ -473,7 +469,7 @@ def birth_coord(parent_rgb_color, tuple_to_alloc, unallocd_coords,
         unallocd_coords.remove(tuple_to_alloc)
         allocd_coords.add(tuple_to_alloc)
         # Give that new living coord, IN canvas[], a parent color (to later mutate from):
-        canvas[tuple_to_alloc].parent_rgb_color = parent_rgb_color
+        canvas[tuple_to_alloc].color = color
         # Remove the coord corresponding to tuple_to_alloc from the unallocd_neighbors lists
         # of all available neighbor coords (if it appears in those set()s), so that in later use
         # of those empty neighbor set()s, we won't erroneously attempt to be reuse the coord:
@@ -492,7 +488,7 @@ def coords_set_to_image(canvas, HEIGHT, WIDTH, image_file_name):
     for i in range(0, HEIGHT):
         coords_row = []
         for j in range(0, WIDTH):
-            coords_row.append(canvas[(i, j)].mutated_rgb_color)
+            coords_row.append(canvas[(i, j)].color)
         tmp_array.append(coords_row)
     tmp_array = np.asarray(tmp_array)
     image_to_save = Image.fromarray(tmp_array.astype(np.uint8)).convert('RGB')
@@ -608,23 +604,22 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
             # to birth_coord) :
             allocd_coords.remove(coord)
             if coord not in filled_coords:
-                # Mutate color--! and assign it to the mutated_rgb_color in the Coordinate object:
-                rgb_color_tmp = canvas[coord].parent_rgb_color + np.random.randint(-RSHIFT, RSHIFT + 1, size=3) / 2
+                # Mutate color--! and assign it to the color variable (list) in the Coordinate object:
+                canvas[coord].color = canvas[coord].color + np.random.randint(-RSHIFT, RSHIFT + 1, size=3) / 2
                 # print('Colored coordinate (y, x)', coord)
-                rgb_color_tmp = np.clip(rgb_color_tmp, 0, 255)
-                canvas[coord].mutated_rgb_color = rgb_color_tmp
-                new_allocd_coords_parent_rgb_color = rgb_color_tmp
+                canvas[coord].color = np.clip(canvas[coord].color, 0, 255)
+                new_allocd_coords_color = canvas[coord].color
                 filled_coords.add(coord)        # When a coordinate has its color mutated, it dies.
                 painted_coordinates += 1
                 # The first returned set is used straightway, the second optionally shuffles
                 # into the first after the first is depleted:
                 rnd_new_coords_set, potential_orphan_coords_one = canvas[coord].get_rnd_unallocd_neighbors()
                 for coordZurg in rnd_new_coords_set:
-                    birth_coord(new_allocd_coords_parent_rgb_color, coordZurg, unallocd_coords, allocd_coords, filled_coords, canvas)
+                    birth_coord(new_allocd_coords_color, coordZurg, unallocd_coords, allocd_coords, filled_coords, canvas)
 # Potential and actual orphan coordinate handling:
-#                Set parent_rgb_color in canvas via potential_orphan_coords_one:
+#                Set color in Coordinate object in canvas dict via potential_orphan_coords_one:
                 for coordGronk in potential_orphan_coords_one:
-                    canvas[coordGronk].parent_rgb_color = new_allocd_coords_parent_rgb_color
+                    canvas[coordGronk].color = new_allocd_coords_color
                 # set union (| "addition," -ish) :
                 potential_orphan_coords_two = potential_orphan_coords_two | potential_orphan_coords_one
 #        Conditionally reclaim orphaned coordinates. Code here to reclaim coordinates gradually (not in spurts as at first coded) is harder to read and inelegant. I'm leaving it that way. Because GEH, DONE.
