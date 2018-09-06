@@ -458,14 +458,12 @@ class Coordinate:
         return rnd_neighbors_to_ret, self.unallocd_neighbors
 # END COORDINATE CLASS
 
-def birth_coord(color, tuple_to_alloc, unallocd_coords,
-                allocd_coords, filled_coords, canvas):
-    """color is a list of RGB values e.g. [255,0,255]. unallocd_coords,
-    allocd_coords, and filled_coords are sets. canvas is a dict of Coordinate
-    objects. As these are all passed by reference (the default Python way, the
-    sets and dict are manipulated directly by the function."""
+def birth_coord(color, tuple_to_alloc, unallocd_coords, allocd_coords, canvas):
+    """color is a list of RGB values e.g. [255,0,255]. unallocd_coords and allocd_coords
+    are sets. canvas is a dict of Coordinate objects. As these are all passed by reference
+	(the default Python way), so the sets and dict are manipulated directly by the function."""
     # Move tuple_to_alloc out of unallocd_coords and into allocd_coords, depending:
-    if tuple_to_alloc in unallocd_coords and tuple_to_alloc not in allocd_coords and tuple_to_alloc not in filled_coords:
+    if tuple_to_alloc in unallocd_coords and tuple_to_alloc not in allocd_coords:
         unallocd_coords.remove(tuple_to_alloc)
         allocd_coords.add(tuple_to_alloc)
         # Give that new living coord, IN canvas[], a parent color (to later mutate from):
@@ -535,7 +533,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 # https://stackoverflow.com/a/15993515/1397555
     RNDcoord = random.sample(unallocd_coords, START_COORDS_N)
     for coordX in RNDcoord:
-        birth_coord(COLOR_MUTATION_BASE, coordX, unallocd_coords, allocd_coords, filled_coords, canvas)
+        birth_coord(COLOR_MUTATION_BASE, coordX, unallocd_coords, allocd_coords, canvas)
 
     report_stats_every_n = 3
     report_stats_nth_counter = 0
@@ -615,7 +613,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
                 # into the first after the first is depleted:
                 rnd_new_coords_set, potential_orphan_coords_one = canvas[coord].get_rnd_unallocd_neighbors()
                 for coordZurg in rnd_new_coords_set:
-                    birth_coord(new_allocd_coords_color, coordZurg, unallocd_coords, allocd_coords, filled_coords, canvas)
+                    birth_coord(new_allocd_coords_color, coordZurg, unallocd_coords, allocd_coords, canvas)
 # Potential and actual orphan coordinate handling:
 #                Set color in Coordinate object in canvas dict via potential_orphan_coords_one:
                 for coordGronk in potential_orphan_coords_one:
