@@ -16,8 +16,6 @@ from https://scipython.com/blog/computer-generated-contemporary-art/
 # python 3 with numpy and pyimage modules installed (and maybe others--see the import statements).
 
 # TO DO:
-# - Bug fix? Since I made --VISCOSITY any possible positive integer, colliding streams can
-# overpaint each other. Or has that always been the case?
 # - Refactor algorithm for better efficiency if possible
 # - See if compiled/transpiled versions of this are faster. In tests:
 #  - pyinstaller compiled packages were ~the same speed. Not exciting.
@@ -34,6 +32,8 @@ from https://scipython.com/blog/computer-generated-contemporary-art/
 # an option check.
 #  - option to randomly alternate that method as you go
 #  - option to set the random chance for using one or the other
+# - Random coordinate death in a frequency range (may make the animation turn anything between
+# trickles to rivers to floods)? See "coordinate death" comment later in this script.
 # - Option to suppress progress print to save time
 # - Initialize COLOR_MUTATION_BASE by random selection from a .hexplt color scheme
 # - Major new feature? : Initialize canvas[] from an image, pick a random coordinate from the
@@ -64,11 +64,11 @@ from PIL import Image
 NUMBER_OF_IMAGES = 1
 WIDTH = 400
 HEIGHT = 200
-RSHIFT = 6
+RSHIFT = 8
 STOP_AT_PERCENT = 1
 SAVE_EVERY_N = 0
-START_COORDS_RANGE = (1, 7)
-VISCOSITY = 14
+START_COORDS_RANGE = (1, 13)
+VISCOSITY = 4        # Acceptable defaults: 0 to 5. 6 works, but generally does little.
 SAVE_PRESET = True
 # BACKGROUND color options;
 # any of these (uncomment only one) are made into a list later by ast.literal_eval(BG_COLOR) :
@@ -156,11 +156,11 @@ is, or how much difficulty coordinates have growing. Default ' + str(VISCOSITY) 
 is higher, free neighbor coordinates are filled less frequently (fewer of them may be\
 randomly selected), which will produce a more stringy/meandering/splatty path or form\
 (as it spreads less uniformly). If this is lower, neighbor coordinates are more often or\
-(if 0) always flooded. Must be between 0 and any positive integer, where 0 is very liquid and\
- --VISCOSITY check will always be bypassed, but coordinates will take longer to spread further--\
- and where higher integers (say, 5 or higher) cause a thicker effect (and smaller streamy/flood\
- things may traverse a distance faster). The higher the viscosity, the more likely the painting\
- will terminate prematurely, unless you set --RECLAIM_ORPHANS True.')
+(if 0) always flooded. Must be between 0 to 5, where 0 is very liquid--VISCOSITY check will\
+always be bypassed, but coordinates will take longer to spread further--and where 5 is very\
+thick (yet smaller streamy/flood things may traverse a distance faster). You can set it to 6,\
+but in tests, it makes a few small strings or streams and quickly ends. However, using the\
+--RECLAIM_ORPHANS causes it to carry on past that and fill the whole canvas.')
 PARSER.add_argument('--SAVE_PRESET', type=str, help='Save all parameters (which are passed to\
 this script) to a .cgp (color growth preset) file. If provided, --SAVE_PRESET must be a string\
 representing a boolean state (True or False or 1 or 0). Default '+ str(SAVE_PRESET) +'.\
@@ -356,6 +356,14 @@ if ARGS.VISCOSITY:
         VISCOSITY = 0
         print('NOTE: VISCOSITY was less than 0. The value was \
 clipped to 0.')
+    if VISCOSITY > 6:
+        VISCOSITY = 6
+        print('NOTE: VISCOSITY was greater than 6. The value was \
+clipped to 6.')
+    if VISCOSITY == 6:
+        print('NOTE: you\'ll probably get uninteresting results with VISCOSITY \
+ at 6. Range 0-6 allowed, 0-5 recommended (with a note that 0 is the slowest).')
+    # Also update that in argv:
     IDX = sys.argv.index('--VISCOSITY')
     sys.argv[IDX+1] = str(VISCOSITY)
 else:
@@ -418,27 +426,42 @@ class Coordinate:
     def get_rnd_unallocd_neighbors(self):
         """Returns both a set() of randomly selected empty neighbor coordinates to use
         immediately, and a set() of neighbors to use later."""
+        # init an empty set we'll populate with neighbors (int tuples) and return:
+        rnd_neighbors_to_ret = set()
         if self.unallocd_neighbors:        # If there is anything left in unallocd_neighbors:
             # START VISCOSITY CONTROL.
-            # Throttle max_rnd_range (for random selection of available neighbors),
+            # Conditionally throttle max_rnd_range (for random selection of available neighbors),
             # via VISCOSITY value.
-            max_rnd_range = len(self.unallocd_neighbors) - VISCOSITY
-            if max_rnd_range < 2:
-                max_rnd_range = 1
+# TO DO: figure out why VISCOSITY = 6 terminates so fast and whether it should.
+# It works but is very short lived.
+            # If we can subtract the highest possiible number (of random selection count)
+            # of available neighbors by VISCOSITY and still have 1 left (and if VISCOSITY
+            # is nonzero), do that:
+            if len(self.unallocd_neighbors) - VISCOSITY > 1 and VISCOSITY != 0:
+                max_rnd_range = len(self.unallocd_neighbors) - VISCOSITY
+            # Otherwise take a random selection of available neighbors from the full number
+            # range of available neighbors:
+            else:
+                max_rnd_range = len(self.unallocd_neighbors)
             # END VISCOSITY CONTROL.
-            # Decide how many empty neighbor coordinates to pick, and pick them:
+            # Decide how many to pick:
+# TO DO: coordinate death via option of negative number in range, as in:
+#            n_neighbors_to_ret = np.random.randint(-6, max_rnd_range + 1)
             n_neighbors_to_ret = np.random.randint(1, max_rnd_range + 1)
+# .. AND WITH int that will (I think) force return of empty set:
+#            if n_neighbors_to_ret < 0:
+#                n_neighbors_to_ret = 0
+# .. if this is done, reclaim orphan coords recovers from evolution death it seems!
             rnd_neighbors_to_ret = set(random.sample(self.unallocd_neighbors, n_neighbors_to_ret))
         else:        # If there is _not_ anything left in unallocd_neighbors:
-            rnd_neighbors_to_ret = set(())        # Prep to return a set with one empty tuple
-        # print('rnd_neighbors_to_ret:', rnd_neighbors_to_ret)
+            rnd_neighbors_to_ret = set(())        # Return a set with one empty tuple
         return rnd_neighbors_to_ret, self.unallocd_neighbors
 # END COORDINATE CLASS
 
 def birth_coord(color, tuple_to_alloc, unallocd_coords, allocd_coords, canvas):
     """color is a list of RGB values e.g. [255,0,255]. unallocd_coords and allocd_coords
     are sets. canvas is a dict of Coordinate objects. As these are all passed by reference
-    (the default Python way), so the sets and dict are manipulated directly by the function."""
+	(the default Python way), so the sets and dict are manipulated directly by the function."""
     # Move tuple_to_alloc out of unallocd_coords and into allocd_coords, depending:
     if tuple_to_alloc in unallocd_coords and tuple_to_alloc not in allocd_coords:
         unallocd_coords.remove(tuple_to_alloc)
@@ -467,11 +490,10 @@ def coords_set_to_image(canvas, HEIGHT, WIDTH, image_file_name):
     image_to_save = Image.fromarray(tmp_array.astype(np.uint8)).convert('RGB')
     image_to_save.save(image_file_name)
 
-def print_progress(newly_painted_coordinates):
+def print_progress():
     """Prints coordinate plotting statistics (progress report)."""
-    print('newly painted : total painted : target : canvas size') 
-    print(newly_painted_coordinates, ':', painted_coordinates, ':',\
-    TERMINATE_PIXELS_N, ':', ALL_PIXELS_N)
+    print('Painted', painted_coordinates, 'of desired', TERMINATE_PIXELS_N,\
+    'coordinates (on a canvas of', ALL_PIXELS_N, ' pixels).')
 # END GLOBAL FUNCTIONS
 # END OPTIONS AND GLOBALS
 
@@ -558,7 +580,6 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
     multiplier = 1
     print('Generating image . . . ')
     while allocd_coords:
-        newly_painted_coordinates = 0
         # NOTE: There are two options for looping here. Mode 0 (which was the first developed
         # mode) makes a copy of allocd_coords, and loops through that. The result is that the
         # loop doesn't continue because of changes to allocd_coords (as it is working on a
@@ -586,7 +607,6 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
                 new_allocd_coords_color = canvas[coord].color
                 filled_coords.add(coord)        # When a coordinate has its color mutated, it dies.
                 painted_coordinates += 1
-                newly_painted_coordinates += 1
                 # The first returned set is used straightway, the second optionally shuffles
                 # into the first after the first is depleted:
                 rnd_new_coords_set, potential_orphan_coords_one = canvas[coord].get_rnd_unallocd_neighbors()
@@ -642,7 +662,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
         if report_stats_nth_counter == 0 or report_stats_nth_counter == report_stats_every_n:
             # print('Saving prograss snapshot image ', state_img_file_name, ' . . .')
             coords_set_to_image(canvas, HEIGHT, WIDTH, state_img_file_name)
-            print_progress(newly_painted_coordinates)
+            print_progress()
             report_stats_nth_counter = 1
         report_stats_nth_counter += 1
 
