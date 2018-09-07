@@ -490,10 +490,11 @@ def coords_set_to_image(canvas, HEIGHT, WIDTH, image_file_name):
     image_to_save = Image.fromarray(tmp_array.astype(np.uint8)).convert('RGB')
     image_to_save.save(image_file_name)
 
-def print_progress():
+def print_progress(newly_painted_coordinates):
     """Prints coordinate plotting statistics (progress report)."""
-    print('Painted', painted_coordinates, 'of desired', TERMINATE_PIXELS_N,\
-    'coordinates (on a canvas of', ALL_PIXELS_N, ' pixels).')
+    print('newly painted : total painted : target : canvas size') 
+    print(newly_painted_coordinates, ':', painted_coordinates, ':',\
+    TERMINATE_PIXELS_N, ':', ALL_PIXELS_N)
 # END GLOBAL FUNCTIONS
 # END OPTIONS AND GLOBALS
 
@@ -580,6 +581,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
     multiplier = 1
     print('Generating image . . . ')
     while allocd_coords:
+        newly_painted_coordinates = 0
         # NOTE: There are two options for looping here. Mode 0 (which was the first developed
         # mode) makes a copy of allocd_coords, and loops through that. The result is that the
         # loop doesn't continue because of changes to allocd_coords (as it is working on a
@@ -607,6 +609,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
                 new_allocd_coords_color = canvas[coord].color
                 filled_coords.add(coord)        # When a coordinate has its color mutated, it dies.
                 painted_coordinates += 1
+                newly_painted_coordinates += 1
                 # The first returned set is used straightway, the second optionally shuffles
                 # into the first after the first is depleted:
                 rnd_new_coords_set, potential_orphan_coords_one = canvas[coord].get_rnd_unallocd_neighbors()
@@ -662,7 +665,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
         if report_stats_nth_counter == 0 or report_stats_nth_counter == report_stats_every_n:
             # print('Saving prograss snapshot image ', state_img_file_name, ' . . .')
             coords_set_to_image(canvas, HEIGHT, WIDTH, state_img_file_name)
-            print_progress()
+            print_progress(newly_painted_coordinates)
             report_stats_nth_counter = 1
         report_stats_nth_counter += 1
 
