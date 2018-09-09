@@ -7,7 +7,7 @@ from https://scipython.com/blog/computer-generated-contemporary-art/
 """
 
 # USAGE
-# Run this script without any paramaters, and it will use a default set of parameters:
+# Run this script without any parameters, and it will use a default set of parameters:
 # python thisScript.py
 # To see available parameters, run this script with the -h switch:
 # python thisScript.py -h
@@ -16,9 +16,12 @@ from https://scipython.com/blog/computer-generated-contemporary-art/
 # python 3 with numpy and pyimage modules installed (and maybe others--see the import statements).
 
 # TO DO:
+# - Fix wrong per loop coordinate paint count in progress print.
 # - Refactor algorithm for better efficiency if possible
 # - See if compiled/transpiled versions of this are faster. In tests:
 #  - pyinstaller compiled packages were ~the same speed. Not exciting.
+# - Make default variables that are tuples and lists either those or strings, not both
+#   for (consistency). If strings, you'll want to remove redundant str() conversion in help.
 # - Add a --NO_DELIST_NEIGHBORS option to optionally make coords fight for space as mentioned in this commit: https://github.com/earthbound19/_ebDev/commit/16dfa0718fea630c919836c7d2326e2bdcbabb83
 # - Control reclaim_orphan_coords_every_n and base_orphan_reclaim_multiplier with CLI options of
 # the same name, defaulting to the values hard-coded right now?
@@ -68,12 +71,12 @@ RSHIFT = 8
 STOP_AT_PERCENT = 1
 SAVE_EVERY_N = 0
 START_COORDS_RANGE = (1, 13)
-VISCOSITY = 4        # Acceptable defaults: 0 to 5. 6 works, but generally does little.
+GROWTH_CLIP = (0, 5)
 SAVE_PRESET = True
 # BACKGROUND color options;
 # any of these (uncomment only one) are made into a list later by ast.literal_eval(BG_COLOR) :
-# BG_COLOR = '[157,140,157]'        # Medium purplish gray
-BG_COLOR = '[252,251,201]'        # Buttery light yellow
+# BG_COLOR = "[157,140,157]"        # Medium purplish gray
+BG_COLOR = "[252,251,201]"        # Buttery light yellow
 RECLAIM_ORPHANS = True
 
 
@@ -146,21 +149,31 @@ they\'re all used?')
 PARSER.add_argument('--START_COORDS_RANGE', help='Random integer range to select a random\
 number of --START_COORDS_N if --START_COORDS_N is not provided. Default ('\
 + str(START_COORDS_RANGE[0]) + ',' + str(START_COORDS_RANGE[1]) + '). Must be provided in\
-that form (a string that can be evaluated to a python tuple), and in the range 0 to 4294967296\
-(2^32), but I bet that sometimes nothing will render if you choose a max range number orders\
-of magnitude higher than the number of pixels available in the image. I probably would never\
-make the max range higher than (number of pixesl in image) / 62500 (which is 250 squared).\
-Will not be used if [-q | START_COORDS_N] is provided.')
-PARSER.add_argument('--VISCOSITY', type=int, help='How "thick" the liquid (if it were liquid)\
-is, or how much difficulty coordinates have growing. Default ' + str(VISCOSITY) + '. If this\
-is higher, free neighbor coordinates are filled less frequently (fewer of them may be\
-randomly selected), which will produce a more stringy/meandering/splatty path or form\
-(as it spreads less uniformly). If this is lower, neighbor coordinates are more often or\
-(if 0) always flooded. Must be between 0 to 5, where 0 is very liquid--VISCOSITY check will\
-always be bypassed, but coordinates will take longer to spread further--and where 5 is very\
-thick (yet smaller streamy/flood things may traverse a distance faster). You can set it to 6,\
-but in tests, it makes a few small strings or streams and quickly ends. However, using the\
---RECLAIM_ORPHANS causes it to carry on past that and fill the whole canvas.')
+that form (a string surrounded by double quote marks (for Windows) which can be evaluated to\
+ a python tuple), and in the range 0 to 4294967296 (2^32), but I bet that sometimes\
+ nothing will render if you choose a max range number orders of magnitude higher than the\
+ number of pixels available in the image. I probably would never make the max range higher\
+ than (number of pixesl in image) / 62500 (which is 250 squared). Will not be used if\
+ [-q | START_COORDS_N] is provided.')
+PARSER.add_argument('--GROWTH_CLIP', type=str, help='Affects seeming "thickness"\
+ (or viscosity) of the liquid. A Python tuple expressed as a string (must be surrounded by\
+ double quote marks for Windows). Default ' + str(GROWTH_CLIP) + '. In growth into\
+ adjacent coordinates, the maximum number of possible neighbor coordinates to grow into is\
+ 8 (which may only ever happen with a start coordinate: in practical terms, the most\
+ coordinates that may usually be expanded into is 7). The first number in the tuple is\
+ the minimum number of coordinates to randomly select, and the second number is the\
+ maximum. The second must be greater than the first. The first may be lower than 0 and\
+ will be clipped to 1, making selection of only 1 neighbor coordinate more common. The\
+ second number may be higher than 8 (or the number of available coordinates as the case\
+ may be), and will be clipped to the maximum number of available coordinates, making\
+ selection of all available coordinates more common. If the first number is a positive\
+ integer <= 7, at least that many coordinates will always be selected when possible. If the\
+ second number is a positive integer >= 1, at most that many coordinates will ever be selected.\
+ A negative first number or low first number clip will tend toward a more evenly spreading\
+ liquid appearance, and a lower second number clip will cause a more stringy/meandering/splatty\
+ path or form\ (as it spreads less uniformly). With an effectively more viscous clip like\
+ "(2, 4)", smaller streamy/flood things may traverse a distance faster. Some tuples make\
+ --RECLAIM_ORPHANS quickly fail, some make it virtually never fail.')
 PARSER.add_argument('--SAVE_PRESET', type=str, help='Save all parameters (which are passed to\
 this script) to a .cgp (color growth preset) file. If provided, --SAVE_PRESET must be a string\
 representing a boolean state (True or False or 1 or 0). Default '+ str(SAVE_PRESET) +'.\
@@ -207,8 +220,10 @@ if ARGS.LOAD_PRESET:
     print('Attempting to load subprocess of this script with the SWITCHES in LOAD_PRESET . . .')
     with open(LOAD_PRESET) as f:
         SWITCHES = f.readline()
-    subprocess.call(shlex.split('python ' + sys.argv[0] + ' ' + SWITCHES))
+    subprocess.call(shlex.split('python ' + repr(sys.argv[0]) + ' ' + SWITCHES))
     # sys.argv[0] is the path to this script.
+    # repr() found at: http://code.activestate.com/recipes/65211-convert-a-string-into-a-raw-string/#c5
+    # repr() fixes some problem with shlex.split string handling of Windows paths.
     print('Subprocess hopefully completed successfully. Will now exit script.')
     sys.exit()
 
@@ -349,26 +364,17 @@ else:        # If --START_COORDS_N is _not_ provided by the user..
     print('Using', START_COORDS_N, 'start coordinates, by random selection ' + STR_PART)
     # END STATE MACHINE "Megergeberg 5,000."
 
-if ARGS.VISCOSITY:
-    VISCOSITY = ARGS.VISCOSITY
-    # If that is outside acceptable range, clip it to acceptable range and notify user:
-    if VISCOSITY < 0:
-        VISCOSITY = 0
-        print('NOTE: VISCOSITY was less than 0. The value was \
-clipped to 0.')
-    if VISCOSITY > 6:
-        VISCOSITY = 6
-        print('NOTE: VISCOSITY was greater than 6. The value was \
-clipped to 6.')
-    if VISCOSITY == 6:
-        print('NOTE: you\'ll probably get uninteresting results with VISCOSITY \
- at 6. Range 0-6 allowed, 0-5 recommended (with a note that 0 is the slowest).')
-    # Also update that in argv:
-    IDX = sys.argv.index('--VISCOSITY')
-    sys.argv[IDX+1] = str(VISCOSITY)
+if ARGS.GROWTH_CLIP:        # See comments in ARGS.BG_COLOR handling. Handled the same.
+    GROWTH_CLIP = ARGS.GROWTH_CLIP
+    GROWTH_CLIP = re.sub(' ', '', GROWTH_CLIP)
+    IDX = sys.argv.index(ARGS.GROWTH_CLIP)
+    sys.argv[IDX] = GROWTH_CLIP
+    GROWTH_CLIP = ast.literal_eval(GROWTH_CLIP)
 else:
-    sys.argv.append('--VISCOSITY')
-    sys.argv.append(str(VISCOSITY))
+    GROWTH_CLIP = str(BG_COLOR)
+    GROWTH_CLIP = re.sub(' ', '', GROWTH_CLIP)
+    sys.argv.append('--GROWTH_CLIP')
+    sys.argv.append(GROWTH_CLIP)
 
 if ARGS.SAVE_PRESET:
     SAVE_PRESET = ast.literal_eval(ARGS.SAVE_PRESET)
@@ -430,31 +436,14 @@ class Coordinate:
         rnd_neighbors_to_ret = set()
         if self.unallocd_neighbors:        # If there is anything left in unallocd_neighbors:
             # START VISCOSITY CONTROL.
-            # Conditionally throttle max_rnd_range (for random selection of available neighbors),
-            # via VISCOSITY value.
-# TO DO: figure out why VISCOSITY = 6 terminates so fast and whether it should.
-# It works but is very short lived.
-            # If we can subtract the highest possiible number (of random selection count)
-            # of available neighbors by VISCOSITY and still have 1 left (and if VISCOSITY
-            # is nonzero), do that:
-            if len(self.unallocd_neighbors) - VISCOSITY > 1 and VISCOSITY != 0:
-                max_rnd_range = len(self.unallocd_neighbors) - VISCOSITY
-            # Otherwise take a random selection of available neighbors from the full number
-            # range of available neighbors:
-            else:
-                max_rnd_range = len(self.unallocd_neighbors)
-            # END VISCOSITY CONTROL.
             # Decide how many to pick:
-# TO DO: coordinate death via option of negative number in range, as in:
-#            n_neighbors_to_ret = np.random.randint(-6, max_rnd_range + 1)
-            n_neighbors_to_ret = np.random.randint(1, max_rnd_range + 1)
-# .. AND WITH int that will (I think) force return of empty set:
-#            if n_neighbors_to_ret < 0:
-#                n_neighbors_to_ret = 0
-# .. if this is done, reclaim orphan coords recovers from evolution death it seems!
+            n_neighbors_to_ret = np.random.randint(GROWTH_CLIP[0], GROWTH_CLIP[1] + 1)
+            if n_neighbors_to_ret < 0:
+                n_neighbors_to_ret = 1
+            if n_neighbors_to_ret > len(self.unallocd_neighbors):
+                n_neighbors_to_ret = len(self.unallocd_neighbors)
+            # END VISCOSITY CONTROL.
             rnd_neighbors_to_ret = set(random.sample(self.unallocd_neighbors, n_neighbors_to_ret))
-        else:        # If there is _not_ anything left in unallocd_neighbors:
-            rnd_neighbors_to_ret = set(())        # Return a set with one empty tuple
         return rnd_neighbors_to_ret, self.unallocd_neighbors
 # END COORDINATE CLASS
 
