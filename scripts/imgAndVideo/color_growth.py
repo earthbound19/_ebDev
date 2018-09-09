@@ -24,7 +24,7 @@ from https://scipython.com/blog/computer-generated-contemporary-art/
 #   for (consistency). If strings, you'll want to remove redundant str() conversion in help.
 # - Add a --NO_DELIST_NEIGHBORS option to optionally make coords fight for space as mentioned in this commit: https://github.com/earthbound19/_ebDev/commit/16dfa0718fea630c919836c7d2326e2bdcbabb83
 # - Control reclaim_orphan_coords_every_n and base_orphan_reclaim_multiplier with CLI options of
-# the same name, defaulting to the values hard-coded right now?
+#   the same name, defaulting to the values hard-coded right now?
 # - Have RECLAIM_ORPHANS do its work only once (without reactivating continued painting) when
 # STOP_AT_PERCENT is reached?
 # - Fixes re pylint comments at end, also things listed in development code with TO DO comments
@@ -44,6 +44,10 @@ from https://scipython.com/blog/computer-generated-contemporary-art/
 # that coordinate as COLOR_MUTATION_BASE. Could also be used to continue terminated runs with
 # the same or different parameters.
 # - Option and function to explicitly set start coords from set of tuple coordinates
+# - Major new feature: using multiple CPU cores, or parallelizing the algorithm (one thread per
+#   mutation from an origin coordinate). Whether it would be advantageous or even feasible would
+#   be answered by the attempt. Re: https://superuser.com/a/679685
+#   https://stackoverflow.com/a/1743350 (which points to https://www.parallelpython.com/)
 
 
 # CODE
@@ -369,12 +373,14 @@ if ARGS.GROWTH_CLIP:        # See comments in ARGS.BG_COLOR handling. Handled th
     GROWTH_CLIP = re.sub(' ', '', GROWTH_CLIP)
     IDX = sys.argv.index(ARGS.GROWTH_CLIP)
     sys.argv[IDX] = GROWTH_CLIP
-    GROWTH_CLIP = ast.literal_eval(GROWTH_CLIP)
 else:
     GROWTH_CLIP = str(BG_COLOR)
     GROWTH_CLIP = re.sub(' ', '', GROWTH_CLIP)
     sys.argv.append('--GROWTH_CLIP')
     sys.argv.append(GROWTH_CLIP)
+GROWTH_CLIP = ast.literal_eval(GROWTH_CLIP)
+# Somehow on Windows that ends up a tuple when a CLI option and list as default.
+# Whatever. Either works.
 
 if ARGS.SAVE_PRESET:
     SAVE_PRESET = ast.literal_eval(ARGS.SAVE_PRESET)
@@ -479,10 +485,10 @@ def coords_set_to_image(canvas, HEIGHT, WIDTH, image_file_name):
     image_to_save = Image.fromarray(tmp_array.astype(np.uint8)).convert('RGB')
     image_to_save.save(image_file_name)
 
-def print_progress(newly_painted_coordinates):
+def print_progress(newly_painted_coords):
     """Prints coordinate plotting statistics (progress report)."""
     print('newly painted : total painted : target : canvas size') 
-    print(newly_painted_coordinates, ':', painted_coordinates, ':',\
+    print(newly_painted_coords, ':', painted_coordinates, ':',\
     TERMINATE_PIXELS_N, ':', ALL_PIXELS_N)
 # END GLOBAL FUNCTIONS
 # END OPTIONS AND GLOBALS
@@ -569,8 +575,8 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
     multiplier_check = int(ALL_PIXELS_N / reclaim_orphan_coords_every_n)
     multiplier = 1
     print('Generating image . . . ')
+    newly_painted_coords = 0		# This is reset at every call of print_progress()
     while allocd_coords:
-        newly_painted_coordinates = 0
         # NOTE: There are two options for looping here. Mode 0 (which was the first developed
         # mode) makes a copy of allocd_coords, and loops through that. The result is that the
         # loop doesn't continue because of changes to allocd_coords (as it is working on a
@@ -598,7 +604,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
                 new_allocd_coords_color = canvas[coord].color
                 filled_coords.add(coord)        # When a coordinate has its color mutated, it dies.
                 painted_coordinates += 1
-                newly_painted_coordinates += 1
+                newly_painted_coords += 1
                 # The first returned set is used straightway, the second optionally shuffles
                 # into the first after the first is depleted:
                 rnd_new_coords_set, potential_orphan_coords_one = canvas[coord].get_rnd_unallocd_neighbors()
@@ -654,7 +660,8 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
         if report_stats_nth_counter == 0 or report_stats_nth_counter == report_stats_every_n:
             # print('Saving prograss snapshot image ', state_img_file_name, ' . . .')
             coords_set_to_image(canvas, HEIGHT, WIDTH, state_img_file_name)
-            print_progress(newly_painted_coordinates)
+            print_progress(newly_painted_coords)
+            newly_painted_coords = 0
             report_stats_nth_counter = 1
         report_stats_nth_counter += 1
 
