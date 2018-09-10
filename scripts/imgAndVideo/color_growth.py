@@ -4,29 +4,54 @@ Output file names are based on the date and time and random characters.
 Inspired and drastically evolved from color_fibers.py, which was horked and adapted
 from https://scipython.com/blog/computer-generated-contemporary-art/
 
-"""
-
 # USAGE
-# Run this script without any parameters, and it will use a default set of parameters:
-# python thisScript.py
-# To see available parameters, run this script with the -h switch:
-# python thisScript.py -h
+Run this script without any parameters, and it will use a default set of parameters:
+python thisScript.py
+To see available parameters, run this script with the -h switch:
+python thisScript.py -h
 
 # DEPENDENCIES
-# python 3 with numpy and pyimage modules installed (and maybe others--see the import statements).
+python 3 with numpy and pyimage modules installed (and maybe others--see the
+import statements).
+
+# KNOWN ISSUES
+See help for --RANDOM_SEED.
+
+# TO DO
+See comments under the same heading in this module.
+
+"""
 
 # TO DO:
-# - Fix wrong per loop coordinate paint count in progress print.
 # - Refactor algorithm for better efficiency if possible
+#   - delete unnecessary import statements
+#   - Examine whether and why exponential slowdown occurs over the run of the script, and whether
+#     it is something in --RECLAIM_ORPHANS that does this. Symptom: newly_painted_coords as
+#     newly_painted_coords as reported by print_progress(newly_painted_coords) stays in a roughly
+#     constant neighborhood from about halfway through the render to the end, but it may be taking
+#     longer and longer to render that same number of coordinates. I think my math/model for
+#     reclaiming coordinates may have something to do with that. Could I do some math _like_
+#     that used in counting and resetting coordinates to report in
+#     print_progress(newly_painted_coords), but with reclaiming orphans?
+#    - AFTER THAT control reclaim_orphan_coords_every_n and base_orphan_reclaim_multiplier with
+#      CLI options of the same name, defaulting to the values hard-coded right now?
+#    - Have RECLAIM_ORPHANS do its work only once (without reactivating continued painting) when
+#      STOP_AT_PERCENT is reached?
+#    - Develop scripted tests of all possible switch combinations, with timing baseline
+#      and improvement checks.
 # - See if compiled/transpiled versions of this are faster. In tests:
 #  - pyinstaller compiled packages were ~the same speed. Not exciting.
 # - Make default variables that are tuples and lists either those or strings, not both
 #   for (consistency). If strings, you'll want to remove redundant str() conversion in help.
-# - Add a --NO_DELIST_NEIGHBORS option to optionally make coords fight for space as mentioned in this commit: https://github.com/earthbound19/_ebDev/commit/16dfa0718fea630c919836c7d2326e2bdcbabb83
-# - Control reclaim_orphan_coords_every_n and base_orphan_reclaim_multiplier with CLI options of
-#   the same name, defaulting to the values hard-coded right now?
-# - Have RECLAIM_ORPHANS do its work only once (without reactivating continued painting) when
-# STOP_AT_PERCENT is reached?
+#   - Destroy -n option and associated functionality because of the problems described in the
+#   help for that option. I would rather that I or others be forced to script repeat runs of
+#   this script, which is more unixy (leave that function to another program) and to fix this
+#   I'd have to refactor this to mess with sys.argv[] to save the new deterministically
+#   generated seed to .cgp files at each new image creation loop which just seems unduly messy.
+# - Fix "KNOWN ISSUE" described in help for --RANDOM_SEED.
+# - Option and function to explicitly set start coords from set of tuple coordinates
+# - Initialize COLOR_MUTATION_BASE by random selection from a .hexplt color scheme
+# - Option to suppress progress print to save time
 # - Fixes re pylint comments at end, also things listed in development code with TO DO comments
 # - Option: instead of randomly mutating color for each individual chosen neighbor coordinate,
 # mutate them all to the same new color. This would be more efficient, and might make colors
@@ -35,16 +60,12 @@ from https://scipython.com/blog/computer-generated-contemporary-art/
 # an option check.
 #  - option to randomly alternate that method as you go
 #  - option to set the random chance for using one or the other
-# - Random coordinate death in a frequency range (may make the animation turn anything between
-# trickles to rivers to floods)? See "coordinate death" comment later in this script.
-# - Option to suppress progress print to save time
-# - Initialize COLOR_MUTATION_BASE by random selection from a .hexplt color scheme
+# - Add a --NO_DELIST_NEIGHBORS option to make coords fight for space as mentioned in this commit: https://github.com/earthbound19/_ebDev/commit/16dfa0718fea630c919836c7d2326e2bdcbabb83
 # - Major new feature? : Initialize canvas[] from an image, pick a random coordinate from the
-# image, and use the color at that coordinate both as the origin coordinate and the color at
-# that coordinate as COLOR_MUTATION_BASE. Could also be used to continue terminated runs with
-# the same or different parameters.
-# - Option and function to explicitly set start coords from set of tuple coordinates
-# - Major new feature: using multiple CPU cores, or parallelizing the algorithm (one thread per
+#   image, and use the color at that coordinate both as the origin coordinate and the color at
+#   that coordinate as COLOR_MUTATION_BASE. Could also be used to continue terminated runs with
+#   the same or different parameters.
+# - Major new feature: use multiple CPU cores, or parallelizing the algorithm (one thread per
 #   mutation from an origin coordinate). Whether it would be advantageous or even feasible would
 #   be answered by the attempt. Re: https://superuser.com/a/679685
 #   https://stackoverflow.com/a/1743350 (which points to https://www.parallelpython.com/)
@@ -140,9 +161,9 @@ PARSER.add_argument('-s', '--RANDOM_SEED', type=int, help='Seed for random numbe
 (random and numpy.random are used). Default generated by random library itself and added to\
 render file name for reference. Can be any integer in the range 0 to 4294967296 (2^32). If\
 not provided, it will be randomly chosen from that range (meta!). If --SAVE_PRESET is used,\
-the chosen seed will be saved with the preset .cgp file. Interestingly, functionally different\
-versions of the "random" and "numpy" libraries would theoretically produce different\
-deterministic results (untested).')
+the chosen seed will be saved with the preset .cgp file. KNOWN ISSUE at this writing:\
+ evidently functional differences between random generators of different versions of Python\
+ and/or Python on different platforms produce different output from the same random seed.')
 PARSER.add_argument('-q', '--START_COORDS_N', type=int, help='How many origin coordinates to\
 begin coordinate and color mutation from. Default randomly chosen from range in\
 --START_COORDS_RANGE (see). Random selection from that range is performed *after* random\
