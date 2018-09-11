@@ -394,12 +394,12 @@ if ARGS.GROWTH_CLIP:        # See comments in ARGS.BG_COLOR handling. Handled th
     GROWTH_CLIP = re.sub(' ', '', GROWTH_CLIP)
     IDX = sys.argv.index(ARGS.GROWTH_CLIP)
     sys.argv[IDX] = GROWTH_CLIP
+    GROWTH_CLIP = ast.literal_eval(GROWTH_CLIP)
 else:
-    GROWTH_CLIP = str(BG_COLOR)
-    GROWTH_CLIP = re.sub(' ', '', GROWTH_CLIP)
+    temp_str = str(GROWTH_CLIP)
+    temp_str = re.sub(' ', '', temp_str)
     sys.argv.append('--GROWTH_CLIP')
-    sys.argv.append(GROWTH_CLIP)
-GROWTH_CLIP = ast.literal_eval(GROWTH_CLIP)
+    sys.argv.append(temp_str)
 # Somehow on Windows that ends up a tuple when a CLI option and list as default.
 # Whatever. Either works.
 
@@ -642,6 +642,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
     # orphan coordinate reclamation rate multiplier ramp check some other noun just for kicks:
             if painted_coordinates > (multiplier_check * multiplier):
                 multiplier += 1
+                # print('__multiplier:__:', multiplier)
     # that ends
             reclaim_orphan_coords_trigger += 1
             if reclaim_orphan_coords_trigger == reclaim_orphan_coords_every_n:
