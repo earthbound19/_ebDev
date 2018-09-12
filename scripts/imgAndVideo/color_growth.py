@@ -54,10 +54,10 @@ See comments under the same heading in this module.
 # - Option to suppress progress print to save time
 # - Fixes re pylint comments at end, also things listed in development code with TO DO comments
 # - Option: instead of randomly mutating color for each individual chosen neighbor coordinate,
-# mutate them all to the same new color. This would be more efficient, and might make colors
-# more banded/ringed/spready than streamy. It would also visually indicate coordinate mutation
-# more clearly. Do this or the other option (mutate each, so each can be different) based on
-# an option check.
+#   mutate them all to the same new color. This would be more efficient, and might make colors
+#   more banded/ringed/spready than streamy. It would also visually indicate coordinate mutation
+#   more clearly. Do this or the other option (mutate each, so each can be different) based on
+#   an option check.
 #  - option to randomly alternate that method as you go
 #  - option to set the random chance for using one or the other
 # - Add a --NO_DELIST_NEIGHBORS option to make coords fight for space as mentioned in this commit: https://github.com/earthbound19/_ebDev/commit/16dfa0718fea630c919836c7d2326e2bdcbabb83
@@ -83,16 +83,13 @@ import subprocess
 import shlex
 import numpy as np
 from PIL import Image
-# For optional subprocess calls to render animation frames via ffmpegAnim.sh at end of script;
-# uncomment those lines also if you want this (I'm not going to make this a CLI option, at
-# least not at this writing) :
-# import os
+
 
 # Defaults which will be overriden if arguments of the same name are provided to the script:
 NUMBER_OF_IMAGES = 1
 WIDTH = 400
 HEIGHT = 200
-RSHIFT = 8
+RSHIFT = 5
 STOP_AT_PERCENT = 1
 SAVE_EVERY_N = 0
 START_COORDS_RANGE = (1, 13)
@@ -394,14 +391,20 @@ if ARGS.GROWTH_CLIP:        # See comments in ARGS.BG_COLOR handling. Handled th
     GROWTH_CLIP = re.sub(' ', '', GROWTH_CLIP)
     IDX = sys.argv.index(ARGS.GROWTH_CLIP)
     sys.argv[IDX] = GROWTH_CLIP
+    # For optional code at the end of the script that renames to parameter demo file names:
+    growth_clip_tst_file_name = re.sub('\(', '', GROWTH_CLIP)
+    growth_clip_tst_file_name = re.sub('\)', '', growth_clip_tst_file_name)
+    growth_clip_tst_file_name_base = '__' + re.sub(',', '_', growth_clip_tst_file_name) + '__'
+    zax_blor = ('%03x' % random.randrange(16**6))
+    png_rename = growth_clip_tst_file_name_base + '__' + zax_blor + '.png'
+    cgp_rename = growth_clip_tst_file_name_base + '__' + zax_blor + '.cgp'
+    mp4_rename = growth_clip_tst_file_name_base + '__' + zax_blor + '.mp4'
     GROWTH_CLIP = ast.literal_eval(GROWTH_CLIP)
 else:
     temp_str = str(GROWTH_CLIP)
     temp_str = re.sub(' ', '', temp_str)
     sys.argv.append('--GROWTH_CLIP')
     sys.argv.append(temp_str)
-# Somehow on Windows that ends up a tuple when a CLI option and list as default.
-# Whatever. Either works.
 
 if ARGS.SAVE_PRESET:
     SAVE_PRESET = ast.literal_eval(ARGS.SAVE_PRESET)
@@ -477,7 +480,7 @@ class Coordinate:
 def birth_coord(color, tuple_to_alloc, unallocd_coords, allocd_coords, canvas):
     """color is a list of RGB values e.g. [255,0,255]. unallocd_coords and allocd_coords
     are sets. canvas is a dict of Coordinate objects. As these are all passed by reference
-	(the default Python way), so the sets and dict are manipulated directly by the function."""
+    (the default Python way), so the sets and dict are manipulated directly by the function."""
     # Move tuple_to_alloc out of unallocd_coords and into allocd_coords, depending:
     if tuple_to_alloc in unallocd_coords and tuple_to_alloc not in allocd_coords:
         unallocd_coords.remove(tuple_to_alloc)
@@ -508,9 +511,9 @@ def coords_set_to_image(canvas, HEIGHT, WIDTH, image_file_name):
 
 def print_progress(newly_painted_coords):
     """Prints coordinate plotting statistics (progress report)."""
-    print('newly painted : total painted : target : canvas size') 
+    print('newly painted : total painted : target : canvas size : reclaimed orphans') 
     print(newly_painted_coords, ':', painted_coordinates, ':',\
-    TERMINATE_PIXELS_N, ':', ALL_PIXELS_N)
+    TERMINATE_PIXELS_N, ':', ALL_PIXELS_N, ':', orphans_to_reclaim_n)
 # END GLOBAL FUNCTIONS
 # END OPTIONS AND GLOBALS
 
@@ -588,15 +591,13 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
     potential_orphan_coords_two = set()
     # used to reclaim orphan coordinates every N iterations through the
     # `while allocd_coords` loop:
-    reclaim_orphan_coords_every_n = 7
-    reclaim_orphan_coords_trigger = 0
-    base_orphan_reclaim_multiplier = 0.08
+    base_orphan_reclaim_multiplier = 0.015
+    orphans_to_reclaim_n = 0
+    coords_painted_since_reclaim = 0
     # These next two variables are used to ramp up orphan coordinate reclamation rate
     # as the render proceeds:
-    multiplier_check = int(ALL_PIXELS_N / reclaim_orphan_coords_every_n)
-    multiplier = 1
     print('Generating image . . . ')
-    newly_painted_coords = 0		# This is reset at every call of print_progress()
+    newly_painted_coords = 0        # This is reset at every call of print_progress()
     while allocd_coords:
         # NOTE: There are two options for looping here. Mode 0 (which was the first developed
         # mode) makes a copy of allocd_coords, and loops through that. The result is that the
@@ -626,6 +627,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
                 filled_coords.add(coord)        # When a coordinate has its color mutated, it dies.
                 painted_coordinates += 1
                 newly_painted_coords += 1
+                coords_painted_since_reclaim += 1
                 # The first returned set is used straightway, the second optionally shuffles
                 # into the first after the first is depleted:
                 rnd_new_coords_set, potential_orphan_coords_one = canvas[coord].get_rnd_unallocd_neighbors()
@@ -639,32 +641,24 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
                 potential_orphan_coords_two = potential_orphan_coords_two | potential_orphan_coords_one
 #        Conditionally reclaim orphaned coordinates. Code here to reclaim coordinates gradually (not in spurts as at first coded) is harder to read and inelegant. I'm leaving it that way. Because GEH, DONE.
         if RECLAIM_ORPHANS:
-    # orphan coordinate reclamation rate multiplier ramp check some other noun just for kicks:
-            if painted_coordinates > (multiplier_check * multiplier):
-                multiplier += 1
-                # print('__multiplier:__:', multiplier)
-    # that ends
-            reclaim_orphan_coords_trigger += 1
-            if reclaim_orphan_coords_trigger == reclaim_orphan_coords_every_n:
-                reclaim_orphan_coords_trigger = 0
-                # removes elements from potential_orphan_coords_two which are in filled_coords
-                # (to avoid reusing coordinates) ; set subtraction; orphanCoords declared here:
-                orphanCoords = potential_orphan_coords_two - filled_coords
-                # decide how many orphans to reclaim; use int() to avoid decimals:
-                orphans_to_reclaim_n = int(len(orphanCoords) * base_orphan_reclaim_multiplier)
-                orphans_to_reclaim_n *= multiplier
-                # clip that to acceptable range if necessary:
-                if orphans_to_reclaim_n <= 0:
-                    orphans_to_reclaim_n = 1
-                if orphans_to_reclaim_n > len(orphanCoords):
-                    orphans_to_reclaim_n = len(orphanCoords)
-                # get those orphans and then move them into allocd_coords:
+            # removes elements from potential_orphan_coords_two which are in filled_coords
+            # (to avoid reusing coordinates) ; set subtraction; orphanCoords declared here:
+            orphanCoords = potential_orphan_coords_two - filled_coords
+            # decide how many orphans to reclaim; use int() to avoid decimals:
+            orphans_to_reclaim_n = int(coords_painted_since_reclaim * base_orphan_reclaim_multiplier)
+            coords_painted_since_reclaim = 0
+            # clip that to acceptable range if necessary:
+            if orphans_to_reclaim_n <= 0:
+                orphans_to_reclaim_n = 1
+            if orphans_to_reclaim_n > len(orphanCoords):
+                orphans_to_reclaim_n = len(orphanCoords)
+            # get those orphans and then move them into allocd_coords:
 # TO DO: more efficient sampling than creating a list here, if possible:
-                tmp_set = set(random.sample(orphanCoords, orphans_to_reclaim_n))
-                # The while loop will continue if there's anything in allocd_coords;
-                # set "addition" with |  :
-                allocd_coords = allocd_coords | tmp_set
-                print('Reclaimed', orphans_to_reclaim_n, 'orphan coordinates.')
+            tmp_set = set(random.sample(orphanCoords, orphans_to_reclaim_n))
+            # The while loop will continue if there's anything in allocd_coords;
+            # set "addition" with |  :
+            allocd_coords = allocd_coords | tmp_set
+            # print('Reclaimed', orphans_to_reclaim_n, 'orphan coordinates.')
 
 # TO DO: I might like it if this stopped saving new frames after every coordinate was
 # colored (it can (always does?) save extra redundant frames at the end;
@@ -702,10 +696,22 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
 # END MAIN FUNCTIONALITY.
 
 
-# Optional sys cd into anim frames subfolder and invoke ffmpegAnim.sh to make an animation from the frames:
+# OPTIONAL, sys cd into anim frames subfolder and invoke ffmpegAnim.sh to make an animation
+# and/or rename files to GROWTH_CLIP parameter demo files names:
 # os.chdir(anim_frames_folder_name)
-# subprocess.call('ffmpegAnim.sh 30 30 7 png', shell=True)
+# subprocess.call('ffmpegAnim.sh 30 30 7 png', shell = True)
 # subprocess.call('open _out.mp4', shell=True)
+# Danger Will Robinson! :
+# subprocess.call('rm *.png', shell=True)
+# OPTIONAL, TO RENAME THE OUTPUT files to a GROWTH_CLIP parameter demo file; ASSUMES only one image made:
+# mv_png_command = 'mv ../' + image_file_name + ' ../' + png_rename
+# mv_cgp_command = 'mv ../' + file_base_name + '.cgp ../' + cgp_rename
+# mv_mp4_command = 'mv ./_out.mp4 ' + '../' + mp4_rename
+# subprocess.call(mv_png_command, shell=True)
+# subprocess.call(mv_cgp_command, shell=True)
+# subprocess.call(mv_mp4_command, shell=True)
+# os.chdir('..')
+# subprocess.call('rm -rf ' + anim_frames_folder_name, shell = True)
 
 
 # MUCH BETTERER REFERENCE:
