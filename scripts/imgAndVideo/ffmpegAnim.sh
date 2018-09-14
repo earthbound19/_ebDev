@@ -10,6 +10,7 @@
 # $3 desired constant quality (crf)
 # $4 the file extension of the input images.
 # Optional: $5 nearest neighbor method rescale target resolution expressed as N[NN..]xN[NN..], for example 200x112; OR to scale to one target dimension and calculate the other automatically (to maintain aspect), give e.g. 1280:-1 (to produce an image that is 1280 pix wide by whatever the other dimension should be). Nearest-neighbor keeps hard edges.
+# Optional: $6 how many seconds to loop the last frame, to create a long still of the last frame appended to the end of the video. Creates the still loop as _append.mp4, then muxes _out.mp4 and _append.mp4 to a temp mp4, deletes both the originals and renames the temp to _out.mp4. UGLY KLUDGE: if you want to use this but not $5, pass the word NULL as $5.
 # EXAMPLE
 # thisScript.sh 29.97 29.97 13 png
 
@@ -23,9 +24,14 @@
 # CODE
 if [ ! -z ${5+x} ]
 then
-	rescaleParams="-vf scale=$5:-1:flags=neighbor"
-		# echo rescaleParams val is\:
-		# echo $rescaleParams
+	if [ $5 != "NULL" ]		# If we want to use $6 but not $5 (as $6 is positional), we use NULL for $5.
+	then
+		rescaleParams="-vf scale=$5:-1:flags=neighbor"
+			# echo rescaleParams val is\:
+			# echo $rescaleParams
+	else
+		echo parameter 5 was the string \"NULL\"\. Will not use.
+	fi
 fi
 
 # IN DEVELOPMENT: automatic centering of image in black matte borders (padding):
@@ -51,16 +57,16 @@ echo executing ffmpeg command . . .
 ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $rescaleParams -vf fps=$2 -crf $3 _out.mp4
 # ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $rescaleParams -vf fps=$2 -crf $3 -codec:v utvideo _out.avi
 
-		# EXPERIMENT re: https://stackoverflow.com/a/45465730
-		# ffmpeg -y -i seeing_noaudio.mp4 -c copy -f h264 seeing_noaudio.h264
-		# ffmpeg -y -r 24 -i seeing_noaudio.h264 -c copy seeing.mp4
-
-
-# THE FOLLOWING could be adapted to a rawvideo option:
-# ffmpeg -y -r 24 -f image2 -i doctoredFrames\mb-DGYTMSWA-fr_%07d.png -vf "format=yuv420p" -vcodec rawvideo -r 29.97 _DGYTMSWAsourceDoctoredUncompressed.avi
-
-# DEV NOTES
-# to enable simple interpolation to up the framerate to 30, use this tag in the codec/output flags section:
-# -vf fps=30
-
-# ex. OLD command: ffmpeg -y -r 18 -f image2 -i %05d.png -crf 17 -vf fps=30 out.mp4
+# If $6 is passed to the script, create a looped still video ($6 seconds long) from the last frame and append it to the video:
+if [ ! -z ${6+x} ]
+then
+	ffmpeg -y -loop 1 -i $lastFoundTypeFile -vf fps=$2 -t $6 -crf $3 _append.mp4
+	printf "" > tmp_ft2N854f.txt
+	echo _out.mp4 >> tmp_ft2N854f.txt
+	echo _append.mp4 >> tmp_ft2N854f.txt
+	sed -i "s/^\(.*\)/file '\1'/g" tmp_ft2N854f.txt
+	ffmpeg -f concat -i tmp_ft2N854f.txt -c copy _tmp_TXF6PmWe.mp4
+	rm ./tmp_ft2N854f.txt
+	rm ./_out.mp4 ./_append.mp4
+	mv ./_tmp_TXF6PmWe.mp4 ./_out.mp4
+fi
