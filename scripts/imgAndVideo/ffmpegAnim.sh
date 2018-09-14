@@ -48,7 +48,7 @@ fi
 # an example command wut does some math as would be needed per this algo: echo "scale=5; 3298 / 1296" | bc
 
 # Assumes that all input files have the same character count in the file base name; I wonder whether I've gone full circle on going away from and back to the exact form of the following command, but *right now* it's testing ok on Cygwin and Mac; re https://stackoverflow.com/a/40876071 ; ALSO gnuWin32 gfind it seems has a bug; the command throws an error. Here using Cygwin find on Windows and find on Mac; maybe I'll do that everywhere..
-lastFoundTypeFile=`find . -iname \*.$4 | tail -n 1 | sed 's/\.\/\(.*\)/\1/g'`
+lastFoundTypeFile=`find . -iname \*.$4 | sort | tail -n 1 | sed 's/\.\/\(.*\)/\1/g'`
 lastFoundTypeFileNameNoExt=${lastFoundTypeFile%.*}
 digitsPadCount=${#lastFoundTypeFileNameNoExt}
 
@@ -64,8 +64,8 @@ then
 	printf "" > tmp_ft2N854f.txt
 	echo _out.mp4 >> tmp_ft2N854f.txt
 	echo _append.mp4 >> tmp_ft2N854f.txt
-	sed -i "s/^\(.*\)/file '\1'/g" tmp_ft2N854f.txt
-	ffmpeg -f concat -i tmp_ft2N854f.txt -c copy _tmp_TXF6PmWe.mp4
+	gsed -i "s/^\(.*\)/file '\1'/g" tmp_ft2N854f.txt
+	ffmpeg -y -f concat -i tmp_ft2N854f.txt -c copy _tmp_TXF6PmWe.mp4
 	rm ./tmp_ft2N854f.txt
 	rm ./_out.mp4 ./_append.mp4
 	mv ./_tmp_TXF6PmWe.mp4 ./_out.mp4
