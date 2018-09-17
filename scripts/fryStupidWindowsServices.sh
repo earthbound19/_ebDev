@@ -39,6 +39,10 @@ ehRecvr \
 ehSched \
 WMPNetworkSvc \
 FontCache3.0.0.0 \
+HomeGroupListener \
+HomeGroupProvider \
+WinDefend \
+AdobeUpdateService \
 BITS"
 
 for element in ${disableServices[@]}
@@ -53,13 +57,10 @@ onDemandServices="
 AeLookupSvc \
 DPS \
 Fax \
-HomeGroupListener \
-HomeGroupProvider \
 Mcx2Svc \
 PcaSvc \
 SharedAccess \
 StorSvc \
-WinDefend \
 WinRM \
 WPCSvc"
 
