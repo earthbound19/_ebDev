@@ -10,9 +10,9 @@
 fileNameNoExt=${1%.*}
 
 # "wrap" CLI option, uses specific fonts:
-wrap pdf $1 --no-scene-numbers --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf"
+# wrap pdf $1 --no-scene-numbers --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf"
 
 # "afterwriting" CLI option:
-# afterwriting --source $1 --overwrite --pdf && open $1.pdf
+afterwriting --source $1 --overwrite --pdf
 
-open ./$fileNameNoExt.pdf
+# open ./$fileNameNoExt.pdf
