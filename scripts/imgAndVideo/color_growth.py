@@ -24,19 +24,16 @@ See comments under the same heading in this module.
 
 # TO DO:
 # - Refactor algorithm for better efficiency if possible
-#   - delete unnecessary import statements
 #   - Examine whether and why exponential slowdown occurs over the run of the script, and whether
 #     it is something in --RECLAIM_ORPHANS that does this. Symptom: newly_painted_coords as
-#     newly_painted_coords as reported by print_progress(newly_painted_coords) stays in a roughly
+#     reported by print_progress(newly_painted_coords) stays in a roughly
 #     constant neighborhood from about halfway through the render to the end, but it may be taking
 #     longer and longer to render that same number of coordinates. I think my math/model for
 #     reclaiming coordinates may have something to do with that. Could I do some math _like_
 #     that used in counting and resetting coordinates to report in
 #     print_progress(newly_painted_coords), but with reclaiming orphans?
-#    - AFTER THAT control reclaim_orphan_coords_every_n and base_orphan_reclaim_multiplier with
-#      CLI options of the same name, defaulting to the values hard-coded right now?
-#    - Have RECLAIM_ORPHANS do its work only once (without reactivating continued painting) when
-#      STOP_AT_PERCENT is reached?
+#    - Option to have RECLAIM_ORPHANS do its work only once (without reactivating continued
+#      painting) when STOP_AT_PERCENT is reached?
 #    - Develop scripted tests of all possible switch combinations, with timing baseline
 #      and improvement checks.
 # - See if compiled/transpiled versions of this are faster. In tests:
@@ -51,6 +48,8 @@ See comments under the same heading in this module.
 # - Fix "KNOWN ISSUE" described in help for --RANDOM_SEED.
 # - Option and function to explicitly set start coords from set of tuple coordinates
 # - Initialize COLOR_MUTATION_BASE by random selection from a .hexplt color scheme
+# - Option to set start coords color mutation bases from .hexplt color scheme (would override)
+#   initialization from set of tuple coords
 # - Option to suppress progress print to save time
 # - Fixes re pylint comments at end, also things listed in development code with TO DO comments
 # - Option: instead of randomly mutating color for each individual chosen neighbor coordinate,
