@@ -32,6 +32,11 @@ See comments under the same heading in this module.
 #     reclaiming coordinates may have something to do with that. Could I do some math _like_
 #     that used in counting and resetting coordinates to report in
 #     print_progress(newly_painted_coords), but with reclaiming orphans?
+#     - I think the slowdown is from checking newly allocated coords are not in allocd_coords.
+#      That set gets larger as the image progresses, so it would make sense that checking a
+#      larger set takes longer toward the end of the render. Do I really even need such a set?
+#      Couldn't I only check the unallocd_coords set and know that if it's not in that set,
+#      it is an allocated coordinate (so that I don't even need an allocd_coords set at all)?
 #    - Option to have RECLAIM_ORPHANS do its work only once (without reactivating continued
 #      painting) when STOP_AT_PERCENT is reached?
 #    - Develop scripted tests of all possible switch combinations, with timing baseline
