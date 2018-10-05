@@ -41,7 +41,9 @@ then
 	# Adapted from: https://backreference.org/2009/12/23/how-to-match-newlines-in-sed/
 	# sed ':begin;$!N;s/FOO\nBAR/FOOBAR/;tbegin;P;D'   # if a line ends in FOO and the next
 	# starts with BAR, join them
-	gsed -i ':begin;$!N;s/\(.*[a-z].*\)\n\(.*[a-z].*\)/\1 \2/;tbegin;P;D' tmp_tail_wYSNpHgq.fountain
+	#   - Also don't match [ .@~] characters at start of line (don't join if those fountain syntax
+	# marks are present:
+	gsed -i ':begin;$!N;s/\(^[^ .\(~@\n].*[a-z].*\)\n\(^[^ .\(~@\n].*[a-z].*\)/\1 \2/;tbegin;P;D' tmp_tail_wYSNpHgq.fountain
 	# - back original fountain file up:
 	mv ./$1 ./$1.fountain-bak.txt
 	# - overwrite original with semantic linefeed-joined version (backed up original will be
