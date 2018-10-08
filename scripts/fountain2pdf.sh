@@ -9,9 +9,9 @@
 # semantic linefeeds in action or dialogue (to a temp file) before PDF conversion.
 
 # NOTES
-# The "wrap" CLI option expects those specific font files to be (I think) in the same
-# PATH as the source fountain file. Also, the optional last line of this script opens
-# the output pdf.
+# The "wrap" CLI option expects those specific font files to be in the samecPATH as the source
+# fountain file or in the font folder of you specific system. Also, the optional last line of
+# this script opens the output pdf.
 
 # DEPENDENCIES
 # wrap or afterwriting CLI (depending on which you choose and which code line you uncomment
@@ -55,7 +55,7 @@ fi
 # ====
 # START PDF RENDER OPTIONS
 # "wrap" CLI option, uses specific fonts:
-# wrap pdf $1 --no-scene-numbers --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf"
+# wrap pdf $1 --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf"
 
 # "afterwriting" CLI option:
 afterwriting --source $1 --overwrite --pdf
