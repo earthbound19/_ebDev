@@ -9,7 +9,7 @@
 # semantic linefeeds in action or dialogue (to a temp file) before PDF conversion.
 
 # NOTES
-# The "wrap" CLI option expects those specific font files to be in the samecPATH as the source
+# The "wrap" CLI option expects those specific font files to be in the same PATH as the source
 # fountain file or in the font folder of you specific system. Also, the optional last line of
 # this script opens the output pdf.
 
