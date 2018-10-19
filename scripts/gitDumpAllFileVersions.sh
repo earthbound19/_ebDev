@@ -15,7 +15,9 @@ git log $* > tmp_DsunTkSwyGsM7c.txt
 # Filter that result to just the hashes of commits printed from the log command; maybe {1,} should be {40} ? :
 sed -i -n 's/^commit \([0-9a-z]\{1,\}\)\(.*\)/\1/p' tmp_DsunTkSwyGsM7c.txt
 # Because git (apparently) counts revisions ascending from newest to oldest, but we want ascending from oldest to newest, reverse that resultant list of file hashes:
-tac tmp_DsunTkSwyGsM7c.txt > tmp_7BTRBAqw4rMBBP.txt
+# tac tmp_DsunTkSwyGsM7c.txt > tmp_7BTRBAqw4rMBBP.txt
+# REVERT to that previous line if the following doesn't work:
+tail -r tmp_DsunTkSwyGsM7c.txt > tmp_7BTRBAqw4rMBBP.txt
 
 while read HASH
 do
