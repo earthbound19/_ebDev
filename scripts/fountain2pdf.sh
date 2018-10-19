@@ -5,7 +5,7 @@
 
 # USAGE
 # thisScript.sh fountain-source-file.fountain foo
-# --where "foo" is optional, and may be anything, which if present, causes the script to joins
+# --where "foo" is optional, and may be anything, which if present, causes the script to join
 # semantic linefeeds in action or dialogue (to a temp file) before PDF conversion.
 
 # NOTES
@@ -55,10 +55,10 @@ fi
 # ====
 # START PDF RENDER OPTIONS
 # "wrap" CLI option, uses specific fonts:
-# wrap pdf $1 --no-scene-numbers --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf"
+wrap pdf $1 --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf"
 
 # "afterwriting" CLI option:
-afterwriting --source $1 --overwrite --pdf
+# afterwriting --source $1 --overwrite --pdf
 # END PDF RENDER OPTIONS
 # ====
 
