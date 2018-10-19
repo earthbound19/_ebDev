@@ -1,0 +1,6 @@
+regex scribbles:
+Doesn't cover all cases of action erroneously broken into separate lines:
+[^Credit: |^Title: |^Source: |^Draft date: |^Contact: ]([a-z.,“”"':;!?])[^:]\n([A-Za-z\s])
+
+attempting develop:
+\n[^A-Z .-]{1,}
