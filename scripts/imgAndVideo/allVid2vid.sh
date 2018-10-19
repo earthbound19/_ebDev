@@ -12,6 +12,7 @@ destIMGformat=$2
 	additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2"
 			# Tossed: -vf scale=-1:1080:force_original_aspect_ratio=1
 
+# wut? Why did I code these next lines? There will never be $5 per script instructions; and that isn't the best way to check for parameter value (existence) :
 if [ ! -a $5 ]
 then
 	param3="-background none"
