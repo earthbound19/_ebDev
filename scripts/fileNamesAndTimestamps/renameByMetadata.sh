@@ -1,4 +1,4 @@
-# WARNING: this script renames files without backup and without any prompt. For this reason everything under the CODE comment is commented out, and you must manually uncomment the code to use it, and I urge you to then comment it out again when done using it.
+# WARNING: this script renames files without backup and without any prompt. For this reason everything under the CODE comment is left undone by an `exit` command which you must comment out to use the script (it will otherwise do nothing other than start and exit). Uncomment exit and save again when done with the script.
 
 # DESCRIPTION
 # Renames image files and .MOV and .mp4 files after dateTimeOriginal and createDate metadata, respectively.
@@ -26,6 +26,7 @@
 # Exploit that given at this URL? : https://smarnach.github.io/pyexiftool/
 
 # CODE
+exit
 
 # renames all image formats in current directory which exiftool decides to:
 exiftool -v -overwrite_original '-Filename<${dateTimeOriginal}${subsecTimeOriginal;$_.=0 x(3-length)}.%e' -d "%Y_%m_%d__%H_%M_%S" .
