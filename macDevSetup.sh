@@ -1,12 +1,12 @@
 pushd .
 
+# NOPE: maybe asdf instead:
 # install n node version manager; re: https://github.com/tj/n/issues/169
-cd ~
-curl -L https://git.io/n-install | bash
+# cd ~
+# curl -L https://git.io/n-install | bash
 # TO UNINSTALL:
 # ~/n/n-uninstall
-
-n latest
+# n latest
 
 popd
 
