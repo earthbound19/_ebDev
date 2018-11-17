@@ -19,6 +19,7 @@ libxslt \
 unixodbc \
 graphicsmagick \
 pyenv \
+findutils \
 openimageio"
 
 # See pyenvFrameworkInstallMac.sh.
@@ -30,7 +31,6 @@ openimageio"
 # cmake \
 # cocoapods \
 # cryptopp \
-# findutils \
 # freetype \
 # gdbm \
 # ghostscript \
