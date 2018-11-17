@@ -1,3 +1,0 @@
-see: https://coolestguidesontheplanet.com/add-shell-path-osx/
-
-and / or http://hathaway.cc/post/69201163472/how-to-edit-your-path-environment-variables-on-mac
