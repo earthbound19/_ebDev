@@ -18,7 +18,10 @@ readline \
 libxslt \
 unixodbc \
 graphicsmagick \
+pyenv \
 gnupg"
+
+# See pyenvFrameworkInstallMac.sh.
 
 # yarn \
 # argtable \
