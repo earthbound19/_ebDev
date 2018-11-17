@@ -19,10 +19,11 @@ libxslt \
 unixodbc \
 graphicsmagick \
 pyenv \
-gnupg"
+openimageio"
 
 # See pyenvFrameworkInstallMac.sh.
 
+# gnupg \
 # yarn \
 # argtable \
 # boost \
