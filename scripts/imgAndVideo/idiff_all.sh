@@ -11,7 +11,7 @@
 # CODE
 
 # Create an array of all file names in the current directory:
-array=(`gfind . -maxdepth 1 -type f -printf '%f\n'`)
+array=(`gfind . -maxdepth 1 -type f -printf '%f\n' | sort`)
 array_size=$((${#array[@]}))	# store size of that array
 inner_loop_start=1						# set base count for inner loop
 															# (will increment to avoid operating on the same file)
@@ -23,14 +23,38 @@ do
 		inner_no_ext=${inner%.*}	# store that without the file extension
 		outer_no_ext=${outer%.*}	# store first file name without file extension
 		# use those to make an out file name after both:
-		outfile="image_diffs/""$outer_no_ext"__"$inner_no_ext"__diff.tif
+		outfileNoExt="image_diffs/""$outer_no_ext"__"$inner_no_ext"__diff		# no ext so I can delete any output file, replace it with a ~_no.txt file starting with the same name, and never render it again (because this script will check for outfileNoExt* files and not render if they exist
+		outfile="$outfileNoExt".tif
 		if [ ! -d image_diffs ]; then mkdir image_diffs; fi
 		# if that out file does not exist, invoke idiff against the source pairs and output the result to the file:
-		if [ ! -e $outfile ]
+		if [ ! -e "$outfileNoExt"* ]
 		then
 			idiff -o $outfile $outer $inner
 		else
-			echo ~- Target file already exists \($outfile\). Skipped render.
+			echo ~- Target file or similarly named already exists \($outfile\). Skipped render.
+		fi
+	done
+	inner_loop_start=$(($inner_loop_start + 1))
+done
+
+# All the same things again, but with the lists reversed first, becauase if you operate on the same pair of file names in different parameter order, you get different results:
+array=(`gfind . -maxdepth 1 -type f -printf '%f\n' | sort -r`)
+array_size=$((${#array[@]}))
+inner_loop_start=1
+for outer in ${array[@]}
+do
+	for((j = inner_loop_start; j<array_size; j++))
+	do
+		inner=${array[j]}
+		inner_no_ext=${inner%.*}
+		outer_no_ext=${outer%.*}
+		outfileNoExt="image_diffs/""$outer_no_ext"__"$inner_no_ext"__diff
+		outfile="$outfileNoExt".tif
+		if [ ! -e "$outfileNoExt"* ]
+		then
+			idiff -o $outfile $outer $inner
+		else
+			echo ~- Target file or similarly named already exists \($outfile\). Skipped render.
 		fi
 	done
 	inner_loop_start=$(($inner_loop_start + 1))
