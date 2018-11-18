@@ -1,3 +1,5 @@
+# OR USE rename.pl in the _in_development folder, which can be installed on mac via `brew install rename`.
+
 # FAIL at first blush; throws error about improper use of basename command.
 # TO DO: investigate (unless I find a better solution).
 
@@ -25,6 +27,7 @@ echo "Dude. In the wrong hands this script is a weapon. You sure you wanna do th
 
 
 rm -f /tmp/clean_dir_file_names*
+mkdir /tmp/clean_dir_file_names
 # cd $1
 find .  | awk '{ print length(), $0 | "sort -n -r" }' | \
 grep -v '^1 \.$' | cut -d/ -f2- > /tmp/clean_dir_file_names_1

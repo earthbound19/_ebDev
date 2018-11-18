@@ -20,6 +20,7 @@ unixodbc \
 graphicsmagick \
 pyenv \
 findutils \
+rename \
 openimageio"
 
 # See pyenvFrameworkInstallMac.sh.
