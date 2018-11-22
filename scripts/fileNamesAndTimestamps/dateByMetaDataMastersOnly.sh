@@ -1,6 +1,6 @@
 # IN DEVELOPMENT? Figure that out.
 
-# DESCRIPTION: Corrects erroneous creation and moficiation file system timestamps in image files by modifying file system file time stamps from file metadata. Runs on every file in a directory tree from which this script is executed. This is a fix for the problem that file system time stamps for files can be thrown off by e.g. restoring files from backups or copying accross drives. It assumes there is any such useful metadata to correct time stamps from. If there isn't any such metadata, nothing will happen for every respective files this script runs against.
+# DESCRIPTION: Corrects erroneous creation and modification file system timestamps in image files by modifying file system file time stamps from file metadata. Runs on every file in a directory tree from which this script is executed. This is a fix for the problem that file system time stamps for files can be thrown off by e.g. restoring files from backups or copying across drives. It assumes there is any such useful metadata to correct time stamps from. If there isn't any such metadata, nothing will be changed in the file (for every respective file this script runs against).
 
 echo BEGINNING correcting of timestamps to match any EXIF data . . .
 

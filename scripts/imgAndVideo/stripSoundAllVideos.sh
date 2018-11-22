@@ -15,4 +15,4 @@ done < $allFilesTXTfile
 
 rm $allFilesTXTfile
 
-echo DONE. Check all the converted videos for errors. If there were any conversion errors, you can restore from the originals which were renamed \<filename\>_original.$fileExt. To save space you may want to delete originals after verifying the sound-stripped video stream copy files are okay.
+echo DONE. Check all the converted videos for errors. If there were any conversion errors, you can restore from the originals which were renamed \<filename\>_backup.$fileExt. To save space you may want to delete originals after verifying the sound-stripped video stream copy files are okay.
