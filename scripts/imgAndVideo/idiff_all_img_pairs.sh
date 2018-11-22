@@ -1,5 +1,5 @@
 # DESCRIPTION
-# runs idiff (from openimageio toolset) against every possible file pair in the current directory to produce interesting diff art. NOTE that the commands will break on unsupported format files.
+# runs idiff (from openimageio toolset) against every possible file pair in the current directory to produce interesting diff art. Can be really instersting with e.g. satellite photography of Earth (wilderness and/or civilization as seen from space). NOTE that the commands will break on unsupported format files.
 
 # DEPENDENCIES
 # A 'nixy environment, the openimageio tool set, and images to diff.
