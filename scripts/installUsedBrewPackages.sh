@@ -21,6 +21,7 @@ graphicsmagick \
 pyenv \
 findutils \
 rename \
+exiftool \
 openimageio"
 
 # See pyenvFrameworkInstallMac.sh.
