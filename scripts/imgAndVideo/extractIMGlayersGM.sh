@@ -16,6 +16,7 @@
 # Once this worked for me using graphicsMagick; now it doesn't. But does work with imagemagick. Le sigh. Putting both gm and magick in _ebSuperBin, and splitting this into two scripts, each adapted for the other.
 # Um, this can be done far more simply? re https://gist.github.com/pepebe/2955410 OR https://superuser.com/a/44602
 # TO DO? examine: http://undertheweathersoftware.com/how-to-extract-layers-from-a-photoshop-file-with-imagemagick-and-python/
+# -- OR: https://github.com/psd-tools/psd-tools
 
 
 # CODE

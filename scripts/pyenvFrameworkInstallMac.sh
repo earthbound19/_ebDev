@@ -1,7 +1,8 @@
 # DESCRIPTION
 # Builds and installs python 3.7.0rc1 with frameworks enabled, on Mac OSX. I want pyinstall to see if a build executable from colorGrowth.py runs more efficiently than that script running against the Python interpreter. At this writing, pyinstall apparently works with Python up to v 3.5.2, so using that:
 
-sudo env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.5.2 --verbose
+# sudo env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.5.2 --verbose
+env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.5.2 --verbose
 
 
 # THE FOLLOWING FAILED, re: https://github.com/pyenv/pyenv/issues/99#issuecomment-34971668 to fix pyinstall not working with the pyenv Python installed version manager and environment:

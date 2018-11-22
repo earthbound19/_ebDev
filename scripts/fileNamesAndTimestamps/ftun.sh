@@ -5,12 +5,11 @@
 # From a terminal, in a folder with terminal-processing-unfriendly names, execute this script and follow the prompts.
 
 # TO DO
-# Finish development of ftun2.sh, deprecate this functionality, and move that functionality here.
+# use rename.pl from the _in_development folder instead of this; deprecate this. NOTE: on mac that can be very easily made available via `brew install rename`. ALL THE BELOW CODE then becomes: `rename -z *` or to preview renames: `rename -n -z *`.
 # Eliminate "rename" commands that would attempt to rename a directory or file to itself.
 # NOT TO DO
-# Use the elegant means I found somewhere of eliminating lines that are identical between alles and alles2.txt etc. (as this would avoid time-wasting and error-trowing renames of a file to itself) before further marking up and pasting them.
-# Reason: I couldn't manage to find that.
-
+# - Use the elegant means I found somewhere of eliminating lines that are identical between alles and alles2.txt etc. (as this would avoid time-wasting and error-trowing renames of a file to itself) before further marking up and pasting them. Reason: I couldn't manage to find that.
+# - use http://www.techrepublic.com/blog/linux-and-open-source/how-to-remove-weird-characters-from-file-and-directory-names-automatically/
 
 # SCRIPT WARNING ==========================================
 echo "Dude. In the wrong hands this script is a weapon. You sure you wanna do that? If this is something you mean to do, press y and enter. Otherwise press n and enter, or close this terminal. NOTE: any folder starting with a - (minus or dash) in the folder name will cause this script to fail. You'll want to avoid ever naming any folder thus. ALSO: this script will ignore all files containing the string 'alles'. For technical reasons."
