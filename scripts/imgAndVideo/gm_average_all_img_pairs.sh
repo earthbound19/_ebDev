@@ -38,4 +38,4 @@ do
 	inner_loop_start=$(($inner_loop_start + 1))
 done
 
-# If we did all the same things againn, but with the lists reversed first, unlike in the idif_all_img_pairs.sh script with subtraction, average will here produce the same result, whatever the file order of a pair--so don't do anything with reversed order.
+# If we did all the same things again, but with the lists reversed first, unlike in the idif_all_img_pairs.sh script with subtraction, average will here produce the same result, whatever the file order of a pair--so don't do anything with reversed order.
