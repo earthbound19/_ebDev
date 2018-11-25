@@ -14,23 +14,20 @@ if [ -d numberedLinks ]; then rm -rf numberedLinks; mkdir numberedLinks; else mk
 # cd ./testFiles
 # if [ -a links ]; then rm -d -r links; mkdir links; else mkdir links; fi
 
-find . -iname \*.$1 > allJunctionSrcs.txt
-mapfile -t arr < allJunctionSrcs.txt
-rm allJunctionSrcs.txt
+arr=(`gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
 arraySize=${#arr[@]}
 numDigitsOf_arraySize=${#arraySize}
-		
 idx=0
 for element in ${arr[@]}
 do
-		# Pads numbers to number of digits in %0n:
-		# var=`printf "%05d\n" $element`
-		# OR e.g.
-		# for i in $(seq -f "%05g" 10 15)
-		idx=$(( $idx + 1 ))
-		paddedNum=`printf "%0""$numDigitsOf_arraySize""d\n" $idx`
-				# echo paddedNum val is $paddedNum
-		link ./$element ./numberedLinks/$paddedNum.$1
+	# Pads numbers to number of digits in %0n:
+	# var=`printf "%05d\n" $element`
+	# OR e.g.
+	# for i in $(seq -f "%05g" 10 15)
+	idx=$(( $idx + 1 ))
+	paddedNum=`printf "%0""$numDigitsOf_arraySize""d\n" $idx`
+			# echo paddedNum val is $paddedNum
+	link ./$element ./numberedLinks/$paddedNum.$1
 done
 
 
