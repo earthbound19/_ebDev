@@ -7,6 +7,8 @@
 # USAGE
 # thisScript.sh
 
+# TO DO: save to high quality compressed files. Straight -o filename.jpg from idiff produced an image with far inferior color fidelity vs. a tif, but tifs are many times the size of the jpg and save slooooowly :( Pipe the output to another openimageio tool to save with custom image quality / color depth?
+
 
 # CODE
 
