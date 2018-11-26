@@ -1,6 +1,6 @@
 # USAGE
-# Invoke this cript with one parameter:
-# $1 The file list name, for which every file name in the list there will have numbered copies made in a subdir. Preparation for other scripts which must operate on numbered files.
+# Invoke this script with one parameter:
+# $1 The file list name, for which every file name in the list will have numbered copies made in a subdir. This is preparation for other scripts which must operate on numbered files.
 
 # WARNING: this script perhaps dangerously assumes all file names provided in the list have the same extension. Also, it clobbers any files that already exist when it copies (overwrites without prompt).
 
