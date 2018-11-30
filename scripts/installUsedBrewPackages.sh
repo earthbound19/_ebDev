@@ -22,6 +22,7 @@ pyenv \
 findutils \
 rename \
 exiftool \
+jq \
 openimageio"
 
 # See pyenvFrameworkInstallMac.sh.
