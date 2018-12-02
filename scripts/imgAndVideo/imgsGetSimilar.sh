@@ -78,7 +78,7 @@ do
 		printf "|$i|$j\n" >> compare__superShrunkRc6d__col2.txt
 	done
 done
-exit
+
 # Reverse the gsed operations before and in that block:
 gsed -i 's/__superShrunkRc6d__//g' allIMGs.txt
 gsed -i 's/__superShrunkRc6d__//g' compare__superShrunkRc6d__col1.txt
