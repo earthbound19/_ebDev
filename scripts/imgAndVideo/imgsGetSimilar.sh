@@ -26,13 +26,13 @@ fi
 
 
 # CODE
-	# OPTIONAL wipe of all leftover files from previous run; comment out everything in the following block if you don't want that:
-	rm __superShrunkRc6d__*
+	# OPTIONAL wipe of all leftover files from previous run; comment out the next line if you don't want that:
+if [ -e __superShrunkRc6d__* ]; then rm __superShrunkRc6d__* ; fi
 
 # Because on stupid platforms find produces windows line-endings, convert them to unix after pipe |
-find . -maxdepth 1 -iname \*.$1 > allIMGs.txt
+gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n' | sort > allIMGs.txt
 # Strip leading ./ from listing:
-sed -i 's/^\(\.\/\)\(.*\)/\2/g' allIMGs.txt
+gsed -i 's/^\(\.\/\)\(.*\)/\2/g' allIMGs.txt
 
 # Create heavily shrunken image copies to run comparison on.
 echo Generating severely shrunken image copies to run comparisons against . . .
