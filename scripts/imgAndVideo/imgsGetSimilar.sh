@@ -26,8 +26,8 @@ fi
 
 
 # CODE
-	# OPTIONAL wipe of all leftover files from previous run; comment out the next line if you don't want that:
-if [ -e __superShrunkRc6d__* ]; then rm __superShrunkRc6d__* ; fi
+	# OPTIONAL wipe of all leftover files from previous run; comment out the next line if you don't want or need that:
+rm __superShrunkRc6d__*
 
 # Because on stupid platforms find produces windows line-endings, convert them to unix after pipe |
 gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n' | sort > allIMGs.txt
@@ -42,7 +42,6 @@ for element in "${allIMGs[@]}"
 do
 	if [ -f "__superShrunkRc6d__""$element" ]
 	then
-farf=for
 				echo COMPARISON SOURCE FILE "__superShrunkRc6d__""$element" already exists\; assuming comparisons against it were already run\; skipping comparison.
 	else
 				echo copying $element to shrunken "__superShrunkRc6d__""$element" to make image comparison much faster . . .
@@ -52,7 +51,8 @@ farf=for
 done
 
 # Prepend everything in allIMGs.txt with that wonky string file name identifier before running comparison via the next block;
-sed -i 's/^\(.*\)/__superShrunkRc6d__\1/g' allIMGs.txt
+gsed -i 's/^\(.*\)/__superShrunkRc6d__\1/g' allIMGs.txt
+
 # Reinitialize allIMGs array from that file which now lists __superShrunk.. images! For a long time this script lacked that and so ran slower (it compared original images and missed the entire point of all of the above code)! :
 allIMGs=$( < allIMGs.txt)
 
@@ -78,17 +78,17 @@ do
 		printf "|$i|$j\n" >> compare__superShrunkRc6d__col2.txt
 	done
 done
-
-# Reverse the sed operations before and in that block:
-sed -i 's/__superShrunkRc6d__//g' allIMGs.txt
-sed -i 's/__superShrunkRc6d__//g' compare__superShrunkRc6d__col1.txt
-sed -i 's/__superShrunkRc6d__//g' compare__superShrunkRc6d__col2.txt
+exit
+# Reverse the gsed operations before and in that block:
+gsed -i 's/__superShrunkRc6d__//g' allIMGs.txt
+gsed -i 's/__superShrunkRc6d__//g' compare__superShrunkRc6d__col1.txt
+gsed -i 's/__superShrunkRc6d__//g' compare__superShrunkRc6d__col2.txt
 
 # Re prevous comment in nested loop blocks:
 dos2unix compare__superShrunkRc6d__col1.txt
-paste -d '' compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt > comparisons__superShrunkRc6d__cols.txt
+gpaste -d '' compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt > comparisons__superShrunkRc6d__cols.txt
 # Filter out information cruft; NOTE that if the first column isn't preceded by | then the later sort command won't work as intended:
-sed -i 's/.*Total: \([0-9]\{1,11\}\.[0-9]\{1,11\}\).*|\([^|]*\).*|\([^|]*\).*/\1|\2|\3/g' comparisons__superShrunkRc6d__cols.txt
+gsed -i 's/.*Total: \([0-9]\{1,11\}\.[0-9]\{1,11\}\).*|\([^|]*\).*|\([^|]*\).*/\1|\2|\3/g' comparisons__superShrunkRc6d__cols.txt
 # Back that up to a pre-sort text file in case subsequent sorting turns out not so useful:
 cp comparisons__superShrunkRc6d__cols.txt comparisons__superShrunkRc6d__cols_unsorted.txt
 # Sort results by reverse rank of keys by priority of certain columns in an attempt at most similar pairs adjacent (usually) ; or . . . some other thingy similar? Uncomment one option and comment out all others:
@@ -97,8 +97,8 @@ cp comparisons__superShrunkRc6d__cols.txt comparisons__superShrunkRc6d__cols_uns
 	# sort -n -b -t\| -k1r -k2 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
 	# sort -n -b -t\| -k3r -k1 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
 # Strip the numeric column so we can work up a file list of said ordering for animation:
-sed -i 's/[^|]*|\(.*\)/\1/g' tmp_fx49V6cdmuFp.txt
-# Strip all newlines so that the following sed operation that removes all but the 1st appearance of a match will work over every appearance of a match in the entire file (since they are all on one line, where otherwise the replace would only work on every individual line where the match is found):
+gsed -i 's/[^|]*|\(.*\)/\1/g' tmp_fx49V6cdmuFp.txt
+# Strip all newlines so that the following gsed operation that removes all but the 1st appearance of a match will work over every appearance of a match in the entire file (since they are all on one line, where otherwise the replace would only work on every individual line where the match is found):
 tr '\n' '|' < tmp_fx49V6cdmuFp.txt > comparisons__superShrunkRc6d__cols_sorted.txt
 
 echo -------------------
@@ -107,20 +107,20 @@ while read x
 do
 	echo replacing all but first appearance of file name $x in result file . . .
 	# Delete all but first occurance of a word e.g. 'pattern' from a line; the way it works is: change the first 1 (in the following command) to a 2 to remove everything but the 2nd occurances of 'pattern', or 4 to remove everything but the 4th occurance of the pattern, or 1 to remove all but the first etc., the next example code line re; https://unix.stackexchange.com/a/18324/110338 :
-	# sed -e 's/pattern/_&/1' -e 's/\([^_]\)pattern//g' -e 's/_\(pattern\)/\1/' tstpattern.txt
+	# gsed -e 's/pattern/_&/1' -e 's/\([^_]\)pattern//g' -e 's/_\(pattern\)/\1/' tstpattern.txt
 	# ALSO NOTE that the & is a reference to the matched pattern, meaning the matched pattern will be substituted for & in the output.
-	# sed -e 's/pattern/_&/1' -e 's/\([^_]\)pattern//g' -e 's/_\(pattern\)/\1/' tstpattern.txt
-	sed -i -e "s/$x/_&/1" -e "s/\([^_]\)$x//g" -e "s/_\($x\)/\1/" comparisons__superShrunkRc6d__cols_sorted.txt
+	# gsed -e 's/pattern/_&/1' -e 's/\([^_]\)pattern//g' -e 's/_\(pattern\)/\1/' tstpattern.txt
+	gsed -i -e "s/$x/_&/1" -e "s/\([^_]\)$x//g" -e "s/_\($x\)/\1/" comparisons__superShrunkRc6d__cols_sorted.txt
 done < allIMGs.txt
 
 # replace | with newlines to produce final frame list for e.g. ffmpeg to use:
 tr '|' '\n' < comparisons__superShrunkRc6d__cols_sorted.txt > IMGlistByMostSimilar.txt
 # strip __superShrunk.. part of file names out of that file (which were used for faster comparison) :
-sed -i "s/__superShrunkRc6d__//g" comparisons__superShrunkRc6d__cols_unsorted.txt
+gsed -i "s/__superShrunkRc6d__//g" comparisons__superShrunkRc6d__cols_unsorted.txt
 rm comparisons__superShrunkRc6d__cols_sorted.txt
 # --or, that's ready after two more tweaks for file list format ffmpeg demands and correct file names:
-sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
-sed -i "s/__superShrunkRc6d__//g" IMGlistByMostSimilar.txt
+gsed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
+gsed -i "s/__superShrunkRc6d__//g" IMGlistByMostSimilar.txt
 
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with e.g. any of these scripts\:
