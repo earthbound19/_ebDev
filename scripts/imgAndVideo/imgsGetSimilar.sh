@@ -61,17 +61,17 @@ j_count=0
 printf "" > compare__superShrunkRc6d__col1.txt
 printf "" > compare__superShrunkRc6d__col2.txt
 # List all possible pairs of file type $1, order is not important, repetition is not allowed (math algorithm $1 pick 2).
-for i in "${allIMGs[@]}"
+for i in ${allIMGs[@]}
 do
 	i_count=$(( i_count + 1 ))
 	# Remove element i from a copy of the array so that we only iterate through the remaining in the array which have not already been compared; re http://unix.stackexchange.com/a/68323 :
 	allIMGs_innerLoop=("${allIMGs[@]:$i_count}")
 			# echo size of arr for inner loop is ${#allIMGs_innerLoop[@]}
-	for j in "${allIMGs_innerLoop[@]}"
+	for j in ${allIMGs_innerLoop[@]}
 	do
 # Template graphicsmagick compare command, re: http://www.imagemagick.org/Usage/compare/
 # compare -metric MAE img_11.png img_3.png null: 2>&1
-		echo "comparing images: $i | $j . . . VIA COMMAND: gm compare -metric MAE $i $j null: 2>&1 | grep 'Total'"
+		echo "comparing images: $i | $j . . . VIA COMMAND on proxy files for: gm compare -metric MAE $i $j null: 2>&1 | grep 'Total'"
 		metricPrint=`gm compare -metric MAE $i $j null: 2>&1 | grep 'Total'`
 		# ODD ERRORS arise from mixed line-ending types, where gm returns windows-style, and printf commands produce unix-style. Solution: write to separate column files, later (after these nested loop blocks) convert all gm-created files to unix via dos2unix, then paste them into one file.
 		echo "$metricPrint" >> compare__superShrunkRc6d__col1.txt
