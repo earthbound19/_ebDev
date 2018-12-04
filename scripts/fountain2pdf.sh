@@ -61,10 +61,12 @@ fi
 # ====
 # START PDF RENDER OPTIONS
 # "wrap" CLI option, uses specific fonts:
-wrap pdf $1 --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf"
+# wrap pdf $1 --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf"
 
 # "afterwriting" CLI option:
-# afterwriting --source $1 --overwrite --pdf
+afterwriting --source $1 --overwrite --pdf
+# I gave my best effort and the following method of loading fonts is *stupid* arcane (*_two_ json files?!_*) and doesn't seem to work:
+# --config courierMegaConfig.json --fonts CourierMega.json
 # END PDF RENDER OPTIONS
 # ====
 
