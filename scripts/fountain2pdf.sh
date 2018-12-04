@@ -9,17 +9,22 @@
 # semantic linefeeds in action or dialogue (to a temp file) before PDF conversion.
 
 # NOTES
-# The "wrap" CLI option expects those specific font files to be (I think) in the same
-# PATH as the source fountain file. Also, the optional last line of this script opens
-# the output pdf.
+# THIS SCRIPT expects everything after the title page of the screenplay (the actual
+# screenplay body text) to start with:
+# > FADE IN:
+# and you may expect this script not to work if that is the case.
+# ALSO, the "wrap" CLI option expects those specific font files (given in this script)
+# to be (I think) in the same PATH as the source fountain file. Also, the optional last
+# line of this script opens the output pdf.
 
 # DEPENDENCIES
 # wrap or afterwriting CLI (depending on which you choose and which code line you uncomment
 # for either, respectively), (g)sed, (g)awk, (those last all from gnuwin32 coreutils), head,
-# tail.
+# tail, dos2unix
 
 
 # CODE
+if [ ! -e $1 ]; then echo proposed input file $1 not found. Terminating script.; fi
 
 fileNameNoExt=${1%.*}
 
@@ -37,6 +42,7 @@ then
 	let head_to=tail_from-1
 	head -n $head_to $1 > tmp_head_wYSNpHgq.fountain
 	tail -n +$tail_from $1 > tmp_tail_wYSNpHgq.fountain
+	dos2unix tmp_head_wYSNpHgq.fountain tmp_tail_wYSNpHgq.fountain
 	#  - join semantic linefeeds into that tail file, in-place:
 	# Adapted from: https://backreference.org/2009/12/23/how-to-match-newlines-in-sed/
 	# sed ':begin;$!N;s/FOO\nBAR/FOOBAR/;tbegin;P;D'   # if a line ends in FOO and the next
