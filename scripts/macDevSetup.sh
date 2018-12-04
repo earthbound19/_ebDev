@@ -11,7 +11,12 @@
 ./install_global_node_modules.sh
 
 # Enable "Allow from Anywhere" in app gatekeeper on macOS Sierra (seriously, Apple, you are AWOL with your controls--I have to enable even the *option* to install apps from anywhere by entering a super-user terminal command?! Isn't that anti-competitive?), re: http://osxdaily.com/2016/09/27/allow-apps-from-anywhere-macos-gatekeeper/
-sudo spctl --master-disable
+# USE WITH CAUTION:
+# sudo spctl --master-disable
+# to revert that: sudo spctl --master-enable
+# OR PERHAPS PREFERABLY USE:
+# spctl --add /Path/To/Application.app
+# re: http://osxdaily.com/2015/07/15/add-remove-gatekeeper-app-command-line-mac-os-x/
 
 # Enable cut-paste in Mac Finder (why would you *not* have that there by default, Apple?) :
 defaults write com.apple.finder AllowCutForItems 1
