@@ -43,6 +43,11 @@ then
 	head -n $head_to $1 > tmp_head_wYSNpHgq.fountain
 	tail -n +$tail_from $1 > tmp_tail_wYSNpHgq.fountain
 	dos2unix tmp_head_wYSNpHgq.fountain tmp_tail_wYSNpHgq.fountain
+	#  - delete lines that start with markdown image syntax (used to double for eBook output via fountain2ePub (using pandoc), but they'll interfere here:
+		# deletes the line:
+		# gsed -i '/\!\[.*/d' tmp_tail_wYSNpHgq.fountain
+	# deletes the line and the line after it (I think?--it leaves one space instead of two) :
+	gsed -i ':begin;$!N;/\!\[.*/d;tbegin;P;D' tmp_tail_wYSNpHgq.fountain
 	#  - join semantic linefeeds into that tail file, in-place:
 	# Adapted from: https://backreference.org/2009/12/23/how-to-match-newlines-in-sed/
 	# sed ':begin;$!N;s/FOO\nBAR/FOOBAR/;tbegin;P;D'   # if a line ends in FOO and the next
