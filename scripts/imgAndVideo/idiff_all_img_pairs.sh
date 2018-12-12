@@ -32,7 +32,7 @@ do
 		# if that out file does not exist, invoke idiff against the source pairs and output the result to the file:
 		if [ ! -e "$outfileNoExt"* ]
 		then
-			idiff -o $outfile $outer $inner
+			idiff -fail 1 -warn 1 -abs -o $outfile $outer $inner
 		else
 			echo ~- Target file or similarly named already exists \($outfile\). Skipped render.
 		fi
