@@ -13,26 +13,34 @@
 # The comparison algorithm never compares the same image pair more than once.
 
 # TO DO:
-# Fix that this is comparing non *__superShrunk* images to those?
 # Refactor to allow continuation of interrupted runs (do not erase temp files; rather append to them.) This means not resizing for comparision any pre-existing files of the pattern __superShrunkRc6d__*, not wiping comparision result temp files, picking up where comparisons left off, and . . . ?
 
-# change search regex depending on presence or absense of parameter $1:
+
+# If no $1 parameter, warn and exit.
 if [ -z ${1+x} ]
 then
-	searchRegex='.*'
+	echo "No paramter \$1 passed to script; will exit. Re-run script with an image format extension (without any .) as the only parameter to the script; e.g.:"
+	echo "	./imgsGetSimilar.sh png"
+	exit
 else
-	searchRegex=".$1"
+	searchRegex=$1
 fi
+# DEPRECATED until it is tested to see whether the presence of text files in list (will result from no $1 passed to script) will mess up process:
+	# change search regex depending on presence or absense of parameter $1:
+	# if [ -z ${1+x} ]
+	# then
+	# 	searchRegex='*'
+	# else
+	# 	searchRegex="$1"
+	# fi
 
 
 # CODE
-	# OPTIONAL wipe of all leftover files from previous run; comment out the next line if you don't want or need that:
+# OPTIONAL wipe of all leftover files from previous run; comment out the next line if you don't want or need that:
 rm __superShrunkRc6d__*
 
-# Because on stupid platforms find produces windows line-endings, convert them to unix after pipe |
-gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n' | sort > allIMGs.txt
-# Strip leading ./ from listing:
-gsed -i 's/^\(\.\/\)\(.*\)/\2/g' allIMGs.txt
+# Because on stupid platforms find produces windows line-endings, convert them to unix after pipe | :
+gfind . -maxdepth 1 -type f -iname \*.$searchRegex -printf '%f\n' | sort > allIMGs.txt
 
 # Create heavily shrunken image copies to run comparison on.
 echo Generating severely shrunken image copies to run comparisons against . . .
@@ -49,7 +57,6 @@ do
 		gm convert $element -scale 11 __superShrunkRc6d__$element
 	fi
 done
-
 # Prepend everything in allIMGs.txt with that wonky string file name identifier before running comparison via the next block;
 gsed -i 's/^\(.*\)/__superShrunkRc6d__\1/g' allIMGs.txt
 
@@ -81,7 +88,6 @@ done
 
 # Reverse the gsed operations before and in that block:
 gsed -i 's/__superShrunkRc6d__//g' allIMGs.txt
-gsed -i 's/__superShrunkRc6d__//g' compare__superShrunkRc6d__col1.txt
 gsed -i 's/__superShrunkRc6d__//g' compare__superShrunkRc6d__col2.txt
 
 # Re prevous comment in nested loop blocks:
@@ -92,7 +98,7 @@ gsed -i 's/.*Total: \([0-9]\{1,11\}\.[0-9]\{1,11\}\).*|\([^|]*\).*|\([^|]*\).*/\
 # Back that up to a pre-sort text file in case subsequent sorting turns out not so useful:
 cp comparisons__superShrunkRc6d__cols.txt comparisons__superShrunkRc6d__cols_unsorted.txt
 # Sort results by reverse rank of keys by priority of certain columns in an attempt at most similar pairs adjacent (usually) ; or . . . some other thingy similar? Uncomment one option and comment out all others:
-	sort -n -b -t\| -k3r -k1 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
+sort -n -b -t\| -k3r -k1 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
 	# sort -n -b -t\| -k2r -k1r -k3 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
 	# sort -n -b -t\| -k1r -k2 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
 	# sort -n -b -t\| -k3r -k1 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
@@ -113,14 +119,14 @@ do
 	gsed -i -e "s/$x/_&/1" -e "s/\([^_]\)$x//g" -e "s/_\($x\)/\1/" comparisons__superShrunkRc6d__cols_sorted.txt
 done < allIMGs.txt
 
-# replace | with newlines to produce final frame list for e.g. ffmpeg to use:
+# replace | with newlines to prep for final frame list for e.g. ffmpeg to use:
 tr '|' '\n' < comparisons__superShrunkRc6d__cols_sorted.txt > IMGlistByMostSimilar.txt
-# strip __superShrunk.. part of file names out of that file (which were used for faster comparison) :
-gsed -i "s/__superShrunkRc6d__//g" comparisons__superShrunkRc6d__cols_unsorted.txt
 rm comparisons__superShrunkRc6d__cols_sorted.txt
-# --or, that's ready after two more tweaks for file list format ffmpeg demands and correct file names:
+# That's ready after this tweak for file list format ffmpeg needs:
 gsed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
-gsed -i "s/__superShrunkRc6d__//g" IMGlistByMostSimilar.txt
+
+rm __superShrunkRc6d__*
+rm allIMGs.txt compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt tmp_fx49V6cdmuFp.txt comparisons__superShrunkRc6d__cols.txt
 
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with e.g. any of these scripts\:
@@ -129,5 +135,5 @@ echo ffmpegCrossfadeIMGsToAnimFromFileList.sh
 echo ffmpegAnimFromFileList.sh
 echo See comments in any of them. That last will produce an animation of these images in a series of stills of each cutting to the next\, arranged by most similar to nearest list neighbor \(roughly\. There will be some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list\)\.
 
-rm allIMGs.txt compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt tmp_fx49V6cdmuFp.txt comparisons__superShrunkRc6d__cols.txt
-rm __superShrunkRc6d__*
+
+
