@@ -21,8 +21,6 @@
 
 # generate an image from a hex palette input file.
   # count colors in palette.
-  # wait, no need to know that here but I'll keep this as handy reference for anything else.
-  # numColors=`wc -w < $1.colorsHex.txt`
 
 # Create subdir of large images from colors in input hex file. It's okay--it does this extremely fast.
 if [ ! -d ./zertsmeh_temp_for_colors ]

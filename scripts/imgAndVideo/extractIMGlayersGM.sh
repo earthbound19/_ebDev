@@ -24,7 +24,7 @@
 # perhaps kludgy, but all I can figure to do; figures out and stores number of images' layers in $numLayers:
 gm identify -verbose $1 > temp_j4EQD83qVYb74ZKeZaMRrWXxw8CBu53uN5.txt
 sed -i -n '/Scene/p' temp_j4EQD83qVYb74ZKeZaMRrWXxw8CBu53uN5.txt
-thisStr=`wc -l temp_j4EQD83qVYb74ZKeZaMRrWXxw8CBu53uN5.txt`
+thisStr=`wc -l temp_j4EQD83qVYb74ZKeZaMRrWXxw8CBu53uN5.txt | tr -d ' '`
 numLayers=`echo $thisStr | sed 's/^\([0-9]\{1,\}\) .*/\1/g'`
 echo numLayers is $numLayers
 exit

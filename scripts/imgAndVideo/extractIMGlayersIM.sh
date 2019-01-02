@@ -16,7 +16,7 @@
 # identify file layers and write them to a temp text file:
 magick identify $1 > tmp_MeK3vSg5HjdntjPkq6K.txt
 # Count the number of lines in that:
-numLayers=`wc -l < tmp_MeK3vSg5HjdntjPkq6K.txt`
+numLayers=`wc -l < tmp_MeK3vSg5HjdntjPkq6K.txt | tr -d ' '`
 rm tmp_MeK3vSg5HjdntjPkq6K.txt
 # layer [0] as given in that file we read represents all layers in a layered file flattened, so we actually want numLayers - 1:
 numLayers=$(( numLayers - 1 ))
