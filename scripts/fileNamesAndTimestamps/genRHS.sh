@@ -7,8 +7,6 @@
 # genRHS.sh png
 # OPTIONAL: pass anything as a second parameter to this script to randomly shuffle the list of files (of the given extension) before generating numbered hardlinks.
 
-# TO DO: Make this instead create a script file which upon execution will generate the hardlinks--so that configurations of hardlinks can be effectively deleted and recreated!
-
 echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
 
 find ./*.$1 > xQpr95b2N_list.txt
@@ -21,7 +19,8 @@ if ! [ -z ${2+x} ]
 		mv temp_fjioem882.txt xQpr95b2N_list.txt
 fi
 
-arraySize=$(wc -l < xQpr95b2N_list.txt)
+# the tr is because some platforms (stupidly) put spaces before the printout:
+arraySize=`wc -l < xQpr95b2N_list.txt | tr -d ' '`
 numDigitsOf_arraySize=${#arraySize}
 
 mapfile -t allFilesArray < xQpr95b2N_list.txt
