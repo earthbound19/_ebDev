@@ -16,12 +16,25 @@
 # to revert that: sudo spctl --master-enable
 # OR PERHAPS PREFERABLY USE:
 # spctl --add /Path/To/Application.app
-# re: http://osxdaily.com/2015/07/15/add-remove-gatekeeper-app-command-line-mac-os-x/
+# re: http://osxdaily.com/Ω2015/07/15/add-remove-gatekeeper-app-command-line-mac-os-x/
 
 # Enable cut-paste in Mac Finder (why would you *not* have that there by default, Apple?) :
 defaults write com.apple.finder AllowCutForItems 1
 
 defaults write com.apple.finder AppleShowAllFiles YES
+
+# OPTIONAL COMMANDS that castrate foistware:
+pushd
+cd ~/Applications
+sudo chmod 000 ./Messages.app
+sudo chmod 000 ./Mail.app
+sudo chmod 000 ./Maps.app
+sudo chmod 000 ./News.app
+sudo chmod 000 ./Notes.app
+sudo chmod 000 ./Stickies.app
+sudo chmod 000 ./Stocks.app
+sudo chmod 000 ./TextEdit.app
+popd
 
 # Possible additional commands to setup asdf and pyenv:
 # git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.6.0
