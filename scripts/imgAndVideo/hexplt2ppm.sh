@@ -182,7 +182,7 @@ else
 	# Because AGAIN windows line endings created by one ported gnu utility are conflicting with unix line endings created by another ported gnu utility:
 	dos2unix ppmBody.txt
 	lastLineString=`tail -1 ppmBody.txt`
-	lastLineValuesCount=`echo $lastLineString | grep -o '[0-9]\{1,\}' | wc -l`
+	lastLineValuesCount=`echo $lastLineString | grep -o '[0-9]\{1,\}' | wc -l | tr -d ' '`
 	#  - Divide that result by 3 because each pixel is three numeric values (RGB) :
 	lastLineTilesCount=$(( $lastLineValuesCount / 3))
 			# echo lastLineTilesCount is\: $lastLineTilesCount

@@ -24,7 +24,7 @@ do
 						# count=`ls -1 $dirName*.$1 2>/dev/null | wc -l`
 						echo ---------------------
 						echo dirName is $dirName
-	count=`ls -1 $dirName/*.$1 2>/dev/null | wc -l`
+	count=`ls -1 $dirName/*.$1 2>/dev/null | wc -l | tr -d ' '`
 		if [ $count != 0 ];
 			then
 						echo $1 file found.
