@@ -11,6 +11,8 @@ I believe that everything not created by me in this archive is at least freely a
 
 # INSTALLATION AND USAGE
 
+Horrible kludge note: for these scripts to work on Windows you may need to rename Cygwin's find.exe to gfind.exe (I _think_ it works the same way as gfind from brew GNU coreutils on Mac?)
+
 ## _ebSuperBin dependencies
 - From a cygwin (or adapt for another 'nixy environment on Windows, or for similar utilities on a Mac) run the following command:
     <!-- DEPRECATED but of potential future use (e.g. to grab the most current release): -->
