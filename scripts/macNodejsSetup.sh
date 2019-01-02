@@ -1,4 +1,4 @@
-# UNTESTED. Makes all npm packages installed with the -g flag install into a local directory of your choosing withing your HOME path. re: https://johnpapa.net/how-to-use-npm-global-without-sudo-on-osx/
+# UNTESTED, and you may want to install asdf and manage nodejs versions with that instead. Supposedly, this makes all npm packages installed with the -g flag install into a local directory of your choosing withing your HOME path. re: https://johnpapa.net/how-to-use-npm-global-without-sudo-on-osx/
 
 brew install node --without-npm  
 mkdir "${HOME}/.npm-packages"  
