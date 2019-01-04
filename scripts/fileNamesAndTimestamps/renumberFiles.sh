@@ -15,11 +15,11 @@
 echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
 
 # Get count of files we want, and from that digits to pad to. Use sort because ls doesn't do sensible sorting on some platforms:
-filesCount=`find . -maxdepth 1 -iname \*.$1 | sort | wc -l`
+filesCount=`gfind . -maxdepth 1 -iname \*.$1 | sort | wc -l`
 digitsToPadTo=`expr $filesCount : '.*'`
 
 # Create array to use to loop over files.
-filesArray=`find . -maxdepth 1 -iname "*.$1" | sort`
+filesArray=`gfind . -maxdepth 1 -iname "*.$1" | sort`
 
 counter=0
 for filename in ${filesArray[@]}

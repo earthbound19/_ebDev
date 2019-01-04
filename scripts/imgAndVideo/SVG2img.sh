@@ -16,7 +16,7 @@
 # If no input file parameter, skip main script logic and notify user.
 if ! [ -z ${1+x} ]; then echo input file parameter \$1 is\: $1\. Proceeding . . .
 	# ==== START SET GLOBALS
-	svgFileName=$1;	svgFilenameNoExtension=`echo $svgFileName | sed 's/\(.*\)\.svg/\1/g'`
+	svgFileName=$1;	svgFilenameNoExtension=${svgFileName%.*}
 	# If no image size parameter, set default image size of 4280.
 	if [ -z ${2+x} ]; then IMGsize=4280; echo SET IMGsize to DEFAULT 4280; else IMGsize=$2; echo SET IMGsize to $2; fi
 	# If no image format parameter, set default image format of jpg.
