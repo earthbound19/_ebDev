@@ -12,7 +12,7 @@
 
 # CODE
 # NOTE: to render svgs in subdirectories as well, remove "-maxdepth 1" from the following command:
-find . -maxdepth 1 -name '*.svg' | sed 's|^./||' > all_svgs.txt
+gfind . -maxdepth 1 -name '*.svg' | gsed 's|^./||' | tr -d '\15\32' > all_svgs.txt
 while read element
 do
 	SVG2img.sh $element $1 $2 $3

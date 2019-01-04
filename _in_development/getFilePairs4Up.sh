@@ -9,6 +9,11 @@
 # thisScript.sh png flame
 # This will result in all those matching .flame file names being moved from up to four paths above this path into this path.
 
+# TO DO:
+# Separate script that searches down directories and moving file here if it exists; re a genius breath yon: http://stackoverflow.com/a/37012114
+# gfind ./ -name "$element" -exec mv '{}' './' ';'
+# TO DO: fix probs. with that; see comments in fetchGenomesImages.sh
+
 
 # CODE
 abortScript=0
@@ -32,41 +37,38 @@ fi
 echo findPairsFor value\: $findPairsFor
 echo movePairTypesHere value\: $movePairTypesHere
 
-exit
-
-find . -maxdepth 1 -iname \*.$imgFormat > imgFiles.txt
-echo Scanning parent directories \(up to three levels up\) for corresponding sheep genome files\; also any directory down . . .
+gfind . -maxdepth 1 -iname \*.$findPairsFor > file_list.txt
+echo Scanning parent directories \(up to three levels up\) for $movePairTypesHere pairs of type $findPairsFor . . .
 
 while read element
 do
-	# trim any ./ off the start of the file name; also trim off extension:
-	element=`echo $element | sed "s/\.\/\(.*\)\.$imgFormat/\1/g"`
-	# echo that is $element
-	# search down directories and moving file here if it exists; re a genius breath yon: http://stackoverflow.com/a/37012114
-# find ./ -name "$element" -exec mv '{}' './' ';'
-# TO DO: fix probs. with that; see comments in fetchGenomesImages.sh
+	# Trim off extension:
+	element=${element%.*}
+	# Also trim any ./ off the start of the file name:
+	element=`echo $element | gsed 's|^./||' | tr -d '\15\32'`
+	echo that is $element
 
 	# search up directories and move the applicable file here if it exists:
-	if [ -e ../$element.$searchExt ]
+	if [ -e ../$element.$movePairTypesHere ]
 		then
-			echo running mv -f ../$element.$searchExt ./
-			mv -f ../$element.$searchExt ./
+			echo running mv -f ../$element.$movePairTypesHere ./
+			mv -f ../$element.$movePairTypesHere ./
 	fi
-	if [ -e ../../$element.$searchExt ]
+	if [ -e ../../$element.$movePairTypesHere ]
 		then
-			echo running mv -f ../../$element.$searchExt ./
-			mv -f ../../$element.$searchExt ./
+			echo running mv -f ../../$element.$movePairTypesHere ./
+			mv -f ../../$element.$movePairTypesHere ./
 	fi
-	if [ -e ../../../$element.$searchExt ]
+	if [ -e ../../../$element.$movePairTypesHere ]
 		then
-			echo running mv -f ../../../$element.$searchExt ./
-			mv -f ../../../$element.$searchExt ./
+			echo running mv -f ../../../$element.$movePairTypesHere ./
+			mv -f ../../../$element.$movePairTypesHere ./
 	fi
-	if [ -e ../../../../$element.$searchExt ]
+	if [ -e ../../../../$element.$movePairTypesHere ]
 		then
-			echo running mv -f ../../../../$element.$searchExt ./
-			mv -f ../../../../$element.$searchExt ./
+			echo running mv -f ../../../../$element.$movePairTypesHere ./
+			mv -f ../../../../$element.$movePairTypesHere ./
 	fi
-done < imgFiles.txt
+done < file_list.txt
 
-rm ./imgFiles.txt
+rm ./file_list.txt
