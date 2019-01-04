@@ -8,3 +8,7 @@ https://www.deviantart.com/developers/http/v1/20160316
 https://sta.sh/
 https://www.deviantart.com/submit/?deviationids=729326372
 https://www.programmableweb.com/api/deviantart-rss
+
+
+My favorites RSS: https://backend.deviantart.com/rss.xml?q=favby%3Aearthbound8%2F61129523&amp;type=deviation
+My favorites web page: https://www.deviantart.com/earthbound8/favourites/
