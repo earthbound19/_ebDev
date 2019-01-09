@@ -20,12 +20,10 @@
 			# tr -dc '[:alnum:]' < /dev/urandom  | dd bs=4 count=8 2>/dev/null
 # PREFERRED method for performance; alternate two--change the number in -c (n) to change length of string:
 # NOTE: The fastest possible random output I've found is: cat /dev/urandom | tr -dc 'your chosen characters here'
-# OPTION 1: uncomment if you prefer (and comment out the others) :
-# cat /dev/urandom | tr -dc 'a-z0-9A-Z' | head -c $1
-# OPTION 2: uncomment if you prefer (and comment out the others) :
-# howMany=$1
-if [[ $1 == "" ]]; then howMany=1; else howMany=$1; fi
-if [[ $2 == "" ]]; then length=9; else length=$2; fi
+
+if [ -z ${1+x} ]; then howMany=1; else howMany=$1; fi
+if [ -z ${2+x} ]; then length=9; else length=$2; fi
+
 for (( i=1; i<=$howMany; i++ ))
 do
 		# 103 wide for Fira Mono standard (not medium or bold) 16-pt.
