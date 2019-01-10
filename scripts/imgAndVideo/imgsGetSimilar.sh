@@ -13,7 +13,8 @@
 # The comparison algorithm never compares the same image pair more than once.
 
 # TO DO:
-# Refactor to allow continuation of interrupted runs (do not erase temp files; rather append to them.) This means not resizing for comparision any pre-existing files of the pattern __superShrunkRc6d__*, not wiping comparision result temp files, picking up where comparisons left off, and . . . ?
+# - fix for Windows: this script had used gpaste instead of paste, but gpaste isn't in my Windows toolchain; find that for windows OR make it work with a built-in or readily available paste executable on Mac and windows.
+# - refactor to allow continuation of interrupted runs (do not erase temp files; rather append to them.) This means not resizing for comparision any pre-existing files of the pattern __superShrunkRc6d__*, not wiping comparision result temp files, picking up where comparisons left off, and . . . ?
 
 
 # If no $1 parameter, warn and exit.
@@ -39,13 +40,11 @@ fi
 # OPTIONAL wipe of all leftover files from previous run; comment out the next line if you don't want or need that:
 rm __superShrunkRc6d__*
 
-# Because on stupid platforms find produces windows line-endings, convert them to unix after pipe | :
-gfind . -maxdepth 1 -type f -iname \*.$searchRegex -printf '%f\n' | sort > allIMGs.txt
 
+# Because on stupid platforms find produces windows line-endings, convert them to unix after pipe | :
+allIMGs=(`gfind . -maxdepth 1 -type f -iname \*.$searchRegex -printf '%f\n' | sort`)
 # Create heavily shrunken image copies to run comparison on.
 echo Generating severely shrunken image copies to run comparisons against . . .
-allIMGs=( $( < allIMGs.txt) )
-
 for element in "${allIMGs[@]}"
 do
 	if [ -f "__superShrunkRc6d__""$element" ]
@@ -57,12 +56,6 @@ do
 		gm convert $element -scale 11 __superShrunkRc6d__$element
 	fi
 done
-# Prepend everything in allIMGs.txt with that wonky string file name identifier before running comparison via the next block;
-gsed -i 's/^\(.*\)/__superShrunkRc6d__\1/g' allIMGs.txt
-
-# Reinitialize allIMGs array from that file which now lists __superShrunk.. images! For a long time this script lacked that and so ran slower (it compared original images and missed the entire point of all of the above code)! :
-allIMGs=$( < allIMGs.txt)
-
 i_count=0
 j_count=0
 printf "" > compare__superShrunkRc6d__col1.txt
@@ -78,21 +71,19 @@ do
 	do
 # Template graphicsmagick compare command, re: http://www.imagemagick.org/Usage/compare/
 # compare -metric MAE img_11.png img_3.png null: 2>&1
+				comp1="__superShrunkRc6d__""$i"
+				comp2="__superShrunkRc6d__""$j"
 		echo "comparing images: $i | $j . . . VIA COMMAND on proxy files for: gm compare -metric MAE $i $j null: 2>&1 | grep 'Total'"
-		metricPrint=`gm compare -metric MAE $i $j null: 2>&1 | grep 'Total'`
+		metricPrint=`gm compare -metric MAE $comp1 $comp2 null: 2>&1 | grep 'Total'`
 		# ODD ERRORS arise from mixed line-ending types, where gm returns windows-style, and printf commands produce unix-style. Solution: write to separate column files, later (after these nested loop blocks) convert all gm-created files to unix via dos2unix, then paste them into one file.
 		echo "$metricPrint" >> compare__superShrunkRc6d__col1.txt
 		printf "|$i|$j\n" >> compare__superShrunkRc6d__col2.txt
 	done
 done
 
-# Reverse the gsed operations before and in that block:
-gsed -i 's/__superShrunkRc6d__//g' allIMGs.txt
-gsed -i 's/__superShrunkRc6d__//g' compare__superShrunkRc6d__col2.txt
-
 # Re prevous comment in nested loop blocks:
 dos2unix compare__superShrunkRc6d__col1.txt
-gpaste -d '' compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt > comparisons__superShrunkRc6d__cols.txt
+paste -d '' compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt > comparisons__superShrunkRc6d__cols.txt
 # Filter out information cruft; NOTE that if the first column isn't preceded by | then the later sort command won't work as intended:
 gsed -i 's/.*Total: \([0-9]\{1,11\}\.[0-9]\{1,11\}\).*|\([^|]*\).*|\([^|]*\).*/\1|\2|\3/g' comparisons__superShrunkRc6d__cols.txt
 # Back that up to a pre-sort text file in case subsequent sorting turns out not so useful:
@@ -104,12 +95,14 @@ sort -n -b -t\| -k3r -k1 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmu
 	# sort -n -b -t\| -k3r -k1 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
 # Strip the numeric column so we can work up a file list of said ordering for animation:
 gsed -i 's/[^|]*|\(.*\)/\1/g' tmp_fx49V6cdmuFp.txt
+# In which my utter frustration at windows newline-related bugs strikes again; re: https://stackoverflow.com/questions/3134791/how-do-i-remove-newlines-from-a-text-file
+dos2unix tmp_fx49V6cdmuFp.txt
 # Strip all newlines so that the following gsed operation that removes all but the 1st appearance of a match will work over every appearance of a match in the entire file (since they are all on one line, where otherwise the replace would only work on every individual line where the match is found):
 tr '\n' '|' < tmp_fx49V6cdmuFp.txt > comparisons__superShrunkRc6d__cols_sorted.txt
 
 echo -------------------
 count=0
-while read x
+for x in ${allIMGs[@]}
 do
 	echo replacing all but first appearance of file name $x in result file . . .
 	# Delete all but first occurance of a word e.g. 'pattern' from a line; the way it works is: change the first 1 (in the following command) to a 2 to remove everything but the 2nd occurances of 'pattern', or 4 to remove everything but the 4th occurance of the pattern, or 1 to remove all but the first etc., the next example code line re; https://unix.stackexchange.com/a/18324/110338 :
@@ -117,16 +110,17 @@ do
 	# ALSO NOTE that the & is a reference to the matched pattern, meaning the matched pattern will be substituted for & in the output.
 	# gsed -e 's/pattern/_&/1' -e 's/\([^_]\)pattern//g' -e 's/_\(pattern\)/\1/' tstpattern.txt
 	gsed -i -e "s/$x/_&/1" -e "s/\([^_]\)$x//g" -e "s/_\($x\)/\1/" comparisons__superShrunkRc6d__cols_sorted.txt
-done < allIMGs.txt
-
+done
+dos2unix comparisons__superShrunkRc6d__cols_sorted.txt
 # replace | with newlines to prep for final frame list for e.g. ffmpeg to use:
 tr '|' '\n' < comparisons__superShrunkRc6d__cols_sorted.txt > IMGlistByMostSimilar.txt
 rm comparisons__superShrunkRc6d__cols_sorted.txt
 # That's ready after this tweak for file list format ffmpeg needs:
 gsed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
+dos2unix IMGlistByMostSimilar.txt
 
 rm __superShrunkRc6d__*
-rm allIMGs.txt compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt tmp_fx49V6cdmuFp.txt comparisons__superShrunkRc6d__cols.txt
+rm compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt tmp_fx49V6cdmuFp.txt tmp_TkU8pQDF5KeH.txt comparisons__superShrunkRc6d__cols.txt
 
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with e.g. any of these scripts\:
