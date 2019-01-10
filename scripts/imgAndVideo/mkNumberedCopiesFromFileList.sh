@@ -30,7 +30,8 @@ fileNameExt=`echo $tempStr | sed "s/.*\.\([^\.]\{1,5\}\)'.*/\1/g"`
 if ! [ -a numberedCopies ]; then mkdir numberedCopies; fi
 
 # NOTE ALSO that this script assumes a list formatted for concatenation by ffmpeg, and makes a temp copy of the list removing that syntax:
-sed "s/file '\(.*\)'/\1/g" $fileList > tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
+gsed "s/file '\(.*\)'/\1/g" $fileList > tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
+dos2unix tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
 
 numElements=`wc -l < $fileList`
 digitsCount=${#numElements}
