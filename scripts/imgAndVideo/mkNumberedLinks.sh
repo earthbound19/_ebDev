@@ -1,6 +1,11 @@
 # USAGE
 # Invoke this script with one paramter $1 being the file type (e.g. png) you wish to create a $fileType_links subdir full of numbered junction links for.
-# TO DO: $2 any parameter, flag to randomly reorder file names array (in memory or temp file) before creating numbered junction links for them.
+
+# DEPENDENCIES
+# 'nixy environment, gshuf
+
+# The else clause should never work unless you happen to have files with the extension .Byarnhoerfer:
+if ! [ -z ${1+x} ]; then fileType=$1; else fileType=Byarnhoerfer; fi
 
 if [ -d numberedLinks ]; then rm -rf numberedLinks; mkdir numberedLinks; else mkdir numberedLinks; fi
 
@@ -14,9 +19,14 @@ if [ -d numberedLinks ]; then rm -rf numberedLinks; mkdir numberedLinks; else mk
 # cd ./testFiles
 # if [ -a links ]; then rm -d -r links; mkdir links; else mkdir links; fi
 
-arr=(`gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
+arr=(`gfind . -maxdepth 1 -type f -iname \*.$fileType -printf '%f\n'`)
+
+# If there is a paramater $2, shuffle that array:
+if ! [ -z ${2+x} ]; then arr=( $(gshuf -e "${arr[@]}") ); fi
+
 arraySize=${#arr[@]}
 numDigitsOf_arraySize=${#arraySize}
+
 idx=0
 for element in ${arr[@]}
 do
@@ -26,28 +36,5 @@ do
 	# for i in $(seq -f "%05g" 10 15)
 	idx=$(( $idx + 1 ))
 	paddedNum=`printf "%0""$numDigitsOf_arraySize""d\n" $idx`
-			# echo paddedNum val is $paddedNum
-	link ./$element ./numberedLinks/$paddedNum.$1
+	link ./$element ./numberedLinks/$paddedNum.$fileType
 done
-
-
-# REFERENCE CODE:
-# Ex. hard link creation command:
-# link ./A.png ./animHardLinks/00000.png
-
-		# reworking draft:
-		# chmod +rwx scr.sh ;)
- 
-# for n in {1..9}; do
-# echo n is $n
-# if [ -a test$n.txt ]; then echo ..; else printf "" > test$n.txt; fi
-# linkFileName="test"$n"_link.txt"
-# echo linkFileName $linkFileName
-# link test$n.txt hlinks/$linkFileName
-# done
- 
-# arr=`ls *.txt`
-# for val in "${arr[@]}"
-# do
-# echo $val
-# done
