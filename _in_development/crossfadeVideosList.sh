@@ -17,7 +17,7 @@ crossFadeDuration=5.8
 # I strongly suspect this script could be done more swiftly and elegantly with Python. But here it is; I coded it, it works, and I am not re-doing it. (Unless I am.)
 # Runs needed to render this sequence:
 # mkNumberedCopiesFromFileList.sh
-# cd numberedCopies
+# cd _temp_numbered
 
 # Use ffmpegCrossfadeImagesToAnim.sh repeatedly on pairs of images by number until there are no more:
 gfind *.mp4 > numberedCopies.txt
