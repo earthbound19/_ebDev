@@ -26,7 +26,16 @@
 
 
 # CODE
-vidExt=mov
+# GLOBAL HARD-CODED OPTIONS--tweak these per your want:
+vidExt=avi
+# vidExt=mp4
+# codecParam=""
+# codecParam="-q 13"
+codecParam="-vcodec rawvideo"
+# codecParam="-codec:v utvideo -r 30"
+# codecParam="-codec:v qtrle -r 30"
+	# looks horrible at video start for animations! :
+# codecParam="-codec:v libvpx-vp9 -lossless 1 -r 30"
 
 # ====
 # SET GLOBALS START
@@ -65,15 +74,6 @@ then
 else
 	echo target file $targetRenderFile does not exist\; will render.
 	# CREATE input static image (looped) video files from the two input images.
-# TO DO move codec options to start of script? Make file extension parameter?
-			# CODEC options:
-			# codecParam=""
-			# codecParam="-vcodec rawvideo"
-			# codecParam="-codec:v utvideo -r 30"
-			codecParam="-codec:v qtrle -r 30"
-					# looks horrible at video start for animations! :
-					# codecParam="-codec:v libvpx-vp9 -lossless 1 -r 30"
-
 	# To avoid repeating work, render still image video (source for later crossfade) only if it does not already exist:
 	if [ ! -e "$fadeSRConeFileName"."$vidExt" ]
 	then
