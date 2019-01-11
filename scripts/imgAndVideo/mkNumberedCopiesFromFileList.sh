@@ -23,17 +23,20 @@ else
 	fileList=$1; echo fileList set to parameter \1\, $1
 fi
 
-tempStr=`head -n 1 $fileList`
-# NOTE that this script also assumes a closing apostraphe or single quote in the input file! :
+# If the numberedCopies directory already exists, TOAST IT without warning, then recreate it; otherwise create it:
+if [ -d numberedCopies ]; then rm -rf numberedCopies; mkdir numberedCopies; else mkdir numberedCopies; fi
+
+tempStr=`ghead -n 1 $fileList`
+# NOTE that this script assumes a closing apostraphe or single quote in the input file! :
+# No, the fileExt=${filename##*.} doesn't work here as there's a trailing ' to trim:
 fileNameExt=`echo $tempStr | sed "s/.*\.\([^\.]\{1,5\}\)'.*/\1/g"`
 
-if ! [ -a numberedCopies ]; then mkdir numberedCopies; fi
-
-# NOTE ALSO that this script assumes a list formatted for concatenation by ffmpeg, and makes a temp copy of the list removing that syntax:
+# NOTE this script assumes a list formatted for concatenation by ffmpeg, and makes a temp copy of the list removing that syntax:
 gsed "s/file '\(.*\)'/\1/g" $fileList > tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
 dos2unix tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
 
-numElements=`wc -l < $fileList`
+# Because some platforms pad wc output with spaces:
+numElements=`wc -l < tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt | tr -d ' '`
 digitsCount=${#numElements}
 
 # create new IMGlistByMostSimilar.txt in the subdir the copies will be written to, only with the new file names (as those file names will be appended to that file in the following block) :
@@ -47,7 +50,7 @@ do
 	paddedNum=`printf "%0"$digitsCount"d\n" $counter`
 	echo "executing command: cp -f ./$element ./numberedCopies/$paddedNum.$fileNameExt"
 	cp -f ./$element ./numberedCopies/$paddedNum.$fileNameExt
-	# Because Cygwin can be STUPID with permissions (I can't use the .png images afterward without special access!) :
+	# Because Cygwin can be silly with permissions (I can't use the .png images afterward without special access!) :
 	chmod 777 ./numberedCopies/$paddedNum.$fileNameExt
 	echo "file '$paddedNum.$fileNameExt'" >> ./numberedCopies/$fileList
 done < ./tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
