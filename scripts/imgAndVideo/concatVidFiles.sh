@@ -1,5 +1,5 @@
 # DESCRIPTION:
-# concatenates all video files (default extension .mp4) in a directory into one output file. Source files must all be encoded with the same codec and settings.
+# Concatenates all video files (default extension .mp4) in a directory into one output file. Source files must all be encoded with the same codec and settings. In contrast to some other scripts here, it makes the list of videos "on the fly"--it will do so with whatever sort the `ls` command outputs.
 
 # USAGE:
 # Ensure this script is in your $PATH, and invoke it from a directory with video e.g. mp4 files that are encoded the same way. The result will appear in _mp4sConcatenated.mp4.
