@@ -7,7 +7,7 @@
 # The else clause should never work unless you happen to have files with the extension .Byarnhoerfer:
 if ! [ -z ${1+x} ]; then fileType=$1; else fileType=Byarnhoerfer; fi
 
-if [ -d numberedLinks ]; then rm -rf numberedLinks; mkdir numberedLinks; else mkdir numberedLinks; fi
+if [ -d _temp_numbered ]; then rm -rf _temp_numbered; mkdir _temp_numbered; else mkdir _temp_numbered; fi
 
 	# TESTING ONLY: create test files:
 	# for element in {1..5}
@@ -36,5 +36,5 @@ do
 	# for i in $(seq -f "%05g" 10 15)
 	idx=$(( $idx + 1 ))
 	paddedNum=`printf "%0""$numDigitsOf_arraySize""d\n" $idx`
-	link ./$element ./numberedLinks/$paddedNum.$fileType
+	link ./$element ./_temp_numbered/$paddedNum.$fileType
 done
