@@ -39,8 +39,6 @@ metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 		# exit
 # END IN DEVELOPMENT SECTION
 
-list=(`gfind . -maxdepth 1 \( -iname \*.mov -o -iname \*.MOV -o -iname \*.avi \) -printf '%f\n' | sort`)
-
 list=(`gfind . -maxdepth 1 \( \
 -iname \*$_MTPL*.mp4 \
 -o -iname \*"$_MTPL"var*.mp4 \
