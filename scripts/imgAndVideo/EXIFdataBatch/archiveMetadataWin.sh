@@ -2,15 +2,15 @@
 # Create XMP (metadata) sidecar file in a subdirectory; the -r option causes sub-directories to be recursively processed:
 # Thanks to: http://stackoverflow.com/a/4909968 and http://stackoverflow.com/a/4040324
 
-# TO DO: use the -args flag to archive this in a format suitable for re-entering into metadata (in -argument format for exiftool).
+# TO DO
+# - make this script cross-platform (use a cygwin .sh call instead of .bat)?
+# - use the -args flag to archive this in a format suitable for re-entering into metadata (in -argument format for exiftool).
 # NOT TO DO: update this to only work on file names that include _final_. I do actually want to archive metadata from everything. Even if it means it takes longer the first run.
 
-find . -iname \*.tif -o -iname \*.tiff -o -iname \*.png -o -iname \*.psd -o -iname \*.ora -o -iname \*.rif -o -iname \*.riff -o -iname \*.jpg -o -iname \*.jpeg -o -iname \*.gif -o -iname \*.bmp -o -iname \*.cr2 -o -iname \*.raw  -o -iname \*.crw -o -iname \*.pdf > imageFilesList.txt
+list=(`gfind . -maxdepth 1 \( -iname \*.tif -o -iname \*.tiff -o -iname \*.png -o -iname \*.psd -o -iname \*.ora -o -iname \*.rif -o -iname \*.riff -o -iname \*.jpg -o -iname \*.jpeg -o -iname \*.gif -o -iname \*.bmp -o -iname \*.cr2 -o -iname \*.raw  -o -iname \*.crw -o -iname \*.pdf \) -printf '%f\n' | sort`)
 # \*.ptg (ArtRage) and *.kra (Krita) no recognized metadata :( I'd be surprised if .ora (any program) and .rif/.riff (any program though most likely Corel Painter) have readable metadata.
 
-mapfile -t imageFilesArray < ./imageFilesList.txt
-
-for element in ${imageFilesArray[@]}
+for element in ${list[@]}
 {
 	# echo ELEMENT:
 	# echo "$element"
