@@ -17,19 +17,19 @@ echo "(if that was a sentence fragment, invisibl_switch was blank)"
 
 # CODE
 imgs_arr=(`gfind . -maxdepth 1 \( \
--iname \*$_MTPL*.tif \
--o -iname \*$_MTPL*.tiff \
--o -iname \*$_MTPL*.png \
--o -iname \*$_MTPL*.psd \
--o -iname \*$_MTPL*.psb \
--o -iname \*$_MTPL*.ora \
--o -iname \*$_MTPL*.rif \
--o -iname \*$_MTPL*.riff \
--o -iname \*$_MTPL*.jpg \
--o -iname \*$_MTPL*.jpeg \
--o -iname \*$_MTPL*.gif \
--o -iname \*$_MTPL*.bmp \
--o -iname \*$_MTPL*.cr2 \
--o -iname \*$_MTPL*.raw \
--o -iname \*$_MTPL*.crw \
+-iname \*.tif \
+-o -iname \*.tiff \
+-o -iname \*.png \
+-o -iname \*.psd \
+-o -iname \*.psb \
+-o -iname \*.ora \
+-o -iname \*.rif \
+-o -iname \*.riff \
+-o -iname \*.jpg \
+-o -iname \*.jpeg \
+-o -iname \*.gif \
+-o -iname \*.bmp \
+-o -iname \*.cr2 \
+-o -iname \*.raw \
+-o -iname \*.crw \
  \) -printf '%f\n' | sort $invisibl_switch`)
