@@ -15,8 +15,8 @@ img_format_2=$2
 # OPTIONAL e.g. resize command:
 # additionalParams="-scale 640 "
 
-find . -iname \*.$img_format_1 > all_"$img_format_1".txt
-while read element
+array=(`gfind . -maxdepth 1 -type f -iname \*.$img_format_1 -printf '%f\n'`)
+for element in ${array[@]}
 do
 	fileNameNoExtension=`basename $element .$img_format_1`
 			# REFERENCE for script hacking for custom runs: the [-scale n] switch will resize the image maintaining aspect with the longest side at n pixels.
@@ -25,6 +25,4 @@ do
 	echo running command\: $command
 	echo . . .
 	$command
-done < all_"$img_format_1".txt
-
-rm all_imgs.txt
+done
