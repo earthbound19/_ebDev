@@ -4,11 +4,14 @@
 # USAGE
 # thisScript.sh
 
-# These rediculous pipe acrobatics are to trim ./ off the start and any windows newlines that gnu ports of windows utilities create:
+# The printf command trims any ./ from the start of output:
 list=(`gfind . -maxdepth 1 \( -iname \*.mov -o -iname \*.MOV -o -iname \*.avi \) -printf '%f\n' | sort`)
 
-# Optional extra parameters:
-# extraParams="-acodec aac -crf 17 -strict -2"		# Because ffmpeg can't handle pcm for mp4 right now, and that would be a silly waste of space for distribution anyway (compress it to aac) -- and it throws an error instructing me to add -strict -2 to that if I use aac
+# OPTIONAL EXTRA PARAMETERS
+# Because ffmpeg can't handle pcm for mp4 right now, and that would be a silly waste of space for distribution anyway (compress it to aac) -- and it throws an error instructing me to add -strict -2 to that if I use aac; BUT the following is an option commented out in distribution because encoding to aac isn't lossless! -crf 15 is quite high quality encoding:
+# extraParams="-acodec aac -crf 15 -strict -2"
+# OR just straight copy the sound (default archived code option) even if it's a Canon DSLR .MOV pcm space hog sound channel:
+extraParams="-acodec copy"
 
 for element in ${list[@]}
 do

@@ -3,7 +3,7 @@
 # Thanks to: http://stackoverflow.com/a/4909968 and http://stackoverflow.com/a/4040324
 
 # TO DO
-# - What?
+# - What? What was I trying to do with this? And an .ahk script (see notes at end)?
 # If I revive use of this, make it not automatically overwrite existing files, including in archives (and only add files to an archive if they don't already exist).
 
 
@@ -21,12 +21,10 @@ echo "!============================================================"
 		esac
 	done
 
-find . -iname \*.tif -o -iname \*.tiff -o -iname \*.png -o -iname \*.psd -o -iname \*.ora -o -iname \*.rif -o -iname \*.riff -o -iname \*.jpg -o -iname \*.jpeg -o -iname \*.gif -o -iname \*.bmp -o -iname \*.cr2 -o -iname \*.raw  -o -iname \*.crw -o -iname \*.pdf > imageFilesList.txt
+list=(`gfind . \( -iname \*.tif -o -iname \*.tiff -o -iname \*.png -o -iname \*.psd -o -iname \*.ora -o -iname \*.rif -o -iname \*.riff -o -iname \*.jpg -o -iname \*.jpeg -o -iname \*.gif -o -iname \*.bmp -o -iname \*.cr2 -o -iname \*.raw  -o -iname \*.crw -o -iname \*.pdf \) -printf '%f\n' | sort`)
 # \*.ptg (ArtRage) and *.kra (Krita) no recognized metadata :( I'd be surprised if .ora (any program) and .rif/.riff (any program though most likely Corel Painter) have readable metadata.
 
-mapfile -t imageFilesArray < ./imageFilesList.txt
-
-for element in ${imageFilesArray[@]}
+for element in ${list[@]}
 {
 	# echo ELEMENT:
 	# echo "$element"
@@ -36,4 +34,5 @@ for element in ${imageFilesArray[@]}
 
 
 # ==VERSION HISTORY==
+# 01/19/2019 06:32:32 AM -- revived development by fixing functionality of find -> gfind in so many scripts. I think this is intended to back up metadata. Don't I already have something that does that though?
 # 01/05/2016 01:17:42 AM -- seriously . . . good night. Got working in tandem with companion script, getShorterImageName.ahk/.exe. Added feature that it's smart enough to properly create and write to _originalMetaData subfolders for respective image directories.

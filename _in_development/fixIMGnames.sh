@@ -1,5 +1,5 @@
 # DESCRIPTION:
-# DOES STUFF, in conjunction with getCorrectedImageName.ahk/exe, to rename image file names for 'nix/Windows/web compatibility. POSSIBLE FUNCTIONAL DUPLICATE of ftun.sh, which at this writing I've used for some while for this function. This script and the .ahk/exe dependency I may deprecate.
+# DOES STUFF, in conjunction with getCorrectedImageName.ahk/exe, to rename image file names for 'nix/Windows/web compatibility. POSSIBLE FUNCTIONAL DUPLICATE of ftun.sh, which at this writing I've used for some while for this function. This script and the .ahk/exe dependency I may deprecate. NOTE: I wonder if the ahk executable generated some random characters in shortening file names to avoid overwriting one file with another if they end up having duplicate names? If so this script still might have use.
 
 # FIX IMAGE NAMES
 
@@ -38,10 +38,8 @@
 # Blank the following file and fill it with a list of images:
 printf "" > imgs_oldNames.txt
 # OR do the following this way: find . -type f -iregex '\.\/.*.\(tif\|tiff\|png\|.psd\|ora\|kra\|rif\|riff\|jpg\|jpeg\|gif\|bmp\|cr2\|crw\|pdf\|ptg\)' -printf '%TY %Tm %Td %TH %TM %TS %p\n' | sort -g > _batchNumbering/fileNamesWithNumberTags.txt
-find . -iname \*.tif -o -iname \*.tiff -o -iname \*.png -o -iname \*.psd -o -iname \*.ora -o -iname \*.kra -o -iname \*.rif -o -iname \*.riff -o -iname \*.jpg -o -iname \*.jpeg -o -iname \*.gif -o -iname \*.bmp -o -iname \*.cr2 -o -iname \*.crw -o -iname \*.pdf -o -iname \*.ptg > imgs_oldNames.txt
+gfind . -maxdepth 1 \( -iname \*.tif -o -iname \*.tiff -o -iname \*.png -o -iname \*.psd -o -iname \*.ora -o -iname \*.kra -o -iname \*.rif -o -iname \*.riff -o -iname \*.jpg -o -iname \*.jpeg -o -iname \*.gif -o -iname \*.bmp -o -iname \*.cr2 -o -iname \*.crw -o -iname \*.pdf -o -iname \*.ptg \) -printf '%f\n' | sort > imgs_oldNames.txt
 
-# Trim resulting ./ off the front of every file name in that list, as it otherwise mucks with the eventual DOS batch:
-sed -i 's/\.\/\(.*\)/\1/g' imgs_oldNames.txt
 # Also convert forward slashes to Windows' @#*$^! backslashes:
 tr '/' '\' < imgs_oldNames.txt > temp_OOOO0o0Oo0oO00ooooO.txt
 rm imgs_oldNames.txt
