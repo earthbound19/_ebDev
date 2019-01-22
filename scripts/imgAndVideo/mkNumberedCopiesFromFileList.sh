@@ -23,8 +23,8 @@ else
 	fileList=$1; echo fileList set to parameter \1\, $1
 fi
 
-# If the numberedCopies directory already exists, TOAST IT without warning, then recreate it; otherwise create it:
-if [ -d numberedCopies ]; then rm -rf numberedCopies; mkdir numberedCopies; else mkdir numberedCopies; fi
+# If the _temp_numbered directory already exists, TOAST IT without warning, then recreate it; otherwise create it:
+if [ -d _temp_numbered ]; then rm -rf _temp_numbered; mkdir _temp_numbered; else mkdir _temp_numbered; fi
 
 tempStr=`ghead -n 1 $fileList`
 # NOTE that this script assumes a closing apostraphe or single quote in the input file! :
@@ -40,7 +40,7 @@ numElements=`wc -l < tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt | tr -d ' '`
 digitsCount=${#numElements}
 
 # create new IMGlistByMostSimilar.txt in the subdir the copies will be written to, only with the new file names (as those file names will be appended to that file in the following block) :
-printf "" > ./numberedCopies/$fileList
+printf "" > ./_temp_numbered/$fileList
 counter=0
 while read element
 do
@@ -48,11 +48,11 @@ do
 			# ex. to pad numbers to number of digits in %0n:
 			# var=`printf "%05d\n" $element`
 	paddedNum=`printf "%0"$digitsCount"d\n" $counter`
-	echo "executing command: cp -f ./$element ./numberedCopies/$paddedNum.$fileNameExt"
-	cp -f ./$element ./numberedCopies/$paddedNum.$fileNameExt
+	echo "executing command: cp -f ./$element ./_temp_numbered/$paddedNum.$fileNameExt"
+	cp -f ./$element ./_temp_numbered/$paddedNum.$fileNameExt
 	# Because Cygwin can be silly with permissions (I can't use the .png images afterward without special access!) :
-	chmod 777 ./numberedCopies/$paddedNum.$fileNameExt
-	echo "file '$paddedNum.$fileNameExt'" >> ./numberedCopies/$fileList
+	chmod 777 ./_temp_numbered/$paddedNum.$fileNameExt
+	echo "file '$paddedNum.$fileNameExt'" >> ./_temp_numbered/$fileList
 done < ./tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
 
 rm ./tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt

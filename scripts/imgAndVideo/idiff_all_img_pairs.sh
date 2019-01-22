@@ -12,17 +12,17 @@
 
 
 # CODE
+# Get array of many images named imgs_arr via dependency script:
+source get_all_imgs_array.sh
 
-# Create an array of all file names in the current directory:
-array=(`gfind . -maxdepth 1 -type f -printf '%f\n' | sort`)
-array_size=$((${#array[@]}))	# store size of that array
+array_size=$((${#imgs_arr[@]}))	# store size of that array
 inner_loop_start=1						# set base count for inner loop
 															# (will increment to avoid operating on the same file)
-for outer in ${array[@]}			# iterate over all items in array
+for outer in ${imgs_arr[@]}			# iterate over all items in array
 do
 	for((j = inner_loop_start; j<array_size; j++))	# iterate again to get pairs, but don't repeat used pairs (because we start with the increased inner_loop_start count base every iteration back through this inner loop
 	do
-		inner=${array[j]}					# store second file name from array
+		inner=${imgs_arr[j]}					# store second file name from array
 		inner_no_ext=${inner%.*}	# store that without the file extension
 		outer_no_ext=${outer%.*}	# store first file name without file extension
 		# use those to make an out file name after both:
@@ -40,15 +40,16 @@ do
 	inner_loop_start=$(($inner_loop_start + 1))
 done
 
-# All the same things again, but with the lists reversed first, becauase if you operate on the same pair of file names in different parameter order, you get different results:
-array=(`gfind . -maxdepth 1 -type f -printf '%f\n' | sort -r`)
-array_size=$((${#array[@]}))
+# All the same things again, but with the lists reversed first, because if you operate on the same pair of file names in different parameter order, you get different results;
+# Get array of many images named imgs_arr via dependency script; the "foo" argument gives us an array in reverse order via that script:
+source get_all_imgs_array.sh foo
+array_size=$((${#imgs_arr[@]}))
 inner_loop_start=1
-for outer in ${array[@]}
+for outer in ${imgs_arr[@]}
 do
 	for((j = inner_loop_start; j<array_size; j++))
 	do
-		inner=${array[j]}
+		inner=${imgs_arr[j]}
 		inner_no_ext=${inner%.*}
 		outer_no_ext=${outer%.*}
 		outfileNoExt="image_pairs_diffs/""$outer_no_ext"__"$inner_no_ext"__diff
