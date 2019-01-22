@@ -36,6 +36,12 @@ sudo chmod 000 ./Stocks.app
 sudo chmod 000 ./TextEdit.app
 popd
 
+printf "" >> ~/.bash_profile
+printf "# Reduces homebrew auto-update on _every flipping install of anything_ annoyance:" >> ~/.bash_profile
+printf "export HOMEBREW_NO_AUTO_UPDATE=1" >> ~/.bash_profile
+
+# NOTE: ntfs-3g location: /usr/local/Cellar/ntfs-3g/2017.3.23
+
 # Possible additional commands to setup asdf and pyenv:
 # git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.6.0
 # echo -e '\n. $HOME/.asdf/asdf.sh' >> ~/.bash_profile
