@@ -27,7 +27,7 @@ do
 		outer_no_ext=${outer%.*}	# store first file name without file extension
 		# use those to make an out file name after both:
 		outfileNoExt="image_pairs_diffs/""$outer_no_ext"__"$inner_no_ext"__diff		# no ext so I can delete any output file, replace it with a ~_no.txt file starting with the same name, and never render it again (because this script will check for outfileNoExt* files and not render if they exist
-		outfile="$outfileNoExt".jpg
+		outfile="$outfileNoExt".tif
 		if [ ! -d image_pairs_diffs ]; then mkdir image_pairs_diffs; fi
 		# if that out file does not exist, invoke idiff against the source pairs and output the result to the file:
 		if [ ! -e "$outfileNoExt"* ]
@@ -53,7 +53,7 @@ do
 		inner_no_ext=${inner%.*}
 		outer_no_ext=${outer%.*}
 		outfileNoExt="image_pairs_diffs/""$outer_no_ext"__"$inner_no_ext"__diff
-		outfile="$outfileNoExt".jpg
+		outfile="$outfileNoExt".tif
 		if [ ! -e "$outfileNoExt"* ]
 		then
 			idiff -fail 1 -warn 1 -abs -o $outfile $outer $inner
