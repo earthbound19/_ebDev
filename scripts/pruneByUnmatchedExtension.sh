@@ -42,7 +42,7 @@
 
 
 # CODE
-list=`find . -maxdepth 1 -iname "*.$1" | gsed 's/^\.\///g' | tr -d '\15\32'`
+list=`gfind . -maxdepth 1 -iname "*.$1" | gsed 's/^\.\///g' | tr -d '\15\32'`
 
 # empty tmp_Dn6M_proposed_deletes.sh.txt whether it exists or not (recreate it blank) :
 printf "" > tmp_Dn6M_proposed_deletes.sh.txt
@@ -50,7 +50,7 @@ for element in ${list[@]}
 do
 	fileNameNoExt=${element%.*}
 	searchFileName="$fileNameNoExt"."$2"
-			echo searchFileName is\: $searchFileName
+			# echo searchFileName is\: $searchFileName
 	if ! [ -f $searchFileName ]
 	then
 # FOR SAFE MODE, uncomment the next line and comment out the line after it! For DANGER MODE, reverse those directions!
@@ -60,4 +60,4 @@ do
 done
 
 echo ~-
-echo "DONE. If you ran this script in SAFE MODE, open the file tmp_Dn6M_proposed_deletes.sh.txt and\, if the delete commands in it are agreeable, rename the file to a .sh script, give it execute permissions, and run it. Otherwise, this script may have permanently deleting things you want to keep, and you are a fool. If you ran this in danger mode you may want to delete the empty, extraneous tmp_Dn6M_proposed_deletes.sh.txt file."
+echo "DONE. If you ran this script in SAFE MODE, open the file tmp_Dn6M_proposed_deletes.sh.txt and\, if the delete commands in it are agreeable, rename the file to a .sh script, give it execute permissions, and run it. Otherwise, this script may have permanently deleted things you want to keep, and you are a fool. If you ran this in danger mode you may want to delete the empty, extraneous tmp_Dn6M_proposed_deletes.sh.txt file. To switch between safe and danger mode see the SAFE MODE comment near the end of this script's source code."
