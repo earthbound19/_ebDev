@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Indexes all text files in a directory tree with a file name of pattern .*_EXPORTED_.*_MD_ADDS.txt (case-sensitive) which contain an EXIF ImageHistory label (or tag or keyword) containing the string $1 (first parameter to this script). See USAGE for further explanation.
+# Indexes all text files in a directory tree with a file name of pattern .*_EXPORTED_.*_MD_ADDS.txt (case-sensitive) which contain an EXIF ImageHistory label (or tag or keyword) containing the string $1 (first parameter to this script); it also lists files that do _not_ contain the label--and files that don't contain that label mean a work has yet to have history (is yet to be published e.g. at a web site, the way I use this script). See USAGE for further explanation.
 
 # DEPENDENCIES
 # Cygwin (and gsed), Everything search engine CLI (and an install of Everything search engine tool).
@@ -13,6 +13,7 @@
 # -EXIF:ImageHistory=".*publication.*
 # -- in all so named text files it finds. 
 # NOTE that searches are case-insensitive.
+# THE PURPOSE is that I put keywords related to e.g. a web site I published a work at in the ImageHistory metadata tag to indicate that the work has been published at that site; this script helps me collect information from *_MD_ADDS.txt files associated with artwork which function as a database of what has been published where. 
 # AN EXAMPLE KEYWORDS documentation file is at _ebArt/MD_ADDS_publication_progress_indexing_keywords.txt
 
 # DEV NOTES
