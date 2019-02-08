@@ -20,22 +20,22 @@ import spectra
 import argparse
 import numpy as np
 
-DEFUALT_NUMBER_OF_COLORS = 7
+DEFAULT_DOMAIN = 7
 
 PARSER = argparse.ArgumentParser(description='Creates a list of colors expressed as RGB hexadecimal values, from a simplified HSL gamut, in N (-n <number> switch) shades of all colors in the gamut. Capture the list with the > operator via terminal e.g. "python get_simple_gamut.py -n 7 > HSL_simplified_gamut.hexplt" (without the double quote marks).')
-PARSER.add_argument('-n', '--DOMAIN', type=int, help='Domains per permutation of H, S, and L in the gamut. Default ' + str(DEFUALT_NUMBER_OF_COLORS))
+PARSER.add_argument('-n', '--DOMAIN', type=int, help='Domains per permutation of H, S, and L in the gamut. Default ' + str(DEFAULT_DOMAIN))
 ARGS = PARSER.parse_args()
 
-# If -n <a number> was passed to script, generate that many colors; otherwise generate DEFUALT_NUMBER_OF_COLORS:
-if ARGS.NUMBER_OF_COLORS:
-    NUMBER_OF_COLORS = ARGS.NUMBER_OF_COLORS
+# If -n <a number> was passed to script, generate that many colors; otherwise generate DEFAULT_DOMAIN:
+if ARGS.DOMAIN:
+    DOMAIN = ARGS.DOMAIN
 else:
-    NUMBER_OF_COLORS = DEFUALT_NUMBER_OF_COLORS
+    DOMAIN = DEFAULT_DOMAIN
 
 
 # FAILED to do what I want implemented with color print; from the spectra tutorial page:
 # scale = spectra.scale([ start, end ])
-# scale_custom_domain = scale.domain([ 0, NUMBER_OF_COLORS ])
+# scale_custom_domain = scale.domain([ 0, DOMAIN ])
 
 
 # Lab max values; IF YOU USE THESE as max it gives a grayscale output:
@@ -51,14 +51,14 @@ else:
 # -- which I had open for longer than I care to confess before it dawned on me
 # _that the spectra library expects values in those ranges_.
 # The additions to all of the following compensates a bit for non-inclusive np.arange.
-A_max = 360 + (360 / (NUMBER_OF_COLORS / 2) )
-B_max = 1.0 + (1.0 / (NUMBER_OF_COLORS / 2) )
-C_max = 1.0 + (1.0 / (NUMBER_OF_COLORS / 2) )
+A_max = 360 + (360 / (DOMAIN / 2) )
+B_max = 1.0 + (1.0 / (DOMAIN / 2) )
+C_max = 1.0 + (1.0 / (DOMAIN / 2) )
 
 # creates numpy array of NUMBER_OF_COLORS (count) values over L (Lab) range; dividing final parameter further results in more colors used:
-A_domain = np.arange(0.0, A_max, A_max / (NUMBER_OF_COLORS * 1.3) )	# * 1.3 moar colors
-B_domain = np.arange(0.0, B_max, B_max / NUMBER_OF_COLORS)
-C_domain = np.arange(0.0, C_max, C_max / (NUMBER_OF_COLORS * 1.7) )	# * 1.7 gets more L
+A_domain = np.arange(0.0, A_max, A_max / (DOMAIN * 1.3) )	# * 1.3 moar colors
+B_domain = np.arange(0.0, B_max, B_max / DOMAIN)
+C_domain = np.arange(0.0, C_max, C_max / (DOMAIN * 1.7) )	# * 1.7 gets more L
 
 # convert from numpy arrays to lists for combinatronics:
 A_domain = list(A_domain)
