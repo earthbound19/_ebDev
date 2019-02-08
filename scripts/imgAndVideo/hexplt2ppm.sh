@@ -5,12 +5,15 @@
 # USAGE
 # Invoke this script with the following parameters:
 #  $1 hex color palette flat file list (input file).
-#  $2 OPTIONAL. Edge length of each square tile to be composited into final (png) image.
-#  $3 OPTIONAL. MUST HAVE VALUE 0 or nonzero (anything other than 0). If nonzero, the script will randomly shuffle the hex color files before compositing them to one image.
-#  $4 OPTIONAL. number of tiles across of tiles-assembled image (columns).
+#  $2 OPTIONAL. Edge length of each square tile to be composited into final (png) image. SEE COMMENTED OUT CODE at end of script; if you wish to invoke a script on windows (cygwin) that blows up ppm images via irfanview, uncomment that code at the end of the script.
+#  $3 OPTIONAL. IF PRESENT, must be zero or any other value. If 0, hex colors will be used in the order found in the source .hexplt file. If anything besides zero, the script will randomly shuffle the hex color files before compositing them to one image.
+#  $4 OPTIONAL. Number of tiles across of tiles-assembled image (columns). If not provided, automatically calculated as approximate square root of total number of colors in source .hexplt file.
 #  $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).
-#  EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, squares in the palette rendered in random order, and the palette image being 5 columns wide and 6 rows down:
+#  -->
+#  EXAMPLE COMMAND:
 #  ./thisScript.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
+#  --creates a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, squares in the palette are rendered in random order, and the palette image will be 5 columns wide and 6 rows down:
+#  FOR THIS EXAMPLE, changing the parameter foo to 0 will not shuffle the colors.
 
 # KNOWN ISSUES
 # - Sometimes Cygwin awk throws errors as invoked by this script. Not sure why. I run it twice and one time awk throws an error, another it doesn't.
@@ -65,13 +68,13 @@ fi
 # Do whitespace / extraneous lines cleanup of .hexplt source file (saving result to temp file which we will operate from) :
 			# commands iterated through in development:
 			# replaces whitespace with ____:
-			# sed -e "s/\s/____/g" ColorSchemeHexBurntSandstone.hexplt
+			# gsed -e "s/\s/____/g" ColorSchemeHexBurntSandstone.hexplt
 			# isolates six-character hex:
-			# sed -e "s/#\([0-9a-fA-F]\{6\}\)/\1/g" ColorSchemeHexBurntSandstone.hexplt
+			# gsed -e "s/#\([0-9a-fA-F]\{6\}\)/\1/g" ColorSchemeHexBurntSandstone.hexplt
 			# combines stripping leading whitespace and isolating sextuple hex strings:
-			# sed -e "s/^\s\{1,\}//g" -e "s/#\([0-9a-fA-F]\{6\}\).*/\1/g" ColorSchemeHexBurntSandstone.hexplt
+			# gsed -e "s/^\s\{1,\}//g" -e "s/#\([0-9a-fA-F]\{6\}\).*/\1/g" ColorSchemeHexBurntSandstone.hexplt
 # I don't know *how* this combination of flags works; it was a shot in the dark (!), but it works; hints from https://stackoverflow.com/a/1665574/1397555 ; ALSO, the \L converts all preceding characters which are uppercase to lowercase :
-sed -n -e "s/^\s\{1,\}//g" -n -e "s/#\([0-9a-fA-F]\{6\}\).*/\L\1/p" $hexColorSrcFullPath > tmp_djEAM2XJ9w.hexplt
+gsed -n -e "s/^\s\{1,\}//g" -n -e "s/#\([0-9a-fA-F]\{6\}\).*/\L\1/p" $hexColorSrcFullPath > tmp_djEAM2XJ9w.hexplt
 # Reassign name of that temp file to hexColorSrcFullPath to work from:
 hexColorSrcFullPath=tmp_djEAM2XJ9w.hexplt
 
@@ -83,7 +86,7 @@ then
 else
 	echo Value of paramater \$3 is NONZERO\; WILL SHUFFLE read values.
 	# Shuffle the values (lines) in tmp_djEAM2XJ9w.hexplt into a new temp file:
-	shuf ./tmp_djEAM2XJ9w.hexplt > ./tmp_NpKH7mFEHg58UsNQ5JX3.txt
+	gshuf ./tmp_djEAM2XJ9w.hexplt > ./tmp_NpKH7mFEHg58UsNQ5JX3.txt
 	# Assign the name of this new shuffled temp file to hexColorSrcFullPath, and remove the previous temp file:
 	hexColorSrcFullPath=tmp_NpKH7mFEHg58UsNQ5JX3.txt
 	rm ./tmp_djEAM2XJ9w.hexplt
@@ -151,14 +154,15 @@ else
 	ppmBodyValues=`tr -d '\n' < $hexColorSrcFullPath`
 			rm $hexColorSrcFullPath
 	# Split that superstring with spaces every two hex chars:
-	ppmBodyValues=`echo $ppmBodyValues | sed 's/../& /g'`
+	ppmBodyValues=`echo $ppmBodyValues | gsed 's/../& /g'`
 	# TO DO for hexplt2ppm.sh: convert that to decimal; first work it up into a string formatted for echo in base-16, e.g.:
 	# ppmBodyValues=`echo $((16#"$thisHexString")) $((16#"$thatHexString"))`
-	ppmBodyValues=`echo $ppmBodyValues | sed 's/[a-zA-Z0-9]\{2\}/$((16#"&"))/g'`
+	ppmBodyValues=`echo $ppmBodyValues | gsed 's/[a-zA-Z0-9]\{2\}/$((16#&))/g'`
 	# If I echo that\, it prints it literally instead of interpretively. Ach! Workaround: make a temp shell script that echos it interpretively (and assign the result to a variable) :
 	printf "echo $ppmBodyValues" > tmp_hsmwzuF64fEWmcZ2.sh
+	chmod +x tmp_hsmwzuF64fEWmcZ2.sh
 	ppmBodyValues=`./tmp_hsmwzuF64fEWmcZ2.sh`
-	rm tmp_hsmwzuF64fEWmcZ2.sh
+#	rm tmp_hsmwzuF64fEWmcZ2.sh
 	echo $ppmBodyValues > ppmBody.txt
 			# DEV NOTES
 			# including "simulate ? (optionals) with \{0,1\}", re: https://stackoverflow.com/a/6157705/1397555
@@ -189,7 +193,7 @@ else
 	#  - Which gives is our value to subtract from tilesAcross as described above:
 	tilesToAdd=$(( $tilesAcross - $lastLineTilesCount ))
 			# echo tilesToAdd is\: $tilesToAdd
-	valuesToAdd=$(( $tilesToAdd * "3"))
+	valuesToAdd=$(( $tilesToAdd * 3))
 			# echo valuesToAdd is\: $valuesToAdd
 	#  - Alas this can't be done as elegantly as printf "ha "%.0s {1..5} with a variable in the range, re https://stackoverflow.com/questions/19432753/brace-expansion-with-variable :
 	for i in $(seq 1 $valuesToAdd)
@@ -198,7 +202,7 @@ else
 	done
 	lastLineValuesPadString="$lastLineString $lastLineValuesPadString"
 	# remove last line from ppmBody.txt, then append the replacement line to it:
-	sed -i '$ d' ppmBody.txt
+	gsed -i '$ d' ppmBody.txt
 	echo $lastLineValuesPadString >> ppmBody.txt
 	# concatenate the header and body to create the final ppm file:
 	cat PPMheader.txt ppmBody.txt > $renderTargetFile
@@ -206,10 +210,11 @@ else
 	rm PPMheader.txt ppmBody.txt
 fi
 
+
 # If $2 (tile size) parameter passed, blow up the image via mathy math and another script:
-if [ ${2+x} ]
-then
-	tileEdgeLen=$2
-	blowupIMGtoXpix=$(( $tileEdgeLen * $tilesAcross ))
-irfanView2imgNN.sh $renderTargetFile png $blowupIMGtoXpix
-fi
+# if [ ${2+x} ]
+# then
+# 	tileEdgeLen=$2
+# 	blowupIMGtoXpix=$(( $tileEdgeLen * $tilesAcross ))
+# irfanView2imgNN.sh $renderTargetFile png $blowupIMGtoXpix
+# fi
