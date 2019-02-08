@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates a list of colors expressed as RGB hexadecimal values, from a simplified HSL gamut, in N (-n <number> switch) domains per permutation of H, S, and L in the gamut. Capture the list with the > operator via terminal (see USAGE). Can be hacked to do this with several gamuts (L*a*b of particular interest?). The script stretches the shade and hue range a bit and produces more colors than you would expect, to that end.
+# Creates a list of colors expressed as RGB hexadecimal values, from a simplified L*a*b gamut, in D (-d <number> switch) domains per permutation of L, a, and b in the gamut. Capture the list with the > operator via terminal (see USAGE). Can be hacked to do this with several gamuts (L*a*b of particular interest?). The script stretches the shade and hue range a bit and produces more colors than you would expect, to that end.
 
 # USAGE
 # python get_simple_gamut.py -n 7
@@ -20,10 +20,10 @@ import spectra
 import argparse
 import numpy as np
 
-DEFAULT_DOMAIN = 7
+DEFAULT_DOMAIN = 5.5
 
-PARSER = argparse.ArgumentParser(description='Creates a list of colors expressed as RGB hexadecimal values, from a simplified HSL gamut, in N (-n <number> switch) shades of all colors in the gamut. Capture the list with the > operator via terminal e.g. "python get_simple_gamut.py -n 7 > HSL_simplified_gamut.hexplt" (without the double quote marks).')
-PARSER.add_argument('-n', '--DOMAIN', type=int, help='Domains per permutation of H, S, and L in the gamut. Default ' + str(DEFAULT_DOMAIN))
+PARSER = argparse.ArgumentParser(description='Creates a list of colors expressed as RGB hexadecimal values, from a simplified HSL gamut, in D (-d <number> switch) domains per permutation of L, a, and b in the gamut. Capture the list with the > operator via terminal e.g. "python get_simple_gamut.py -d 5.5 > Lab_simplified_gamut.hexplt" (without the double quote marks). Note that -d is a float.')
+PARSER.add_argument('-d', '--DOMAIN', type=float, help='Domains per permutation of L, a, and b in the L*a*b gamut. Default ' + str(DEFAULT_DOMAIN))
 ARGS = PARSER.parse_args()
 
 # If -n <a number> was passed to script, generate that many colors; otherwise generate DEFAULT_DOMAIN:
@@ -50,15 +50,22 @@ else:
 # HSL max values: (360, 1.0, 1.0); re http://www.workwithcolor.com/hsl-color-picker-01.htm
 # -- which I had open for longer than I care to confess before it dawned on me
 # _that the spectra library expects values in those ranges_.
-# The additions to all of the following compensates a bit for non-inclusive np.arange.
-A_max = 360 + (360 / (DOMAIN / 2) )
-B_max = 1.0 + (1.0 / (DOMAIN / 2) )
-C_max = 1.0 + (1.0 / (DOMAIN / 2) )
+
+# Lab min and max values? : L: 0 to 100; a: -110 to 110; b: -110 to 110? re: http://davidjohnstone.net/pages/lch-lab-colour-gradient-picker
+
+# The clipping of the low L*a*b range compensates for the fact that few actually decipher color that dark.
+# The additions to the max range compensate for the non-inclusive upper np.arange.
+A_min = 2
+A_max = 100 + (100 / DOMAIN * 1.8)
+B_min = -100
+B_max = 110 + (110 / DOMAIN)
+C_min = -100
+C_max = 110 + (110 / DOMAIN)
 
 # creates numpy array of NUMBER_OF_COLORS (count) values over L (Lab) range; dividing final parameter further results in more colors used:
-A_domain = np.arange(0.0, A_max, A_max / (DOMAIN * 1.3) )	# * 1.3 moar colors
-B_domain = np.arange(0.0, B_max, B_max / DOMAIN)
-C_domain = np.arange(0.0, C_max, C_max / (DOMAIN * 1.7) )	# * 1.7 gets more L
+A_domain = np.arange(A_min, A_max, A_max / DOMAIN)
+B_domain = np.arange(B_min, B_max, B_max / DOMAIN)
+C_domain = np.arange(C_min, C_max, C_max / DOMAIN)
 
 # convert from numpy arrays to lists for combinatronics:
 A_domain = list(A_domain)
@@ -71,7 +78,7 @@ simplified_gamut = []
 for i in A_domain:
 	for j in B_domain:
 		for k in C_domain:
-			this_color = spectra.hsl(i, j, k)
+			this_color = spectra.lab(i, j, k)
 			# print(i, j, k)
 			simplified_gamut.append(this_color.hexcode)
 
