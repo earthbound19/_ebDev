@@ -162,7 +162,7 @@ else
 	printf "echo $ppmBodyValues" > tmp_hsmwzuF64fEWmcZ2.sh
 	chmod +x tmp_hsmwzuF64fEWmcZ2.sh
 	ppmBodyValues=`./tmp_hsmwzuF64fEWmcZ2.sh`
-#	rm tmp_hsmwzuF64fEWmcZ2.sh
+	rm tmp_hsmwzuF64fEWmcZ2.sh
 	echo $ppmBodyValues > ppmBody.txt
 			# DEV NOTES
 			# including "simulate ? (optionals) with \{0,1\}", re: https://stackoverflow.com/a/6157705/1397555
