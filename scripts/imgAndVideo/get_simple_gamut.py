@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates a list of colors expressed as RGB hexadecimal values, from a simplified L*a*b gamut, in D (-d <number> switch) domains per permutation of L, a, and b in the gamut. Capture the list with the > operator via terminal (see USAGE). Can be hacked to do this with several gamuts (L*a*b of particular interest?). The script stretches the shade and hue range a bit and produces more colors than you would expect, to that end.
+# Creates a list of colors expressed as RGB hexadecimal values, from a simplified L*a*b gamut, in D (-d <number> switch) domains per permutation of L, a, and b in the gamut. Capture the list with the > operator via terminal (see USAGE). Can be hacked to do this with several gamuts (L*a*b of particular interest?). The script stretches the shade and hue range a bit and produces more colors than you would expect, to that end. Also writes new files (or clobbers them if they already exist) all_gamut_two_pairs.txt, which is a list of all possible combinations of two colors in the simplified gamut (without repetition of any color--every combination will be two different colors).
 
 # USAGE
 # python get_simple_gamut.py -n 7
@@ -33,7 +33,7 @@ else:
     DOMAIN = DEFAULT_DOMAIN
 
 
-# FAILED to do what I want implemented with color print; from the spectra tutorial page:
+# FAILED to do what I want implemented with color print; from the spectra tutorial page; but handy reference for creating gradients (scales) :
 # scale = spectra.scale([ start, end ])
 # scale_custom_domain = scale.domain([ 0, DOMAIN ])
 
@@ -82,6 +82,7 @@ for i in A_domain:
 			# print(i, j, k)
 			simplified_gamut.append(this_color.hexcode)
 
+
 # Deduplicate list but maintain order; re: https://stackoverflow.com/a/17016257/1397555
 # -- or TO DO--this without importing another library, re: https://thispointer.com/python-how-to-remove-duplicates-from-a-list/
 from more_itertools import unique_everseen
@@ -91,3 +92,19 @@ for element in simplified_gamut:
 	print(element)
 
 
+# Write lists of all two-and-three pairs from reduced gamut:
+import string
+import itertools
+all_two_permutations = list(itertools.permutations(simplified_gamut, 2))
+outfile = open('all_gamut_two_pairs.txt', 'w')
+
+for i in all_two_permutations:
+	outfile.write(i[0] +"," + i[1] +'\n')
+outfile.close()
+
+# all_three_permutations = list(itertools.permutations(simplified_gamut, 3))
+# outfile = open('all_gamut_three_pairs.txt', 'w')
+# 
+# for i in all_three_permutations:
+# 	outfile.write(i[0] +i[1] +i[2] +'\n')
+# outfile.close()
