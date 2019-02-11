@@ -14,7 +14,6 @@ C_max = 1
 A_domain = 4
 B_domain = 4
 C_domain = 4
-# Stepping (counting) down because it's difficult (or with this code depending, impossible) to hit the max ranges counting up:
 simplified_gamut = []
 # [x/10 for x in range(0, 10)] -- that is a list comprehension to get a decimal range, re: https://stackoverflow.com/a/477513/1397555
 A_range = [x/(A_max * A_domain) for x in range(A_min, (A_max * A_domain + 1))]
