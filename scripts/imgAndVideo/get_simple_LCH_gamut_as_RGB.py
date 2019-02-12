@@ -2,22 +2,10 @@
 # Creates a list of colors expressed as RGB hexadecimal values, from a simplified LCH (a.k.a. HCL) gamut. Capture the list with the > operator via terminal (see USAGE). Can be hacked to do this with several gamuts which the supporting "spectra" python library can use. To change the step over various components in the gamut, hack the A_domain, B_domain and C_domain variables in this script.
 
 # USAGE
-# python get_simple_gamut.py -n 7 > HSL_simplified_gamut.hexplt
+# python get_simple_gamut.py > HSL_simplified_gamut.hexplt
 
 # DEPENDENCIES
-# Python 3, spectra, argparse, numpy
-# spectra library via:
-# pip install spectra
-# -- and documented at:
-# https://github.com/jsvine/spectra/blob/master/docs/walkthrough.ipynb
-
-# PROGRAMMER NOTES
-# TO DO: use CIECAM02.
-# This page -- https://colorspacious.readthedocs.io/en/latest/tutorial.html -- describes a gamut in HCL (actually Jcl there) which is "state of the art:" CIECAM02. Supported as such by chronology in this article: https://en.wikipedia.org/wiki/Color_appearance_model#CIECAM02 Excellent article about it describing well different attributes of color and colorfulness: https://en.wikipedia.org/wiki/CIECAM02
-# Packages that support it:
-# - https://colorspacious.readthedocs.io/en/latest/reference.html#supported-colorspaces
-# - https://colour.readthedocs.io/en/latest/colour.appearance.html#ciecam02
-# - winner if it works: https://colorspacious.readthedocs.io/en/latest/reference.html#ciecam02 : "If you just want a better replacement for traditional ad hoc spaces like “Hue/Saturation/Value”, then use the string "JCh" for your colorspace (see Perceptual transformations for a tutorial) and be happy."
+# Python 3, spectra
 
 # Something I read and my own sample simplified gamut of lab vs. hcl convinced me to use HCL. BUT:
 # NOT TO DO: use https://github.com/colour-science/colour which has _a lot_ of functionality (including Colour Difference calculation), a ton of commits, and at this writing the newest commit only 4 days ago -- or any of the packages _it_ lists? -- don't use because it doesn't support HCL. https://github.com/colour-science/colour#see-also
