@@ -5,8 +5,11 @@
 # Invoke this script without any parameters: markdown gallery from; e.g.:
 # ./thisScript.sh
 
+# NOTES
+# On Mac (at least) this script throws an error about test, and yet it still works as intended (the test causes a zero or nonzero return code).
+
 # TO DO
-# Remove parameter $1 and replace it with a built-in listing of many image types.
+# Remove search for many image types?
 
 
 # CODE
