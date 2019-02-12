@@ -11,14 +11,23 @@
 # -- and documented at:
 # https://github.com/jsvine/spectra/blob/master/docs/walkthrough.ipynb
 
-# TO DO: or instead of using colormath, use? : https://github.com/colour-science/colour which has _a lot_ of functionality (including Colour Difference calculation), a ton of commits, and at this writing the newest commit only 4 days ago -- or any of the packages _it_ lists? : https://github.com/colour-science/colour#see-also
+# PROGRAMMER NOTES
+# TO DO: use CIECAM02.
+# This page -- https://colorspacious.readthedocs.io/en/latest/tutorial.html -- describes a gamut in HCL (actually Jcl there) which is "state of the art:" CIECAM02. Supported as such by chronology in this article: https://en.wikipedia.org/wiki/Color_appearance_model#CIECAM02 Excellent article about it describing well different attributes of color and colorfulness: https://en.wikipedia.org/wiki/CIECAM02
+# Packages that support it:
+# - https://colorspacious.readthedocs.io/en/latest/reference.html#supported-colorspaces
+# - https://colour.readthedocs.io/en/latest/colour.appearance.html#ciecam02
+# - winner if it works: https://colorspacious.readthedocs.io/en/latest/reference.html#ciecam02 : "If you just want a better replacement for traditional ad hoc spaces like “Hue/Saturation/Value”, then use the string "JCh" for your colorspace (see Perceptual transformations for a tutorial) and be happy."
+
+# Something I read and my own sample simplified gamut of lab vs. hcl convinced me to use HCL. BUT:
+# NOT TO DO: use https://github.com/colour-science/colour which has _a lot_ of functionality (including Colour Difference calculation), a ton of commits, and at this writing the newest commit only 4 days ago -- or any of the packages _it_ lists? -- don't use because it doesn't support HCL. https://github.com/colour-science/colour#see-also
 
 
 # CODE
 import spectra
-from colormath.color_objects import LabColor
-from colormath.color_objects import LCHabColor
-from colormath.color_diff import delta_e_cie2000
+# from colormath.color_objects import LabColor
+# from colormath.color_objects import LCHabColor
+# from colormath.color_diff import delta_e_cie2000
 
 # FAILED to do what I want implemented with color print; from the spectra tutorial page; but handy reference for creating gradients (scales) :
 # scale = spectra.scale([ start, end ])
