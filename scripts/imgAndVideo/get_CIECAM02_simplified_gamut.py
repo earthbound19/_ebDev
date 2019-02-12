@@ -13,6 +13,7 @@
 # - https://colorspacious.readthedocs.io/en/latest/reference.html#supported-colorspaces
 # - https://colour.readthedocs.io/en/latest/colour.appearance.html#ciecam02
 # - winner if it works: https://colorspacious.readthedocs.io/en/latest/reference.html#ciecam02 : "If you just want a better replacement for traditional ad hoc spaces like “Hue/Saturation/Value”, then use the string "JCh" for your colorspace (see Perceptual transformations for a tutorial) and be happy."
+# - OR maybe better?! : https://pypi.org/project/ciecam02/
 
 A_min = 0
 A_max = 100
@@ -67,3 +68,17 @@ for element in simplified_gamut:
 # for i in all_three_permutations:
 # 	outfile.write(i[0] +i[1] +i[2] +'\n')
 # outfile.close()
+
+
+# BONEYARD
+# import colormath
+# from colormath.color_conversions import convert_color
+# from colormath.color_objects import LCHabColor, sRGBColor
+# this_color = colormath.color_objects.LCHabColor(100, 50, 40)
+# converted_color = convert_color(this_color, sRGBColor)
+# converted_color.clamped_rgb_b
+# 0.763059175368764
+# converted_color.get_rgb_hex
+# this_hex = converted_color.get_rgb_hex()
+# this_hex
+# '#153e1c3'
