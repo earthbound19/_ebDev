@@ -125,13 +125,15 @@ fi
 
 
 # IF RENDER TARGET already exists, abort script. Otherwise continue.
-if [ -f ./$paletteFile.png ]
+fileNameNoExt=${paletteFile%.*}
+renderTarget=$fileNameNoExt.png
+if [ -f ./$renderTarget ]
 then
-	echo Render target $paletteFile.png already exists\; SKIPPING render.
+	echo Render target $renderTarget already exists\; SKIPPING render.
 	# FOR DEVELOPMENT: Comment out the next line if you want to render anyway:
 	exit
 else
-	echo Render target $paletteFile.png does not exist\; WILL RENDER.
+	echo Render target $renderTarget does not exist\; WILL RENDER.
 fi
 
 if [ -d ./$paletteFile.colors ]
@@ -169,7 +171,7 @@ echo "gm montage -tile $tilesAcross"x"$tilesDown -background gray -geometry $til
 sed 's/.*#\(.*\)$/_hexPaletteIMGgenTMP_2bbVyVxD\/\1.png \\/' $hexColorSrcFullPath > ./mkGridSRCimgs.txt
 # IF $shuffleValues is nonzero, randomly sort that list:
 	if [ $shuffleValues -ne 0 ]; then shuf ./mkGridSRCimgs.txt > ./tmp_3A7u2ZymRgdss4rsXuxs.txt; rm ./mkGridSRCimgs.txt; mv ./tmp_3A7u2ZymRgdss4rsXuxs.txt ./mkGridSRCimgs.txt; fi
-echo $paletteFile.png > mkGridTail.txt
+echo $renderTarget > mkGridTail.txt
 cat mkGridHead.txt mkGridSRCimgs.txt mkGridTail.txt > mkColorPaletteGrid.sh
 
 rm mkGridHead.txt mkGridSRCimgs.txt mkGridTail.txt
@@ -185,7 +187,7 @@ mv _hexPaletteIMGgenTMP_2bbVyVxD $paletteFile.colors
 	# AND, if it annoys you, also delete:
 	rm -rf $paletteFile.colors
 
-echo DONE--created color palette image is $paletteFile.png
+echo DONE--created color palette image is $renderTarget
 
 # TO DO? : make the following statement optionally true (via parameter), and echo it: "You will also find color swatch images from the palette in the folder $paletteFile.colors."
 
