@@ -5,7 +5,8 @@
 # A 'nixy environment, the openimageio tool set, and images to diff.
 
 # USAGE
-# thisScript.sh
+# NOTE: IF SOURCE IMAGES are of various resolutions (not all the same), you may wish to first create copies of them all at matching resolutions via gm_downsize_img_copies_to_smallest.sh, and then run this script against the resulting /__smaller_img subfolder. Then invoke this script:
+# idiff_all_img_pairs.sh
 
 # TO DO:
 # - DON'T TRY saving to jpgs via this tool, because this tool isn't built to. Jpegs from this are 8-bit and of inferior quality versus the 24-bit tifs. It might be nice to pipe the image output to another openimageio tool to save a high-quality 24-bit image.
