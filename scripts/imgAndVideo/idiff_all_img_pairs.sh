@@ -15,6 +15,8 @@
 # CODE
 # Get array of many images named imgs_arr via dependency script:
 source get_all_imgs_array.sh
+# Shuffle that so that any re-run of this script will always go through images in a different order (useful for previewing samples among many choices):
+imgs_arr=( $(shuf -e "${imgs_arr[@]}") )
 
 array_size=$((${#imgs_arr[@]}))	# store size of that array
 inner_loop_start=1						# set base count for inner loop
@@ -45,12 +47,14 @@ done
 # Get array of many images named imgs_arr via dependency script; the "foo" argument gives us an array in reverse order via that script:
 source get_all_imgs_array.sh foo
 array_size=$((${#imgs_arr[@]}))
+# Make a shuffled copy of that array for the inner loop (again useful for previewing samples among many choices):
+imgs_arr_shuf_copy=( $(shuf -e "${imgs_arr[@]}") )
 inner_loop_start=1
 for outer in ${imgs_arr[@]}
 do
 	for((j = inner_loop_start; j<array_size; j++))
 	do
-		inner=${imgs_arr[j]}
+		inner=${imgs_arr_shuf_copy[j]}
 		inner_no_ext=${inner%.*}
 		outer_no_ext=${outer%.*}
 		outfileNoExt="image_pairs_diffs/""$outer_no_ext"__"$inner_no_ext"__diff
