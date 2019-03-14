@@ -7,3 +7,4 @@ scripts\imgAndVideo
 scripts\imgAndVideo\EXIFdataBatch
 scripts\imgAndVideo\EXIFdataBatch\metaDataTemplates
 scripts\imgAndVideo\virtualDub
+scripts\admin
