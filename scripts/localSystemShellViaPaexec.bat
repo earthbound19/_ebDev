@@ -1,1 +1,0 @@
-paexec \\localhost -i -s cmd.exe
