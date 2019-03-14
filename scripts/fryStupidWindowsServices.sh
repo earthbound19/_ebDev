@@ -43,10 +43,14 @@ HomeGroupListener \
 HomeGroupProvider \
 WinDefend \
 AdobeUpdateService \
+WerSvc \
 BITS"
 
 for element in ${disableServices[@]}
 do
+	echo RUNNING COMMAND\:
+	echo SC STOP $element
+	SC STOP $element
 	echo RUNNING COMMAND\:
 	echo SC CONFIG $element start= disabled
 	SC CONFIG $element start= disabled
@@ -62,10 +66,14 @@ PcaSvc \
 SharedAccess \
 StorSvc \
 WinRM \
+WerSvc \
 WPCSvc"
 
 for element in ${onDemandServices[@]}
 do
+	echo RUNNING COMMAND\:
+	echo SC STOP $element
+	SC STOP $element
 	echo RUNNING COMMAND\:
 	echo SC CONFIG $element start= demand
 	SC CONFIG $element start= demand
