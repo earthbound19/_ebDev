@@ -7,8 +7,8 @@ sc stop "Apple Mobile Device Service"
 sc stop SbieSvc
 sc stop PcaSvc
 sc stop AeLookupSvc
-sc stop MBAMScheduler
-sc stop MBAMService
+REM sc stop MBAMScheduler
+REM sc stop MBAMService
 sc stop wscsvc
 sc stop mi-raysat_3dsmax2013_64
 sc stop LMS
@@ -35,6 +35,8 @@ sc stop gupdate
 SC DELETE gupdate
 sc stop BrYNSvc
 sc stop bthserv
+sc stop "AMD External Events Utility"
+sc stop WerSvc
 process -k iexplore.exe
 process -k dropbox.exe
 process -k greenshot.exe
@@ -53,4 +55,13 @@ process -k uTorrent.exe
 process -k iCloudDrive.exe
 process -k ApplePhotoStreams.exe
 process -k iCloudServices.exe
-process -k BrotherHelp.exe
+process -k steamwebhelper.exe
+process -k Steam.exe
+process -k RadeonSettings.exe
+process -k sqlwriter.exe
+REM Adobe CC-related processes:
+process -k "Adobe Desktop Service.exe"
+process -k AdobeICPbroker.exe
+process -k CoreSync.exe
+process -k CCXprocess.exe
+process -k CCLibrary.exe
