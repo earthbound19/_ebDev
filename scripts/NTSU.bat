@@ -7,3 +7,6 @@ REM thisBatch.bat
 
 REM CODE
 paexec -i -s cmd
+
+REM Or alternately? :
+REM paexec \\localhost -i -s cmd.exe
