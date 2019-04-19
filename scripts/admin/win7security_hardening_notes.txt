@@ -1,0 +1,17 @@
+Vulnerabilities in Windows 7 to lock down:
+re: https://www.csoonline.com/article/2619720/how-to-defeat-the-new-rdp-exploit----the-easy-way.html
+- change any network-exposed services to use alternate, uncommon ports
+- admin websites should not be run on port 80 or even 443
+- SSH shouldn't be listening on port 22
+- telnet hosts shouldn't be listening on port 23
+- regrettably, FTP only works on ports 21 and 22 (in passive mode or active mode)
+
+re: https://research.checkpoint.com/reverse-rdp-attack-code-execution-on-rdp-clients/
+- disable or rename these executables:
+  - mstsc.exe
+  - rdpclip.exe
+
+Learned from sad experience :( :
+- _Don't forward ports from your router to your computer unless you safeguard those ports_.
+
+- Linux has a built-in firewall (look up the service name) which can whitelist ports (which has the effect of blocking everything other than what is on the whitelist).

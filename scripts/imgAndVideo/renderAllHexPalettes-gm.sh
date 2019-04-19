@@ -14,7 +14,7 @@ while read fileName
 do
 	echo ~~~~
 	echo invoking renderHexPalette-gm.sh for $fileName . . .
-	renderHexPalette-gm.sh $fileName 80 0
+	renderHexPalette-gm.sh $fileName 80 0 5 1
 done < all_hexplt.txt
 
 rm all_hexplt.txt
