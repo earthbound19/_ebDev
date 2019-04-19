@@ -16,7 +16,8 @@
 # GraphicsMagick, possibly IrfanView, both in your $PATH.
 
 # TO DO
-# Make irfanvew call alter if $4 parameter present.
+# Make irfanvew call alter if $4 parameter present. [alter how?]
+# Deprecate irfanview?-- or conditionally don't use it? gm convert may work on all platforms.
 # Assign script paramaters to named variables and use the named variables.
 
 
@@ -33,17 +34,17 @@ do
 	if [ ! -f $targetFileName ]; then
 		echo RENDERING target file $targetFileName as it does not exist . . .
 		# If the source file format is ppm, use Irfanview to do the conversion (at this writing, I find that only IrfanView reads ppm format). Otherwise, use GraphicsMagick.
-		if [ $imgFileExt == "ppm" ]; then
+#		if [ $imgFileExt == "ppm" ]; then
 			# option that forces a given size:
-			i_view32.exe $img /resize=\($3,$4\) /convert=$targetFileName
+#			i_view32.exe $img /resize=\($3,$4\) /convert=$targetFileName
 			# option that preserves aspect setting dimension for longest side:
 			# i_view32.exe $img /resize_long=$3 /aspectratio /convert=$targetFileName
-		else
+#		else
 				# ex. GraphicsMagick command:
 				# gm convert 6x5gridRND_2017_05_06__01_51_14__099842100.ppm -scale 1200 out.png
 			# If params $3 or $4 were not passed to the script, the command will simply be empty where they are (on the following line of code), and it should still work:
 			gm convert $img -scale $3 $4 $targetFileName
-		fi
+#		fi
 		echo ~~
 	fi
 done < all_$1.txt
