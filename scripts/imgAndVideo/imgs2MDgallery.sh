@@ -3,7 +3,9 @@
 
 # USAGE
 # Invoke this script without any parameters:
-# ./thisScript.sh
+# ./imgs2MDgallery.sh
+# (Omit the ./ if the directory which contains this script is in your PATH environment variable.)
+
 
 # CODE
 gfind *.png *.jpg *.gif *.tif *.tiff > all_imgs.txt
@@ -15,7 +17,7 @@ do
     # echo current image is\: $element
 	imageFileName="${element%.*}"
     # Create header which is image file name linking to image file:
-	printf "### [$imageFileName]($element)\n\n" >> README.md
+	printf "### [\`$imageFileName\`]($element)\n\n" >> README.md
     # Show image under that header, with alt text of full image name, also linking to image file:
 	printf "[ ![$element]($element) ]($element)\n\n" >> README.md
 	# printf "bruh\n\n" >> README.md
@@ -24,3 +26,7 @@ done < all_imgs.txt
 rm all_imgs.txt
 
 printf "*Created with [img2MDgallery.sh](https://github.com/earthbound19/_ebDev/blob/master/scripts/imgAndVideo/imgs2MDgallery.sh).*" >> README.md
+
+echo "
+~
+DONE. README.md with image gallery created (or re-created)."
