@@ -1,6 +1,8 @@
 REM TO DO: Find the exact name of the FlashP* / FlashU* executables and use the found name to terminate those.
+REM I am experimenting with disabling the secondary logon service, "seclogon."
+REM Also, it may be more secure to disable the network list service, "netprofm."
+sc stop tvnserver
 sc stop Everything
-sc stop DisplayFusionService
 sc stop "Bonjour Service"
 sc stop "iPod Service"
 sc stop "Apple Mobile Device Service"
@@ -27,6 +29,9 @@ sc stop VMnetDHCP
 sc stop "VMware NAT Service"
 sc stop VMUSBArbService
 sc stop AGSService
+sc stop AGMService
+sc stop SwitchBoard
+sc stop AdobeUpdateService
 sc stop "Bonjour Service"
 sc stop MMCSS
 sc stop sppsvc
@@ -37,6 +42,9 @@ sc stop BrYNSvc
 sc stop bthserv
 sc stop "AMD External Events Utility"
 sc stop WerSvc
+sc stop BEService
+sc DELETE BEService
+process -k sizer.exe
 process -k iexplore.exe
 process -k dropbox.exe
 process -k greenshot.exe
@@ -65,3 +73,4 @@ process -k AdobeICPbroker.exe
 process -k CoreSync.exe
 process -k CCXprocess.exe
 process -k CCLibrary.exe
+process -k "Adobe CEF Helper.exe"
