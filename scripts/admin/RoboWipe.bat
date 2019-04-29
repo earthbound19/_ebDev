@@ -33,6 +33,7 @@ REM (Re)-create a list of all temp folders
 DIR * /AD /B /S | FINDSTR /E /I \temp > robowipeTempDirList.txt
 DIR * /AD /B /S | FINDSTR /E /I \cache >> robowipeTempDirList.txt
 DIR * /AD /B /S | FINDSTR /E /I \cache2 >> robowipeTempDirList.txt
+DIR * /AD /B /S | FINDSTR /E /I \caches >> robowipeTempDirList.txt
 REM Set number of threads to number of processors * 3
 SET /A NUM = %NUMBER_OF_PROCESSORS% * 3
 
