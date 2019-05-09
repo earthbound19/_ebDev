@@ -24,6 +24,7 @@ rename \
 exiftool \
 jq \
 basictex \
+dcraw \
 openimageio"
 
 # See pyenvFrameworkInstallMac.sh.
