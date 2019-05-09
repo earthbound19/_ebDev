@@ -4,9 +4,11 @@
 # (AKA ventilated prose or sense lines).
 
 # USAGE
-# thisScript.sh fountain-source-file.fountain foo
+# With this script and dependencies in your PATH:
+# fountain2pdf.sh fountain-source-file.fountain foo
 # --where "foo" is optional, and may be anything, which if present, causes the script to join
 # semantic linefeeds in action or dialogue (to a temp file) before PDF conversion.
+# SEE comments in "START PDF RENDER OPTIONS" section for different possible dependencies to use (via comment/uncomment of code lines)).
 
 # NOTES
 # THIS SCRIPT expects everything after the title page of the screenplay (the actual
