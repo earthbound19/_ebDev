@@ -34,7 +34,7 @@ fi
 	# Pad video to a given size, with the video in the center:
 	# additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2"
 	# Scale video to given pixels X, maintain aspect ratio, no padding:
-	additionalParams="-vf scale=-1:720:force_original_aspect_ratio=1"
+	# additionalParams="-vf scale=-1:720:force_original_aspect_ratio=1"
 
 for element in "${IMGconvertList[@]}"
 do
