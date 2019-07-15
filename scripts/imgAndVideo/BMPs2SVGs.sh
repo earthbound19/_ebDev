@@ -6,16 +6,12 @@
 
 
 # CODE
-find . -iname \*.bmp > bmp_imgs.txt
-mapfile -t imgs < bmp_imgs.txt
-i=0
+imgs=$(gfind . -iname \*.bmp)
 for element in "${imgs[@]}"
 do
-	imgFileNoExt=`echo $element | sed 's/\(.*\)\..\{1,4\}/\1/g'`
-	if [ -a $imgFileNoExt.svg ]
+	imgFileNoExt=`echo $element | gsed 's/\(.*\)\..\{1,4\}/\1/g'`
+	if ! [ -a $imgFileNoExt.svg ]
 	then
-		der=duh
-	else
 	echo tracing $element . . .
 	# original command:
 	# potrace -n -s --group -r 24 -C \#000000 --fillcolor \#ffffff $element
@@ -26,7 +22,6 @@ do
 		# potrace -s -t 2 -a 0.73 -r 150 -O 0.71 -C \#000000 --fillcolor \#ffffff $element
 		potrace -s -t 12 -a 0.88 -r 150 -O 0.86 -C \#000000 --fillcolor \#ffffff $element
 		# potrace -s -t 4 -a 0.84 -r 150 -O 0.347 -C \#000000 --fillcolor \#ffffff $element
-	i=$[ $i+1 ]
 	fi
 # ! --------
 # OPTIONAL--COMMENT OUT IF YOU DON'T WANT THE ORIGINAL IMAGE DELETED! :
@@ -34,10 +29,7 @@ do
 # ! --------
 done
 
-echo Traced $i bitmaps. Done.
-
-rm bmp_imgs.txt
-
+echo Traced all bmp files. Done.
 
 # Abridged potrace reference; for details, refer to: http://potrace.sourceforge.net/potrace.1.html
 # Usage: potrace [options] [filename...]
