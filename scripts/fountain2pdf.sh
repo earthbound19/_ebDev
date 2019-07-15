@@ -14,7 +14,7 @@
 # THIS SCRIPT expects everything after the title page of the screenplay (the actual
 # screenplay body text) to start with:
 # > FADE IN:
-# and you may expect this script not to work if that is the case.
+# and you may expect this script to wnot ork if that is not the case.
 # ALSO, the "wrap" CLI option expects those specific font files (given in this script)
 # to be (I think) in the same PATH as the source fountain file. Also, the optional last
 # line of this script opens the output pdf.
@@ -66,12 +66,12 @@ then
 fi
 
 # ====
-# START PDF RENDER OPTIONS
-# "wrap" CLI option, uses specific fonts:
-# wrap pdf $1 --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf"
+# START PDF RENDER OPTIONS:
+# UNCOMMENT THIS: "wrap" CLI option, uses specific fonts--
+wrap pdf $1 --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf"
 
-# "afterwriting" CLI option:
-afterwriting --source $1 --overwrite --pdf
+# _OR_ UNCOMMENT THIS: "afterwriting" CLI option--
+# afterwriting --source $1 --overwrite --pdf
 # I gave my best effort and the following method of loading fonts is *stupid* arcane (*_two_ json files?!_*) and doesn't seem to work:
 # --config courierMegaConfig.json --fonts CourierMega.json
 # END PDF RENDER OPTIONS
