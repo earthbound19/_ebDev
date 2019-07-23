@@ -25,6 +25,7 @@ exiftool \
 jq \
 basictex \
 dcraw \
+blink1 \
 openimageio"
 
 # See pyenvFrameworkInstallMac.sh.
