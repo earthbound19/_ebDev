@@ -31,11 +31,11 @@ for x in $(seq 10); do
   sleep $(echo "60 * 34" | bc)    # 60 seconds times 34 (34 minutes)
   echo "
 ---- BE TAKING A BREAK ----"
+    # Change blink1 device to bright yellow:
+    blink1-tool --rgb fffbcc;
+    # echo "(blink command sent)"
   for x in $(seq 3); do
     brightness 0 2> /dev/null; sleep 1; brightness 1 2> /dev/null; sleep 1.9;
-      # Change blink1 device to bright yellow:
-      blink1-tool --rgb fffbcc;
-      # echo "(blink command sent)"
   done
   sleep $(echo "60 * 8" | bc)     # 60 seconds times 8 (8 minutes)
 done
