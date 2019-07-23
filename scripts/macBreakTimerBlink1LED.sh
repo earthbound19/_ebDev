@@ -18,7 +18,9 @@
 # If you terminate this script in an inverval of darkness, you will be left in darkness.
 # DARKNESS, Batman. DARKNESS.
 
-# DEVELOPER NOTE: `2> /dev/null` suppresses error print.
+# DEVELOPER NOTES
+# `2> /dev/null` suppresses error print.
+# blink1-tool command reference/examples: https://github.com/todbot/blink1/blob/master/docs/blink1-tool.md
 
 for x in $(seq 10); do
   echo "
