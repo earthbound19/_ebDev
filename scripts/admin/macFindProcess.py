@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Identifies the process associated with a window on Macself. RE: https://superuser.com/a/1171739
+# Identifies the process associated with a window on Macs. RE: https://superuser.com/a/1171739
 
 # USAGE
 # python thisScript.py
