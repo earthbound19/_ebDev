@@ -2,11 +2,13 @@
 # Work/break pomodoro timer.
 # Variables L, M, X, and Y in description are customizable.
 # For L minutes (customizable), echoes a prompt to work. If you have a blink1 device, changes
-# the device to a random color every M seconds during that work period. (SUGGESTION:
+# the device to a random color every M seconds during that work period.
+# (Also with N millisecond color gradation change.) (SUGGESTION:
 # don't change the blink color at all, or change it infrequently, during the work period.
 # The blinking can distract.)
 # Then for X minutes echoes a prompt to take a break. If you have a blink device,
 # randomly changes the blink color every Y seconds (customizable) during break period Y.
+# (Also with Z millisecond customizable color gradation change.)
 # Also, dims the computer screen to black and back quickly three times at that break prompt.
 # Repeats this cycle indefinitely.
 # ANOTHER SUGGESTION: Every N break periods (4? 5?), take a long break.
@@ -19,6 +21,9 @@
 # run in the background as you work.
 # NOTE: if you do not have a blink device, uncomment the lines with the "sleep" commands.
 # ALSO NOTE that you may alter the values under the "CHANGE THESE VALUES" comment.
+# ALSO NOTE that depending on the way timer intervals divide (if the color change interval
+# doesn't divide the break interval evenly), work and break periods may be a bit shorter
+# than what you tell this script.
 
 # WARNING
 # If you terminate this script in an inverval of screen darkness, you will be left in darkness.
@@ -31,27 +36,32 @@
 # USER VARIABLES
 # CHANGE THESE VALUES to your liking:
 workMinutes=35
-  workBlinkColorChangeIntervalMS=$((60000 * 4))   # every 4 minutes (in milliseconds)
-  # How many times do we need to change the color to reach workMinutes duration if
+  workMinutesInMS=$((workMinutes * 60000))
+  workBlinkColorChangeIntervalMS=$((50000))   # ~every 50 seconds (in milliseconds)
+  # How many times do we need to change the color to reach workMinutesInMS duration if
   # we change colors every workBlinkColorChangeIntervalMS? The following figures that out:
-  workBlinkChangeColorTimes=`echo "(60000 * $workMinutes) / $workBlinkColorChangeIntervalMS" | bc`
-  workBlinkColorChangeMilliseconds=12000
+  workBlinkChangeColorTimes=`echo "$workMinutesInMS / $workBlinkColorChangeIntervalMS" | bc`
+  workBlinkColorChangeMilliseconds=9000   # 9 seconds
 breakMinutes=7
+  breakMinutesInMS=$((breakMinutes * 60000))
   breakBlinkColorChangeIntervalMS=900
   # How many times do we need to change the color to reach breakMinutes duration if
   # we change colors every breakBlinkColorChangeIntervalMS? The following figures that out:
-  breakBlinkChangeColorTimes=`echo "(60000 * $breakMinutes) / $breakBlinkColorChangeIntervalMS" | bc`
+  breakBlinkChangeColorTimes=`echo "$breakMinutesInMS / $breakBlinkColorChangeIntervalMS" | bc`
       # The following statements are for testing; comment them out in producton:
-      # echo "workBlinkChangeColorTimes value is $workBlinkChangeColorTimes"
-      # echo "breakBlinkChangeColorTimes value is $breakBlinkChangeColorTimes"
-  breakBlinkColorChangeMilliseconds=360
+      echo "workBlinkChangeColorTimes value is $workBlinkChangeColorTimes over workMinutesInMS $workMinutesInMS"
+      echo "breakBlinkChangeColorTimes value is $breakBlinkChangeColorTimes over breakMinutesInMS $breakMinutesInMS"
+  breakBlinkColorChangeMilliseconds=672
 
 
 # WORK / BREAK LOOP
-# At start of loop, flash blink device magenta and cyan 5 times:
+# At start of loop, flash blink device magenta and cyan 5 times, then 4 random colors:
 blink1-tool --playpattern '5,#ff00ff,0.4,0,#00ffff,0.4,0';
+blink1-tool --random=4 -l 1 -l 2 -q;
 # do work/break loop / echoes / blinking lights:
 while (true); do    # eternal loop
+    # OPTIONALLY at start of work loop, dim screen to black and then full brightness again, once:
+  # brightness 0 2> /dev/null; sleep 0.8; brightness 1 2> /dev/null;
     # echo prompt for work run:
   echo "
 ---- DO THE THINGS ----"
@@ -63,13 +73,13 @@ while (true); do    # eternal loop
         # sleep $(echo "60 * $workMinutes" | bc)    # workMinutes times 60 seconds per minute
   echo "
 ---- TAKE A BREAK ----"
-    # fade computer monitor in and out of black 3 times to prompt to take a break:
-  for x in $(seq 3)
-    do
-      brightness 0 2> /dev/null; sleep 1; brightness 1 2> /dev/null; sleep 1.9;
-    done
+    # OPTIONALLY fade computer monitor in and out of black 3 times to prompt to take a break:
+  # for x in $(seq 3)
+  # do
+  #   brightness 0 2> /dev/null; sleep 0.8; brightness 1 2> /dev/null; sleep 0.8;
+  # done
     # blink color prompt for break; similar to that for work run (see comments above):
-  blink1-tool -t $breakBlinkColorChangeIntervalMS --random=$breakBlinkChangeColorTimes -l 1 -l 2 -q;
+  blink1-tool -t $breakBlinkColorChangeIntervalMS --random=$breakBlinkChangeColorTimes --millis=$breakBlinkColorChangeMilliseconds -l 1 -l 2 -q;
         # UNCOMMENT the next line only if you don't have a blink device:
         # sleep $(echo "60 * $breakMinutes" | bc)    # breakMinutes times 60 seconds per minute
 done
