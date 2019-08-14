@@ -44,6 +44,7 @@ HomeGroupProvider \
 WinDefend \
 AdobeUpdateService \
 WerSvc \
+IEEtwCollectorService \
 BITS"
 
 for element in ${disableServices[@]}
