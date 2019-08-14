@@ -41,7 +41,7 @@ workMinutes=35
   # How many times do we need to change the color to reach workMinutesInMS duration if
   # we change colors every workBlinkColorChangeIntervalMS? The following figures that out:
   workBlinkChangeColorTimes=`echo "$workMinutesInMS / $workBlinkColorChangeIntervalMS" | bc`
-  workBlinkColorChangeMilliseconds=9000   # 9 seconds
+  workBlinkColorChangeMilliseconds=14000   # 14 seconds
 breakMinutes=7
   breakMinutesInMS=$((breakMinutes * 60000))
   breakBlinkColorChangeIntervalMS=900
@@ -51,7 +51,7 @@ breakMinutes=7
       # The following statements are for testing; comment them out in producton:
       echo "workBlinkChangeColorTimes value is $workBlinkChangeColorTimes over workMinutesInMS $workMinutesInMS"
       echo "breakBlinkChangeColorTimes value is $breakBlinkChangeColorTimes over breakMinutesInMS $breakMinutesInMS"
-  breakBlinkColorChangeMilliseconds=672
+  breakBlinkColorChangeMilliseconds=1400
 
 
 # WORK / BREAK LOOP
