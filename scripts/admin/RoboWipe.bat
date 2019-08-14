@@ -7,10 +7,7 @@ REM USAGE
 REM Run this as an Administrator, or from a console with Administrator rights. This is designed for Windows 7, untested on prior and newer versions of Windows (it may or may not work on those; I don't know).
 
 REM WARNING
-REM This script errs on the side of clearing possibly too much unused junk on your computer. If you've examined the contents of this batch, and you know what you're doing, and/or you're doing this in a test environment, press <enter> If you actually don't need to clear a ton of space, CLOSE THIS CONSOLE.
-
-REM eh, probably as well or better: for /D %d in (*) do rmdir /S /Q "%d"
-REM re (can't seem to link to comment directly!) : https://social.technet.microsoft.com/Forums/windows/en-US/6b8d5a57-2929-44d1-93ef-a9d825d9e17a/how-can-i-disable-this-folder-is-shared-with-other-people-message?forum=w7itprogeneral
+REM This script errs on the side of clearing possibly too much unused junk on your computer. If you've examined the contents of this batch, and you know what you're doing, and/or you're doing this in a test environment, press <enter>. If you actually don't need to clear a ton of space, CLOSE THIS CONSOLE.
 
 REM 06/20/2015 12:08:03 PM RAH Added Cache and cache2 folders to list of folders to wipe clean via robowipeTempDirList.txt
 
@@ -28,17 +25,18 @@ CD /
 REM Check for existence of empty stub dir; if it already exists, warn user and exit.
 REM Make temporary robowipeStubDir:
 MKDIR robowipeStubDir
+
+REM Copy the contents of the following delete folders list into the delete list for this batch:
+TYPE robowipelist.txt > robowipeTempDirList.txt
+
 REM (Re)-create a list of all temp folders
 	REM Had been trying to do the following with %~d0\ which is irrelevant after discovering the PUSDH and POPD commands:
-DIR * /AD /B /S | FINDSTR /E /I \temp > robowipeTempDirList.txt
+DIR * /AD /B /S | FINDSTR /E /I \temp >> robowipeTempDirList.txt
 DIR * /AD /B /S | FINDSTR /E /I \cache >> robowipeTempDirList.txt
 DIR * /AD /B /S | FINDSTR /E /I \cache2 >> robowipeTempDirList.txt
 DIR * /AD /B /S | FINDSTR /E /I \caches >> robowipeTempDirList.txt
 REM Set number of threads to number of processors * 3
 SET /A NUM = %NUMBER_OF_PROCESSORS% * 3
-
-REM Delete all files in those folders (as described), and also all files in a custom folder list if it exists:
-REM in development: TYPE robowipelist.txt >> robowipeTempDirList.txt
 
 FOR /F "delims=*" %%A IN (robowipeTempDirList.txt) DO (
 REM ECHO WOULD HERE WIPE DIRECTORY %%A ...
@@ -83,5 +81,6 @@ POPD
 
 
 REM DEVELOPMENT HISTORY
-REM Before now: Many thing.
+REM 2019-07-03 06:07 AM added custom delete list (via robowipelist.txt) functionality
 REM 2016-07-26 Added /W:0 and /R:0 flags to skip file delete/other failures (zero retries) re: http://pureinfotech.com/robocopy-recover-and-skip-files-with-errors-from-bad-hard-drive-in-windows/
+REM Before now: Many thing.

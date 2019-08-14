@@ -1,0 +1,5 @@
+Maybe this could be adapted? :
+ffmpeg -i Frame_03d.png -vcodec rawvideo -pix_fmt yuv444p Output.y4m 
+re: https://stackoverflow.com/questions/6701805/h264-lossless-coding/12303936#comment48094247_18506577
+
+OR consult other commands in this thread
