@@ -44,7 +44,7 @@ workMinutes=35
   workBlinkColorChangeMilliseconds=14000   # 14 seconds
 breakMinutes=7
   breakMinutesInMS=$((breakMinutes * 60000))
-  breakBlinkColorChangeIntervalMS=900
+  breakBlinkColorChangeIntervalMS=1400
   # How many times do we need to change the color to reach breakMinutes duration if
   # we change colors every breakBlinkColorChangeIntervalMS? The following figures that out:
   breakBlinkChangeColorTimes=`echo "$breakMinutesInMS / $breakBlinkColorChangeIntervalMS" | bc`
