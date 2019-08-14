@@ -5,11 +5,11 @@
 
 workMinutes=35
   workMinutesInMS=$((workMinutes * 60000))
-  workBlinkColorChangeMS=9000
+  workBlinkColorChangeMS=14000
   workBlinkChangeColorTimes=`echo "$workMinutesInMS / $workBlinkColorChangeMS" | bc`
 breakMinutes=7
   breakMinutesInMS=$((breakMinutes * 60000))
-  breakBlinkColorChangeMS=1460
+  breakBlinkColorChangeMS=1400
   breakBlinkChangeColorTimes=`echo "$breakMinutesInMS / $breakBlinkColorChangeMS + $workBlinkChangeColorTimes" | bc`
 
 # blink1-tool --playpattern '5,#ff00ff,0.4,0,#00ffff,0.4,0';
