@@ -95,8 +95,8 @@ done
 # for i in $(seq 1000)
 # do
 #	This could be done more efficiently by pregenerating so much randomness
-	and cutting sections off it, as in other scripts, but;
-	(re: https://unix.stackexchange.com/a/140751) :
+#	and cutting sections off it, as in other scripts, but;
+#	(re: https://unix.stackexchange.com/a/140751) :
 	# rndR=`shuf -i 0-255 -n 1`
 	# rndG=`shuf -i 0-255 -n 1`
 	# rndB=`shuf -i 0-255 -n 1`
@@ -105,7 +105,7 @@ done
 # done
 
 # save that pattern to the blink as a bootup (USB only--no computer) pattern:
-blink1-tool --savepattern
+#blink1-tool --savepattern
 
 
 
