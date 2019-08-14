@@ -67,8 +67,8 @@ while (true); do    # eternal loop
 ---- DO THE THINGS ----"
     # blink color prompt for work run;
     # blink1 device randomly change color every M seconds, randomly change both lights, quiet mode;
-    # via semicolon is non-waiting command:
-  blink1-tool -t $workBlinkColorChangeIntervalMS --random=$workBlinkChangeColorTimes --millis=$workBlinkColorChangeMilliseconds -l 1 -l 2 -q;
+    # via semicolon is non-waiting command; no idea whether no gamma correction (-g) effects anything:
+  blink1-tool -g -t $workBlinkColorChangeIntervalMS --random=$workBlinkChangeColorTimes --millis=$workBlinkColorChangeMilliseconds -l 1 -l 2 -q;
         # UNCOMMENT the next line only if you don't have a blink device:
         # sleep $(echo "60 * $workMinutes" | bc)    # workMinutes times 60 seconds per minute
   echo "
@@ -83,6 +83,30 @@ while (true); do    # eternal loop
         # UNCOMMENT the next line only if you don't have a blink device:
         # sleep $(echo "60 * $breakMinutes" | bc)    # breakMinutes times 60 seconds per minute
 done
+
+# DEVELOPMENT CODE
+# SAVES a random color boot pattern to a blink1 (USB-powered LED) device via
+# blink1-tool (Mac).
+# Wipe whatever pattern may be on the device:
+# blink1-tool --clearpattern ; blink1-tool --savepattern
+# Because if you try to save a --random= to the blink device it saves black,
+# we have to generate our random color specifically in this script and save it.
+# So, wenerate an RND color for pattern line N (counting from 0 to N):
+# for i in $(seq 1000)
+# do
+#	This could be done more efficiently by pregenerating so much randomness
+	and cutting sections off it, as in other scripts, but;
+	(re: https://unix.stackexchange.com/a/140751) :
+	# rndR=`shuf -i 0-255 -n 1`
+	# rndG=`shuf -i 0-255 -n 1`
+	# rndB=`shuf -i 0-255 -n 1`
+#	echo "writing $rndR,$rndG,$rndB"
+	# blink1-tool -m 400 -t 600 --rgb $rndR,$rndG,$rndB --setpattline $i
+# done
+
+# save that pattern to the blink as a bootup (USB only--no computer) pattern:
+blink1-tool --savepattern
+
 
 
 # REFERENCE
