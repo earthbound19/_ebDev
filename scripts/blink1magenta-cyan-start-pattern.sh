@@ -1,4 +1,4 @@
-# SAVES a boot pattern to a blink1 (USB-powered LED device) device via blink1-tool (Mac).
+# SAVES a boot pattern to a blink1 (USB-powered LED) device via blink1-tool (Mac).
 # reference:
 # https://github.com/todbot/blink1-tool/blob/master/scripts/blink1-pattern-fill.sh
 # https://github.com/todbot/blink1-tool/blob/master/scripts/blink1-patt-tst.sh
