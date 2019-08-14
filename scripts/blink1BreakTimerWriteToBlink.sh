@@ -5,21 +5,23 @@
 
 workMinutes=35
   workMinutesInMS=$((workMinutes * 60000))
-  workBlinkColorChangeMS=14000
+  workBlinkColorChangeMS=50000
   workBlinkChangeColorTimes=`echo "$workMinutesInMS / $workBlinkColorChangeMS" | bc`
-breakMinutes=7
+breakMinutes=5
   breakMinutesInMS=$((breakMinutes * 60000))
   breakBlinkColorChangeMS=1400
   breakBlinkChangeColorTimes=`echo "$breakMinutesInMS / $breakBlinkColorChangeMS + $workBlinkChangeColorTimes" | bc`
 
 # blink1-tool --playpattern '5,#ff00ff,0.4,0,#00ffff,0.4,0';
 blink1-tool --clearpattern
+blink1-tool --savepattern
 for i in $(seq 0 2 $workBlinkChangeColorTimes)
 do
   iPlusOne=$((i + 1))
  rndR=`shuf -i 0-255 -n 1`
  rndG=`shuf -i 0-255 -n 1`
  rndB=`shuf -i 0-255 -n 1`
+ # echo i $i iPlusOne $iPlusOne
  blink1-tool -m $workBlinkColorChangeMS --rgb $rndR,$rndG,$rndB -l 1 --setpattline $i
  blink1-tool -m $workBlinkColorChangeMS --rgb $rndR,$rndG,$rndB -l 2 --setpattline $iPlusOne
 done
@@ -30,8 +32,10 @@ do
   rndR=`shuf -i 0-255 -n 1`
   rndG=`shuf -i 0-255 -n 1`
   rndB=`shuf -i 0-255 -n 1`
+  # echo j $j jPlusOne $jPlusOne
   blink1-tool -m $breakBlinkColorChangeMS --rgb $rndR,$rndG,$rndB -l 1 --setpattline $j
   blink1-tool -m $breakBlinkColorChangeMS --rgb $rndR,$rndG,$rndB -l 2 --setpattline $jPlusOne
 done
- blink1-tool --savepattern
- blink1-tool --play 1
+
+blink1-tool --savepattern
+blink1-tool --play 1
