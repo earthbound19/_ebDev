@@ -1,14 +1,23 @@
 # DESCRIPTION
 # Stripped down version of blink1BreakTimer.sh which instead writes instructions to a blink device
 # (flashes the device memory) so that it will play the pattern when connected to USB power
-# (when it is not connected to a computer)
+# (when it is not connected to a computer). Even though the math here "should" produce
+# accurate minute/second intervals, in practice it doesn't.
+
+# DEVELOPER NOTES
+# For a long time this script had a minute defined as 60000 ms (which is accurate), but
+# I wondered why it didn't seem to time the lights that way. The answer is that I am controlling
+# two lights, and it waits for the delay of one light to finish before it controls the other
+# light. It therefore took twice as long with work minutes and break minutes.
+# The solution is to define a minute as half a minute.
+
 
 workMinutes=35
-  workMinutesInMS=$((workMinutes * 60000))
-  workBlinkColorChangeMS=50000
+  workMinutesInMS=$((workMinutes * 30000))
+  workBlinkColorChangeMS=$((workMinutesInMS / 12))
   workBlinkChangeColorTimes=`echo "$workMinutesInMS / $workBlinkColorChangeMS" | bc`
-breakMinutes=5
-  breakMinutesInMS=$((breakMinutes * 60000))
+breakMinutes=8
+  breakMinutesInMS=$((breakMinutes * 30000))
   breakBlinkColorChangeMS=1400
   breakBlinkChangeColorTimes=`echo "$breakMinutesInMS / $breakBlinkColorChangeMS + $workBlinkChangeColorTimes" | bc`
 
@@ -26,7 +35,7 @@ do
  blink1-tool -m $workBlinkColorChangeMS --rgb $rndR,$rndG,$rndB -l 2 --setpattline $iPlusOne
 done
 
-for j in $(seq $((workBlinkChangeColorTimes +2)) 2 $breakBlinkChangeColorTimes)
+for j in $(seq $((workBlinkChangeColorTimes +1)) 2 $breakBlinkChangeColorTimes)
 do
   jPlusOne=$((j + 1))
   rndR=`shuf -i 0-255 -n 1`
