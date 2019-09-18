@@ -40,6 +40,8 @@
 # NOTES
 # This script intended to run e.g. after NrandomHexColorSchemes.sh and renderAllHexPalettes-gm.sh (which invokes renderHexPalette-gm.sh repeatedly for every .hexplt file in a directory), and renders and deletes of not desired converted pngs of those palettes, or after autobrood fractorium renders to prune undesired fractal flame genomes.
 
+# KEYWORDS
+# orphan, unmatched, unpaired, no pair, extension, prune, delete, not found, pair
 
 # CODE
 list=`gfind . -maxdepth 1 -iname "*.$1" | gsed 's/^\.\///g' | tr -d '\15\32'`
