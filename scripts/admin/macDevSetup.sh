@@ -21,7 +21,14 @@
 # Enable cut-paste in Mac Finder (why would you *not* have that there by default, Apple?) :
 defaults write com.apple.finder AllowCutForItems 1
 
+# Enable show all files:
 defaults write com.apple.finder AppleShowAllFiles YES
+
+# Disable "HAY TEH APP CRASHED" dialogue--except I'm not sure it actually does--maybe after a reboot?
+defaults write com.apple.CrashReporter DialogType none
+# OR make it a slightly less annoying notification:
+# defaults write com.apple.CrashReporter UseUNC 1
+
 
 # OPTIONAL COMMANDS that castrate foistware:
 pushd
@@ -31,9 +38,9 @@ sudo chmod 000 ./Mail.app
 sudo chmod 000 ./Maps.app
 sudo chmod 000 ./News.app
 sudo chmod 000 ./Notes.app
-sudo chmod 000 ./Stickies.app
+# sudo chmod 000 ./Stickies.app
 sudo chmod 000 ./Stocks.app
-sudo chmod 000 ./TextEdit.app
+# sudo chmod 000 ./TextEdit.app
 popd
 
 printf "" >> ~/.bash_profile

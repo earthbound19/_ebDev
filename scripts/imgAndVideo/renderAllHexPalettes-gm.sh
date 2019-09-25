@@ -6,17 +6,16 @@
 
 
 # CODE
-echo "finding all *.hexplt files in the current path and subpaths . . ."
-gfind *.hexplt > all_hexplt.txt
-dos2unix all_hexplt.txt
+# UNCOMMENT the next two lines and comment out the third line from here to work on all subdirs also:
+# echo "finding all *.hexplt files in the current path and subpaths . . ."
+# array=(`gfind *.hexplt`)
+array=(`gfind . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n'`)
 
-while read fileName
+for element in ${array[@]}
 do
 	echo ~~~~
-	echo invoking renderHexPalette-gm.sh for $fileName . . .
-	renderHexPalette-gm.sh $fileName 80 0 5 1
-done < all_hexplt.txt
-
-rm all_hexplt.txt
+	echo invoking renderHexPalette-gm.sh for $element . . .
+	renderHexPalette-gm.sh $element 80 0
+done
 
 echo "DONE. Color palettes have been rendered from all *.hexplt files in the current path and subpaths. Palette images are named after the source *.hexplt files."
