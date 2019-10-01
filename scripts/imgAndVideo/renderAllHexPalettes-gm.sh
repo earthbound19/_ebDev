@@ -1,15 +1,12 @@
 # DESCRIPTION
-# Calls renderHexPalette-gm.sh for every .hexplt file in the path from which this script is invoked (non-recusrive). Result: all hex palette files in the current path is rendered.
+# Calls renderHexPalette-gm.sh for every .hexplt file in the path from which this script is invoked (recusrive). Result: all hex palette files in the current path are rendered.
 
 # USAGE
-# thisScript.sh
+# ./renderAllHexPalettes-gm.sh
 
 
 # CODE
-# UNCOMMENT the next two lines and comment out the third line from here to work on all subdirs also:
-# echo "finding all *.hexplt files in the current path and subpaths . . ."
-# array=(`gfind *.hexplt`)
-array=(`gfind . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n'`)
+array=(`gfind . -type f -iname \*.hexplt`)
 
 for element in ${array[@]}
 do
@@ -18,4 +15,4 @@ do
 	renderHexPalette-gm.sh $element 80 0
 done
 
-echo "DONE. Color palettes have been rendered from all *.hexplt files in the current path and subpaths. Palette images are named after the source *.hexplt files."
+echo "DONE. Color palettes have been rendered from all *.hexplt files in the current path and subpaths for which there was not already a corresponding .png image. Palette images are named after the source *.hexplt files."
