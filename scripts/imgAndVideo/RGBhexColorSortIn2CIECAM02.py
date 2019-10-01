@@ -1,8 +1,6 @@
 # DESCRIPTION
 # Takes a list of RGB colors expressed in hex (one per line) and sorts them 
 # using the state of the art color appearance model for human color vision: CIECAM02.
-# Coded to sort by hCQ in that model. Look in the hex_to_CIECAM02_JCh(in_string)
-# function to hack something different.
 # v1.0.1 AKTULLY works (algorithm overhaul after I realized a logic error). Also, known issue solved.
 
 # USAGE
