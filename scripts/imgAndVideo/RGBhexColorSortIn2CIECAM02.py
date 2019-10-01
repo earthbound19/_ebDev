@@ -14,10 +14,12 @@
 # OR, if you pass an optional 2nd argument (which may be anything), it will overwrite the source file with the sorted colors.
 
 # DEPENDENCIES
-# Python (probably Python 3.5), various python packages (see import list at start of code) which you may install with easy_install or pip.
+# Python (probably Python 3.5), various python packages (see import list at start of code) which you may install with
+# easy_install or pip.
 
 # KNOWN ISSUES
-# The same input sorted in a different order always produces the same output, but you must decide what the first color in the list is--because if you change the first color, the sorting changes.
+# The same input sorted in a different order always produces the same output, but you must decide what the first color
+# in the list is--because if you change the first color, the sorting changes.
 
 # LICENSE
 # This is my original code and I release it to the Public Domain. -RAH 2019-09-23 09:18 PM
@@ -43,8 +45,10 @@ def hex_to_CIECAM02_JCh(in_string):
         # REFERENCE for the third parameter of the next function call in code; re
         # re https://colorspacious.readthedocs.io/en/latest/reference.html#colorspacious.deltaE :
         # classcolorspacious.JChQMsH(J, C, h, Q, M, s, H)
-        # A namedtuple with a mnemonic name: it has attributes J, C, h, Q, M, s, and H, each of which holds a scalar or NumPy array representing . . 
-        # [things!] . . . [read the docs thar!] . . . and as a convenience, all strings composed of the character JChQMsH are automatically treated as specifying CIECAM02-subset spaces, so you can write:
+        # A namedtuple with a mnemonic name: it has attributes J, C, h, Q, M, s, and H, each of which holds a scalar
+        # or NumPy array representing . . 
+        # [things!] . . . [read the docs thar!] . . . and as a convenience, all strings composed of the character
+        # JChQMsH are automatically treated as specifying CIECAM02-subset spaces, so you can write:
         # 
         # "JCh"
         #
@@ -124,7 +128,8 @@ while len(sorted_colors) < len(colors_list):
             deltaEs_subsection.append(element)
     # sort that subsection, which places the lowest deltaE in the first list in it.
     deltaEs_subsection.sort()
-    # then put the color pair in that subsection list in the sorted list, with the search color (the "search_color" variable here in this code) first; the search color may
+    # then put the color pair in that subsection list in the sorted list, with the search color (the
+    # "search_color" variable here in this code) first; the search color may
     # be at either [0][1] or [0][2], so figure out which. Then add color and the
     # other color: if len(deltaEs_subsection) > 1:
     if search_color == deltaEs_subsection[0][1]:
@@ -137,7 +142,8 @@ while len(sorted_colors) < len(colors_list):
         sorted_colors.append(matched_color)
 #        print('added ', matched_color, 'for', search_color)
         search_color = matched_color
-    # remove the subsection from pair_deltaEs, to avoid future matches against current search_color after search_color changes in the next loop:
+    # remove the subsection from pair_deltaEs, to avoid future matches against current search_color
+    # after search_color changes in the next loop:
     for element_two in deltaEs_subsection:
         pair_deltaEs.remove(element_two)
 
