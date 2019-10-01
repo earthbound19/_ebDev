@@ -39,7 +39,8 @@ def hex_to_CIECAM02_JCh(in_string):
     """ Takes an RGB hex value and returns:
     1. a CIECAM02 3-point value.
     2. The CIECAM02 triplet string used in the cpace_convert function call in this function.
-    This is because you may want to hack this function to try different triplet strins. See comments in this function, and the cpace_convert function call in this function."""
+    This is because you may want to hack this function to try different triplet strins. See comments
+    in this function, and the cpace_convert function call in this function."""
         # hex to RGB ganked from https://stackoverflow.com/a/29643643/1397555 :
     RGB = tuple(int(in_string[i:i+2], 16) for i in (0, 2, 4))
         # REFERENCE for the third parameter of the next function call in code; re
