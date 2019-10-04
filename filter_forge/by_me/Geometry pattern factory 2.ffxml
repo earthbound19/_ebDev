@@ -1,0 +1,5211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Filter>
+	<Components>
+		<Result id="result">
+			<Source source="highpass4 01"/>
+			<FilterType value="0"/>
+			<Advanced value="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+		</Result>
+		<CheckboxControl id="checkboxcontrol 01">
+			<Name value-en="Checker inclined"/>
+			<UseRemapping value="false"/>
+			<Checked value="false"/>
+		</CheckboxControl>
+		<Checker5 id="checker5 02">
+			<Color1 source="switch5 02" red="0" green="0" blue="1" alpha="1"/>
+			<Color2 source="switch5 03" red="1" green="1" blue="1" alpha="1"/>
+			<RepeatH source="intslidercontrol 17" value="2">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</RepeatH>
+			<RepeatV source="intslidercontrol 18" value="2">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</RepeatV>
+			<SolidFill value="false"/>
+			<Inclined source="checkboxcontrol 01" value="false">
+				<Invert value="false"/>
+			</Inclined>
+		</Checker5>
+		<Checker5 id="checker5 03">
+			<Color1 source="switch5 04" red="0" green="0" blue="1" alpha="1"/>
+			<Color2 source="switch5 05" red="1" green="1" blue="1" alpha="1"/>
+			<RepeatH source="intslidercontrol 17" value="2">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</RepeatH>
+			<RepeatV source="intslidercontrol 18" value="2">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</RepeatV>
+			<SolidFill value="false"/>
+			<Inclined source="checkboxcontrol 01" value="false">
+				<Invert value="false"/>
+			</Inclined>
+		</Checker5>
+		<Checker5 id="checker5 04">
+			<Color1 source="frame2 01" red="0" green="0" blue="1" alpha="1"/>
+			<Color2 source="invert2 02" red="1" green="1" blue="1" alpha="1"/>
+			<RepeatH source="intslidercontrol 17" value="2">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</RepeatH>
+			<RepeatV source="intslidercontrol 18" value="2">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</RepeatV>
+			<SolidFill value="false"/>
+			<Inclined source="checkboxcontrol 01" value="false">
+				<Invert value="false"/>
+			</Inclined>
+		</Checker5>
+		<Frame2 id="frame2 01">
+			<Contents red="1" green="1" blue="1" alpha="1"/>
+			<InnerFrame red="0.62352941176470589" green="0.62352941176470589" blue="0.62352941176470589" alpha="1"/>
+			<OuterFrame red="0.32156862745098036" green="0.32156862745098036" blue="0.32156862745098036" alpha="1"/>
+			<Margins red="0" green="0" blue="0" alpha="1"/>
+			<FrameWidth source="intslidercontrol 14" value="0.40000000000000002">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</FrameWidth>
+			<MarginWidth source="intslidercontrol 13" value="0.10000000000000001">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</MarginWidth>
+			<Corners source="intslidercontrol 12" value="0.5">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</Corners>
+			<Proportional value="false"/>
+			<FixedSize value="false"/>
+			<Bevel source="intslidercontrol 15" value="0"/>
+		</Frame2>
+		<FreePolygon3 id="freepolygon3 01">
+			<Color red="1" green="1" blue="1" alpha="1"/>
+			<Background red="0" green="0" blue="0" alpha="1"/>
+			<Radius source="slidercontrol 02" value="0.5">
+				<Minimum value="0.40000000000000002"/>
+				<Maximum value="1"/>
+			</Radius>
+			<OriginX value="0.5"/>
+			<OriginY value="0.53000000000000003"/>
+			<StarFactor source="intslidercontrol 11" value="0.13">
+				<Minimum value="0.20000000000000001"/>
+				<Maximum value="0.40999999999999998"/>
+			</StarFactor>
+			<Rotation value="0"/>
+			<Squash value="0"/>
+			<OuterRadius source="intslidercontrol 09" value="1">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</OuterRadius>
+			<InnerRadius source="intslidercontrol 08" value="1">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</InnerRadius>
+			<BevelWidth source="intslidercontrol 07" value="0">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</BevelWidth>
+			<Sides source="intslidercontrol 06" value="10">
+				<Step value="1"/>
+				<Offset value="3"/>
+				<Flip value="false"/>
+			</Sides>
+			<FitRadius value="true"/>
+			<Mode value="0"/>
+			<BevelCurve value="0"/>
+		</FreePolygon3>
+		<HighPass4 id="highpass4 01">
+			<Source source="switch5 01"/>
+			<Radius source="slidercontrol 01" value="0.10000000000000001">
+				<Minimum value="0.050000000000000003"/>
+				<Maximum value="1"/>
+			</Radius>
+			<Contrast value="1"/>
+			<Monochrome value="false"/>
+		</HighPass4>
+		<IntSliderControl id="intslidercontrol 01">
+			<Name value-en="Kaleido offset H"/>
+			<UseRemapping value="true"/>
+			<Value value="3"/>
+			<RangeMax value="8"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 02">
+			<Name value-en="H V C or K"/>
+			<UseRemapping value="false"/>
+			<Value value="3"/>
+			<RangeMax value="4"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 03">
+			<Name value-en="Poly+inv/fr/fr-inv"/>
+			<UseRemapping value="false"/>
+			<Value value="2"/>
+			<RangeMax value="3"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 04">
+			<Name value-en="Kaleido offset V"/>
+			<UseRemapping value="true"/>
+			<Value value="6"/>
+			<RangeMax value="8"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 05">
+			<Name value-en="Poly inv.+fr/fr-inv."/>
+			<UseRemapping value="false"/>
+			<Value value="2"/>
+			<RangeMax value="2"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 06">
+			<Name value-en="Poly sides"/>
+			<UseRemapping value="true"/>
+			<Value value="3"/>
+			<RangeMax value="5"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 07">
+			<Name value-en="Poly bevel"/>
+			<UseRemapping value="true"/>
+			<Value value="8"/>
+			<RangeMax value="8"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 08">
+			<Name value-en="Poly inner corners"/>
+			<UseRemapping value="true"/>
+			<Value value="5"/>
+			<RangeMax value="8"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 09">
+			<Name value-en="Poly corners"/>
+			<UseRemapping value="true"/>
+			<Value value="5"/>
+			<RangeMax value="8"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 10">
+			<Name value-en="Kaleido shape size"/>
+			<UseRemapping value="true"/>
+			<Value value="1"/>
+			<RangeMax value="10"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 11">
+			<Name value-en="Poly star"/>
+			<UseRemapping value="true"/>
+			<Value value="1"/>
+			<RangeMax value="5"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 12">
+			<Name value-en="Frame corners"/>
+			<UseRemapping value="true"/>
+			<Value value="1"/>
+			<RangeMax value="3"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 13">
+			<Name value-en="Frame margin"/>
+			<UseRemapping value="true"/>
+			<Value value="1"/>
+			<RangeMax value="5"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 14">
+			<Name value-en="Frame width"/>
+			<UseRemapping value="true"/>
+			<Value value="3"/>
+			<RangeMax value="4"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 15">
+			<Name value-en="Frame bevel"/>
+			<UseRemapping value="false"/>
+			<Value value="4"/>
+			<RangeMax value="4"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 16">
+			<Name value-en="Poly/fr final combo"/>
+			<UseRemapping value="false"/>
+			<Value value="2"/>
+			<RangeMax value="3"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 17">
+			<Name value-en="Checker H"/>
+			<UseRemapping value="false"/>
+			<Value value="2"/>
+			<RangeMax value="2"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 18">
+			<Name value-en="Checker V"/>
+			<UseRemapping value="false"/>
+			<Value value="2"/>
+			<RangeMax value="2"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<Invert2 id="invert2 01">
+			<Source source="freepolygon3 01"/>
+			<Invert value="true"/>
+		</Invert2>
+		<Invert2 id="invert2 02">
+			<Source source="frame2 01"/>
+			<Invert value="true"/>
+		</Invert2>
+		<Kaleidoscope3 id="kaleidoscope3 01">
+			<Source source="switch5 06"/>
+			<RepeatH value="1"/>
+			<RepeatV value="1"/>
+			<Mode value="3"/>
+			<OffsetH source="intslidercontrol 01" value="0.14000000000000001">
+				<Minimum value="0.10000000000000001"/>
+				<Maximum value="0.90000000000000002"/>
+			</OffsetH>
+			<OffsetV source="intslidercontrol 04" value="0.39000000000000001">
+				<Minimum value="0.10000000000000001"/>
+				<Maximum value="0.90000000000000002"/>
+			</OffsetV>
+			<ShapeSize source="intslidercontrol 10" value="0.62">
+				<Minimum value="0.25"/>
+				<Maximum value="0.55000000000000004"/>
+			</ShapeSize>
+		</Kaleidoscope3>
+		<LinearCurve2 id="linearcurve2 01">
+			<Start value="0.5"/>
+			<End value="1"/>
+			<Minimum value="0"/>
+			<Maximum value="1"/>
+			<Invert value="false"/>
+		</LinearCurve2>
+		<LinearCurve2 id="linearcurve2 02">
+			<Start value="0.5"/>
+			<End value="1"/>
+			<Minimum value="0"/>
+			<Maximum value="1"/>
+			<Invert value="false"/>
+		</LinearCurve2>
+		<Offset2 id="offset2 01">
+			<Source source="offset4 01"/>
+			<OffsetH value="0"/>
+			<OffsetV source="profilegradient4 01" value="0.10000000000000009"/>
+			<Percentage value="1"/>
+		</Offset2>
+		<Offset2 id="offset2 02">
+			<Source source="offset4 01"/>
+			<OffsetH source="profilegradient4 02" value="0"/>
+			<OffsetV value="0"/>
+			<Percentage value="1"/>
+		</Offset2>
+		<Offset4 id="offset4 01">
+			<Source source="switch5 06"/>
+			<OffsetX value="0"/>
+			<OffsetY value="0"/>
+			<Percentage value="1"/>
+			<Mode value="0"/>
+		</Offset4>
+		<ProfileGradient4 id="profilegradient4 01">
+			<Color1 red="0.50196078431372548" green="0.50196078431372548" blue="0.50196078431372548" alpha="1"/>
+			<Color2 red="1" green="1" blue="1" alpha="1"/>
+			<Offset value="0"/>
+			<Rotate value="1"/>
+			<Repeat value="1"/>
+			<Profile source="linearcurve2 01" value="0"/>
+			<Mirror value="false"/>
+		</ProfileGradient4>
+		<ProfileGradient4 id="profilegradient4 02">
+			<Color1 red="0.50196078431372548" green="0.50196078431372548" blue="0.50196078431372548" alpha="1"/>
+			<Color2 red="1" green="1" blue="1" alpha="1"/>
+			<Offset value="0"/>
+			<Rotate value="0"/>
+			<Repeat value="1"/>
+			<Profile source="linearcurve2 02" value="0"/>
+			<Mirror value="false"/>
+		</ProfileGradient4>
+		<SliderControl id="slidercontrol 01">
+			<Name value-en="High pass radius"/>
+			<UseRemapping value="true"/>
+			<Value value="0.20000000000000001"/>
+		</SliderControl>
+		<SliderControl id="slidercontrol 02">
+			<Name value-en="Poly radius"/>
+			<UseRemapping value="true"/>
+			<Value value="0.55000000000000004"/>
+		</SliderControl>
+		<Switch5 id="switch5 01">
+			<Source1 source="offset2 01" red="1" green="0.066000000000000003" blue="0" alpha="1"/>
+			<Source2 source="offset2 02" red="1" green="0.77200000000000002" blue="0.113" alpha="1"/>
+			<Source3 source="switch5 06" red="1" green="1" blue="0.16800000000000001" alpha="1"/>
+			<Source4 source="kaleidoscope3 01" red="0.125" green="1" blue="0.184" alpha="1"/>
+			<Source5 red="0" green="1" blue="1" alpha="1"/>
+			<Source6 red="0" green="0.76000000000000001" blue="1" alpha="1"/>
+			<Source7 red="0" green="0" blue="0.99199999999999999" alpha="1"/>
+			<Source8 red="0.996" green="0" blue="0.98799999999999999" alpha="1"/>
+			<Source9 red="0" green="0" blue="0" alpha="1"/>
+			<Source10 red="0.5" green="0.5" blue="0.5" alpha="1"/>
+			<Source11 red="0.74099999999999999" green="0.74099999999999999" blue="0.74099999999999999" alpha="1"/>
+			<Source12 red="1" green="1" blue="1" alpha="1"/>
+			<Selector source="intslidercontrol 02" value="4">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</Selector>
+		</Switch5>
+		<Switch5 id="switch5 02">
+			<Source1 source="freepolygon3 01" red="1" green="0.066000000000000003" blue="0" alpha="1"/>
+			<Source2 red="1" green="0.77200000000000002" blue="0.113" alpha="1"/>
+			<Source3 red="1" green="1" blue="0.16800000000000001" alpha="1"/>
+			<Source4 red="0.125" green="1" blue="0.184" alpha="1"/>
+			<Source5 red="0" green="1" blue="1" alpha="1"/>
+			<Source6 red="0" green="0.76000000000000001" blue="1" alpha="1"/>
+			<Source7 red="0" green="0" blue="0.99199999999999999" alpha="1"/>
+			<Source8 red="0.996" green="0" blue="0.98799999999999999" alpha="1"/>
+			<Source9 red="0" green="0" blue="0" alpha="1"/>
+			<Source10 red="0.5" green="0.5" blue="0.5" alpha="1"/>
+			<Source11 red="0.74099999999999999" green="0.74099999999999999" blue="0.74099999999999999" alpha="1"/>
+			<Source12 red="1" green="1" blue="1" alpha="1"/>
+			<Selector value="1"/>
+		</Switch5>
+		<Switch5 id="switch5 03">
+			<Source1 source="invert2 01" red="1" green="0.066000000000000003" blue="0" alpha="1"/>
+			<Source2 source="frame2 01" red="1" green="0.77200000000000002" blue="0.113" alpha="1"/>
+			<Source3 source="invert2 02" red="1" green="1" blue="0.16800000000000001" alpha="1"/>
+			<Source4 red="0.125" green="1" blue="0.184" alpha="1"/>
+			<Source5 red="0" green="1" blue="1" alpha="1"/>
+			<Source6 red="0" green="0.76000000000000001" blue="1" alpha="1"/>
+			<Source7 red="0" green="0" blue="0.99199999999999999" alpha="1"/>
+			<Source8 red="0.996" green="0" blue="0.98799999999999999" alpha="1"/>
+			<Source9 red="0" green="0" blue="0" alpha="1"/>
+			<Source10 red="0.5" green="0.5" blue="0.5" alpha="1"/>
+			<Source11 red="0.74099999999999999" green="0.74099999999999999" blue="0.74099999999999999" alpha="1"/>
+			<Source12 red="1" green="1" blue="1" alpha="1"/>
+			<Selector source="intslidercontrol 03" value="1">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</Selector>
+		</Switch5>
+		<Switch5 id="switch5 04">
+			<Source1 source="invert2 01" red="1" green="0.066000000000000003" blue="0" alpha="1"/>
+			<Source2 red="1" green="0.77200000000000002" blue="0.113" alpha="1"/>
+			<Source3 red="1" green="1" blue="0.16800000000000001" alpha="1"/>
+			<Source4 red="0.125" green="1" blue="0.184" alpha="1"/>
+			<Source5 red="0" green="1" blue="1" alpha="1"/>
+			<Source6 red="0" green="0.76000000000000001" blue="1" alpha="1"/>
+			<Source7 red="0" green="0" blue="0.99199999999999999" alpha="1"/>
+			<Source8 red="0.996" green="0" blue="0.98799999999999999" alpha="1"/>
+			<Source9 red="0" green="0" blue="0" alpha="1"/>
+			<Source10 red="0.5" green="0.5" blue="0.5" alpha="1"/>
+			<Source11 red="0.74099999999999999" green="0.74099999999999999" blue="0.74099999999999999" alpha="1"/>
+			<Source12 red="1" green="1" blue="1" alpha="1"/>
+			<Selector value="1"/>
+		</Switch5>
+		<Switch5 id="switch5 05">
+			<Source1 source="frame2 01" red="1" green="0.066000000000000003" blue="0" alpha="1"/>
+			<Source2 source="invert2 02" red="1" green="0.77200000000000002" blue="0.113" alpha="1"/>
+			<Source3 red="1" green="1" blue="0.16800000000000001" alpha="1"/>
+			<Source4 red="0.125" green="1" blue="0.184" alpha="1"/>
+			<Source5 red="0" green="1" blue="1" alpha="1"/>
+			<Source6 red="0" green="0.76000000000000001" blue="1" alpha="1"/>
+			<Source7 red="0" green="0" blue="0.99199999999999999" alpha="1"/>
+			<Source8 red="0.996" green="0" blue="0.98799999999999999" alpha="1"/>
+			<Source9 red="0" green="0" blue="0" alpha="1"/>
+			<Source10 red="0.5" green="0.5" blue="0.5" alpha="1"/>
+			<Source11 red="0.74099999999999999" green="0.74099999999999999" blue="0.74099999999999999" alpha="1"/>
+			<Source12 red="1" green="1" blue="1" alpha="1"/>
+			<Selector source="intslidercontrol 05" value="1">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</Selector>
+		</Switch5>
+		<Switch5 id="switch5 06">
+			<Source1 source="checker5 02" red="1" green="0.066000000000000003" blue="0" alpha="1"/>
+			<Source2 source="checker5 03" red="1" green="0.77200000000000002" blue="0.113" alpha="1"/>
+			<Source3 source="checker5 04" red="1" green="1" blue="0.16800000000000001" alpha="1"/>
+			<Source4 red="0.125" green="1" blue="0.184" alpha="1"/>
+			<Source5 red="0" green="1" blue="1" alpha="1"/>
+			<Source6 red="0" green="0.76000000000000001" blue="1" alpha="1"/>
+			<Source7 red="0" green="0" blue="0.99199999999999999" alpha="1"/>
+			<Source8 red="0.996" green="0" blue="0.98799999999999999" alpha="1"/>
+			<Source9 red="0" green="0" blue="0" alpha="1"/>
+			<Source10 red="0.5" green="0.5" blue="0.5" alpha="1"/>
+			<Source11 red="0.74099999999999999" green="0.74099999999999999" blue="0.74099999999999999" alpha="1"/>
+			<Source12 red="1" green="1" blue="1" alpha="1"/>
+			<Selector source="intslidercontrol 16" value="1">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</Selector>
+		</Switch5>
+	</Components>
+	<GroupNames/>
+	<SettingsOverride>
+		<Size value="1"/>
+		<Variation value="0"/>
+		<Seamless value="0"/>
+		<ResultBlending value="1"/>
+	</SettingsOverride>
+	<Presets>
+		<DefaultPreset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.1435721336285649" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.56999999999999995"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.47232106582835365"/>
+				</SliderControl>
+			</Controls>
+		</DefaultPreset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.1435721336285649" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="1"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.47232106582835365"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.0408888932578133" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.050000000000000003"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.83999999999999997"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.2243922625607186" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="7"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.11"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.53649276892491282"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.7945586937375229" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="7"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.23999999999999999"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.57717453575561495"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.2243922625607186" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="7"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.13"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.53649276892491282"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.2243922625607186" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="7"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.20000000000000001"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.53649276892491282"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.0408888932578133" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.050000000000000003"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.83999999999999997"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.56999999999999995"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.65000000000000002"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.10000000000000001"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.65000000000000002"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.20000000000000001"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.55000000000000004"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.20000000000000001"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.55000000000000004"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.16"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.65000000000000002"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.12"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.4609769863714692" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.25"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.71999999999999997"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.4609769863714692" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.20000000000000001"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.71999999999999997"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.0408888932578133" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.47999999999999998"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.83999999999999997"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="7386" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.13"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="4" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="6"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.11"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="2.4321476280207794" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="7"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="7"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.47999999999999998"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.72708894113408817"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="2.4321476280207794" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="7"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="7"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.16"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.72708894113408817"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="6" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="10"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.22"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.0513023521747147" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="9"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.51000000000000001"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.19"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="10" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.10000000000000001"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="9" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="5"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.27054346086017017"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="5" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="5"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.69952656407818503"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="4" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="6"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.089999999999999997"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="7"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.070000000000000007"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="2" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="5"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.25066908572365953"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="4" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="4"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.19"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="9" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="7"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.17000000000000001"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="9" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="5"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.68999999999999995"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="4" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="2"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.59999999999999998"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="4" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="9"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.10000000000000001"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="4" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="9"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="1"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="4" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="8"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.54000000000000004"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="4" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="7"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="6"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.050000000000000003"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="4" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="8"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.20000000000000001"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="4" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="10"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.080000000000000002"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="5" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="7"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.27000000000000002"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="5" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="4"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.27000000000000002"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="8"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.17000000000000001"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.29999999999999999"/>
+				</SliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="3"/>
+				</IntSliderControl>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.1435721336285649" variation="1" seamless="true" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 06">
+					<Value value="4"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 07">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 08">
+					<Value value="6"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 09">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 10">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 11">
+					<Value value="5"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 12">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 13">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 14">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 15">
+					<Value value="3"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 16">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 17">
+					<Value value="1"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 18">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.070000000000000007"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.93000000000000005"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+	</Presets>
+	<Locks>
+		<Settings size="false" variation="false"/>
+		<Lighting elements="false" environment="false" brightness="false" saturation="false" height="false"/>
+		<Controls>
+			<Control id="checkboxcontrol 01" lock="false"/>
+			<Control id="intslidercontrol 01" lock="false"/>
+			<Control id="intslidercontrol 02" lock="false"/>
+			<Control id="intslidercontrol 03" lock="false"/>
+			<Control id="intslidercontrol 04" lock="false"/>
+			<Control id="intslidercontrol 05" lock="true"/>
+			<Control id="intslidercontrol 06" lock="false"/>
+			<Control id="intslidercontrol 07" lock="false"/>
+			<Control id="intslidercontrol 08" lock="false"/>
+			<Control id="intslidercontrol 09" lock="false"/>
+			<Control id="intslidercontrol 10" lock="false"/>
+			<Control id="intslidercontrol 11" lock="false"/>
+			<Control id="intslidercontrol 12" lock="false"/>
+			<Control id="intslidercontrol 13" lock="false"/>
+			<Control id="intslidercontrol 14" lock="false"/>
+			<Control id="intslidercontrol 15" lock="false"/>
+			<Control id="intslidercontrol 16" lock="false"/>
+			<Control id="intslidercontrol 17" lock="false"/>
+			<Control id="intslidercontrol 18" lock="false"/>
+			<Control id="slidercontrol 01" lock="false"/>
+			<Control id="slidercontrol 02" lock="false"/>
+		</Controls>
+	</Locks>
+	<Information author="earthbound" name-en="Geometry pattern factory 2" url="http://earthbound.io" description-en="Produces sharp black, white and gray geometry patterns. Modification of OneMillionAlphas by CorvusCroax.[br][br]Control changes can dramatically alter the image; all presets are from randomization and (usually) tweak of the high pass radius control.[br][br]Controls:[br]- Frame width, margin, corners, and bevel alter the base image.[br]- Checker H, V and inclined alter the checker.[br]- H V C or K selects horizontal, vertical, checker, or kaleidoscope (rhombus) mode.[br]- High pass radius varies the line thresholds and amount of black, white, and gray in the image.[br][br]This modification introduces more base image (frame) options, gray, forced maximum scale, and restricts kaleidoscope to rhombus.[br][br]This file has more presets in it than what is published at the Filter Forge filters directory (which limits presets)." keywords-en="geometry pattern design factory shape symmetry highpass harmony black white gray bw checker kaleidoscope contrast" update_notes-en="" major_version="7" minor_version="7"/>
+	<ControlsOrder>
+		<Automatic value="false"/>
+		<Items>
+			<Item id="slidercontrol 02" order="0"/>
+			<Item id="intslidercontrol 11" order="1"/>
+			<Item id="intslidercontrol 09" order="2"/>
+			<Item id="intslidercontrol 08" order="3"/>
+			<Item id="intslidercontrol 07" order="4"/>
+			<Item id="intslidercontrol 06" order="5"/>
+			<Item id="intslidercontrol 14" order="6"/>
+			<Item id="intslidercontrol 13" order="7"/>
+			<Item id="intslidercontrol 12" order="8"/>
+			<Item id="intslidercontrol 15" order="9"/>
+			<Item id="intslidercontrol 03" order="10"/>
+			<Item id="intslidercontrol 05" order="11"/>
+			<Item id="intslidercontrol 16" order="12"/>
+			<Item id="intslidercontrol 17" order="13"/>
+			<Item id="intslidercontrol 18" order="14"/>
+			<Item id="checkboxcontrol 01" order="15"/>
+			<Item id="intslidercontrol 01" order="16"/>
+			<Item id="intslidercontrol 04" order="17"/>
+			<Item id="intslidercontrol 10" order="18"/>
+			<Item id="intslidercontrol 02" order="19"/>
+			<Item id="slidercontrol 01" order="20"/>
+		</Items>
+	</ControlsOrder>
+	<FilterEditor>
+		<Groups/>
+		<ThumbnailSize value="1"/>
+		<Canvas left="-755" top="-999" zoom_factor="1"/>
+		<Viewport left="0" top="0" zoom_factor="-2"/>
+		<LockPreview>
+			<Locked value="false"/>
+			<LockedComponent name=""/>
+		</LockPreview>
+		<Item id="checkboxcontrol 01">
+			<Position left="1269" top="551"/>
+		</Item>
+		<Item id="checker5 02">
+			<Position left="1057" top="-363"/>
+		</Item>
+		<Item id="checker5 03">
+			<Position left="1049" top="-211"/>
+		</Item>
+		<Item id="checker5 04">
+			<Position left="1293" top="301"/>
+		</Item>
+		<Item id="frame2 01">
+			<Position left="1942" top="-168"/>
+		</Item>
+		<Item id="freepolygon3 01">
+			<Position left="1760" top="-682"/>
+		</Item>
+		<Item id="highpass4 01">
+			<Position left="-175" top="185"/>
+		</Item>
+		<Item id="intslidercontrol 01">
+			<Position left="633" top="93"/>
+		</Item>
+		<Item id="intslidercontrol 02">
+			<Position left="141" top="110"/>
+		</Item>
+		<Item id="intslidercontrol 03">
+			<Position left="1549" top="-387"/>
+		</Item>
+		<Item id="intslidercontrol 04">
+			<Position left="629" top="157"/>
+		</Item>
+		<Item id="intslidercontrol 05">
+			<Position left="1549" top="137"/>
+		</Item>
+		<Item id="intslidercontrol 06">
+			<Position left="2056" top="-388"/>
+		</Item>
+		<Item id="intslidercontrol 07">
+			<Position left="2056" top="-472"/>
+		</Item>
+		<Item id="intslidercontrol 08">
+			<Position left="2062" top="-552"/>
+		</Item>
+		<Item id="intslidercontrol 09">
+			<Position left="2060" top="-634"/>
+		</Item>
+		<Item id="intslidercontrol 10">
+			<Position left="627" top="235"/>
+		</Item>
+		<Item id="intslidercontrol 11">
+			<Position left="2060" top="-718"/>
+		</Item>
+		<Item id="intslidercontrol 12">
+			<Position left="2028" top="184"/>
+		</Item>
+		<Item id="intslidercontrol 13">
+			<Position left="2030" top="113"/>
+		</Item>
+		<Item id="intslidercontrol 14">
+			<Position left="2032" top="45"/>
+		</Item>
+		<Item id="intslidercontrol 15">
+			<Position left="2030" top="253"/>
+		</Item>
+		<Item id="intslidercontrol 16">
+			<Position left="973" top="241"/>
+		</Item>
+		<Item id="intslidercontrol 17">
+			<Position left="1625" top="309"/>
+		</Item>
+		<Item id="intslidercontrol 18">
+			<Position left="1625" top="397"/>
+		</Item>
+		<Item id="invert2 01">
+			<Position left="1548" top="-606"/>
+		</Item>
+		<Item id="invert2 02">
+			<Position left="1596" top="-234"/>
+		</Item>
+		<Item id="kaleidoscope3 01">
+			<Position left="331" top="17"/>
+		</Item>
+		<Item id="linearcurve2 01">
+			<Position left="577" top="-513"/>
+		</Item>
+		<Item id="linearcurve2 02">
+			<Position left="585" top="-159"/>
+		</Item>
+		<Item id="offset2 01">
+			<Position left="157" top="-361"/>
+		</Item>
+		<Item id="offset2 02">
+			<Position left="151" top="-193"/>
+		</Item>
+		<Item id="offset4 01">
+			<Position left="577" top="-353"/>
+		</Item>
+		<Item id="profilegradient4 01">
+			<Position left="381" top="-505"/>
+		</Item>
+		<Item id="profilegradient4 02">
+			<Position left="395" top="-173"/>
+		</Item>
+		<Item id="result">
+			<Position left="-368" top="58"/>
+		</Item>
+		<Item id="slidercontrol 01">
+			<Position left="-48" top="350"/>
+		</Item>
+		<Item id="slidercontrol 02">
+			<Position left="2052" top="-805"/>
+		</Item>
+		<Item id="switch5 01">
+			<Position left="-83" top="-75"/>
+		</Item>
+		<Item id="switch5 02">
+			<Position left="1289" top="-815"/>
+		</Item>
+		<Item id="switch5 03">
+			<Position left="1285" top="-571"/>
+		</Item>
+		<Item id="switch5 04">
+			<Position left="1289" top="-275"/>
+		</Item>
+		<Item id="switch5 05">
+			<Position left="1293" top="-35"/>
+		</Item>
+		<Item id="switch5 06">
+			<Position left="813" top="-83"/>
+		</Item>
+	</FilterEditor>
+</Filter>
