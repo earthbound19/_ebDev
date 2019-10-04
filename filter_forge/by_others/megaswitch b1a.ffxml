@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Filter>
+	<CustomClasses>
+		<ScriptMap name="ScriptMap01">
+			<HDRColor name="INPUT_1" display_name="Input 1"/>
+			<HDRColor name="INPUT_2" display_name="Input 2"/>
+			<HDRColor name="INPUT_3" display_name="Input 3"/>
+			<HDRColor name="INPUT_4" display_name="Input 4"/>
+			<HDRColor name="INPUT_5" display_name="Input 5"/>
+			<HDRColor name="INPUT_6" display_name="Input 6"/>
+			<HDRColor name="INPUT_7" display_name="Input 7"/>
+			<HDRColor name="INPUT_8" display_name="Input 8"/>
+			<HDRColor name="INPUT_9" display_name="Input 9"/>
+			<HDRColor name="INPUT_10" display_name="Input 10"/>
+			<HDRColor name="INPUT_11" display_name="Input 11"/>
+			<HDRColor name="INPUT_12" display_name="Input 12"/>
+			<HDRColor name="INPUT_13" display_name="Input 13"/>
+			<HDRColor name="INPUT_14" display_name="Input 14"/>
+			<HDRColor name="INPUT_15" display_name="Input 15"/>
+			<HDRColor name="INPUT_16" display_name="Input 16"/>
+			<IntSlider name="INPUTCOUNT" display_name="InputCount">
+				<Range min="1" max="16"/>
+			</IntSlider>
+			<Checkbox name="ISRANDOMIZABLE" display_name="IsRandomizable"/>
+			<IntSlider name="SELECTOR" display_name="Selector">
+				<Range min="1" max="16"/>
+			</IntSlider>
+		</ScriptMap>
+	</CustomClasses>
+	<Components>
+		<Result id="result">
+			<Source source="scriptmap01 01"/>
+			<FilterType value="0"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+		</Result>
+		<ScriptMap01 id="scriptmap01 01">
+			<Script value="function prepare()\[br]\[tb]-- This function is called once,\[br]\[tb]-- before the rendering begins.\[br]\[tb]-- Use it for querying non-mapped\[br]\[tb]-- inputs and precalculation.\[br]\[tb]itemcount = get_intslider_input(INPUTCOUNT);\[br]\[tb]israndom = get_checkbox_input(ISRANDOMIZABLE);\[br]\[tb]if israndom==1 then\[br]\[tb]\[tb]index = math.mod(VARIATION, itemcount);\[br]\[tb]else\[br]\[tb]\[tb]index = get_intslider_input(SELECTOR);\[br]\[tb]end\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]-- Image generation code goes here.\[br]\[tb]local inp\[br]\[br]if ( index==2) then inp=INPUT_2\[br]elseif ( index==3) then inp=INPUT_3\[br]elseif ( index==4) then inp=INPUT_4\[br]elseif ( index==5) then inp=INPUT_5\[br]elseif ( index==6) then inp=INPUT_6\[br]elseif ( index==7) then inp=INPUT_7\[br]elseif ( index==8) then inp=INPUT_8\[br]elseif ( index==9) then inp=INPUT_9\[br]elseif ( index==10) then inp=INPUT_10\[br]elseif ( index==11) then inp=INPUT_11\[br]elseif ( index==12) then inp=INPUT_12\[br]elseif ( index==13) then inp=INPUT_13\[br]elseif ( index==14) then inp=INPUT_14\[br]elseif ( index==15) then inp=INPUT_15\[br]elseif ( index==16) then inp=INPUT_16\[br]else inp=INPUT_1\[br]end\[br]\[br]\[br]\[tb]return get_sample_map(x, y, inp)\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="true"/>
+				<Sizable value="true"/>
+				<Randomizable value="true"/>
+				<SafeScript value="true"/>
+			</Settings>
+			<INPUT_1 source="color3gradient 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_2 source="color5gradient 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_3 source="noisegradient2 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_4 source="spectrum 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_5 source="blocks2 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_6 source="cells2 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_7 source="chaffs2 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_8 source="perlinnoise2 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_9 source="pyramids2 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_10 source="stones2 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_11 source="techno2 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_12 source="bomber 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_13 source="checker2 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_14 source="bricks 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_15 source="kaleidoscope2 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUT_16 source="pavements 01" red="0.78431372549019607" green="1" blue="0.62745098039215685" alpha="1"/>
+			<INPUTCOUNT source="intslidercontrol 01" value="1">
+				<Step value="1"/>
+				<Offset value="0"/>
+			</INPUTCOUNT>
+			<ISRANDOMIZABLE source="checkboxcontrol 01" value="true">
+				<Invert value="false"/>
+			</ISRANDOMIZABLE>
+			<SELECTOR source="intslidercontrol 02" value="1">
+				<Step value="1"/>
+				<Offset value="0"/>
+			</SELECTOR>
+		</ScriptMap01>
+		<Blocks2 id="blocks2 01">
+			<Noise red="1" green="1" blue="1" alpha="1"/>
+			<Background red="0" green="0" blue="0" alpha="1"/>
+			<Roughness value="0.20000000000000001"/>
+			<Contrast value="0"/>
+			<Formula value="0"/>
+			<Scale value="2.5"/>
+			<Stretch value="0"/>
+			<VerticalStretch value="false"/>
+			<Flat value="false"/>
+			<SolidFill value="false"/>
+			<Details value="0.40000000000000002"/>
+			<Variation value="1"/>
+			<OctaveCurve value="0"/>
+		</Blocks2>
+		<Bomber id="bomber 01">
+			<Particle1 red="0" green="0.15686274509803921" blue="0.39215686274509803" alpha="1"/>
+			<Particle2 red="0" green="0.50980392156862742" blue="1" alpha="1"/>
+			<Particle3 red="1" green="0.96078431372549022" blue="0.62745098039215685" alpha="1"/>
+			<Particle4 red="1" green="0.66666666666666663" blue="0" alpha="1"/>
+			<Particle5 red="0.62745098039215685" green="0.29411764705882354" blue="0" alpha="1"/>
+			<Frequency1 value="1"/>
+			<Frequency2 value="0.80000000000000004"/>
+			<Frequency3 value="0.59999999999999998"/>
+			<Frequency4 value="0.40000000000000002"/>
+			<Frequency5 value="0.20000000000000001"/>
+			<Background red="0" green="0.078431372549019607" blue="0.15686274509803921" alpha="1"/>
+			<Opacity value="1"/>
+			<Size value="0.5"/>
+			<Rotation value="0"/>
+			<OffsetH value="0"/>
+			<OffsetV value="0"/>
+			<Squash value="0"/>
+			<OpacityChaos value="0"/>
+			<SizeChaos value="0.5"/>
+			<RotationChaos value="0"/>
+			<OffsetChaosH value="0"/>
+			<OffsetChaosV value="0"/>
+			<SquashChaos value="0"/>
+			<Tint red="1" green="0.70588235294117652" blue="0" alpha="1"/>
+			<TintAmount value="0.20000000000000001"/>
+			<Roughness value="0.10000000000000001"/>
+			<ParticleMode value="0"/>
+			<TintMode value="17"/>
+			<OctavesScaleMode value="0"/>
+			<LayerOrder value="0"/>
+			<Details value="0.29999999999999999"/>
+			<ParticleRepeats value="10"/>
+			<ParticlePerCell value="1"/>
+			<Variation value="1"/>
+		</Bomber>
+		<Bricks id="bricks 01">
+			<Color red="0.69999999999999996" green="0.46600000000000003" blue="0.34999999999999998" alpha="1"/>
+			<Mortar red="0" green="0" blue="0" alpha="1"/>
+			<HRange value="0.050000000000000003"/>
+			<LRange value="0.14999999999999999"/>
+			<SRange value="0.25"/>
+			<MortarWidth value="0.050000000000000003"/>
+			<BevelWidth value="0.20000000000000001"/>
+			<Corners value="0"/>
+			<Bond value="0"/>
+			<BrickType value="0"/>
+			<FillMode value="0"/>
+			<Repeat value="3"/>
+			<Chaos value="0.14999999999999999"/>
+			<Variation value="1"/>
+			<Bevel value="0"/>
+		</Bricks>
+		<Cells2 id="cells2 01">
+			<Noise red="1" green="1" blue="1" alpha="1"/>
+			<Background red="0" green="0" blue="0" alpha="1"/>
+			<Roughness value="0.20000000000000001"/>
+			<Contrast value="0"/>
+			<Formula value="0"/>
+			<Scale value="2.2000000000000002"/>
+			<Stretch value="0"/>
+			<VerticalStretch value="false"/>
+			<Smooth value="false"/>
+			<Flat value="false"/>
+			<SolidFill value="false"/>
+			<Details value="0.40000000000000002"/>
+			<Variation value="1"/>
+			<OctaveCurve value="0"/>
+		</Cells2>
+		<Chaffs2 id="chaffs2 01">
+			<Noise red="1" green="1" blue="1" alpha="1"/>
+			<Background red="0" green="0" blue="0" alpha="1"/>
+			<Roughness value="0.20000000000000001"/>
+			<Contrast value="0"/>
+			<Formula value="0"/>
+			<Scale value="2"/>
+			<Stretch value="0"/>
+			<VerticalStretch value="false"/>
+			<Smooth value="false"/>
+			<Flat value="false"/>
+			<SolidFill value="false"/>
+			<Details value="0.40000000000000002"/>
+			<Variation value="1"/>
+			<OctaveCurve value="0"/>
+		</Chaffs2>
+		<CheckboxControl id="checkboxcontrol 01">
+			<Name value-en="IsRandomizable"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<Checker2 id="checker2 01">
+			<Color1 red="0" green="0" blue="1" alpha="1"/>
+			<Color2 red="1" green="1" blue="1" alpha="1"/>
+			<RepeatH value="2"/>
+			<RepeatV value="2"/>
+			<SolidFill value="false"/>
+			<Inclined value="false"/>
+		</Checker2>
+		<Color3Gradient id="color3gradient 01">
+			<Color1 red="1" green="0.58431372549019611" blue="0" alpha="1"/>
+			<Color2 red="1" green="0.98039215686274506" blue="0.83921568627450982" alpha="1"/>
+			<Color3 red="0.74901960784313726" green="0.34509803921568627" blue="0.26666666666666666" alpha="1"/>
+			<Position1 value="0.16666666666666666"/>
+			<Position2 value="0.5"/>
+			<Position3 value="0.83333333333333337"/>
+			<Rotate value="0"/>
+			<Repeat value="1"/>
+			<Transition value="0"/>
+		</Color3Gradient>
+		<Color5Gradient id="color5gradient 01">
+			<Color1 red="0" green="0.40392156862745099" blue="0" alpha="1"/>
+			<Color2 red="0" green="1" blue="0.14901960784313725" alpha="1"/>
+			<Color3 red="0.73333333333333328" green="0.73333333333333328" blue="0.73333333333333328" alpha="1"/>
+			<Color4 red="1" green="0.98039215686274506" blue="0.6470588235294118" alpha="1"/>
+			<Color5 red="1" green="0.69411764705882351" blue="0.30980392156862746" alpha="1"/>
+			<Position1 value="0.10000000000000001"/>
+			<Position2 value="0.29999999999999999"/>
+			<Position3 value="0.5"/>
+			<Position4 value="0.69999999999999996"/>
+			<Position5 value="0.90000000000000002"/>
+			<Rotate value="0"/>
+			<Repeat value="1"/>
+			<Transition value="0"/>
+		</Color5Gradient>
+		<IntSliderControl id="intslidercontrol 01">
+			<Name value-en="ItemCount"/>
+			<UseRemapping value="false"/>
+			<Value value="16"/>
+			<RangeMax value="16"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 02">
+			<Name value-en="Selector"/>
+			<UseRemapping value="false"/>
+			<Value value="2"/>
+			<RangeMax value="16"/>
+		</IntSliderControl>
+		<Kaleidoscope2 id="kaleidoscope2 01">
+			<Mode value="6"/>
+			<Source source="spectrum 01"/>
+			<OffsetH value="0.10000000000000001"/>
+			<OffsetV value="0.10000000000000001"/>
+			<ShapeSize value="0.5"/>
+			<RepeatH value="1"/>
+			<RepeatV value="1"/>
+		</Kaleidoscope2>
+		<NoiseGradient2 id="noisegradient2 01">
+			<BaseColor red="0" green="0.75019607843137259" blue="0.3749019607843137" alpha="1"/>
+			<HRange value="0.59999999999999998"/>
+			<LRange value="0.80000000000000004"/>
+			<SRange value="0.90000000000000002"/>
+			<Roughness value="0.20000000000000001"/>
+			<Scale value="1.77"/>
+			<Vertical value="true"/>
+			<Details value="1"/>
+			<Contrast value="0.20000000000000001"/>
+			<Variation value="1"/>
+			<Randomizable value="true"/>
+		</NoiseGradient2>
+		<Pavements id="pavements 01">
+			<Color red="0.69999999999999996" green="0.46600000000000003" blue="0.34999999999999998" alpha="1"/>
+			<Mortar red="0" green="0" blue="0" alpha="1"/>
+			<HRange value="0.050000000000000003"/>
+			<LRange value="0.14999999999999999"/>
+			<SRange value="0.25"/>
+			<MortarWidth value="0.050000000000000003"/>
+			<BevelWidth value="0.20000000000000001"/>
+			<Corners value="0"/>
+			<Bond value="0"/>
+			<FillMode value="0"/>
+			<Repeat value="1"/>
+			<Chaos value="0.14999999999999999"/>
+			<Variation value="1"/>
+			<Bevel value="0"/>
+		</Pavements>
+		<PerlinNoise2 id="perlinnoise2 01">
+			<Noise red="1" green="1" blue="1" alpha="1"/>
+			<Background red="0" green="0" blue="0" alpha="1"/>
+			<Roughness value="0.20000000000000001"/>
+			<Scale value="2.5"/>
+			<Stretch value="0"/>
+			<Angle value="0"/>
+			<Details value="1"/>
+			<Contrast value="0.25"/>
+			<Variation value="1"/>
+			<OctaveCurve value="0"/>
+		</PerlinNoise2>
+		<Pyramids2 id="pyramids2 01">
+			<Noise red="1" green="1" blue="1" alpha="1"/>
+			<Background red="0" green="0" blue="0" alpha="1"/>
+			<Roughness value="0.20000000000000001"/>
+			<Contrast value="0"/>
+			<Formula value="0"/>
+			<Scale value="2.5"/>
+			<Stretch value="0"/>
+			<VerticalStretch value="false"/>
+			<Flat value="false"/>
+			<SolidFill value="false"/>
+			<Details value="0.40000000000000002"/>
+			<Variation value="1"/>
+			<OctaveCurve value="0"/>
+		</Pyramids2>
+		<Spectrum id="spectrum 01">
+			<Rotate value="0"/>
+			<Repeat value="1"/>
+		</Spectrum>
+		<Stones2 id="stones2 01">
+			<Noise red="1" green="1" blue="1" alpha="1"/>
+			<Background red="0" green="0" blue="0" alpha="1"/>
+			<Roughness value="0.20000000000000001"/>
+			<Contrast value="0"/>
+			<Formula value="0"/>
+			<Scale value="2.3999999999999999"/>
+			<Stretch value="0"/>
+			<VerticalStretch value="false"/>
+			<Flat value="false"/>
+			<SolidFill value="false"/>
+			<Details value="0.40000000000000002"/>
+			<Variation value="1"/>
+			<OctaveCurve value="0"/>
+		</Stones2>
+		<Techno2 id="techno2 01">
+			<Noise red="1" green="1" blue="1" alpha="1"/>
+			<Background red="0" green="0" blue="0" alpha="1"/>
+			<Roughness value="0.20000000000000001"/>
+			<Contrast value="0"/>
+			<Formula value="0"/>
+			<Scale value="2.5"/>
+			<Stretch value="0"/>
+			<VerticalStretch value="false"/>
+			<Flat value="false"/>
+			<SolidFill value="false"/>
+			<Details value="0.40000000000000002"/>
+			<Variation value="1"/>
+			<OctaveCurve value="0"/>
+		</Techno2>
+	</Components>
+	<SettingsOverride>
+		<Size value="0"/>
+		<Variation value="0"/>
+		<Seamless value="0"/>
+		<ResultBlending value="0"/>
+	</SettingsOverride>
+	<Presets>
+		<DefaultPreset>
+			<Settings size_factor="1" variation="1" seamless="false" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="true"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="16"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 02">
+					<Value value="2"/>
+				</IntSliderControl>
+			</Controls>
+		</DefaultPreset>
+	</Presets>
+	<Information author="totte" name-en="megaswitch" url="http://4eyes.code66.se/" description="" keywords="" update_notes="" major_version="2" minor_version="8"/>
+	<ControlsOrder>
+		<Automatic value="true"/>
+	</ControlsOrder>
+	<FilterEditor>
+		<ThumbnailSize value="1"/>
+		<Canvas left="-564" top="1976" zoom_factor="0"/>
+		<Viewport left="3618" top="7506" zoom_factor="16"/>
+		<LockPreview>
+			<Locked value="true"/>
+			<LockedComponent name="scriptmap01 01"/>
+		</LockPreview>
+		<Item id="blocks2 01">
+			<Position left="864" top="608"/>
+		</Item>
+		<Item id="bomber 01">
+			<Position left="944" top="3008"/>
+		</Item>
+		<Item id="bricks 01">
+			<Position left="944" top="4368"/>
+		</Item>
+		<Item id="cells2 01">
+			<Position left="896" top="896"/>
+		</Item>
+		<Item id="chaffs2 01">
+			<Position left="864" top="1248"/>
+		</Item>
+		<Item id="checkboxcontrol 01">
+			<Position left="352" top="2656"/>
+		</Item>
+		<Item id="checker2 01">
+			<Position left="896" top="4016"/>
+		</Item>
+		<Item id="color3gradient 01">
+			<Position left="880" top="-304"/>
+		</Item>
+		<Item id="color5gradient 01">
+			<Position left="880" top="-96"/>
+		</Item>
+		<Item id="intslidercontrol 01">
+			<Position left="880" top="4272"/>
+		</Item>
+		<Item id="intslidercontrol 02">
+			<Position left="352" top="2736"/>
+		</Item>
+		<Item id="kaleidoscope2 01">
+			<Position left="992" top="4784"/>
+		</Item>
+		<Item id="noisegradient2 01">
+			<Position left="880" top="176"/>
+		</Item>
+		<Item id="pavements 01">
+			<Position left="1024" top="5040"/>
+		</Item>
+		<Item id="perlinnoise2 01">
+			<Position left="896" top="1632"/>
+		</Item>
+		<Item id="pyramids2 01">
+			<Position left="896" top="1904"/>
+		</Item>
+		<Item id="result">
+			<Position left="-464" top="2448"/>
+		</Item>
+		<Item id="scriptmap01 01">
+			<Position left="-16" top="2416"/>
+		</Item>
+		<Item id="spectrum 01">
+			<Position left="880" top="480"/>
+		</Item>
+		<Item id="stones2 01">
+			<Position left="896" top="2256"/>
+		</Item>
+		<Item id="techno2 01">
+			<Position left="880" top="2624"/>
+		</Item>
+	</FilterEditor>
+</Filter>

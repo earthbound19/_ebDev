@@ -1,0 +1,19 @@
+https://filterforge.com/forum/read.php?FID=11&TID=15538&MID=151245
+
+There are two motivations for making this filter. Firstly, I wanted something that just generated a gajillion patterns. Secondly, I wanted it to make a filter that goes making surprises but predictable and not look like s**t. The point here is that each of these outputs should look designed but somewhat still random enough.
+
+The Ultra-Lite edition isn't the original RGBland stripped down but it's entirely a new filter just working on the same exact principles I've described here. In general while it's different it's easy to just add even more on this and make your own insane node-tree spaceship creation.
+
+You'll need to understand 4 key elements:
+1. The source (A simple gradient that's manipulated by the profile gradient).
+2. A randomizer - These output black and white random signals (HDR too) that's used to drive the green input parameters. This effectively removes the need for controls and keeps everything in-filter hence allowing you to just smash that Next-variant button instead of wondering what each of the darn sliders do.
+3. Signal operators - Each channel R G and B signals have their own thing going. Each is randomized which results in a lot of variation but since all signals share the same exact string of operations, the result doesn't look like crap.
+4. The assembly - Try swapping this with other assembly nodes for fun. I personally like RGB the most only because it gives you the most variance. The others such as HSL gives you rainbows and all sorts of other effects.
+
+Here are some useful things:
+
+- Make sure each signal uses the exact same flow. Reordering or throwing in something different per channel works but I tend to stick to the same tree to avoid one channel fr om looking too different from others.
+
+- The Randomizers are capable of producing HDR output. This is because some of the parameters such as the WAVE curve generator has a section wh ere I can use a value of 4 to drive the wave type parameter.
+
+- To avoid really noisy images avoid just adding noise on noise on noise. Use low values for parameters that can quickly go awry. i.e. Frequencies, Repeat H/V.

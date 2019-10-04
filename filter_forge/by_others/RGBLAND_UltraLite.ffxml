@@ -1,0 +1,832 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Filter>
+	<CustomClasses>
+		<MapGroup name="MapGroup01" display_name-en="">
+			<IntSlider name="groupped_intslidercontrol_01" display_name="Variation">
+				<Range min="1" max="30000"/>
+			</IntSlider>
+			<Grayscale name="groupped_grayscalemapcontrol_01" display_name="HDR Value" samplable="true" required="false" hdr="true"/>
+		</MapGroup>
+	</CustomClasses>
+	<Components>
+		<Result id="result">
+			<Source source="assemblergb3 01"/>
+			<FilterType value="0"/>
+			<Advanced value="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+		</Result>
+		<AssembleRGB3 id="assemblergb3 01">
+			<R source="offset4 02" value="0.39215686274509803"/>
+			<G source="offset4 03" value="0.5490196078431373"/>
+			<B source="offset4 01" value="0.82352941176470584"/>
+		</AssembleRGB3>
+		<GrayscaleMapControl id="grayscalemapcontrol 01">
+			<Name value-en="R Signal GAIN"/>
+			<ExternalImagesMode value="0"/>
+			<HDRMode value="1"/>
+			<HorizontalAnchor value="1"/>
+			<VerticalAnchor value="1"/>
+			<PlacementMode value="0"/>
+			<TilingMode value="0"/>
+			<Value value="1.1499999999999999"/>
+		</GrayscaleMapControl>
+		<GrayscaleMapControl id="grayscalemapcontrol 02">
+			<Name value-en="G Signal GAIN"/>
+			<ExternalImagesMode value="0"/>
+			<HDRMode value="1"/>
+			<HorizontalAnchor value="1"/>
+			<VerticalAnchor value="1"/>
+			<PlacementMode value="0"/>
+			<TilingMode value="0"/>
+			<Value value="1.0700000000000001"/>
+		</GrayscaleMapControl>
+		<GrayscaleMapControl id="grayscalemapcontrol 03">
+			<Name value-en="B Signal GAIN"/>
+			<ExternalImagesMode value="0"/>
+			<HDRMode value="1"/>
+			<HorizontalAnchor value="1"/>
+			<VerticalAnchor value="1"/>
+			<PlacementMode value="0"/>
+			<TilingMode value="0"/>
+			<Value value="1.1800000000000002"/>
+		</GrayscaleMapControl>
+		<Kaleidoscope3 id="kaleidoscope3 01">
+			<Source source="noisedistortion2 03"/>
+			<RepeatH value="1"/>
+			<RepeatV value="1"/>
+			<Mode source="mapgroup01 11" value="2"/>
+			<OffsetH value="0.10000000000000001"/>
+			<OffsetV value="0.10000000000000001"/>
+			<ShapeSize value="1"/>
+		</Kaleidoscope3>
+		<Kaleidoscope3 id="kaleidoscope3 02">
+			<Source source="noisedistortion2 02"/>
+			<RepeatH value="1"/>
+			<RepeatV value="1"/>
+			<Mode source="mapgroup01 12" value="2"/>
+			<OffsetH value="0.10000000000000001"/>
+			<OffsetV value="0.10000000000000001"/>
+			<ShapeSize value="1"/>
+		</Kaleidoscope3>
+		<Kaleidoscope3 id="kaleidoscope3 03">
+			<Source source="noisedistortion2 01"/>
+			<RepeatH value="1"/>
+			<RepeatV value="1"/>
+			<Mode source="mapgroup01 13" value="3"/>
+			<OffsetH value="0"/>
+			<OffsetV value="0.90000000000000002"/>
+			<ShapeSize value="1"/>
+		</Kaleidoscope3>
+		<MapGroup01 id="mapgroup01 01">
+			<groupped_intslidercontrol_01 value="11126"/>
+			<groupped_grayscalemapcontrol_01 value="4"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 02">
+			<groupped_intslidercontrol_01 value="11126"/>
+			<groupped_grayscalemapcontrol_01 value="1"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 03">
+			<groupped_intslidercontrol_01 value="4376"/>
+			<groupped_grayscalemapcontrol_01 value="0.33000000000000002"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 04">
+			<groupped_intslidercontrol_01 value="23625"/>
+			<groupped_grayscalemapcontrol_01 value="0.33000000000000002"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 05">
+			<groupped_intslidercontrol_01 value="23375"/>
+			<groupped_grayscalemapcontrol_01 value="1"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 06">
+			<groupped_intslidercontrol_01 value="23375"/>
+			<groupped_grayscalemapcontrol_01 value="1"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 07">
+			<groupped_intslidercontrol_01 value="12376"/>
+			<groupped_grayscalemapcontrol_01 value="1"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 08">
+			<groupped_intslidercontrol_01 value="28875"/>
+			<groupped_grayscalemapcontrol_01 value="0.33000000000000002"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 09">
+			<groupped_intslidercontrol_01 value="23625"/>
+			<groupped_grayscalemapcontrol_01 value="0.33000000000000002"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 10">
+			<groupped_intslidercontrol_01 value="17125"/>
+			<groupped_grayscalemapcontrol_01 value="0.33000000000000002"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 11">
+			<groupped_intslidercontrol_01 value="4376"/>
+			<groupped_grayscalemapcontrol_01 value="5"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 12">
+			<groupped_intslidercontrol_01 value="26875"/>
+			<groupped_grayscalemapcontrol_01 value="5"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 13">
+			<groupped_intslidercontrol_01 value="12876"/>
+			<groupped_grayscalemapcontrol_01 value="5"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 14">
+			<groupped_intslidercontrol_01 value="24125"/>
+			<groupped_grayscalemapcontrol_01 value="1"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 15">
+			<groupped_intslidercontrol_01 value="23625"/>
+			<groupped_grayscalemapcontrol_01 value="1"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 16">
+			<groupped_intslidercontrol_01 value="28875"/>
+			<groupped_grayscalemapcontrol_01 value="0.33000000000000002"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 17">
+			<groupped_intslidercontrol_01 value="11126"/>
+			<groupped_grayscalemapcontrol_01 value="4"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 18">
+			<groupped_intslidercontrol_01 value="21125"/>
+			<groupped_grayscalemapcontrol_01 value="4"/>
+		</MapGroup01>
+		<MapGroup01 id="mapgroup01 19">
+			<groupped_intslidercontrol_01 value="4126"/>
+			<groupped_grayscalemapcontrol_01 value="4"/>
+		</MapGroup01>
+		<NoiseDistortion2 id="noisedistortion2 01">
+			<Source source="profilegradient4 01"/>
+			<Distortion value="1"/>
+			<Roughness value="0"/>
+			<Scale value="2.9100000000000001"/>
+			<Stretch value="0"/>
+			<Angle value="0"/>
+			<Details value="1"/>
+			<Variation value="13626"/>
+		</NoiseDistortion2>
+		<NoiseDistortion2 id="noisedistortion2 02">
+			<Source source="profilegradient4 02"/>
+			<Distortion value="1"/>
+			<Roughness value="0"/>
+			<Scale value="2.8199999999999998"/>
+			<Stretch value="0"/>
+			<Angle value="0"/>
+			<Details value="1"/>
+			<Variation value="8876"/>
+		</NoiseDistortion2>
+		<NoiseDistortion2 id="noisedistortion2 03">
+			<Source source="profilegradient4 03"/>
+			<Distortion value="1"/>
+			<Roughness value="0"/>
+			<Scale value="2.73"/>
+			<Stretch value="0"/>
+			<Angle value="0"/>
+			<Details value="1"/>
+			<Variation value="12126"/>
+		</NoiseDistortion2>
+		<Offset4 id="offset4 01">
+			<Source source="rotate2 02"/>
+			<OffsetX source="mapgroup01 16" value="0"/>
+			<OffsetY source="mapgroup01 16" value="0"/>
+			<Percentage value="1"/>
+			<Mode value="0"/>
+		</Offset4>
+		<Offset4 id="offset4 02">
+			<Source source="rotate2 01"/>
+			<OffsetX source="mapgroup01 16" value="0"/>
+			<OffsetY source="mapgroup01 14" value="0"/>
+			<Percentage value="1"/>
+			<Mode value="0"/>
+		</Offset4>
+		<Offset4 id="offset4 03">
+			<Source source="rotate2 03"/>
+			<OffsetX source="mapgroup01 14" value="0"/>
+			<OffsetY source="mapgroup01 15" value="0"/>
+			<Percentage value="1"/>
+			<Mode value="0"/>
+		</Offset4>
+		<ProfileGradient4 id="profilegradient4 01">
+			<Color1 red="0" green="0" blue="0" alpha="1"/>
+			<Color2 source="grayscalemapcontrol 03" red="0.97999999999999998" green="0.97999999999999998" blue="0.97999999999999998" alpha="1"/>
+			<Offset source="mapgroup01 04" value="0"/>
+			<Rotate source="mapgroup01 19" value="0"/>
+			<Repeat value="1"/>
+			<Profile source="wavecurve3 01" value="0"/>
+			<Mirror value="false"/>
+		</ProfileGradient4>
+		<ProfileGradient4 id="profilegradient4 02">
+			<Color1 red="0" green="0" blue="0" alpha="1"/>
+			<Color2 source="grayscalemapcontrol 02" red="1" green="1" blue="1" alpha="1"/>
+			<Offset source="mapgroup01 03" value="0"/>
+			<Rotate source="mapgroup01 18" value="1"/>
+			<Repeat value="1"/>
+			<Profile source="wavecurve3 01" value="0"/>
+			<Mirror value="false"/>
+		</ProfileGradient4>
+		<ProfileGradient4 id="profilegradient4 03">
+			<Color1 red="0" green="0" blue="0" alpha="1"/>
+			<Color2 source="grayscalemapcontrol 01" red="1" green="1" blue="1" alpha="1"/>
+			<Offset source="mapgroup01 02" value="0"/>
+			<Rotate source="mapgroup01 17" value="0"/>
+			<Repeat value="1"/>
+			<Profile source="wavecurve3 01" value="0"/>
+			<Mirror value="false"/>
+		</ProfileGradient4>
+		<Rotate2 id="rotate2 01">
+			<Source source="kaleidoscope3 01"/>
+			<Rotation source="mapgroup01 10" value="0.11"/>
+			<OriginX value="0.5"/>
+			<OriginY value="0.5"/>
+			<Percentage value="1"/>
+			<Mode value="0"/>
+		</Rotate2>
+		<Rotate2 id="rotate2 02">
+			<Source source="kaleidoscope3 03"/>
+			<Rotation source="mapgroup01 08" value="0.11"/>
+			<OriginX value="0.5"/>
+			<OriginY value="0.5"/>
+			<Percentage value="1"/>
+			<Mode value="0"/>
+		</Rotate2>
+		<Rotate2 id="rotate2 03">
+			<Source source="kaleidoscope3 02"/>
+			<Rotation source="mapgroup01 09" value="0.11"/>
+			<OriginX value="0.5"/>
+			<OriginY value="0.5"/>
+			<Percentage value="1"/>
+			<Mode value="0"/>
+		</Rotate2>
+		<SliderControl id="slidercontrol 01">
+			<Name value-en="Frequency"/>
+			<UseRemapping value="true"/>
+			<Value value="0.81701373766037344"/>
+		</SliderControl>
+		<WaveCurve3 id="wavecurve3 01">
+			<Shape source="mapgroup01 05" value="0.97999999999999998"/>
+			<AVariance source="mapgroup01 06" value="0"/>
+			<FVariance source="mapgroup01 07" value="0"/>
+			<Phase value="-1"/>
+			<Minimum value="0"/>
+			<Maximum value="1"/>
+			<Wave source="mapgroup01 01" value="0"/>
+			<Frequency source="slidercontrol 01" value="0.02">
+				<Minimum value="0.01"/>
+				<Maximum value="0.050000000000000003"/>
+			</Frequency>
+			<Variation value="1"/>
+			<Invert value="false"/>
+			<Randomizable value="true"/>
+		</WaveCurve3>
+	</Components>
+	<GroupNames>
+		<Group id="mapgroup01 01">
+			<Components>
+				<Component name="grayscalemapcontrol 13" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 01" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 03" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 01" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 02" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 01" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 01" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 02">
+			<Components>
+				<Component name="grayscalemapcontrol 07" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 02" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 06" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 05" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 04" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 02" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 02" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 03">
+			<Components>
+				<Component name="grayscalemapcontrol 08" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 03" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 09" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 07" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 08" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 03" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 03" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 04">
+			<Components>
+				<Component name="grayscalemapcontrol 09" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 04" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 12" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 11" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 10" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 04" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 04" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 05">
+			<Components>
+				<Component name="grayscalemapcontrol 14" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 07" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 21" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 20" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 19" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 07" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 07" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 06">
+			<Components>
+				<Component name="grayscalemapcontrol 15" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 12" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 36" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 34" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 35" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 12" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 12" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 07">
+			<Components>
+				<Component name="grayscalemapcontrol 16" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 13" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 39" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 38" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 37" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 13" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 13" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 08">
+			<Components>
+				<Component name="grayscalemapcontrol 10" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 08" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 24" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 22" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 23" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 08" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 08" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 09">
+			<Components>
+				<Component name="grayscalemapcontrol 11" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 09" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 27" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 26" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 25" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 09" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 09" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 10">
+			<Components>
+				<Component name="grayscalemapcontrol 12" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 10" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 30" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 28" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 29" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 10" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 10" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 11">
+			<Components>
+				<Component name="grayscalemapcontrol 04" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 05" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 15" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 14" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 13" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 05" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 05" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 12">
+			<Components>
+				<Component name="grayscalemapcontrol 05" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 06" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 18" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 16" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 17" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 06" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 06" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 13">
+			<Components>
+				<Component name="grayscalemapcontrol 06" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 11" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 33" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 31" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 32" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 11" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 11" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 14">
+			<Components>
+				<Component name="grayscalemapcontrol 17" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 14" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 42" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 41" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 40" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 14" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 14" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 15">
+			<Components>
+				<Component name="grayscalemapcontrol 18" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 15" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 45" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 43" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 44" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 15" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 15" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 16">
+			<Components>
+				<Component name="grayscalemapcontrol 19" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 16" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 48" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 47" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 46" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 16" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 16" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 17">
+			<Components>
+				<Component name="grayscalemapcontrol 20" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 17" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 51" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 49" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 50" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 17" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 17" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 18">
+			<Components>
+				<Component name="grayscalemapcontrol 21" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 18" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 54" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 53" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 52" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 18" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 18" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+		<Group id="mapgroup01 19">
+			<Components>
+				<Component name="grayscalemapcontrol 22" group_id="groupped_grayscalemapcontrol_01"/>
+				<Component name="intslidercontrol 19" group_id="groupped_intslidercontrol_01"/>
+				<Component name="lookup2 57" group_id="groupped_lookup2_01"/>
+				<Component name="lookup2 56" group_id="groupped_lookup2_02"/>
+				<Component name="lookup2 55" group_id="groupped_lookup2_03"/>
+				<Component name="mapgroupresult 19" group_id="groupped_mapgroupresult_01"/>
+				<Component name="perlinnoise2 19" group_id="groupped_perlinnoise2_01"/>
+			</Components>
+		</Group>
+	</GroupNames>
+	<Groups>
+		<Group id="MapGroup01">
+			<Components>
+				<MapGroupResult id="groupped_mapgroupresult_01">
+					<Source source="groupped_lookup2_01"/>
+				</MapGroupResult>
+				<GrayscaleMapControl id="groupped_grayscalemapcontrol_01">
+					<Name value-en="HDR Value"/>
+					<ExternalImagesMode value="0"/>
+					<HDRMode value="1"/>
+					<HorizontalAnchor value="1"/>
+					<VerticalAnchor value="1"/>
+					<PlacementMode value="0"/>
+					<TilingMode value="0"/>
+					<Value value="4"/>
+				</GrayscaleMapControl>
+				<IntSliderControl id="groupped_intslidercontrol_01">
+					<Name value-en="Variation"/>
+					<UseRemapping value="false"/>
+					<Value value="11126"/>
+					<RangeMax value="30000"/>
+				</IntSliderControl>
+				<Lookup2 id="groupped_lookup2_02">
+					<Source source="groupped_perlinnoise2_01"/>
+					<LookupX value="0.45000000000000001"/>
+					<LookupY value="0.84000000000000008"/>
+					<Mode value="0"/>
+				</Lookup2>
+				<Lookup2 id="groupped_lookup2_03">
+					<Source source="groupped_perlinnoise2_01"/>
+					<LookupX value="0.39000000000000001"/>
+					<LookupY value="0.60999999999999999"/>
+					<Mode value="0"/>
+				</Lookup2>
+				<Lookup2 id="groupped_lookup2_01">
+					<Source source="groupped_perlinnoise2_01"/>
+					<LookupX source="groupped_lookup2_02" value="0.48999999999999999"/>
+					<LookupY source="groupped_lookup2_03" value="0.77000000000000002"/>
+					<Mode value="0"/>
+				</Lookup2>
+				<PerlinNoise2 id="groupped_perlinnoise2_01">
+					<Noise source="groupped_grayscalemapcontrol_01" red="1" green="1" blue="1" alpha="1"/>
+					<Background red="0" green="0" blue="0" alpha="1"/>
+					<Roughness value="1"/>
+					<Scale value="0"/>
+					<Stretch value="0"/>
+					<Angle value="0"/>
+					<Details value="1"/>
+					<Contrast value="0.56999999999999995"/>
+					<Variation source="groupped_intslidercontrol_01" value="14376">
+						<Step value="1"/>
+						<Offset value="0"/>
+						<Flip value="false"/>
+					</Variation>
+					<OctaveCurve value="0"/>
+				</PerlinNoise2>
+			</Components>
+		</Group>
+	</Groups>
+	<SettingsOverride>
+		<Size value="0"/>
+		<Variation value="0"/>
+		<Seamless value="0"/>
+		<ResultBlending value="0"/>
+	</SettingsOverride>
+	<Presets>
+		<DefaultPreset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="20722" seamless="false" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<GrayscaleMapControl id="grayscalemapcontrol 01">
+					<HorizontalAnchor value="1"/>
+					<VerticalAnchor value="1"/>
+					<PlacementMode value="0"/>
+					<TilingMode value="0"/>
+					<Value value="1.1499999999999999"/>
+				</GrayscaleMapControl>
+				<GrayscaleMapControl id="grayscalemapcontrol 02">
+					<HorizontalAnchor value="1"/>
+					<VerticalAnchor value="1"/>
+					<PlacementMode value="0"/>
+					<TilingMode value="0"/>
+					<Value value="1.0700000000000001"/>
+				</GrayscaleMapControl>
+				<GrayscaleMapControl id="grayscalemapcontrol 03">
+					<HorizontalAnchor value="1"/>
+					<VerticalAnchor value="1"/>
+					<PlacementMode value="0"/>
+					<TilingMode value="0"/>
+					<Value value="1.1800000000000002"/>
+				</GrayscaleMapControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.81701373766037344"/>
+				</SliderControl>
+			</Controls>
+		</DefaultPreset>
+	</Presets>
+	<Locks>
+		<Settings size="true" variation="false"/>
+		<Lighting elements="false" environment="false" brightness="false" saturation="false" height="false"/>
+		<Controls>
+			<Control id="grayscalemapcontrol 01" lock="true"/>
+			<Control id="grayscalemapcontrol 02" lock="true"/>
+			<Control id="grayscalemapcontrol 03" lock="true"/>
+			<Control id="slidercontrol 01" lock="false"/>
+		</Controls>
+	</Locks>
+	<Information author="Skybase" name-en="RGBLAND - UltraLite" url="https://skybase.xyz/" description="" keywords="" update_notes="" major_version="8" minor_version="4"/>
+	<ControlsOrder>
+		<Automatic value="true"/>
+	</ControlsOrder>
+	<FilterEditor>
+		<Groups>
+			<Group id="MapGroup01">
+				<Canvas left="2559" top="-269" zoom_factor="0"/>
+				<Item id="groupped_grayscalemapcontrol_01">
+					<Position left="3308" top="77"/>
+				</Item>
+				<Item id="groupped_intslidercontrol_01">
+					<Position left="3326" top="204"/>
+				</Item>
+				<Item id="groupped_lookup2_01">
+					<Position left="2610" top="129"/>
+				</Item>
+				<Item id="groupped_lookup2_02">
+					<Position left="2831" top="67"/>
+				</Item>
+				<Item id="groupped_lookup2_03">
+					<Position left="2831" top="196"/>
+				</Item>
+				<Item id="groupped_mapgroupresult_01">
+					<Position left="2370" top="131"/>
+				</Item>
+				<Item id="groupped_perlinnoise2_01">
+					<Position left="3055" top="80"/>
+				</Item>
+			</Group>
+		</Groups>
+		<ThumbnailSize value="1"/>
+		<Canvas left="1010" top="-1065" zoom_factor="1"/>
+		<Viewport left="0" top="0" zoom_factor="1"/>
+		<LockPreview>
+			<Locked value="true"/>
+			<LockedComponent name="result"/>
+		</LockPreview>
+		<Item id="assemblergb3 01">
+			<Position left="1078" top="-175"/>
+		</Item>
+		<Item id="grayscalemapcontrol 01">
+			<Position left="2526" top="-335"/>
+		</Item>
+		<Item id="grayscalemapcontrol 02">
+			<Position left="2526" top="-275"/>
+		</Item>
+		<Item id="grayscalemapcontrol 03">
+			<Position left="2526" top="-218"/>
+		</Item>
+		<Item id="kaleidoscope3 01">
+			<Position left="1852" top="-277"/>
+		</Item>
+		<Item id="kaleidoscope3 02">
+			<Position left="1857" top="-135"/>
+		</Item>
+		<Item id="kaleidoscope3 03">
+			<Position left="1857" top="11"/>
+		</Item>
+		<Item id="mapgroup01 01">
+			<Position left="3072" top="298"/>
+		</Item>
+		<Item id="mapgroup01 02">
+			<Position left="2814" top="-514"/>
+		</Item>
+		<Item id="mapgroup01 03">
+			<Position left="2813" top="-314"/>
+		</Item>
+		<Item id="mapgroup01 04">
+			<Position left="2809" top="-119"/>
+		</Item>
+		<Item id="mapgroup01 05">
+			<Position left="3074" top="-203"/>
+		</Item>
+		<Item id="mapgroup01 06">
+			<Position left="3073" top="-39"/>
+		</Item>
+		<Item id="mapgroup01 07">
+			<Position left="3074" top="128"/>
+		</Item>
+		<Item id="mapgroup01 08">
+			<Position left="2339" top="-486"/>
+		</Item>
+		<Item id="mapgroup01 09">
+			<Position left="2343" top="-681"/>
+		</Item>
+		<Item id="mapgroup01 10">
+			<Position left="2344" top="-881"/>
+		</Item>
+		<Item id="mapgroup01 11">
+			<Position left="2029" top="230"/>
+		</Item>
+		<Item id="mapgroup01 12">
+			<Position left="2035" top="340"/>
+		</Item>
+		<Item id="mapgroup01 13">
+			<Position left="2034" top="450"/>
+		</Item>
+		<Item id="mapgroup01 14">
+			<Position left="1512" top="-816"/>
+		</Item>
+		<Item id="mapgroup01 15">
+			<Position left="1510" top="-659"/>
+		</Item>
+		<Item id="mapgroup01 16">
+			<Position left="1508" top="-506"/>
+		</Item>
+		<Item id="mapgroup01 17">
+			<Position left="2579" top="-79"/>
+		</Item>
+		<Item id="mapgroup01 18">
+			<Position left="2575" top="19"/>
+		</Item>
+		<Item id="mapgroup01 19">
+			<Position left="2587" top="117"/>
+		</Item>
+		<Item id="noisedistortion2 01">
+			<Position left="2102" top="38"/>
+		</Item>
+		<Item id="noisedistortion2 02">
+			<Position left="2094" top="-129"/>
+		</Item>
+		<Item id="noisedistortion2 03">
+			<Position left="2095" top="-306"/>
+		</Item>
+		<Item id="offset4 01">
+			<Position left="1271" top="0"/>
+		</Item>
+		<Item id="offset4 02">
+			<Position left="1269" top="-272"/>
+		</Item>
+		<Item id="offset4 03">
+			<Position left="1273" top="-134"/>
+		</Item>
+		<Item id="profilegradient4 01">
+			<Position left="2325" top="99"/>
+		</Item>
+		<Item id="profilegradient4 02">
+			<Position left="2330" top="-51"/>
+		</Item>
+		<Item id="profilegradient4 03">
+			<Position left="2331" top="-200"/>
+		</Item>
+		<Item id="result">
+			<Position left="886" top="-175"/>
+		</Item>
+		<Item id="rotate2 01">
+			<Position left="1511" top="-250"/>
+		</Item>
+		<Item id="rotate2 02">
+			<Position left="1499" top="25"/>
+		</Item>
+		<Item id="rotate2 03">
+			<Position left="1509" top="-112"/>
+		</Item>
+		<Item id="slidercontrol 01">
+			<Position left="2801" top="297"/>
+		</Item>
+		<Item id="wavecurve3 01">
+			<Position left="2791" top="78"/>
+		</Item>
+	</FilterEditor>
+</Filter>

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Filter>
+	<Components>
+		<Result id="result">
+			<Source source="divide 01"/>
+			<FilterType value="0"/>
+			<Advanced value="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+		</Result>
+		<Add id="add 01">
+			<SourceA source="noisedistortion2 01" red="0.10000000000000001" green="0.5" blue="0.90000000000000002" alpha="1"/>
+			<SourceB source="loopaccumulated 01" red="0.90000000000000002" green="0.5" blue="0.10000000000000001" alpha="1"/>
+		</Add>
+		<Blend6 id="blend6 01">
+			<Foreground red="1" green="1" blue="1" alpha="1"/>
+			<Background red="0" green="0" blue="0" alpha="1"/>
+			<Opacity value="0.050000000000000003"/>
+			<Mode value="0"/>
+		</Blend6>
+		<Divide id="divide 01">
+			<Dividend source="loop 01" red="4" green="2" blue="1" alpha="1"/>
+			<Divisor source="intslidercontrol 01" red="4" green="4" blue="4" alpha="1">
+				<Minimum red="1" green="1" blue="1" alpha="1"/>
+				<Maximum red="350" green="350" blue="350" alpha="1"/>
+			</Divisor>
+			<Error red="1" green="0" blue="1" alpha="1"/>
+		</Divide>
+		<Image3 id="image3 01"/>
+		<IntSliderControl id="intslidercontrol 01">
+			<Name value-en="Iterations"/>
+			<UseRemapping value="true"/>
+			<Value value="150"/>
+			<RangeMax value="350"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<Loop id="loop 01">
+			<Accumulator source="add 01"/>
+			<Iterations source="intslidercontrol 01" value="100">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</Iterations>
+		</Loop>
+		<LoopAccumulated id="loopaccumulated 01" master="loop 01">
+			<Initial red="0" green="0" blue="0" alpha="1"/>
+			<IterationPreview value="1"/>
+		</LoopAccumulated>
+		<LoopPosition id="loopposition 01" master="loop 01">
+			<Start red="0" green="0" blue="0" alpha="1"/>
+			<End red="0.18217054263565891" green="0.18217054263565891" blue="0.18217054263565891" alpha="1"/>
+			<IterationPreview value="1"/>
+		</LoopPosition>
+		<NoiseDistortion2 id="noisedistortion2 01">
+			<Source source="image3 01"/>
+			<Distortion source="loopposition 01" value="1"/>
+			<Roughness value="0.34000000000000002"/>
+			<Scale value="2.3100000000000001"/>
+			<Stretch value="0"/>
+			<Angle value="0"/>
+			<Details value="1"/>
+			<Variation value="1"/>
+		</NoiseDistortion2>
+	</Components>
+	<GroupNames/>
+	<SettingsOverride>
+		<Size value="0"/>
+		<Variation value="0"/>
+		<Seamless value="0"/>
+		<ResultBlending value="0"/>
+	</SettingsOverride>
+	<Presets>
+		<DefaultPreset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="1" seamless="false" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="150"/>
+				</IntSliderControl>
+			</Controls>
+		</DefaultPreset>
+	</Presets>
+	<Locks>
+		<Settings size="false" variation="false"/>
+		<Lighting elements="false" environment="false" brightness="false" saturation="false" height="false"/>
+		<Controls>
+			<Control id="intslidercontrol 01" lock="false"/>
+		</Controls>
+	</Locks>
+	<Information author="Work" name-en="Iterated Distortion via Average" url="" description="" keywords="" update_notes="" major_version="7" minor_version="6"/>
+	<ControlsOrder>
+		<Automatic value="true"/>
+	</ControlsOrder>
+	<FilterEditor>
+		<Groups/>
+		<ThumbnailSize value="1"/>
+		<Canvas left="-449" top="-290" zoom_factor="0"/>
+		<Viewport left="0" top="0" zoom_factor="1"/>
+		<LockPreview>
+			<Locked value="true"/>
+			<LockedComponent name="result"/>
+		</LockPreview>
+		<Item id="add 01">
+			<Position left="672" top="160"/>
+		</Item>
+		<Item id="blend6 01">
+			<Position left="656" top="16"/>
+		</Item>
+		<Item id="divide 01">
+			<Position left="32" top="48"/>
+		</Item>
+		<Item id="image3 01">
+			<Position left="1424" top="48"/>
+		</Item>
+		<Item id="intslidercontrol 01">
+			<Position left="656" top="480"/>
+		</Item>
+		<Item id="loop 01">
+			<Position left="320" top="-16"/>
+		</Item>
+		<Item id="loopaccumulated 01">
+			<Position left="1168" top="128"/>
+		</Item>
+		<Item id="loopposition 01">
+			<Position left="1408" top="-208"/>
+		</Item>
+		<Item id="noisedistortion2 01">
+			<Position left="912" top="-96"/>
+		</Item>
+		<Item id="result">
+			<Position left="-192" top="48"/>
+		</Item>
+	</FilterEditor>
+</Filter>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Filter>
+	<Components>
+		<Result id="result">
+			<Source source="switch5 01"/>
+			<FilterType value="0"/>
+			<Advanced value="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+		</Result>
+		<Blur2 id="blur2 01">
+			<Source source="huesaturation 01"/>
+			<Radius value="1"/>
+			<Gaussian value="true"/>
+		</Blur2>
+		<CheckboxControl id="checkboxcontrol 01">
+			<Name value-en="Blur On"/>
+			<UseRemapping value="true"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<ExtractHSB4 id="extracthsb4 01">
+			<Source source="image3 01" red="0.36470588235294116" green="0.062745098039215685" blue="0.70588235294117652" alpha="1"/>
+			<Channel value="0"/>
+			<Invert value="false"/>
+		</ExtractHSB4>
+		<HueSaturation id="huesaturation 01">
+			<Source source="image3 01"/>
+			<Hue source="extracthsb4 01" value="0.59999999999999987"/>
+			<Saturation value="0"/>
+			<Lightness value="0"/>
+		</HueSaturation>
+		<Image3 id="image3 01"/>
+		<Switch5 id="switch5 01">
+			<Source1 source="blur2 01" red="1" green="0.066000000000000003" blue="0" alpha="1"/>
+			<Source2 source="huesaturation 01" red="1" green="0.77200000000000002" blue="0.113" alpha="1"/>
+			<Source3 red="1" green="1" blue="0.16800000000000001" alpha="1"/>
+			<Source4 red="0.125" green="1" blue="0.184" alpha="1"/>
+			<Source5 red="0" green="1" blue="1" alpha="1"/>
+			<Source6 red="0" green="0.76000000000000001" blue="1" alpha="1"/>
+			<Source7 red="0" green="0" blue="0.99199999999999999" alpha="1"/>
+			<Source8 red="0.996" green="0" blue="0.98799999999999999" alpha="1"/>
+			<Source9 red="0" green="0" blue="0" alpha="1"/>
+			<Source10 red="0.5" green="0.5" blue="0.5" alpha="1"/>
+			<Source11 red="0.74099999999999999" green="0.74099999999999999" blue="0.74099999999999999" alpha="1"/>
+			<Source12 red="1" green="1" blue="1" alpha="1"/>
+			<Selector source="checkboxcontrol 01" value="1">
+				<Checked value="1"/>
+				<Unchecked value="2"/>
+			</Selector>
+		</Switch5>
+	</Components>
+	<GroupNames/>
+	<SettingsOverride>
+		<Size value="0"/>
+		<Variation value="0"/>
+		<Seamless value="0"/>
+		<ResultBlending value="0"/>
+	</SettingsOverride>
+	<Presets>
+		<DefaultPreset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="1" seamless="false" antialiasing="8" map_type="0" edges_only="true" clip_hdr_for_result="false"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 01">
+					<Checked value="true"/>
+				</CheckboxControl>
+			</Controls>
+		</DefaultPreset>
+	</Presets>
+	<Locks>
+		<Settings size="false" variation="false"/>
+		<Lighting elements="false" environment="false" brightness="false" saturation="false" height="false"/>
+		<Controls>
+			<Control id="checkboxcontrol 01" lock="false"/>
+		</Controls>
+	</Locks>
+	<Information author="Rachel Duim" name-en="Blur Switch Test" url="duim.org" description-en="" keywords-en="" update_notes-en="" major_version="7" minor_version="7"/>
+	<ControlsOrder>
+		<Automatic value="true"/>
+	</ControlsOrder>
+	<FilterEditor>
+		<Groups/>
+		<ThumbnailSize value="1"/>
+		<Canvas left="489" top="-367" zoom_factor="0"/>
+		<Viewport left="0" top="0" zoom_factor="1"/>
+		<LockPreview>
+			<Locked value="true"/>
+			<LockedComponent name="huesaturation 01"/>
+		</LockPreview>
+		<Item id="blur2 01">
+			<Position left="320" top="-128"/>
+		</Item>
+		<Item id="checkboxcontrol 01">
+			<Position left="336" top="192"/>
+		</Item>
+		<Item id="extracthsb4 01">
+			<Position left="1104" top="-112"/>
+		</Item>
+		<Item id="huesaturation 01">
+			<Position left="832" top="32"/>
+		</Item>
+		<Item id="image3 01">
+			<Position left="1296" top="48"/>
+		</Item>
+		<Item id="result">
+			<Position left="-144" top="0"/>
+		</Item>
+		<Item id="switch5 01">
+			<Position left="64" top="-48"/>
+		</Item>
+	</FilterEditor>
+</Filter>

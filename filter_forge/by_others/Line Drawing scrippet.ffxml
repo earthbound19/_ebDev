@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Filter>
+	<CustomClasses>
+		<ScriptMap name="ScriptMap01">
+			<Slider name="X1" display_name="x1"/>
+			<Slider name="Y1" display_name="y1"/>
+			<Slider name="X2" display_name="x2"/>
+			<Slider name="Y2" display_name="y2"/>
+		</ScriptMap>
+	</CustomClasses>
+	<Components>
+		<Result id="result">
+			<Source source="threshold2 01"/>
+			<FilterType value="0"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+		</Result>
+		<ScriptMap01 id="scriptmap01 01">
+			<Script value="function prepare()\[br]\[tb]x1 = get_slider_input(X1)\[br]\[tb]y1 = get_slider_input(Y1)\[br]\[tb]x2 = get_slider_input(X2)\[br]\[tb]y2 = get_slider_input(Y2)\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]v=1\[br]\[tb]\[tb]--area of triangle:\[br]\[tb]\[tb]--Area=SQRT(s(s-a)(s-b)(s-c))\[br]\[tb]\[tb]--where s=(a+b+c)/2 or perimeter/2 \[br]\[tb]da=math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))\[br]\[tb]db=math.sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1))\[br]\[tb]dc=math.sqrt((x-x2)*(x-x2)+(y-y2)*(y-y2))\[br]\[tb]s=(da+db+dc)/2\[br]\[tb]area = math.sqrt(s*(s-da)*(s-db)*(s-dc))\[br]\[tb]distance = area/da\[br]\[tb]v = math.min(v, distance*2)\[br]\[tb]if db&gt;math.sqrt(da*da+dc*dc) then\[br]\[tb]\[tb]v = dc\[br]\[tb]end\[br]\[tb]if dc&gt;math.sqrt(da*da+db*db) then\[br]\[tb]\[tb]v = db\[br]\[tb]end\[br]\[tb]local r = v\[br]\[tb]local g = v\[br]\[tb]local b = v\[br]\[tb]local a = 1\[br]\[tb]return r, g, b, a\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+			<X1 source="slidercontrol 06" value="0">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</X1>
+			<Y1 source="slidercontrol 07" value="0">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</Y1>
+			<X2 source="slidercontrol 08" value="0">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</X2>
+			<Y2 source="slidercontrol 09" value="0">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</Y2>
+		</ScriptMap01>
+		<ColorMapControl id="colormapcontrol 01">
+			<Name value-en="Line color"/>
+			<ExternalImagesMode value="0"/>
+			<HDRMode value="2"/>
+			<HorizontalAnchor value="1"/>
+			<VerticalAnchor value="1"/>
+			<PlacementMode value="0"/>
+			<TilingMode value="0"/>
+			<Color red="1" green="0.5" blue="0" alpha="1"/>
+			<AlphaMode value="2"/>
+		</ColorMapControl>
+		<SliderControl id="slidercontrol 01">
+			<Name value-en="Line thickness"/>
+			<UseRemapping value="true"/>
+			<Value value="0.25"/>
+		</SliderControl>
+		<SliderControl id="slidercontrol 06">
+			<Name value-en="x1"/>
+			<UseRemapping value="false"/>
+			<Value value="0.17999999999999999"/>
+		</SliderControl>
+		<SliderControl id="slidercontrol 07">
+			<Name value-en="y1"/>
+			<UseRemapping value="false"/>
+			<Value value="0.050000000000000003"/>
+		</SliderControl>
+		<SliderControl id="slidercontrol 08">
+			<Name value-en="x2"/>
+			<UseRemapping value="false"/>
+			<Value value="0.82000000000000006"/>
+		</SliderControl>
+		<SliderControl id="slidercontrol 09">
+			<Name value-en="y2"/>
+			<UseRemapping value="false"/>
+			<Value value="0.93000000000000005"/>
+		</SliderControl>
+		<Threshold2 id="threshold2 01">
+			<Source source="scriptmap01 01"/>
+			<Threshold source="slidercontrol 01" value="0.98999999999999999">
+				<Minimum value="0.001"/>
+				<Maximum value="0.10000000000000001"/>
+			</Threshold>
+			<Smooth value="0"/>
+			<Low source="colormapcontrol 01" red="0" green="0" blue="0" alpha="1"/>
+			<High red="1" green="1" blue="1" alpha="1"/>
+		</Threshold2>
+	</Components>
+	<SettingsOverride>
+		<Size value="0"/>
+		<Variation value="0"/>
+		<Seamless value="0"/>
+		<ResultBlending value="0"/>
+	</SettingsOverride>
+	<Presets>
+		<DefaultPreset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="16780" seamless="true" antialiasing="3" map_type="0" edges_only="true" clip_hdr_for_result="true"/>
+			<Lighting>
+				<Height value="0.20000000000000001"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<ColorMapControl id="colormapcontrol 01">
+					<HorizontalAnchor value="1"/>
+					<VerticalAnchor value="1"/>
+					<PlacementMode value="0"/>
+					<TilingMode value="0"/>
+					<Color red="1" green="0.5" blue="0" alpha="1"/>
+				</ColorMapControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.25"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 06">
+					<Value value="0.17999999999999999"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 07">
+					<Value value="0.050000000000000003"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 08">
+					<Value value="0.82000000000000006"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 09">
+					<Value value="0.93000000000000005"/>
+				</SliderControl>
+			</Controls>
+		</DefaultPreset>
+	</Presets>
+	<Information author="ThreeDee" name-en="Line Drawing scrippet" url="" description-en="A scrippet for drawing a line between two points." keywords-en="line, x, y, input, scrippet, path, color, thickness, round cap, stroke, draw, point," update_notes-en="" major_version="3" minor_version="7"/>
+	<ControlsOrder>
+		<Automatic value="false"/>
+		<Items>
+			<Item id="slidercontrol 06" order="0"/>
+			<Item id="slidercontrol 07" order="1"/>
+			<Item id="slidercontrol 08" order="2"/>
+			<Item id="slidercontrol 09" order="3"/>
+			<Item id="slidercontrol 01" order="4"/>
+			<Item id="colormapcontrol 01" order="5"/>
+		</Items>
+	</ControlsOrder>
+	<FilterEditor>
+		<ThumbnailSize value="1"/>
+		<Canvas left="-1217" top="-861" zoom_factor="0"/>
+		<Viewport left="71" top="33" zoom_factor="1"/>
+		<LockPreview>
+			<Locked value="true"/>
+			<LockedComponent name="threshold2 01"/>
+		</LockPreview>
+		<Item id="colormapcontrol 01">
+			<Position left="-608" top="-384"/>
+		</Item>
+		<Item id="result">
+			<Position left="-1072" top="-592"/>
+		</Item>
+		<Item id="scriptmap01 01">
+			<Position left="-576" top="-640"/>
+		</Item>
+		<Item id="slidercontrol 01">
+			<Position left="-592" top="-480"/>
+		</Item>
+		<Item id="slidercontrol 06">
+			<Position left="-336" top="-736"/>
+		</Item>
+		<Item id="slidercontrol 07">
+			<Position left="-336" top="-656"/>
+		</Item>
+		<Item id="slidercontrol 08">
+			<Position left="-336" top="-560"/>
+		</Item>
+		<Item id="slidercontrol 09">
+			<Position left="-336" top="-480"/>
+		</Item>
+		<Item id="threshold2 01">
+			<Position left="-864" top="-592"/>
+		</Item>
+	</FilterEditor>
+</Filter>

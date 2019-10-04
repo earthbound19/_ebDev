@@ -1,0 +1,824 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Filter>
+	<CustomClasses>
+		<ScriptMap name="ScriptMap01" display_name-en="">
+			<Checkbox name="LINEAR" display_name="Linear"/>
+		</ScriptMap>
+		<ScriptMap name="ScriptMap16" display_name-en="">
+			<Color name="FOREGROUND" display_name="Foreground" required="false" hdr="true"/>
+			<Color name="BACKGROUND" display_name="Background" required="false" hdr="false"/>
+			<Grayscale name="BLEND_MODE" display_name="Blend Mode" samplable="true" required="true" hdr="false"/>
+			<Grayscale name="OPACITY" display_name="Opacity" samplable="true" required="false" hdr="false"/>
+		</ScriptMap>
+		<ScriptMap name="ScriptMap17" display_name-en=""/>
+		<ScriptMap name="ScriptMap18" display_name-en=""/>
+		<ScriptMap name="ScriptMap19" display_name-en=""/>
+		<ScriptMap name="ScriptMap20" display_name-en=""/>
+		<ScriptMap name="ScriptMap21" display_name-en=""/>
+		<ScriptMap name="ScriptMap22" display_name-en=""/>
+		<ScriptMap name="ScriptMap23" display_name-en="">
+			<Checkbox name="CURVED" display_name="Curved"/>
+		</ScriptMap>
+		<ScriptMap name="ScriptMap24" display_name-en=""/>
+		<ScriptMap name="ScriptMap25" display_name-en=""/>
+		<ScriptMap name="ScriptMap26" display_name-en=""/>
+		<ScriptMap name="ScriptMap27" display_name-en="">
+			<Grayscale name="BLEND_MODE" display_name="Blend Mode" samplable="true" required="false" hdr="true"/>
+			<Grayscale name="INFLUENCE" display_name="Influence" samplable="true" required="false" hdr="false"/>
+			<IntSlider name="VARIANT" display_name="Variant">
+				<Range min="1" max="4"/>
+			</IntSlider>
+			<Checkbox name="INVERT_RESULT" display_name="Invert"/>
+		</ScriptMap>
+		<ScriptMap name="ScriptMap28" display_name-en=""/>
+		<ScriptMap name="ScriptMap29" display_name-en=""/>
+		<ScriptMap name="ScriptMap30" display_name-en=""/>
+		<ScriptMap name="ScriptMap31" display_name-en=""/>
+		<ScriptMap name="ScriptMap32" display_name-en=""/>
+		<ScriptMap name="ScriptMap33" display_name-en=""/>
+		<ScriptMap name="ScriptMap34" display_name-en=""/>
+		<ScriptMap name="ScriptMap35" display_name-en="">
+			<Grayscale name="FILL" display_name="Fill" samplable="true" required="false" hdr="false"/>
+		</ScriptMap>
+		<ScriptMap name="ScriptMap36" display_name-en="">
+			<Checkbox name="LINEAR" display_name="Linear"/>
+		</ScriptMap>
+	</CustomClasses>
+	<Components>
+		<Result id="result">
+			<Source source="scriptmap16 01"/>
+			<FilterType value="0"/>
+			<Advanced value="false"/>
+			<Lighting>
+				<Height value="0.2000000000000000111"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.2000000000000000111"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.2999999999999999889"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+		</Result>
+		<ScriptMap01 id="scriptmap01 01">
+			<Script value="-- (C) 2012 Michael Hansen Buur\[br]\[br]-- This blend mode has been designed to \[br]-- preserve highlights and shadows from\[br]-- both foreground and background\[br]-- while averaging midtones\[br]\[br]-- It comes in two variants:\[br]-- Linear has more contrast than smooth\[br]\[br]get_sample = get_sample_linear\[br]\[br]function prepare() \[br]\[tb]QPI = 2 / math.pi\[br]\[tb]if (1 == get_checkbox_input(LINEAR)) then\[br]\[tb]\[tb]get_sample = get_sample_linear\[tb]\[tb]\[br]\[tb]else\[br]\[tb]\[tb]get_sample = get_sample_smooth\[br]\[tb]end\[br]\[br]end;\[br]\[br]function get_sample_linear(x, y)\[br]\[tb]local v, v1, v2\[br]\[br]\[tb]if (1 - x + y) &gt; 1 then\[br]\[tb]\[tb]a = y\[br]\[tb]\[tb]b = x\[br]\[tb]else\[br]\[tb]\[tb]a = x\[br]\[tb]\[tb]b = y\[br]\[tb]end\[br]\[tb]a = 1 - a\[br]\[tb]if a == 0 then\[br]\[tb]\[tb]v = 0\[br]\[tb]else\[br]\[tb]\[tb]v = 1 - a / (a + b)\[br]\[tb]end\[br]\[tb]return v,v,v,1\[br]end;\[br]\[br]function get_sample_smooth(x, y)\[br]\[br]\[tb]local v, v1, v2, w\[br]\[tb]--[[\[br]\[tb]w = (1 - x + y) * 0.5\[br]\[tb]v1 = 1 - (1 - x) / ((1 - x) + y)\[br]\[tb]v2 = 1 - (1 - y) / ((1 - y) + x)\[br]\[tb]v = v1 + (v2 - v1) * w]]\[br]\[tb]--v = (1 - (1 - x) / ((1 - x) + y)) + ((1 - (1 - y) / ((1 - y) + x)) - (1 - (1 - x) / ((1 - x) + y))) * ((1 - x + y) * 0.5)\[br]\[br]   --v =  x /(1+x-y) + y/(1-x+y) - (1/2)*(x+y)\[br]\[tb]v1 = x + y\[br]\[tb]v2 = x - y\[br]\[tb]v2 = v2 * v2\[br]\[tb]v = 1 + (v1 - 1) / (1 - v2) - 0.5 * v1\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+			<LINEAR value="false"/>
+		</ScriptMap01>
+		<ScriptMap16 id="scriptmap16 01">
+			<Script value="function prepare() end;\[br]\[br]-- Correct alpha combining blending routine\[br]\[br]function get_sample(x, y) \[br]\[tb]-- fetch inputs \[br]\[tb]local O = get_sample_grayscale(x, y, OPACITY) \[br]\[tb]local Ra, Ga, Ba, Aa = get_sample_map(x, y, FOREGROUND) \[br]\[tb]local Rb, Gb, Bb, Ab = get_sample_map(x, y, BACKGROUND) \[br]\[tb]\[br]\[tb]-- combine foreground alpha and master opacity \[br]\[tb]Aa = O * Aa \[br]\[br]\[tb]-- blend individual channels\[tb]\[br]\[tb]local Ao = Aa + Ab * (1 - Aa) \[br]\[tb]if Ao &gt; 0 then\[br]\[tb]\[tb]local rAo = 1 / Ao\[br]\[br]\[tb]\[tb]-- blendmode callback\[br]\[tb]\[tb]Ro = Ra + (get_sample_grayscale(Ra, Rb, BLEND_MODE) - Ra) * Ab\[br]\[tb]\[tb]Go = Ga + (get_sample_grayscale(Ga, Gb, BLEND_MODE) - Ga) * Ab\[br]\[tb]\[tb]Bo = Ba + (get_sample_grayscale(Ba, Bb, BLEND_MODE) - Ba) * Ab\[br]\[br]\[tb]\[tb]Rb = Rb * Ab\[br]\[tb]\[tb]Gb = Gb * Ab\[br]\[tb]\[tb]Bb = Bb * Ab\[br]\[br]\[tb]\[tb]Ro = (Rb + (Ro - Rb) * Aa) * rAo\[br]\[tb]\[tb]Go = (Gb + (Go - Gb) * Aa) * rAo\[br]\[tb]\[tb]Bo = (Bb + (Bo - Bb) * Aa) * rAo\[br]\[br]\[tb]\[tb]return Ro, Go, Bo, Ao \[br]\[tb]else\[br]\[tb]\[tb]return Rb,Gb,Bb,Ab\[br]\[tb]end\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+			<FOREGROUND source="colormapcontrol 02" red="1" green="1" blue="1" alpha="1"/>
+			<BACKGROUND source="image3 01" red="0" green="0" blue="0" alpha="1"/>
+			<BLEND_MODE source="scriptmap27 01"/>
+			<OPACITY value="1"/>
+		</ScriptMap16>
+		<ScriptMap17 id="scriptmap17 01">
+			<Script value="function prepare()\[br]\[tb]-- This function is called once,\[br]\[tb]-- before the rendering begins.\[br]\[tb]-- Use it for querying non-mapped\[br]\[tb]-- inputs and precalculation.\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v = math.max(x, y)\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap17>
+		<ScriptMap18 id="scriptmap18 01">
+			<Script value="function prepare()\[br]\[tb]-- This function is called once,\[br]\[tb]-- before the rendering begins.\[br]\[tb]-- Use it for querying non-mapped\[br]\[tb]-- inputs and precalculation.\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v = math.min(x, y)\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap18>
+		<ScriptMap19 id="scriptmap19 01">
+			<Script value="function prepare()\[br]\[tb]-- This function is called once,\[br]\[tb]-- before the rendering begins.\[br]\[tb]-- Use it for querying non-mapped\[br]\[tb]-- inputs and precalculation.\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v = x * y\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap19>
+		<ScriptMap20 id="scriptmap20 01">
+			<Script value="function prepare()\[br]\[tb]-- This function is called once,\[br]\[tb]-- before the rendering begins.\[br]\[tb]-- Use it for querying non-mapped\[br]\[tb]-- inputs and precalculation.\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v = x + y\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap20>
+		<ScriptMap21 id="scriptmap21 01">
+			<Script value="function prepare()\[br]\[tb]-- This function is called once,\[br]\[tb]-- before the rendering begins.\[br]\[tb]-- Use it for querying non-mapped\[br]\[tb]-- inputs and precalculation.\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v = x - y\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap21>
+		<ScriptMap22 id="scriptmap22 01">
+			<Script value="function prepare()\[br]\[tb]-- This function is called once,\[br]\[tb]-- before the rendering begins.\[br]\[tb]-- Use it for querying non-mapped\[br]\[tb]-- inputs and precalculation.\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v = 1\[br]\[tb]if y &gt; 0 then\[br]\[tb]\[tb]v = y / x\[br]\[tb]end\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap22>
+		<ScriptMap23 id="scriptmap23 01">
+			<Script value="-- (C) 2010 Michael Hansen Buur\[br]\[br]-- Experimental blendmode\[br]\[br]function prepare()\[br]\[tb]curved = (1 == get_checkbox_input(CURVED))\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]if curved then\[br]\[tb]\[tb]y = math.sin(y * math.pi - math.pi * 0.5) * 0.5 + 0.5\[br]\[tb]end\[br]\[tb]local v = 1\[br]\[tb]if (y &gt; 0) and (y &lt; 1) then\[br]\[tb]\[tb]v = math.min(x / y, (1 - x) / (1 - y))\[br]\[tb]end\[br]\[tb]--[[ \[br]\[tb]v = 1 - v\[br]\[tb]if y &gt; x then\[br]\[tb]\[tb]v = - v\[tb]\[br]\[tb]end\[br]\[tb]v = v * 0.5 + 0.5\[br]\[tb]]]\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+			<CURVED value="true"/>
+		</ScriptMap23>
+		<ScriptMap24 id="scriptmap24 01">
+			<Script value="function prepare()\[br]\[tb]-- This function is called once,\[br]\[tb]-- before the rendering begins.\[br]\[tb]-- Use it for querying non-mapped\[br]\[tb]-- inputs and precalculation.\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v = math.abs(x - y)\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap24>
+		<ScriptMap25 id="scriptmap25 01">
+			<Script value="function prepare()\[br]\[tb]-- This function is called once,\[br]\[tb]-- before the rendering begins.\[br]\[tb]-- Use it for querying non-mapped\[br]\[tb]-- inputs and precalculation.\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v = math.sqrt(x * x + y * y)\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap25>
+		<ScriptMap26 id="scriptmap26 01">
+			<Script value="-- (C) 2010 Michael Hansen Buur\[br]function prepare()\[br]\[tb]Q = 1 / math.sqrt(2)\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v\[br]\[tb]if y &gt; 0.5 then\[br]\[tb]\[tb]y = y * 2 - 1\[br]\[tb]\[tb]v = math.sqrt(x * x + y * y)\[br]\[tb]else\[br]\[tb]\[tb]x = 1 - x\[br]\[tb]\[tb]y = y * 2 - 1\[br]\[tb]\[tb]v = 1 - math.sqrt(x * x + y * y)\[br]\[tb]end\[br]\[tb]\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap26>
+		<ScriptMap27 id="scriptmap27 01">
+			<Script value="function prepare()\[br]\[tb]vari = get_intslider_input(VARIANT)\[br]\[tb]invF = (vari == 2) or (vari == 4)\[br]\[tb]invB = (vari == 3) or (vari == 4)\[br]\[tb]invR = (1 == get_checkbox_input(INVERT_RESULT))\[br]\[tb]influence = get_slider_input(INFLUENCE)\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local f = y\[br]\[tb]if invF then x = 1 - x end\[br]\[tb]if invB then y = 1 - y end\[br]\[tb]local r = get_sample_grayscale(x, y, BLEND_MODE)\[br]\[tb]if invR then r = 1 - r end\[br]\[tb]r = f + (r - f) * influence\[br]\[tb]return r,r,r,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+			<BLEND_MODE source="scriptmap36 01" value="0.2999999999999999889"/>
+			<INFLUENCE source="slidercontrol 01" value="0">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</INFLUENCE>
+			<VARIANT source="intslidercontrol 01" value="1">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</VARIANT>
+			<INVERT_RESULT source="checkboxcontrol 38" value="true">
+				<Invert value="false"/>
+			</INVERT_RESULT>
+		</ScriptMap27>
+		<ScriptMap28 id="scriptmap28 01">
+			<Script value="function prepare()\[br]\[tb]-- This function is called once,\[br]\[tb]-- before the rendering begins.\[br]\[tb]-- Use it for querying non-mapped\[br]\[tb]-- inputs and precalculation.\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v = 1 - math.abs(x - y)\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap28>
+		<ScriptMap29 id="scriptmap29 01">
+			<Script value="function prepare()\[br]\[tb]-- This function is called once,\[br]\[tb]-- before the rendering begins.\[br]\[tb]-- Use it for querying non-mapped\[br]\[tb]-- inputs and precalculation.\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v = x + y - 2 * x * y\[br]\[tb]\[tb]\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap29>
+		<ScriptMap30 id="scriptmap30 01">
+			<Script value="function prepare()\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]v = 1 - math.abs(1 - x - y)\[tb]\[tb]\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap30>
+		<ScriptMap31 id="scriptmap31 01">
+			<Script value="-- (C) 2006 Michael Hansen Buur\[br]function prepare()\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]v = y\[br]\[tb]if y &lt; 1 then\[br]\[tb]\[tb]v = x * x / (1 - y) \[br]\[tb]end\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap31>
+		<ScriptMap32 id="scriptmap32 01">
+			<Script value="function prepare() end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v = 1\[br]\[tb]x = x * 2\[br]\[tb]if x &lt; 1 then\[br]\[tb]\[tb]if x &gt; 0 then\[br]\[tb]\[tb]\[tb]v = 1 - (1 - y) / x\[br]\[tb]\[tb]end\[br]\[tb]else\[br]\[tb]\[tb]x = 2 - x\[br]\[tb]\[tb]if x &gt; 0 then\[br]\[tb]\[tb]\[tb]v = y / x\[br]\[tb]\[tb]end\[br]\[tb]end\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap32>
+		<ScriptMap33 id="scriptmap33 01">
+			<Script value="function prepare() end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v = 1\[br]\[tb]\[br]\[tb]if x &lt; 0.5 then\[br]\[tb]\[tb]v = math.min(x * 2, y)\[br]\[tb]else\[br]\[tb]\[tb]v = math.max(2 * (x - 0.5), y)\[br]\[tb]end\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap33>
+		<ScriptMap34 id="scriptmap34 01">
+			<Script value="-- (C) 2010 Michael Hansen Buur\[br]function prepare()\[br]\[tb]Q = 1 / math.sqrt(2)\[br]end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v\[br]\[tb]x = 1 - x\[br]\[tb]y = 1 - y\[br]\[tb]v = 1 - math.sqrt(x * x + y * y) * Q \[br]\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+		</ScriptMap34>
+		<ScriptMap35 id="scriptmap35 01">
+			<Script value="function prepare() end;\[br]\[br]function get_sample(x, y)\[br]\[tb]local v, f\[br]\[tb]f = get_sample_grayscale(x, y, FILL)\[br]\[tb]v = (x + y) - 1\[br]\[br]\[tb]if f &lt; 1 then\[br]\[br]\[tb]\[tb]v = v * (1 / (1 - f))\[br]\[tb]else\[br]\[tb]\[tb]if v &gt; 0 then\[br]\[tb]\[tb]\[tb]v = 1\[br]\[tb]\[tb]else\[br]\[tb]\[tb]\[tb]v = -1\[br]\[tb]\[tb]end\[br]\[tb]end\[br]\[tb]v = v * 0.5 + 0.5\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+			<FILL value="0.8499999999999999778"/>
+		</ScriptMap35>
+		<ScriptMap36 id="scriptmap36 01">
+			<Script value="-- (C) 2012 Michael Hansen Buur\[br]\[br]-- This blend mode has been designed to \[br]-- preserve highlights and shadows from\[br]-- both foreground and background\[br]-- while averaging midtones\[br]\[br]-- It comes in two variants:\[br]-- Linear has more contrast than smooth\[br]\[br]get_sample = get_sample_linear\[br]\[br]function prepare() \[br]\[tb]QPI = 2 / math.pi\[br]\[tb]if (1 == get_checkbox_input(LINEAR)) then\[br]\[tb]\[tb]get_sample = get_sample_linear\[tb]\[tb]\[br]\[tb]else\[br]\[tb]\[tb]get_sample = get_sample_smooth\[br]\[tb]end\[br]\[br]end;\[br]\[br]function get_sample_linear(x, y)\[br]\[tb]local v\[br]\[tb]if ((1 - x) + y) &gt; 1 then\[br]\[tb]\[tb]v = math.atan2(x, 1 - y) * QPI\[br]\[tb]else\[br]\[tb]\[tb]v = 1 - math.atan2(1 - x, y) * QPI\[br]\[tb]end\[br]\[tb]return v,v,v,1\[br]\[br]end;\[br]\[br]function get_sample_smooth(x, y)\[br]\[tb]local v, v1, v2\[br]\[tb]v1 = math.atan2(x, 1 - y) * QPI\[br]\[tb]v2 = 1 - math.atan2(1 - x, y) * QPI\[br]\[tb]local w = ((1 - x) + y) * 0.5\[br]\[tb]v = v2 + (v1 - v2) * w\[br]\[tb]return v,v,v,1\[br]end;"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+			<LINEAR value="false"/>
+		</ScriptMap36>
+		<Blend5 id="blend5 03">
+			<Mode value="6"/>
+			<Foreground source="profilegradient2 03" red="1" green="1" blue="1" alpha="1"/>
+			<Background source="profilegradient2 04" red="0" green="0" blue="0" alpha="1"/>
+			<Opacity value="1"/>
+		</Blend5>
+		<CheckboxControl id="checkboxcontrol 01">
+			<Name value-en="Absorb (fast)"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 02">
+			<Name value-en="Real Alpha Mix Blend"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 19">
+			<Name value-en="Lighten"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 20">
+			<Name value-en="Darken"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 21">
+			<Name value-en="Multiply"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 22">
+			<Name value-en="Add"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 23">
+			<Name value-en="Subtract"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 24">
+			<Name value-en="Divide"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 25">
+			<Name value-en="Sample Blend Modes"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 26">
+			<Name value-en="Helix"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 27">
+			<Name value-en="Difference"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 28">
+			<Name value-en="Extract B.M. from FF"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 29">
+			<Name value-en="Euclidean"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 30">
+			<Name value-en="Euclidean Overlay"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 31">
+			<Name value-en="Blend Mode Settings"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 32">
+			<Name value-en="X = Foreground"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 33">
+			<Name value-en="Similarity / Phoenix"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 34">
+			<Name value-en="Y = Background"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 35">
+			<Name value-en="Exclusion"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 36">
+			<Name value-en="Negation"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 37">
+			<Name value-en="Reflect"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 38">
+			<Name value-en="Invert"/>
+			<UseRemapping value="false"/>
+			<Checked value="false"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 39">
+			<Name value-en="Vivid Light"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 40">
+			<Name value-en="Pin Light"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 41">
+			<Name value-en="Back Light"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 42">
+			<Name value-en="Hard Mix"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<CheckboxControl id="checkboxcontrol 43">
+			<Name value-en="Absorb"/>
+			<UseRemapping value="false"/>
+			<Checked value="true"/>
+		</CheckboxControl>
+		<ColorMapControl id="colormapcontrol 02">
+			<Name value-en="Foreground"/>
+			<InputImage value="TREE_OPAQUE"/>
+			<ExternalImagesMode value="1"/>
+			<HDRMode value="1"/>
+			<HorizontalAnchor value="1"/>
+			<VerticalAnchor value="1"/>
+			<PlacementMode value="0"/>
+			<TilingMode value="0"/>
+			<Color red="1" green="0.5" blue="0" alpha="1"/>
+			<AlphaMode value="1"/>
+		</ColorMapControl>
+		<Image3 id="image3 01"/>
+		<IntSliderControl id="intslidercontrol 01">
+			<Name value-en="Variant"/>
+			<UseRemapping value="false"/>
+			<Value value="1"/>
+			<RangeMax value="4"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<ProfileGradient2 id="profilegradient2 03">
+			<Color1 red="0" green="0" blue="0" alpha="1"/>
+			<Color2 red="1" green="1" blue="1" alpha="1"/>
+			<Offset value="0"/>
+			<Rotate value="0"/>
+			<Repeat value="1"/>
+			<Profile value="0"/>
+			<Mirror value="false"/>
+		</ProfileGradient2>
+		<ProfileGradient2 id="profilegradient2 04">
+			<Color1 red="0" green="0" blue="0" alpha="1"/>
+			<Color2 red="1" green="1" blue="1" alpha="1"/>
+			<Offset value="0"/>
+			<Rotate value="1"/>
+			<Repeat value="1"/>
+			<Profile value="0"/>
+			<Mirror value="false"/>
+		</ProfileGradient2>
+		<SliderControl id="slidercontrol 01">
+			<Name value-en="Influence"/>
+			<UseRemapping value="false"/>
+			<Value value="1"/>
+		</SliderControl>
+	</Components>
+	<GroupNames/>
+	<Groups/>
+	<SettingsOverride>
+		<Size value="0"/>
+		<Variation value="0"/>
+		<Seamless value="0"/>
+		<ResultBlending value="0"/>
+	</SettingsOverride>
+	<Presets>
+		<DefaultPreset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="1" seamless="false" antialiasing="0" map_type="0" edges_only="true" clip_hdr_for_result="true"/>
+			<Lighting>
+				<Height value="0.2000000000000000111"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.2000000000000000111"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.2999999999999999889"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<CheckboxControl id="checkboxcontrol 38">
+					<Checked value="false"/>
+				</CheckboxControl>
+				<ColorMapControl id="colormapcontrol 02">
+					<InputImage value="TREE_OPAQUE"/>
+					<HorizontalAnchor value="1"/>
+					<VerticalAnchor value="1"/>
+					<PlacementMode value="0"/>
+					<TilingMode value="0"/>
+					<Color red="1" green="0.5" blue="0" alpha="1"/>
+				</ColorMapControl>
+				<IntSliderControl id="intslidercontrol 01">
+					<Value value="1"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 01">
+					<Value value="1"/>
+				</SliderControl>
+			</Controls>
+		</DefaultPreset>
+	</Presets>
+	<Locks>
+		<Settings size="false" variation="false"/>
+		<Lighting elements="false" environment="false" brightness="false" saturation="false" height="false"/>
+		<Controls>
+			<Control id="checkboxcontrol 38" lock="false"/>
+			<Control id="colormapcontrol 02" lock="false"/>
+			<Control id="intslidercontrol 01" lock="false"/>
+			<Control id="slidercontrol 01" lock="false"/>
+		</Controls>
+	</Locks>
+	<Information author="Michael Hansen" name-en="Blend Modes" url="" description-en="Components included:[br]- Average Color (hdr map input)[br]- Minimum, Median &amp; Maximum Levels (hdr map input)[br]- Auto Contrast / Levels (both supported)[br]- Assemble RGBA" keywords-en="" update_notes-en="" major_version="8" minor_version="4"/>
+	<ControlsOrder>
+		<Automatic value="true"/>
+	</ControlsOrder>
+	<FilterEditor>
+		<Groups/>
+		<ThumbnailSize value="1"/>
+		<Canvas left="470" top="-4887" zoom_factor="1"/>
+		<Viewport left="0" top="30" zoom_factor="1"/>
+		<LockPreview>
+			<Locked value="true"/>
+			<LockedComponent name="scriptmap34 01"/>
+		</LockPreview>
+		<Item id="blend5 03">
+			<Position left="1696" top="-6736"/>
+		</Item>
+		<Item id="checkboxcontrol 01">
+			<Position left="1696" top="-2768"/>
+		</Item>
+		<Item id="checkboxcontrol 02">
+			<Position left="688" top="-7056"/>
+		</Item>
+		<Item id="checkboxcontrol 19">
+			<Position left="1696" top="-6496"/>
+		</Item>
+		<Item id="checkboxcontrol 20">
+			<Position left="1696" top="-6304"/>
+		</Item>
+		<Item id="checkboxcontrol 21">
+			<Position left="1696" top="-5728"/>
+		</Item>
+		<Item id="checkboxcontrol 22">
+			<Position left="1696" top="-6112"/>
+		</Item>
+		<Item id="checkboxcontrol 23">
+			<Position left="1696" top="-5920"/>
+		</Item>
+		<Item id="checkboxcontrol 24">
+			<Position left="1696" top="-5536"/>
+		</Item>
+		<Item id="checkboxcontrol 25">
+			<Position left="1712" top="-7136"/>
+		</Item>
+		<Item id="checkboxcontrol 26">
+			<Position left="1696" top="-4752"/>
+		</Item>
+		<Item id="checkboxcontrol 27">
+			<Position left="1696" top="-5344"/>
+		</Item>
+		<Item id="checkboxcontrol 28">
+			<Position left="1696" top="-6800"/>
+		</Item>
+		<Item id="checkboxcontrol 29">
+			<Position left="1696" top="-4944"/>
+		</Item>
+		<Item id="checkboxcontrol 30">
+			<Position left="1696" top="-3968"/>
+		</Item>
+		<Item id="checkboxcontrol 31">
+			<Position left="1072" top="-6768"/>
+		</Item>
+		<Item id="checkboxcontrol 32">
+			<Position left="1712" top="-7072"/>
+		</Item>
+		<Item id="checkboxcontrol 33">
+			<Position left="1696" top="-5152"/>
+		</Item>
+		<Item id="checkboxcontrol 34">
+			<Position left="1712" top="-7008"/>
+		</Item>
+		<Item id="checkboxcontrol 35">
+			<Position left="1696" top="-4560"/>
+		</Item>
+		<Item id="checkboxcontrol 36">
+			<Position left="1696" top="-4368"/>
+		</Item>
+		<Item id="checkboxcontrol 37">
+			<Position left="1696" top="-4176"/>
+		</Item>
+		<Item id="checkboxcontrol 38">
+			<Position left="1072" top="-6432"/>
+		</Item>
+		<Item id="checkboxcontrol 39">
+			<Position left="1696" top="-3760"/>
+		</Item>
+		<Item id="checkboxcontrol 40">
+			<Position left="1696" top="-3568"/>
+		</Item>
+		<Item id="checkboxcontrol 41">
+			<Position left="1696" top="-3376"/>
+		</Item>
+		<Item id="checkboxcontrol 42">
+			<Position left="1696" top="-3184"/>
+		</Item>
+		<Item id="checkboxcontrol 43">
+			<Position left="1696" top="-2976"/>
+		</Item>
+		<Item id="colormapcontrol 02">
+			<Position left="1120" top="-7024"/>
+		</Item>
+		<Item id="image3 01">
+			<Position left="1120" top="-6960"/>
+		</Item>
+		<Item id="intslidercontrol 01">
+			<Position left="1072" top="-6496"/>
+		</Item>
+		<Item id="profilegradient2 03">
+			<Position left="1920" top="-6832"/>
+		</Item>
+		<Item id="profilegradient2 04">
+			<Position left="1920" top="-6672"/>
+		</Item>
+		<Item id="result">
+			<Position left="176" top="-7024"/>
+		</Item>
+		<Item id="scriptmap01 01">
+			<Position left="1696" top="-2704"/>
+		</Item>
+		<Item id="scriptmap16 01">
+			<Position left="656" top="-6992"/>
+		</Item>
+		<Item id="scriptmap17 01">
+			<Position left="1696" top="-6448"/>
+		</Item>
+		<Item id="scriptmap18 01">
+			<Position left="1696" top="-6256"/>
+		</Item>
+		<Item id="scriptmap19 01">
+			<Position left="1696" top="-5680"/>
+		</Item>
+		<Item id="scriptmap20 01">
+			<Position left="1696" top="-6064"/>
+		</Item>
+		<Item id="scriptmap21 01">
+			<Position left="1696" top="-5872"/>
+		</Item>
+		<Item id="scriptmap22 01">
+			<Position left="1696" top="-5488"/>
+		</Item>
+		<Item id="scriptmap23 01">
+			<Position left="1696" top="-4704"/>
+		</Item>
+		<Item id="scriptmap24 01">
+			<Position left="1696" top="-5296"/>
+		</Item>
+		<Item id="scriptmap25 01">
+			<Position left="1696" top="-4896"/>
+		</Item>
+		<Item id="scriptmap26 01">
+			<Position left="1696" top="-3920"/>
+		</Item>
+		<Item id="scriptmap27 01">
+			<Position left="1024" top="-6704"/>
+		</Item>
+		<Item id="scriptmap28 01">
+			<Position left="1696" top="-5104"/>
+		</Item>
+		<Item id="scriptmap29 01">
+			<Position left="1696" top="-4512"/>
+		</Item>
+		<Item id="scriptmap30 01">
+			<Position left="1696" top="-4320"/>
+		</Item>
+		<Item id="scriptmap31 01">
+			<Position left="1696" top="-4128"/>
+		</Item>
+		<Item id="scriptmap32 01">
+			<Position left="1696" top="-3712"/>
+		</Item>
+		<Item id="scriptmap33 01">
+			<Position left="1696" top="-3520"/>
+		</Item>
+		<Item id="scriptmap34 01">
+			<Position left="1696" top="-3328"/>
+		</Item>
+		<Item id="scriptmap35 01">
+			<Position left="1696" top="-3136"/>
+		</Item>
+		<Item id="scriptmap36 01">
+			<Position left="1696" top="-2912"/>
+		</Item>
+		<Item id="slidercontrol 01">
+			<Position left="1072" top="-6560"/>
+		</Item>
+	</FilterEditor>
+</Filter>

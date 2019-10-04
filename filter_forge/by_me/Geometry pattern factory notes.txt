@@ -1,0 +1,42 @@
+silly simple (I overcomplicated this before I looked it up): https://math.stackexchange.com/questions/149800/how-do-i-calculate-the-number-of-different-combinations-of-multiple-sets-elemen
+
+possible combination of controls in this filter, from possible numbers in each set:
+frame width: 4
+frame margin: 4
+frame corners: 3
+frame bevel: 4
+checker H: 3
+checker V: 3
+checker inclined: 2
+kaleido offset H: 8
+kaleido offset V: 8
+kaliedo shape size: 10
+H V C or K: 4
+high pass radius: 100, but let's break that up into increments of 4, so: 20
+
+4 * 4 * 3 * 4 * 3 * 3 * 2 * 8 * 8 * 10 * 4 * 20 =
+176,947,200
+
+~177 million possible combinations, but some different control combinations can produce the same result.
+
+V2
+possible combinations of poly/frame checker choices:
+
+poly
+poly invert
+frame
+frame invert
+
+GIVES 6 possible combinations (pick 2):
+poly, poly invert
+poly, frame
+poly, frame invert
+~
+poly invert, frame
+poly invert, frame invert
+~
+frame, frame invert
+
+V3? Alt controls?
+- unchecking monochrome on high pass and forwarding to desaturate various modes produces (more?) interesting grayscale patterns.
+- median, minimum, or maximum on the output (or maybe also just before the high pass) produces interesting variations that adjust the amount of black, white and gray. median especially alters things more.

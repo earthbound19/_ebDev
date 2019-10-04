@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Filter>
+	<CustomClasses>
+		<MapGroup name="MapGroup01" display_name-en="Kernel">
+			<Grayscale name="groupped_slidercontrol_01" display_name="Frequency" samplable="false" hdr="false" required="false"/>
+			<Grayscale name="groupped_slidercontrol_02" display_name="Phase" samplable="false" hdr="false" required="false"/>
+			<Grayscale name="groupped_slidercontrol_03" display_name="Rotation" samplable="false" hdr="false" required="false"/>
+		</MapGroup>
+	</CustomClasses>
+	<Components>
+		<Result id="result">
+			<Source source="brightnesscontrast2 01"/>
+			<FilterType value="0"/>
+			<Lighting>
+				<Height value="0.25"/>
+				<Environment>
+					<Source value="Church"/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+		</Result>
+		<Bomber3 id="bomber3 01">
+			<HDRParticle1 source="mapgroup01 02" red="0" green="0.15686274509803921" blue="0.39215686274509803" alpha="1"/>
+			<HDRParticle2 red="0" green="0.50980392156862742" blue="1" alpha="1"/>
+			<HDRParticle3 red="1" green="0.96078431372549022" blue="0.62745098039215685" alpha="1"/>
+			<HDRParticle4 red="1" green="0.66666666666666663" blue="0" alpha="1"/>
+			<HDRParticle5 red="0.62745098039215685" green="0.29411764705882354" blue="0" alpha="1"/>
+			<Frequency1 value="1"/>
+			<Frequency2 value="0"/>
+			<Frequency3 value="0"/>
+			<Frequency4 value="0"/>
+			<Frequency5 value="0"/>
+			<HDRBackground red="0" green="0" blue="0" alpha="1"/>
+			<Opacity value="1"/>
+			<Size value="1"/>
+			<Rotation value="0"/>
+			<OffsetH value="0"/>
+			<OffsetV value="0"/>
+			<Squash value="0"/>
+			<OpacityChaos value="0"/>
+			<SizeChaos source="slidercontrol 03" value="0.44">
+				<Minimum value="0"/>
+				<Maximum value="0.40000000000000002"/>
+			</SizeChaos>
+			<RotationChaos source="slidercontrol 01" value="1">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</RotationChaos>
+			<OffsetChaosH value="1"/>
+			<OffsetChaosV value="1"/>
+			<SquashChaos value="0"/>
+			<HDRTint red="0" green="0" blue="0" alpha="1"/>
+			<TintAmount value="0"/>
+			<Roughness value="0"/>
+			<DepthMap/>
+			<HDRParticleMode value="0"/>
+			<HDRTintMode value="0"/>
+			<OctavesScaleMode value="0"/>
+			<LayerOrder value="0"/>
+			<DepthSorting value="0"/>
+			<Details value="0"/>
+			<ParticleRepeats value="6"/>
+			<ParticlePerCell value="5"/>
+			<Variation value="18293"/>
+			<HDRMode value="true"/>
+		</Bomber3>
+		<BrightnessContrast2 id="brightnesscontrast2 01">
+			<Source source="bomber3 01"/>
+			<Brightness value="0"/>
+			<Contrast source="slidercontrol 06" value="0.020000000000000018">
+				<Minimum value="-1"/>
+				<Maximum value="0"/>
+			</Contrast>
+			<PreserveColor value="false"/>
+		</BrightnessContrast2>
+		<MapGroup01 id="mapgroup01 02">
+			<groupped_slidercontrol_01 source="slidercontrol 02" value="0.29999999999999999">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</groupped_slidercontrol_01>
+			<groupped_slidercontrol_02 source="slidercontrol 04" value="0.25">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</groupped_slidercontrol_02>
+			<groupped_slidercontrol_03 source="slidercontrol 05" value="0.65000000000000002">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</groupped_slidercontrol_03>
+		</MapGroup01>
+		<SliderControl id="slidercontrol 01">
+			<Name value-en="Rotation Chaos"/>
+			<UseRemapping value="false"/>
+			<Value value="1"/>
+		</SliderControl>
+		<SliderControl id="slidercontrol 02">
+			<Name value-en="Kernel Frequency"/>
+			<UseRemapping value="false"/>
+			<Value value="0.23000000000000001"/>
+		</SliderControl>
+		<SliderControl id="slidercontrol 03">
+			<Name value-en="Size Chaos"/>
+			<UseRemapping value="true"/>
+			<Value value="0.53000000000000003"/>
+		</SliderControl>
+		<SliderControl id="slidercontrol 04">
+			<Name value-en="Kernel Phase"/>
+			<UseRemapping value="false"/>
+			<Value value="0.10000000000000001"/>
+		</SliderControl>
+		<SliderControl id="slidercontrol 05">
+			<Name value-en="Kernel Rotation"/>
+			<UseRemapping value="false"/>
+			<Value value="0.66000000000000003"/>
+		</SliderControl>
+		<SliderControl id="slidercontrol 06">
+			<Name value-en="Contrast"/>
+			<UseRemapping value="true"/>
+			<Value value="1"/>
+		</SliderControl>
+	</Components>
+	<GroupNames>
+		<Group id="mapgroup01 02">
+			<Components>
+				<Component name="ellipse 03" group_id="groupped_ellipse_01"/>
+				<Component name="gaussiancurve 03" group_id="groupped_gaussiancurve_01"/>
+				<Component name="mapgroupresult 02" group_id="groupped_mapgroupresult_01"/>
+				<Component name="profilegradient2 03" group_id="groupped_profilegradient2_01"/>
+				<Component name="repeatcurve 03" group_id="groupped_repeatcurve_01"/>
+				<Component name="rotate 02" group_id="groupped_rotate_01"/>
+				<Component name="slidercontrol 12" group_id="groupped_slidercontrol_01"/>
+				<Component name="slidercontrol 11" group_id="groupped_slidercontrol_02"/>
+				<Component name="slidercontrol 10" group_id="groupped_slidercontrol_03"/>
+				<Component name="wavecurve 03" group_id="groupped_wavecurve_01"/>
+			</Components>
+		</Group>
+	</GroupNames>
+	<Groups>
+		<Group id="MapGroup01">
+			<Components>
+				<MapGroupResult id="groupped_mapgroupresult_01">
+					<Source source="groupped_ellipse_01"/>
+				</MapGroupResult>
+				<Ellipse id="groupped_ellipse_01">
+					<Color source="groupped_rotate_01" red="1" green="0.50196078431372548" blue="0" alpha="1"/>
+					<Background red="1" green="1" blue="1" alpha="0"/>
+					<Radius value="1"/>
+					<Rotation value="0"/>
+					<Squash value="0"/>
+					<BevelWidth value="1"/>
+					<BevelCurve source="groupped_repeatcurve_01" value="0"/>
+				</Ellipse>
+				<GaussianCurve id="groupped_gaussiancurve_01">
+					<Width value="1"/>
+					<Minimum value="0"/>
+					<Maximum value="1"/>
+					<Invert value="false"/>
+				</GaussianCurve>
+				<ProfileGradient2 id="groupped_profilegradient2_01">
+					<Color1 red="0" green="0" blue="0" alpha="1"/>
+					<Color2 red="1" green="1" blue="1" alpha="1"/>
+					<Offset value="0"/>
+					<Rotate value="0"/>
+					<Repeat value="1"/>
+					<Profile source="groupped_wavecurve_01" value="0"/>
+					<Mirror value="false"/>
+				</ProfileGradient2>
+				<RepeatCurve id="groupped_repeatcurve_01">
+					<Repeat value="0.0050000000000000001"/>
+					<Mirror value="false"/>
+					<Source source="groupped_gaussiancurve_01"/>
+				</RepeatCurve>
+				<Rotate id="groupped_rotate_01">
+					<Source source="groupped_profilegradient2_01"/>
+					<Rotation source="groupped_slidercontrol_03" value="0.16">
+						<Minimum value="0"/>
+						<Maximum value="1"/>
+					</Rotation>
+					<OriginX value="0.5"/>
+					<OriginY value="0.5"/>
+					<Percentage value="1"/>
+					<Mode value="0"/>
+				</Rotate>
+				<SliderControl id="groupped_slidercontrol_03">
+					<Name value-en="Rotation"/>
+					<UseRemapping value="false"/>
+					<Value value="0.66000000000000003"/>
+				</SliderControl>
+				<SliderControl id="groupped_slidercontrol_02">
+					<Name value-en="Phase"/>
+					<UseRemapping value="false"/>
+					<Value value="0.10000000000000001"/>
+				</SliderControl>
+				<SliderControl id="groupped_slidercontrol_01">
+					<Name value-en="Frequency"/>
+					<UseRemapping value="true"/>
+					<Value value="0.23000000000000001"/>
+				</SliderControl>
+				<WaveCurve id="groupped_wavecurve_01">
+					<Shape value="0"/>
+					<AVariance value="0"/>
+					<FVariance value="0"/>
+					<Phase source="groupped_slidercontrol_02" value="-0.75999999999999979">
+						<Minimum value="-1"/>
+						<Maximum value="1"/>
+					</Phase>
+					<Minimum value="0"/>
+					<Maximum value="1"/>
+					<Wave value="0"/>
+					<Frequency source="groupped_slidercontrol_01" value="0.02">
+						<Minimum value="0"/>
+						<Maximum value="0.089999999999999997"/>
+					</Frequency>
+					<Variation value="1"/>
+					<Invert value="false"/>
+					<Randomizable value="true"/>
+				</WaveCurve>
+			</Components>
+		</Group>
+	</Groups>
+	<SettingsOverride>
+		<Size value="0"/>
+		<Variation value="0"/>
+		<Seamless value="0"/>
+		<ResultBlending value="0"/>
+	</SettingsOverride>
+	<Presets>
+		<DefaultPreset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.0411612696336987" variation="1" seamless="false" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="true"/>
+			<Lighting>
+				<Height value="0.25"/>
+				<Environment>
+					<Source value="Church"/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<SliderControl id="slidercontrol 01">
+					<Value value="1"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.23000000000000001"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 03">
+					<Value value="0.53000000000000003"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 04">
+					<Value value="0.10000000000000001"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 05">
+					<Value value="0.66000000000000003"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 06">
+					<Value value="1"/>
+				</SliderControl>
+			</Controls>
+		</DefaultPreset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1.0411612696336987" variation="15819" seamless="false" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="true"/>
+			<Lighting>
+				<Height value="0.25"/>
+				<Environment>
+					<Source value="Church"/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.14999999999999999"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.46000000000000002"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 03">
+					<Value value="0.53000000000000003"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 04">
+					<Value value="0.10000000000000001"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 05">
+					<Value value="0.66000000000000003"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 06">
+					<Value value="1"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="2.3614841928151842" variation="15819" seamless="false" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="true"/>
+			<Lighting>
+				<Height value="0.25"/>
+				<Environment>
+					<Source value="Church"/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.11"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 03">
+					<Value value="0"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 04">
+					<Value value="0"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 05">
+					<Value value="0.95000000000000007"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 06">
+					<Value value="1"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="2.1584472993507386" variation="15819" seamless="false" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="true"/>
+			<Lighting>
+				<Height value="0.25"/>
+				<Environment>
+					<Source value="Church"/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.26000000000000001"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.19"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 03">
+					<Value value="0"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 04">
+					<Value value="0.41000000000000003"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 05">
+					<Value value="0.45000000000000001"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 06">
+					<Value value="1"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="15819" seamless="false" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="true"/>
+			<Lighting>
+				<Height value="0.25"/>
+				<Environment>
+					<Source value="Church"/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.070000000000000007"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.67000000000000004"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 03">
+					<Value value="0"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 04">
+					<Value value="0.20999999999999999"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 05">
+					<Value value="0.25"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 06">
+					<Value value="0.83000000000000007"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="15819" seamless="false" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="true"/>
+			<Lighting>
+				<Height value="0.25"/>
+				<Environment>
+					<Source value="Church"/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.44"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.13"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 03">
+					<Value value="1"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 04">
+					<Value value="0.65000000000000002"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 05">
+					<Value value="0.25"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 06">
+					<Value value="0.83000000000000007"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+		<Preset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="2.96291028900227" variation="15819" seamless="false" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="true"/>
+			<Lighting>
+				<Height value="0.25"/>
+				<Environment>
+					<Source value="Church"/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.20000000000000001"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.29999999999999999"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<SliderControl id="slidercontrol 01">
+					<Value value="0.44"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 02">
+					<Value value="0.13"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 03">
+					<Value value="0.47999999999999998"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 04">
+					<Value value="0.65000000000000002"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 05">
+					<Value value="0.70000000000000007"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 06">
+					<Value value="1"/>
+				</SliderControl>
+			</Controls>
+		</Preset>
+	</Presets>
+	<Information author="raabix" name-en="Noise Gabor" url="" description-en="This is a very simple implementation of gabor noise. In this example I am using just one Kernela and I am not doing all of what would be possible.[br]Using several Kernels would allow us to have even more variation, but this snippet is a good starting point for modifications." keywords-en="gabor noise kernel bomber procedural snippet" update_notes-en="" major_version="4" minor_version="10"/>
+	<ControlsOrder>
+		<Automatic value="false"/>
+		<Items>
+			<Item id="slidercontrol 02" order="0"/>
+			<Item id="slidercontrol 04" order="1"/>
+			<Item id="slidercontrol 05" order="2"/>
+			<Item id="slidercontrol 01" order="3"/>
+			<Item id="slidercontrol 03" order="4"/>
+			<Item id="slidercontrol 06" order="5"/>
+		</Items>
+	</ControlsOrder>
+	<FilterEditor>
+		<Groups>
+			<Group id="MapGroup01">
+				<Canvas left="-231" top="-219" zoom_factor="0"/>
+				<Item id="groupped_ellipse_01">
+					<Position left="336" top="208"/>
+				</Item>
+				<Item id="groupped_gaussiancurve_01">
+					<Position left="1040" top="544"/>
+				</Item>
+				<Item id="groupped_mapgroupresult_01">
+					<Position left="112" top="224"/>
+				</Item>
+				<Item id="groupped_profilegradient2_01">
+					<Position left="848" top="288"/>
+				</Item>
+				<Item id="groupped_repeatcurve_01">
+					<Position left="816" top="512"/>
+				</Item>
+				<Item id="groupped_rotate_01">
+					<Position left="592" top="352"/>
+				</Item>
+				<Item id="groupped_slidercontrol_01">
+					<Position left="1392" top="416"/>
+				</Item>
+				<Item id="groupped_slidercontrol_02">
+					<Position left="1360" top="304"/>
+				</Item>
+				<Item id="groupped_slidercontrol_03">
+					<Position left="832" top="448"/>
+				</Item>
+				<Item id="groupped_wavecurve_01">
+					<Position left="1088" top="288"/>
+				</Item>
+			</Group>
+		</Groups>
+		<ThumbnailSize value="1"/>
+		<Canvas left="-860" top="-447" zoom_factor="0"/>
+		<Viewport left="62" top="42" zoom_factor="1"/>
+		<Item id="bomber3 01">
+			<Position left="16" top="-64"/>
+		</Item>
+		<Item id="brightnesscontrast2 01">
+			<Position left="-288" top="-64"/>
+		</Item>
+		<Item id="mapgroup01 02">
+			<Position left="336" top="-96"/>
+		</Item>
+		<Item id="result">
+			<Position left="-512" top="-64"/>
+		</Item>
+		<Item id="slidercontrol 01">
+			<Position left="336" top="336"/>
+		</Item>
+		<Item id="slidercontrol 02">
+			<Position left="624" top="-208"/>
+		</Item>
+		<Item id="slidercontrol 03">
+			<Position left="336" top="224"/>
+		</Item>
+		<Item id="slidercontrol 04">
+			<Position left="624" top="-128"/>
+		</Item>
+		<Item id="slidercontrol 05">
+			<Position left="624" top="-48"/>
+		</Item>
+		<Item id="slidercontrol 06">
+			<Position left="16" top="-144"/>
+		</Item>
+	</FilterEditor>
+</Filter>

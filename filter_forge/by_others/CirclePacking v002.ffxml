@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Filter>
+	<CustomClasses>
+		<ScriptMap name="ScriptMap03" display_name-en="">
+			<Grayscale name="MAX_RADIUS" display_name="max radius" samplable="false" required="false" hdr="false"/>
+			<Grayscale name="MIN_RADIUS" display_name="min radius" samplable="false" required="false" hdr="false"/>
+			<Grayscale name="SCALE" display_name="scale" samplable="false" required="false" hdr="false"/>
+			<IntSlider name="MODE" display_name="mode">
+				<Range min="1" max="3"/>
+			</IntSlider>
+			<IntSlider name="POINTS" display_name="points">
+				<Range min="1" max="10000"/>
+			</IntSlider>
+			<IntSlider name="SEED" display_name="seed">
+				<Range min="1" max="9999"/>
+			</IntSlider>
+		</ScriptMap>
+	</CustomClasses>
+	<Components>
+		<Result id="result">
+			<Source source="scriptmap03 01"/>
+			<FilterType value="0"/>
+			<Advanced value="false"/>
+			<Lighting>
+				<Height value="0.2000000000000000111"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.2000000000000000111"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.2999999999999999889"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+		</Result>
+		<ScriptMap03 id="scriptmap03 01">
+			<Script value="function prepare()\[br]\[tb]points = get_intslider_input(POINTS)\[br]\[tb]math.randomseed(get_intslider_input(SEED))\[br]\[tb]mode = get_intslider_input(MODE)\[br]\[tb]maxrad = get_slider_input(MAX_RADIUS) / 2 + 0.05\[br]\[tb]minrad = get_slider_input(MIN_RADIUS) / 20 + 0.005\[br]\[tb]scale = get_slider_input(SCALE) / 2 + 0.5\[br]\[tb]circles = {}\[br]\[tb]count = 0\[br]\[br]\[tb]if OUTPUT_WIDTH &gt; OUTPUT_HEIGHT then\[br]\[tb]\[tb]sizex = OUTPUT_WIDTH / OUTPUT_HEIGHT\[br]\[tb]\[tb]sizey = 1\[br]\[tb]else\[br]\[tb]\[tb]sizex = 1\[br]\[tb]\[tb]sizey = OUTPUT_HEIGHT / OUTPUT_WIDTH\[br]\[tb]end\[br]\[tb]\[br]\[tb]function distance (x1, y1, x2, y2)\[br]\[tb]\[tb]dist = math.sqrt((x1-x2)^2+(y1-y2)^2)\[br]\[tb]\[tb]return dist\[br]\[tb]end\[br]\[br]\[tb]for i=1, points do\[br]\[tb]\[tb]circle = { x = math.random()*sizex, y = math.random()*sizey, r = minrad, closest = maxrad, col = math.random(1,5)/5 }\[br]\[tb]\[tb]overlapping = false\[br]\[tb]\[tb]for j=1, count do\[br]\[tb]\[tb]\[tb]other = circles[j]\[br]\[tb]\[tb]\[tb]d = distance(circle.x, circle.y, other.x, other.y)\[br]\[tb]\[tb]\[tb]if d &lt; (circle.r + other.r) then\[br]\[tb]\[tb]\[tb]\[tb]overlapping = true\[br]\[tb]\[tb]\[tb]\[tb]break\[br]\[tb]\[tb]\[tb]end\[br]\[tb]\[tb]\[tb]if d - other.r &lt; circle.closest then\[br]\[tb]\[tb]\[tb]\[tb]circle.closest = d - other.r \[br]\[tb]\[tb]\[tb]end\[br]\[tb]\[tb]end\[br]\[br]\[tb]\[tb]if overlapping == false then\[br]\[tb]\[tb]\[tb]circle.r = circle.closest\[br]\[tb]\[tb]\[tb]table.insert(circles, circle)\[br]\[tb]\[tb]\[tb]count = count + 1\[br]\[tb]\[tb]end\[br]\[tb]end\[br]end\[br]\[br]function get_sample(x, y)\[br]\[tb]v=0\[br]\[tb]aa_zone = 0\[br]\[tb]for i=1, count do\[br]\[tb]\[tb]if distance(x, y, circles[i].x, circles[i].y) &lt; circles[i].r * scale then\[br]\[tb]\[tb]\[tb]if mode == 1 then\[br]\[tb]\[tb]\[tb]\[tb]v = circles[i].r / maxrad\[br]\[tb]\[tb]\[tb]elseif mode == 2 then\[br]\[tb]\[tb]\[tb]\[tb]v = circles[i].col\[br]\[tb]\[tb]\[tb]elseif mode == 3 then\[br]\[tb]\[tb]\[tb]\[tb]v = 1 - distance(x,y,circles[i].x, circles[i].y) / circles[i].r\[br]\[tb]\[tb]\[tb]end\[br]\[tb]\[tb]\[tb]aa_zone = combine_aa_zones(aa_zone, 1)\[br]\[tb]\[tb]\[tb]break\[br]\[tb]\[tb]end\[br]\[tb]end\[br]\[tb]return v, v, v, 1, aa_zone\[br]end"/>
+			<Settings>
+				<OutputType value="2"/>
+				<Discrete value="false"/>
+				<HDR value="true"/>
+				<Seamless value="false"/>
+				<Sizable value="true"/>
+				<Randomizable value="false"/>
+				<SafeScript value="true"/>
+			</Settings>
+			<MAX_RADIUS source="slidercontrol 10" value="0">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</MAX_RADIUS>
+			<MIN_RADIUS source="slidercontrol 12" value="0">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</MIN_RADIUS>
+			<SCALE source="slidercontrol 11" value="0">
+				<Minimum value="0"/>
+				<Maximum value="1"/>
+			</SCALE>
+			<MODE source="intslidercontrol 03" value="1">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</MODE>
+			<POINTS source="intslidercontrol 05" value="1">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</POINTS>
+			<SEED source="intslidercontrol 04" value="300">
+				<Step value="1"/>
+				<Offset value="0"/>
+				<Flip value="false"/>
+			</SEED>
+		</ScriptMap03>
+		<IntSliderControl id="intslidercontrol 03">
+			<Name value-en="mode"/>
+			<UseRemapping value="false"/>
+			<Value value="2"/>
+			<RangeMax value="3"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 04">
+			<Name value-en="seed"/>
+			<UseRemapping value="false"/>
+			<Value value="1234"/>
+			<RangeMax value="9999"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<IntSliderControl id="intslidercontrol 05">
+			<Name value-en="points"/>
+			<UseRemapping value="false"/>
+			<Value value="3000"/>
+			<RangeMax value="10000"/>
+			<ClampRange value="false"/>
+		</IntSliderControl>
+		<SliderControl id="slidercontrol 10">
+			<Name value-en="max radius"/>
+			<UseRemapping value="false"/>
+			<Value value="0.2000000000000000111"/>
+		</SliderControl>
+		<SliderControl id="slidercontrol 11">
+			<Name value-en="scale"/>
+			<UseRemapping value="false"/>
+			<Value value="0.9000000000000000222"/>
+		</SliderControl>
+		<SliderControl id="slidercontrol 12">
+			<Name value-en="min radius"/>
+			<UseRemapping value="false"/>
+			<Value value="0.0200000000000000004"/>
+		</SliderControl>
+	</Components>
+	<GroupNames/>
+	<Groups/>
+	<SettingsOverride>
+		<Size value="0"/>
+		<Variation value="0"/>
+		<Seamless value="0"/>
+		<ResultBlending value="0"/>
+	</SettingsOverride>
+	<Presets>
+		<DefaultPreset preview_image="LIFESAVER_OPAQUE">
+			<Settings size_factor="1" variation="1" seamless="false" antialiasing="2" map_type="0" edges_only="true" clip_hdr_for_result="true"/>
+			<Lighting>
+				<Height value="0.2000000000000000111"/>
+				<Environment>
+					<Source value=""/>
+					<Brightness value="1"/>
+					<Saturation value="1"/>
+					<Rotation value="0"/>
+					<RotationAxis x="0" y="0" z="0"/>
+				</Environment>
+				<Ambience>
+					<AmbientLight red="0" green="0" blue="0"/>
+					<Shadowing value="0"/>
+					<CurrentOcclusionSettings>
+						<RayDirections value="4"/>
+						<TraceDistance value="0.2000000000000000111"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="0"/>
+						<ROQuality value="3"/>
+					</CurrentOcclusionSettings>
+					<CustomOcclusionSettings>
+						<RayDirections value="16"/>
+						<TraceDistance value="0.2999999999999999889"/>
+						<RayJittering value="true"/>
+						<RayBounce value="true"/>
+						<AvoidStreaks value="true"/>
+						<DirectSamples value="1"/>
+						<ROQuality value="10"/>
+					</CustomOcclusionSettings>
+					<ArtisticSettings>
+						<BlackPoint value="0"/>
+						<Midtones value="0.5"/>
+						<WhitePoint value="1"/>
+					</ArtisticSettings>
+				</Ambience>
+			</Lighting>
+			<Controls>
+				<IntSliderControl id="intslidercontrol 03">
+					<Value value="2"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 04">
+					<Value value="1234"/>
+				</IntSliderControl>
+				<IntSliderControl id="intslidercontrol 05">
+					<Value value="3000"/>
+				</IntSliderControl>
+				<SliderControl id="slidercontrol 10">
+					<Value value="0.2000000000000000111"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 11">
+					<Value value="0.9000000000000000222"/>
+				</SliderControl>
+				<SliderControl id="slidercontrol 12">
+					<Value value="0.0200000000000000004"/>
+				</SliderControl>
+			</Controls>
+		</DefaultPreset>
+	</Presets>
+	<Locks>
+		<Settings size="true" variation="false"/>
+		<Lighting elements="false" environment="false" brightness="false" saturation="false" height="false"/>
+		<Controls>
+			<Control id="intslidercontrol 03" lock="false"/>
+			<Control id="intslidercontrol 04" lock="false"/>
+			<Control id="intslidercontrol 05" lock="false"/>
+			<Control id="slidercontrol 10" lock="false"/>
+			<Control id="slidercontrol 11" lock="false"/>
+			<Control id="slidercontrol 12" lock="false"/>
+		</Controls>
+	</Locks>
+	<Information author="ThreeDee" name-en="CirclePacking v002" url="" description="" keywords="" update_notes="" major_version="8" minor_version="4"/>
+	<ControlsOrder>
+		<Automatic value="true"/>
+	</ControlsOrder>
+	<FilterEditor>
+		<Groups/>
+		<ThumbnailSize value="1"/>
+		<Canvas left="86" top="-633" zoom_factor="0"/>
+		<Viewport left="18" top="13" zoom_factor="1"/>
+		<LockPreview>
+			<Locked value="true"/>
+			<LockedComponent name="result"/>
+		</LockPreview>
+		<Item id="intslidercontrol 03">
+			<Position left="1000" top="-59"/>
+		</Item>
+		<Item id="intslidercontrol 04">
+			<Position left="997" top="96"/>
+		</Item>
+		<Item id="intslidercontrol 05">
+			<Position left="998" top="18"/>
+		</Item>
+		<Item id="result">
+			<Position left="544" top="-133"/>
+		</Item>
+		<Item id="scriptmap03 01">
+			<Position left="756" top="-133"/>
+		</Item>
+		<Item id="slidercontrol 10">
+			<Position left="1008" top="-290"/>
+		</Item>
+		<Item id="slidercontrol 11">
+			<Position left="1007" top="-136"/>
+		</Item>
+		<Item id="slidercontrol 12">
+			<Position left="1011" top="-212"/>
+		</Item>
+	</FilterEditor>
+</Filter>
