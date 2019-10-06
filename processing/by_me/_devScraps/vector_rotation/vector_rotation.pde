@@ -7,7 +7,7 @@ int translate_offset = 200;
 void setup() {
   size(400,400);
   //noLoop();
-  v = new PVector(140, 140);
+  v = new PVector(0, -200);
   //a = new PVector(3, 3);
 }
 
