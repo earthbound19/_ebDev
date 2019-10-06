@@ -20,8 +20,9 @@ void setup()
   PVector v = new PVector(0, (width / 3 * (-1)) );
   PShape s = createShape();
   s.beginShape();
-  // THIS IS WHERE THERE'S MAGIC: for a triangle, set it to 3, for a square, 4, a pentagon, 5, hexagon 7, etc.:
-  float vertices = 3;  // interestingly, 2 will just make a line.
+  // THIS IS WHERE THERE'S MAGIC: for a triangle, set it to 3, for a square, 4, a pentagon, 5, hexagon 7, etc.;
+// TO DO: set n-gons with even number of sides to rotate angle_step / 2 (to "rest" the "bottom" line "flat" against imaginary "ground?"
+  float vertices = 7;  // interestingly, 2 will just make a line.
   float angle_step = 360 / vertices;
   print("angle_step is " + angle_step + "\n");
   for (int i=0; i<vertices; i++) {
