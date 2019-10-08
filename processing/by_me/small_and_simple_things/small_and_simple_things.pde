@@ -162,8 +162,8 @@ String get_image_file_name_no_ext() {
 // frame number and user interaction string in the file name, as this script
 // can save it when a user interacts and then also at the last frame of a
 // displayed variation before the next variation:
-  // + " cols " + N_cols_tmp
-  // + " bgHex " + BGcolorHex
+  + " cols " + N_cols_tmp
+  + " bgHex " + BGcolorHex
   // + " pix " + width + "x" + height
   // + " runVariant " + variationNumThisRun
   + " frame " + framesRenderedThisVariation
