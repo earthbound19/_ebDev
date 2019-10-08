@@ -8,15 +8,33 @@
 // https://www.abstractoons.com/2017/05/03/by-small-and-simple-things/by-small-and-simple-things-22x30/
 // re: https://www.abstractoons.com/2017/05/03/by-small-and-simple-things/
 //
-// v1.2.4 make save image function name less ambiguous, correct explanatory image file name per use
-String versionString = "v1.2.4";
+// v1.3.0 work log:
+// - svg save controlled by booleans in global booleans. Some re-architecting of what is done when
+// in order to accomplish this. No option to save SVG to cloud folder; could be done with hack.
+// NOT IMPLEMENTED: svg save every animation frame option.
+// - png save now also controlled by global booleans.
+// - no longer saving reference images in folders, and using same file name wherever I save (cloud or local);
+// because sort by name will put images showing same no. of cols of circles next to each other,
+// and moving them into folders if desired is easy enough.
+// - added boolean controlling whether to display running FPS estimate (set to false--change to true to enable)
+// - (again?) fix bug of saved image file names giving seed as 0 (gives actual seed now)
+// IN DEVELOPMENT (but code effecting it commented out) :
+// prevent repeat save image when user clicks / taps more than once per displayed variant. See
+// noMoarIMGsaveNow boolean and associated functions. 
+String versionString = "v1.3.0";
+
 
 // TO DO:
+// - svg save every frame?
 // - move initialization of these randomization controlling varaibles into initial circles grid (or circles?) function call(s)? :
 // max_wander_dist_mult = 0.087;
 // wander_max_step = random(0.002, 0.0521);
 // diameter = random(diameterMin, diameterMax);
 // diameter_morph_rate = random(0.009, 0.011);
+
+
+// DEPENDENCY IMPORTS
+import processing.svg.*;
 
 
 // BEGIN GLOBAL VARIABLES:
@@ -45,7 +63,7 @@ int seed;
 boolean booleanOverrideSeed = false;    // if set to true, intOverrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly.
 int intOverrideSeed = -161287679;    // a favorite is: -161287679
 boolean USE_FULLSCREEN = true;  // if set to true, overrides the following values; if false, they are used:
-int globalWidth = 1080; int globalHeight = 1920;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
+int globalWidth = 640; int globalHeight = 640;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
 int gridNesting = 4;    // controls how many nests of circles there are for each circle on the grid.
 CirclesGrid[] nestedGridSmallCircles = new CirclesGrid[gridNesting];    // must be allocated here (but is not yet initialized)
 int circlesGridNumCols;    // to be reinitialized in each loop of setup() -- for reference from other functions
@@ -54,38 +72,55 @@ int RNDcolorIDX;    // to be used as random index from array of colors
 color globalBackgroundColor;
 // for "frenetic option", loop creates a list of size gridNesting (of ints) :
 // IntList nestedGridRenderOrder = new IntList();    // because this list has a shuffle() member function, re: https://processing.org/reference/IntList.html
-//to make the script exit after N frames if desired, increment a value from 0 in draw() and exit when it is this:
-int renderNtotalFrames = 7200;    // if encoded at 30 FPS, 30 * 60 = 1800 (or one minute) * 4 = 7200 (4 minutes)
-boolean saveAllAnimationFrames = false;    // if true, all frames up to renderNtotalFrames are saved (and then the program is terminated), so that they can be strung together in a video.
+//
+// START VARIABLES RELATED TO image save:
+boolean savePNGs = true;  // Save PNG images or not -- NOTE: if set false, overrides all PNG-save related functionality to not happen.
+boolean saveSVGs = true;  // Save SVG images (in animation frames and at other times)
+boolean saveAllAnimationFrames = false;    // if true, all frames up to renderNtotalFrames are saved (and then the program is terminated), so that they can be strung together in a video. Overrides savePNGs state.
+// NOTE: at this writing, no SVG save of every frame.
+int renderNtotalFrames = 7200;    // see saveAllAnimationFrames comment
 int totalFramesRendered;    // incremented during each frame of a running variation. reset at new variation.
-boolean firstFrameSaved;    // to control save of first frame of anim, so that we have that if we interrupt the program (which saves the last frame via setup_again_if_time() )
-String userInteractionString;    // changed to states reflecting whether user interacted with a variation or not (empty or not empty)
+int framesRenderedThisVariation;
+boolean saveEveryVariation = true;    // saves first frame of every variation. If this is set to true, you may also want doFixedTimePerVariation set to true
 int variationNumThisRun = 0;    // counts how many variations are made during run of program.
-boolean saveEveryVariation = false;    // note that if this is set to true, you may also want doFixedTimePerVariation set to true
 boolean doFixedTimePerVariation = false;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
 int fixedMillisecondsPerVariation = (int) (1000 * 1.3);		// milliseconds to display each variation, if previous boolean is true
 int minimumMillisecondsPerVariation = (int) (1000 * 16.5);		// 1000 milliseconds * 16.5 = 16.5 seconds
 int maximumMillisecondsPerVariation = (int) (1000 * 52);			// 1000 milliesconds * 52 = 52 seconds
 int currentTimeMilliseconds;
-int runSetupAgainAtMilliseconds;	// at start of each variation, altered to cue time for next variation
-int framesRenderedThisVariation;
-int FPS = 0;    // dynamically modied by program as it runs (and prints running FPS estimate)
+int runSetupAtMilliseconds;     // at start of each variation, altered to cue time for next variation
+String userInteractionString;   // changed to states reflecting whether user interacted with a variation or not (empty or not empty)
+// END VARIABLES RELATED TO image save.
+boolean estimateFPS = true;
+int FPS = 0;    // dynamically modified by program as it runs (and prints running FPS estimate), IF that afore boolean is true
 // reference of original art:
 // larger original grid size: 25x14, wobbly circle placement, wobbly concentricity in circles.
 // smaller original grid size: 19x13, regular circle placement on grid, wobbly concentricity in circles.
 // SMOFA entry configuration for the following values, for ~6' tall kiosk: 7, 21. OR 1, ~65? Match whatever high number it can handle? ~4K resolution horizontally larger monitors: 14, 43
-int minimumColumns = 1; int maximumColumns = 21;
+int minimumColumns = 2; int maximumColumns = 21;
 float circlesGridXminPercent = 0.4175;    // controls minimum diameter of circle vs. grid cell size
 float circlesGridXmaxPercent = 0.72;      // controls maximum "" -- v0.9.12 had 0.63
+// NOTE: to control additional information contained in saved file names, see comments in the get_image_file_name_no_ext() function further below.
 // END GLOBAL VARIABLES
 
 
 // BEGIN GLOBAL FUNCTIONS
+// To initialize and subsequently reinitialize delay to creating and animating next variant:
+void setDelayToNextVariant() {
+  // SETUP DELAY until this function will be called again by altering the timer control values;
+  // otherwise this block here that we're running will be immediately called again (as 
+  // runSetupAtMilliseconds hasn't incremented) :
+  if (doFixedTimePerVariation == true) {
+    runSetupAtMilliseconds = currentTimeMilliseconds + fixedMillisecondsPerVariation;
+  } else {
+    int tmp_MS_to_add_till_next_variation = (int) random(minimumMillisecondsPerVariation, maximumMillisecondsPerVariation);
+    runSetupAtMilliseconds = currentTimeMilliseconds + tmp_MS_to_add_till_next_variation;
+  }
+}
+
+
 // Because I want to respond to both mousePressed AND mouseDragged events, those functions can pass mouseX and mouseY to this when they are called:
 void set_color_morph_mode_at_XY(int Xpos, int Ypos) {
-  // If a user taps or clicks, set a value to this string so it will be noted in file names (intended use)! Otherwise,
-  //the string will before now be set and left empty:
-  userInteractionString = "__user_interacted__";		// intended use by other functions / reset to "" by other functions
       // print(Xpos + " " + Ypos + "\n");
   // collision detection of mouse x and y pos vs. center and radius of circle via this genius breath: https://happycoding.io/tutorials/processing/collision-detection ;
   // checks if distance between center of circle and mouse click is less than radius of circle. if smaller, click  was inside circle. if greater, was outside:
@@ -115,35 +150,43 @@ void set_color_morph_mode_at_XY(int Xpos, int Ypos) {
 }
 
 
-// saves PNG image of whatever is rendered at the moment:
-void save_image() {
+// get file name without extension -- for use before image save function or alternately before svg save (add extension to returned string)
+String get_image_file_name_no_ext() {
   int N_cols_tmp = nestedGridSmallCircles[0].cols;
   String BGcolorHex = hex(globalBackgroundColor);
   BGcolorHex = BGcolorHex.substring(2, 8);    // take the first two characters (which will, the way this is set up, be FF, for full alpha) off
-  String img_file_name = "BSaST_" + versionString + "__cols" + N_cols_tmp + "__bg" + BGcolorHex + "__run_var_" + variationNumThisRun + "__seed_" + seed + "__fr_" + framesRenderedThisVariation + userInteractionString + ".png";
-  String explanatory_img_name = "By Small and Simple Things " + versionString + " seed " + seed + " frame " + framesRenderedThisVariation + ".png";
-  // UNCOMMENT on or the other (or both of!) the following line(s) if you want to save to a dropbox folder; correct the UR_USERNAME to your actual windows user folder:
-  // -- WINDOWS:
-  // saveFrame("C:\\Users\\UR_USERNAME\\Dropbox\\By_Small_and_Simple_Things__SMOFA_visitor_image_saves\\" + explanatory_img_name);
-  // -- MAC:
-  // saveFrame("/Users/UR_USERNAME/Dropbox/By_Small_and_Simple_Things__SMOFA_visitor_image_saves/" + explanatory_img_name);
-  // UNCOMMENT the following line to save images into subfolders named after columns, number of variation in run, and random seed:
-  saveFrame("XY_" + width + "x" + height + "__cols_" + N_cols_tmp + "/" + img_file_name);
+  String img_file_name_no_ext =
+  "By Small and Simple Things " + versionString + " seed " + seed
+// COMMENT OUT any of the below additions that you don't want in the file name,
+// un UNCOMMENT any that you do--and I strongly recommend keeping the
+// frame number and user interaction string in the file name, as this script
+// can save it when a user interacts and then also at the last frame of a
+// displayed variation before the next variation:
+  // + " cols " + N_cols_tmp
+  // + " bgHex " + BGcolorHex
+  // + " pix " + width + "x" + height
+  // + " runVariant " + variationNumThisRun
+  + " frame " + framesRenderedThisVariation
+  + userInteractionString;
+  
+  return img_file_name_no_ext;
 }
 
 
-  // set up and start animation of a new variation via setup() IF global values controlling that are just so:
- void new_variation_if_time() {
-  int current_time_ms = millis();
-  if (current_time_ms >= runSetupAgainAtMilliseconds) {
-  // call save frame ONLY if a user tapped or clicked the image (which in the mouse-related function causes the following value to be set:
-  if (userInteractionString == "__user_interacted__") {
-    save_image();
-    }
-  // setup() and draw() will handle the values that will trigger the next run of this function:
-  setup();
-  }
+// saves whatever is rendered at the moment (expects PNG or other supported raster image file name):
+  void save_PNG() {
+    String FNNE = get_image_file_name_no_ext();
+    //LOCAL FOLDER SAVE:
+    saveFrame(FNNE + ".png");
+    
+    // CLOUD SAVE option one (SMOFA kiosk, Windows) :
+    // saveFrame("C:\\Users\\UR_USERNAME\\Dropbox\\By_Small_and_Simple_Things__SMOFA_visitor_image_saves\\" + FNNE + ".png");
+    
+    // CLOUD SAVE option two (RAH collecting images, Mac) :
+    // saveFrame("/Users/earthbound/Dropbox/small_and_simple_things_RAH_image_saves/" + FNNE + ".png");
 }
+
+
 // END GLOBAL FUNCTIONS
 
 
@@ -331,7 +374,7 @@ class CirclesGrid {
     }
   }
 
-  void drawCirclesGrid() {
+  void CirclesGridDrawAndChange() {
     //int counter = 0;    // uncomment code that uses this to print a number count of circles in the center of each circle.
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
@@ -365,10 +408,16 @@ void settings() {
   } else {
     size(globalWidth, globalHeight);
   }
+
+  // initializes runSetupAtMilliseconds before draw() is called:
+  setDelayToNextVariant();
 }
 
+
+boolean noMoarIMGsaveNow;  // controls to save images once per user interaction per variation.
+// handles values etc. for new animated variation to be displayed:
 void setup() {
-  int seed = (int) random(-2147483648, 2147483647);
+  seed = (int) random(-2147483648, 2147483647);
   randomSeed(seed);
   // THAT WILL BE OVERRIDEN if the boolean value booleanOverrideSeed is set to true:
   if (variationNumThisRun == 0 && booleanOverrideSeed == true) {
@@ -378,6 +427,7 @@ void setup() {
   variationNumThisRun += 1;
   //print("~-~- Setting up variation number " + variationNumThisRun + " in run. Seed: " + seed + " -~-~\n");
   
+// TO DO: check: I think the interpreter demanded I use static values? Do I really need W and H here:
   int W = width; int H = height;
   ellipseMode(CENTER);
 
@@ -414,29 +464,17 @@ void setup() {
   //  //print(x + "\n");
   //}
   
-  firstFrameSaved = false;
   userInteractionString = "";
-
-  // if a boolean is marked to display variations for a fixed number of milliseconds, add that fixed amount to the current time
-  // to demark when to display the next variant. otherwise, add an amount in the range minimumMillisecondsPerVariation to maximumMillisecondsPerVariation:
-  int tmp_current_time_milliseconds = millis();
-  if (doFixedTimePerVariation == true) {
-    runSetupAgainAtMilliseconds = tmp_current_time_milliseconds + fixedMillisecondsPerVariation;
-  } else {
-    int tmp_MS_to_add_till_next_variation = (int) random(minimumMillisecondsPerVariation, maximumMillisecondsPerVariation);
-    runSetupAgainAtMilliseconds = tmp_current_time_milliseconds + tmp_MS_to_add_till_next_variation;
-    }
-
   framesRenderedThisVariation = 0;  // reset here and incremented in every loop of draw()
-  
+  noMoarIMGsaveNow = false;
+
   // to produce one static image, uncomment the next function:
   //noLoop();
 }
 
 
-int last_captured_millis = 0;
-int last_captured_totalFramesRendered = 0;
-void draw() {
+// DOES ALL THE THINGS for one frame of animation:
+void animate() {
   background(globalBackgroundColor);  // clears canvas to white before next animaton frame (so no overlap of smaller shapes this frame on larger from last frame) :
   
   // randomizes list--for frenetic option (probably will never want) :
@@ -445,53 +483,144 @@ void draw() {
 
   for (int j = 0; j < gridNesting; j++) {
     //use the next line instead of the one after it for the "frenetic option" (see other comments that say that) :
-    //nestedGridSmallCircles[ nestedGridRenderOrder.get(j) ].drawCirclesGrid();
-    nestedGridSmallCircles[j].drawCirclesGrid();
+    //nestedGridSmallCircles[ nestedGridRenderOrder.get(j) ].CirclesGridDrawAndChange();
+    nestedGridSmallCircles[j].CirclesGridDrawAndChange();
   }
 
-  // this control block can only be true on the first run of this loop (this draw() function loops after setup():
-  if (firstFrameSaved == false && userInteractionString == "__user_interacted__" || firstFrameSaved == false && saveEveryVariation == true) {
-    // save the current frame, and set that boolean to true, so this control block will not be executed on subsequent runs of this loop:
-    save_image();
-    firstFrameSaved = true;
-  }
-
-  totalFramesRendered += 1;  // increment this whether or not it is used in the below block, becuase it may be used elsewhere
+  totalFramesRendered += 1;
   framesRenderedThisVariation += 1;   // this is reset to 0 at every call of setup()
   
-  //calculate and print running display of frames per second.
-  int current_millis = millis();
-  if (current_millis - last_captured_millis > 999) {
-    FPS = totalFramesRendered - last_captured_totalFramesRendered;
-    int countdown_to_next_render = runSetupAgainAtMilliseconds - current_millis;
-    print("Estimated frames per second: " + FPS + ". total frames rendered: " + totalFramesRendered + ". Next variation in " + countdown_to_next_render + "ms\n");
-    //reset these values or this won't work:
-    last_captured_millis = current_millis;
-    last_captured_totalFramesRendered = totalFramesRendered;
+  // conditionally calculate and print running display of frames per second.
+  if (estimateFPS == true) {
+    int current_millis = millis();
+    if (current_millis - last_captured_millis > 999) {
+      FPS = totalFramesRendered - last_captured_totalFramesRendered;
+      int countdown_to_next_render = runSetupAtMilliseconds - current_millis;
+      print("Estimated frames per second: " + FPS + ". total frames rendered: " + totalFramesRendered + ". Next variation in " + countdown_to_next_render + "ms\n");
+      //reset these values or this won't work:
+      last_captured_millis = current_millis;
+      last_captured_totalFramesRendered = totalFramesRendered;
+    }
   }
-  
+
+  // BUT UMMMM... THERE'S A frameRate() FUNCTION?
   // conditioanlly THROTTLE delay either fixed or current calculated FPS;
   // BUT: ON A CONSISTENTLY VERY SLUGGISH computer, maybe just forget that,
   // and comment out the next line of code (delay(FPS);) and uncomment the one after it (delay(0)):
   //delay(FPS);    // 33 = ~30fps -- or to hog CPU cycles less on dynamic run, try 250. For a wimpy kiosk, do ONE OR ZERO.
   //delay(0);
 
-  // ANIMATION IMAGE SERIES SAVE, conditioned on boolean:
-  if (saveAllAnimationFrames == true) {
+}
+
+
+int last_captured_millis = 0;
+int last_captured_totalFramesRendered = 0;
+boolean runSetup = false;   // Controls when to run setup() again. Manipulated by script logic.
+boolean savePNGnow = false;  // Controls when to save PNGs. Manipulated by script logic.
+boolean recordSVGnow = false;  // Controls when to save SVGs. Manipulated by script logic.
+void draw() {
+// print("At start of draw loop.\n");
+// print("value of recordSVGnow is: " + recordSVGnow + "\n");
+  // TEH THINGS WE WANNA DO AROUND AND THROUGH ANIMATION which maybe belong in other functions:
+  //IF WE WANT to save SVGs AND we want to do that now AND we are not already recording one start recording one:
+  if (saveSVGs == true && recordSVGnow == true) {
+    // print("Starting SVG recording..\n");
+    String svg_file_name_no_ext = get_image_file_name_no_ext();
+    beginRecord(SVG, svg_file_name_no_ext + ".svg");
+    // print("SVG recording started at frame " + framesRenderedThisVariation + "\n");
+  }
+
+  animate();
+
+            // Surely there is a better way? :/
+            boolean pls_reset_string = false;
+
+  if (recordSVGnow == true) {
+    // not the cleanest function control; I think this will be called even when beginRecord() wasn't;
+    // but it hasn't hated be for it:
+    endRecord();
+    recordSVGnow = false;
+    pls_reset_string = true;
+    // print("SVG recording ended at variant frame " + framesRenderedThisVariation + "\n");
+  }
+
+  if (savePNGnow == true && savePNGs == true) {
+    save_PNG();
+    savePNGnow = false;
+    pls_reset_string = true;
+    }
+    
+            // BLERGH at this necessary String reset for what I want:
+            if (pls_reset_string == true) {
+              userInteractionString = "";
+            }
+
+  // SAVE PNG FRAME AS PART OF ANIMATION FRAMES conditioned on boolean:
+  if (saveAllAnimationFrames == true && savePNGs == true) {
     saveFrame("_anim_frames/#######.png");
     if (totalFramesRendered == renderNtotalFrames) {
       exit();
     }
   }
 
-  // The following function starts a new variation if runSetupAgainAtNframe == totalFramesRendered, the former handled in setup() :
-  new_variation_if_time();
+  // WEIRDNESS to allow save of last frame of this variant as PNG and/or SVG
+  // (BEFORE before next variant is created) : 
+  // NOTE: runSetupAtMilliseconds (on which this block depends) is initialized in settings() :
+    currentTimeMilliseconds = millis();
+    if (currentTimeMilliseconds >= runSetupAtMilliseconds) {
+    // print("Set up next variant time elapsed; control block triggered.\n");
+      // this captures PNG if boolean controlling says do so, before next variant starts via setup() :
+      if (saveEveryVariation == true && savePNGs == true) { save_PNG(); }
+      // With the runSetup boolean below, and the handling of recordSVGnow in draw(), allows
+      // saving of SVG of last frame of variation, in one more loop of draw(),
+      // before setting up next variant via setup() :
+      if (saveEveryVariation == true && saveSVGs == true) { recordSVGnow = true; }
+      print("set recordSVGnow true at variant frame " + framesRenderedThisVariation + "\n");
+      // using bool because we want to check it and setup AFTER next loop of draw() has mabye saved SVG:
+      runSetup = true;
+      // IF WE DON'T DO THE FOLLOWING, this block here is invoked immediately in the
+      // next loop of draw() (which we don't want to happen) :
+      setDelayToNextVariant();
+    }
+  // END WEIRDNESS to allow save of last frame as PNG and/or SVG
 
+// TO DO: figure out why this would trigger before I've saved the last frame of an SVG,
+// and maybe rework my logic? It "shouldn't" set up the next variant before an SVG is recorded,
+// BUT IT DOES unless I check that (recordSVGnow == false) (which is set false after an SVG
+// is done recording) :
+  if (runSetup == true && recordSVGnow == false) {
+    setup();
+    // counting on other functionality to set that true :/ to call this again when it's time:
+    runSetup = false;
+  }
 }
+
+// TO DO: finish developing this and test:
+// void delay_noMoarIMGsaveNow() {
+//   delay(150);
+//   // print("Meep!\n");
+//   noMoarIMGsaveNow = true;
+// }
 
 
 void mousePressed() {
   set_color_morph_mode_at_XY(mouseX, mouseY);
+  userInteractionString = "__user_interacted";    // intended use by other functions / reset to "" by other functions
+  savePNGnow = true;
+  recordSVGnow = true;
+  // calls the function of the name given in the string in a separate thread, which has an asynchronous
+  // delay before setting a boolean (asynchronous so that this function doesn't wait for it to finish
+  // before this function completes and exits) :
+// NOTE: it is possibly a faulty assumption that the next loop of draw() will happen within the time
+// of the delay in delay_noMoarIMGsaveNow() -- and if it is a false assumption, no images will save,
+// because noMoarIMGsaveNow will be set to true before the next draw() loop even happens, and if
+// noMoarIMGsaveNow is true, the logic in now() will not save images.
+// I TRIED to more precisely control this via noLoop, redraw(), and loop(), but I guess I don't know
+// how those work. I THOUGHT they were supposed to allow loop manipulation if invoked from e.g. mouse
+// events?
+// IN DEVELOPMENT:
+//  thread("delay_noMoarIMGsaveNow");
+  // print("Did this print before the message \"Meep?\" if so (and assuming that print statement is uncommented), that successfully ran in a separate thread (asynchronously, or delayed)!\n");
 }
 
 
