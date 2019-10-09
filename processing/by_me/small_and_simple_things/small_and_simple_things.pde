@@ -83,8 +83,8 @@ int totalFramesRendered;    // incremented during each frame of a running variat
 int framesRenderedThisVariation;
 boolean saveEveryVariation = true;    // saves first frame of every variation. If this is set to true, you may also want doFixedTimePerVariation set to true
 int variationNumThisRun = 0;    // counts how many variations are made during run of program.
-boolean doFixedTimePerVariation = false;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
-int fixedMillisecondsPerVariation = (int) (1000 * 1.3);		// milliseconds to display each variation, if previous boolean is true
+boolean doFixedTimePerVariation = true;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
+int fixedMillisecondsPerVariation = (int) (1000 * 7);		// milliseconds to display each variation, if previous boolean is true
 int minimumMillisecondsPerVariation = (int) (1000 * 16.5);		// 1000 milliseconds * 16.5 = 16.5 seconds
 int maximumMillisecondsPerVariation = (int) (1000 * 52);			// 1000 milliesconds * 52 = 52 seconds
 int currentTimeMilliseconds;
@@ -532,28 +532,18 @@ void draw() {
 
   animate();
 
-            // Surely there is a better way? :/
-            boolean pls_reset_string = false;
-
   if (recordSVGnow == true) {
     // not the cleanest function control; I think this will be called even when beginRecord() wasn't;
     // but it hasn't hated be for it:
     endRecord();
     recordSVGnow = false;
-    pls_reset_string = true;
     // print("SVG recording ended at variant frame " + framesRenderedThisVariation + "\n");
   }
 
   if (savePNGnow == true && savePNGs == true) {
     save_PNG();
     savePNGnow = false;
-    pls_reset_string = true;
     }
-    
-            // BLERGH at this necessary String reset for what I want:
-            if (pls_reset_string == true) {
-              userInteractionString = "";
-            }
 
   // SAVE PNG FRAME AS PART OF ANIMATION FRAMES conditioned on boolean:
   if (saveAllAnimationFrames == true && savePNGs == true) {
@@ -584,13 +574,14 @@ void draw() {
     }
   // END WEIRDNESS to allow save of last frame as PNG and/or SVG
 
-// TO DO: figure out why this would trigger before I've saved the last frame of an SVG,
-// and maybe rework my logic? It "shouldn't" set up the next variant before an SVG is recorded,
-// BUT IT DOES unless I check that (recordSVGnow == false) (which is set false after an SVG
-// is done recording) :
+// TO DO: I think the following code block _could_ trigger before I've saved the last frame
+// of an SVG (if I didn't have the "if" check),
+// because maybe the draw() loop (or maybe the SVG save functions in it) are non-blocking,
+// or it doesn't/they don't force the loop to wait until they complete. In other words, maybe
+// the loop continues even if the SVG draw / save functions haven't completed yet.
+// So, this "if" checks for a value set afte the SVG functions complete before running setup() again:
   if (runSetup == true && recordSVGnow == false) {
     setup();
-    // counting on other functionality to set that true :/ to call this again when it's time:
     runSetup = false;
   }
 }
