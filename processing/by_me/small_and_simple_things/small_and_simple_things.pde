@@ -28,7 +28,7 @@ String versionString = "v1.3.0";
 // - svg save every frame?
 // - move initialization of these randomization controlling varaibles into initial circles grid (or circles?) function call(s)? :
 // max_wander_dist_mult = 0.087;
-// wander_max_step = random(0.002, 0.0521);
+// wander_max_step_mult = random(0.002, 0.0521);
 // diameter = random(diameterMin, diameterMax);
 // diameter_morph_rate = random(0.009, 0.011);
 
@@ -201,7 +201,7 @@ class PersistentCircle {
   int x_wandered;
   int y_wandered;
   float max_wander_dist_mult;
-  float wander_max_step;
+  float wander_max_step_mult;
   float diameter;
   float diameter_min;
   float diameter_max;
@@ -222,7 +222,7 @@ class PersistentCircle {
     x_center = xCenter;
     y_center = yCenter;
     max_wander_dist_mult = 0.0575;    // remember subtle value I like the result of (if I change that) : 0.83 -- for smaller circles. For YUGE: 0.0575
-    wander_max_step = random(0.002, 0.038);  // remember subtle values I like the results of: random(0.002, 0.058) -- for smaller circles. For YUGE: 0.002, 0.038
+    wander_max_step_mult = random(0.002, 0.038);  // remember subtle values I like the results of: random(0.002, 0.058) -- for smaller circles. For YUGE: 0.002, 0.038
     diameter = random(diameterMin, diameterMax);
     diameter_morph_rate = random(0.009, 0.012);
       //randomly make that percent positive or negative to start (which will cause grow or expand animation if used as intended) :
@@ -257,8 +257,8 @@ class PersistentCircle {
   }
   
   void morphTranslation() {
-    //to use: wander_max_step, max_wander_dist_mult
-    int xy_wander_max = (int) (diameter * wander_max_step);
+    //to use: wander_max_step_mult, max_wander_dist_mult
+    int xy_wander_max = (int) (diameter * wander_max_step_mult);
     // SETUP x AND y ADDITION (positive or negative) of morph coordinate:
     x_wandered = x_wandered + ((int) random(xy_wander_max * (-1), xy_wander_max));
     y_wandered = y_wandered + ((int) random(xy_wander_max * (-1), xy_wander_max));
