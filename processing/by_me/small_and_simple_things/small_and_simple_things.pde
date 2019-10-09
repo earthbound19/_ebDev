@@ -8,26 +8,16 @@
 // https://www.abstractoons.com/2017/05/03/by-small-and-simple-things/by-small-and-simple-things-22x30/
 // re: https://www.abstractoons.com/2017/05/03/by-small-and-simple-things/
 //
-// v1.3.0 work log:
-// - svg save controlled by booleans in global booleans. Some re-architecting of what is done when
-// in order to accomplish this. No option to save SVG to cloud folder; could be done with hack.
-// NOT IMPLEMENTED: svg save every animation frame option.
-// - png save now also controlled by global booleans.
-// - no longer saving reference images in folders, and using same file name wherever I save (cloud or local);
-// because sort by name will put images showing same no. of cols of circles next to each other,
-// and moving them into folders if desired is easy enough.
-// - added boolean controlling whether to display running FPS estimate (set to false--change to true to enable)
-// - (again?) fix bug of saved image file names giving seed as 0 (gives actual seed now)
-// IN DEVELOPMENT (but code effecting it commented out) :
-// prevent repeat save image when user clicks / taps more than once per displayed variant. See
-// noMoarIMGsaveNow boolean and associated functions. 
-String versionString = "v1.3.0";
+// v1.3.1 work log:
+// - no image save during display of a variation and continued user interaction (wait until next
+// display variation)
+// TO DO: fix bug that this causes first frame of next variation to always save.
+String versionString = "v1.3.1";
 
 
 // TO DO:
 // - svg save every frame?
 // - move initialization of these randomization controlling varaibles into initial circles grid (or circles?) function call(s)? :
-// max_wander_dist_mult = 0.087;
 // wander_max_step_mult = random(0.002, 0.0521);
 // diameter = random(diameterMin, diameterMax);
 // diameter_morph_rate = random(0.009, 0.011);
@@ -84,7 +74,7 @@ int framesRenderedThisVariation;
 boolean saveEveryVariation = true;    // saves first frame of every variation. If this is set to true, you may also want doFixedTimePerVariation set to true
 int variationNumThisRun = 0;    // counts how many variations are made during run of program.
 boolean doFixedTimePerVariation = true;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
-int fixedMillisecondsPerVariation = (int) (1000 * 7);		// milliseconds to display each variation, if previous boolean is true
+int fixedMillisecondsPerVariation = (int) (1000 * 17);		// milliseconds to display each variation, if previous boolean is true
 int minimumMillisecondsPerVariation = (int) (1000 * 16.5);		// 1000 milliseconds * 16.5 = 16.5 seconds
 int maximumMillisecondsPerVariation = (int) (1000 * 52);			// 1000 milliesconds * 52 = 52 seconds
 int currentTimeMilliseconds;
@@ -200,7 +190,6 @@ class PersistentCircle {
   int y_center;
   int x_wandered;
   int y_wandered;
-  float max_wander_dist_mult;
   float wander_max_step_mult;
   float diameter;
   float diameter_min;
@@ -221,7 +210,6 @@ class PersistentCircle {
     y_origin = yCenter;
     x_center = xCenter;
     y_center = yCenter;
-    max_wander_dist_mult = 0.0575;    // remember subtle value I like the result of (if I change that) : 0.83 -- for smaller circles. For YUGE: 0.0575
     wander_max_step_mult = random(0.002, 0.038);  // remember subtle values I like the results of: random(0.002, 0.058) -- for smaller circles. For YUGE: 0.002, 0.038
     diameter = random(diameterMin, diameterMax);
     diameter_morph_rate = random(0.009, 0.012);
@@ -257,7 +245,6 @@ class PersistentCircle {
   }
   
   void morphTranslation() {
-    //to use: wander_max_step_mult, max_wander_dist_mult
     int xy_wander_max = (int) (diameter * wander_max_step_mult);
     // SETUP x AND y ADDITION (positive or negative) of morph coordinate:
     x_wandered = x_wandered + ((int) random(xy_wander_max * (-1), xy_wander_max));
@@ -414,7 +401,8 @@ void settings() {
 }
 
 
-boolean noMoarIMGsaveNow;  // controls to save images once per user interaction per variation.
+boolean noMoarSVGsaveNow;  // controls to save SVGs once per user interaction per variation.
+boolean noMoarPNGssaveNow;  // " (similar)
 // handles values etc. for new animated variation to be displayed:
 void setup() {
   seed = (int) random(-2147483648, 2147483647);
@@ -466,7 +454,8 @@ void setup() {
   
   userInteractionString = "";
   framesRenderedThisVariation = 0;  // reset here and incremented in every loop of draw()
-  noMoarIMGsaveNow = false;
+  noMoarSVGsaveNow = false;
+  noMoarPNGssaveNow = false;
 
   // to produce one static image, uncomment the next function:
   //noLoop();
@@ -519,11 +508,9 @@ boolean runSetup = false;   // Controls when to run setup() again. Manipulated b
 boolean savePNGnow = false;  // Controls when to save PNGs. Manipulated by script logic.
 boolean recordSVGnow = false;  // Controls when to save SVGs. Manipulated by script logic.
 void draw() {
-// print("At start of draw loop.\n");
-// print("value of recordSVGnow is: " + recordSVGnow + "\n");
-  // TEH THINGS WE WANNA DO AROUND AND THROUGH ANIMATION which maybe belong in other functions:
-  //IF WE WANT to save SVGs AND we want to do that now AND we are not already recording one start recording one:
-  if (saveSVGs == true && recordSVGnow == true) {
+  
+  // SVG RECORD START:
+  if (saveSVGs == true && recordSVGnow == true && noMoarSVGsaveNow == false) {
     // print("Starting SVG recording..\n");
     String svg_file_name_no_ext = get_image_file_name_no_ext();
     beginRecord(SVG, svg_file_name_no_ext + ".svg");
@@ -532,6 +519,7 @@ void draw() {
 
   animate();
 
+  // SVG RECORD END:
   if (recordSVGnow == true) {
     // not the cleanest function control; I think this will be called even when beginRecord() wasn't;
     // but it hasn't hated be for it:
@@ -540,7 +528,7 @@ void draw() {
     // print("SVG recording ended at variant frame " + framesRenderedThisVariation + "\n");
   }
 
-  if (savePNGnow == true && savePNGs == true) {
+  if (savePNGnow == true && savePNGs == true && noMoarPNGssaveNow == false) {
     save_PNG();
     savePNGnow = false;
     }
@@ -558,7 +546,9 @@ void draw() {
   // NOTE: runSetupAtMilliseconds (on which this block depends) is initialized in settings() :
     currentTimeMilliseconds = millis();
     if (currentTimeMilliseconds >= runSetupAtMilliseconds) {
-    // print("Set up next variant time elapsed; control block triggered.\n");
+      // IF WE DON'T DO THE FOLLOWING, this block here is invoked immediately in the
+      // next loop of draw() (which we don't want to happen) :
+      setDelayToNextVariant();
       // this captures PNG if boolean controlling says do so, before next variant starts via setup() :
       if (saveEveryVariation == true && savePNGs == true) { save_PNG(); }
       // With the runSetup boolean below, and the handling of recordSVGnow in draw(), allows
@@ -568,30 +558,27 @@ void draw() {
       print("set recordSVGnow true at variant frame " + framesRenderedThisVariation + "\n");
       // using bool because we want to check it and setup AFTER next loop of draw() has mabye saved SVG:
       runSetup = true;
-      // IF WE DON'T DO THE FOLLOWING, this block here is invoked immediately in the
-      // next loop of draw() (which we don't want to happen) :
-      setDelayToNextVariant();
     }
   // END WEIRDNESS to allow save of last frame as PNG and/or SVG
 
-// TO DO: I think the following code block _could_ trigger before I've saved the last frame
+// I think the following code block _could_ be invoked before I've saved the last frame
 // of an SVG (if I didn't have the "if" check),
 // because maybe the draw() loop (or maybe the SVG save functions in it) are non-blocking,
 // or it doesn't/they don't force the loop to wait until they complete. In other words, maybe
 // the loop continues even if the SVG draw / save functions haven't completed yet.
-// So, this "if" checks for a value set afte the SVG functions complete before running setup() again:
+// So, this "if" checks for a value set after the SVG functions complete before running setup() again:
   if (runSetup == true && recordSVGnow == false) {
     setup();
     runSetup = false;
   }
 }
 
-// TO DO: finish developing this and test:
-// void delay_noMoarIMGsaveNow() {
-//   delay(150);
-//   // print("Meep!\n");
-//   noMoarIMGsaveNow = true;
-// }
+
+void delay_noMoarIMGsaveNow() {
+  delay(50);
+  noMoarSVGsaveNow = true;    // is reset to false each run of setup()
+  noMoarPNGssaveNow = true;   // "
+}
 
 
 void mousePressed() {
@@ -602,16 +589,14 @@ void mousePressed() {
   // calls the function of the name given in the string in a separate thread, which has an asynchronous
   // delay before setting a boolean (asynchronous so that this function doesn't wait for it to finish
   // before this function completes and exits) :
-// NOTE: it is possibly a faulty assumption that the next loop of draw() will happen within the time
-// of the delay in delay_noMoarIMGsaveNow() -- and if it is a false assumption, no images will save,
-// because noMoarIMGsaveNow will be set to true before the next draw() loop even happens, and if
-// noMoarIMGsaveNow is true, the logic in now() will not save images.
-// I TRIED to more precisely control this via noLoop, redraw(), and loop(), but I guess I don't know
-// how those work. I THOUGHT they were supposed to allow loop manipulation if invoked from e.g. mouse
-// events?
-// IN DEVELOPMENT:
-//  thread("delay_noMoarIMGsaveNow");
-  // print("Did this print before the message \"Meep?\" if so (and assuming that print statement is uncommented), that successfully ran in a separate thread (asynchronously, or delayed)!\n");
+  // NOTE: it is possibly a faulty assumption that the next loop of draw() will happen within the time
+  // of the delay in delay_noMoarIMGsaveNow() -- and if it is a false assumption, no images will save,
+  // because noMoarIMGsaveNow will be set to true before the next draw() loop even happens, and if
+  // noMoarIMGsaveNow is true, the logic in now() will not save images.
+  // I TRIED to more precisely control this via noLoop, redraw(), and loop(), but I guess I don't know
+  // how those work. I THOUGHT they were supposed to allow loop manipulation if invoked from e.g. mouse
+  // events?
+  thread("delay_noMoarIMGsaveNow");
 }
 
 
