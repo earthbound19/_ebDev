@@ -8,11 +8,8 @@
 // https://www.abstractoons.com/2017/05/03/by-small-and-simple-things/by-small-and-simple-things-22x30/
 // re: https://www.abstractoons.com/2017/05/03/by-small-and-simple-things/
 //
-// v1.3.1 work log:
-// - no image save during display of a variation and continued user interaction (wait until next
-// display variation)
-// TO DO: fix bug that this causes first frame of next variation to always save.
-String versionString = "v1.3.1";
+// v1.3.2 -- bug fix timing of some image saves by refactoring PNG / SVG save logic (in animation() loop now)
+String versionString = "v1.3.2";
 
 
 // TO DO:
@@ -62,21 +59,22 @@ int RNDcolorIDX;    // to be used as random index from array of colors
 color globalBackgroundColor;
 // for "frenetic option", loop creates a list of size gridNesting (of ints) :
 // IntList nestedGridRenderOrder = new IntList();    // because this list has a shuffle() member function, re: https://processing.org/reference/IntList.html
-//
+    // TESTING NOTES: states to test:
+    // true / false for savePNGs, saveSVGs, saveEveryVariation, and (maybe--though I'm confident it works regardless) saveAllAnimationFrames, .
 // START VARIABLES RELATED TO image save:
-boolean savePNGs = true;  // Save PNG images or not -- NOTE: if set false, overrides all PNG-save related functionality to not happen.
-boolean saveSVGs = true;  // Save SVG images (in animation frames and at other times)
+boolean savePNGs = true;  // Save PNG images or not
+boolean saveSVGs = true;  // Save SVG images or not
 boolean saveAllAnimationFrames = false;    // if true, all frames up to renderNtotalFrames are saved (and then the program is terminated), so that they can be strung together in a video. Overrides savePNGs state.
 // NOTE: at this writing, no SVG save of every frame.
 int renderNtotalFrames = 7200;    // see saveAllAnimationFrames comment
 int totalFramesRendered;    // incremented during each frame of a running variation. reset at new variation.
 int framesRenderedThisVariation;
-boolean saveEveryVariation = true;    // saves first frame of every variation. If this is set to true, you may also want doFixedTimePerVariation set to true
+boolean saveEveryVariation = true;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
 int variationNumThisRun = 0;    // counts how many variations are made during run of program.
-boolean doFixedTimePerVariation = true;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
-int fixedMillisecondsPerVariation = (int) (1000 * 17);		// milliseconds to display each variation, if previous boolean is true
-int minimumMillisecondsPerVariation = (int) (1000 * 16.5);		// 1000 milliseconds * 16.5 = 16.5 seconds
-int maximumMillisecondsPerVariation = (int) (1000 * 52);			// 1000 milliesconds * 52 = 52 seconds
+boolean doFixedTimePerVariation = false;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
+int fixedMillisecondsPerVariation = (int) (1000 * 1.3);         // milliseconds to display each variation, if previous boolean is true
+int minimumMillisecondsPerVariation = (int) (1000 * 16.5);      // 1000 milliseconds * 16.5 = 16.5 seconds
+int maximumMillisecondsPerVariation = (int) (1000 * 52);        // 1000 milliesconds * 52 = 52 seconds
 int currentTimeMilliseconds;
 int runSetupAtMilliseconds;     // at start of each variation, altered to cue time for next variation
 String userInteractionString;   // changed to states reflecting whether user interacted with a variation or not (empty or not empty)
@@ -326,7 +324,7 @@ class CirclesGrid {
     for (int i = 0; i < CirclesGridOBJ.length; i++) {          // that comparison measures first dimension of array ( == cols)
       for (int j = 0; j < CirclesGridOBJ[0].length; j++) {    // that comparision measures second dimension of array ( == rows)
 // TO DO: get RND diameter min and max, to pass to PersistentCircle initializer:
-		// OY the convolution of additional offests just to make a grid centered! :
+        // OY the convolution of additional offests just to make a grid centered! :
         int circleLocX = ((graph_xy_len * j) - (int) graph_xy_len / 2) + grid_to_canvas_x_offset + graph_xy_len;
         int circleLocY = ((graph_xy_len * i) - (int) graph_xy_len / 2) + grid_to_canvas_y_offset + graph_xy_len;
         // randomly pick smallest and largest diameter range for (to be) animated circle (to be passsed to PersistentCircle constructor) :
@@ -401,8 +399,10 @@ void settings() {
 }
 
 
-boolean noMoarSVGsaveNow;  // controls to save SVGs once per user interaction per variation.
-boolean noMoarPNGssaveNow;  // " (similar)
+boolean runSetup = false;                      // Controls when to run setup() again. Manipulated by script logic.
+boolean savePNGnow = false;                    // Controls when to save PNGs. Manipulated by script logic.
+boolean recordSVGnow = false;                  // Controls when to save SVGs. Manipulated by script logic.
+boolean userInteractedThisVariation = false;   // affects those booleans via script logic.
 // handles values etc. for new animated variation to be displayed:
 void setup() {
   seed = (int) random(-2147483648, 2147483647);
@@ -454,8 +454,10 @@ void setup() {
   
   userInteractionString = "";
   framesRenderedThisVariation = 0;  // reset here and incremented in every loop of draw()
-  noMoarSVGsaveNow = false;
-  noMoarPNGssaveNow = false;
+  runSetup = false;
+  savePNGnow = false;
+  recordSVGnow = false;
+  userInteractedThisVariation = false;
 
   // to produce one static image, uncomment the next function:
   //noLoop();
@@ -464,6 +466,13 @@ void setup() {
 
 // DOES ALL THE THINGS for one frame of animation:
 void animate() {
+
+  // SVG RECORD, CONDITIONALLY:
+  if (recordSVGnow == true) {
+    String svg_file_name_no_ext = get_image_file_name_no_ext();
+    beginRecord(SVG, svg_file_name_no_ext + ".svg");
+  }
+
   background(globalBackgroundColor);  // clears canvas to white before next animaton frame (so no overlap of smaller shapes this frame on larger from last frame) :
   
   // randomizes list--for frenetic option (probably will never want) :
@@ -474,6 +483,11 @@ void animate() {
     //use the next line instead of the one after it for the "frenetic option" (see other comments that say that) :
     //nestedGridSmallCircles[ nestedGridRenderOrder.get(j) ].CirclesGridDrawAndChange();
     nestedGridSmallCircles[j].CirclesGridDrawAndChange();
+  }
+
+  if (recordSVGnow == true) {
+    endRecord();
+    recordSVGnow = false;
   }
 
   totalFramesRendered += 1;
@@ -504,34 +518,9 @@ void animate() {
 
 int last_captured_millis = 0;
 int last_captured_totalFramesRendered = 0;
-boolean runSetup = false;   // Controls when to run setup() again. Manipulated by script logic.
-boolean savePNGnow = false;  // Controls when to save PNGs. Manipulated by script logic.
-boolean recordSVGnow = false;  // Controls when to save SVGs. Manipulated by script logic.
 void draw() {
-  
-  // SVG RECORD START:
-  if (saveSVGs == true && recordSVGnow == true && noMoarSVGsaveNow == false) {
-    // print("Starting SVG recording..\n");
-    String svg_file_name_no_ext = get_image_file_name_no_ext();
-    beginRecord(SVG, svg_file_name_no_ext + ".svg");
-    // print("SVG recording started at frame " + framesRenderedThisVariation + "\n");
-  }
 
   animate();
-
-  // SVG RECORD END:
-  if (recordSVGnow == true) {
-    // not the cleanest function control; I think this will be called even when beginRecord() wasn't;
-    // but it hasn't hated be for it:
-    endRecord();
-    recordSVGnow = false;
-    // print("SVG recording ended at variant frame " + framesRenderedThisVariation + "\n");
-  }
-
-  if (savePNGnow == true && savePNGs == true && noMoarPNGssaveNow == false) {
-    save_PNG();
-    savePNGnow = false;
-    }
 
   // SAVE PNG FRAME AS PART OF ANIMATION FRAMES conditioned on boolean:
   if (saveAllAnimationFrames == true && savePNGs == true) {
@@ -541,8 +530,6 @@ void draw() {
     }
   }
 
-  // WEIRDNESS to allow save of last frame of this variant as PNG and/or SVG
-  // (BEFORE before next variant is created) : 
   // NOTE: runSetupAtMilliseconds (on which this block depends) is initialized in settings() :
     currentTimeMilliseconds = millis();
     if (currentTimeMilliseconds >= runSetupAtMilliseconds) {
@@ -551,52 +538,41 @@ void draw() {
       setDelayToNextVariant();
       // this captures PNG if boolean controlling says do so, before next variant starts via setup() :
       if (saveEveryVariation == true && savePNGs == true) { save_PNG(); }
-      // With the runSetup boolean below, and the handling of recordSVGnow in draw(), allows
-      // saving of SVG of last frame of variation, in one more loop of draw(),
-      // before setting up next variant via setup() :
-      if (saveEveryVariation == true && saveSVGs == true) { recordSVGnow = true; }
-      print("set recordSVGnow true at variant frame " + framesRenderedThisVariation + "\n");
-      // using bool because we want to check it and setup AFTER next loop of draw() has mabye saved SVG:
+      // captures SVG if boolean controlling says to:
+      if (saveEveryVariation == true && saveSVGs == true) {
+        noLoop();
+        recordSVGnow = true;
+        animate();
+        loop();
+      }
       runSetup = true;
     }
-  // END WEIRDNESS to allow save of last frame as PNG and/or SVG
 
-// I think the following code block _could_ be invoked before I've saved the last frame
-// of an SVG (if I didn't have the "if" check),
-// because maybe the draw() loop (or maybe the SVG save functions in it) are non-blocking,
-// or it doesn't/they don't force the loop to wait until they complete. In other words, maybe
-// the loop continues even if the SVG draw / save functions haven't completed yet.
-// So, this "if" checks for a value set after the SVG functions complete before running setup() again:
-  if (runSetup == true && recordSVGnow == false) {
+  if (runSetup == true) {
     setup();
-    runSetup = false;
   }
-}
-
-
-void delay_noMoarIMGsaveNow() {
-  delay(50);
-  noMoarSVGsaveNow = true;    // is reset to false each run of setup()
-  noMoarPNGssaveNow = true;   // "
 }
 
 
 void mousePressed() {
   set_color_morph_mode_at_XY(mouseX, mouseY);
   userInteractionString = "__user_interacted";    // intended use by other functions / reset to "" by other functions
-  savePNGnow = true;
-  recordSVGnow = true;
-  // calls the function of the name given in the string in a separate thread, which has an asynchronous
-  // delay before setting a boolean (asynchronous so that this function doesn't wait for it to finish
-  // before this function completes and exits) :
-  // NOTE: it is possibly a faulty assumption that the next loop of draw() will happen within the time
-  // of the delay in delay_noMoarIMGsaveNow() -- and if it is a false assumption, no images will save,
-  // because noMoarIMGsaveNow will be set to true before the next draw() loop even happens, and if
-  // noMoarIMGsaveNow is true, the logic in now() will not save images.
-  // I TRIED to more precisely control this via noLoop, redraw(), and loop(), but I guess I don't know
-  // how those work. I THOUGHT they were supposed to allow loop manipulation if invoked from e.g. mouse
-  // events?
-  thread("delay_noMoarIMGsaveNow");
+
+  if (userInteractedThisVariation == false) {    // restricts the functionality in this block to once per variation
+                                                 // (because setup(), which is called every variation, sets that false)
+    //save PNG on click, conditionally:
+    if (savePNGs == true) {
+      save_PNG();
+    }
+    // save SVG on click, conditionally:
+    if (saveSVGs == true) {
+      noLoop();
+      recordSVGnow = true;
+      animate();
+      loop();
+    }
+    userInteractedThisVariation = true;
+  }
 }
 
 
