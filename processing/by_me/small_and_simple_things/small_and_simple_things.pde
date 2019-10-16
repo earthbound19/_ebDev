@@ -28,6 +28,7 @@ String versionString = "v1.4.1";
 
 // DEPENDENCY IMPORTS
 import processing.svg.*;
+//import gohai.simpletweet.*;
 
 
 // BEGIN GLOBAL VARIABLES:
@@ -70,7 +71,7 @@ color globalBackgroundColor;
 // true / false for savePNGs, saveSVGs, saveEveryVariation, and (maybe--though I'm confident it works regardless) saveAllAnimationFrames, .
 // START VARIABLES RELATED TO image save:
 boolean savePNGs = true;  // Save PNG images or not
-boolean saveSVGs = true;  // Save SVG images or not
+boolean saveSVGs = false;  // Save SVG images or not
 boolean saveAllAnimationFrames = false;    // if true, all frames up to renderNtotalFrames are saved (and then the program is terminated), so that they can be strung together in a video. Overrides savePNGs state.
 // NOTE: at this writing, no SVG save of every frame.
 int renderNtotalFrames = 7200;    // see saveAllAnimationFrames comment
@@ -78,7 +79,7 @@ int totalFramesRendered;    // incremented during each frame of a running variat
 int framesRenderedThisVariation;
 boolean saveEveryVariation = false;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
 int variationNumThisRun = 0;    // counts how many variations are made during run of program.
-boolean doFixedTimePerVariation = true;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
+boolean doFixedTimePerVariation = false;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
 int fixedMillisecondsPerVariation = (int) (1000 * 11.5);         // milliseconds to display each variation, if previous boolean is true
 int minMillisecondsPerVariation = (int) (1000 * 16.5);      // 1000 milliseconds * 16.5 = 16.5 seconds
 int maxMillisecondsPerVariation = (int) (1000 * 52);        // 1000 milliesconds * 52 = 52 seconds
@@ -94,10 +95,12 @@ int estimatedFPS = 0;    // dynamically modified by program as it runs (and prin
 // SMOFA entry configuration for the following values, for ~6' tall kiosk: 7, 21. ~4K resolution horizontally larger monitors: 14, 43
 int minColumns = 2; int maxColumns = 19;
 float ShapesGridXminPercent = 0.24;   // minimum diameter of circle vs. grid cell size.   Maybe best ~ .6
-float ShapesGridXmaxPercent = 0.91;   // maximum ""                                       Maybe best ~ .75
-int minimumNgonSides = -6;    // if negative number, that many times more circles will appear.
+float ShapesGridXmaxPercent = 0.86;   // maximum ""                                       Maybe best ~ .75
+int minimumNgonSides = -13;    // if negative number, that many times more circles will appear.
 int maximumNgonSides = 7;    // maximum number of sides of shapes randomly chosen. Between minimum and maximum, negative numbers, 0, and 1 will be circles. 2 will be a line.
 // NOTE: to control additional information contained in saved file names, see comments in the get_image_file_name_no_ext() function further below.
+// for image tweets! :
+//SimpleTweet simpletweet;
 // END GLOBAL VARIABLES
 
 
@@ -153,12 +156,12 @@ String get_image_file_name_no_ext() {
     // frame number and user interaction string in the file name, as this script
     // can save it when a user interacts and then also at the last frame of a
     // displayed variation before the next variation:
-    + " cols " + N_cols_tmp
-    + " bgHex " + BGcolorHex
+    // + " cols " + N_cols_tmp
+    // + " bgHex " + BGcolorHex
     // + " pix " + width + "x" + height
     // + " runVariant " + variationNumThisRun
-    + " frame " + framesRenderedThisVariation
-    + userInteractionString;
+    + " frame " + framesRenderedThisVariation;
+    // + userInteractionString;
 
   return img_file_name_no_ext;
 }
@@ -171,7 +174,7 @@ void save_PNG() {
   saveFrame(FNNE + ".png");
 
   // CLOUD SAVE option one (SMOFA kiosk, Windows) :
-  // saveFrame("C:\\Users\\UR_USERNAME\\Dropbox\\By_Small_and_Simple_Things__SMOFA_visitor_image_saves\\" + FNNE + ".png");
+   //saveFrame("C:\\Users\\SMOFA_guest\\Dropbox\\By_Small_and_Simple_Things__SMOFA_visitor_image_saves\\" + FNNE + ".png");
 
   // CLOUD SAVE option two (RAH collecting images, Mac) :
   // saveFrame("/Users/earthbound/Dropbox/small_and_simple_things_RAH_image_saves/" + FNNE + ".png");
@@ -527,9 +530,13 @@ boolean savePNGnow = false;                    // Controls when to save PNGs. Ma
 boolean recordSVGnow = false;                  // Controls when to save SVGs. Manipulated by script logic.
 boolean userInteractedThisVariation = false;   // affects those booleans via script logic.
 // handles values etc. for new animated variation to be displayed:
-// DEV TEST:
-// NestedAnimatedShapes testNestedAnimationShape;
 void setup() {
+  //simpletweet = new SimpleTweet(this);
+  //simpletweet.setOAuthConsumerKey("");
+  //simpletweet.setOAuthConsumerSecret("");
+  //simpletweet.setOAuthAccessToken("");
+  //simpletweet.setOAuthAccessTokenSecret("");
+  
   // uncomment if u want to throttle framerate--RECOMMENDED or
   // a fast CPU will DO ALL THE THINGS TOO MANY TOO FAST and heat up--
   // also it will make for properly timed animations if you save all frames to PNGs or SVGs:
@@ -688,6 +695,10 @@ void mousePressed() {
     }
     userInteractedThisVariation = true;
   }
+  
+  //String fileNameNoExt = get_image_file_name_no_ext();
+  //String tweet = simpletweet.tweetImage(get(), fileNameNoExt + " saved via visitor interaction at Springville Museum of Art! More visitor images at: http://s.earthbound.io/BSaST #generative #generativeArt #processing #processingLanguage #creativeCoding");
+  //println("Posted " + tweet);
 }
 
 
