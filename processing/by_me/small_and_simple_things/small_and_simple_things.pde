@@ -8,19 +8,8 @@
 // https://www.abstractoons.com/2017/05/03/by-small-and-simple-things/by-small-and-simple-things-22x30/
 // re: https://www.abstractoons.com/2017/05/03/by-small-and-simple-things/
 
-// v1.4 work log:
-// - nGon (regular polygon) option of any number sides! See comments on minNgonSides and
-// maxNgonSides in the comments (GLOBAL VARIABLES section).
-// - save all frames as SVGs if saveAllAnimationFrames set to true (and saveSVGs true)
-// - random shape movement on vector that bounces off outer shapes OR invisible boundary
-// beyond outmost shape in nested shapes. BUG FIX in that process: found I was using multiples of diameter before I set circle diameter :p and am now doing that _after_.
-// - throttle framerate to 30 fps with built-in Processing function
-// - fix bug that led to wrong hex code in file names for black and white backgrounds
-// - nested circles size init behavior change hard-coded OPTION (hard-coded disabled): don't allow max size of inner circle to overlap min size of outer circle. NOTE that visually they sometimes will anyway because of randomly thick stroke weights.
-// - updated all animation-controlling variables to floats
-// - defaults tweaks
-// - variable / class renames for clarity (and because of refactoring), defaults tweaks, comment fixups
-String versionString = "v1.4";
+// v1.4.1 improved variability of concentric shape sizing
+String versionString = "v1.4.1";
 
 
 // TO DO:
@@ -90,24 +79,24 @@ int framesRenderedThisVariation;
 boolean saveEveryVariation = false;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
 int variationNumThisRun = 0;    // counts how many variations are made during run of program.
 boolean doFixedTimePerVariation = true;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
-int fixedMillisecondsPerVariation = (int) (1000 * 13.5);         // milliseconds to display each variation, if previous boolean is true
+int fixedMillisecondsPerVariation = (int) (1000 * 11.5);         // milliseconds to display each variation, if previous boolean is true
 int minMillisecondsPerVariation = (int) (1000 * 16.5);      // 1000 milliseconds * 16.5 = 16.5 seconds
 int maxMillisecondsPerVariation = (int) (1000 * 52);        // 1000 milliesconds * 52 = 52 seconds
 int currentTimeMilliseconds;
 int runSetupAtMilliseconds;     // at start of each variation, altered to cue time for next variation
 String userInteractionString;   // changed to states reflecting whether user interacted with a variation or not (empty or not empty)
 // END VARIABLES RELATED TO image save.
-boolean estimateFPS = false;		// vestige from estimating / throttling framerate before I learned about frameRate()). Still useful for displaying time to next variation.
+boolean estimateFPS = true;		// vestige from estimating / throttling framerate before I learned about frameRate()). Still useful for displaying time to next variation.
 int estimatedFPS = 0;    // dynamically modified by program as it runs (and prints running estimatedFPS estimate), IF that afore boolean is true
 // reference of original art:
 // larger original grid size: 25x14, wobbly circle placement, wobbly concentricity in circles.
 // smaller original grid size: 19x13, regular circle placement on grid, wobbly concentricity in circles.
 // SMOFA entry configuration for the following values, for ~6' tall kiosk: 7, 21. ~4K resolution horizontally larger monitors: 14, 43
-int minColumns = 2; int maxColumns = 21;
-float ShapesGridXminPercent = 0.591;   // minimum diameter of circle vs. grid cell size.   Maybe best ~ .6
-float ShapesGridXmaxPercent = 0.734;   // maximum ""                                       Maybe best ~ .75
-int minimumNgonSides = -8;    // if negative number, that many times more circles will appear.
-int maximumNgonSides = 6;    // maximum number of sides of shapes randomly chosen. Between minimum and maximum, negative numbers, 0, and 1 will be circles. 2 will be a line.
+int minColumns = 2; int maxColumns = 19;
+float ShapesGridXminPercent = 0.24;   // minimum diameter of circle vs. grid cell size.   Maybe best ~ .6
+float ShapesGridXmaxPercent = 0.91;   // maximum ""                                       Maybe best ~ .75
+int minimumNgonSides = -6;    // if negative number, that many times more circles will appear.
+int maximumNgonSides = 7;    // maximum number of sides of shapes randomly chosen. Between minimum and maximum, negative numbers, 0, and 1 will be circles. 2 will be a line.
 // NOTE: to control additional information contained in saved file names, see comments in the get_image_file_name_no_ext() function further below.
 // END GLOBAL VARIABLES
 
@@ -393,7 +382,35 @@ class NestedAnimatedShapes {
     nesting = nestingArg;
     AnimatedShapesArray = new AnimatedShape[nesting];
     float donwMultiplyConstantMin = 0.67; float downMultiplyConstantMax = 0.92;
-    float percentOfMinDiameterToMax = RND_min_diameter_mult / RND_max_diameter_mult;
+    // float percentOfMinDiameterToMax = RND_min_diameter_mult / RND_max_diameter_mult;
+
+
+    // PRE-DETERMINE diameter/apothem ("diameter" / 2) sizes for an array of animated shapes.
+    // Then pass them as max and min radius for each shape as we build the array of shapes.
+    // METHOD: get a fixed number of random numbers from a range divided by an interval, descending.
+    // (for nested circle diameters)
+    int interval = nesting + 4;    // divide min and max possible radius by how many intervals to determine size slices?
+    float dividend = (RND_max_diameter_mult - RND_min_diameter_mult) / interval;
+    int radii_to_get = nesting + 1;   // or the last circle will have no min. radius!
+    int low_range_excluder = radii_to_get;
+    int selected = interval;    // a lie to start with but starts the loop as we wish
+    // YARP:
+              // print("~-~-\n");
+    float[] radii = new float[radii_to_get];
+    for (int i = 0; i < radii_to_get; i++) {
+               //print("sel. range: " + low_range_excluder + ":" + selected + " ");
+      int selected_num = (int) random(low_range_excluder, selected + 1);
+      float result_num = RND_min_diameter_mult + (selected_num * dividend);
+      radii[i] = result_num;
+               //print("--selected: " + selected_num + " --dividend: " + dividend + " * selected is: " + result_num + "\n");
+      selected = selected_num - 1;
+      low_range_excluder -= 1;
+    }
+    //debug print (lower index numbers have higher values indeed as intended) :
+    //for (int j = 0; j < radii.length; j++) { print("radii[" + j + "]: " + radii[j] + "\n"); }
+    // END PRE-DETERMINE diameter/apothem sizes.
+
+
 
     for (int i = 0; i < nesting; i++) {
       // tried using this instead of nGonSides; maybe it will be more impressive with random shape orientation / spin? But for now, nah:
@@ -401,8 +418,10 @@ class NestedAnimatedShapes {
       AnimatedShapesArray[i] = new AnimatedShape(
         xCenter,
         yCenter,
-        RND_min_diameter_mult,
-        RND_max_diameter_mult,
+        //RND_min_diameter_mult,
+        //RND_max_diameter_mult,
+        radii[i+1],
+        radii[i+1],
         nGonSides
       );
           // SHRINK MIN AND MAX so next iteration will have smaller shape.
