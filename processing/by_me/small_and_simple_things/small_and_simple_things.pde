@@ -1,16 +1,26 @@
 // "By Small and Simple Things"
 // Coded by Richard Alexander Hall 2019
 // Generates an animated grid of playfully colored concentric nested circles or n-gons (default circles)
-// which contract, expand, rotate, and on user click (or click and drag or tap and tap and drag), morph color.
-// Also saves reference image with random seed in file name on first frame of user tap and last frame of that variant.
+// which change on user click/drag. See USAGE for functionality.
 //
 // Pretty closely imitates art by Daniel Bartholomew, but with random generative constraints:
 // https://www.abstractoons.com/2017/05/03/by-small-and-simple-things/by-small-and-simple-things-22x30/
 // re: https://www.abstractoons.com/2017/05/03/by-small-and-simple-things/
 
-// v1.4.2 work log:
-// - if < 13.5 seconds to next variant and user interact, add 13.5 seconds 'till next variant
-String versionString = "v1.4.2";
+// USAGE:
+// - click or click and drag on shapes to cause them to change.
+// - press the RIGHT arrow key to skip the current displayed variant.
+// - press the LEFT arrow key to go back one variant (only one variant remembered).
+// - if certain booleans are set true, click/drag also causes PNG/SVG image save
+// (only saves first clicked frame and last frame of variant.)
+// - see other global variables as documented below for other functionality.
+
+// v1.4.3 work log:
+// - FIX: if < 13.5 seconds to next variant and user interact, add 21.5 seconds 'till next variant.
+// I must have deleted that line of logic with a print statement before push?! It works now.
+// - ALSO on any key press.
+// - addednext/previous variant display on RIGHT / LEFT arrow keypresses.
+String versionString = "v1.4.3";
 
 
 // TO DO: * = done, */ (or deleted / moved to work log!) = in progress
@@ -21,6 +31,7 @@ String versionString = "v1.4.2";
 // - random orbits for outer and inner shapes?
 // - optional randomly changing nGon sides (shapes) in nested shape init.
 // - even-numbered nested shapes cut out parent shape.
+// - */ drag inner circles along with outer when outer moves (use return from ~.wander())
 // - move items in this list to tracker that aren't there :)
 // - move initialization of these randomization controlling varaibles into initial circles grid (or circles?) function call(s)? :
 // jitter_max_step_mult = random(0.002, 0.0521);
@@ -54,9 +65,10 @@ color[] Prismacolors = {
 };
 
 int PrismacolorArrayLength = Prismacolors.length;
-int seed;
-boolean booleanOverrideSeed = false;    // if set to true, intOverrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly.
-int intOverrideSeed = -161287679;    // a favorite is: -161287679
+boolean booleanOverrideSeed = true;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly.
+int overrideSeed = -161287679;    // a favorite is: -161287679
+int previousSeed = overrideSeed;
+int seed = overrideSeed;
 boolean USE_FULLSCREEN = true;  // if set to true, overrides the following values; if false, they are used:
 int globalWidth = 800;
 int globalHeight = 800;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
@@ -72,13 +84,13 @@ color globalBackgroundColor;
 // true / false for savePNGs, saveSVGs, saveEveryVariation, and (maybe--though I'm confident it works regardless) saveAllAnimationFrames, .
 // START VARIABLES RELATED TO image save:
 boolean savePNGs = true;  // Save PNG images or not
-boolean saveSVGs = false;  // Save SVG images or not
+boolean saveSVGs = true;  // Save SVG images or not
 boolean saveAllAnimationFrames = false;    // if true, all frames up to renderNtotalFrames are saved (and then the program is terminated), so that they can be strung together in a video. Overrides savePNGs state.
 // NOTE: at this writing, no SVG save of every frame.
 int renderNtotalFrames = 7200;    // see saveAllAnimationFrames comment
 int totalFramesRendered;    // incremented during each frame of a running variation. reset at new variation.
 int framesRenderedThisVariation;
-boolean saveEveryVariation = false;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
+boolean saveEveryVariation = true;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
 int variationNumThisRun = 0;    // counts how many variations are made during run of program.
 boolean doFixedTimePerVariation = false;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
 int fixedMillisecondsPerVariation = (int) (1000 * 11.5);         // milliseconds to display each variation, if previous boolean is true
@@ -88,13 +100,13 @@ int currentTimeMilliseconds;
 int runSetupAtMilliseconds;     // at start of each variation, altered to cue time for next variation
 String userInteractionString;   // changed to states reflecting whether user interacted with a variation or not (empty or not empty)
 // END VARIABLES RELATED TO image save.
-boolean estimateFPS = true;		// vestige from estimating / throttling framerate before I learned about frameRate()). Still useful for displaying time to next variation.
+boolean estimateFPS = false;		// vestige from estimating / throttling framerate before I learned about frameRate()). Still useful for displaying time to next variation.
 int estimatedFPS = 0;    // dynamically modified by program as it runs (and prints running estimatedFPS estimate), IF that afore boolean is true
 // reference of original art:
 // larger original grid size: 25x14, wobbly circle placement, wobbly concentricity in circles.
 // smaller original grid size: 19x13, regular circle placement on grid, wobbly concentricity in circles.
 // SMOFA entry configuration for the following values, for ~6' tall kiosk: 7, 21. ~4K resolution horizontally larger monitors: 14, 43
-int minColumns = 2; int maxColumns = 19;
+int minColumns = 2; int maxColumns = 21;
 float ShapesGridXminPercent = 0.24;   // minimum diameter of circle vs. grid cell size.   Maybe best ~ .6
 float ShapesGridXmaxPercent = 0.86;   // maximum ""                                       Maybe best ~ .75
 int minimumNgonSides = -13;    // if negative number, that many times more circles will appear.
@@ -124,6 +136,10 @@ void setDelayToNextVariant() {
 void addGracePeriodToNextVariant() {
   int tmp_millis = millis();
   int time_to_next_variant = runSetupAtMilliseconds - tmp_millis;
+  if (time_to_next_variant < 13500) {
+    runSetupAtMilliseconds += 21500;
+    print("ADDED TIME to next variation because of user interaction.\n");
+  }
 }
 
 
@@ -325,18 +341,21 @@ class AnimatedShape {
     return a;
   }
 
-  void wander() {
-    baseVector.add(additionVector);
+  PVector wander() {
+    PVector vector_to_return = new PVector(0,0);    // will be northing unless changed
     x_center = baseVector.x; y_center = baseVector.y;
     float wandered_distance = dist(x_origin, y_origin, x_center, y_center);
     if (wandered_distance > max_wander_dist) {
-      // undo add:
-      baseVector.sub(additionVector);
+      baseVector.sub(additionVector);      // undo add
 //NOTE: if the following allows angles too near 90, collissions happen before they happen, and freaky atomic jitter results:
       float rotation_angle = random(130, 230);
       //float rotation_angle = random(-11, 12);
       additionVector.rotate(radians(rotation_angle));
+    } else {
+      baseVector.add(additionVector);
+      vector_to_return = additionVector;
     }
+    return vector_to_return;
   }
 
 //  void orbit() {
@@ -544,18 +563,20 @@ void setup() {
   //simpletweet.setOAuthConsumerSecret("");
   //simpletweet.setOAuthAccessToken("");
   //simpletweet.setOAuthAccessTokenSecret("");
-  
+
   // uncomment if u want to throttle framerate--RECOMMENDED or
   // a fast CPU will DO ALL THE THINGS TOO MANY TOO FAST and heat up--
   // also it will make for properly timed animations if you save all frames to PNGs or SVGs:
   frameRate(30);
 
-  seed = (int) random(-2147483648, 2147483647);
-  randomSeed(seed);
-  // THAT WILL BE OVERRIDEN if the boolean value booleanOverrideSeed is set to true:
-  if (variationNumThisRun == 0 && booleanOverrideSeed == true) {
-    randomSeed(intOverrideSeed);
+  if (booleanOverrideSeed == true) {
+    seed = previousSeed;
+    booleanOverrideSeed = false;
+  } else {
+    previousSeed = seed;
+    seed = (int) random(-2147483648, 2147483647);
   }
+  randomSeed(seed);
 
   variationNumThisRun += 1;
   //print("~-~- Setting up variation number " + variationNumThisRun + " in run. Seed: " + seed + " -~-~\n");
@@ -703,7 +724,7 @@ void mousePressed() {
     }
     userInteractedThisVariation = true;
   }
-  
+
   //String fileNameNoExt = get_image_file_name_no_ext();
   //String tweet = simpletweet.tweetImage(get(), fileNameNoExt + " saved via visitor interaction at Springville Museum of Art! More visitor images at: http://s.earthbound.io/BSaST #generative #generativeArt #processing #processingLanguage #creativeCoding");
   //println("Posted " + tweet);
@@ -713,4 +734,24 @@ void mousePressed() {
 
 void mouseDragged() {
   set_color_morph_mode_at_XY(mouseX, mouseY);
+}
+
+
+void keyPressed() {
+  // if user presses left arrow key, go back to previous variant:
+  if (keyCode == LEFT) {
+    booleanOverrideSeed = true;
+    runSetupAtMilliseconds = 0;
+  }
+  // if user presses right arrow key, skip this variant:
+  if (keyCode == RIGHT) {
+    // booleanOverrideSeed = false;
+    runSetupAtMilliseconds = 0;
+  }
+
+  // Is there a more elegant way to do this where switches aren't available?
+  // If I add more key responses above, I have to add them here:
+  if (keyCode != LEFT && keyCode != RIGHT) {
+    addGracePeriodToNextVariant();
+  }
 }
