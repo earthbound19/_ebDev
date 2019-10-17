@@ -15,12 +15,10 @@
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
 
-// v1.4.3 work log:
-// - FIX: if < 13.5 seconds to next variant and user interact, add 21.5 seconds 'till next variant.
-// I must have deleted that line of logic with a print statement before push?! It works now.
-// - ALSO on any key press.
-// - addednext/previous variant display on RIGHT / LEFT arrow keypresses.
-String versionString = "v1.4.3";
+// v1.4.4 work log:
+// - drag inner circles along with outer when outer moves (use return from ~.wander())
+// - delete unused variables / vestigal comments
+String versionString = "v1.4.4";
 
 
 // TO DO: * = done, */ (or deleted / moved to work log!) = in progress
@@ -31,7 +29,6 @@ String versionString = "v1.4.3";
 // - random orbits for outer and inner shapes?
 // - optional randomly changing nGon sides (shapes) in nested shape init.
 // - even-numbered nested shapes cut out parent shape.
-// - */ drag inner circles along with outer when outer moves (use return from ~.wander())
 // - move items in this list to tracker that aren't there :)
 // - move initialization of these randomization controlling varaibles into initial circles grid (or circles?) function call(s)? :
 // jitter_max_step_mult = random(0.002, 0.0521);
@@ -65,7 +62,7 @@ color[] Prismacolors = {
 };
 
 int PrismacolorArrayLength = Prismacolors.length;
-boolean booleanOverrideSeed = true;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly.
+boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly.
 int overrideSeed = -161287679;    // a favorite is: -161287679
 int previousSeed = overrideSeed;
 int seed = overrideSeed;
@@ -312,6 +309,9 @@ class AnimatedShape {
     nGon.scale(percent_change_multiplier);
   }
 
+// TO DO: redo how jitter is done? Do I want to calc. off origins?
+// And doesn't this undo things that wander does (by resetting center off wander)?
+// Commenting out of render functions for now..
   void jitter() {
     max_jitter_dist = diameter * jitter_max_step_mult;
     // SETUP x AND y ADDITION (positive or negative) of morph coordinate:
@@ -397,6 +397,11 @@ class AnimatedShape {
       ellipse(x_center, y_center, diameter, diameter);
     }
   }
+
+  void translate(PVector add) {
+    x_center += add.x; y_center += add.y;
+  }
+
 }
 
 
@@ -439,44 +444,34 @@ class NestedAnimatedShapes {
     //debug print (lower index numbers have higher values indeed as intended) :
     //for (int j = 0; j < radii.length; j++) { print("radii[" + j + "]: " + radii[j] + "\n"); }
     // END PRE-DETERMINE diameter/apothem sizes.
-
-
-
     for (int i = 0; i < nesting; i++) {
-      // tried using this instead of nGonSides; maybe it will be more impressive with random shape orientation / spin? But for now, nah:
-      // int rnd_meta_nGonSides = (int) random(0, nGonSides + 1);    // sometimes this will be "random" between 0 and 0. Whatever.
       AnimatedShapesArray[i] = new AnimatedShape(
         xCenter,
         yCenter,
-        //RND_min_diameter_mult,
-        //RND_max_diameter_mult,
         radii[i+1],
         radii[i+1],
         nGonSides
       );
-          // SHRINK MIN AND MAX so next iteration will have smaller shape.
-          // OPTION ONE:
-          // Make old minimum new maximum, and new minimum from min. multiplier vs. that new max
-          // (or percentOfMinDiameterToMax) :
-    RND_max_diameter_mult = RND_min_diameter_mult;
-    RND_min_diameter_mult *= donwMultiplyConstantMin;
-          // OR:
-          // OPTION TWO: min and max down-multiplied by a constant, which results in inner shapes
-          // sometimes having a diameter (allowed max) greater than out shape minimum size. This
-          // is more visually interesting in terms of animation, and at first I thought it broke
-          // random vector movement of shapes, but is seems not to.
-    // RND_min_diameter_mult *= donwMultiplyConstantMin;
-    // RND_max_diameter_mult *= downMultiplyConstantMax;
     }
+// TO DO: THIS HACK to allow outer circle to wander a lot more than inner ones--ENABLE when I redo the way wandering works and inner shapes stay within outer:
+//    AnimatedShapesArray[0].max_wander_dist *= 5.8;    // or whatever looks good
+
   }
 
   void drawAndChangeNestedShapes() {
     for (int j = 0; j < nesting; j++) {
       AnimatedShapesArray[j].drawShape();
       AnimatedShapesArray[j].morphDiameter();
-      AnimatedShapesArray[j].jitter();
-      AnimatedShapesArray[j].wander();
-      // UNCOMMENT FOR COLOR MORPHING, which makes it freaking DAZZLING, if I may say so:
+// COMMENTING OUT for reasons given in comment near function:
+      // AnimatedShapesArray[j].jitter();
+      PVector tmp_vec = AnimatedShapesArray[j].wander();
+      // drag all inner circles with outer translated circle, using that gotten vector:
+      if (j < nesting) {
+        for (int k = j; k < nesting; k++) {
+          AnimatedShapesArray[k].translate(tmp_vec);
+        }
+      }
+      // COLOR MORPHING makes it freaking DAZZLING, if I may say so:
       AnimatedShapesArray[j].morphColor();
     }
   }
