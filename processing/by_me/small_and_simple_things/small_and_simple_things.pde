@@ -8,12 +8,15 @@
 // https://www.abstractoons.com/2017/05/03/by-small-and-simple-things/by-small-and-simple-things-22x30/
 // re: https://www.abstractoons.com/2017/05/03/by-small-and-simple-things/
 
-// v1.4.1 improved variability of concentric shape sizing
-String versionString = "v1.4.1";
+// v1.4.2 work log:
+// - if < 13.5 seconds to next variant and user interact, add 13.5 seconds 'till next variant
+String versionString = "v1.4.2";
 
 
-// TO DO:
+// TO DO: * = done, */ (or deleted / moved to work log!) = in progress
 // - animation-controlling-varaible scaling up/down vs. 800 px-wide grid reference.
+// - moar / different things on subsequent user interaction: color index cycle jump, bw mode, grayscale mode, toggle nGon/circle mode, size rnd? . . .
+// - scale nGons to all be same area as circle with same "diameter" (apothem)? https://en.wikipedia.org/wiki/Regular_polygon#Area
 // - group PShapes with children in nested shapes on render (for SVG grouping)
 // - random orbits for outer and inner shapes?
 // - optional randomly changing nGon sides (shapes) in nested shape init.
@@ -21,9 +24,7 @@ String versionString = "v1.4.1";
 // - move items in this list to tracker that aren't there :)
 // - move initialization of these randomization controlling varaibles into initial circles grid (or circles?) function call(s)? :
 // jitter_max_step_mult = random(0.002, 0.0521);
-// diameter = random(diameterMin, diameterMax);
 // diameter_morph_rate = random(0.009, 0.011);
-// scale nGons to all be same area as circle with same "diameter" (apothem)? https://en.wikipedia.org/wiki/Regular_polygon#Area
 
 
 // DEPENDENCY IMPORTS
@@ -116,6 +117,13 @@ void setDelayToNextVariant() {
     int tmp_MS_to_add_till_next_variation = (int) random(minMillisecondsPerVariation, maxMillisecondsPerVariation);
     runSetupAtMilliseconds = currentTimeMilliseconds + tmp_MS_to_add_till_next_variation;
   }
+}
+
+// if less than short number of seconds until next variant, add that + more seconds 'till next variant
+// (in circumstances where this function call will be executed) :
+void addGracePeriodToNextVariant() {
+  int tmp_millis = millis();
+  int time_to_next_variant = runSetupAtMilliseconds - tmp_millis;
 }
 
 
@@ -699,6 +707,7 @@ void mousePressed() {
   //String fileNameNoExt = get_image_file_name_no_ext();
   //String tweet = simpletweet.tweetImage(get(), fileNameNoExt + " saved via visitor interaction at Springville Museum of Art! More visitor images at: http://s.earthbound.io/BSaST #generative #generativeArt #processing #processingLanguage #creativeCoding");
   //println("Posted " + tweet);
+  addGracePeriodToNextVariant();
 }
 
 
