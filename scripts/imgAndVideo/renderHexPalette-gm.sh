@@ -155,8 +155,9 @@ fi
 # make directory of color tiles from palette:
 while IFS= read -r line || [ -n "$line" ]
 do
-	hexNoHash=`echo $line | sed 's/\#//g'`
-	gm convert -size "$tileEdgeLen"x"$tileEdgeLen" xc:\#$hexNoHash _hexPaletteIMGgenTMP_2bbVyVxD/$hexNoHash.png
+	# IF A SCRIPT THAT I DEVELOPED WORKED ONCE UPON A TIME BUT DOESN'T ANYMORE, it is because sed on windows is inserting $#@! windows newlines into stdin/out! &@*(@!! FIXED with tr -d '\15\32':
+	hexNoHash=`echo $line | gsed 's/\#//g' | tr -d '\15\32'`
+	gm convert -size "$tileEdgeLen"x"$tileEdgeLen" xc:\#"$hexNoHash" _hexPaletteIMGgenTMP_2bbVyVxD/"$hexNoHash".png
 done < $hexColorSrcFullPath
 
 # make the actual montage image.
@@ -168,7 +169,8 @@ done < $hexColorSrcFullPath
 echo "gm montage -tile $tilesAcross"x"$tilesDown -background gray -geometry $tileEdgeLen"x"$tileEdgeLen+0+0 \\" > mkGridHead.txt
 
   # convert hex color scheme text list file to parameter list for ~magick:
-sed 's/.*#\(.*\)$/_hexPaletteIMGgenTMP_2bbVyVxD\/\1.png \\/' $hexColorSrcFullPath > ./mkGridSRCimgs.txt
+gsed 's/.*#\(.*\)$/_hexPaletteIMGgenTMP_2bbVyVxD\/\1.png \\/' $hexColorSrcFullPath > ./mkGridSRCimgs.txt
+dos2unix ./mkGridSRCimgs.txt
 # IF $shuffleValues is nonzero, randomly sort that list:
 	if [ $shuffleValues -ne 0 ]; then shuf ./mkGridSRCimgs.txt > ./tmp_3A7u2ZymRgdss4rsXuxs.txt; rm ./mkGridSRCimgs.txt; mv ./tmp_3A7u2ZymRgdss4rsXuxs.txt ./mkGridSRCimgs.txt; fi
 echo $renderTarget > mkGridTail.txt
