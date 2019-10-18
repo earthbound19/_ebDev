@@ -1,5 +1,7 @@
 # DESCRIPTION
 # Overwrites a .hexplt file (pass it to the script as $1) with a hex-sorted copy of itself.
+# You probably don't want to do this for color sorting though--raw math sort is often bad with
+# color--you probably want to use RGBhexColorSortIn2CIECAM02.py (see).
 
 # USAGE
 # sort_hexplt.sh a_hexplt_file.hexplt
