@@ -15,10 +15,10 @@
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
 
-// v1.4.4 work log:
-// - drag inner circles along with outer when outer moves (use return from ~.wander())
-// - delete unused variables / vestigal comments
-String versionString = "v1.4.4";
+// v1.4.5 work log:
+// - set file name back to giving cols and bg color
+// - discard variationNumThisRun variable and related things--no use for anymore
+String versionString = "v1.4.5";
 
 
 // TO DO: * = done, */ (or deleted / moved to work log!) = in progress
@@ -88,7 +88,6 @@ int renderNtotalFrames = 7200;    // see saveAllAnimationFrames comment
 int totalFramesRendered;    // incremented during each frame of a running variation. reset at new variation.
 int framesRenderedThisVariation;
 boolean saveEveryVariation = true;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
-int variationNumThisRun = 0;    // counts how many variations are made during run of program.
 boolean doFixedTimePerVariation = false;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
 int fixedMillisecondsPerVariation = (int) (1000 * 11.5);         // milliseconds to display each variation, if previous boolean is true
 int minMillisecondsPerVariation = (int) (1000 * 16.5);      // 1000 milliseconds * 16.5 = 16.5 seconds
@@ -135,7 +134,7 @@ void addGracePeriodToNextVariant() {
   int time_to_next_variant = runSetupAtMilliseconds - tmp_millis;
   if (time_to_next_variant < 13500) {
     runSetupAtMilliseconds += 21500;
-    print("ADDED TIME to next variation because of user interaction.\n");
+    print("ADDED TIME delay until next variation because of user interaction.\n");
   }
 }
 
@@ -177,12 +176,11 @@ String get_image_file_name_no_ext() {
     // frame number and user interaction string in the file name, as this script
     // can save it when a user interacts and then also at the last frame of a
     // displayed variation before the next variation:
-    // + " cols " + N_cols_tmp
-    // + " bgHex " + BGcolorHex
+     + " cols " + N_cols_tmp
+     + " bgHex " + BGcolorHex
     // + " pix " + width + "x" + height
-    // + " runVariant " + variationNumThisRun
-    + " frame " + framesRenderedThisVariation;
-    // + userInteractionString;
+     + " frame " + framesRenderedThisVariation
+     + userInteractionString;
 
   return img_file_name_no_ext;
 }
@@ -572,9 +570,6 @@ void setup() {
     seed = (int) random(-2147483648, 2147483647);
   }
   randomSeed(seed);
-
-  variationNumThisRun += 1;
-  //print("~-~- Setting up variation number " + variationNumThisRun + " in run. Seed: " + seed + " -~-~\n");
 
   ellipseMode(CENTER);
 
