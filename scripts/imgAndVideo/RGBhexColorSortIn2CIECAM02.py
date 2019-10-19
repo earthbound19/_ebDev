@@ -1,8 +1,12 @@
 # DESCRIPTION
 # Takes a list of RGB colors expressed in hex (one per line) and sorts them 
 # using the state of the art color appearance model for human color vision: CIECAM02.
-# v1.0.1 AKTULLY works (algorithm overhaul after I realized a logic error). Also, known issue solved.
+# v1.0.2:
+# - add usage notes about mangled input data because it tripped me
+# - better agrv count detection (prior method borke on windows)
 
+# NOTES: this script expects perfect data. If there's a blank line anywhere in the
+# input file, or any other unexpected data, it may stop with an unhelpful error.
 # USAGE
 # With this script and a .hexplt file both in your immediate path, and
 # Python in your PATH, call this script with one parameter, being a hex palette list:
@@ -38,9 +42,9 @@ from colorspacious import cspace_convert, deltaE
 def hex_to_CIECAM02_JCh(in_string):
     """ Takes an RGB hex value and returns:
     1. a CIECAM02 3-point value.
-    2. The CIECAM02 triplet string used in the cpace_convert function call in this function.
+    2. The CIECAM02 triplet string used in the cspace_convert function call in this function.
     This is because you may want to hack this function to try different triplet strins. See comments
-    in this function, and the cpace_convert function call in this function."""
+    in this function, and the cspace_convert function call in this function."""
         # hex to RGB ganked from https://stackoverflow.com/a/29643643/1397555 :
     RGB = tuple(int(in_string[i:i+2], 16) for i in (0, 2, 4))
         # REFERENCE for the third parameter of the next function call in code; re
@@ -100,7 +104,8 @@ colors_list = [element[1:] for element in colors_list]
 # with manual nested for loops because itertools returns tuples and other reasons that
 # may not be valid:
 pair_deltaEs = []
-if sys.argv[2]:
+
+if len(sys.argv) > 1:	# if a second parameter was passed to script, do these things:
     print('Input file is ', inputFile)
     print('Getting deltaE for all color combinations . . .')
 for i in range(len(colors_list)):
@@ -112,12 +117,12 @@ for i in range(len(colors_list)):
         pair_deltaEs.append([distance, colors_list[i], colors_list[j]])
 
 # results in lowest deltaE values first; may cause searches to run faster (I don't know):
-if sys.argv[2]:
+if len(sys.argv) > 1:
     print('Sorting deltaEs . . .')
 pair_deltaEs.sort()
 sorted_colors = list()
 
-if sys.argv[2]:
+if len(sys.argv) > 1:
     print('Sorting colors by nearest deltaE . . .')
 search_color = colors_list[0]
 sorted_colors.append(search_color)  # starts list
@@ -153,15 +158,14 @@ while len(sorted_colors) < len(colors_list):
 # If a second argument (which may be anything) was passed to the script, 
 # overwrite the source read file with the sorted copy of it.
 # Otherwise, print the sorted list to stdout.
-try:
-    yorf = sys.argv[2]
+if len(sys.argv) > 2:
     print('Writing sorted color list back over original file . . .')
     with open(inputFile, 'w') as f:
         for element in sorted_colors:
             print_element = '#' + element + '\n'
             f.write(print_element)
     f.close()
-except:
+else:
     for element in sorted_colors:
         print_element = '#' + element
         print(print_element)
