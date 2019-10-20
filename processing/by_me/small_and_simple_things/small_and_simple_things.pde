@@ -15,20 +15,21 @@
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
 
-// v1.4.5 work log:
-// - set file name back to giving cols and bg color
-// - discard variationNumThisRun variable and related things--no use for anymore
-String versionString = "v1.4.5";
+// v1.4.6 work log:
+// - remove some nearly redundant background colors, add new ones
+// - split background and fill colors into different palettes
+String versionString = "v1.4.6";
 
 
 // TO DO: * = done, */ (or deleted / moved to work log!) = in progress
+// - intra-circle collision detection/wrangling to stay in (improved wander/jitter restrict)
 // - animation-controlling-varaible scaling up/down vs. 800 px-wide grid reference.
 // - moar / different things on subsequent user interaction: color index cycle jump, bw mode, grayscale mode, toggle nGon/circle mode, size rnd? . . .
 // - scale nGons to all be same area as circle with same "diameter" (apothem)? https://en.wikipedia.org/wiki/Regular_polygon#Area
 // - group PShapes with children in nested shapes on render (for SVG grouping)
 // - random orbits for outer and inner shapes?
 // - optional randomly changing nGon sides (shapes) in nested shape init.
-// - even-numbered nested shapes cut out parent shape.
+// - option: even-numbered nested shapes cut out parent shape.
 // - move items in this list to tracker that aren't there :)
 // - move initialization of these randomization controlling varaibles into initial circles grid (or circles?) function call(s)? :
 // jitter_max_step_mult = random(0.002, 0.0521);
@@ -41,27 +42,7 @@ import processing.svg.*;
 
 
 // BEGIN GLOBAL VARIABLES:
-// Prismacolor marker colors array:
-color[] Prismacolors = {
-  #CA4587, #D8308F, #E54D93, #EA5287, #E14E6D, #F45674, #F86060,
-  #D96A6E, #CA5A62, #C14F6E, #B34958, #AA4662, #8E4C5C, #8F4772,
-  #934393, #AF62A2, #8D6CA9, #7F7986, #72727D, #615F6B, #62555E,
-  #72646C, #745D5F, #877072, #8D6E64, #9B685D, #BD6E6B, #C87F73,
-  #C97B8E, #E497A4, #F895AC, #FA9394, #F98973, #EE8A74, #FA855B,
-  #FD9863, #EBB28B, #FEC29F, #F9C0BC, #F6C6D0, #F5D3DD, #F0D9DC,
-  #F5DCD5, #EEE4DC, #F1E5E9, #E5E4E9, #C7C6CD, #C9CBE0, #97C1DA,
-  #91BACB, #95B6BA, #A2B1A2, #BFA9A8, #CBADB1, #D1BCBD, #DEBBB3,
-  #E0BFB5, #F0CCC4, #EDD6BF, #F8D9BE, #EEE2C7, #F2D8A4, #F7D580,
-  #FFC874, #F5D969, #C6DD8E, #93CD87, #82B079, #36B191, #009D79,
-  #009E90, #008D94, #4F8584, #618979, #59746E, #1E7C72, #367793,
-  #6389AB, #7B91A2, #69A2BE, #74B3E3, #00B3DB, #4CC8D9, #7AD2E2,
-  #0BBDC4, #66C7B0, #9B98A2, #AC9EB8, #B1A1C9, #A1A6D0, #C0A9BE,
-  #B7A1AF, #A58E9A, #B19491, #AA8E79, #987D80, #75755C, #687B57,
-  #524547, #5B4446, #574C70, #405F89, #435BA3, #33549B, #0090C7,
-  #BEB27B, #ECA6B9, #EF7FAD, #E65F9F, #D13352
-};
-
-int PrismacolorArrayLength = Prismacolors.length;
+// NOTE: to control additional information contained in saved file names, see comments in the get_image_file_name_no_ext() function further below.
 boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly.
 int overrideSeed = -161287679;    // a favorite is: -161287679
 int previousSeed = overrideSeed;
@@ -73,7 +54,7 @@ int gridNesting = 4;    // controls how many nests of circles there are for each
 GridOfNestedAnimatedShapes GridOfShapes;
 int GridOfShapesNumCols;    // to be reinitialized in each loop of setup() -- for reference from other functions
 int GridOfShapesNumRows;    // "
-int RNDcolorIDX;    // to be used as random index from array of colors
+int RNDbgColorIDX;    // to be used as random index from array of colors
 color globalBackgroundColor;
 // for "frenetic option", loop creates a list of size gridNesting (of ints) :
 // IntList nestedGridRenderOrder = new IntList();    // because this list has a shuffle() member function, re: https://processing.org/reference/IntList.html
@@ -107,7 +88,42 @@ float ShapesGridXminPercent = 0.24;   // minimum diameter of circle vs. grid cel
 float ShapesGridXmaxPercent = 0.86;   // maximum ""                                       Maybe best ~ .75
 int minimumNgonSides = -13;    // if negative number, that many times more circles will appear.
 int maximumNgonSides = 7;    // maximum number of sides of shapes randomly chosen. Between minimum and maximum, negative numbers, 0, and 1 will be circles. 2 will be a line.
-// NOTE: to control additional information contained in saved file names, see comments in the get_image_file_name_no_ext() function further below.
+// Prismacolor marker colors array:
+color[] backgroundColors = {
+	#CA4587, #D8308F, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E,
+	#CA5A62, #C14F6E, #B34958, #AA4662, #8E4C5C, #8F4772, #934393, #AF62A2,
+	#8D6CA9, #72727D, #615F6B, #62555E, #745D5F, #877072, #8D6E64, #9B685D,
+	#A45A52, #BD6E6B, #C87F73, #C97B8E, #E497A4, #F895AC, #FA9394, #F98973,
+	#EE8A74, #FA855B, #FD9863, #EBB28B, #FEC29F, #F9C0BC, #F6C6D0, #F5D3DD,
+	#F0D9DC, #F5DCD5, #F0CCC4, #E0BFB5, #F8D9BE, #EEE2C7, #F2D8A4, #FADFA7,
+	#F7D580, #FFC874, #FDFD96, #F5FFA1, #F0FFF0, #FFFFFF, #E0FFFF, #E5E4E9, #F1E5E9,
+	#C7C6CD, #C9CBE0, #97C1DA, #91BACB, #95B6BA, #A2B1A2, #BFA9A8, #B7A1AF,
+	#AC9EB8, #B1A1C9, #A1A6D0, #9B98A2, #A58E9A, #B19491, #7B91A2, #6389AB,
+	#69A2BE, #74B3E3, #00B3DB, #4CC8D9, #7AD2E2, #93EDF7, #00FFEF, #7FFFD4,
+	#88D8C0, #93CD87, #82B079, #00A86B, #009B7D, #00A693, #36B191, #0BBDC4,
+	#008D94, #4F8584, #1E7C72, #59746E, #367793, #405F89, #435BA3, #33549B,
+	#3344EF, #333388, #333366, #333351, #003153, #002147, #000000, #32127A, #574C70,
+	#524547, #414141, #79443B, #4E1609, #C23B22, #EF3312, #FD0E35, #D13352,
+	#E323DB, #2E8B57, #73ED91, #00FA9A, #A1FA2A, #7EF100
+};
+int backgroundColorsArrayLength = backgroundColors.length;
+color[] fillColors = {
+	#CA4587, #D8308F, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E,
+	#CA5A62, #C14F6E, #B34958, #AA4662, #8E4C5C, #8F4772, #934393, #AF62A2,
+	#8D6CA9, #72727D, #615F6B, #62555E, #745D5F, #877072, #8D6E64, #9B685D,
+	#A45A52, #BD6E6B, #C87F73, #C97B8E, #E497A4, #F895AC, #FA9394, #F98973,
+	#EE8A74, #FA855B, #FD9863, #EBB28B, #FEC29F, #F9C0BC, #F6C6D0, #F5D3DD,
+	#F0D9DC, #F5DCD5, #F0CCC4, #E0BFB5, #F8D9BE, #EEE2C7, #F2D8A4, #FADFA7,
+	#F7D580, #FFC874, #FDFD96, #F5FFA1, #F0FFF0, #E0FFFF, #E5E4E9, #F1E5E9,
+	#C7C6CD, #C9CBE0, #97C1DA, #91BACB, #95B6BA, #A2B1A2, #BFA9A8, #B7A1AF,
+	#AC9EB8, #B1A1C9, #A1A6D0, #9B98A2, #A58E9A, #B19491, #7B91A2, #6389AB,
+	#69A2BE, #74B3E3, #00B3DB, #4CC8D9, #7AD2E2, #93EDF7, #00FFEF, #7FFFD4,
+	#88D8C0, #93CD87, #82B079, #00A86B, #009B7D, #00A693, #36B191, #0BBDC4,
+	#008D94, #4F8584, #1E7C72, #59746E, #367793, #405F89, #435BA3, #33549B,
+	#3344BB, #333388, #333366, #333351, #003153, #002147, #32127A, #574C70,
+	#524547, #414141, #79443B, #4E1609, #2E8B57, #73ED91, #00FA9A
+};
+int fillColorsArrayLength = fillColors.length;
 // for image tweets! :
 //SimpleTweet simpletweet;
 // END GLOBAL VARIABLES
@@ -132,8 +148,8 @@ void setDelayToNextVariant() {
 void addGracePeriodToNextVariant() {
   int tmp_millis = millis();
   int time_to_next_variant = runSetupAtMilliseconds - tmp_millis;
-  if (time_to_next_variant < 13500) {
-    runSetupAtMilliseconds += 21500;
+  if (time_to_next_variant < 13750) {
+    runSetupAtMilliseconds += 28750;
     print("ADDED TIME delay until next variation because of user interaction.\n");
   }
 }
@@ -205,7 +221,7 @@ void save_PNG() {
 
 // BEGIN CLASSES
 // class that contains persisting, modifiable information on a circle.
-// NOTE: uses the above global Prismacolors array of colors.
+// NOTE: uses the above global fillColors array of colors.
 class AnimatedShape {
   float x_origin;
   float y_origin;
@@ -256,12 +272,12 @@ class AnimatedShape {
     max_jitter_dist = diameter * jitter_max_step_mult;
     max_wander_dist = diameter * 0.032;   // MAYBE TO DO: set that in logic elsewhere in this script (when setting up grid of animated shapes?) using these circles, to: (outer_circle_diameter - inner_circle_diameter)   -- outer circle being circle this one may be within.
     // set RND stroke and fill colors:
-    int RNDarrayIndex = (int)random(PrismacolorArrayLength);
-    stroke_color = Prismacolors[RNDarrayIndex];
+    int RNDarrayIndex = (int)random(fillColorsArrayLength);
+    stroke_color = fillColors[RNDarrayIndex];
     stroke_color_palette_idx = RNDarrayIndex;
     stroke_weight = random(diameter_max * 0.0064, diameter_max * 0.0307);   // have tried as high as 0.042 tweaked up from v.1.3.6 size: 0.028
-    RNDarrayIndex = (int)random(PrismacolorArrayLength);
-    fill_color = Prismacolors[RNDarrayIndex];
+    RNDarrayIndex = (int)random(fillColorsArrayLength);
+    fill_color = fillColors[RNDarrayIndex];
     fill_color_palette_idx = RNDarrayIndex;
     //TO DO? : control the folling rnd range with parameters?
     milliseconds_elapse_to_color_morph = (int) random(42, 111);    // on more powerful hardware, 194 is effectively true with no throttling of this.
@@ -366,16 +382,16 @@ class AnimatedShape {
     if ((localMillis - milliseconds_at_last_color_change_elapsed) > milliseconds_elapse_to_color_morph && color_morph_on == true) {
       // morph stroke color:
       stroke_color_palette_idx += 1;
-      if (stroke_color_palette_idx >= PrismacolorArrayLength) {
+      if (stroke_color_palette_idx >= fillColorsArrayLength) {
         stroke_color_palette_idx = 0;
       }    // reset that if it went out of bounds of array indices
-      stroke_color = Prismacolors[stroke_color_palette_idx];
+      stroke_color = fillColors[stroke_color_palette_idx];
       // morph fill color:
       fill_color_palette_idx += 1;
-      if (fill_color_palette_idx >= PrismacolorArrayLength) {
+      if (fill_color_palette_idx >= fillColorsArrayLength) {
         fill_color_palette_idx = 0;
       }        // also reset that if it was out of bounds
-      fill_color = Prismacolors[fill_color_palette_idx];
+      fill_color = fillColors[fill_color_palette_idx];
       milliseconds_at_last_color_change_elapsed = millis();
     }
   }
@@ -573,18 +589,9 @@ void setup() {
 
   ellipseMode(CENTER);
 
-  // Randomly change the background color to any color from the Prismacolor array OR black OR white at each run:
-  RNDcolorIDX = (int)random(PrismacolorArrayLength + 2);
-  // I can't use a switch because of requirement that cases be constant expressions, so:
-  if (RNDcolorIDX == PrismacolorArrayLength) {    // confusingly, that actually means what results from the (PrismacolorArrayLength + 1) max range (as random doesn't include max range)
-    globalBackgroundColor = color(0);    // black
-  } else {
-    if (RNDcolorIDX == PrismacolorArrayLength + 1) {
-      globalBackgroundColor = color(255);    // white
-    } else {   // all other cases, use whatever rnd idx was chosen in the range 0 - length of array:
-      globalBackgroundColor = Prismacolors[RNDcolorIDX];
-    }
-  }
+  // Randomly change the background color to any color from backgroundColors array at each run:
+  RNDbgColorIDX = (int)random(backgroundColorsArrayLength);
+	globalBackgroundColor = backgroundColors[RNDbgColorIDX];
   // To always have N circles accross the grid, uncomment the next line and comment out the line after it. For random between N and N-1, comment out the next line and uncomment the one after it.
   // int gridXcount = 19;  // good values: any, or 14 or 19
   int gridXcount = (int) random(minColumns, maxColumns + 1);  // +1 because random doesn't include max range. Also, see comments where those values are set.
