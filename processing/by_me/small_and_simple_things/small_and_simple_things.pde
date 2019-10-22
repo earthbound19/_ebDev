@@ -15,23 +15,28 @@
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
 
-// v1.4.6 work log:
-// - remove some nearly redundant background colors, add new ones
-// - split background and fill colors into different palettes
-String versionString = "v1.4.6";
+// v1.5.0 work log:
+// - constrain shapes within boundaries of other shapes via a bit o' algebra; means:
+// - improved wander/jitter restrict: intra-shape collision detection/wrangling to stay in
+// - fix loop counting bug (redundancy) in implementing that
+// - add functions assisting with collision / distance detect
+// - add to do items for simpler code
+// - comment out jitter
+String versionString = "v1.5.0";
 
 
 // TO DO: * = done, */ (or deleted / moved to work log!) = in progress
-// - intra-circle collision detection/wrangling to stay in (improved wander/jitter restrict)
 // - animation-controlling-varaible scaling up/down vs. 800 px-wide grid reference.
 // - moar / different things on subsequent user interaction: color index cycle jump, bw mode, grayscale mode, toggle nGon/circle mode, size rnd? . . .
 // - scale nGons to all be same area as circle with same "diameter" (apothem)? https://en.wikipedia.org/wiki/Regular_polygon#Area
 // - group PShapes with children in nested shapes on render (for SVG grouping)
+// - constraint-free mode (all shapes wander on initial vector without bouncing back)
 // - random orbits for outer and inner shapes?
 // - optional randomly changing nGon sides (shapes) in nested shape init.
 // - option: even-numbered nested shapes cut out parent shape.
+// - change all x y coordinate pair variables to PVectors
 // - move items in this list to tracker that aren't there :)
-// - move initialization of these randomization controlling varaibles into initial circles grid (or circles?) function call(s)? :
+// - move initialization of these randomization controlling varaibles into initial shapes grid (or circles?) function call(s)? :
 // jitter_max_step_mult = random(0.002, 0.0521);
 // diameter_morph_rate = random(0.009, 0.011);
 
@@ -50,7 +55,7 @@ int seed = overrideSeed;
 boolean USE_FULLSCREEN = true;  // if set to true, overrides the following values; if false, they are used:
 int globalWidth = 800;
 int globalHeight = 800;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
-int gridNesting = 4;    // controls how many nests of circles there are for each circle on the grid. 5 hangs it. ?
+int gridNesting = 4;    // controls how many nests of shapes there are for each shape on the grid. 5 hangs it. ?
 GridOfNestedAnimatedShapes GridOfShapes;
 int GridOfShapesNumCols;    // to be reinitialized in each loop of setup() -- for reference from other functions
 int GridOfShapesNumRows;    // "
@@ -82,9 +87,9 @@ int estimatedFPS = 0;    // dynamically modified by program as it runs (and prin
 // reference of original art:
 // larger original grid size: 25x14, wobbly circle placement, wobbly concentricity in circles.
 // smaller original grid size: 19x13, regular circle placement on grid, wobbly concentricity in circles.
-// SMOFA entry configuration for the following values, for ~6' tall kiosk: 7, 21. ~4K resolution horizontally larger monitors: 14, 43
+// SMOFA entry configuration for the following values, for ~6' tall kiosk: 1, 21? ~4K resolution horizontally larger monitors: 14, 43
 int minColumns = 2; int maxColumns = 21;
-float ShapesGridXminPercent = 0.24;   // minimum diameter of circle vs. grid cell size.   Maybe best ~ .6
+float ShapesGridXminPercent = 0.24;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
 float ShapesGridXmaxPercent = 0.86;   // maximum ""                                       Maybe best ~ .75
 int minimumNgonSides = -13;    // if negative number, that many times more circles will appear.
 int maximumNgonSides = 7;    // maximum number of sides of shapes randomly chosen. Between minimum and maximum, negative numbers, 0, and 1 will be circles. 2 will be a line.
@@ -158,19 +163,19 @@ void addGracePeriodToNextVariant() {
 // Because I want to respond to both mousePressed AND mouseDragged events, those functions can pass mouseX and mouseY to this when they are called:
 void set_color_morph_mode_at_XY(int Xpos, int Ypos) {
   // collision detection of mouse x and y pos vs. center and radius of circle via this genius breath: https://happycoding.io/tutorials/processing/collision-detection ;
-  // checks if distance between center of circle and mouse click is less than radius of circle. if smaller, click  was inside circle. if greater, was outside:
+  // checks if distance between center of shapes and mouse click is less than radius of circle. if smaller, click  was inside circle. if greater, was outside:
   for (int grid_Y = 0; grid_Y < GridOfShapesNumRows; grid_Y ++) {
     for (int grid_X = 0; grid_X < GridOfShapesNumCols; grid_X ++) {
-      float circle_center_x = GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[0].x_center;
+      float shape_center_x = GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[0].x_center;
       // I need to go home and rethink my life. Wait. I _am_ home.
-      float circle_center_y = GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[0].y_center;
-      float circle_radius = GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[0].diameter / 2;
-      // if click was within radius of a circle (which will be caught in the amazing speed of
-      // for loops in modern computers), activate color morph mode for that circle and all nested circles in it:
-        if (dist(Xpos, Ypos, circle_center_x, circle_center_y) < circle_radius) {
+      float shape_center_y = GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[0].y_center;
+      float shape_radius = GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[0].diameter / 2;
+      // if click was within radius of a circle (or apothem of shape) (which will be caught in the amazing speed of
+      // for loops in modern computers), activate color morph mode for that shape and all nested shapes in it:
+        if (dist(Xpos, Ypos, shape_center_x, shape_center_y) < shape_radius) {
         // int hooman_column = grid_X + 1; int hooman_row = grid_Y + 1;    // compensate for humans; compy starts count at 0
-        //    //print("Click is within circle at row " + hooman_row + " column " + hooman_column + "!\n");
-        //    // activate color morph mode on all AnimatedShapes in AnimatedShapesArray:
+            //print("Click is within shape at row " + hooman_row + " column " + hooman_column + "!\n");
+            // activate color morph mode on all AnimatedShapes in AnimatedShapesArray:
         for (int N = 0; N < gridNesting; N ++) {
         GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[N].color_morph_on = true;
         }
@@ -216,6 +221,41 @@ void save_PNG() {
 }
 
 
+// checks properties of two shapes to determine whether one is within the other and returns boolean saying which:
+boolean is_shape_within_shape(PVector larger_shape_XY, float larger_shape_diameter, PVector smaller_shape_XY, float smaller_shape_diameter) {
+  float centers_distance = dist(larger_shape_XY.x, larger_shape_XY.y, smaller_shape_XY.x, smaller_shape_XY.y);
+  float radii_difference = (larger_shape_diameter / 2) - (smaller_shape_diameter / 2);
+  boolean is_within_shape = true;
+  if (centers_distance > radii_difference) { is_within_shape = false; } else { is_within_shape = true; }
+  return is_within_shape;
+}
+
+// takes six values: the x and y center coordinate and diamter of a larger circle or shape
+// (intended use), and the same for a smaller shape. returns a PVector which is the x and y
+// coordinates to make the smaller shape interior nearest tangent to the larger shape
+// (constrained within its maximum or nearest edge). Intended use: to keep shapes within
+// shapes from wandering outside the shape.
+PVector get_larger_to_smaller_shape_interior_tangent_PVector(
+PVector larger_shape_XY, float larger_shape_diameter,
+PVector smaller_shape_XY, float smaller_shape_diameter
+) {
+  PVector coords_to_return = new PVector(0,0);    // will be 0,0 unless changed
+  boolean is_within_shape = is_shape_within_shape(larger_shape_XY, larger_shape_diameter, smaller_shape_XY, smaller_shape_diameter);
+  if (is_within_shape == false) {
+            // print("circle/shape is outside larger circle/shape.\n");
+    float target_centers_dist = (larger_shape_diameter / 2) - (smaller_shape_diameter / 2);
+    float shapes_center_to_center_dist = dist(larger_shape_XY.x, larger_shape_XY.y, smaller_shape_XY.x, smaller_shape_XY.y);
+    float centers_to_target_dist_mult = target_centers_dist / shapes_center_to_center_dist;
+    float Xdiff = larger_shape_XY.x - smaller_shape_XY.x;
+    float Ydiff = larger_shape_XY.y - smaller_shape_XY.y;
+    float newX = larger_shape_XY.x - (Xdiff * centers_to_target_dist_mult);   // a + will put it tangent opposite side
+    float newY = larger_shape_XY.y - (Ydiff * centers_to_target_dist_mult);
+    coords_to_return = new PVector(newX, newY);
+    }
+  return coords_to_return;
+}
+
+
 // END GLOBAL FUNCTIONS
 
 
@@ -229,7 +269,10 @@ class AnimatedShape {
   float y_center;
   float x_wandered;
   float y_wandered;
-// IN PROGRESS: reworking constructor to init animating values off multiplier of what looks good at 800 px wide, including: jitter_max_step_mult, max_jitter_dist, max_wander_dist, diameter_morph_rate, stroke_weight, additionVector. WHEN EACH OF THOSE ARE DONE, and until this consctruction project is complete, I'll add a comment with an asterisk beside each, indicating "done." astrisk/slash (*/) will mean "in progress."
+// IN PROGRESS: reworking constructor to init animating values off multiplier of what looks good at 800 px wide,
+// including: jitter_max_step_mult, max_jitter_dist, max_wander_dist, diameter_morph_rate, stroke_weight, additionVector.
+// WHEN EACH OF THOSE ARE DONE, and until this consctruction project is complete, I'll add a comment with an asterisk beside each,
+// indicating "done." astrisk/slash (*/) will mean "in progress."
   float jitter_max_step_mult;
   float max_jitter_dist;
   float max_wander_dist;    // */
@@ -253,7 +296,7 @@ class AnimatedShape {
   PShape nGon;
   PVector radiusVector;    // used to construct the nGon
   float reference_scale = 800;  // DON'T CHANGE THIS hard-coded value. But if you do :) note that it affects speeds / distances of animation.
-  float scale_mult;       // used to scale all animation variables vs. 800px wide grid reference to which hard-coded values were visually tuned. Because the circles vary in size as the program runs, if animation increments are constant, things move relatively "faster" when circles are smaller. This multiplier throttles those values up or down so that animation has the same relative distances/speeds as circles grow/shrink. IT WILL BE FIGURED FROM diameter_max.
+  float scale_mult;       // used to scale all animation variables vs. 800px wide grid reference to which hard-coded values were visually tuned. Because the shapes vary in size as the program runs, if animation increments are constant, things move relatively "faster" when shapes are smaller. This multiplier throttles those values up or down so that animation has the same relative distances/speeds as shapes grow/shrink. IT WILL BE FIGURED FROM diameter_max.
 
   // class constructor--sets random diameter and morph speed values from passed parameters;
   // IF nGonSides is 0, we'll know it's intended to be a circle:
@@ -268,9 +311,9 @@ class AnimatedShape {
     if (RNDtrueFalse == 1) {
       diameter_morph_rate *= (-1);
     }  // flips it to negative if RNDtrueFalse is 1
-    jitter_max_step_mult = random(0.002, 0.038);  // remember subtle values I like the results of: random(0.002, 0.058) -- for smaller circles. For YUGE: 0.002, 0.038
+    jitter_max_step_mult = random(0.002, 0.0032);  // remember subtle values I like the results of: random(0.002, 0.058) -- for smaller circles/shapes. For YUGE: 0.002, 0.038
     max_jitter_dist = diameter * jitter_max_step_mult;
-    max_wander_dist = diameter * 0.032;   // MAYBE TO DO: set that in logic elsewhere in this script (when setting up grid of animated shapes?) using these circles, to: (outer_circle_diameter - inner_circle_diameter)   -- outer circle being circle this one may be within.
+    max_wander_dist = diameter * 1.16;		// Only for outer circle (or shape) of nested circle (or shape).
     // set RND stroke and fill colors:
     int RNDarrayIndex = (int)random(fillColorsArrayLength);
     stroke_color = fillColors[RNDarrayIndex];
@@ -306,6 +349,7 @@ class AnimatedShape {
 
   // member functions
   void morphDiameter() {
+            // print("diameter:diameter_min:diameter_max: " + diameter + ":" + diameter_min + ":" + diameter_max + "\n");
     // constrains a value to not exceed a maximum and minimum value; re: https://processing.org/reference/constrain_.html
     // constrain(amt, low, high)
     // grow diameter (positive or negative) :
@@ -321,22 +365,16 @@ class AnimatedShape {
     }
         float percent_change_multiplier = diameter / old_diameter;
     nGon.scale(percent_change_multiplier);
+            // print("->diameter:diameter_min:diameter_max: " + diameter + ":" + diameter_min + ":" + diameter_max + "\n");
   }
 
-// TO DO: redo how jitter is done? Do I want to calc. off origins?
-// And doesn't this undo things that wander does (by resetting center off wander)?
-// Commenting out of render functions for now..
   void jitter() {
     max_jitter_dist = diameter * jitter_max_step_mult;
     // SETUP x AND y ADDITION (positive or negative) of morph coordinate:
-    x_wandered = x_wandered + ((int) random(max_jitter_dist * (-1), max_jitter_dist));
-    y_wandered = y_wandered + ((int) random(max_jitter_dist * (-1), max_jitter_dist));
-    // ACTUAL COORDINATE MORPH but constrained:
-    x_center = x_origin + x_wandered;
-    x_center = constrain(x_center, (int) x_origin + (max_jitter_dist / 2) * (-1), (int) x_origin + (max_jitter_dist / 2));
-    // UND MORPH UND constrained:
-    y_center = y_origin + y_wandered;
-    y_center = constrain(y_center, (int) y_origin + (max_jitter_dist / 2) * (-1), (int) y_origin + (max_jitter_dist / 2));
+    x_wandered = ((int) random(max_jitter_dist * (-1), max_jitter_dist));
+    y_wandered = ((int) random(max_jitter_dist * (-1), max_jitter_dist));
+    x_center += x_wandered;
+    y_center += y_wandered;
   }
 
 // Java (Processing) always passes by value (makes a copy of a paremeter
@@ -355,19 +393,23 @@ class AnimatedShape {
     return a;
   }
 
-  PVector wander() {
+  PVector wander(PVector parent_shape_XY, float parent_shape_diameter) {
     PVector vector_to_return = new PVector(0,0);    // will be northing unless changed
+    // updating variable within the object this function is a part of:
+    // but shouldn't I use? : translate(additionVector);
+    baseVector.add(additionVector);
     x_center = baseVector.x; y_center = baseVector.y;
-    float wandered_distance = dist(x_origin, y_origin, x_center, y_center);
-    if (wandered_distance > max_wander_dist) {
-      baseVector.sub(additionVector);      // undo add
+    // check if we just made the shape go outside its parent, and if so undo that translate:
+//TO DO: update the object to use PVectors so I don't have to create this temp one (or do other redundant operations) :
+    PVector this_shape_XY = new PVector(x_center, y_center);
+    boolean is_shape_within_parent = is_shape_within_shape(parent_shape_XY, parent_shape_diameter, this_shape_XY, diameter);
+    if (is_shape_within_parent == true) {
+      vector_to_return = additionVector;
+    } else {    // undo that translate, and change wander direction:
+      baseVector.sub(additionVector);
 //NOTE: if the following allows angles too near 90, collissions happen before they happen, and freaky atomic jitter results:
       float rotation_angle = random(130, 230);
-      //float rotation_angle = random(-11, 12);
       additionVector.rotate(radians(rotation_angle));
-    } else {
-      baseVector.add(additionVector);
-      vector_to_return = additionVector;
     }
     return vector_to_return;
   }
@@ -437,38 +479,32 @@ class NestedAnimatedShapes {
     // PRE-DETERMINE diameter/apothem ("diameter" / 2) sizes for an array of animated shapes.
     // Then pass them as max and min radius for each shape as we build the array of shapes.
     // METHOD: get a fixed number of random numbers from a range divided by an interval, descending.
-    // (for nested circle diameters)
+    // (for nested circle diameters or nested shape apothems)
     int interval = nesting + 4;    // divide min and max possible radius by how many intervals to determine size slices?
     float dividend = (RND_max_diameter_mult - RND_min_diameter_mult) / interval;
-    int radii_to_get = nesting + 1;   // or the last circle will have no min. radius!
+    int radii_to_get = nesting + 1;   // or the last circle/shape will have no min. radius!
     int low_range_excluder = radii_to_get;
     int selected = interval;    // a lie to start with but starts the loop as we wish
-    // YARP:
-              // print("~-~-\n");
     float[] radii = new float[radii_to_get];
     for (int i = 0; i < radii_to_get; i++) {
                //print("sel. range: " + low_range_excluder + ":" + selected + " ");
       int selected_num = (int) random(low_range_excluder, selected + 1);
       float result_num = RND_min_diameter_mult + (selected_num * dividend);
       radii[i] = result_num;
-               //print("--selected: " + selected_num + " --dividend: " + dividend + " * selected is: " + result_num + "\n");
       selected = selected_num - 1;
       low_range_excluder -= 1;
     }
-    //debug print (lower index numbers have higher values indeed as intended) :
-    //for (int j = 0; j < radii.length; j++) { print("radii[" + j + "]: " + radii[j] + "\n"); }
     // END PRE-DETERMINE diameter/apothem sizes.
     for (int i = 0; i < nesting; i++) {
+			// print(radii[i+1] + ":" + radii[i] + "\n");
       AnimatedShapesArray[i] = new AnimatedShape(
         xCenter,
         yCenter,
         radii[i+1],
-        radii[i+1],
+        radii[i],
         nGonSides
       );
     }
-// TO DO: THIS HACK to allow outer circle to wander a lot more than inner ones--ENABLE when I redo the way wandering works and inner shapes stay within outer:
-//    AnimatedShapesArray[0].max_wander_dist *= 5.8;    // or whatever looks good
 
   }
 
@@ -476,15 +512,46 @@ class NestedAnimatedShapes {
     for (int j = 0; j < nesting; j++) {
       AnimatedShapesArray[j].drawShape();
       AnimatedShapesArray[j].morphDiameter();
-// COMMENTING OUT for reasons given in comment near function:
-      // AnimatedShapesArray[j].jitter();
-      PVector tmp_vec = AnimatedShapesArray[j].wander();
-      // drag all inner circles with outer translated circle, using that gotten vector:
-      if (j < nesting) {
-        for (int k = j; k < nesting; k++) {
+       // AnimatedShapesArray[j].jitter();    // so dang silky smooth without jitter; also maybe edge collisions are now less spastic _without_ that (the opposite case used to be).
+        for (int k = j + 1; k < nesting; k++) {
+          PVector tmp_vec;
+          // WANDERING
+          // if we're at the outmost shape or circle, pass made-up PVector and diameter by extrapolation from max_distance;
+          // otherwise pass those properties of the parent shape:
+          if (j == 0) {     // wander under these conditions:
+            PVector INVISIBL_PARENT_XY = new PVector(AnimatedShapesArray[0].x_origin, AnimatedShapesArray[0].y_origin);
+            float INVISIBL_RADIUS = AnimatedShapesArray[0].max_wander_dist;
+            tmp_vec = AnimatedShapesArray[0].wander(INVISIBL_PARENT_XY, INVISIBL_RADIUS);
+          } else {          // or under these conditions (one or the other) :
+            PVector parent_center_XY = new PVector(AnimatedShapesArray[j].x_center, AnimatedShapesArray[j].y_center);
+            tmp_vec = AnimatedShapesArray[k].wander(parent_center_XY, AnimatedShapesArray[j].diameter);
+          }
+          // DONE WANDERING
+          // drag all inner circles/shapes with outer translated circle/shape, using that gotten vector;
+          // this won't always actually move anything (as sometimes tmp_vec is (0,0), but it's a waste to check if it will:
           AnimatedShapesArray[k].translate(tmp_vec);
+          // CONSTRAINING inner shapes within borders of outer ones
+          // if shape has wandered beyond border of parent, drag it within parent, tangent on nearest edge;
+          // get XY tmp vectors anew (as prior operations can move things)
+          PVector parent_center_XY = new PVector(AnimatedShapesArray[j].x_center, AnimatedShapesArray[j].y_center);
+          PVector child_center_XY = new PVector(AnimatedShapesArray[k].x_center, AnimatedShapesArray[k].y_center);
+          boolean is_within_parent = is_shape_within_shape(
+          parent_center_XY,
+          AnimatedShapesArray[j].diameter,
+          child_center_XY,
+          AnimatedShapesArray[k].diameter);
+          if (is_within_parent == false) {      // CONSTRAIN it:
+                    // print(is_within_parent + "\n");
+            PVector relocate_XY = get_larger_to_smaller_shape_interior_tangent_PVector(
+            parent_center_XY, AnimatedShapesArray[j].diameter,
+            child_center_XY, AnimatedShapesArray[k].diameter
+            );
+                    // print(relocate_XY + "\n");
+            AnimatedShapesArray[k].x_center = relocate_XY.x;
+            AnimatedShapesArray[k].y_center = relocate_XY.y;
+          }
+          // DONE CONSTRAINING
         }
-      }
       // COLOR MORPHING makes it freaking DAZZLING, if I may say so:
       AnimatedShapesArray[j].morphColor();
     }
@@ -513,30 +580,31 @@ class GridOfNestedAnimatedShapes {
     int canvasToGridYremainder = canvasYpx - (rows * graph_xy_len);
     grid_to_canvas_y_offset = canvasToGridYremainder / 2;
     ShapesGridOBJ = new NestedAnimatedShapes[rows][cols];
-    // int counter = 0;    // uncomment code that uses this to print a number count of circles in the center of each circle.
+    // int counter = 0;    // uncomment code that uses this to print a number count of shapes in the center of each shape.
     for (int i = 0; i < ShapesGridOBJ.length; i++) {          // that comparison measures first dimension of array ( == cols)
       for (int j = 0; j < ShapesGridOBJ[0].length; j++) {    // that comparision measures second dimension of array ( == rows)
         // OY the convolution of additional offests just to make a grid centered! :
-        int circleLocX = ((graph_xy_len * j) - (int) graph_xy_len / 2) + grid_to_canvas_x_offset + graph_xy_len;
-        int circleLocY = ((graph_xy_len * i) - (int) graph_xy_len / 2) + grid_to_canvas_y_offset + graph_xy_len;
+        int shapeLocX = ((graph_xy_len * j) - (int) graph_xy_len / 2) + grid_to_canvas_x_offset + graph_xy_len;
+        int shapeLocY = ((graph_xy_len * i) - (int) graph_xy_len / 2) + grid_to_canvas_y_offset + graph_xy_len;
         int rnd_num = (int) random(minimumNgonSides, maximumNgonSides + 1);
         float minDiam = graph_xy_len * RND_min_diameter_multArg;
         float maxDiam = graph_xy_len * RND_max_diameter_multArg;
-        ShapesGridOBJ[i][j] = new NestedAnimatedShapes(circleLocX, circleLocY, minDiam, maxDiam, rnd_num, nestingArg);    // I might best like: 1, 8
+        ShapesGridOBJ[i][j] = new NestedAnimatedShapes(shapeLocX, shapeLocY, minDiam, maxDiam, rnd_num, nestingArg);    // I might best like: 1, 8
       }
     }
   }
 
   void ShapesGridDrawAndChange() {
-    //int counter = 0;    // uncomment code that uses this to print a number count of circles in the center of each circle.
+    //int counter = 0;    // uncomment code that uses this to print a number count of shapes in the center of each shape.
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
         fill(255);
         //stroke(255,0,255);
+                // print("~~\n");
         ShapesGridOBJ[i][j].drawAndChangeNestedShapes();
         fill(0);
         //counter += 1;
-        // debug numbering print of circles:
+        // debug numbering print of shapes:
         //text(counter, ((graph_xy_len * j) - (int) graph_xy_len / 2) + graph_xy_len, ((graph_xy_len * i) - graph_xy_len / 2) + graph_xy_len);
       }
     }
@@ -592,7 +660,7 @@ void setup() {
   // Randomly change the background color to any color from backgroundColors array at each run:
   RNDbgColorIDX = (int)random(backgroundColorsArrayLength);
 	globalBackgroundColor = backgroundColors[RNDbgColorIDX];
-  // To always have N circles accross the grid, uncomment the next line and comment out the line after it. For random between N and N-1, comment out the next line and uncomment the one after it.
+  // To always have N shapes accross the grid, uncomment the next line and comment out the line after it. For random between N and N-1, comment out the next line and uncomment the one after it.
   // int gridXcount = 19;  // good values: any, or 14 or 19
   int gridXcount = (int) random(minColumns, maxColumns + 1);  // +1 because random doesn't include max range. Also, see comments where those values are set.
 
