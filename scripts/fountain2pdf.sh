@@ -14,7 +14,7 @@
 # THIS SCRIPT expects everything after the title page of the screenplay (the actual
 # screenplay body text) to start with:
 # > FADE IN:
-# and you may expect this script to wnot ork if that is not the case.
+# and you may expect this script to not work if that is not the case.
 # ALSO, the "wrap" CLI option expects those specific font files (given in this script)
 # to be (I think) in the same PATH as the source fountain file. Also, the optional last
 # line of this script opens the output pdf.
@@ -42,8 +42,8 @@ then
 	#  - get line number (of match) to split on:
 	tail_from=`awk '/> FADE IN:/{print NR;exit}' $1`
 	let head_to=tail_from-1
-	head -n $head_to $1 > tmp_head_wYSNpHgq.fountain
-	tail -n +$tail_from $1 > tmp_tail_wYSNpHgq.fountain
+	ghead -n $head_to $1 > tmp_head_wYSNpHgq.fountain
+	gtail -n +$tail_from $1 > tmp_tail_wYSNpHgq.fountain
 	dos2unix tmp_head_wYSNpHgq.fountain tmp_tail_wYSNpHgq.fountain
 	#  - delete lines that start with markdown image syntax (used to double for eBook output via fountain2ePub (using pandoc), but they'll interfere here:
 		# deletes the line:
