@@ -74,7 +74,7 @@ int estimatedFPS = 0;    // dynamically modified by program as it runs (and prin
 // larger original grid size: 25x14, wobbly circle placement, wobbly concentricity in circles.
 // smaller original grid size: 19x13, regular circle placement on grid, wobbly concentricity in circles.
 // SMOFA entry configuration for the following values, for ~6' tall kiosk: 1, 21? ~4K resolution horizontally larger monitors: 14, 43
-int minColumns = 4; int maxColumns = 8;
+int minColumns = 2; int maxColumns = 21;
 float ShapesGridXminPercent = 0.22;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
 float ShapesGridXmaxPercent = 0.67;   // maximum ""                                       Maybe best ~ .75
 int minimumNgonSides = -13;    // if negative number, that many times more circles will appear.
