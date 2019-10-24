@@ -1,12 +1,12 @@
 // randomly generate irregular geometry ideas (image batches are saved alongside this source file when run by Processing). 
 // Copyright 2019 RAH
 // Inspired by Daniel Bartholomew's "Abstractoons."
-// v0.9.15 changes:
-// - erase mode / no erase mode boolean setting (do or don't illustrate suggested dark/erasure fills -- if not, no fills)
-// - moar rectangles chance
-// - tighter random shape selection logic
-// - translation jitter after step 3
-// - defaults tweaks
+// v0.9.16 changes:
+// - global varaible controlling iterations
+// - add version string global variable
+// - give both these items of information in saved file names.
+// - hard code img size to 11x95" @ 96DPI (not fullscreen)
+String versionString = "0.9.16";
 
 
 // TO DO:
@@ -23,6 +23,7 @@ import processing.svg.*;
 
 
 // Global variables:
+int iterationsArg = 2;    // controls how many subsequently smaller shape arrangements to make.
 color backgroundColor = #524547;  // Prismacolor Black
 // color backgroundColor = #FFFFFF;
 
@@ -73,7 +74,7 @@ class IrregularGeometryGenerator {
   color fillModeColorStroke;
 
   // constructor
-  IrregularGeometryGenerator() {
+  IrregularGeometryGenerator(int iterationsArg) {
     canvasDimX = width;     // display width
     canvasDimY = height;    // display height
     RNDtranslateMultiplier = 0.84;
@@ -87,10 +88,10 @@ class IrregularGeometryGenerator {
       else {
         canvasLen = canvasDimX;
       }
-    iterations = 1;
+    iterations = iterationsArg;
     shapeStrokeWeight = 4;
     inEraseMode = false;
-	useEraseMode = true;
+    useEraseMode = true;
 // TO DO: RND color mode things enabled via the following boolean when true! :
     RNDcolorMode = false;
     eraseModeColorStroke = #615F6B;      // Prismacolor cool grey 90%
@@ -324,7 +325,7 @@ String rndString() {
 
 void setup()
 {
-  size(displayWidth, displayHeight);    // use full display size--why these !same as width and height above, I don't know.
+  size(1056, 816);    // use full display size--why these !same as width and height above, I don't know.
   // To generate only one image per run, uncomment the next line:
   //noLoop();
 }
@@ -336,13 +337,14 @@ void draw()
     // this all happens over the infinite loop which is this draw() function:
   String flarf = rndString();
     // start logging all geometry drawing as SVG; re https://processing.org/reference/libraries/svg/index.html :
-  beginRecord(SVG, "irregular_geometry_" + flarf + ".svg");
+  String fileNameNoExt = "rnd_irregular_geometry_gen_v" + versionString + "_iters_" + iterationsArg + "__" + flarf;
+  beginRecord(SVG, fileNameNoExt + ".svg");
     // generate irregular shape! :
-  genOne = new IrregularGeometryGenerator();
+  genOne = new IrregularGeometryGenerator(iterationsArg);
     // contrive random string for unique file name component:
   genOne.makeIrregularGeometry();
     // save PNG image! :
-  save("irregular_geometry_" + flarf + ".png");
+  save(fileNameNoExt + ".png");
     // stop SVG logging:
  endRecord();
 }
