@@ -1,4 +1,5 @@
-// Random walk with drawn primary shapes (with outlines) of random colors.
+// Random walk with drawn primary shapes (with outlines) of
+// colors randomly chosen from palette.
 // by Richard Alexander Hall
 // evolved from rnd_walk_draw_square.pde
 
