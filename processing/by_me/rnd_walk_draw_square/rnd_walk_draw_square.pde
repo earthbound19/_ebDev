@@ -1,4 +1,4 @@
-// Random walk with drawn squares (with outlines) of random colors.
+// Random walk with drawn squares, with fills and outlinses of random colors.
 // by Richard Alexander Hall
 // Heavily modified from Random Walker example, "The Nature of Code," by Daniel Shiffman, http://natureofcode.com
 
