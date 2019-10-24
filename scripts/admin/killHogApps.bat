@@ -47,6 +47,7 @@ sc DELETE BEService
 process -k sizer.exe
 process -k iexplore.exe
 process -k dropbox.exe
+process -k DropboxUpdate.exe
 process -k greenshot.exe
 process -k robotaskbaricon.exe
 process -k DisplayFusionHookApp64.exe
@@ -66,6 +67,7 @@ process -k iCloudServices.exe
 process -k steamwebhelper.exe
 process -k Steam.exe
 process -k RadeonSettings.exe
+porcess -k amdow.exe
 process -k sqlwriter.exe
 REM Adobe CC-related processes:
 process -k "Adobe Desktop Service.exe"
@@ -74,3 +76,6 @@ process -k CoreSync.exe
 process -k CCXprocess.exe
 process -k CCLibrary.exe
 process -k "Adobe CEF Helper.exe"
+process -k upd.exe
+process -k keybase.exe
+process -k jusched.exe
