@@ -15,31 +15,17 @@
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
 
-// v1.5.0 work log:
-// - constrain shapes within boundaries of other shapes via a bit o' algebra; means:
-// - improved wander/jitter restrict: intra-shape collision detection/wrangling to stay in
-// - fix loop counting bug (redundancy) in implementing that
-// - add functions assisting with collision / distance detect
-// - add to do items for simpler code
-// - comment out jitter
-String versionString = "v1.5.0";
+// v1.6.1 work log:
+// - optional stroke color global override and true/false controlling boolean (altStrokeColor, overrideStrokeColor)
+// - optional fill color global override and true/false controlling boolean (altFillColor, overrideFillColor)
+// - optional global background color override and controlling boolean (altBackgroundColor, overrideBackgroundColor)
+// - control stroke weight min and max with global variables (strokeMinWeightMult, strokeMaxWeightMult)
+// - control max parent wander distance with global var: parentMaxWanderDistMultiple
+// - consistentize objects internal use of vectors for XY locations
+// - tweak global shape min / max size range
+String versionString = "v1.6.1";
 
-
-// TO DO: * = done, */ (or deleted / moved to work log!) = in progress
-// - animation-controlling-varaible scaling up/down vs. 800 px-wide grid reference.
-// - moar / different things on subsequent user interaction: color index cycle jump, bw mode, grayscale mode, toggle nGon/circle mode, size rnd? . . .
-// - scale nGons to all be same area as circle with same "diameter" (apothem)? https://en.wikipedia.org/wiki/Regular_polygon#Area
-// - group PShapes with children in nested shapes on render (for SVG grouping)
-// - constraint-free mode (all shapes wander on initial vector without bouncing back)
-// - random orbits for outer and inner shapes?
-// - optional randomly changing nGon sides (shapes) in nested shape init.
-// - option: even-numbered nested shapes cut out parent shape.
-// - change all x y coordinate pair variables to PVectors
-// - move items in this list to tracker that aren't there :)
-// - move initialization of these randomization controlling varaibles into initial shapes grid (or circles?) function call(s)? :
-// jitter_max_step_mult = random(0.002, 0.0521);
-// diameter_morph_rate = random(0.009, 0.011);
-
+// TO DO items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
 
 // DEPENDENCY IMPORTS
 import processing.svg.*;
@@ -88,12 +74,21 @@ int estimatedFPS = 0;    // dynamically modified by program as it runs (and prin
 // larger original grid size: 25x14, wobbly circle placement, wobbly concentricity in circles.
 // smaller original grid size: 19x13, regular circle placement on grid, wobbly concentricity in circles.
 // SMOFA entry configuration for the following values, for ~6' tall kiosk: 1, 21? ~4K resolution horizontally larger monitors: 14, 43
-int minColumns = 2; int maxColumns = 21;
-float ShapesGridXminPercent = 0.24;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
-float ShapesGridXmaxPercent = 0.86;   // maximum ""                                       Maybe best ~ .75
+int minColumns = 4; int maxColumns = 8;
+float ShapesGridXminPercent = 0.22;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
+float ShapesGridXmaxPercent = 0.67;   // maximum ""                                       Maybe best ~ .75
 int minimumNgonSides = -13;    // if negative number, that many times more circles will appear.
-int maximumNgonSides = 7;    // maximum number of sides of shapes randomly chosen. Between minimum and maximum, negative numbers, 0, and 1 will be circles. 2 will be a line.
-// Prismacolor marker colors array:
+int maximumNgonSides = 7;      // maximum number of sides of shapes randomly chosen. Between minimum and maximum, negative numbers, 0, and 1 will be circles. 2 will be a line.
+float parentMaxWanderDistMultiple = 1.137;		// how far beyond origin + max radius, as percent, a parent shape can wander. Default hard-coding: 1.14 (14 percent past max origin)
+float strokeMinWeightMult = 0.0064;		// stroke or outline min size multiplier vs. shape diameter--diameters change! 
+float strokeMaxWeightMult = 0.0307;		// stroke or outline max size multiplier vs. shape diameter
+boolean overrideFillColor = false;			// set to true, and the following RGB color will override random color fills:
+color altFillColor = color(255,0,255);
+boolean overrideStrokeColor = false;		// set to true, and the following RGB stroke color will override random colors:
+color altStrokeColor = color(80,80,120);
+boolean overrideBackgroundColor = false;
+color altBackgroundColor = color(30,0,60);
+// Marker colors array -- at this writing, mostly Prismacolor marker colors--but some are not, so far as I know! :
 color[] backgroundColors = {
 	#CA4587, #D8308F, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E,
 	#CA5A62, #C14F6E, #B34958, #AA4662, #8E4C5C, #8F4772, #934393, #AF62A2,
@@ -166,9 +161,9 @@ void set_color_morph_mode_at_XY(int Xpos, int Ypos) {
   // checks if distance between center of shapes and mouse click is less than radius of circle. if smaller, click  was inside circle. if greater, was outside:
   for (int grid_Y = 0; grid_Y < GridOfShapesNumRows; grid_Y ++) {
     for (int grid_X = 0; grid_X < GridOfShapesNumCols; grid_X ++) {
-      float shape_center_x = GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[0].x_center;
+      float shape_center_x = GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[0].centerXY.x;
       // I need to go home and rethink my life. Wait. I _am_ home.
-      float shape_center_y = GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[0].y_center;
+      float shape_center_y = GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[0].centerXY.y;
       float shape_radius = GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[0].diameter / 2;
       // if click was within radius of a circle (or apothem of shape) (which will be caught in the amazing speed of
       // for loops in modern computers), activate color morph mode for that shape and all nested shapes in it:
@@ -263,12 +258,9 @@ PVector smaller_shape_XY, float smaller_shape_diameter
 // class that contains persisting, modifiable information on a circle.
 // NOTE: uses the above global fillColors array of colors.
 class AnimatedShape {
-  float x_origin;
-  float y_origin;
-  float x_center;
-  float y_center;
-  float x_wandered;
-  float y_wandered;
+	PVector originXY;
+	PVector centerXY;
+	PVector wanderedXY;
 // IN PROGRESS: reworking constructor to init animating values off multiplier of what looks good at 800 px wide,
 // including: jitter_max_step_mult, max_jitter_dist, max_wander_dist, diameter_morph_rate, stroke_weight, additionVector.
 // WHEN EACH OF THOSE ARE DONE, and until this consctruction project is complete, I'll add a comment with an asterisk beside each,
@@ -281,15 +273,16 @@ class AnimatedShape {
   float diameter_max;
   float diameter_morph_rate;
   color stroke_color;
+	color alt_stroke_color;
   int stroke_color_palette_idx;
   float stroke_weight;
 // TO DO? animate stroke weight?
   color fill_color;
+	color alt_fill_color;
   int fill_color_palette_idx;
   int milliseconds_elapse_to_color_morph;
   int milliseconds_at_last_color_change_elapsed;
   boolean color_morph_on;
-  PVector baseVector;
   PVector additionVector;   // */
   //FOR NGON:
   int sides;
@@ -300,9 +293,9 @@ class AnimatedShape {
 
   // class constructor--sets random diameter and morph speed values from passed parameters;
   // IF nGonSides is 0, we'll know it's intended to be a circle:
-  AnimatedShape(int xCenter, int yCenter, float diameterMin, float diameterMax, int sidesArg) {
-    x_origin = xCenter; y_origin = yCenter;
-    x_center = xCenter; y_center = yCenter;
+  AnimatedShape(int Xcenter, int yCenter, float diameterMin, float diameterMax, int sidesArg) {
+    originXY = new PVector(Xcenter,yCenter);
+    centerXY = new PVector(Xcenter,yCenter);
     diameter_min = diameterMin; diameter_max = diameterMax;
     diameter = random(diameterMin, diameterMax);
     diameter_morph_rate = random(0.001, 0.00205);
@@ -313,20 +306,19 @@ class AnimatedShape {
     }  // flips it to negative if RNDtrueFalse is 1
     jitter_max_step_mult = random(0.002, 0.0032);  // remember subtle values I like the results of: random(0.002, 0.058) -- for smaller circles/shapes. For YUGE: 0.002, 0.038
     max_jitter_dist = diameter * jitter_max_step_mult;
-    max_wander_dist = diameter * 1.16;		// Only for outer circle (or shape) of nested circle (or shape).
+    max_wander_dist = diameter * parentMaxWanderDistMultiple;		// Only for outer circle (or shape) of nested circle (or shape).
     // set RND stroke and fill colors:
     int RNDarrayIndex = (int)random(fillColorsArrayLength);
-    stroke_color = fillColors[RNDarrayIndex];
+    stroke_color = fillColors[RNDarrayIndex]; alt_stroke_color = stroke_color;
     stroke_color_palette_idx = RNDarrayIndex;
-    stroke_weight = random(diameter_max * 0.0064, diameter_max * 0.0307);   // have tried as high as 0.042 tweaked up from v.1.3.6 size: 0.028
+    stroke_weight = random(diameter_max * strokeMinWeightMult, diameter_max * strokeMaxWeightMult);   // have tried as high as 0.042 tweaked up from v.1.3.6 size: 0.028
     RNDarrayIndex = (int)random(fillColorsArrayLength);
-    fill_color = fillColors[RNDarrayIndex];
+    fill_color = fillColors[RNDarrayIndex]; alt_fill_color = fill_color;
     fill_color_palette_idx = RNDarrayIndex;
     //TO DO? : control the folling rnd range with parameters?
     milliseconds_elapse_to_color_morph = (int) random(42, 111);    // on more powerful hardware, 194 is effectively true with no throttling of this.
     milliseconds_at_last_color_change_elapsed = millis();
     color_morph_on = false;
-    baseVector = new PVector(x_center, y_center);
     additionVector = getRandomVector();
     // FOR NGON: conditionally alter number of sides:
     if (sidesArg < 3 && sidesArg > 0) { sidesArg = 3; }   // force triangle if 1 or 2 "sides"
@@ -371,10 +363,12 @@ class AnimatedShape {
   void jitter() {
     max_jitter_dist = diameter * jitter_max_step_mult;
     // SETUP x AND y ADDITION (positive or negative) of morph coordinate:
-    x_wandered = ((int) random(max_jitter_dist * (-1), max_jitter_dist));
-    y_wandered = ((int) random(max_jitter_dist * (-1), max_jitter_dist));
-    x_center += x_wandered;
-    y_center += y_wandered;
+    wanderedXY.x = ((int) random(max_jitter_dist * (-1), max_jitter_dist));
+    wanderedXY.y = ((int) random(max_jitter_dist * (-1), max_jitter_dist));
+    // I think this will accompish this? :
+    centerXY.add(wanderedXY);    // more simply than this (and do the same thing) :
+    //centerXY.x += wanderedXY.x;
+    //centerXY.y += wanderedXY.y;
   }
 
 // Java (Processing) always passes by value (makes a copy of a paremeter
@@ -397,16 +391,15 @@ class AnimatedShape {
     PVector vector_to_return = new PVector(0,0);    // will be northing unless changed
     // updating variable within the object this function is a part of:
     // but shouldn't I use? : translate(additionVector);
-    baseVector.add(additionVector);
-    x_center = baseVector.x; y_center = baseVector.y;
+    centerXY.add(additionVector);
     // check if we just made the shape go outside its parent, and if so undo that translate:
-//TO DO: update the object to use PVectors so I don't have to create this temp one (or do other redundant operations) :
-    PVector this_shape_XY = new PVector(x_center, y_center);
-    boolean is_shape_within_parent = is_shape_within_shape(parent_shape_XY, parent_shape_diameter, this_shape_XY, diameter);
+    boolean is_shape_within_parent = is_shape_within_shape(parent_shape_XY, parent_shape_diameter, centerXY, diameter);
     if (is_shape_within_parent == true) {
+			print("true\n");
       vector_to_return = additionVector;
     } else {    // undo that translate, and change wander direction:
-      baseVector.sub(additionVector);
+			print("false\n");
+      centerXY.sub(additionVector);
 //NOTE: if the following allows angles too near 90, collissions happen before they happen, and freaky atomic jitter results:
       float rotation_angle = random(130, 230);
       additionVector.rotate(radians(rotation_angle));
@@ -439,23 +432,36 @@ class AnimatedShape {
   }
 
   void drawShape() {
-// TO DO: black and white mode that conditionally skips color functions here:
+		// NOTE: it's a weird semantic, but this function always uses alt_fill_color.
+		// fill_color is then simply a backup of a preferred color . . . which may not be preferred.
+				// OPTIONAL STROKE AND FILL color overrides!
+				if (overrideFillColor == true) {
+					alt_fill_color = altFillColor;		// the latter taken from a global
+				} else {
+					alt_fill_color = fill_color;
+				}
+				if (overrideStrokeColor == true) {
+					alt_stroke_color = altStrokeColor;		// the latter taken from a global
+				} else {
+					alt_stroke_color = stroke_color;
+				}
+				// END OPTIONAL STROKE AND FILL color overrides!
     if (sides > 2) {    // as manipulated by constructor logic, this will mean an nGon, so render that:
-      nGon.setFill(fill_color);
-      nGon.setStrokeWeight(stroke_weight * 1.3);    // * more because it just seems to be better as heavier for nGons than circles.
-      nGon.setStroke(stroke_color);  // can not has float but global stroke weight can why?
-      shape(nGon, x_center, y_center);
+      nGon.setFill(alt_fill_color);
+      nGon.setStrokeWeight(stroke_weight * 1.3);    // * because it just seems to be better as heavier for nGons than circles.
+      nGon.setStroke(alt_stroke_color);  // can not has float but global stroke weight can why?
+      shape(nGon, centerXY.x, centerXY.y);
     }
     else {    // otherwise it's a circle, so render that:
-      stroke(stroke_color);
+			fill(alt_fill_color);
+      stroke(alt_stroke_color);
       strokeWeight(stroke_weight);
-      fill(fill_color);
-      ellipse(x_center, y_center, diameter, diameter);
+      ellipse(centerXY.x, centerXY.y, diameter, diameter);
     }
   }
 
-  void translate(PVector add) {
-    x_center += add.x; y_center += add.y;
+  void translate(PVector addArg) {
+    centerXY.add(addArg);
   }
 
 }
@@ -468,7 +474,7 @@ class NestedAnimatedShapes {
   // PShape nestedShapes;
 
   // class constructor: same as for AnimatedShape but adding int nesting to start of list:
-  NestedAnimatedShapes(int xCenter, int yCenter, float RND_min_diameter_mult, float RND_max_diameter_mult, int nGonSides, int nestingArg) {
+  NestedAnimatedShapes(int xCenterArg, int yCenterArg, float RND_min_diameter_mult, float RND_max_diameter_mult, int nGonSides, int nestingArg) {
 
     nesting = nestingArg;
     AnimatedShapesArray = new AnimatedShape[nesting];
@@ -498,8 +504,8 @@ class NestedAnimatedShapes {
     for (int i = 0; i < nesting; i++) {
 			// print(radii[i+1] + ":" + radii[i] + "\n");
       AnimatedShapesArray[i] = new AnimatedShape(
-        xCenter,
-        yCenter,
+        xCenterArg,
+        yCenterArg,
         radii[i+1],
         radii[i],
         nGonSides
@@ -519,11 +525,11 @@ class NestedAnimatedShapes {
           // if we're at the outmost shape or circle, pass made-up PVector and diameter by extrapolation from max_distance;
           // otherwise pass those properties of the parent shape:
           if (j == 0) {     // wander under these conditions:
-            PVector INVISIBL_PARENT_XY = new PVector(AnimatedShapesArray[0].x_origin, AnimatedShapesArray[0].y_origin);
+            PVector INVISIBL_PARENT_XY = new PVector(AnimatedShapesArray[0].originXY.x, AnimatedShapesArray[0].originXY.y);
             float INVISIBL_RADIUS = AnimatedShapesArray[0].max_wander_dist;
             tmp_vec = AnimatedShapesArray[0].wander(INVISIBL_PARENT_XY, INVISIBL_RADIUS);
           } else {          // or under these conditions (one or the other) :
-            PVector parent_center_XY = new PVector(AnimatedShapesArray[j].x_center, AnimatedShapesArray[j].y_center);
+            PVector parent_center_XY = new PVector(AnimatedShapesArray[j].centerXY.x, AnimatedShapesArray[j].centerXY.y);
             tmp_vec = AnimatedShapesArray[k].wander(parent_center_XY, AnimatedShapesArray[j].diameter);
           }
           // DONE WANDERING
@@ -533,8 +539,8 @@ class NestedAnimatedShapes {
           // CONSTRAINING inner shapes within borders of outer ones
           // if shape has wandered beyond border of parent, drag it within parent, tangent on nearest edge;
           // get XY tmp vectors anew (as prior operations can move things)
-          PVector parent_center_XY = new PVector(AnimatedShapesArray[j].x_center, AnimatedShapesArray[j].y_center);
-          PVector child_center_XY = new PVector(AnimatedShapesArray[k].x_center, AnimatedShapesArray[k].y_center);
+          PVector parent_center_XY = new PVector(AnimatedShapesArray[j].centerXY.x, AnimatedShapesArray[j].centerXY.y);
+          PVector child_center_XY = new PVector(AnimatedShapesArray[k].centerXY.x, AnimatedShapesArray[k].centerXY.y);
           boolean is_within_parent = is_shape_within_shape(
           parent_center_XY,
           AnimatedShapesArray[j].diameter,
@@ -547,8 +553,8 @@ class NestedAnimatedShapes {
             child_center_XY, AnimatedShapesArray[k].diameter
             );
                     // print(relocate_XY + "\n");
-            AnimatedShapesArray[k].x_center = relocate_XY.x;
-            AnimatedShapesArray[k].y_center = relocate_XY.y;
+            AnimatedShapesArray[k].centerXY.x = relocate_XY.x;
+            AnimatedShapesArray[k].centerXY.y = relocate_XY.y;
           }
           // DONE CONSTRAINING
         }
@@ -657,9 +663,15 @@ void setup() {
 
   ellipseMode(CENTER);
 
-  // Randomly change the background color to any color from backgroundColors array at each run:
-  RNDbgColorIDX = (int)random(backgroundColorsArrayLength);
-	globalBackgroundColor = backgroundColors[RNDbgColorIDX];
+  // Randomly change the background color to any color from backgroundColors array at each run;
+	// OR, if a global override boolean is set, use a global override color:
+	if (overrideBackgroundColor == true) {
+		globalBackgroundColor = altBackgroundColor;
+	} else {
+  	RNDbgColorIDX = (int)random(backgroundColorsArrayLength);
+		globalBackgroundColor = backgroundColors[RNDbgColorIDX];
+	}
+	
   // To always have N shapes accross the grid, uncomment the next line and comment out the line after it. For random between N and N-1, comment out the next line and uncomment the one after it.
   // int gridXcount = 19;  // good values: any, or 14 or 19
   int gridXcount = (int) random(minColumns, maxColumns + 1);  // +1 because random doesn't include max range. Also, see comments where those values are set.
