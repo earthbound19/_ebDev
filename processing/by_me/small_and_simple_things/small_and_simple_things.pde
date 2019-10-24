@@ -38,15 +38,21 @@ boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be 
 int overrideSeed = -161287679;    // a favorite is: -161287679
 int previousSeed = overrideSeed;
 int seed = overrideSeed;
-boolean USE_FULLSCREEN = true;  // if set to true, overrides the following values; if false, they are used:
-int globalWidth = 800;
-int globalHeight = 800;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
+boolean USE_FULLSCREEN = false;  // if set to true, overrides the following values; if false, they are used:
+int globalWidth = 720;
+int globalHeight = 1280;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
 int gridNesting = 4;    // controls how many nests of shapes there are for each shape on the grid. 5 hangs it. ?
 GridOfNestedAnimatedShapes GridOfShapes;
 int GridOfShapesNumCols;    // to be reinitialized in each loop of setup() -- for reference from other functions
 int GridOfShapesNumRows;    // "
 int RNDbgColorIDX;    // to be used as random index from array of colors
 color globalBackgroundColor;
+boolean overrideBackgroundColor = false;
+color altBackgroundColor = color(30,0,60);
+boolean overrideFillColor = false;      // set to true, and the following RGB color will override random color fills:
+color altFillColor = color(255,0,255);
+boolean overrideStrokeColor = false;    // set to true, and the following RGB stroke color will override random colors:
+color altStrokeColor = color(80,80,120);
 // for "frenetic option", loop creates a list of size gridNesting (of ints) :
 // IntList nestedGridRenderOrder = new IntList();    // because this list has a shuffle() member function, re: https://processing.org/reference/IntList.html
 // TESTING NOTES: states to test:
@@ -59,7 +65,7 @@ boolean saveAllAnimationFrames = false;    // if true, all frames up to renderNt
 int renderNtotalFrames = 7200;    // see saveAllAnimationFrames comment
 int totalFramesRendered;    // incremented during each frame of a running variation. reset at new variation.
 int framesRenderedThisVariation;
-boolean saveEveryVariation = true;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
+boolean saveEveryVariation = false;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
 boolean doFixedTimePerVariation = false;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
 int fixedMillisecondsPerVariation = (int) (1000 * 11.5);         // milliseconds to display each variation, if previous boolean is true
 int minMillisecondsPerVariation = (int) (1000 * 16.5);      // 1000 milliseconds * 16.5 = 16.5 seconds
@@ -78,16 +84,10 @@ int minColumns = 2; int maxColumns = 21;
 float ShapesGridXminPercent = 0.22;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
 float ShapesGridXmaxPercent = 0.67;   // maximum ""                                       Maybe best ~ .75
 int minimumNgonSides = -13;    // if negative number, that many times more circles will appear.
-int maximumNgonSides = 7;      // maximum number of sides of shapes randomly chosen. Between minimum and maximum, negative numbers, 0, and 1 will be circles. 2 will be a line.
+int maximumNgonSides = 2;      // maximum number of sides of shapes randomly chosen. Between minimum and maximum, negative numbers, 0, 1 and 2 will be circles. 3 will be a triangle, 4 a square, 5 a pentagon, and so on.
 float parentMaxWanderDistMultiple = 1.137;		// how far beyond origin + max radius, as percent, a parent shape can wander. Default hard-coding: 1.14 (14 percent past max origin)
 float strokeMinWeightMult = 0.0064;		// stroke or outline min size multiplier vs. shape diameter--diameters change! 
 float strokeMaxWeightMult = 0.0307;		// stroke or outline max size multiplier vs. shape diameter
-boolean overrideFillColor = false;			// set to true, and the following RGB color will override random color fills:
-color altFillColor = color(255,0,255);
-boolean overrideStrokeColor = false;		// set to true, and the following RGB stroke color will override random colors:
-color altStrokeColor = color(80,80,120);
-boolean overrideBackgroundColor = false;
-color altBackgroundColor = color(30,0,60);
 // Marker colors array -- at this writing, mostly Prismacolor marker colors--but some are not, so far as I know! :
 color[] backgroundColors = {
 	#CA4587, #D8308F, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E,
@@ -395,10 +395,8 @@ class AnimatedShape {
     // check if we just made the shape go outside its parent, and if so undo that translate:
     boolean is_shape_within_parent = is_shape_within_shape(parent_shape_XY, parent_shape_diameter, centerXY, diameter);
     if (is_shape_within_parent == true) {
-			print("true\n");
       vector_to_return = additionVector;
     } else {    // undo that translate, and change wander direction:
-			print("false\n");
       centerXY.sub(additionVector);
 //NOTE: if the following allows angles too near 90, collissions happen before they happen, and freaky atomic jitter results:
       float rotation_angle = random(130, 230);
