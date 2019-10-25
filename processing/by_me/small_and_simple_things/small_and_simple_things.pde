@@ -15,22 +15,25 @@
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
 
-// v1.6.1 work log:
-// - optional stroke color global override and true/false controlling boolean (altStrokeColor, overrideStrokeColor)
-// - optional fill color global override and true/false controlling boolean (altFillColor, overrideFillColor)
-// - optional global background color override and controlling boolean (altBackgroundColor, overrideBackgroundColor)
-// - control stroke weight min and max with global variables (strokeMinWeightMult, strokeMaxWeightMult)
-// - control max parent wander distance with global var: parentMaxWanderDistMultiple
-// - consistentize objects internal use of vectors for XY locations
-// - tweak global shape min / max size range
-String versionString = "v1.6.1";
+// v1.7.1 work log:
+// - optional load of twitter Auth keys from local file, to enable to tweet directly from
+// running script, with error handling on auth keys load or tweet attempts. Commented out;
+// uncomment for example on install in a museum kiosk :)
+// - have figured how to get global animation values scaling working, and base variables
+// in place to do so (to continue development, see where animationScaleBaseReference is used,
+// and work off of that).
+
+String versionString = "v1.7.1";
 
 // TO DO items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
 
-// DEPENDENCY IMPORTS
+// DEPENDENCY IMPORTS and associated globals:
 import processing.svg.*;
+// for image tweets! :
 //import gohai.simpletweet.*;
-
+String[] twitterAPIauthLines;
+//SimpleTweet simpletweet;
+boolean doNotTryToTweet = true;    // flase state of this is deliberately confusing double-negative message :)
 
 // BEGIN GLOBAL VARIABLES:
 // NOTE: to control additional information contained in saved file names, see comments in the get_image_file_name_no_ext() function further below.
@@ -39,12 +42,16 @@ int overrideSeed = -161287679;    // a favorite is: -161287679
 int previousSeed = overrideSeed;
 int seed = overrideSeed;
 boolean USE_FULLSCREEN = false;  // if set to true, overrides the following values; if false, they are used:
-int globalWidth = 720;
-int globalHeight = 1280;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
+int globalWidth = 1080;
+int globalHeight = 1920;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
 int gridNesting = 4;    // controls how many nests of shapes there are for each shape on the grid. 5 hangs it. ?
 GridOfNestedAnimatedShapes GridOfShapes;
 int GridOfShapesNumCols;    // to be reinitialized in each loop of setup() -- for reference from other functions
 int GridOfShapesNumRows;    // "
+// used by AnimatedShape objects to scale down animation-related values when the shapes are smaller (so that smaller objects do not animate relatively faster;
+// this was itself figured as a place of "how fast I want things to animate when there is one column in an image 1080 pix wide;" AND THEN
+// multiplied by two! (because this multiple is used by even the largest shapes, which I don't want scaled by 1/2 because I divide everything . . it's complicated:
+int animationScaleBaseReference = 1440;
 int RNDbgColorIDX;    // to be used as random index from array of colors
 color globalBackgroundColor;
 boolean overrideBackgroundColor = false;
@@ -80,14 +87,15 @@ int estimatedFPS = 0;    // dynamically modified by program as it runs (and prin
 // larger original grid size: 25x14, wobbly circle placement, wobbly concentricity in circles.
 // smaller original grid size: 19x13, regular circle placement on grid, wobbly concentricity in circles.
 // SMOFA entry configuration for the following values, for ~6' tall kiosk: 1, 21? ~4K resolution horizontally larger monitors: 14, 43
-int minColumns = 2; int maxColumns = 21;
-float ShapesGridXminPercent = 0.22;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
-float ShapesGridXmaxPercent = 0.67;   // maximum ""                                       Maybe best ~ .75
-int minimumNgonSides = -13;    // if negative number, that many times more circles will appear.
-int maximumNgonSides = 2;      // maximum number of sides of shapes randomly chosen. Between minimum and maximum, negative numbers, 0, 1 and 2 will be circles. 3 will be a triangle, 4 a square, 5 a pentagon, and so on.
-float parentMaxWanderDistMultiple = 1.137;		// how far beyond origin + max radius, as percent, a parent shape can wander. Default hard-coding: 1.14 (14 percent past max origin)
+int minColumns = 1; int maxColumns = 2;
+float ShapesGridXminPercent = 0.245;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
+float ShapesGridXmaxPercent = 0.64;   // maximum ""                                       Maybe best ~ .75
+int minimumNgonSides = -13;    // If negative number, there is that many more times chance of any shape being a circle.
+int maximumNgonSides = 7;      // Preferred: 7. Max number of shape sides randomly chosen. 0, 1 and 2 will be circles. 3 will be a triangle, 4 a square, 5 a pentagon, and so on.
+float parentMaxWanderDistMultiple = 1.176;		// how far beyond origin + max radius, as percent, a parent shape can wander. Default hard-coding: 1.14 (14 percent past max origin)
 float strokeMinWeightMult = 0.0064;		// stroke or outline min size multiplier vs. shape diameter--diameters change! 
 float strokeMaxWeightMult = 0.0307;		// stroke or outline max size multiplier vs. shape diameter
+float motionVectorMax = 0.25;          // maximum pixels (I think?) an object may move per frame. Script randomizes between this and (this * -1) * a downscale multiplier per shapes' diameter.
 // Marker colors array -- at this writing, mostly Prismacolor marker colors--but some are not, so far as I know! :
 color[] backgroundColors = {
 	#CA4587, #D8308F, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E,
@@ -124,8 +132,6 @@ color[] fillColors = {
 	#524547, #414141, #79443B, #4E1609, #2E8B57, #73ED91, #00FA9A
 };
 int fillColorsArrayLength = fillColors.length;
-// for image tweets! :
-//SimpleTweet simpletweet;
 // END GLOBAL VARIABLES
 
 
@@ -283,13 +289,17 @@ class AnimatedShape {
   int milliseconds_elapse_to_color_morph;
   int milliseconds_at_last_color_change_elapsed;
   boolean color_morph_on;
+  float motion_vector_max;  // */
   PVector additionVector;   // */
   //FOR NGON:
   int sides;
   PShape nGon;
   PVector radiusVector;    // used to construct the nGon
-  float reference_scale = 800;  // DON'T CHANGE THIS hard-coded value. But if you do :) note that it affects speeds / distances of animation.
-  float scale_mult;       // used to scale all animation variables vs. 800px wide grid reference to which hard-coded values were visually tuned. Because the shapes vary in size as the program runs, if animation increments are constant, things move relatively "faster" when shapes are smaller. This multiplier throttles those values up or down so that animation has the same relative distances/speeds as shapes grow/shrink. IT WILL BE FIGURED FROM diameter_max.
+  // The following is used to scale all animation variables vs. 800px wide grid reference to which hard-coded
+  // values were visually tuned. Because the shapes vary in size as the program runs, if animation increments
+  // are constant, things move relatively "faster" when shapes are smaller. This multiplier throttles those
+  // values up or down so that animation has the same relative distances/speeds as shapes grow/shrink.
+  float animationScalingMultiplier;
 
   // class constructor--sets random diameter and morph speed values from passed parameters;
   // IF nGonSides is 0, we'll know it's intended to be a circle:
@@ -298,7 +308,7 @@ class AnimatedShape {
     centerXY = new PVector(Xcenter,yCenter);
     diameter_min = diameterMin; diameter_max = diameterMax;
     diameter = random(diameterMin, diameterMax);
-    diameter_morph_rate = random(0.001, 0.00205);
+    diameter_morph_rate = random(0.001, 0.0016);
     //randomly make that percent positive or negative to start (which will cause grow or expand animation if used as intended) :
     int RNDtrueFalse = (int) random(0, 2);  // gets random 0 or 1
     if (RNDtrueFalse == 1) {
@@ -319,7 +329,10 @@ class AnimatedShape {
     milliseconds_elapse_to_color_morph = (int) random(42, 111);    // on more powerful hardware, 194 is effectively true with no throttling of this.
     milliseconds_at_last_color_change_elapsed = millis();
     color_morph_on = false;
+    motion_vector_max = motionVectorMax;    // assigning from global there.
     additionVector = getRandomVector();
+    animationScalingMultiplier = diameter / animationScaleBaseReference; print("animationScalingMultiplier: " + animationScalingMultiplier + "\n");
+    
     // FOR NGON: conditionally alter number of sides:
     if (sidesArg < 3 && sidesArg > 0) { sidesArg = 3; }   // force triangle if 1 or 2 "sides"
     // if sidesArg is negative number, don't worry about changing it--it will be interpreted as a circle. Unless I change that? :
@@ -376,8 +389,9 @@ class AnimatedShape {
 // (as it won't work directly on the values of anything we decided to pass
 // to the function if we coded it that way, which would mean copying twice == less efficient) :
   PVector getRandomVector() {
-    float vector_x = random(-0.583, 0.584);
-    float vector_y = random(-0.583, 0.584);
+            //print("diameter_max: " + diameter_max + " motion_vector_max: " + motion_vector_max + "\n");
+    float vector_x = random(motion_vector_max * -1, motion_vector_max + 0.001);    // using a global variable
+    float vector_y = random(motion_vector_max * -1, motion_vector_max + 0.001);
     PVector a = new PVector(vector_x, vector_y);
     // if a.x and a.y are both 0, that means no motion--which we don't want; so:
     // randomize again--by calling this function itself--meta! :
@@ -630,6 +644,22 @@ void settings() {
 
   // initializes runSetupAtMilliseconds before draw() is called:
   setDelayToNextVariant();
+  
+  // FOR TWITTER API auth; load from local file; throw warning if try fails (instead of crashing);
+  // also set "don't even try to tweet" boolean to true on failure.
+  // This will only fail here if file not found or if there's an error during loading it.
+  try {
+    twitterAPIauthLines = loadStrings("/Users/earthbound/twitterAPIauth.txt");
+    //simpletweet = new SimpleTweet(this);
+    //simpletweet.setOAuthConsumerKey(twitterAPIauthLines[0]);
+    //simpletweet.setOAuthConsumerSecret(twitterAPIauthLines[1]);
+    //simpletweet.setOAuthAccessToken(twitterAPIauthLines[2]);
+    //simpletweet.setOAuthAccessTokenSecret(twitterAPIauthLines[3]);
+    doNotTryToTweet = false;
+  } catch (Exception e) {
+    doNotTryToTweet = true;
+    print("NO TEXT FILE twitterAPIauth.txt found.\n");
+  }
 }
 
 
@@ -639,11 +669,6 @@ boolean recordSVGnow = false;                  // Controls when to save SVGs. Ma
 boolean userInteractedThisVariation = false;   // affects those booleans via script logic.
 // handles values etc. for new animated variation to be displayed:
 void setup() {
-  //simpletweet = new SimpleTweet(this);
-  //simpletweet.setOAuthConsumerKey("");
-  //simpletweet.setOAuthConsumerSecret("");
-  //simpletweet.setOAuthAccessToken("");
-  //simpletweet.setOAuthAccessTokenSecret("");
 
   // uncomment if u want to throttle framerate--RECOMMENDED or
   // a fast CPU will DO ALL THE THINGS TOO MANY TOO FAST and heat up--
@@ -670,8 +695,6 @@ void setup() {
 		globalBackgroundColor = backgroundColors[RNDbgColorIDX];
 	}
 	
-  // To always have N shapes accross the grid, uncomment the next line and comment out the line after it. For random between N and N-1, comment out the next line and uncomment the one after it.
-  // int gridXcount = 19;  // good values: any, or 14 or 19
   int gridXcount = (int) random(minColumns, maxColumns + 1);  // +1 because random doesn't include max range. Also, see comments where those values are set.
 
   GridOfShapes = new GridOfNestedAnimatedShapes(width, height, gridXcount, ShapesGridXminPercent, ShapesGridXmaxPercent, gridNesting);
@@ -800,9 +823,21 @@ void mousePressed() {
     userInteractedThisVariation = true;
   }
 
-  //String fileNameNoExt = get_image_file_name_no_ext();
-  //String tweet = simpletweet.tweetImage(get(), fileNameNoExt + " saved via visitor interaction at Springville Museum of Art! More visitor images at: http://s.earthbound.io/BSaST #generative #generativeArt #processing #processingLanguage #creativeCoding");
-  //println("Posted " + tweet);
+  //TRY TO TWEET, if boolean that says we may is so set; will print exception + warning if fail:
+  if (doNotTryToTweet == false) {
+    String fileNameNoExt = get_image_file_name_no_ext();
+    try {
+      //String tweet = simpletweet.tweetImage(get(), fileNameNoExt + " saved via visitor interaction at Springville Museum of Art! More visitor images at: http://s.earthbound.io/BSaST #generative #generativeArt #processing #processingLanguage #creativeCoding");
+      //String tweet = simpletweet.tweetImage(get(), fileNameNoExt
+      //+ " created during development or manual run of program. #generative #generativeArt #processing #processingLanguage #creativeCoding");
+      //println("Posted " + tweet);
+    } catch (Exception e) {
+      print("Failure during attempt to tweet. Hopefully a helpful error message follows.\n");
+    }
+  } else {
+    print("Could have have tweeted on user interaction, but told not to.\n");
+  }
+  
   addGracePeriodToNextVariant();
 }
 
