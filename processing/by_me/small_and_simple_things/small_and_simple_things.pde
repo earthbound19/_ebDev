@@ -105,6 +105,7 @@ float strokeMaxWeightMult = 0.0307;		// stroke or outline max size multiplier vs
 float diameterMorphRateMin = 0.0002;	// minimum rate of shape size contract or expand
 float diameterMorphRateMax = 0.0017;	// maximum "
 float motionVectorMax = 0.382;          // maximum pixels (I think?) an object may move per frame. Script randomizes between this and (this * -1) * a downscale multiplier per shapes' diameter.
+// float orbitRadiansMax = 
 // Marker colors array -- at this writing, mostly Prismacolor marker colors--but some are not, so far as I know! :
 color[] backgroundColors = {
 	#CA4587, #D8308F, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E,
@@ -317,8 +318,7 @@ class AnimatedShape {
   int milliseconds_elapse_to_color_morph;
   int milliseconds_at_last_color_change_elapsed;
   boolean color_morph_on;
-  // IN PROGRESS: reworking constructor to init vector movement (animating) value motion_vector_max off multiplier of what looks good at 800 px wide.
-  float motion_vector_max;  // */
+  float motion_vector_max;
   PVector additionVector;
   //FOR NGON:
   int sides;
@@ -450,10 +450,9 @@ class AnimatedShape {
     return vector_to_return;
   }
 
-//  void orbit() {
-// ?? :
-//see vector_rotation.pde
-//  }
+ //void orbit() {
+	// additionVector.rotate(radians(orbit_radians_rate));
+ //}
 
   void morphColor() {
 		// variable names reference:
@@ -592,6 +591,7 @@ class NestedAnimatedShapes {
       AnimatedShapesArray[j].drawShape();
       AnimatedShapesArray[j].morphDiameter();
       AnimatedShapesArray[j].udpate_animation_scale_multiplier();
+			// AnimatedShapesArray[j].orbit();
        // AnimatedShapesArray[j].jitter();    // so dang silky smooth without jitter; also maybe edge collisions are now less spastic _without_ that (the opposite case used to be).
         for (int k = j + 1; k < nesting; k++) {
           PVector tmp_vec;
