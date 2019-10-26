@@ -15,17 +15,9 @@
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
 
-// v1.7.3 work log:
-// - Scale motion vectors vs. speed tune on original reference grid: smaller shapes no longer relatively
-// so much faster. See motionVectorScaleBaseReference and what uses it.
-// - Scale diameter morph rate vs. speed tune on original reference grid for same reasons.
-// - Control diameter morph rate min and max via new globals diameterMorphRateMin, diameterMorphRateMax
-// - Tweak defaults + rnd sizes options of nesting
-// - Break fill colors into three palettes: light fill colors, dark fill colors, and all fill colors
-// (which includes both light and dark fill colors), and have color fills from outer to inner shapes usually 
-// alternate between light and dark, but have a one in five chance of staying either dark or light. Strokes
-// always randomly draw from all fill colors. I think this gives much more interesting/contrasty variety.
-String versionString = "v1.7.3";
+// v1.7.4 work log:
+// - shapes orbit()
+String versionString = "v1.7.4";
 
 // TO DO items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
 
@@ -104,8 +96,8 @@ float strokeMinWeightMult = 0.0064;		// stroke or outline min size multiplier vs
 float strokeMaxWeightMult = 0.0307;		// stroke or outline max size multiplier vs. shape diameter
 float diameterMorphRateMin = 0.0002;	// minimum rate of shape size contract or expand
 float diameterMorphRateMax = 0.0017;	// maximum "
-float motionVectorMax = 0.382;          // maximum pixels (I think?) an object may move per frame. Script randomizes between this and (this * -1) * a downscale multiplier per shapes' diameter.
-// float orbitRadiansMax = 
+float motionVectorMax = 0.457;          // maximum pixels (I think?) an object may move per frame. Script randomizes between this and (this * -1) * a downscale multiplier per shapes' diameter.
+float orbitRadiansMax = 6.84;					// how many degrees maximum any shape may orbit per call of orbit()
 // Marker colors array -- at this writing, mostly Prismacolor marker colors--but some are not, so far as I know! :
 color[] backgroundColors = {
 	#CA4587, #D8308F, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E,
@@ -320,6 +312,8 @@ class AnimatedShape {
   boolean color_morph_on;
   float motion_vector_max;
   PVector additionVector;
+	PVector orbitVector;		// Wanted because additionVector randomizes periodically but I want constant orbit.
+	float orbit_radians_rate;
   //FOR NGON:
   int sides;
   PShape nGon;
@@ -369,6 +363,8 @@ class AnimatedShape {
     motion_vector_max = motionVectorMax * animation_scale_multiplier;    // assigning from global there, then modifying further for local size/speed scale (animation_scale_multiplier)
 		diameter_morph_rate = random(diameterMorphRateMin, diameterMorphRateMax) * animation_scale_multiplier;		// also * animation_scale_multiplier because it's anim
     additionVector = getRandomVector();
+		orbitVector = getRandomVector();
+		orbit_radians_rate = random(orbitRadiansMax * -1, orbitRadiansMax);
     
     // FOR NGON: conditionally alter number of sides:
     if (sidesArg < 3 && sidesArg > 0) { sidesArg = 3; }   // force triangle if 1 or 2 "sides"
@@ -450,9 +446,9 @@ class AnimatedShape {
     return vector_to_return;
   }
 
- //void orbit() {
-	// additionVector.rotate(radians(orbit_radians_rate));
- //}
+	void orbit() {
+	additionVector.rotate(radians(orbit_radians_rate));
+	}
 
   void morphColor() {
 		// variable names reference:
@@ -582,6 +578,8 @@ class NestedAnimatedShapes {
 																									// print("changed mode.\n");
 						// print("is now: " + darkColorFillArg + "\n");
 																					} // else { print("chose not to change mode!\n"); }
+		// override orbitVector of all nested shapes to match outermost (lockstep orbits):
+		AnimatedShapesArray[i].orbitVector = AnimatedShapesArray[0].orbitVector;
     }
 
   }
@@ -591,7 +589,7 @@ class NestedAnimatedShapes {
       AnimatedShapesArray[j].drawShape();
       AnimatedShapesArray[j].morphDiameter();
       AnimatedShapesArray[j].udpate_animation_scale_multiplier();
-			// AnimatedShapesArray[j].orbit();
+			AnimatedShapesArray[j].orbit();
        // AnimatedShapesArray[j].jitter();    // so dang silky smooth without jitter; also maybe edge collisions are now less spastic _without_ that (the opposite case used to be).
         for (int k = j + 1; k < nesting; k++) {
           PVector tmp_vec;
