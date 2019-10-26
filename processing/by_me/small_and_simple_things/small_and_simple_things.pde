@@ -15,15 +15,17 @@
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
 
-// v1.7.1 work log:
-// - optional load of twitter Auth keys from local file, to enable to tweet directly from
-// running script, with error handling on auth keys load or tweet attempts. Commented out;
-// uncomment for example on install in a museum kiosk :)
-// - have figured how to get global animation values scaling working, and base variables
-// in place to do so (to continue development, see where animationScaleBaseReference is used,
-// and work off of that).
-
-String versionString = "v1.7.1";
+// v1.7.3 work log:
+// - Scale motion vectors vs. speed tune on original reference grid: smaller shapes no longer relatively
+// so much faster. See motionVectorScaleBaseReference and what uses it.
+// - Scale diameter morph rate vs. speed tune on original reference grid for same reasons.
+// - Control diameter morph rate min and max via new globals diameterMorphRateMin, diameterMorphRateMax
+// - Tweak defaults + rnd sizes options of nesting
+// - Break fill colors into three palettes: light fill colors, dark fill colors, and all fill colors
+// (which includes both light and dark fill colors), and have color fills from outer to inner shapes usually 
+// alternate between light and dark, but have a one in five chance of staying either dark or light. Strokes
+// always randomly draw from all fill colors. I think this gives much more interesting/contrasty variety.
+String versionString = "v1.7.3";
 
 // TO DO items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
 
@@ -35,13 +37,16 @@ String[] twitterAPIauthLines;
 //SimpleTweet simpletweet;
 boolean doNotTryToTweet = true;    // flase state of this is deliberately confusing double-negative message :)
 
+
+
+
 // BEGIN GLOBAL VARIABLES:
 // NOTE: to control additional information contained in saved file names, see comments in the get_image_file_name_no_ext() function further below.
 boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly.
 int overrideSeed = -161287679;    // a favorite is: -161287679
 int previousSeed = overrideSeed;
 int seed = overrideSeed;
-boolean USE_FULLSCREEN = false;  // if set to true, overrides the following values; if false, they are used:
+boolean USE_FULLSCREEN = true;  // if set to true, overrides the following values; if false, they are used:
 int globalWidth = 1080;
 int globalHeight = 1920;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
 int gridNesting = 4;    // controls how many nests of shapes there are for each shape on the grid. 5 hangs it. ?
@@ -50,8 +55,10 @@ int GridOfShapesNumCols;    // to be reinitialized in each loop of setup() -- fo
 int GridOfShapesNumRows;    // "
 // used by AnimatedShape objects to scale down animation-related values when the shapes are smaller (so that smaller objects do not animate relatively faster;
 // this was itself figured as a place of "how fast I want things to animate when there is one column in an image 1080 pix wide;" AND THEN
-// multiplied by two! (because this multiple is used by even the largest shapes, which I don't want scaled by 1/2 because I divide everything . . it's complicated:
-int animationScaleBaseReference = 1440;
+// multiplied by two! (because this multiple is used by even the largest shapes, which I don't want scaled by 1/2 because I divide everything . . it's complicated);
+// -- becomes: ~1382.4 ALSO NOTE this was with ShapesGridXmaxPercent = 0.64, where circle size max was then 691.2; ALSO with motionVectorMax = 0.273 . . .
+// but then I futzed it to 187 anyway because I like that speed better at all scales. ::shrug:: ANYWAY:
+int motionVectorScaleBaseReference = 168;
 int RNDbgColorIDX;    // to be used as random index from array of colors
 color globalBackgroundColor;
 boolean overrideBackgroundColor = false;
@@ -87,15 +94,17 @@ int estimatedFPS = 0;    // dynamically modified by program as it runs (and prin
 // larger original grid size: 25x14, wobbly circle placement, wobbly concentricity in circles.
 // smaller original grid size: 19x13, regular circle placement on grid, wobbly concentricity in circles.
 // SMOFA entry configuration for the following values, for ~6' tall kiosk: 1, 21? ~4K resolution horizontally larger monitors: 14, 43
-int minColumns = 1; int maxColumns = 2;
-float ShapesGridXminPercent = 0.245;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
-float ShapesGridXmaxPercent = 0.64;   // maximum ""                                       Maybe best ~ .75
+int minColumns = 2; int maxColumns = 21;
+float ShapesGridXminPercent = 0.239;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
+float ShapesGridXmaxPercent = 0.6522;   // maximum ""                                       Maybe best ~ .75
 int minimumNgonSides = -13;    // If negative number, there is that many more times chance of any shape being a circle.
 int maximumNgonSides = 7;      // Preferred: 7. Max number of shape sides randomly chosen. 0, 1 and 2 will be circles. 3 will be a triangle, 4 a square, 5 a pentagon, and so on.
-float parentMaxWanderDistMultiple = 1.176;		// how far beyond origin + max radius, as percent, a parent shape can wander. Default hard-coding: 1.14 (14 percent past max origin)
+float parentMaxWanderDistMultiple = 1.3;		// how far beyond origin + max radius, as percent, a parent shape can wander. Default hard-coding: 1.14 (14 percent past max origin)
 float strokeMinWeightMult = 0.0064;		// stroke or outline min size multiplier vs. shape diameter--diameters change! 
 float strokeMaxWeightMult = 0.0307;		// stroke or outline max size multiplier vs. shape diameter
-float motionVectorMax = 0.25;          // maximum pixels (I think?) an object may move per frame. Script randomizes between this and (this * -1) * a downscale multiplier per shapes' diameter.
+float diameterMorphRateMin = 0.0002;	// minimum rate of shape size contract or expand
+float diameterMorphRateMax = 0.0017;	// maximum "
+float motionVectorMax = 0.382;          // maximum pixels (I think?) an object may move per frame. Script randomizes between this and (this * -1) * a downscale multiplier per shapes' diameter.
 // Marker colors array -- at this writing, mostly Prismacolor marker colors--but some are not, so far as I know! :
 color[] backgroundColors = {
 	#CA4587, #D8308F, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E,
@@ -115,24 +124,47 @@ color[] backgroundColors = {
 	#E323DB, #2E8B57, #73ED91, #00FA9A, #A1FA2A, #7EF100
 };
 int backgroundColorsArrayLength = backgroundColors.length;
-color[] fillColors = {
-	#CA4587, #D8308F, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E,
-	#CA5A62, #C14F6E, #B34958, #AA4662, #8E4C5C, #8F4772, #934393, #AF62A2,
-	#8D6CA9, #72727D, #615F6B, #62555E, #745D5F, #877072, #8D6E64, #9B685D,
-	#A45A52, #BD6E6B, #C87F73, #C97B8E, #E497A4, #F895AC, #FA9394, #F98973,
-	#EE8A74, #FA855B, #FD9863, #EBB28B, #FEC29F, #F9C0BC, #F6C6D0, #F5D3DD,
-	#F0D9DC, #F5DCD5, #F0CCC4, #E0BFB5, #F8D9BE, #EEE2C7, #F2D8A4, #FADFA7,
-	#F7D580, #FFC874, #FDFD96, #F5FFA1, #F0FFF0, #E0FFFF, #E5E4E9, #F1E5E9,
-	#C7C6CD, #C9CBE0, #97C1DA, #91BACB, #95B6BA, #A2B1A2, #BFA9A8, #B7A1AF,
-	#AC9EB8, #B1A1C9, #A1A6D0, #9B98A2, #A58E9A, #B19491, #7B91A2, #6389AB,
-	#69A2BE, #74B3E3, #00B3DB, #4CC8D9, #7AD2E2, #93EDF7, #00FFEF, #7FFFD4,
-	#88D8C0, #93CD87, #82B079, #00A86B, #009B7D, #00A693, #36B191, #0BBDC4,
-	#008D94, #4F8584, #1E7C72, #59746E, #367793, #405F89, #435BA3, #33549B,
-	#3344BB, #333388, #333366, #333351, #003153, #002147, #32127A, #574C70,
-	#524547, #414141, #79443B, #4E1609, #2E8B57, #73ED91, #00FA9A
+color[] darkFillColors = {
+  #CA4587, #D8308F, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E,
+  #CA5A62, #C14F6E, #B34958, #AA4662, #8E4C5C, #8F4772, #934393, #AF62A2,
+  #8D6CA9, #72727D, #615F6B, #62555E, #745D5F, #877072, #8D6E64, #9B685D,
+  #A45A52, #BD6E6B, #C87F73, #C97B8E, #F895AC, #FA9394, #F98973, #EE8A74,
+  #FA855B, #FD9863, #FFC874, #F7D580, #FDFD96, #93CD87, #82B079, #00A86B,
+  #009B7D, #00A693, #36B191, #0BBDC4, #008D94, #4F8584, #1E7C72, #59746E,
+  #367793, #405F89, #435BA3, #33549B, #3344BB, #333388, #333366, #333351,
+  #003153, #002147, #32127A, #574C70, #524547, #414141, #79443B, #4E1609,
+  #2E8B57, #73ED91, #00FA9A, 
 };
-int fillColorsArrayLength = fillColors.length;
+int darkFillColorsArrayLength = darkFillColors.length;
+color[] lightFillColors = {
+  #E497A4, #F9C0BC, #F6C6D0, #F5D3DD, #F0D9DC, #F5DCD5, #F0CCC4, #E0BFB5,
+  #FEC29F, #EBB28B, #F2D8A4, #FADFA7, #F8D9BE, #EEE2C7, #F1E5E9, #E5E4E9,
+  #C7C6CD, #C9CBE0, #97C1DA, #91BACB, #95B6BA, #A2B1A2, #BFA9A8, #B7A1AF,
+  #AC9EB8, #B1A1C9, #A1A6D0, #9B98A2, #A58E9A, #B19491, #7B91A2, #6389AB,
+  #69A2BE, #74B3E3, #00B3DB, #4CC8D9, #7AD2E2, #93EDF7, #00FFEF, #7FFFD4,
+  #88D8C0, #E0FFFF, #F0FFF0, #F5FFA1
+};
+int lightFillColorsArrayLength = lightFillColors.length;
+color[] allFillColors = {
+  #CA4587, #D8308F, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E,
+  #CA5A62, #C14F6E, #B34958, #AA4662, #8E4C5C, #8F4772, #934393, #AF62A2,
+  #8D6CA9, #72727D, #615F6B, #62555E, #745D5F, #877072, #8D6E64, #9B685D,
+  #A45A52, #BD6E6B, #C87F73, #C97B8E, #E497A4, #F895AC, #FA9394, #F98973,
+  #EE8A74, #FA855B, #FD9863, #EBB28B, #FEC29F, #F9C0BC, #F6C6D0, #F5D3DD,
+  #F0D9DC, #F5DCD5, #F0CCC4, #E0BFB5, #F8D9BE, #EEE2C7, #F2D8A4, #FADFA7,
+  #F7D580, #FFC874, #FDFD96, #F5FFA1, #F0FFF0, #E0FFFF, #E5E4E9, #F1E5E9,
+  #C7C6CD, #C9CBE0, #97C1DA, #91BACB, #95B6BA, #A2B1A2, #BFA9A8, #B7A1AF,
+  #AC9EB8, #B1A1C9, #A1A6D0, #9B98A2, #A58E9A, #B19491, #7B91A2, #6389AB,
+  #69A2BE, #74B3E3, #00B3DB, #4CC8D9, #7AD2E2, #93EDF7, #00FFEF, #7FFFD4,
+  #88D8C0, #93CD87, #82B079, #00A86B, #009B7D, #00A693, #36B191, #0BBDC4,
+  #008D94, #4F8584, #1E7C72, #59746E, #367793, #405F89, #435BA3, #33549B,
+  #3344BB, #333388, #333366, #333351, #003153, #002147, #32127A, #574C70,
+  #524547, #414141, #79443B, #4E1609, #2E8B57, #73ED91, #00FA9A
+};
+int allFillColorsArrayLength = allFillColors.length;
 // END GLOBAL VARIABLES
+
+
 
 
 // BEGIN GLOBAL FUNCTIONS
@@ -255,25 +287,21 @@ PVector smaller_shape_XY, float smaller_shape_diameter
     }
   return coords_to_return;
 }
-
-
 // END GLOBAL FUNCTIONS
+
+
 
 
 // BEGIN CLASSES
 // class that contains persisting, modifiable information on a circle.
-// NOTE: uses the above global fillColors array of colors.
+// NOTE: uses the above global darkFillColors array of colors.
 class AnimatedShape {
 	PVector originXY;
 	PVector centerXY;
 	PVector wanderedXY;
-// IN PROGRESS: reworking constructor to init animating values off multiplier of what looks good at 800 px wide,
-// including: jitter_max_step_mult, max_jitter_dist, max_wander_dist, diameter_morph_rate, stroke_weight, additionVector.
-// WHEN EACH OF THOSE ARE DONE, and until this consctruction project is complete, I'll add a comment with an asterisk beside each,
-// indicating "done." astrisk/slash (*/) will mean "in progress."
   float jitter_max_step_mult;
   float max_jitter_dist;
-  float max_wander_dist;    // */
+  float max_wander_dist;
   float diameter;
   float diameter_min;
   float diameter_max;
@@ -282,33 +310,34 @@ class AnimatedShape {
 	color alt_stroke_color;
   int stroke_color_palette_idx;
   float stroke_weight;
-// TO DO? animate stroke weight?
+	boolean use_dark_color_fill;
   color fill_color;
 	color alt_fill_color;
   int fill_color_palette_idx;
   int milliseconds_elapse_to_color_morph;
   int milliseconds_at_last_color_change_elapsed;
   boolean color_morph_on;
+  // IN PROGRESS: reworking constructor to init vector movement (animating) value motion_vector_max off multiplier of what looks good at 800 px wide.
   float motion_vector_max;  // */
-  PVector additionVector;   // */
+  PVector additionVector;
   //FOR NGON:
   int sides;
   PShape nGon;
   PVector radiusVector;    // used to construct the nGon
-  // The following is used to scale all animation variables vs. 800px wide grid reference to which hard-coded
-  // values were visually tuned. Because the shapes vary in size as the program runs, if animation increments
-  // are constant, things move relatively "faster" when shapes are smaller. This multiplier throttles those
-  // values up or down so that animation has the same relative distances/speeds as shapes grow/shrink.
-  float animationScalingMultiplier;
+  // The following is used to scale all animation variables vs. an original animation size/speed tuning reference grid.
+  // See comments for motionVectorScaleBaseReference. Because the shapes vary in size as the program runs, if animation
+  // increments are constant, things move relatively "faster" when shapes are smaller. This multiplier throttles those
+  // values up or down so that animation has the same relative distances/speeds as shapes grow/shrink. See how this is
+  // initialized in the constructor..
+  float animation_scale_multiplier;
 
   // class constructor--sets random diameter and morph speed values from passed parameters;
   // IF nGonSides is 0, we'll know it's intended to be a circle:
-  AnimatedShape(int Xcenter, int yCenter, float diameterMin, float diameterMax, int sidesArg) {
+  AnimatedShape(int Xcenter, int yCenter, float diameterMin, float diameterMax, int sidesArg, boolean darkColorFillArg) {
     originXY = new PVector(Xcenter,yCenter);
     centerXY = new PVector(Xcenter,yCenter);
     diameter_min = diameterMin; diameter_max = diameterMax;
     diameter = random(diameterMin, diameterMax);
-    diameter_morph_rate = random(0.001, 0.0016);
     //randomly make that percent positive or negative to start (which will cause grow or expand animation if used as intended) :
     int RNDtrueFalse = (int) random(0, 2);  // gets random 0 or 1
     if (RNDtrueFalse == 1) {
@@ -317,21 +346,29 @@ class AnimatedShape {
     jitter_max_step_mult = random(0.002, 0.0032);  // remember subtle values I like the results of: random(0.002, 0.058) -- for smaller circles/shapes. For YUGE: 0.002, 0.038
     max_jitter_dist = diameter * jitter_max_step_mult;
     max_wander_dist = diameter * parentMaxWanderDistMultiple;		// Only for outer circle (or shape) of nested circle (or shape).
-    // set RND stroke and fill colors:
-    int RNDarrayIndex = (int)random(fillColorsArrayLength);
-    stroke_color = fillColors[RNDarrayIndex]; alt_stroke_color = stroke_color;
+    // set RND stroke and fill colors and stroke weight;
+		// stroke RND from all fill colors:
+    int RNDarrayIndex = (int) random(allFillColorsArrayLength);  // use all fill colors for stroke
+    stroke_color = allFillColors[RNDarrayIndex]; alt_stroke_color = stroke_color;
     stroke_color_palette_idx = RNDarrayIndex;
     stroke_weight = random(diameter_max * strokeMinWeightMult, diameter_max * strokeMaxWeightMult);   // have tried as high as 0.042 tweaked up from v.1.3.6 size: 0.028
-    RNDarrayIndex = (int)random(fillColorsArrayLength);
-    fill_color = fillColors[RNDarrayIndex]; alt_fill_color = fill_color;
+		use_dark_color_fill = darkColorFillArg;
+		if (use_dark_color_fill == true) {
+			RNDarrayIndex = (int) random(darkFillColorsArrayLength);
+			fill_color = darkFillColors[RNDarrayIndex]; alt_fill_color = fill_color;
+		} else {
+			RNDarrayIndex = (int) random(lightFillColorsArrayLength);
+			fill_color = lightFillColors[RNDarrayIndex]; alt_fill_color = fill_color;
+		}
     fill_color_palette_idx = RNDarrayIndex;
     //TO DO? : control the folling rnd range with parameters?
     milliseconds_elapse_to_color_morph = (int) random(42, 111);    // on more powerful hardware, 194 is effectively true with no throttling of this.
     milliseconds_at_last_color_change_elapsed = millis();
     color_morph_on = false;
-    motion_vector_max = motionVectorMax;    // assigning from global there.
+    animation_scale_multiplier = diameter / motionVectorScaleBaseReference; // print("animation_scale_multiplier: " + animation_scale_multiplier + "\n");
+    motion_vector_max = motionVectorMax * animation_scale_multiplier;    // assigning from global there, then modifying further for local size/speed scale (animation_scale_multiplier)
+		diameter_morph_rate = random(diameterMorphRateMin, diameterMorphRateMax) * animation_scale_multiplier;		// also * animation_scale_multiplier because it's anim
     additionVector = getRandomVector();
-    animationScalingMultiplier = diameter / animationScaleBaseReference; print("animationScalingMultiplier: " + animationScalingMultiplier + "\n");
     
     // FOR NGON: conditionally alter number of sides:
     if (sidesArg < 3 && sidesArg > 0) { sidesArg = 3; }   // force triangle if 1 or 2 "sides"
@@ -354,9 +391,6 @@ class AnimatedShape {
 
   // member functions
   void morphDiameter() {
-            // print("diameter:diameter_min:diameter_max: " + diameter + ":" + diameter_min + ":" + diameter_max + "\n");
-    // constrains a value to not exceed a maximum and minimum value; re: https://processing.org/reference/constrain_.html
-    // constrain(amt, low, high)
     // grow diameter (positive or negative) :
         float old_diameter = diameter;  // for later reference in scaling nGon
     diameter = diameter + (diameter * diameter_morph_rate);
@@ -370,7 +404,6 @@ class AnimatedShape {
     }
         float percent_change_multiplier = diameter / old_diameter;
     nGon.scale(percent_change_multiplier);
-            // print("->diameter:diameter_min:diameter_max: " + diameter + ":" + diameter_min + ":" + diameter_max + "\n");
   }
 
   void jitter() {
@@ -389,7 +422,6 @@ class AnimatedShape {
 // (as it won't work directly on the values of anything we decided to pass
 // to the function if we coded it that way, which would mean copying twice == less efficient) :
   PVector getRandomVector() {
-            //print("diameter_max: " + diameter_max + " motion_vector_max: " + motion_vector_max + "\n");
     float vector_x = random(motion_vector_max * -1, motion_vector_max + 0.001);    // using a global variable
     float vector_y = random(motion_vector_max * -1, motion_vector_max + 0.001);
     PVector a = new PVector(vector_x, vector_y);
@@ -404,7 +436,6 @@ class AnimatedShape {
   PVector wander(PVector parent_shape_XY, float parent_shape_diameter) {
     PVector vector_to_return = new PVector(0,0);    // will be northing unless changed
     // updating variable within the object this function is a part of:
-    // but shouldn't I use? : translate(additionVector);
     centerXY.add(additionVector);
     // check if we just made the shape go outside its parent, and if so undo that translate:
     boolean is_shape_within_parent = is_shape_within_shape(parent_shape_XY, parent_shape_diameter, centerXY, diameter);
@@ -425,21 +456,33 @@ class AnimatedShape {
 //  }
 
   void morphColor() {
+		// variable names reference:
+		// int darkFillColorsArrayLength = darkFillColors.length;
+		// int lightFillColorsArrayLength = lightFillColors.length;
+		// int allFillColorsArrayLength = allFillColors.length;
     int localMillis = millis();
     if ((localMillis - milliseconds_at_last_color_change_elapsed) > milliseconds_elapse_to_color_morph && color_morph_on == true) {
-      // morph stroke color:
-      stroke_color_palette_idx += 1;
-      if (stroke_color_palette_idx >= fillColorsArrayLength) {
-        stroke_color_palette_idx = 0;
-      }    // reset that if it went out of bounds of array indices
-      stroke_color = fillColors[stroke_color_palette_idx];
-      // morph fill color:
-      fill_color_palette_idx += 1;
-      if (fill_color_palette_idx >= fillColorsArrayLength) {
-        fill_color_palette_idx = 0;
-      }        // also reset that if it was out of bounds
-      fill_color = fillColors[fill_color_palette_idx];
-      milliseconds_at_last_color_change_elapsed = millis();
+			stroke_color_palette_idx += 1;		// reset that if it went out of bounds of array indices:
+			if (stroke_color_palette_idx >= allFillColorsArrayLength) {
+				stroke_color_palette_idx = 0;
+			}    
+			stroke_color = allFillColors[stroke_color_palette_idx];
+
+			// morph dark or light color fill index and color, depending on whether shape in dark or light mode:
+			fill_color_palette_idx += 1;
+			if (use_dark_color_fill == true) {
+				// reset that if it went out of bounds:
+				if (fill_color_palette_idx >= darkFillColorsArrayLength) {
+					fill_color_palette_idx = 0;
+				}
+				fill_color = darkFillColors[fill_color_palette_idx];
+			} else {		// light mode, so adjust idx / color for light palette:
+				if (fill_color_palette_idx >= lightFillColorsArrayLength) {
+					fill_color_palette_idx = 0;
+				}
+				fill_color = lightFillColors[fill_color_palette_idx];
+			}
+	    milliseconds_at_last_color_change_elapsed = millis();
     }
   }
 
@@ -461,7 +504,7 @@ class AnimatedShape {
     if (sides > 2) {    // as manipulated by constructor logic, this will mean an nGon, so render that:
       nGon.setFill(alt_fill_color);
       nGon.setStrokeWeight(stroke_weight * 1.3);    // * because it just seems to be better as heavier for nGons than circles.
-      nGon.setStroke(alt_stroke_color);  // can not has float but global stroke weight can why?
+      nGon.setStroke(alt_stroke_color);
       shape(nGon, centerXY.x, centerXY.y);
     }
     else {    // otherwise it's a circle, so render that:
@@ -474,6 +517,10 @@ class AnimatedShape {
 
   void translate(PVector addArg) {
     centerXY.add(addArg);
+  }
+  
+  void udpate_animation_scale_multiplier() {
+    animation_scale_multiplier = diameter / motionVectorScaleBaseReference;
   }
 
 }
@@ -490,15 +537,15 @@ class NestedAnimatedShapes {
 
     nesting = nestingArg;
     AnimatedShapesArray = new AnimatedShape[nesting];
-    float donwMultiplyConstantMin = 0.67; float downMultiplyConstantMax = 0.92;
-    // float percentOfMinDiameterToMax = RND_min_diameter_mult / RND_max_diameter_mult;
+    // float donwMultiplyConstantMin = 0.67; float downMultiplyConstantMax = 0.92;		// vestigal from experiment
+    // float percentOfMinDiameterToMax = RND_min_diameter_mult / RND_max_diameter_mult;		// vestigal "
 
 
     // PRE-DETERMINE diameter/apothem ("diameter" / 2) sizes for an array of animated shapes.
     // Then pass them as max and min radius for each shape as we build the array of shapes.
     // METHOD: get a fixed number of random numbers from a range divided by an interval, descending.
     // (for nested circle diameters or nested shape apothems)
-    int interval = nesting + 4;    // divide min and max possible radius by how many intervals to determine size slices?
+    int interval = nesting + 9;    // divide min and max possible radius by how many intervals to determine size slices?
     float dividend = (RND_max_diameter_mult - RND_min_diameter_mult) / interval;
     int radii_to_get = nesting + 1;   // or the last circle/shape will have no min. radius!
     int low_range_excluder = radii_to_get;
@@ -513,15 +560,29 @@ class NestedAnimatedShapes {
       low_range_excluder -= 1;
     }
     // END PRE-DETERMINE diameter/apothem sizes.
+		// randomly choose true or false for dark color fill (will be used for outermost shape),
+		// and toggle it to opposite in each iteration of loop (to alternate light/dark fill) :
+		boolean darkColorFillArg = random(1) > .5;    // I thank a genius breath: https://forum.processing.org/two/discussion/1433/random-boolean-howto
+    				// print("chose " + darkColorFillArg + "\n");
     for (int i = 0; i < nesting; i++) {
 			// print(radii[i+1] + ":" + radii[i] + "\n");
+			//print("darkColorFillArg for " + i + " is " + darkColorFillArg + "\n");
       AnimatedShapesArray[i] = new AnimatedShape(
         xCenterArg,
         yCenterArg,
         radii[i+1],
         radii[i],
-        nGonSides
+        nGonSides,
+        darkColorFillArg
       );
+						// BUT one out of five times, do _not_ toggle it, and continue with dark if dark or light if light:
+						int five_sided_die_roll = (int) random(1, 6);		// 6 because not inclusive: max of range is 5
+						if (five_sided_die_roll != 5) {
+		if (darkColorFillArg == false) { darkColorFillArg = true; } else { darkColorFillArg = false; }
+		// Plato smiles as his student keels over in agony.
+																									// print("changed mode.\n");
+						// print("is now: " + darkColorFillArg + "\n");
+																					} // else { print("chose not to change mode!\n"); }
     }
 
   }
@@ -530,6 +591,7 @@ class NestedAnimatedShapes {
     for (int j = 0; j < nesting; j++) {
       AnimatedShapesArray[j].drawShape();
       AnimatedShapesArray[j].morphDiameter();
+      AnimatedShapesArray[j].udpate_animation_scale_multiplier();
        // AnimatedShapesArray[j].jitter();    // so dang silky smooth without jitter; also maybe edge collisions are now less spastic _without_ that (the opposite case used to be).
         for (int k = j + 1; k < nesting; k++) {
           PVector tmp_vec;
@@ -691,7 +753,7 @@ void setup() {
 	if (overrideBackgroundColor == true) {
 		globalBackgroundColor = altBackgroundColor;
 	} else {
-  	RNDbgColorIDX = (int)random(backgroundColorsArrayLength);
+  	RNDbgColorIDX = (int) random(backgroundColorsArrayLength);
 		globalBackgroundColor = backgroundColors[RNDbgColorIDX];
 	}
 	
