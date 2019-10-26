@@ -15,19 +15,17 @@
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
 
-// v1.7.5 work log:
-// - shapes rotateShape()
-// - tweak division interval of nesting
-String versionString = "v1.7.5";
+// v1.7.6 scale up nGons a bit to compensate for smaller area (want to figure how to make same area as circle)
+String versionString = "v1.7.6";
 
 // TO DO items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
 
 // DEPENDENCY IMPORTS and associated globals:
 import processing.svg.*;
 // for image tweets! :
-//import gohai.simpletweet.*;
+// import gohai.simpletweet.*;
 String[] twitterAPIauthLines;
-//SimpleTweet simpletweet;
+// SimpleTweet simpletweet;
 boolean doNotTryToTweet = true;    // flase state of this is deliberately confusing double-negative message :)
 
 
@@ -88,11 +86,11 @@ int estimatedFPS = 0;    // dynamically modified by program as it runs (and prin
 // smaller original grid size: 19x13, regular circle placement on grid, wobbly concentricity in circles.
 // SMOFA entry configuration for the following values, for ~6' tall kiosk: 1, 21? ~4K resolution horizontally larger monitors: 14, 43
 int minColumns = 2; int maxColumns = 21;
-float ShapesGridXminPercent = 0.239;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
-float ShapesGridXmaxPercent = 0.6522;   // maximum ""                                       Maybe best ~ .75
+float ShapesGridXminPercent = 0.231;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
+float ShapesGridXmaxPercent = 0.63;   // maximum ""                                       Maybe best ~ .75
 int minimumNgonSides = -13;    // If negative number, there is that many more times chance of any shape being a circle.
 int maximumNgonSides = 7;      // Preferred: 7. Max number of shape sides randomly chosen. 0, 1 and 2 will be circles. 3 will be a triangle, 4 a square, 5 a pentagon, and so on.
-float parentMaxWanderDistMultiple = 1.3;		// how far beyond origin + max radius, as percent, a parent shape can wander. Default hard-coding: 1.14 (14 percent past max origin)
+float parentMaxWanderDistMultiple = 1.34;		// how far beyond origin + max radius, as percent, a parent shape can wander. Default hard-coding: 1.14 (14 percent past max origin)
 float strokeMinWeightMult = 0.0064;		// stroke or outline min size multiplier vs. shape diameter--diameters change! 
 float strokeMaxWeightMult = 0.0307;		// stroke or outline max size multiplier vs. shape diameter
 float diameterMorphRateMin = 0.0002;	// minimum rate of shape size contract or expand
@@ -374,6 +372,12 @@ class AnimatedShape {
     if (sidesArg < 3 && sidesArg > 0) { sidesArg = 3; }   // force triangle if 1 or 2 "sides"
     // if sidesArg is negative number, don't worry about changing it--it will be interpreted as a circle. Unless I change that? :
     sides = sidesArg;
+		// scale up shapes with less area;
+		if (sides == 3) { diameter *= 1.18; diameter_min *= 1.18; diameter_max *= 1.18; }
+		if (sides == 4) { diameter *= 1.12; diameter_min *= 1.12; diameter_max *= 1.12; }
+		if (sides == 5) { diameter *= 1.09; diameter_min *= 1.09; diameter_max *= 1.09; }
+		if (sides == 6) { diameter *= 1.04; diameter_min *= 1.04; diameter_max *= 1.04; }
+		if (sides == 7) { diameter *= 1.02; diameter_min *= 1.02; diameter_max *= 1.02; }
     radiusVector = new PVector(0, (diameter / 2 * (-1)) );    // This init vector allows us to construct an n-gon with the first vertex at the top of a conceptual construction circle
     // if "sides" is a negative number, I think an empty shape is built? -- because the for loop won't trigger (i > sides)? :
     nGon = createShape();
