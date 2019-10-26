@@ -15,9 +15,10 @@
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
 
-// v1.7.4 work log:
-// - shapes orbit()
-String versionString = "v1.7.4";
+// v1.7.5 work log:
+// - shapes rotateShape()
+// - tweak division interval of nesting
+String versionString = "v1.7.5";
 
 // TO DO items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
 
@@ -98,6 +99,7 @@ float diameterMorphRateMin = 0.0002;	// minimum rate of shape size contract or e
 float diameterMorphRateMax = 0.0017;	// maximum "
 float motionVectorMax = 0.457;          // maximum pixels (I think?) an object may move per frame. Script randomizes between this and (this * -1) * a downscale multiplier per shapes' diameter.
 float orbitRadiansMax = 6.84;					// how many degrees maximum any shape may orbit per call of orbit()
+float rotationRadiansMax = 1.864;			// how many degrees maximum any shape may orbit per call of shapeRotate();
 // Marker colors array -- at this writing, mostly Prismacolor marker colors--but some are not, so far as I know! :
 color[] backgroundColors = {
 	#CA4587, #D8308F, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E,
@@ -314,6 +316,7 @@ class AnimatedShape {
   PVector additionVector;
 	PVector orbitVector;		// Wanted because additionVector randomizes periodically but I want constant orbit.
 	float orbit_radians_rate;
+	float rotate_radians_rate;
   //FOR NGON:
   int sides;
   PShape nGon;
@@ -365,6 +368,7 @@ class AnimatedShape {
     additionVector = getRandomVector();
 		orbitVector = getRandomVector();
 		orbit_radians_rate = random(orbitRadiansMax * -1, orbitRadiansMax);
+		rotate_radians_rate = random(rotationRadiansMax * -1, rotationRadiansMax);
     
     // FOR NGON: conditionally alter number of sides:
     if (sidesArg < 3 && sidesArg > 0) { sidesArg = 3; }   // force triangle if 1 or 2 "sides"
@@ -448,6 +452,10 @@ class AnimatedShape {
 
 	void orbit() {
 	additionVector.rotate(radians(orbit_radians_rate));
+	}
+
+	void rotateShape() {
+		nGon.rotate(radians(rotate_radians_rate));
 	}
 
   void morphColor() {
@@ -540,7 +548,7 @@ class NestedAnimatedShapes {
     // Then pass them as max and min radius for each shape as we build the array of shapes.
     // METHOD: get a fixed number of random numbers from a range divided by an interval, descending.
     // (for nested circle diameters or nested shape apothems)
-    int interval = nesting + 9;    // divide min and max possible radius by how many intervals to determine size slices?
+    int interval = nesting + 7;    // divide min and max possible radius by how many intervals to determine size slices?
     float dividend = (RND_max_diameter_mult - RND_min_diameter_mult) / interval;
     int radii_to_get = nesting + 1;   // or the last circle/shape will have no min. radius!
     int low_range_excluder = radii_to_get;
@@ -580,6 +588,8 @@ class NestedAnimatedShapes {
 																					} // else { print("chose not to change mode!\n"); }
 		// override orbitVector of all nested shapes to match outermost (lockstep orbits):
 		AnimatedShapesArray[i].orbitVector = AnimatedShapesArray[0].orbitVector;
+		// also rotate_radians_rate:
+		AnimatedShapesArray[i].rotate_radians_rate = AnimatedShapesArray[0].rotate_radians_rate;
     }
 
   }
@@ -590,6 +600,7 @@ class NestedAnimatedShapes {
       AnimatedShapesArray[j].morphDiameter();
       AnimatedShapesArray[j].udpate_animation_scale_multiplier();
 			AnimatedShapesArray[j].orbit();
+			AnimatedShapesArray[j].rotateShape();
        // AnimatedShapesArray[j].jitter();    // so dang silky smooth without jitter; also maybe edge collisions are now less spastic _without_ that (the opposite case used to be).
         for (int k = j + 1; k < nesting; k++) {
           PVector tmp_vec;
