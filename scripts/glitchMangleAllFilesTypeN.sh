@@ -8,16 +8,13 @@
 
 # if [ ! -d ./out ]; then mkdir out; fi
 
-# re http://stackoverflow.com/a/5927391/1397555
-find . -type f -name "*.$1" > alles.txt
+array=(`gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
 
-while read -r element
+for element in ${array[@]}
 do
 	# randomCharsString=`cat /dev/urandom | tr -cd 'a-km-np-zA-KM-NP-Z2-9' | head -c $numRandomCharsToGet`
 	bm.exe $element -x jpg -u $2 -r 6 -t 1 -s 100 -v -a -m +-
 	mv ./out ./"$element"_corrupted
 	mkdir out
 	echo element is $element
-done < alles.txt
-
-rm ./alles.txt
+done
