@@ -10,15 +10,11 @@
 # The following command, for example, will make 10 corrupted copies of every jpg in the current path, corrupting each copy by 2 percent:
 # thisScript.sh jpg 10 2
 
-gfind \*.$1 > _alles.txt
-# I WASTED A CURSEDLY LARGE PORTION OF MY BREATH AND TOIL before figuring out I need to do the following:
-dos2unix _alles.txt
-# strip off ./ at start as it messes up later glitchThisFile.sh call:
-sed -i 's/\.\/\(.*\)/\1/g' _alles.txt
+array=(`gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
 
 if [ ! -d _glitched ]; then mkdir _glitched; fi
 
-while read element
+for element in ${array[@]}
 do
 			echo corrupting file $element . . .
 	cp "$element" ./_glitched/
@@ -33,10 +29,7 @@ do
 		done
 	rm "$element"
 	cd ..
-			# another option, which would be done without a loop; use bm.exe, to be found in this repository: https://github.com/earthbound19/_ebdev
-			# bm.exe "$element" bm.exe $1 -x jpg -u 100 -r 12 -t 1 -s 9 -a 5 -v -m +-
-done < _alles.txt
-rm ./_alles.txt
+done
 
 # because my windows Cygwin install can be a buggy moron about permissions:
 # chmod 777 ./_glitched/*
