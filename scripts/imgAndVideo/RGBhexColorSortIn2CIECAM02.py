@@ -7,6 +7,7 @@
 
 # NOTES: this script expects perfect data. If there's a blank line anywhere in the
 # input file, or any other unexpected data, it may stop with an unhelpful error.
+# ALSO, this script will eliminate duplicates in the input list.
 # USAGE
 # With this script and a .hexplt file both in your immediate path, and
 # Python in your PATH, call this script with one parameter, being a hex palette list:
@@ -95,6 +96,9 @@ colors_list = list(f.read().splitlines())
 f.close()
 # strip beginning '#' character off every string in that list:
 colors_list = [element[1:] for element in colors_list]
+# deduplicate the list, but maintain same order:
+from more_itertools import unique_everseen
+colors_list = list(unique_everseen(colors_list))
 
 # SORT HEX RGB color list to next nearest per color,
 # by converting to CIECAM02, then sorting on some dimensions in that space.
