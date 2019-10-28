@@ -1,12 +1,12 @@
 # DESCRIPTION
-# Calls renderHexPalette-gm.sh for every .hexplt file in the path from which this script is invoked (recusrive). Result: all hex palette files in the current path are rendered.
+# Calls renderHexPalette-gm.sh for every .hexplt file in the path (non-recrusive) from which this script is invoked. Result: all hex palette files in the current path are rendered.
 
 # USAGE
 # ./renderAllHexPalettes-gm.sh
-
+# NOTE: to make this recursive (render in all sub-directories), temporily hack this by deleting the "-maxdepth 1" parameter.
 
 # CODE
-array=(`gfind . -type f -iname \*.hexplt`)
+array=(`gfind . -maxdepth 1 -type f -iname \*.hexplt`)
 
 for element in ${array[@]}
 do
