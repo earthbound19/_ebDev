@@ -15,8 +15,8 @@
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
 
-// v1.7.6 scale up nGons a bit to compensate for smaller area (want to figure how to make same area as circle)
-String versionString = "v1.7.6";
+// v1.7.7 more light color fill variety
+String versionString = "v1.7.7";
 
 // TO DO items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
 
@@ -130,12 +130,15 @@ color[] darkFillColors = {
 };
 int darkFillColorsArrayLength = darkFillColors.length;
 color[] lightFillColors = {
-  #E497A4, #F9C0BC, #F6C6D0, #F5D3DD, #F0D9DC, #F5DCD5, #F0CCC4, #E0BFB5,
-  #FEC29F, #EBB28B, #F2D8A4, #FADFA7, #F8D9BE, #EEE2C7, #F1E5E9, #E5E4E9,
-  #C7C6CD, #C9CBE0, #97C1DA, #91BACB, #95B6BA, #A2B1A2, #BFA9A8, #B7A1AF,
-  #AC9EB8, #B1A1C9, #A1A6D0, #9B98A2, #A58E9A, #B19491, #7B91A2, #6389AB,
-  #69A2BE, #74B3E3, #00B3DB, #4CC8D9, #7AD2E2, #93EDF7, #00FFEF, #7FFFD4,
-  #88D8C0, #E0FFFF, #F0FFF0, #F5FFA1
+	#E497A4, #F9C0BC, #F6C6D0, #F5D3DD, #F5DCD5, #F0CCC4, #E0BFB5, #FEC29F,
+	#EBB28B, #FADFA7, #F8D9BE, #EEE2C7, #F1E5E9, #E5E4E9, #C7C6CD, #C9CBE0,
+	#97C1DA, #91BACB, #95B6BA, #A2B1A2, #BFA9A8, #B7A1AF, #AC9EB8, #B1A1C9, #A1A6D0,
+	#9B98A2, #A58E9A, #B19491, #7B91A2, #6389AB, #69A2BE, #74B3E3, #00B3DB, #4CC8D9,
+	#7AD2E2, #93EDF7, #00FFEF, #7FFFD4, #88D8C0, #E0FFFF, #F0FFF0, #F5FFA1, #F0D9DC,
+	#F5DCD5, #F0CCC4, #E0BFB5, #F8D9BE, #EEE2C7, #F2D8A4, #FADFA7, #F7D580, #FFC874,
+	#FDFD96, #F5FFA1, #F0FFF0, #E0FFFF, #E5E4E9, #F1E5E9, #C7C6CD, #C9CBE0, #97C1DA,
+	#91BACB, #A2B1A2, #BFA9A8, #B7A1AF, #69A2BE, #74B3E3, #00B3DB, #4CC8D9,
+	#7AD2E2, #93EDF7, #00FFEF, #7FFFD4, #88D8C0, #0BBDC4
 };
 int lightFillColorsArrayLength = lightFillColors.length;
 color[] allFillColors = {
