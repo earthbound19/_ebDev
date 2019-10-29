@@ -15,8 +15,8 @@
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
 
-// v1.7.7 more light color fill variety
-String versionString = "v1.7.7";
+// v1.7.8 move next variant prepare values into new function (don't call setup() again, doc says no
+String versionString = "v1.7.8";
 
 // TO DO items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
 
@@ -42,7 +42,7 @@ int globalWidth = 1080;
 int globalHeight = 1920;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
 int gridNesting = 4;    // controls how many nests of shapes there are for each shape on the grid. 5 hangs it. ?
 GridOfNestedAnimatedShapes GridOfShapes;
-int GridOfShapesNumCols;    // to be reinitialized in each loop of setup() -- for reference from other functions
+int GridOfShapesNumCols;    // to be reinitialized in each loop of prepareNextVariation()
 int GridOfShapesNumRows;    // "
 // used by AnimatedShape objects to scale down animation-related values when the shapes are smaller (so that smaller objects do not animate relatively faster;
 // this was itself figured as a place of "how fast I want things to animate when there is one column in an image 1080 pix wide;" AND THEN
@@ -50,7 +50,6 @@ int GridOfShapesNumRows;    // "
 // -- becomes: ~1382.4 ALSO NOTE this was with ShapesGridXmaxPercent = 0.64, where circle size max was then 691.2; ALSO with motionVectorMax = 0.273 . . .
 // but then I futzed it to 187 anyway because I like that speed better at all scales. ::shrug:: ANYWAY:
 int motionVectorScaleBaseReference = 168;
-int RNDbgColorIDX;    // to be used as random index from array of colors
 color globalBackgroundColor;
 boolean overrideBackgroundColor = false;
 color altBackgroundColor = color(30,0,60);
@@ -118,6 +117,8 @@ color[] backgroundColors = {
 	#E0FFFF, #A1FA2A, #7EF100
 };
 int backgroundColorsArrayLength = backgroundColors.length;
+int RNDbgColorIDX;	    // to be used as random index from array of colors
+
 color[] darkFillColors = {
 	#D8308F, #CA4587, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E, #CA5A62,
 	#C14F6E, #B34958, #AA4662, #8E4C5C, #8F4772, #934393, #AF62A2, #8D6CA9, #72727D,
@@ -129,6 +130,7 @@ color[] darkFillColors = {
 	#524547, #414141, #79443B, #4E1609
 };
 int darkFillColorsArrayLength = darkFillColors.length;
+
 color[] lightFillColors = {
 	#E497A4, #F9C0BC, #F6C6D0, #F5D3DD, #F5DCD5, #F0CCC4, #E0BFB5, #FEC29F, #EBB28B,
 	#FADFA7, #F8D9BE, #EEE2C7, #F1E5E9, #E5E4E9, #C7C6CD, #C9CBE0, #97C1DA, #91BACB,
@@ -141,6 +143,7 @@ color[] lightFillColors = {
 #7FFFD4, #88D8C0, #0BBDC4
 };
 int lightFillColorsArrayLength = lightFillColors.length;
+
 color[] allFillColors = {
 	#D8308F, #CA4587, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E, #CA5A62,
 	#C14F6E, #B34958, #AA4662, #8E4C5C, #8F4772, #934393, #AF62A2, #8D6CA9, #72727D,
@@ -740,60 +743,63 @@ void settings() {
 }
 
 
-boolean runSetup = false;                      // Controls when to run setup() again. Manipulated by script logic.
+boolean runSetup = false;                      // Controls when to run prepareNextVariation() again. Manipulated by script logic.
 boolean savePNGnow = false;                    // Controls when to save PNGs. Manipulated by script logic.
 boolean recordSVGnow = false;                  // Controls when to save SVGs. Manipulated by script logic.
 boolean userInteractedThisVariation = false;   // affects those booleans via script logic.
 // handles values etc. for new animated variation to be displayed:
-void setup() {
+void prepareNextVariation() {
+	
+	  if (booleanOverrideSeed == true) {
+	    seed = previousSeed;
+	    booleanOverrideSeed = false;
+	  } else {
+	    previousSeed = seed;
+	    seed = (int) random(-2147483648, 2147483647);
+	  }
+	  randomSeed(seed);
 
+	  ellipseMode(CENTER);
+
+	  // Randomly change the background color to any color from backgroundColors array at each run;
+		// OR, if a global override boolean is set, use a global override color:
+		if (overrideBackgroundColor == true) {
+			globalBackgroundColor = altBackgroundColor;
+		} else {
+	  	RNDbgColorIDX = (int) random(backgroundColorsArrayLength);
+			globalBackgroundColor = backgroundColors[RNDbgColorIDX];
+		}
+		
+	  int gridXcount = (int) random(minColumns, maxColumns + 1);  // +1 because random doesn't include max range. Also, see comments where those values are set.
+
+	  GridOfShapes = new GridOfNestedAnimatedShapes(width, height, gridXcount, ShapesGridXminPercent, ShapesGridXmaxPercent, gridNesting);
+
+	  GridOfShapesNumCols = GridOfShapes.cols;
+	  GridOfShapesNumRows = GridOfShapes.rows;
+
+	  // for "frenetic option" :
+	  //for (int x = 0; x < gridNesting; x++) {
+	  //  nestedGridRenderOrder.append(x);
+	  //  //print(x + "\n");
+	  //}
+
+	  userInteractionString = "";
+	  framesRenderedThisVariation = 0;  // reset here and incremented in every loop of draw()
+	  runSetup = false;
+	  savePNGnow = false;
+	  recordSVGnow = false;
+	  userInteractedThisVariation = false;
+}
+
+
+void setup() {
   // uncomment if u want to throttle framerate--RECOMMENDED or
   // a fast CPU will DO ALL THE THINGS TOO MANY TOO FAST and heat up--
   // also it will make for properly timed animations if you save all frames to PNGs or SVGs:
   frameRate(30);
-
-  if (booleanOverrideSeed == true) {
-    seed = previousSeed;
-    booleanOverrideSeed = false;
-  } else {
-    previousSeed = seed;
-    seed = (int) random(-2147483648, 2147483647);
-  }
-  randomSeed(seed);
-
-  ellipseMode(CENTER);
-
-  // Randomly change the background color to any color from backgroundColors array at each run;
-	// OR, if a global override boolean is set, use a global override color:
-	if (overrideBackgroundColor == true) {
-		globalBackgroundColor = altBackgroundColor;
-	} else {
-  	RNDbgColorIDX = (int) random(backgroundColorsArrayLength);
-		globalBackgroundColor = backgroundColors[RNDbgColorIDX];
-	}
-	
-  int gridXcount = (int) random(minColumns, maxColumns + 1);  // +1 because random doesn't include max range. Also, see comments where those values are set.
-
-  GridOfShapes = new GridOfNestedAnimatedShapes(width, height, gridXcount, ShapesGridXminPercent, ShapesGridXmaxPercent, gridNesting);
-
-  GridOfShapesNumCols = GridOfShapes.cols;
-  GridOfShapesNumRows = GridOfShapes.rows;
-
-  // for "frenetic option" :
-  //for (int x = 0; x < gridNesting; x++) {
-  //  nestedGridRenderOrder.append(x);
-  //  //print(x + "\n");
-  //}
-
-  userInteractionString = "";
-  framesRenderedThisVariation = 0;  // reset here and incremented in every loop of draw()
-  runSetup = false;
-  savePNGnow = false;
-  recordSVGnow = false;
-  userInteractedThisVariation = false;
-
-  // to produce one static image, uncomment the next function:
-  //noLoop();
+	prepareNextVariation();
+	// to produce one static image, uncomment the next function:
+	//noLoop();
 }
 
 
@@ -820,7 +826,7 @@ void animate() {
   }
 
   totalFramesRendered += 1;
-  framesRenderedThisVariation += 1;   // this is reset to 0 at every call of setup()
+  framesRenderedThisVariation += 1;   // this is reset to 0 at every call of prepareNextVariation()
 
   // conditionally calculate and print running display of frames per second.
   if (estimateFPS == true) {
@@ -860,7 +866,7 @@ void draw() {
     // IF WE DON'T DO THE FOLLOWING, this block here is invoked immediately in the
     // next loop of draw() (which we don't want to happen) :
     setDelayToNextVariant();
-    // this captures PNG if boolean controlling says do so, before next variant starts via setup() :
+    // this captures PNG if boolean controlling says do so, before next variant starts via prepareNextVariation() :
     if (saveEveryVariation == true && savePNGs == true) {
       save_PNG();
     }
@@ -875,7 +881,7 @@ void draw() {
   }
 
   if (runSetup == true) {
-    setup();
+    prepareNextVariation();
   }
 }
 
@@ -885,7 +891,7 @@ void mousePressed() {
   userInteractionString = "__user_interacted";    // intended use by other functions / reset to "" by other functions
 
   if (userInteractedThisVariation == false) {    // restricts the functionality in this block to once per variation
-    // (because setup(), which is called every variation, sets that false)
+    // (because prepareNextVariation(), which is called to create every variation, sets that false)
     //save PNG on click, conditionally:
     if (savePNGs == true) {
       save_PNG();
