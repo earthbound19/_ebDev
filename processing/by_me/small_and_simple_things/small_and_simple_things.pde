@@ -15,12 +15,11 @@
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
 
-// v1.7.9 work log; optimizations:
-// - eliminate unecessary vector copy in motion constrain check (was doing 2x or more work!)
-// - simplify vector copy in various places
-// - correct various vector copies to use .copy() instead of copy by reference
-// - groundwork for attempt to only do constrain checks every N ms instead of every shape modify loop (via timers)
-String versionString = "v1.7.9";
+// v1.7.10 work log:
+// - lazyConcentricity boolean option: only constrain shapes within shapes every
+// N ms (70 hard-coded), not every shape change loop.
+// - less intensive defaults to accomodate saving all SVGs without too much framerate slowdown.
+String versionString = "v1.7.10";
 
 // TO DO items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
 
@@ -66,7 +65,7 @@ color altStrokeColor = color(80,80,120);
 // TESTING NOTES: states to test:
 // true / false for savePNGs, saveSVGs, saveEveryVariation, and (maybe--though I'm confident it works regardless) saveAllAnimationFrames, .
 // START VARIABLES RELATED TO image save:
-boolean savePNGs = false;  // Save PNG images or not
+boolean savePNGs = true;  // Save PNG images or not
 boolean saveSVGs = true;  // Save SVG images or not
 boolean saveAllAnimationFrames = false;    // if true, all frames up to renderNtotalFrames are saved (and then the program is terminated), so that they can be strung together in a video. Overrides savePNGs state.
 // NOTE: at this writing, no SVG save of every frame.
@@ -87,8 +86,9 @@ int estimatedFPS = 0;    // dynamically modified by program as it runs (and prin
 // reference of original art:
 // larger original grid size: 25x14, wobbly circle placement, wobbly concentricity in circles.
 // smaller original grid size: 19x13, regular circle placement on grid, wobbly concentricity in circles.
-// SMOFA entry configuration for the following values, for ~6' tall kiosk: 1, 21? ~4K resolution horizontally larger monitors: 14, 43
-int minColumns = 2; int maxColumns = 21;
+// SMOFA entry configuration for the following values, for ~6' tall kiosk: 1, 17. Before more advanced anim, ~21
+// ~4K resolution horizontally larger monitors: 1, 43
+int minColumns = 2; int maxColumns = 17;
 float ShapesGridXminPercent = 0.231;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
 float ShapesGridXmaxPercent = 0.63;   // maximum ""                                       Maybe best ~ .75
 int minimumNgonSides = -13;    // If negative number, there is that many more times chance of any shape being a circle.
@@ -100,8 +100,10 @@ float diameterMorphRateMin = 0.0002;	// minimum rate of shape size contract or e
 float diameterMorphRateMax = 0.0017;	// maximum "
 float motionVectorMax = 0.457;          // maximum pixels (I think?) an object may move per frame. Script randomizes between this and (this * -1) * a downscale multiplier per shapes' diameter.
 float orbitRadiansMax = 6.84;					// how many degrees maximum any shape may orbit per call of orbit()
-float rotationRadiansMax = 1.864;			// how many degrees maximum any shape may orbit per call of shapeRotate();
-// Marker colors array -- at this writing, mostly Prismacolor marker colors--but some are not, so far as I know! :
+float rotationRadiansMax = 1.976;			// how many degrees maximum any shape may orbit per call of shapeRotate();
+boolean lazyConcentricity = false;		// If true, every N ms (13?), shape wander is constrained within parent shape. If false, ALL frames are constrained.
+
+// Marker-like colors array -- may have a lot of Prismacolor marker colors:
 color[] backgroundColors = {
 	#FD0E35, #EF3312, #C23B22, #D13352, #E14E6D, #F45674, #EA5287, #E54D93, #D8308F,
 	#CA4587, #C14F6E, #B34958, #AA4662, #8E4C5C, #8F4772, #934393, #AF62A2, #8D6CA9,
@@ -619,14 +621,10 @@ class NestedAnimatedShapes {
           // if we're at the outmost shape or circle, pass made-up PVector and diameter by extrapolation from max_distance;
           // otherwise pass those properties of the parent shape:
           if (j == 0) {     // wander under these conditions:
-            // PVector INVISIBL_PARENT_XY = new PVector(AnimatedShapesArray[0].originXY.x, AnimatedShapesArray[0].originXY.y);
-// SIMPLIFIED THAT TO:
             PVector INVISIBL_PARENT_XY = AnimatedShapesArray[0].originXY.copy();
             float INVISIBL_RADIUS = AnimatedShapesArray[0].max_wander_dist;
             tmp_vec = AnimatedShapesArray[0].wander(INVISIBL_PARENT_XY, INVISIBL_RADIUS);
           } else {          // or under these conditions (one or the other) :
-            // PVector parent_center_XY = new PVector(AnimatedShapesArray[j].centerXY.x, AnimatedShapesArray[j].centerXY.y);
-// SIMPLIFIED THAT TO:
             PVector parent_center_XY = AnimatedShapesArray[j].centerXY.copy();
             tmp_vec = AnimatedShapesArray[k].wander(parent_center_XY, AnimatedShapesArray[j].diameter);
           }
@@ -634,31 +632,29 @@ class NestedAnimatedShapes {
           // this won't always actually move anything (as sometimes tmp_vec is (0,0), but it's a waste to check if it will:
           AnimatedShapesArray[k].translate(tmp_vec);
           // DONE WANDERING
-          // CONSTRAINING inner shapes within borders of outer ones
-          // if shape has wandered beyond border of parent, drag it within parent, tangent on nearest edge;
-//          PVector parent_center_XY = new PVector(AnimatedShapesArray[j].centerXY.x, AnimatedShapesArray[j].centerXY.y);
-//          PVector child_center_XY = new PVector(AnimatedShapesArray[k].centerXY.x, AnimatedShapesArray[k].centerXY.y);
-// SIMPLIFIED THOSE BY USING THEM DIRECTLY IN FUNCTION CALL:
-          boolean is_within_parent = is_shape_within_shape(
-          AnimatedShapesArray[j].centerXY,		// INSTEAD OF parent_center_XY
-          AnimatedShapesArray[j].diameter,
-          AnimatedShapesArray[k].centerXY,
-          AnimatedShapesArray[k].diameter);		// INSTEAD OF child_center_XY
-          if (is_within_parent == false) {      // CONSTRAIN it:
-                    // print(is_within_parent + "\n");
-            PVector relocate_XY = get_larger_to_smaller_shape_interior_tangent_PVector(
-            AnimatedShapesArray[j].centerXY,		// INSTEAD OF parent_center_XY
-			AnimatedShapesArray[j].diameter,
-            AnimatedShapesArray[k].centerXY,		// INSTEAD OF child_center_XY
-			AnimatedShapesArray[k].diameter
-            );
-                    // print(relocate_XY + "\n");
-            // AnimatedShapesArray[k].centerXY.x = relocate_XY.x;
-            // AnimatedShapesArray[k].centerXY.y = relocate_XY.y;
-// SIMPLIFIED THAT TO:
-			AnimatedShapesArray[k].centerXY = relocate_XY.copy();		// could probably get away with reference here? Eh.
-          }
-          // DONE CONSTRAINING
+				// CONSTRAINING inner shapes within borders of outer ones
+				// if shape has wandered beyond border of parent, drag it within parent, tangent on nearest edge;
+				// ONLY EVERY N milliseconds, as controlled by functions that set detect_collision_now true;
+				// UNLESS lazyConcentricity is false (always do this in that case) :
+				if (detect_collision_now == true && lazyConcentricity == true || lazyConcentricity == false) {
+					boolean is_within_parent = is_shape_within_shape(
+					AnimatedShapesArray[j].centerXY,		// INSTEAD OF parent_center_XY
+					AnimatedShapesArray[j].diameter,
+					AnimatedShapesArray[k].centerXY,
+					AnimatedShapesArray[k].diameter);		// INSTEAD OF child_center_XY
+					if (is_within_parent == false) {      // CONSTRAIN it:
+								// print(is_within_parent + "\n");
+						PVector relocate_XY = get_larger_to_smaller_shape_interior_tangent_PVector(
+						AnimatedShapesArray[j].centerXY,		// INSTEAD OF parent_center_XY
+						AnimatedShapesArray[j].diameter,
+						AnimatedShapesArray[k].centerXY,		// INSTEAD OF child_center_XY
+						AnimatedShapesArray[k].diameter
+						);
+								// print(relocate_XY + "\n");
+						AnimatedShapesArray[k].centerXY = relocate_XY.copy();		// could probably get away with reference here? Eh.
+					}
+				}
+				  // DONE CONSTRAINING
         }
       // COLOR MORPHING makes it freaking DAZZLING, if I may say so:
       AnimatedShapesArray[j].morphColor();
@@ -808,7 +804,7 @@ void setup() {
   // also it will make for properly timed animations if you save all frames to PNGs or SVGs:
   frameRate(30);
 	prepareNextVariation();
-  thread("start_collision_detection_timer");
+  thread("start_concentricity_constrain_timer");
 	// to produce one static image, uncomment the next function:
 	//noLoop();
 }
@@ -962,29 +958,30 @@ void keyPressed() {
 }
 
 
-// delays to set a boolean true at an interval (boolean will be used to time collision detection, so
-// we can check every N ms for collissions instead of every single run of a loop, which bogs it down.
+// delays to set a boolean true at an interval (boolean will be used to time
+// setting concentricity constraint), so we can check every N ms for collissions
+// instead of every single run of a loop, which can (maybe?) bog it down.
 boolean delay_started = false;  // only false to start, true thereafter and a function never called again after true.
 boolean detect_collision_now = false;
-int delay_ms = 66;
+int delay_ms = 70;
 
-void start_collision_detection_timer() {
-  if (delay_started == false) {
-    thread("collision_detection_timer_on");
+void start_concentricity_constrain_timer() {
+// only start time if we're even using lazyConcentricity, bcse otherwise
+// script constrains all regardless:
+  if (delay_started == false && lazyConcentricity == true) {
+    thread("set_concentricity_constrain_on");
     delay_started = true;
   }
 }
 
-void collision_detection_timer_on() {
+void set_concentricity_constrain_on() {
   delay(delay_ms);
   detect_collision_now = true;
-  thread("collision_detection_timer_off");
+  thread("set_concentricity_constrain_off");
 }
 
-void collision_detection_timer_off() {
+void set_concentricity_constrain_off() {
   delay(delay_ms);
-  // don't need to set false, as a function that relies on true will set false when it's done;
-  // so this function will only delay, then call the other function which will set true:
-  //detect_collision_now = false;
-  thread("collision_detection_timer_on");
+  detect_collision_now = false;
+  thread("set_concentricity_constrain_on");
 }
