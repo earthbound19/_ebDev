@@ -15,8 +15,12 @@
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
 
-// v1.7.8 move next variant prepare values into new function (don't call setup() again, doc says no
-String versionString = "v1.7.8";
+// v1.7.9 work log; optimizations:
+// - eliminate unecessary vector copy in motion constrain check (was doing 2x or more work!)
+// - simplify vector copy in various places
+// - correct various vector copies to use .copy() instead of copy by reference
+// - groundwork for attempt to only do constrain checks every N ms instead of every shape modify loop (via timers)
+String versionString = "v1.7.9";
 
 // TO DO items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
 
@@ -62,7 +66,7 @@ color altStrokeColor = color(80,80,120);
 // TESTING NOTES: states to test:
 // true / false for savePNGs, saveSVGs, saveEveryVariation, and (maybe--though I'm confident it works regardless) saveAllAnimationFrames, .
 // START VARIABLES RELATED TO image save:
-boolean savePNGs = true;  // Save PNG images or not
+boolean savePNGs = false;  // Save PNG images or not
 boolean saveSVGs = true;  // Save SVG images or not
 boolean saveAllAnimationFrames = false;    // if true, all frames up to renderNtotalFrames are saved (and then the program is terminated), so that they can be strung together in a video. Overrides savePNGs state.
 // NOTE: at this writing, no SVG save of every frame.
@@ -421,9 +425,7 @@ class AnimatedShape {
     wanderedXY.x = ((int) random(max_jitter_dist * (-1), max_jitter_dist));
     wanderedXY.y = ((int) random(max_jitter_dist * (-1), max_jitter_dist));
     // I think this will accompish this? :
-    centerXY.add(wanderedXY);    // more simply than this (and do the same thing) :
-    //centerXY.x += wanderedXY.x;
-    //centerXY.y += wanderedXY.y;
+    centerXY.add(wanderedXY);
   }
 
 // Java (Processing) always passes by value (makes a copy of a paremeter
@@ -433,13 +435,13 @@ class AnimatedShape {
   PVector getRandomVector() {
     float vector_x = random(motion_vector_max * -1, motion_vector_max + 0.001);    // using a global variable
     float vector_y = random(motion_vector_max * -1, motion_vector_max + 0.001);
-    PVector a = new PVector(vector_x, vector_y);
+    PVector RNDvector = new PVector(vector_x, vector_y);
     // if a.x and a.y are both 0, that means no motion--which we don't want; so:
     // randomize again--by calling this function itself--meta! :
-    while (a.x == 0 && a.y == 0) {
-      a = getRandomVector();
+    while (RNDvector.x == 0 && RNDvector.y == 0) {
+      RNDvector = getRandomVector();
     }
-    return a;
+    return RNDvector;
   }
 
   PVector wander(PVector parent_shape_XY, float parent_shape_diameter) {
@@ -449,7 +451,7 @@ class AnimatedShape {
     // check if we just made the shape go outside its parent, and if so undo that translate:
     boolean is_shape_within_parent = is_shape_within_shape(parent_shape_XY, parent_shape_diameter, centerXY, diameter);
     if (is_shape_within_parent == true) {
-      vector_to_return = additionVector;
+      vector_to_return = additionVector.copy();		// NOT by reference, by COPY--dunno if it makes difference here though :/
     } else {    // undo that translate, and change wander direction:
       centerXY.sub(additionVector);
 //NOTE: if the following allows angles too near 90, collissions happen before they happen, and freaky atomic jitter results:
@@ -595,9 +597,9 @@ class NestedAnimatedShapes {
 																									// print("changed mode.\n");
 						// print("is now: " + darkColorFillArg + "\n");
 																					} // else { print("chose not to change mode!\n"); }
-		// override orbitVector of all nested shapes to match outermost (lockstep orbits):
+		// override orbitVector of all nested shapes to match outermost (lockstep orbits) ;
+		// NOTE that the following assigns by reference, which is fine, it saves memory and does what we want:
 		AnimatedShapesArray[i].orbitVector = AnimatedShapesArray[0].orbitVector;
-		// also rotate_radians_rate:
 		AnimatedShapesArray[i].rotate_radians_rate = AnimatedShapesArray[0].rotate_radians_rate;
     }
 
@@ -617,36 +619,44 @@ class NestedAnimatedShapes {
           // if we're at the outmost shape or circle, pass made-up PVector and diameter by extrapolation from max_distance;
           // otherwise pass those properties of the parent shape:
           if (j == 0) {     // wander under these conditions:
-            PVector INVISIBL_PARENT_XY = new PVector(AnimatedShapesArray[0].originXY.x, AnimatedShapesArray[0].originXY.y);
+            // PVector INVISIBL_PARENT_XY = new PVector(AnimatedShapesArray[0].originXY.x, AnimatedShapesArray[0].originXY.y);
+// SIMPLIFIED THAT TO:
+            PVector INVISIBL_PARENT_XY = AnimatedShapesArray[0].originXY.copy();
             float INVISIBL_RADIUS = AnimatedShapesArray[0].max_wander_dist;
             tmp_vec = AnimatedShapesArray[0].wander(INVISIBL_PARENT_XY, INVISIBL_RADIUS);
           } else {          // or under these conditions (one or the other) :
-            PVector parent_center_XY = new PVector(AnimatedShapesArray[j].centerXY.x, AnimatedShapesArray[j].centerXY.y);
+            // PVector parent_center_XY = new PVector(AnimatedShapesArray[j].centerXY.x, AnimatedShapesArray[j].centerXY.y);
+// SIMPLIFIED THAT TO:
+            PVector parent_center_XY = AnimatedShapesArray[j].centerXY.copy();
             tmp_vec = AnimatedShapesArray[k].wander(parent_center_XY, AnimatedShapesArray[j].diameter);
           }
-          // DONE WANDERING
           // drag all inner circles/shapes with outer translated circle/shape, using that gotten vector;
           // this won't always actually move anything (as sometimes tmp_vec is (0,0), but it's a waste to check if it will:
           AnimatedShapesArray[k].translate(tmp_vec);
+          // DONE WANDERING
           // CONSTRAINING inner shapes within borders of outer ones
           // if shape has wandered beyond border of parent, drag it within parent, tangent on nearest edge;
-          // get XY tmp vectors anew (as prior operations can move things)
-          PVector parent_center_XY = new PVector(AnimatedShapesArray[j].centerXY.x, AnimatedShapesArray[j].centerXY.y);
-          PVector child_center_XY = new PVector(AnimatedShapesArray[k].centerXY.x, AnimatedShapesArray[k].centerXY.y);
+//          PVector parent_center_XY = new PVector(AnimatedShapesArray[j].centerXY.x, AnimatedShapesArray[j].centerXY.y);
+//          PVector child_center_XY = new PVector(AnimatedShapesArray[k].centerXY.x, AnimatedShapesArray[k].centerXY.y);
+// SIMPLIFIED THOSE BY USING THEM DIRECTLY IN FUNCTION CALL:
           boolean is_within_parent = is_shape_within_shape(
-          parent_center_XY,
+          AnimatedShapesArray[j].centerXY,		// INSTEAD OF parent_center_XY
           AnimatedShapesArray[j].diameter,
-          child_center_XY,
-          AnimatedShapesArray[k].diameter);
+          AnimatedShapesArray[k].centerXY,
+          AnimatedShapesArray[k].diameter);		// INSTEAD OF child_center_XY
           if (is_within_parent == false) {      // CONSTRAIN it:
                     // print(is_within_parent + "\n");
             PVector relocate_XY = get_larger_to_smaller_shape_interior_tangent_PVector(
-            parent_center_XY, AnimatedShapesArray[j].diameter,
-            child_center_XY, AnimatedShapesArray[k].diameter
+            AnimatedShapesArray[j].centerXY,		// INSTEAD OF parent_center_XY
+			AnimatedShapesArray[j].diameter,
+            AnimatedShapesArray[k].centerXY,		// INSTEAD OF child_center_XY
+			AnimatedShapesArray[k].diameter
             );
                     // print(relocate_XY + "\n");
-            AnimatedShapesArray[k].centerXY.x = relocate_XY.x;
-            AnimatedShapesArray[k].centerXY.y = relocate_XY.y;
+            // AnimatedShapesArray[k].centerXY.x = relocate_XY.x;
+            // AnimatedShapesArray[k].centerXY.y = relocate_XY.y;
+// SIMPLIFIED THAT TO:
+			AnimatedShapesArray[k].centerXY = relocate_XY.copy();		// could probably get away with reference here? Eh.
           }
           // DONE CONSTRAINING
         }
@@ -798,6 +808,7 @@ void setup() {
   // also it will make for properly timed animations if you save all frames to PNGs or SVGs:
   frameRate(30);
 	prepareNextVariation();
+  thread("start_collision_detection_timer");
 	// to produce one static image, uncomment the next function:
 	//noLoop();
 }
@@ -846,6 +857,7 @@ void animate() {
 int last_captured_millis = 0;
 int last_captured_totalFramesRendered = 0;
 void draw() {
+  print("collis. detect: " + detect_collision_now + "\n");
 
   // SAVE SVG FRAME AS PART OF ANIMATION FRAMES conditioned on boolean:
   if (saveAllAnimationFrames == true && saveSVGs == true) { beginRecord(SVG, "_anim_frames/#######.svg"); }
@@ -947,4 +959,32 @@ void keyPressed() {
   if (keyCode != LEFT && keyCode != RIGHT) {
     addGracePeriodToNextVariant();
   }
+}
+
+
+// delays to set a boolean true at an interval (boolean will be used to time collision detection, so
+// we can check every N ms for collissions instead of every single run of a loop, which bogs it down.
+boolean delay_started = false;  // only false to start, true thereafter and a function never called again after true.
+boolean detect_collision_now = false;
+int delay_ms = 66;
+
+void start_collision_detection_timer() {
+  if (delay_started == false) {
+    thread("collision_detection_timer_on");
+    delay_started = true;
+  }
+}
+
+void collision_detection_timer_on() {
+  delay(delay_ms);
+  detect_collision_now = true;
+  thread("collision_detection_timer_off");
+}
+
+void collision_detection_timer_off() {
+  delay(delay_ms);
+  // don't need to set false, as a function that relies on true will set false when it's done;
+  // so this function will only delay, then call the other function which will set true:
+  //detect_collision_now = false;
+  thread("collision_detection_timer_on");
 }
