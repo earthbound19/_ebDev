@@ -4,6 +4,8 @@
 # USAGE
 # Invoke this script with one parameter $1, being the file type extension (without a .) you wish to so copy.
 
+# keywords: fetch, retrieve, copy, down
+
 
 # CODE
 fileListFileName="all"_"$1".txt
