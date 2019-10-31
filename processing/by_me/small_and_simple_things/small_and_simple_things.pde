@@ -11,17 +11,43 @@
 // - click or click and drag on shapes to cause them to change.
 // - press the RIGHT arrow key to skip the current displayed variant.
 // - press the LEFT arrow key to go back one variant (only one variant remembered).
-// - if certain booleans are set true, click/drag also causes PNG/SVG image save
+// - if controlling booleans are set true, click/drag also causes PNG/SVG image save
 // (only saves first clicked frame and last frame of variant.)
 // - see other global variables as documented below for other functionality.
+// NOTE: if saveAllFrames is true, SVG animation frames are saved to _anims/ subfolder,
+// grouping by number for this run of the program, variation, an rnd string, and SVG files
+// named by frame. The SVGs may be copied out of these subfolders into one folder, and they
+// will be incrementally numbered IF saveAllFrames was true for the entire program run.
+// if that boolean was toggled off and on during run, the SVG file names won't be strictly
+// contiguous, but will still be ordered by higher number last.
 
-// v1.7.10 work log:
-// - lazyConcentricity boolean option: only constrain shapes within shapes every
-// N ms (70 hard-coded), not every shape change loop.
+
+// v1.11.1 work log:
+// - on interactions with shape after 1st (color morph mode activate), shape changes.
+// - found and implemented apothem multipliers for n-gons up to 7 sides that accurately
+// scale n-gons to be same area as circle with same diameter (as apothem)
+// - lazyParentBoundaryConstraint boolean option: only constrain shapes within shapes every
+// N ms (~14th second hard-coded), not every shape change loop.
+// - for saveAllFrames true, now saves frames into subfolders grouping number for this
+// run of the program, variation, an rnd string, and SVG files named by frame.
+// - optional temporary override of saveAllFrames (renamed from saveAllAnimationFrames) to true
+// on user interaction (reverts saveAllFrames to false at next variation IF it started out false)
 // - less intensive defaults to accomodate saving all SVGs without too much framerate slowdown.
-String versionString = "v1.7.10";
+// - don't do nGon rotate calcs if it's a sphere (more efficient)
+// - after delay, color morph mode disables per shape
+// - sometimes start field with all of one randomly chosen shape, sometimes with RND shapes.
+// - remember and re-init rotation on nGon reconstruct (keeps same rotation on change n sides)
+// - adds variant display time grace period on drag interaction (it didn't before)
+// - bug fix: somewhere in development I accidentally (?) made it stop saving last frame of
+// variation after user interaction (but it still saved first frame as png and/or svg). It
+// saves the last frame of variation (before next variation is loaded) now.
+String versionString = "v1.11.1";
 
-// TO DO items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
+// TO DO; * = doing:
+// (concentricity control and) rnd higher/lower concentricity range.
+// - simple (tweet) file name vs. detailed file name get functions
+// - rnd ellipse eccentricity (would mean using PShape for circle)
+// - other items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
 
 // DEPENDENCY IMPORTS and associated globals:
 import processing.svg.*;
@@ -36,13 +62,14 @@ boolean doNotTryToTweet = true;    // flase state of this is deliberately confus
 
 // BEGIN GLOBAL VARIABLES:
 // NOTE: to control additional information contained in saved file names, see comments in the get_image_file_name_no_ext() function further below.
+int variationNumberThisRun = 0;
 boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly.
 int overrideSeed = -161287679;    // a favorite is: -161287679
 int previousSeed = overrideSeed;
 int seed = overrideSeed;
-boolean USE_FULLSCREEN = true;  // if set to true, overrides the following values; if false, they are used:
-int globalWidth = 1080;
-int globalHeight = 1920;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
+boolean USE_FULLSCREEN = false;  // if set to true, overrides the following values; if false, they are used:
+int globalWidth = 600;
+int globalHeight = 600;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
 int gridNesting = 4;    // controls how many nests of shapes there are for each shape on the grid. 5 hangs it. ?
 GridOfNestedAnimatedShapes GridOfShapes;
 int GridOfShapesNumCols;    // to be reinitialized in each loop of prepareNextVariation()
@@ -63,13 +90,16 @@ color altStrokeColor = color(80,80,120);
 // for "frenetic option", loop creates a list of size gridNesting (of ints) :
 // IntList nestedGridRenderOrder = new IntList();    // because this list has a shuffle() member function, re: https://processing.org/reference/IntList.html
 // TESTING NOTES: states to test:
-// true / false for savePNGs, saveSVGs, saveEveryVariation, and (maybe--though I'm confident it works regardless) saveAllAnimationFrames, .
+// true / false for savePNGs, saveSVGs, saveEveryVariation, and (maybe--though I'm confident it works regardless) saveAllFrames, and saveAllFramesWasFalse:
 // START VARIABLES RELATED TO image save:
-boolean savePNGs = true;  // Save PNG images or not
+boolean savePNGs = false;  // Save PNG images or not
 boolean saveSVGs = true;  // Save SVG images or not
-boolean saveAllAnimationFrames = false;    // if true, all frames up to renderNtotalFrames are saved (and then the program is terminated), so that they can be strung together in a video. Overrides savePNGs state.
-// NOTE: at this writing, no SVG save of every frame.
-int renderNtotalFrames = 7200;    // see saveAllAnimationFrames comment
+boolean saveAllFrames = false;    // if true, all frames up to renderNtotalFrames are saved (and then the program is terminated), so that they can be strung together in a video. Overrieds saveSVGs, but not savePNGs.
+boolean saveAllFramesInteractOverride = false;		// overrides saveAllFrames + saveSVGs on user interact 'till end of variant.
+boolean initialSaveAllFramesState = saveAllFrames;		// stores initial state to revert to after override period.
+boolean initialSaveSVGsState = saveSVGs;							// stores initial state to revert to after override period.
+// TEMP OR PERMANENT KLUDGE: not using the following. Could cut off user and close program at museum! :
+// int renderNtotalFrames = 7200;    // see saveAllFrames comment
 int totalFramesRendered;    // incremented during each frame of a running variation. reset at new variation.
 int framesRenderedThisVariation;
 boolean saveEveryVariation = true;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
@@ -91,7 +121,7 @@ int estimatedFPS = 0;    // dynamically modified by program as it runs (and prin
 int minColumns = 2; int maxColumns = 17;
 float ShapesGridXminPercent = 0.231;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
 float ShapesGridXmaxPercent = 0.63;   // maximum ""                                       Maybe best ~ .75
-int minimumNgonSides = -13;    // If negative number, there is that many more times chance of any shape being a circle.
+int minimumNgonSides = -11;    // If negative number, n*-1*-1 (many more) chance of choosing circle on rnd shape draw.
 int maximumNgonSides = 7;      // Preferred: 7. Max number of shape sides randomly chosen. 0, 1 and 2 will be circles. 3 will be a triangle, 4 a square, 5 a pentagon, and so on.
 float parentMaxWanderDistMultiple = 1.34;		// how far beyond origin + max radius, as percent, a parent shape can wander. Default hard-coding: 1.14 (14 percent past max origin)
 float strokeMinWeightMult = 0.0064;		// stroke or outline min size multiplier vs. shape diameter--diameters change! 
@@ -99,9 +129,9 @@ float strokeMaxWeightMult = 0.0307;		// stroke or outline max size multiplier vs
 float diameterMorphRateMin = 0.0002;	// minimum rate of shape size contract or expand
 float diameterMorphRateMax = 0.0017;	// maximum "
 float motionVectorMax = 0.457;          // maximum pixels (I think?) an object may move per frame. Script randomizes between this and (this * -1) * a downscale multiplier per shapes' diameter.
-float orbitRadiansMax = 6.84;					// how many degrees maximum any shape may orbit per call of orbit()
-float rotationRadiansMax = 1.976;			// how many degrees maximum any shape may orbit per call of shapeRotate();
-boolean lazyConcentricity = false;		// If true, every N ms (13?), shape wander is constrained within parent shape. If false, ALL frames are constrained.
+float orbitRadiansRateMax = 6.84;					// how many degrees maximum any shape may orbit per call of orbit()
+float rotationRadiansRateMax = 1.976;			// how many degrees maximum any shape may orbit per call of shapeRotate();
+boolean lazyParentBoundaryConstraint = false;		// If true, every N ms (13?), shape wander is constrained within parent shape. If false, ALL frames are constrained.
 
 // Marker-like colors array -- may have a lot of Prismacolor marker colors:
 color[] backgroundColors = {
@@ -198,7 +228,7 @@ void addGracePeriodToNextVariant() {
 
 
 // Because I want to respond to both mousePressed AND mouseDragged events, those functions can pass mouseX and mouseY to this when they are called:
-void set_color_morph_mode_at_XY(int Xpos, int Ypos) {
+void change_mode_at_XY(int Xpos, int Ypos, int eventType) {
   // collision detection of mouse x and y pos vs. center and radius of circle via this genius breath: https://happycoding.io/tutorials/processing/collision-detection ;
   // checks if distance between center of shapes and mouse click is less than radius of circle. if smaller, click  was inside circle. if greater, was outside:
   for (int grid_Y = 0; grid_Y < GridOfShapesNumRows; grid_Y ++) {
@@ -214,7 +244,7 @@ void set_color_morph_mode_at_XY(int Xpos, int Ypos) {
             //print("Click is within shape at row " + hooman_row + " column " + hooman_column + "!\n");
             // activate color morph mode on all AnimatedShapes in AnimatedShapesArray:
         for (int N = 0; N < gridNesting; N ++) {
-        GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[N].color_morph_on = true;
+					GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[N].change_mode(eventType);
         }
       }
     }
@@ -267,6 +297,7 @@ boolean is_shape_within_shape(PVector larger_shape_XY, float larger_shape_diamet
   return is_within_shape;
 }
 
+
 // takes six values: the x and y center coordinate and diamter of a larger circle or shape
 // (intended use), and the same for a smaller shape. returns a PVector which is the x and y
 // coordinates to make the smaller shape interior nearest tangent to the larger shape
@@ -291,6 +322,48 @@ PVector smaller_shape_XY, float smaller_shape_diameter
     }
   return coords_to_return;
 }
+
+
+// FOR LAZY CONSTRAINING to parent inner edge boundary:
+// delays to set a boolean true at an interval (boolean will be used to time
+// setting a constraint), so we can check every N ms for collissions
+// instead of every single run of a loop, which can (maybe?) bog it down.
+boolean delay_started = false;  // only false to start, true thereafter and a function never called again after true.
+boolean detect_collision_now = false;
+int delay_ms = 70;
+void start_parent_shape_bound_constrain_timer() {
+// only start time if we're even using lazyParentBoundaryConstraint, bcse otherwise
+// script constrains all regardless:
+  if (delay_started == false && lazyParentBoundaryConstraint == true) {
+    thread("set_parent_shape_bound_constrain_on");
+    delay_started = true;
+  }
+}
+// ->
+void set_parent_shape_bound_constrain_on() {
+  delay(delay_ms);
+  detect_collision_now = true;
+  thread("set_parent_shape_bound_constrain_off");
+}
+// ->
+void set_parent_shape_bound_constrain_off() {
+  delay(delay_ms);
+  detect_collision_now = false;
+  thread("set_parent_shape_bound_constrain_on");
+}
+
+
+String get_rnd_string(int length) {
+	// https://programming.guide/java/generate-random-character.html
+	String felf = "";
+	String rnd_string_components = "abcdeghijklmnopqruvwyzABCDEGHIJKLMNOPQRUVWYZ23456789";
+	for (int i = 0; i < length; i++)
+	{
+	int rnd_choice = (int) random(0, rnd_string_components.length());
+	felf+= rnd_string_components.charAt(rnd_choice);
+	}
+	return felf;
+}
 // END GLOBAL FUNCTIONS
 
 
@@ -306,7 +379,8 @@ class AnimatedShape {
   float jitter_max_step_mult;
   float max_jitter_dist;
   float max_wander_dist;
-  float diameter;
+  float orig_diam;		// a separate thing we want to remember from current_diameter
+	float diameter;
   float diameter_min;
   float diameter_max;
   float diameter_morph_rate;
@@ -321,13 +395,17 @@ class AnimatedShape {
   int milliseconds_elapse_to_color_morph;
   int milliseconds_at_last_color_change_elapsed;
   boolean color_morph_on;
+	int ms_color_morph_active;
   float motion_vector_max;
   PVector additionVector;
 	PVector orbitVector;		// Wanted because additionVector randomizes periodically but I want constant orbit.
 	float orbit_radians_rate;
+	float rotation = 0;		// tracked separate from PShapes which have this internal, bcse can recreate PShape and want same rot.
 	float rotate_radians_rate;
   //FOR NGON:
   int sides;
+	int minNgonSides = 3;			// quasi-global (can only set here in class declaration); no nGon can have less sides than this.
+	int maxNgonSides = 7;			// " no nGon can have more sides than this.
   PShape nGon;
   PVector radiusVector;    // used to construct the nGon
   // The following is used to scale all animation variables vs. an original animation size/speed tuning reference grid.
@@ -336,14 +414,17 @@ class AnimatedShape {
   // values up or down so that animation has the same relative distances/speeds as shapes grow/shrink. See how this is
   // initialized in the constructor..
   float animation_scale_multiplier;
+  int change_mode_if_ms_elapsed;
+  int ms_at_last_mode_change;
 
   // class constructor--sets random diameter and morph speed values from passed parameters;
   // IF nGonSides is 0, we'll know it's intended to be a circle:
-  AnimatedShape(int Xcenter, int yCenter, float diameterMin, float diameterMax, int sidesArg, boolean darkColorFillArg) {
-    originXY = new PVector(Xcenter,yCenter);
-    centerXY = new PVector(Xcenter,yCenter);
+  AnimatedShape(int xCenter, int yCenter, float diameterMin, float diameterMax, int sidesArg, boolean darkColorFillArg) {
+    originXY = new PVector(xCenter,yCenter);
+    centerXY = new PVector(xCenter,yCenter);
     diameter_min = diameterMin; diameter_max = diameterMax;
     diameter = random(diameterMin, diameterMax);
+		orig_diam = diameter;
     //randomly make that percent positive or negative to start (which will cause grow or expand animation if used as intended) :
     int RNDtrueFalse = (int) random(0, 2);  // gets random 0 or 1
     if (RNDtrueFalse == 1) {
@@ -376,33 +457,69 @@ class AnimatedShape {
 		diameter_morph_rate = random(diameterMorphRateMin, diameterMorphRateMax) * animation_scale_multiplier;		// also * animation_scale_multiplier because it's anim
     additionVector = getRandomVector();
 		orbitVector = getRandomVector();
-		orbit_radians_rate = random(orbitRadiansMax * -1, orbitRadiansMax);
-		rotate_radians_rate = random(rotationRadiansMax * -1, rotationRadiansMax);
-    
-    // FOR NGON: conditionally alter number of sides:
-    if (sidesArg < 3 && sidesArg > 0) { sidesArg = 3; }   // force triangle if 1 or 2 "sides"
-    // if sidesArg is negative number, don't worry about changing it--it will be interpreted as a circle. Unless I change that? :
-    sides = sidesArg;
-		// scale up shapes with less area;
-		if (sides == 3) { diameter *= 1.18; diameter_min *= 1.18; diameter_max *= 1.18; }
-		if (sides == 4) { diameter *= 1.12; diameter_min *= 1.12; diameter_max *= 1.12; }
-		if (sides == 5) { diameter *= 1.09; diameter_min *= 1.09; diameter_max *= 1.09; }
-		if (sides == 6) { diameter *= 1.04; diameter_min *= 1.04; diameter_max *= 1.04; }
-		if (sides == 7) { diameter *= 1.02; diameter_min *= 1.02; diameter_max *= 1.02; }
-    radiusVector = new PVector(0, (diameter / 2 * (-1)) );    // This init vector allows us to construct an n-gon with the first vertex at the top of a conceptual construction circle
-    // if "sides" is a negative number, I think an empty shape is built? -- because the for loop won't trigger (i > sides)? :
-    nGon = createShape();
-    nGon.beginShape();
-    float angle_step = 360.0 / sides;
-    for (int i = 0; i < sides; i ++) {
-      nGon.vertex(radiusVector.x, radiusVector.y);
-      radiusVector.rotate(radians(angle_step));
-    }
-    //turns n-gons with one side that isn't parallel with horizontal so they are:
-    int two_division_remainder = sides % 2;
-    if (two_division_remainder == 0) { nGon.rotate(radians(angle_step / 2)); }
-    nGon.endShape(CLOSE);
+		orbit_radians_rate = random(orbitRadiansRateMax * -1, orbitRadiansRateMax);
+		rotate_radians_rate = random(rotationRadiansRateMax * -1, rotationRadiansRateMax);
+		// sides assignment taken care of in constructShape():
+    change_mode_if_ms_elapsed = 438;
+    ms_at_last_mode_change = millis();
+		constructShape(sidesArg);
   }
+
+	// Build or rebuild nGon as PShape via number of sides:
+	void constructShape(int sidesArg) {
+		// FOR NGON: conditionally alter number of sides:
+		if (sidesArg < minNgonSides) { sidesArg = minNgonSides - 1; }		// force sphere if below min
+		if (sidesArg > maxNgonSides) { sidesArg = maxNgonSides; }
+		// if sidesArg is negative number, don't worry about changing it--it will be interpreted as a circle. Unless I change that? :
+		sides = sidesArg;
+		if (sides < 3) { diameter = orig_diam; }
+		// scale up shapes with less area, VIA CONSTANTS I found that approximate same area as circle if multiply apothem by:
+		float three_scale = 1.209199;
+		if (sides == 3) {	diameter = orig_diam * three_scale; diameter_min = orig_diam * three_scale;	diameter_max = orig_diam * three_scale; }
+		float four_scale = 1.110720;
+		if (sides == 4) {	diameter = orig_diam * four_scale; diameter_min = orig_diam * four_scale;	diameter_max = orig_diam * four_scale; }
+		float five_scale = 1.068959;
+		if (sides == 5) {	diameter = orig_diam * five_scale; diameter_min = orig_diam * five_scale;	diameter_max = orig_diam * five_scale; }
+    float six_scale = 1.047197;
+		if (sides == 6) {	diameter = orig_diam * six_scale; diameter_min = orig_diam * six_scale;	diameter_max = orig_diam * six_scale; }
+    float seven_scale = 1.034376;
+		if (sides == 7) {	diameter = orig_diam * seven_scale; diameter_min = orig_diam * seven_scale;	diameter_max = orig_diam * seven_scale; }
+		
+		// only even build a shape if at minimum sides:
+		if (sides >= minNgonSides) {
+			radiusVector = new PVector(0, (diameter / 2 * (-1)) );    // This init vector allows us to construct an n-gon with the first vertex at the top of a conceptual construction circle
+			nGon = createShape();
+			nGon.beginShape();
+			float angle_step = 360.0 / sides;
+			for (int i = 0; i < sides; i ++) {
+				nGon.vertex(radiusVector.x, radiusVector.y);
+				radiusVector.rotate(radians(angle_step));
+			}
+			nGon.endShape(CLOSE);
+			PVector zero_index_loc = nGon.getVertex(0);
+			PVector one_index_loc = nGon.getVertex(1);
+					// DEV TESTING: find+print area of polygon (PShape) AND MULTIPLIER to make any nGon < 8 sides same area as circle.
+					// AREA OF POLYGON = 1/2 x perimeter x apothem
+					// float nGonEdgeDistance = dist(zero_index_loc.x, zero_index_loc.y, one_index_loc.x, one_index_loc.y);
+					// float nGonPerimeter = nGonEdgeDistance * sides;
+					// float apothem = diameter / 2;
+					// float nGon_area = 0.5 * nGonPerimeter * apothem;	// 1/2 x perimeter x apothem (or "radius");
+					// float circle_mode_area = PI * apothem * apothem;		// apothem here is AKTULLY RLLY radius in circle mode
+					// 	print("~ apothem:" + apothem + " sides:" + sides + " perimeter:" + nGonPerimeter + " ");
+					// 	print("nGon area:" + nGon_area + " circle mode area:" + circle_mode_area + " ");
+					// float nGon_to_circle_multiplier = circle_mode_area / nGon_area;
+					// 	print("(circle mode area / nGon area) : " + nGon_to_circle_multiplier + "\n");
+					// float scaled_nGon = (0.5 * nGonPerimeter * apothem * nGon_to_circle_multiplier);
+					// 	print("->area of nGon if apothem is multiplied up by that: " + scaled_nGon + "\n");
+			// turns n-gons with one side that isn't parallel with horizontal so they are:
+			int two_division_remainder = sides % 2;
+			if (two_division_remainder == 0) {
+				nGon.rotate(radians(angle_step / 2));
+				// rotation += (angle_step / 2);
+			}
+			nGon.rotate(radians(rotation));
+		}
+	}
 
   // member functions
   void morphDiameter() {
@@ -418,7 +535,9 @@ class AnimatedShape {
       diameter_morph_rate *= (-1);
     }
         float percent_change_multiplier = diameter / old_diameter;
-    nGon.scale(percent_change_multiplier);
+    if (sides >= minNgonSides) {
+      nGon.scale(percent_change_multiplier);
+    }
   }
 
   void jitter() {
@@ -468,7 +587,12 @@ class AnimatedShape {
 	}
 
 	void rotateShape() {
-		nGon.rotate(radians(rotate_radians_rate));
+    if (sides >= minNgonSides) {
+      nGon.rotate(radians(rotate_radians_rate));
+			rotation += rotate_radians_rate;
+			// keeps rotation < 360 yet still true to angle; math magic! :
+			rotation = rotation % 360.0;
+    }
 	}
 
   void morphColor() {
@@ -517,7 +641,7 @@ class AnimatedShape {
 					alt_stroke_color = stroke_color;
 				}
 				// END OPTIONAL STROKE AND FILL color overrides!
-    if (sides > 2) {    // as manipulated by constructor logic, this will mean an nGon, so render that:
+    if (sides >= minNgonSides) {    // as manipulated by constructShape(), this will mean an nGon, so render that:
       nGon.setFill(alt_fill_color);
       nGon.setStrokeWeight(stroke_weight * 1.3);    // * because it just seems to be better as heavier for nGons than circles.
       nGon.setStroke(alt_stroke_color);
@@ -538,6 +662,40 @@ class AnimatedShape {
   void udpate_animation_scale_multiplier() {
     animation_scale_multiplier = diameter / motionVectorScaleBaseReference;
   }
+	
+	void change_mode(int eventType) {		// interaction event type 1 is click, 2 is drag
+		// The succession of changes I want is:
+		// - first interaction: activate color morph if it is off.
+		// - subsequent interactions: add 1 side (if circle, go "down" to triangle),
+		// unless at max number of sides, then go back to circle.
+		// so: 
+		// if color morph off, activate it. otherwise, add a side but cycle back to circle if needed.
+    // ALSO, only if time diff since ms_at_last_mode_change and current time > a period,
+		// ALSO, only depending on other things I won't explain having to do with click or drag.
+		int diff = millis() - ms_at_last_mode_change; ms_at_last_mode_change = millis();
+		if (diff > change_mode_if_ms_elapsed || eventType == 1) {
+			if (color_morph_on == false) {
+				color_morph_on = true;
+				ms_color_morph_active = millis();
+			} else {
+				sides -= 1;		// try += 1 or -= 1. I prefer -= 1 sides per user interaction.
+				// BUT:
+				if (sides > maxNgonSides) {
+					sides = minNgonSides - 1;			// minNgonSides - 1 is a circle
+				}	else {
+					if (sides < minNgonSides - 1) { sides = maxNgonSides; }		// in case I hack += 1 to -= 1
+				}
+
+				constructShape(sides);
+			}
+		}
+	}
+	
+	void disable_color_morph_if_time() {
+		int current_millis = millis();
+		int diff = current_millis - ms_color_morph_active;
+		if (diff > 21426) { color_morph_on = false; }
+	}
 
 }
 
@@ -580,6 +738,8 @@ class NestedAnimatedShapes {
 		// and toggle it to opposite in each iteration of loop (to alternate light/dark fill) :
 		boolean darkColorFillArg = random(1) > .5;    // I thank a genius breath: https://forum.processing.org/two/discussion/1433/random-boolean-howto
     				// print("chose " + darkColorFillArg + "\n");
+// TO DO: get this working? Couldna first tries:
+		// float new_RND_rotate_origin_for_nesting = random(0.0, 361.0);
     for (int i = 0; i < nesting; i++) {
 			// print(radii[i+1] + ":" + radii[i] + "\n");
 			//print("darkColorFillArg for " + i + " is " + darkColorFillArg + "\n");
@@ -599,10 +759,17 @@ class NestedAnimatedShapes {
 																									// print("changed mode.\n");
 						// print("is now: " + darkColorFillArg + "\n");
 																					} // else { print("chose not to change mode!\n"); }
-		// override orbitVector of all nested shapes to match outermost (lockstep orbits) ;
+		// override orbitVector, rotation rate, and starting rotation of all nested shapes to match outermost
+		// (lockstep / make visually similar them all)
 		// NOTE that the following assigns by reference, which is fine, it saves memory and does what we want:
 		AnimatedShapesArray[i].orbitVector = AnimatedShapesArray[0].orbitVector;
 		AnimatedShapesArray[i].rotate_radians_rate = AnimatedShapesArray[0].rotate_radians_rate;
+		// Also "unrotate" them from whatever their original random rotation was, then reset rnd rotation and
+		// rotation to here-determined value:
+		// float unrotate_degrees = (AnimatedShapesArray[i].rotation * -1); print("unrotation: " + unrotate_degrees + "\n");
+		// AnimatedShapesArray[i].nGon.rotate(unrotate_degrees);
+		// AnimatedShapesArray[i].rotation = new_RND_rotate_origin_for_nesting;
+		// AnimatedShapesArray[i].nGon.rotate(radians(new_RND_rotate_origin_for_nesting));
     }
 
   }
@@ -610,7 +777,7 @@ class NestedAnimatedShapes {
   void drawAndChangeNestedShapes() {
     for (int j = 0; j < nesting; j++) {
       AnimatedShapesArray[j].drawShape();
-      AnimatedShapesArray[j].morphDiameter();
+      // AnimatedShapesArray[j].morphDiameter();
       AnimatedShapesArray[j].udpate_animation_scale_multiplier();
 			AnimatedShapesArray[j].orbit();
 			AnimatedShapesArray[j].rotateShape();
@@ -635,8 +802,8 @@ class NestedAnimatedShapes {
 				// CONSTRAINING inner shapes within borders of outer ones
 				// if shape has wandered beyond border of parent, drag it within parent, tangent on nearest edge;
 				// ONLY EVERY N milliseconds, as controlled by functions that set detect_collision_now true;
-				// UNLESS lazyConcentricity is false (always do this in that case) :
-				if (detect_collision_now == true && lazyConcentricity == true || lazyConcentricity == false) {
+				// UNLESS lazyParentBoundaryConstraint is false (always do this in that case) :
+				if (detect_collision_now == true && lazyParentBoundaryConstraint == true || lazyParentBoundaryConstraint == false) {
 					boolean is_within_parent = is_shape_within_shape(
 					AnimatedShapesArray[j].centerXY,		// INSTEAD OF parent_center_XY
 					AnimatedShapesArray[j].diameter,
@@ -658,6 +825,7 @@ class NestedAnimatedShapes {
         }
       // COLOR MORPHING makes it freaking DAZZLING, if I may say so:
       AnimatedShapesArray[j].morphColor();
+			AnimatedShapesArray[j].disable_color_morph_if_time();	// But let's stop it after an interval. Interaction will restart it.
     }
   }
 
@@ -684,16 +852,34 @@ class GridOfNestedAnimatedShapes {
     int canvasToGridYremainder = canvasYpx - (rows * graph_xy_len);
     grid_to_canvas_y_offset = canvasToGridYremainder / 2;
     ShapesGridOBJ = new NestedAnimatedShapes[rows][cols];
-    // int counter = 0;    // uncomment code that uses this to print a number count of shapes in the center of each shape.
+							// START CONTROL of sides of shapes in grids
+							// draw a number between 1 and 4. if 4, make number of sides of every shape in grid random.
+							// if not 4, randomly choose N sides between min and max (PREFERENCE OVERRIDE: 0 and max if
+							// least sides < 0, to avoid excesses of negative range result) allowed and make them all that.
+							boolean do_rnd_sides_every_shape = false;
+							int rndShapeSides = 2;
+							int dice = (int) random(1, 5);
+							if (dice == 4) {
+								do_rnd_sides_every_shape = true;
+								} else {
+									int kludge_minRange = 1;
+									if (minimumNgonSides < 0) { kludge_minRange = 0; }
+									rndShapeSides = (int) random(kludge_minRange, maximumNgonSides + 1);
+								}
+							// END CONTROL of sides of shapes in grids
     for (int i = 0; i < ShapesGridOBJ.length; i++) {          // that comparison measures first dimension of array ( == cols)
       for (int j = 0; j < ShapesGridOBJ[0].length; j++) {    // that comparision measures second dimension of array ( == rows)
         // OY the convolution of additional offests just to make a grid centered! :
         int shapeLocX = ((graph_xy_len * j) - (int) graph_xy_len / 2) + grid_to_canvas_x_offset + graph_xy_len;
         int shapeLocY = ((graph_xy_len * i) - (int) graph_xy_len / 2) + grid_to_canvas_y_offset + graph_xy_len;
-        int rnd_num = (int) random(minimumNgonSides, maximumNgonSides + 1);
+							// ALTER CONTROL of sides of shapes if boolean says so:
+							if (do_rnd_sides_every_shape == true) {
+								// low range 1 or 2 still does circles more often, but not so many as if minimumNgonSides is neg.
+								rndShapeSides = (int) random(minimumNgonSides, maximumNgonSides + 1);
+							}
         float minDiam = graph_xy_len * RND_min_diameter_multArg;
         float maxDiam = graph_xy_len * RND_max_diameter_multArg;
-        ShapesGridOBJ[i][j] = new NestedAnimatedShapes(shapeLocX, shapeLocY, minDiam, maxDiam, rnd_num, nestingArg);    // I might best like: 1, 8
+        ShapesGridOBJ[i][j] = new NestedAnimatedShapes(shapeLocX, shapeLocY, minDiam, maxDiam, rndShapeSides, nestingArg);    // I might best like: 1, 8
       }
     }
   }
@@ -753,9 +939,11 @@ boolean runSetup = false;                      // Controls when to run prepareNe
 boolean savePNGnow = false;                    // Controls when to save PNGs. Manipulated by script logic.
 boolean recordSVGnow = false;                  // Controls when to save SVGs. Manipulated by script logic.
 boolean userInteractedThisVariation = false;   // affects those booleans via script logic.
+String subdir_RND_name_part = "";
+String animFramesSaveSubdir = "";
 // handles values etc. for new animated variation to be displayed:
 void prepareNextVariation() {
-	
+
 	  if (booleanOverrideSeed == true) {
 	    seed = previousSeed;
 	    booleanOverrideSeed = false;
@@ -773,8 +961,8 @@ void prepareNextVariation() {
 			globalBackgroundColor = altBackgroundColor;
 		} else {
 	  	RNDbgColorIDX = (int) random(backgroundColorsArrayLength);
-			globalBackgroundColor = backgroundColors[RNDbgColorIDX];
-		}
+			globalBackgroundColor = backgroundColors[RNDbgColorIDX]; //<>//
+		} //<>//
 		
 	  int gridXcount = (int) random(minColumns, maxColumns + 1);  // +1 because random doesn't include max range. Also, see comments where those values are set.
 
@@ -795,6 +983,16 @@ void prepareNextVariation() {
 	  savePNGnow = false;
 	  recordSVGnow = false;
 	  userInteractedThisVariation = false;
+		// restore these to whatever was backed up when changed elsewhere
+		// (even if "restore" is to the same) :
+		saveAllFrames = initialSaveAllFramesState;
+		saveSVGs = initialSaveSVGsState;
+		
+		subdir_RND_name_part = get_rnd_string(4);
+		variationNumberThisRun += 1;
+		String padded_num = nf(variationNumberThisRun, 6);
+		animFramesSaveSubdir = "_anims/run_variation_" + padded_num +
+		"__anim_frames_seed_" + seed + "__" + subdir_RND_name_part;
 }
 
 
@@ -804,7 +1002,7 @@ void setup() {
   // also it will make for properly timed animations if you save all frames to PNGs or SVGs:
   frameRate(30);
 	prepareNextVariation();
-  thread("start_concentricity_constrain_timer");
+  thread("start_parent_shape_bound_constrain_timer");
 	// to produce one static image, uncomment the next function:
 	//noLoop();
 }
@@ -853,19 +1051,19 @@ void animate() {
 int last_captured_millis = 0;
 int last_captured_totalFramesRendered = 0;
 void draw() {
-  print("collis. detect: " + detect_collision_now + "\n");
-
   // SAVE SVG FRAME AS PART OF ANIMATION FRAMES conditioned on boolean:
-  if (saveAllAnimationFrames == true && saveSVGs == true) { beginRecord(SVG, "_anim_frames/#######.svg"); }
+// TO DO: remove && saveSVGs == true as part of condition? (saveAllAnimationFrames overrides?) :
+  if (saveAllFrames == true && saveSVGs == true) { beginRecord(SVG, animFramesSaveSubdir + "/##########.svg"); }
   animate();
-  if (saveAllAnimationFrames == true && saveSVGs == true) { endRecord(); }
+  if (saveAllFrames == true && saveSVGs == true) { endRecord(); }
 
   // SAVE PNG FRAME AS PART OF ANIMATION FRAMES conditioned on boolean:
-  if (saveAllAnimationFrames == true && savePNGs == true) {
-    saveFrame("_anim_frames/#######.png");
-    if (totalFramesRendered == renderNtotalFrames) {
-      exit();
-    }
+  if (saveAllFrames == true && savePNGs == true) {
+    saveFrame(animFramesSaveSubdir + "/##########.png");
+// TEMP OR PERMANENT KLUDGE; NO:
+//    if (totalFramesRendered == renderNtotalFrames) {
+//      exit();
+//    }
   }
 
   // NOTE: runSetupAtMilliseconds (on which this block depends) is initialized in settings() :
@@ -875,11 +1073,11 @@ void draw() {
     // next loop of draw() (which we don't want to happen) :
     setDelayToNextVariant();
     // this captures PNG if boolean controlling says do so, before next variant starts via prepareNextVariation() :
-    if (saveEveryVariation == true && savePNGs == true) {
+    if (saveEveryVariation == true && savePNGs == true || userInteractedThisVariation == true && savePNGs == true ) {
       save_PNG();
     }
-    // captures SVG if boolean controlling says to:
-    if (saveEveryVariation == true && saveSVGs == true) {
+    // captures SVG if booleans controlling says to:
+    if (saveEveryVariation == true && saveSVGs == true || userInteractedThisVariation == true && saveSVGs == true ) {
       noLoop();
       recordSVGnow = true;
       animate();
@@ -895,7 +1093,7 @@ void draw() {
 
 
 void mousePressed() {
-  set_color_morph_mode_at_XY(mouseX, mouseY);
+  change_mode_at_XY(mouseX, mouseY, 1);			// 1 means event type: click
   userInteractionString = "__user_interacted";    // intended use by other functions / reset to "" by other functions
 
   if (userInteractedThisVariation == false) {    // restricts the functionality in this block to once per variation
@@ -912,6 +1110,14 @@ void mousePressed() {
       loop();
     }
     userInteractedThisVariation = true;
+		
+		// NOTE THIS ALSO will execute only once per variation (per condition of outer control
+		// of this block), which we want; if the following is set more than once per variation,
+		// the "initial" saveAllFrames state becomes true even if it was false:
+		if (saveAllFramesInteractOverride == true) {		// overrides that on user interact 'till end of variant.
+			initialSaveAllFramesState = saveAllFrames; initialSaveSVGsState = saveSVGs;
+			saveAllFrames = true; saveSVGs = true;
+		}
   }
 
   //TRY TO TWEET, if boolean that says we may is so set; will print exception + warning if fail:
@@ -923,10 +1129,10 @@ void mousePressed() {
       //+ " created during development or manual run of program. #generative #generativeArt #processing #processingLanguage #creativeCoding");
       //println("Posted " + tweet);
     } catch (Exception e) {
-      print("Failure during attempt to tweet. Hopefully a helpful error message follows.\n");
+      print("Failure during tweet attempt.\n");
     }
   } else {
-    print("Could have have tweeted on user interaction, but told not to.\n");
+    print("Could have tweeted, but told not to.\n");
   }
   
   addGracePeriodToNextVariant();
@@ -934,7 +1140,8 @@ void mousePressed() {
 
 
 void mouseDragged() {
-  set_color_morph_mode_at_XY(mouseX, mouseY);
+  change_mode_at_XY(mouseX, mouseY, 2);		// 2 means event type: drag
+	addGracePeriodToNextVariant();
 }
 
 
@@ -955,33 +1162,4 @@ void keyPressed() {
   if (keyCode != LEFT && keyCode != RIGHT) {
     addGracePeriodToNextVariant();
   }
-}
-
-
-// delays to set a boolean true at an interval (boolean will be used to time
-// setting concentricity constraint), so we can check every N ms for collissions
-// instead of every single run of a loop, which can (maybe?) bog it down.
-boolean delay_started = false;  // only false to start, true thereafter and a function never called again after true.
-boolean detect_collision_now = false;
-int delay_ms = 70;
-
-void start_concentricity_constrain_timer() {
-// only start time if we're even using lazyConcentricity, bcse otherwise
-// script constrains all regardless:
-  if (delay_started == false && lazyConcentricity == true) {
-    thread("set_concentricity_constrain_on");
-    delay_started = true;
-  }
-}
-
-void set_concentricity_constrain_on() {
-  delay(delay_ms);
-  detect_collision_now = true;
-  thread("set_concentricity_constrain_off");
-}
-
-void set_concentricity_constrain_off() {
-  delay(delay_ms);
-  detect_collision_now = false;
-  thread("set_concentricity_constrain_on");
 }
