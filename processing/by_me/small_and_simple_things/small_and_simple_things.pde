@@ -22,7 +22,10 @@
 // contiguous, but will still be ordered by higher number last.
 
 
-// v1.11.1 work log:
+// v1.11.2 work log:
+// - v1.11.1 -> 1.11.2 patch whoopsies:
+//  - I actually prefer it start shape sides low -> go higher
+//  - defaults fixes
 // - on interactions with shape after 1st (color morph mode activate), shape changes.
 // - found and implemented apothem multipliers for n-gons up to 7 sides that accurately
 // scale n-gons to be same area as circle with same diameter (as apothem)
@@ -41,7 +44,7 @@
 // - bug fix: somewhere in development I accidentally (?) made it stop saving last frame of
 // variation after user interaction (but it still saved first frame as png and/or svg). It
 // saves the last frame of variation (before next variation is loaded) now.
-String versionString = "v1.11.1";
+String versionString = "v1.11.2";
 
 // TO DO; * = doing:
 // (concentricity control and) rnd higher/lower concentricity range.
@@ -67,10 +70,10 @@ boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be 
 int overrideSeed = -161287679;    // a favorite is: -161287679
 int previousSeed = overrideSeed;
 int seed = overrideSeed;
-boolean USE_FULLSCREEN = false;  // if set to true, overrides the following values; if false, they are used:
-int globalWidth = 600;
-int globalHeight = 600;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
-int gridNesting = 4;    // controls how many nests of shapes there are for each shape on the grid. 5 hangs it. ?
+boolean USE_FULLSCREEN = true;  // if set to true, overrides the following values; if false, they are used:
+int globalWidth = 1080;
+int globalHeight = 1920;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
+int gridNesting = 4;    // controls how many nests of shapes there are for each shape on the grid.
 GridOfNestedAnimatedShapes GridOfShapes;
 int GridOfShapesNumCols;    // to be reinitialized in each loop of prepareNextVariation()
 int GridOfShapesNumRows;    // "
@@ -678,7 +681,7 @@ class AnimatedShape {
 				color_morph_on = true;
 				ms_color_morph_active = millis();
 			} else {
-				sides -= 1;		// try += 1 or -= 1. I prefer -= 1 sides per user interaction.
+				sides += 1;		// try += 1 or -= 1.
 				// BUT:
 				if (sides > maxNgonSides) {
 					sides = minNgonSides - 1;			// minNgonSides - 1 is a circle
