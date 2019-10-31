@@ -22,10 +22,19 @@
 // contiguous, but will still be ordered by higher number last.
 
 
-// v1.11.2 work log:
-// - v1.11.1 -> 1.11.2 patch whoopsies:
+// work log:
+// 1.11.3
+// - patch 2 whoopsie: diameter morph was commented out! uncommented.
+// - improved subfolder names when recording all frames, get_random_string function for
+// - create and use disableColorMorphAfter_ms global
+// - rename vague timer varaible to constrainToParentInnerBoundaryDelay_ms
+// - uniquely name program runs in anim frame save subfolders
+// - include nesting value in long file names
+// 1.11.2
+// - patch whoopsies:
 //  - I actually prefer it start shape sides low -> go higher
 //  - defaults fixes
+// 1.11.1
 // - on interactions with shape after 1st (color morph mode activate), shape changes.
 // - found and implemented apothem multipliers for n-gons up to 7 sides that accurately
 // scale n-gons to be same area as circle with same diameter (as apothem)
@@ -44,7 +53,7 @@
 // - bug fix: somewhere in development I accidentally (?) made it stop saving last frame of
 // variation after user interaction (but it still saved first frame as png and/or svg). It
 // saves the last frame of variation (before next variation is loaded) now.
-String versionString = "v1.11.2";
+String versionString = "v1.11.3";
 
 // TO DO; * = doing:
 // (concentricity control and) rnd higher/lower concentricity range.
@@ -71,8 +80,8 @@ int overrideSeed = -161287679;    // a favorite is: -161287679
 int previousSeed = overrideSeed;
 int seed = overrideSeed;
 boolean USE_FULLSCREEN = true;  // if set to true, overrides the following values; if false, they are used:
-int globalWidth = 1080;
-int globalHeight = 1920;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
+int globalWidth = 1920;
+int globalHeight = 1080;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
 int gridNesting = 4;    // controls how many nests of shapes there are for each shape on the grid.
 GridOfNestedAnimatedShapes GridOfShapes;
 int GridOfShapesNumCols;    // to be reinitialized in each loop of prepareNextVariation()
@@ -119,9 +128,9 @@ int estimatedFPS = 0;    // dynamically modified by program as it runs (and prin
 // reference of original art:
 // larger original grid size: 25x14, wobbly circle placement, wobbly concentricity in circles.
 // smaller original grid size: 19x13, regular circle placement on grid, wobbly concentricity in circles.
-// SMOFA entry configuration for the following values, for ~6' tall kiosk: 1, 17. Before more advanced anim, ~21
+// SMOFA entry configuration for the following values, for ~6' tall kiosk: 1, 21. Before more advanced anim, ~21
 // ~4K resolution horizontally larger monitors: 1, 43
-int minColumns = 2; int maxColumns = 17;
+int minColumns = 2; int maxColumns = 21;
 float ShapesGridXminPercent = 0.231;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
 float ShapesGridXmaxPercent = 0.63;   // maximum ""                                       Maybe best ~ .75
 int minimumNgonSides = -11;    // If negative number, n*-1*-1 (many more) chance of choosing circle on rnd shape draw.
@@ -134,7 +143,8 @@ float diameterMorphRateMax = 0.0017;	// maximum "
 float motionVectorMax = 0.457;          // maximum pixels (I think?) an object may move per frame. Script randomizes between this and (this * -1) * a downscale multiplier per shapes' diameter.
 float orbitRadiansRateMax = 6.84;					// how many degrees maximum any shape may orbit per call of orbit()
 float rotationRadiansRateMax = 1.976;			// how many degrees maximum any shape may orbit per call of shapeRotate();
-boolean lazyParentBoundaryConstraint = false;		// If true, every N ms (13?), shape wander is constrained within parent shape. If false, ALL frames are constrained.
+boolean lazyParentBoundaryConstraint = true;		// If true, every N ms (13?), shape wander is constrained within parent shape. If false, ALL frames are constrained.
+int disableColorMorphAfter_ms = 21426;
 
 // Marker-like colors array -- may have a lot of Prismacolor marker colors:
 color[] backgroundColors = {
@@ -258,6 +268,8 @@ void change_mode_at_XY(int Xpos, int Ypos, int eventType) {
 // get file name without extension -- for use before image save function or alternately before svg save (add extension to returned string)
 String get_image_file_name_no_ext() {
   int N_cols_tmp = GridOfShapes.cols;
+	int nesting_tmp = GridOfShapes.ShapesGridOBJ[0][0].nesting;		// assumes (at this writing correctly) that number applies to all objects in that 2d array
+print("that nesting is: " + nesting_tmp + "\n");
   String BGcolorHex = hex(globalBackgroundColor);
   BGcolorHex = BGcolorHex.substring(2, 8);    // take the first two characters (which will, the way this is set up, be FF, for full alpha) off
   String img_file_name_no_ext =
@@ -269,6 +281,7 @@ String get_image_file_name_no_ext() {
     // displayed variation before the next variation:
      + " cols " + N_cols_tmp
      + " bgHex " + BGcolorHex
+		 + " nesting " + nesting_tmp 
     // + " pix " + width + "x" + height
      + " frame " + framesRenderedThisVariation
      + userInteractionString;
@@ -333,7 +346,7 @@ PVector smaller_shape_XY, float smaller_shape_diameter
 // instead of every single run of a loop, which can (maybe?) bog it down.
 boolean delay_started = false;  // only false to start, true thereafter and a function never called again after true.
 boolean detect_collision_now = false;
-int delay_ms = 70;
+int constrainToParentInnerBoundaryDelay_ms = 70;
 void start_parent_shape_bound_constrain_timer() {
 // only start time if we're even using lazyParentBoundaryConstraint, bcse otherwise
 // script constrains all regardless:
@@ -344,19 +357,19 @@ void start_parent_shape_bound_constrain_timer() {
 }
 // ->
 void set_parent_shape_bound_constrain_on() {
-  delay(delay_ms);
+  delay(constrainToParentInnerBoundaryDelay_ms);
   detect_collision_now = true;
   thread("set_parent_shape_bound_constrain_off");
 }
 // ->
 void set_parent_shape_bound_constrain_off() {
-  delay(delay_ms);
+  delay(constrainToParentInnerBoundaryDelay_ms);
   detect_collision_now = false;
   thread("set_parent_shape_bound_constrain_on");
 }
 
 
-String get_rnd_string(int length) {
+String get_random_string(int length) {
 	// https://programming.guide/java/generate-random-character.html
 	String felf = "";
 	String rnd_string_components = "abcdeghijklmnopqruvwyzABCDEGHIJKLMNOPQRUVWYZ23456789";
@@ -367,6 +380,18 @@ String get_rnd_string(int length) {
 	}
 	return felf;
 }
+
+String get_formatted_datetime() {
+int d = day(); String dS = nf(d, 2);
+int m = month(); String mS = nf(m, 2);
+int y = year(); String yS = nf(y, 4);
+int h = hour(); String hS = nf(h, 2);
+int min = minute(); String minS = nf(min, 2);
+int s = second(); String sS = nf(s, 2);
+String formattedDateTime = yS + "_" + mS + "_" + dS + "__" + hS + "_" + minS + "_" + sS;
+return formattedDateTime;
+}
+
 // END GLOBAL FUNCTIONS
 
 
@@ -697,7 +722,7 @@ class AnimatedShape {
 	void disable_color_morph_if_time() {
 		int current_millis = millis();
 		int diff = current_millis - ms_color_morph_active;
-		if (diff > 21426) { color_morph_on = false; }
+		if (diff > disableColorMorphAfter_ms) { color_morph_on = false; }		// compare to a global val.
 	}
 
 }
@@ -780,7 +805,7 @@ class NestedAnimatedShapes {
   void drawAndChangeNestedShapes() {
     for (int j = 0; j < nesting; j++) {
       AnimatedShapesArray[j].drawShape();
-      // AnimatedShapesArray[j].morphDiameter();
+      AnimatedShapesArray[j].morphDiameter();
       AnimatedShapesArray[j].udpate_animation_scale_multiplier();
 			AnimatedShapesArray[j].orbit();
 			AnimatedShapesArray[j].rotateShape();
@@ -808,16 +833,16 @@ class NestedAnimatedShapes {
 				// UNLESS lazyParentBoundaryConstraint is false (always do this in that case) :
 				if (detect_collision_now == true && lazyParentBoundaryConstraint == true || lazyParentBoundaryConstraint == false) {
 					boolean is_within_parent = is_shape_within_shape(
-					AnimatedShapesArray[j].centerXY,		// INSTEAD OF parent_center_XY
+					AnimatedShapesArray[j].centerXY,
 					AnimatedShapesArray[j].diameter,
 					AnimatedShapesArray[k].centerXY,
-					AnimatedShapesArray[k].diameter);		// INSTEAD OF child_center_XY
+					AnimatedShapesArray[k].diameter); //<>//
 					if (is_within_parent == false) {      // CONSTRAIN it:
 								// print(is_within_parent + "\n");
 						PVector relocate_XY = get_larger_to_smaller_shape_interior_tangent_PVector(
-						AnimatedShapesArray[j].centerXY,		// INSTEAD OF parent_center_XY
+						AnimatedShapesArray[j].centerXY,
 						AnimatedShapesArray[j].diameter,
-						AnimatedShapesArray[k].centerXY,		// INSTEAD OF child_center_XY
+						AnimatedShapesArray[k].centerXY,
 						AnimatedShapesArray[k].diameter
 						);
 								// print(relocate_XY + "\n");
@@ -828,7 +853,7 @@ class NestedAnimatedShapes {
         }
       // COLOR MORPHING makes it freaking DAZZLING, if I may say so:
       AnimatedShapesArray[j].morphColor();
-			AnimatedShapesArray[j].disable_color_morph_if_time();	// But let's stop it after an interval. Interaction will restart it.
+			AnimatedShapesArray[j].disable_color_morph_if_time();	// But let's stop it after an interval. Interaction will restart it. //<>// //<>//
     }
   }
 
@@ -942,7 +967,6 @@ boolean runSetup = false;                      // Controls when to run prepareNe
 boolean savePNGnow = false;                    // Controls when to save PNGs. Manipulated by script logic.
 boolean recordSVGnow = false;                  // Controls when to save SVGs. Manipulated by script logic.
 boolean userInteractedThisVariation = false;   // affects those booleans via script logic.
-String subdir_RND_name_part = "";
 String animFramesSaveSubdir = "";
 // handles values etc. for new animated variation to be displayed:
 void prepareNextVariation() {
@@ -991,19 +1015,29 @@ void prepareNextVariation() {
 		saveAllFrames = initialSaveAllFramesState;
 		saveSVGs = initialSaveSVGsState;
 		
-		subdir_RND_name_part = get_rnd_string(4);
+		// prep for subfolder names capturing every frame as SVG if script will do so:
 		variationNumberThisRun += 1;
-		String padded_num = nf(variationNumberThisRun, 6);
-		animFramesSaveSubdir = "_anims/run_variation_" + padded_num +
-		"__anim_frames_seed_" + seed + "__" + subdir_RND_name_part;
+		String variationNumberThisRun_padded = nf(variationNumberThisRun, 6);
+		String seedFolderNameCollisionAvoidance_extra_RND = get_random_string(5);
+		// prep actual subfolder name:
+		animFramesSaveSubdir = "_anims/"
+		+ "BSaST_run_"
+		+ formattedDateTime + "_"
+		+ subdirRunNumberNameCollisionAvoidString + "/"
+		+ variationNumberThisRun_padded +
+		"__frames__seed_" + seed
+		+ "_" + seedFolderNameCollisionAvoidance_extra_RND;
 }
 
-
+String formattedDateTime = "";
+String subdirRunNumberNameCollisionAvoidString = "";
 void setup() {
   // uncomment if u want to throttle framerate--RECOMMENDED or
   // a fast CPU will DO ALL THE THINGS TOO MANY TOO FAST and heat up--
   // also it will make for properly timed animations if you save all frames to PNGs or SVGs:
   frameRate(30);
+	subdirRunNumberNameCollisionAvoidString = get_random_string(4);
+	formattedDateTime = get_formatted_datetime();
 	prepareNextVariation();
   thread("start_parent_shape_bound_constrain_timer");
 	// to produce one static image, uncomment the next function:
