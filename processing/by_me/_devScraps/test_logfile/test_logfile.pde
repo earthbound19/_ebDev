@@ -8,8 +8,6 @@ String outFilename = "out.txt";
 
 // creates file if it doesn't exist, appending data only:
 void appendTextToFile(String filename, String text){
-  // I tried omitting the dataPath() call--it crashes! SO, you
-  // must accept that everything ends up in a data subdir!
   File f = new File(sketchPath(filename));
   if(!f.exists()){
     createFile(f);
