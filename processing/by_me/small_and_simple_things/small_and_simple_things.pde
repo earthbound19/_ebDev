@@ -23,40 +23,16 @@
 
 
 // work log:
-// 1.11.3
-// - patch 2 whoopsie: diameter morph was commented out! uncommented.
-// - improved subfolder names when recording all frames, get_random_string function for
-// - create and use disableColorMorphAfter_ms global
-// - rename vague timer varaible to constrainToParentInnerBoundaryDelay_ms
-// - uniquely name program runs in anim frame save subfolders
-// - include nesting value in long file names
-// 1.11.2
-// - patch whoopsies:
-//  - I actually prefer it start shape sides low -> go higher
-//  - defaults fixes
-// 1.11.1
-// - on interactions with shape after 1st (color morph mode activate), shape changes.
-// - found and implemented apothem multipliers for n-gons up to 7 sides that accurately
-// scale n-gons to be same area as circle with same diameter (as apothem)
-// - lazyParentBoundaryConstraint boolean option: only constrain shapes within shapes every
-// N ms (~14th second hard-coded), not every shape change loop.
-// - for saveAllFrames true, now saves frames into subfolders grouping number for this
-// run of the program, variation, an rnd string, and SVG files named by frame.
-// - optional temporary override of saveAllFrames (renamed from saveAllAnimationFrames) to true
-// on user interaction (reverts saveAllFrames to false at next variation IF it started out false)
-// - less intensive defaults to accomodate saving all SVGs without too much framerate slowdown.
-// - don't do nGon rotate calcs if it's a sphere (more efficient)
-// - after delay, color morph mode disables per shape
-// - sometimes start field with all of one randomly chosen shape, sometimes with RND shapes.
-// - remember and re-init rotation on nGon reconstruct (keeps same rotation on change n sides)
-// - adds variant display time grace period on drag interaction (it didn't before)
-// - bug fix: somewhere in development I accidentally (?) made it stop saving last frame of
-// variation after user interaction (but it still saved first frame as png and/or svg). It
-// saves the last frame of variation (before next variation is loaded) now.
-String versionString = "v1.11.3";
+// 1.11.4
+// - make confusing boolean name related to trying to tweet _not_ confusing anymore (nor
+// assocaited logic)
+// - fix kludge logic that was intended to lower chance of making entire grid circles
+// so that it honors instead of overrides minimumNgonSides.
+String versionString = "v1.11.4";
 
 // TO DO; * = doing:
-// (concentricity control and) rnd higher/lower concentricity range.
+// * log with variation (random seed) number if tweet attempt fails
+// - (concentricity control and) rnd higher/lower concentricity range.
 // - simple (tweet) file name vs. detailed file name get functions
 // - rnd ellipse eccentricity (would mean using PShape for circle)
 // - other items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
@@ -67,13 +43,13 @@ import processing.svg.*;
 // import gohai.simpletweet.*;
 String[] twitterAPIauthLines;
 // SimpleTweet simpletweet;
-boolean doNotTryToTweet = true;    // flase state of this is deliberately confusing double-negative message :)
+boolean tryToTweet = false;
 
 
 
 
 // BEGIN GLOBAL VARIABLES:
-// NOTE: to control additional information contained in saved file names, see comments in the get_image_file_name_no_ext() function further below.
+// NOTE: to control additional information contained in saved file names, see comments in the get_detailed_image_file_name_no_ext() function further below.
 int variationNumberThisRun = 0;
 boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly.
 int overrideSeed = -161287679;    // a favorite is: -161287679
@@ -266,10 +242,9 @@ void change_mode_at_XY(int Xpos, int Ypos, int eventType) {
 
 
 // get file name without extension -- for use before image save function or alternately before svg save (add extension to returned string)
-String get_image_file_name_no_ext() {
+String get_detailed_image_file_name_no_ext() {
   int N_cols_tmp = GridOfShapes.cols;
 	int nesting_tmp = GridOfShapes.ShapesGridOBJ[0][0].nesting;		// assumes (at this writing correctly) that number applies to all objects in that 2d array
-print("that nesting is: " + nesting_tmp + "\n");
   String BGcolorHex = hex(globalBackgroundColor);
   BGcolorHex = BGcolorHex.substring(2, 8);    // take the first two characters (which will, the way this is set up, be FF, for full alpha) off
   String img_file_name_no_ext =
@@ -289,10 +264,20 @@ print("that nesting is: " + nesting_tmp + "\n");
   return img_file_name_no_ext;
 }
 
+// get simple file name more usable for e.g. what may become part of the text of a tweet:
+String get_simple_file_name_no_ext() {
+  //String simple_img_file_name_no_ext =
+  //  "By Small and Simple Things " + versionString + " seed " + seed
+  //   + " frame " + framesRenderedThisVariation
+  //   + userInteractionString;
+  //return img_file_name_no_ext;
+  return "flarf";
+}
+
 
 // saves whatever is rendered at the moment (expects PNG or other supported raster image file name):
 void save_PNG() {
-  String FNNE = get_image_file_name_no_ext();
+  String FNNE = get_detailed_image_file_name_no_ext();
   //LOCAL FOLDER SAVE:
   saveFrame(FNNE + ".png");
 
@@ -849,8 +834,8 @@ class NestedAnimatedShapes {
 						AnimatedShapesArray[k].centerXY = relocate_XY.copy();		// could probably get away with reference here? Eh.
 					}
 				}
-				  // DONE CONSTRAINING
-        }
+				  // DONE CONSTRAINING //<>// //<>//
+        } //<>//
       // COLOR MORPHING makes it freaking DAZZLING, if I may say so:
       AnimatedShapesArray[j].morphColor();
 			AnimatedShapesArray[j].disable_color_morph_if_time();	// But let's stop it after an interval. Interaction will restart it. //<>// //<>//
@@ -882,18 +867,22 @@ class GridOfNestedAnimatedShapes {
     ShapesGridOBJ = new NestedAnimatedShapes[rows][cols];
 							// START CONTROL of sides of shapes in grids
 							// draw a number between 1 and 4. if 4, make number of sides of every shape in grid random.
-							// if not 4, randomly choose N sides between min and max (PREFERENCE OVERRIDE: 0 and max if
-							// least sides < 0, to avoid excesses of negative range result) allowed and make them all that.
+							// Otherwise, randomly choose N sides between minimumNgonSides and maximumNgonSides, and
+							// make every shape in grid have that many sides. BUT alter the chances of choosing how many
+							// sides there: if the minimum sides is set below -2, bring it up to -2 in a temp,
+							// altered copy of minimumNgonSides which is used instead of minimumNgonSides.
 							boolean do_rnd_sides_every_shape = false;
-							int rndShapeSides = 2;
+							int rndShapeSides = 0;		// declared here for scope, value change decisions will be made on this
+							// int rndShapeSides = minimumNgonSides;    // need to declare here for scope--may override
+              // int kludge_minRange = minimumNgonSides;  // also
+							int kludge_minimumNgonSides;
 							int dice = (int) random(1, 5);
 							if (dice == 4) {
 								do_rnd_sides_every_shape = true;
-								} else {
-									int kludge_minRange = 1;
-									if (minimumNgonSides < 0) { kludge_minRange = 0; }
-									rndShapeSides = (int) random(kludge_minRange, maximumNgonSides + 1);
-								}
+							} else {
+								if (minimumNgonSides < 0) { kludge_minimumNgonSides = 0; } else { kludge_minimumNgonSides = minimumNgonSides; }
+								rndShapeSides = (int) random(kludge_minimumNgonSides, maximumNgonSides + 1);
+							}
 							// END CONTROL of sides of shapes in grids
     for (int i = 0; i < ShapesGridOBJ.length; i++) {          // that comparison measures first dimension of array ( == cols)
       for (int j = 0; j < ShapesGridOBJ[0].length; j++) {    // that comparision measures second dimension of array ( == rows)
@@ -904,7 +893,7 @@ class GridOfNestedAnimatedShapes {
 							if (do_rnd_sides_every_shape == true) {
 								// low range 1 or 2 still does circles more often, but not so many as if minimumNgonSides is neg.
 								rndShapeSides = (int) random(minimumNgonSides, maximumNgonSides + 1);
-							}
+							} // else do nothing; rndShapeSides as set before this nested i/j for loop will be used.
         float minDiam = graph_xy_len * RND_min_diameter_multArg;
         float maxDiam = graph_xy_len * RND_max_diameter_multArg;
         ShapesGridOBJ[i][j] = new NestedAnimatedShapes(shapeLocX, shapeLocY, minDiam, maxDiam, rndShapeSides, nestingArg);    // I might best like: 1, 8
@@ -955,9 +944,9 @@ void settings() {
     //simpletweet.setOAuthConsumerSecret(twitterAPIauthLines[1]);
     //simpletweet.setOAuthAccessToken(twitterAPIauthLines[2]);
     //simpletweet.setOAuthAccessTokenSecret(twitterAPIauthLines[3]);
-    doNotTryToTweet = false;
+    tryToTweet = true;
   } catch (Exception e) {
-    doNotTryToTweet = true;
+    tryToTweet = false;
     print("NO TEXT FILE twitterAPIauth.txt found.\n");
   }
 }
@@ -1050,7 +1039,7 @@ void animate() {
 
   // SVG RECORD, CONDITIONALLY:
   if (recordSVGnow == true) {
-    String svg_file_name_no_ext = get_image_file_name_no_ext();
+    String svg_file_name_no_ext = get_detailed_image_file_name_no_ext();
     beginRecord(SVG, svg_file_name_no_ext + ".svg");
   }
 
@@ -1158,8 +1147,8 @@ void mousePressed() {
   }
 
   //TRY TO TWEET, if boolean that says we may is so set; will print exception + warning if fail:
-  if (doNotTryToTweet == false) {
-    String fileNameNoExt = get_image_file_name_no_ext();
+  if (tryToTweet == true) {
+    String fileNameNoExt = get_simple_file_name_no_ext();
     try {
       //String tweet = simpletweet.tweetImage(get(), fileNameNoExt + " saved via visitor interaction at Springville Museum of Art! More visitor images at: http://s.earthbound.io/BSaST #generative #generativeArt #processing #processingLanguage #creativeCoding");
       //String tweet = simpletweet.tweetImage(get(), fileNameNoExt
