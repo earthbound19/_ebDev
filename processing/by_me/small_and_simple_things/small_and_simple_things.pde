@@ -23,30 +23,39 @@
 
 
 // work log:
-// 1.11.4
-// - make confusing boolean name related to trying to tweet _not_ confusing anymore (nor
-// assocaited logic)
-// - fix kludge logic that was intended to lower chance of making entire grid circles
-// so that it honors instead of overrides minimumNgonSides.
-String versionString = "v1.11.4";
+// 1.11.5
+// - simple (tweet) file name vs. detailed file name get functions
+// - tweet code in place but must be uncommented to activate. Logs with variation (random seed)
+// number if tweet attempt fails.
+String versionString = "v1.11.5";
 
 // TO DO; * = doing:
-// * log with variation (random seed) number if tweet attempt fails
 // - (concentricity control and) rnd higher/lower concentricity range.
-// - simple (tweet) file name vs. detailed file name get functions
+// - rnd range of nesting, with heavier max stroke / smaller min shape size on less nesting?
 // - rnd ellipse eccentricity (would mean using PShape for circle)
 // - other items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
 
 // DEPENDENCY IMPORTS and associated globals:
 import processing.svg.*;
-// for image tweets! :
-// import gohai.simpletweet.*;
+// for logging:
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+String tweetErrorLogOutfileName = "_tweetErrorLog.txt";
+// TO ENABLE IMAGE TWEETS, uncomment the last section of code with a varaible named simpletweet,
+// uncomment the desired code, then work backward to hunt for the related code earleir that
+// defines simpletweet until you get back to the define which follows these comments, then run
+// this script and see if it doesn't complain of undefined things.
+// I don't want to require that library to be installed just to run this script, so that's
+// how I'm managing disabling / enabling tweet dependency.
+// NOTE that this requires the presence of a text file in the same folder, named twitterAPIauth.txt,
+// containing OAauth keys that will work with twitter's API. Without those the tweet will fail and
+// the console and _tweetErrorLog.txt will note the failure.
+// ALSO NOTE: do disalble tweeting, comment out this next line of code, then try to run the script
+// and comment out all lines where it says there's an error until there are none.
+//import gohai.simpletweet.*;
+//SimpleTweet simpletweet;
 String[] twitterAPIauthLines;
-// SimpleTweet simpletweet;
-boolean tryToTweet = false;
-
-
-
+boolean tryToTweet = true;
 
 // BEGIN GLOBAL VARIABLES:
 // NOTE: to control additional information contained in saved file names, see comments in the get_detailed_image_file_name_no_ext() function further below.
@@ -55,7 +64,7 @@ boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be 
 int overrideSeed = -161287679;    // a favorite is: -161287679
 int previousSeed = overrideSeed;
 int seed = overrideSeed;
-boolean USE_FULLSCREEN = true;  // if set to true, overrides the following values; if false, they are used:
+boolean USE_FULLSCREEN = false;  // if set to true, overrides the following values; if false, they are used:
 int globalWidth = 1920;
 int globalHeight = 1080;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
 int gridNesting = 4;    // controls how many nests of shapes there are for each shape on the grid.
@@ -90,7 +99,7 @@ boolean initialSaveSVGsState = saveSVGs;							// stores initial state to revert
 // int renderNtotalFrames = 7200;    // see saveAllFrames comment
 int totalFramesRendered;    // incremented during each frame of a running variation. reset at new variation.
 int framesRenderedThisVariation;
-boolean saveEveryVariation = true;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
+boolean saveEveryVariation = false;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
 boolean doFixedTimePerVariation = false;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
 int fixedMillisecondsPerVariation = (int) (1000 * 11.5);         // milliseconds to display each variation, if previous boolean is true
 int minMillisecondsPerVariation = (int) (1000 * 16.5);      // 1000 milliseconds * 16.5 = 16.5 seconds
@@ -108,10 +117,10 @@ int estimatedFPS = 0;    // dynamically modified by program as it runs (and prin
 // ~4K resolution horizontally larger monitors: 1, 43
 int minColumns = 2; int maxColumns = 21;
 float ShapesGridXminPercent = 0.231;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
-float ShapesGridXmaxPercent = 0.63;   // maximum ""                                       Maybe best ~ .75
+float ShapesGridXmaxPercent = 0.67;   // maximum ""                                       Maybe best ~ .75
 int minimumNgonSides = -11;    // If negative number, n*-1*-1 (many more) chance of choosing circle on rnd shape draw.
 int maximumNgonSides = 7;      // Preferred: 7. Max number of shape sides randomly chosen. 0, 1 and 2 will be circles. 3 will be a triangle, 4 a square, 5 a pentagon, and so on.
-float parentMaxWanderDistMultiple = 1.34;		// how far beyond origin + max radius, as percent, a parent shape can wander. Default hard-coding: 1.14 (14 percent past max origin)
+float parentMaxWanderDistMultiple = 1.372;		// how far beyond origin + max radius, as percent, a parent shape can wander. Default hard-coding: 1.14 (14 percent past max origin)
 float strokeMinWeightMult = 0.0064;		// stroke or outline min size multiplier vs. shape diameter--diameters change! 
 float strokeMaxWeightMult = 0.0307;		// stroke or outline max size multiplier vs. shape diameter
 float diameterMorphRateMin = 0.0002;	// minimum rate of shape size contract or expand
@@ -266,12 +275,10 @@ String get_detailed_image_file_name_no_ext() {
 
 // get simple file name more usable for e.g. what may become part of the text of a tweet:
 String get_simple_file_name_no_ext() {
-  //String simple_img_file_name_no_ext =
-  //  "By Small and Simple Things " + versionString + " seed " + seed
-  //   + " frame " + framesRenderedThisVariation
-  //   + userInteractionString;
-  //return img_file_name_no_ext;
-  return "flarf";
+  String simple_img_file_name_no_ext =
+  "By Small and Simple Things " + versionString + " seed " + seed
+  + " frame " + framesRenderedThisVariation;
+  return simple_img_file_name_no_ext;
 }
 
 
@@ -281,7 +288,7 @@ void save_PNG() {
   //LOCAL FOLDER SAVE:
   saveFrame(FNNE + ".png");
 
-  // CLOUD SAVE option one (SMOFA kiosk, Windows) :
+  // CLOUD SAVE option one (SMOFA kiosk, Windows) ;
    //saveFrame("C:\\Users\\SMOFA_guest\\Dropbox\\By_Small_and_Simple_Things__SMOFA_visitor_image_saves\\" + FNNE + ".png");
 
   // CLOUD SAVE option two (RAH collecting images, Mac) :
@@ -375,6 +382,33 @@ int min = minute(); String minS = nf(min, 2);
 int s = second(); String sS = nf(s, 2);
 String formattedDateTime = yS + "_" + mS + "_" + dS + "__" + hS + "_" + minS + "_" + sS;
 return formattedDateTime;
+}
+
+// for logging:
+// creates file if it doesn't exist, appending data only:
+void appendTextToFile(String filename, String text) {
+  File f = new File(sketchPath(filename));
+  if(!f.exists()) {
+    createFile(f);
+  }
+  try {
+    PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f, true)));
+    out.println(text);
+    out.close();
+  } catch (IOException e) {
+      e.printStackTrace();
+  }
+}
+// also for logging:
+// creates a new file including all subfolders:
+void createFile(File f) {
+  File parentDir = f.getParentFile();
+  try {
+    parentDir.mkdirs(); 
+    f.createNewFile();
+  } catch (Exception e) {
+    e.printStackTrace();
+  }
 }
 
 // END GLOBAL FUNCTIONS
@@ -801,18 +835,18 @@ class NestedAnimatedShapes {
           // if we're at the outmost shape or circle, pass made-up PVector and diameter by extrapolation from max_distance;
           // otherwise pass those properties of the parent shape:
           if (j == 0) {     // wander under these conditions:
-            PVector INVISIBL_PARENT_XY = AnimatedShapesArray[0].originXY.copy();
+            PVector INVISIBL_PARENT_XY = AnimatedShapesArray[0].originXY.copy(); //<>// //<>//
             float INVISIBL_RADIUS = AnimatedShapesArray[0].max_wander_dist;
-            tmp_vec = AnimatedShapesArray[0].wander(INVISIBL_PARENT_XY, INVISIBL_RADIUS);
+            tmp_vec = AnimatedShapesArray[0].wander(INVISIBL_PARENT_XY, INVISIBL_RADIUS); //<>//
           } else {          // or under these conditions (one or the other) :
             PVector parent_center_XY = AnimatedShapesArray[j].centerXY.copy();
             tmp_vec = AnimatedShapesArray[k].wander(parent_center_XY, AnimatedShapesArray[j].diameter);
           }
           // drag all inner circles/shapes with outer translated circle/shape, using that gotten vector;
           // this won't always actually move anything (as sometimes tmp_vec is (0,0), but it's a waste to check if it will:
-          AnimatedShapesArray[k].translate(tmp_vec);
+          AnimatedShapesArray[k].translate(tmp_vec); //<>//
           // DONE WANDERING
-				// CONSTRAINING inner shapes within borders of outer ones
+				// CONSTRAINING inner shapes within borders of outer ones //<>// //<>//
 				// if shape has wandered beyond border of parent, drag it within parent, tangent on nearest edge;
 				// ONLY EVERY N milliseconds, as controlled by functions that set detect_collision_now true;
 				// UNLESS lazyParentBoundaryConstraint is false (always do this in that case) :
@@ -835,10 +869,10 @@ class NestedAnimatedShapes {
 					}
 				}
 				  // DONE CONSTRAINING //<>// //<>//
-        } //<>//
+        }
       // COLOR MORPHING makes it freaking DAZZLING, if I may say so:
       AnimatedShapesArray[j].morphColor();
-			AnimatedShapesArray[j].disable_color_morph_if_time();	// But let's stop it after an interval. Interaction will restart it. //<>// //<>//
+			AnimatedShapesArray[j].disable_color_morph_if_time();	// But let's stop it after an interval. Interaction will restart it. //<>// //<>// //<>//
     }
   }
 
@@ -938,13 +972,13 @@ void settings() {
   // also set "don't even try to tweet" boolean to true on failure.
   // This will only fail here if file not found or if there's an error during loading it.
   try {
-    twitterAPIauthLines = loadStrings("/Users/earthbound/twitterAPIauth.txt");
+    twitterAPIauthLines = loadStrings("../twitterAPIauth.txt");
+		if (twitterAPIauthLines.length != 4) { tryToTweet = false; }	// because the expected format is 4 lines; encrytped, it isn't.
     //simpletweet = new SimpleTweet(this);
     //simpletweet.setOAuthConsumerKey(twitterAPIauthLines[0]);
     //simpletweet.setOAuthConsumerSecret(twitterAPIauthLines[1]);
     //simpletweet.setOAuthAccessToken(twitterAPIauthLines[2]);
     //simpletweet.setOAuthAccessTokenSecret(twitterAPIauthLines[3]);
-    tryToTweet = true;
   } catch (Exception e) {
     tryToTweet = false;
     print("NO TEXT FILE twitterAPIauth.txt found.\n");
@@ -1109,6 +1143,10 @@ void draw() {
       animate();
       loop();
     }
+		// tweets final frame of image if controlling boolean says so:
+		if (userInteractedThisVariation == true) {
+			try_to_tweet();
+		}
     runSetup = true;
   }
 
@@ -1125,6 +1163,8 @@ void mousePressed() {
   if (userInteractedThisVariation == false) {    // restricts the functionality in this block to once per variation
     // (because prepareNextVariation(), which is called to create every variation, sets that false)
     //save PNG on click, conditionally:
+		userInteractedThisVariation = true;
+
     if (savePNGs == true) {
       save_PNG();
     }
@@ -1135,7 +1175,6 @@ void mousePressed() {
       animate();
       loop();
     }
-    userInteractedThisVariation = true;
 		
 		// NOTE THIS ALSO will execute only once per variation (per condition of outer control
 		// of this block), which we want; if the following is set more than once per variation,
@@ -1144,22 +1183,11 @@ void mousePressed() {
 			initialSaveAllFramesState = saveAllFrames; initialSaveSVGsState = saveSVGs;
 			saveAllFrames = true; saveSVGs = true;
 		}
+		
+		try_to_tweet();
   }
 
-  //TRY TO TWEET, if boolean that says we may is so set; will print exception + warning if fail:
-  if (tryToTweet == true) {
-    String fileNameNoExt = get_simple_file_name_no_ext();
-    try {
-      //String tweet = simpletweet.tweetImage(get(), fileNameNoExt + " saved via visitor interaction at Springville Museum of Art! More visitor images at: http://s.earthbound.io/BSaST #generative #generativeArt #processing #processingLanguage #creativeCoding");
-      //String tweet = simpletweet.tweetImage(get(), fileNameNoExt
-      //+ " created during development or manual run of program. #generative #generativeArt #processing #processingLanguage #creativeCoding");
-      //println("Posted " + tweet);
-    } catch (Exception e) {
-      print("Failure during tweet attempt.\n");
-    }
-  } else {
-    print("Could have tweeted, but told not to.\n");
-  }
+// formerly tweet attempt code was here!
   
   addGracePeriodToNextVariant();
 }
@@ -1188,4 +1216,31 @@ void keyPressed() {
   if (keyCode != LEFT && keyCode != RIGHT) {
     addGracePeriodToNextVariant();
   }
+}
+
+boolean try_to_tweet() {
+	boolean tweet_success = false;		// half empty kinda guy?
+	//TRY TO TWEET, if boolean that says we may is so set; will print exception + warning if fail:
+	if (tryToTweet == true) {
+		String simpleFileNameNoExt = get_simple_file_name_no_ext();
+		try {
+			
+		// OPTION ONE--uncomment if this is what you want:
+			// String tweet = simpletweet.tweetImage(get(), simpleFileNameNoExt + " saved via visitor interaction at Springville Museum of Art! More visitor images at: http://s.earthbound.io/BSaST #generative #generativeArt #processing #processingLanguage #creativeCoding"); println("Posted " + tweet);
+		// OR:
+		// OPTION TWO--uncomment if this is what you want:
+			//String tweet = simpletweet.tweetImage(get(), simpleFileNameNoExt + " created during development or manual run of program. #generative #generativeArt #processing #processingLanguage #creativeCoding"); println("Posted " + tweet);
+			tweet_success = true;
+		} catch (Exception e) {
+			print("Failure during tweet attempt. Attempting to log..\n");
+			String date_time = get_formatted_datetime();
+			String error_log_string = "Error on attempt to tweet at " + date_time + " seed " + seed;
+			appendTextToFile(tweetErrorLogOutfileName, error_log_string);
+			tweet_success = false;
+		}
+	} else {
+		print("Could have tweeted, but told not to.\n");
+		tweet_success = false;
+	}
+	return tweet_success;
 }
