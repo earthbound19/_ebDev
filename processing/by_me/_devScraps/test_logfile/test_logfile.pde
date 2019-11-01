@@ -4,7 +4,7 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
-String outFilename = "out.txt";
+String outFilename = "yerfelp/fhi/hoi/out.txt";
 
 // creates file if it doesn't exist, appending data only:
 void appendTextToFile(String filename, String text){
