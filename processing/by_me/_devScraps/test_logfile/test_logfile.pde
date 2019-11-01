@@ -6,18 +6,11 @@ import java.io.FileWriter;
 
 String outFilename = "out.txt";
 
-void setup(){
-  // Write some text to the file
-  for(int i=0; i<10; i++){
-    appendTextToFile(outFilename, "Text " + i);
-  } 
-}
-
 // creates file if it doesn't exist, appending data only:
 void appendTextToFile(String filename, String text){
   // I tried omitting the dataPath() call--it crashes! SO, you
   // must accept that everything ends up in a data subdir!
-  File f = new File(dataPath(filename));
+  File f = new File(sketchPath(filename));
   if(!f.exists()){
     createFile(f);
   }
@@ -54,6 +47,7 @@ String getRandomString(int length) {
   return felf;
 }
 
+// without this function in place, even though it's "doing nothing," mousePressed() does nothing:
 void draw() {
 }
 
