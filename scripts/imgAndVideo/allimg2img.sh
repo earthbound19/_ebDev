@@ -13,7 +13,7 @@ img_format_1=$1
 img_format_2=$2
 
 # OPTIONAL e.g. resize command:
-# additionalParams="-scale 640 "
+# additionalParams="-scale 1920 "
 
 array=(`gfind . -maxdepth 1 -type f -iname \*.$img_format_1 -printf '%f\n'`)
 for element in ${array[@]}
@@ -21,7 +21,7 @@ do
 	fileNameNoExtension=`basename $element .$img_format_1`
 			# REFERENCE for script hacking for custom runs: the [-scale n] switch will resize the image maintaining aspect with the longest side at n pixels.
 	# what parameter was I after here? : -size $1x$1
-	command="gm convert $element $fileNameNoExtension.$img_format_2 $additionalParams"
+	command="gm convert $additionalParams $element $fileNameNoExtension.$img_format_2"
 	echo running command\: $command
 	echo . . .
 	$command
