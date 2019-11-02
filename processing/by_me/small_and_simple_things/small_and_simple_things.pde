@@ -22,12 +22,11 @@
 // contiguous, but will still be ordered by higher number last.
 
 
-// work log:
-// 1.11.5
-// - simple (tweet) file name vs. detailed file name get functions
-// - tweet code in place but must be uncommented to activate. Logs with variation (random seed)
-// number if tweet attempt fails.
-String versionString = "v1.11.5";
+// v1.11.6 work log:
+// - bug/feature fix: intended grow and shrink of nGons I think never happened. It does now.
+// - defaults tweaks (faster / moar)
+// - why do these stupid comments keep appearing; what puts them there?! : //<>// -- DELETED.
+String versionString = "v1.11.6";
 
 // TO DO; * = doing:
 // - (concentricity control and) rnd higher/lower concentricity range.
@@ -61,12 +60,12 @@ boolean tryToTweet = true;
 // NOTE: to control additional information contained in saved file names, see comments in the get_detailed_image_file_name_no_ext() function further below.
 int variationNumberThisRun = 0;
 boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly.
-int overrideSeed = -161287679;    // a favorite is: -161287679
+int overrideSeed = 858293248;    // some favorites are: -161287679, 858293248 
 int previousSeed = overrideSeed;
 int seed = overrideSeed;
-boolean USE_FULLSCREEN = false;  // if set to true, overrides the following values; if false, they are used:
-int globalWidth = 1920;
-int globalHeight = 1080;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
+boolean USE_FULLSCREEN = true;  // if set to true, overrides the following values; if false, they are used:
+int globalWidth = 600;
+int globalHeight = 600;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
 int gridNesting = 4;    // controls how many nests of shapes there are for each shape on the grid.
 GridOfNestedAnimatedShapes GridOfShapes;
 int GridOfShapesNumCols;    // to be reinitialized in each loop of prepareNextVariation()
@@ -116,19 +115,19 @@ int estimatedFPS = 0;    // dynamically modified by program as it runs (and prin
 // SMOFA entry configuration for the following values, for ~6' tall kiosk: 1, 21. Before more advanced anim, ~21
 // ~4K resolution horizontally larger monitors: 1, 43
 int minColumns = 2; int maxColumns = 21;
-float ShapesGridXminPercent = 0.231;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .6
-float ShapesGridXmaxPercent = 0.67;   // maximum ""                                       Maybe best ~ .75
+float ShapesGridXminPercent = 0.231;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .2
+float ShapesGridXmaxPercent = 0.681;   // maximum ""                                       Maybe best ~ .67
 int minimumNgonSides = -11;    // If negative number, n*-1*-1 (many more) chance of choosing circle on rnd shape draw.
 int maximumNgonSides = 7;      // Preferred: 7. Max number of shape sides randomly chosen. 0, 1 and 2 will be circles. 3 will be a triangle, 4 a square, 5 a pentagon, and so on.
 float parentMaxWanderDistMultiple = 1.372;		// how far beyond origin + max radius, as percent, a parent shape can wander. Default hard-coding: 1.14 (14 percent past max origin)
 float strokeMinWeightMult = 0.0064;		// stroke or outline min size multiplier vs. shape diameter--diameters change! 
 float strokeMaxWeightMult = 0.0307;		// stroke or outline max size multiplier vs. shape diameter
-float diameterMorphRateMin = 0.0002;	// minimum rate of shape size contract or expand
-float diameterMorphRateMax = 0.0017;	// maximum "
-float motionVectorMax = 0.457;          // maximum pixels (I think?) an object may move per frame. Script randomizes between this and (this * -1) * a downscale multiplier per shapes' diameter.
-float orbitRadiansRateMax = 6.84;					// how many degrees maximum any shape may orbit per call of orbit()
-float rotationRadiansRateMax = 1.976;			// how many degrees maximum any shape may orbit per call of shapeRotate();
-boolean lazyParentBoundaryConstraint = true;		// If true, every N ms (13?), shape wander is constrained within parent shape. If false, ALL frames are constrained.
+float diameterMorphRateMin = 0.0004;	// minimum rate of shape size contract or expand
+float diameterMorphRateMax = 0.0031;	// maximum "
+float motionVectorMax = 0.6;          // maximum pixels (I think?) an object moves per frame. Randomizes between this and (this * -1) * a downscale multiplier, per shapes' diameter.
+float orbitRadiansRateMax = 8.84;					// how many degrees maximum any shape may orbit per call of orbit()
+float rotationRadiansRateMax = 4;			// how many degrees maximum any shape may orbit per call of shapeRotate();
+boolean lazyParentBoundaryConstraint = false;		// If true, every N ms (13?), shape wander is constrained within parent shape. If false, ALL frames are constrained.
 int disableColorMorphAfter_ms = 21426;
 
 // Marker-like colors array -- may have a lot of Prismacolor marker colors:
@@ -426,10 +425,12 @@ class AnimatedShape {
   float jitter_max_step_mult;
   float max_jitter_dist;
   float max_wander_dist;
-  float orig_diam;		// a separate thing we want to remember from current_diameter
+  float original_diameter;		// a separate thing we want to remember from current_diameter
 	float diameter;
   float diameter_min;
+	float original_diameter_min;
   float diameter_max;
+	float original_diameter_max;
   float diameter_morph_rate;
   color stroke_color;
 	color alt_stroke_color;
@@ -469,9 +470,10 @@ class AnimatedShape {
   AnimatedShape(int xCenter, int yCenter, float diameterMin, float diameterMax, int sidesArg, boolean darkColorFillArg) {
     originXY = new PVector(xCenter,yCenter);
     centerXY = new PVector(xCenter,yCenter);
-    diameter_min = diameterMin; diameter_max = diameterMax;
+    diameter_min = diameterMin; original_diameter_min = diameter_min;
+		diameter_max = diameterMax; original_diameter_max = diameter_max;
     diameter = random(diameterMin, diameterMax);
-		orig_diam = diameter;
+		original_diameter = diameter;
     //randomly make that percent positive or negative to start (which will cause grow or expand animation if used as intended) :
     int RNDtrueFalse = (int) random(0, 2);  // gets random 0 or 1
     if (RNDtrueFalse == 1) {
@@ -512,6 +514,12 @@ class AnimatedShape {
 		constructShape(sidesArg);
   }
 
+	void scaleDiameterBounds(float multiplier) {
+		diameter = original_diameter * multiplier;
+		diameter_min = original_diameter_min * multiplier;
+		diameter_max = original_diameter_max * multiplier;
+	}
+
 	// Build or rebuild nGon as PShape via number of sides:
 	void constructShape(int sidesArg) {
 		// FOR NGON: conditionally alter number of sides:
@@ -519,20 +527,15 @@ class AnimatedShape {
 		if (sidesArg > maxNgonSides) { sidesArg = maxNgonSides; }
 		// if sidesArg is negative number, don't worry about changing it--it will be interpreted as a circle. Unless I change that? :
 		sides = sidesArg;
-		if (sides < 3) { diameter = orig_diam; }
+		if (sides < 3) { scaleDiameterBounds(1); }
 		// scale up shapes with less area, VIA CONSTANTS I found that approximate same area as circle if multiply apothem by:
-		float three_scale = 1.209199;
-		if (sides == 3) {	diameter = orig_diam * three_scale; diameter_min = orig_diam * three_scale;	diameter_max = orig_diam * three_scale; }
-		float four_scale = 1.110720;
-		if (sides == 4) {	diameter = orig_diam * four_scale; diameter_min = orig_diam * four_scale;	diameter_max = orig_diam * four_scale; }
-		float five_scale = 1.068959;
-		if (sides == 5) {	diameter = orig_diam * five_scale; diameter_min = orig_diam * five_scale;	diameter_max = orig_diam * five_scale; }
-    float six_scale = 1.047197;
-		if (sides == 6) {	diameter = orig_diam * six_scale; diameter_min = orig_diam * six_scale;	diameter_max = orig_diam * six_scale; }
-    float seven_scale = 1.034376;
-		if (sides == 7) {	diameter = orig_diam * seven_scale; diameter_min = orig_diam * seven_scale;	diameter_max = orig_diam * seven_scale; }
+		if (sides == 3) { scaleDiameterBounds(1.209199); }
+		if (sides == 4) {	scaleDiameterBounds(1.110720); }
+		if (sides == 5) {	scaleDiameterBounds(1.068959); }
+		if (sides == 6) {	scaleDiameterBounds(1.047197); }
+		if (sides == 7) {	scaleDiameterBounds(1.034376); }
 		
-		// only even build a shape if at minimum sides:
+		// if at least at minimum nGon sides, build polygon:
 		if (sides >= minNgonSides) {
 			radiusVector = new PVector(0, (diameter / 2 * (-1)) );    // This init vector allows us to construct an n-gon with the first vertex at the top of a conceptual construction circle
 			nGon = createShape();
@@ -565,26 +568,30 @@ class AnimatedShape {
 				// rotation += (angle_step / 2);
 			}
 			nGon.rotate(radians(rotation));
+		}	else {		// otherwise build a circle:
+			nGon = createShape(ELLIPSE,0,0,diameter,diameter);
 		}
 	}
 
   // member functions
   void morphDiameter() {
     // grow diameter (positive or negative) :
-        float old_diameter = diameter;  // for later reference in scaling nGon
+		float old_diameter = diameter;  // for later reference in scaling nGon
+    float tmp = diameter / old_diameter;
     diameter = diameter + (diameter * diameter_morph_rate);
+		diameter = constrain(diameter, diameter_min, diameter_max);
     // if diameter is at min or max, alter the grow rate to positive or negative (depending):
-    diameter = constrain(diameter, diameter_min, diameter_max);
     if (diameter == diameter_max) {
-      diameter_morph_rate *= (-1);
-    }
+			diameter_morph_rate *= (-1);
+			// print("\n\n~~shrinking . .\n");
+		}
     if (diameter == diameter_min) {
-      diameter_morph_rate *= (-1);
-    }
-        float percent_change_multiplier = diameter / old_diameter;
-    if (sides >= minNgonSides) {
-      nGon.scale(percent_change_multiplier);
-    }
+			diameter_morph_rate *= (-1);
+			// print("\n\n~~growing . . .\n");
+		}
+
+		float percent_change_multiplier = diameter / old_diameter;
+    nGon.scale(percent_change_multiplier);
   }
 
   void jitter() {
@@ -688,18 +695,15 @@ class AnimatedShape {
 					alt_stroke_color = stroke_color;
 				}
 				// END OPTIONAL STROKE AND FILL color overrides!
-    if (sides >= minNgonSides) {    // as manipulated by constructShape(), this will mean an nGon, so render that:
-      nGon.setFill(alt_fill_color);
-      nGon.setStrokeWeight(stroke_weight * 1.3);    // * because it just seems to be better as heavier for nGons than circles.
-      nGon.setStroke(alt_stroke_color);
+		nGon.setFill(alt_fill_color);
+		nGon.setStroke(alt_stroke_color);
+		if (sides >= minNgonSides) {    // as manipulated by constructShape(), this will mean an nGon, so render that:
+			nGon.setStrokeWeight(stroke_weight * 1.3);    // * because it just seems to be better as heavier for nGons than circles.
+		} else {
+			nGon.setStrokeWeight(stroke_weight);
+		}
+// LEARNED: it displays them YUGE if I also pass diameter, diameter because that means _that much past existing size_ (which is already ~same as if circle)
       shape(nGon, centerXY.x, centerXY.y);
-    }
-    else {    // otherwise it's a circle, so render that:
-			fill(alt_fill_color);
-      stroke(alt_stroke_color);
-      strokeWeight(stroke_weight);
-      ellipse(centerXY.x, centerXY.y, diameter, diameter);
-    }
   }
 
   void translate(PVector addArg) {
@@ -766,7 +770,7 @@ class NestedAnimatedShapes {
     // Then pass them as max and min radius for each shape as we build the array of shapes.
     // METHOD: get a fixed number of random numbers from a range divided by an interval, descending.
     // (for nested circle diameters or nested shape apothems)
-    int interval = nesting + 7;    // divide min and max possible radius by how many intervals to determine size slices?
+    int interval = nesting + 9;    // divide min and max possible radius by how many intervals to determine size slices?
     float dividend = (RND_max_diameter_mult - RND_min_diameter_mult) / interval;
     int radii_to_get = nesting + 1;   // or the last circle/shape will have no min. radius!
     int low_range_excluder = radii_to_get;
@@ -801,11 +805,8 @@ class NestedAnimatedShapes {
 						// BUT one out of five times, do _not_ toggle it, and continue with dark if dark or light if light:
 						int five_sided_die_roll = (int) random(1, 6);		// 6 because not inclusive: max of range is 5
 						if (five_sided_die_roll != 5) {
-		if (darkColorFillArg == false) { darkColorFillArg = true; } else { darkColorFillArg = false; }
-		// Plato smiles as his student keels over in agony.
-																									// print("changed mode.\n");
-						// print("is now: " + darkColorFillArg + "\n");
-																					} // else { print("chose not to change mode!\n"); }
+          		if (darkColorFillArg == false) { darkColorFillArg = true; } else { darkColorFillArg = false; }
+																					}
 		// override orbitVector, rotation rate, and starting rotation of all nested shapes to match outermost
 		// (lockstep / make visually similar them all)
 		// NOTE that the following assigns by reference, which is fine, it saves memory and does what we want:
@@ -818,35 +819,34 @@ class NestedAnimatedShapes {
 		// AnimatedShapesArray[i].rotation = new_RND_rotate_origin_for_nesting;
 		// AnimatedShapesArray[i].nGon.rotate(radians(new_RND_rotate_origin_for_nesting));
     }
-
-  }
-
-  void drawAndChangeNestedShapes() {
+   }
+   void drawAndChangeNestedShapes() {
     for (int j = 0; j < nesting; j++) {
       AnimatedShapesArray[j].drawShape();
       AnimatedShapesArray[j].morphDiameter();
       AnimatedShapesArray[j].udpate_animation_scale_multiplier();
-			AnimatedShapesArray[j].orbit();
-			AnimatedShapesArray[j].rotateShape();
+			// AnimatedShapesArray[j].orbit();
+			// AnimatedShapesArray[j].rotateShape();
        // AnimatedShapesArray[j].jitter();    // so dang silky smooth without jitter; also maybe edge collisions are now less spastic _without_ that (the opposite case used to be).
+///*
+        // START WANDERING
         for (int k = j + 1; k < nesting; k++) {
           PVector tmp_vec;
-          // WANDERING
           // if we're at the outmost shape or circle, pass made-up PVector and diameter by extrapolation from max_distance;
           // otherwise pass those properties of the parent shape:
           if (j == 0) {     // wander under these conditions:
-            PVector INVISIBL_PARENT_XY = AnimatedShapesArray[0].originXY.copy(); //<>// //<>//
+            PVector INVISIBL_PARENT_XY = AnimatedShapesArray[0].originXY.copy();
             float INVISIBL_RADIUS = AnimatedShapesArray[0].max_wander_dist;
-            tmp_vec = AnimatedShapesArray[0].wander(INVISIBL_PARENT_XY, INVISIBL_RADIUS); //<>//
+            tmp_vec = AnimatedShapesArray[0].wander(INVISIBL_PARENT_XY, INVISIBL_RADIUS);
           } else {          // or under these conditions (one or the other) :
             PVector parent_center_XY = AnimatedShapesArray[j].centerXY.copy();
             tmp_vec = AnimatedShapesArray[k].wander(parent_center_XY, AnimatedShapesArray[j].diameter);
           }
           // drag all inner circles/shapes with outer translated circle/shape, using that gotten vector;
           // this won't always actually move anything (as sometimes tmp_vec is (0,0), but it's a waste to check if it will:
-          AnimatedShapesArray[k].translate(tmp_vec); //<>//
+          AnimatedShapesArray[k].translate(tmp_vec);
           // DONE WANDERING
-				// CONSTRAINING inner shapes within borders of outer ones //<>// //<>//
+				// CONSTRAINING inner shapes within borders of outer ones
 				// if shape has wandered beyond border of parent, drag it within parent, tangent on nearest edge;
 				// ONLY EVERY N milliseconds, as controlled by functions that set detect_collision_now true;
 				// UNLESS lazyParentBoundaryConstraint is false (always do this in that case) :
@@ -855,7 +855,7 @@ class NestedAnimatedShapes {
 					AnimatedShapesArray[j].centerXY,
 					AnimatedShapesArray[j].diameter,
 					AnimatedShapesArray[k].centerXY,
-					AnimatedShapesArray[k].diameter); //<>//
+					AnimatedShapesArray[k].diameter);
 					if (is_within_parent == false) {      // CONSTRAIN it:
 								// print(is_within_parent + "\n");
 						PVector relocate_XY = get_larger_to_smaller_shape_interior_tangent_PVector(
@@ -868,11 +868,13 @@ class NestedAnimatedShapes {
 						AnimatedShapesArray[k].centerXY = relocate_XY.copy();		// could probably get away with reference here? Eh.
 					}
 				}
-				  // DONE CONSTRAINING //<>// //<>//
+				  // DONE CONSTRAINING
         }
+				// END WANDERING
+//*/
       // COLOR MORPHING makes it freaking DAZZLING, if I may say so:
       AnimatedShapesArray[j].morphColor();
-			AnimatedShapesArray[j].disable_color_morph_if_time();	// But let's stop it after an interval. Interaction will restart it. //<>// //<>// //<>//
+			AnimatedShapesArray[j].disable_color_morph_if_time();	// But let's stop it after an interval. Interaction will restart it.
     }
   }
 
@@ -993,7 +995,6 @@ boolean userInteractedThisVariation = false;   // affects those booleans via scr
 String animFramesSaveSubdir = "";
 // handles values etc. for new animated variation to be displayed:
 void prepareNextVariation() {
-
 	  if (booleanOverrideSeed == true) {
 	    seed = previousSeed;
 	    booleanOverrideSeed = false;
@@ -1002,7 +1003,6 @@ void prepareNextVariation() {
 	    seed = (int) random(-2147483648, 2147483647);
 	  }
 	  randomSeed(seed);
-
 	  ellipseMode(CENTER);
 
 	  // Randomly change the background color to any color from backgroundColors array at each run;
@@ -1011,8 +1011,8 @@ void prepareNextVariation() {
 			globalBackgroundColor = altBackgroundColor;
 		} else {
 	  	RNDbgColorIDX = (int) random(backgroundColorsArrayLength);
-			globalBackgroundColor = backgroundColors[RNDbgColorIDX]; //<>//
-		} //<>//
+			globalBackgroundColor = backgroundColors[RNDbgColorIDX];
+		}
 		
 	  int gridXcount = (int) random(minColumns, maxColumns + 1);  // +1 because random doesn't include max range. Also, see comments where those values are set.
 
