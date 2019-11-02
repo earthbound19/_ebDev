@@ -2,8 +2,9 @@
 
 # DESCRIPTION: converts all images of one type in a directory tree to another.
 
+# WARNING: for svgs, use SVG2img.sh or allsvg2img.sh, not this. This will do very crummy upscaling of vector images, _post-resterization_.
 # USAGE: invoke this script with these parameters:
-# $1 the source file format e.g. eps or svg
+# $1 the source file format e.g. bmp or png
 # $2 the target file format e.g. tif or jpg
 
 # DEV NOTE: template command: gm -size 850 test.svg result.tif
