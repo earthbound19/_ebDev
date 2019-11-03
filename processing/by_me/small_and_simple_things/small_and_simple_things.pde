@@ -98,7 +98,7 @@ boolean initialSaveSVGsState = saveSVGs;							// stores initial state to revert
 // int renderNtotalFrames = 7200;    // see saveAllFrames comment
 int totalFramesRendered;    // incremented during each frame of a running variation. reset at new variation.
 int framesRenderedThisVariation;
-boolean saveEveryVariation = false;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
+boolean saveEveryVariation = true;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
 boolean doFixedTimePerVariation = false;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
 int fixedMillisecondsPerVariation = (int) (1000 * 11.5);         // milliseconds to display each variation, if previous boolean is true
 int minMillisecondsPerVariation = (int) (1000 * 16.5);      // 1000 milliseconds * 16.5 = 16.5 seconds
@@ -825,8 +825,8 @@ class NestedAnimatedShapes {
       AnimatedShapesArray[j].drawShape();
       AnimatedShapesArray[j].morphDiameter();
       AnimatedShapesArray[j].udpate_animation_scale_multiplier();
-			// AnimatedShapesArray[j].orbit();
-			// AnimatedShapesArray[j].rotateShape();
+			 AnimatedShapesArray[j].orbit();
+			 AnimatedShapesArray[j].rotateShape();
        // AnimatedShapesArray[j].jitter();    // so dang silky smooth without jitter; also maybe edge collisions are now less spastic _without_ that (the opposite case used to be).
 ///*
         // START WANDERING
