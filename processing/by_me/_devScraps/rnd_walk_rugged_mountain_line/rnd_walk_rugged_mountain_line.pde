@@ -40,11 +40,6 @@ void init() {
   strokeJoin(ROUND);
   lineStartX = 0;
   lineStartY = height * random(0.33, 0.66);
-  // randomly init sign of anglerPosNegMult as opposite if rnd choose 1 from range 0,1:
-  //int chooser = (int) random(0, 2); if (chooser == 1) { posNegMult *= -1; }
-  angler = new PVector(lineStartX, lineStartY);
-  PVector tmpVec = getRNDslopeAndDistVec();
-  angler.add(tmpVec);
 }
 
 void setup() {
@@ -59,6 +54,7 @@ void draw() {
   if (lineStartX < width) {
   //stroke((int) random(0, 200));    // randomly change stroke gray color to differentiate strokes
   PVector tmpVec = getRNDslopeAndDistVec();
+  angler = new PVector(lineStartX, lineStartY);
   angler.add(tmpVec);
   line(lineStartX, lineStartY, angler.x, angler.y);
      print("Drew line no. " + strokeCounter + "\n");
