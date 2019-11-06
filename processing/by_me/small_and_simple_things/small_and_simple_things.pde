@@ -22,14 +22,16 @@
 // contiguous, but will still be ordered by higher number last.
 
 
-// v1.11.6 work log:
-// - bug/feature fix: intended grow and shrink of nGons I think never happened. It does now.
-// - defaults tweaks (faster / moar)
-// - why do these stupid comments keep appearing; what puts them there?! : //<>// -- DELETED.
-String versionString = "v1.11.6";
+// v1.11.7 work log:
+// - animation scaling values weren't updating (function did nothing!) fixed. Does it look more..
+// fluid / dynamic now?
+// - toyed with jitter and got it working in a way that I like by itself, but I don't like
+// it with everything else. Funciton call commented out ::shrug::
+String versionString = "v1.11.7";
 
 // TO DO; * = doing:
-// - (concentricity control and) rnd higher/lower concentricity range.
+// * ATTEMPT MADE; may need to work off new fake size/dist values in object: (concentricity
+// control and) rnd higher/lower concentricity range.
 // - rnd range of nesting, with heavier max stroke / smaller min shape size on less nesting?
 // - rnd ellipse eccentricity (would mean using PShape for circle)
 // - other items / progress are in tracker at https://github.com/earthbound19/_ebDev/projects/3
@@ -423,15 +425,15 @@ class AnimatedShape {
 	PVector centerXY;
 	PVector wanderedXY;
   float jitter_max_step_mult;
-  float max_jitter_dist;
-  float max_wander_dist;
+  float max_jitter_dist; float original_max_jitter_dist;
+  float max_wander_dist; float original_max_wander_dist;
   float original_diameter;		// a separate thing we want to remember from current_diameter
 	float diameter;
   float diameter_min;
 	float original_diameter_min;
   float diameter_max;
 	float original_diameter_max;
-  float diameter_morph_rate;
+  float diameter_morph_rate; float original_diameter_morph_rate;
   color stroke_color;
 	color alt_stroke_color;
   int stroke_color_palette_idx;
@@ -444,7 +446,7 @@ class AnimatedShape {
   int milliseconds_at_last_color_change_elapsed;
   boolean color_morph_on;
 	int ms_color_morph_active;
-  float motion_vector_max;
+  float motion_vector_max; float original_motion_vector_max;
   PVector additionVector;
 	PVector orbitVector;		// Wanted because additionVector randomizes periodically but I want constant orbit.
 	float orbit_radians_rate;
@@ -470,6 +472,7 @@ class AnimatedShape {
   AnimatedShape(int xCenter, int yCenter, float diameterMin, float diameterMax, int sidesArg, boolean darkColorFillArg) {
     originXY = new PVector(xCenter,yCenter);
     centerXY = new PVector(xCenter,yCenter);
+		wanderedXY = new PVector(0,0);
     diameter_min = diameterMin; original_diameter_min = diameter_min;
 		diameter_max = diameterMax; original_diameter_max = diameter_max;
     diameter = random(diameterMin, diameterMax);
@@ -479,9 +482,11 @@ class AnimatedShape {
     if (RNDtrueFalse == 1) {
       diameter_morph_rate *= (-1);
     }  // flips it to negative if RNDtrueFalse is 1
-    jitter_max_step_mult = random(0.002, 0.0032);  // remember subtle values I like the results of: random(0.002, 0.058) -- for smaller circles/shapes. For YUGE: 0.002, 0.038
+    jitter_max_step_mult = random(0.007, 0.0097);  // 0.005 amounts to nothing visible.
     max_jitter_dist = diameter * jitter_max_step_mult;
+		original_max_jitter_dist = max_jitter_dist;
     max_wander_dist = diameter * parentMaxWanderDistMultiple;		// Only for outer circle (or shape) of nested circle (or shape).
+		original_max_wander_dist = max_wander_dist;
     // set RND stroke and fill colors and stroke weight;
 		// stroke RND from all fill colors:
     int RNDarrayIndex = (int) random(allFillColorsArrayLength);  // use all fill colors for stroke
@@ -502,8 +507,11 @@ class AnimatedShape {
     milliseconds_at_last_color_change_elapsed = millis();
     color_morph_on = false;
     animation_scale_multiplier = diameter / motionVectorScaleBaseReference; // print("animation_scale_multiplier: " + animation_scale_multiplier + "\n");
+		original_motion_vector_max = motionVectorMax;
     motion_vector_max = motionVectorMax * animation_scale_multiplier;    // assigning from global there, then modifying further for local size/speed scale (animation_scale_multiplier)
 		diameter_morph_rate = random(diameterMorphRateMin, diameterMorphRateMax) * animation_scale_multiplier;		// also * animation_scale_multiplier because it's anim
+		original_diameter_morph_rate = diameter_morph_rate;
+		jitter_max_step_mult = jitter_max_step_mult / animation_scale_multiplier;
     additionVector = getRandomVector();
 		orbitVector = getRandomVector();
 		orbit_radians_rate = random(orbitRadiansRateMax * -1, orbitRadiansRateMax);
@@ -709,9 +717,12 @@ class AnimatedShape {
   void translate(PVector addArg) {
     centerXY.add(addArg);
   }
-  
+
   void udpate_animation_scale_multiplier() {
     animation_scale_multiplier = diameter / motionVectorScaleBaseReference;
+    motion_vector_max = original_motion_vector_max * animation_scale_multiplier;
+		diameter_morph_rate = original_diameter_morph_rate * animation_scale_multiplier;
+		max_jitter_dist = original_max_jitter_dist * animation_scale_multiplier;
   }
 	
 	void change_mode(int eventType) {		// interaction event type 1 is click, 2 is drag
@@ -825,9 +836,9 @@ class NestedAnimatedShapes {
       AnimatedShapesArray[j].drawShape();
       AnimatedShapesArray[j].morphDiameter();
       AnimatedShapesArray[j].udpate_animation_scale_multiplier();
-			 AnimatedShapesArray[j].orbit();
-			 AnimatedShapesArray[j].rotateShape();
-       // AnimatedShapesArray[j].jitter();    // so dang silky smooth without jitter; also maybe edge collisions are now less spastic _without_ that (the opposite case used to be).
+			AnimatedShapesArray[j].orbit();
+			AnimatedShapesArray[j].rotateShape();
+      // AnimatedShapesArray[j].jitter();    // so dang silky smooth without jitter; also maybe edge collisions are now less spastic _without_ that (the opposite case used to be).
 ///*
         // START WANDERING
         for (int k = j + 1; k < nesting; k++) {
