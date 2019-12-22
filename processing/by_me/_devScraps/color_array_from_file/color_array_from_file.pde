@@ -32,7 +32,15 @@ backgroundColorsArrayLength = backgroundColors.length;
 print("Hopefully CHANGED backgroundColors.length value:" + backgroundColors.length + "\n");
 
 RNDbgColorIDX = (int) random(backgroundColorsArrayLength);
-globalBackgroundColor = backgroundColors[RNDbgColorIDX];
+  globalBackgroundColor = backgroundColors[RNDbgColorIDX];
+    //a gray averaging dev test:
+    //color tmpColor = backgroundColors[RNDbgColorIDX];
+    //float redVal = red(tmpColor); float greenVal = green(tmpColor); float blueVal = blue(tmpColor);
+    //float avgGray = (redVal + greenVal + blueVal) / 3;
+    //print("red:" + redVal + " green:" + greenVal + " blue:" + blueVal + "\n");
+    //print("avgGray: " + avgGray + "\n");
+    //color avgdGray = color(avgGray);
+    //globalBackgroundColor = avgdGray;
 }
 
 void setup() {
