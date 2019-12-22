@@ -1,23 +1,26 @@
 # DESCRIPTION
-# Builds and installs python 3.7.0rc1 with frameworks enabled, on Mac OSX. I want pyinstall to see if a build executable from colorGrowth.py runs more efficiently than that script running against the Python interpreter. At this writing, pyinstall apparently works with Python up to v 3.5.2, so using that:
+# Supposedly builds and installs python with frameworks and tcl-tk (for idle) enabled, on Mac OS.
+# After this you can run python -m idlelib & (pyenv-idle.py) to run python IDLE.
 
-env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.5.2 --verbose
+# IF YOU RUN INTO TROUBLE, uncomment any/many these code lines before the last:
+# brew uninstall pyenv && rm -rf ~/.pyenv
+# brew install readline xz zlib
+
+export LDFLAGS="-L/usr/local/opt/tcl-tk/lib"
+export CPPFLAGS="-I/usr/local/opt/tcl-tk/include"
+export PATH=$PATH:/usr/local/opt/tcl-tk/bin
+
+export LDFLAGS="${LDFLAGS} -L/usr/local/opt/zlib/lib"
+export CPPFLAGS="${CPPFLAGS} -I/usr/local/opt/zlib/include"
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH} /usr/local/opt/zlib/lib/pkgconfig"
+
+# brew install pyenv
+
+env PYTHON_CONFIGURE_OPTS="--enable-framework --with-tcl-tk" pyenv install 3.5.3 --verbose
 # OR e.g. for other python versions:
-# env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 2.7.15 --verbose
+# env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.8.0 --verbose
 
 
-# THE FOLLOWING FAILED, re: https://github.com/pyenv/pyenv/issues/99#issuecomment-34971668 to fix pyinstall not working with the pyenv Python installed version manager and environment:
 
-# mkdir tmp_cvmeiuZ7wtsnQA32pM
-# cd tmp_cvmeiuZ7wtsnQA32pM
-# wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tgz
-# tar -zvxf Python-3.7.0.tgz
-# cd Python-3.7.0
-# mkdir $(pyenv root)/versions/3.7.0
-# ./configure --enable-framework=$(pyenv root)/versions/3.7.0/
-# make
-# make install
-# cd $(pyenv root)/versions/Python-3.7.0rc1
-# env PYTHON_CONFIGURE_OPTS="--enable-framework CC=clang" pyenv virtualenv 3.7.0 3.7.0
-# cd ..
-# rm -rf tmp_cvmeiuZ7wtsnQA32pM
+
+
