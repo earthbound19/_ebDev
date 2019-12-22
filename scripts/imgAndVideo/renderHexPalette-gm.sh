@@ -10,9 +10,9 @@
 # Invoke this script with the following parameters:
 # $1 hex color palette flat file list (input file).
 # $2 edge length of each square tile to be composited into final image.
-# $3 MUST HAVE VALUE 0 or nonzero (anything other than 0). If nonzero, the script will randomly shuffle the hex color files before compositing them to one image. PREVIOUSLY WAS $5, PREVIOUSLY WAS OPTIONAL; NOW REQUIRED. OVERWRITES different previous parameter position (from a prior version of this script).
-# $4 OPTIONAL. number of tiles accross of tiles-assembled image (columns). PREVIOUSLY WAS $3.
-# $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows). PREVIOUSLY WAS $4.
+# $3 OPTIONAL. If not provided, the order of colors copied from source file will be left alone. If provided and zero, the order will be left alone. If nonzero, the order will be randomly shuffled.
+# $4 OPTIONAL. Number of tiles accross of tiles-assembled image (columns). A string will be considered nonzero, so for scripting clarity you can pass this parameter as foo instead of 1, 4, or 50000 or whatever.
+# $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script may otherwise do math you don't want.
 # EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, the palette image being 5 columns wide and 6 rows down, with squares in the palette rendered in random order:
 # renderHexPalette-gm.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
 
@@ -69,56 +69,66 @@ fi
 
 
 tileEdgeLen=$2
-# Whether to shuffle colors:
-if [[ $3 == 0 ]]
+
+# Whether to shuffle colors; if parameter three was passed, shuffle colors if $3 is nonzero.
+# If it is not provided or is provided but is zero, do not shuffle colors.
+# Accomplished by setting default 0 and overriding only on condition $3 exists and is nonzero:
+shuffleValues=0
+if [[ "$3" ]]
 then
-	shuffleValues=0
-	echo Value of paramater \$3 is zero\; will not shuffle read values.
-else
-	shuffleValues=1
-	echo echo Value of paramater \$3 is NONZERO\; WILL SHUFFLE read values.
+	if [[ "$3" != 0 ]]
+	then
+		shuffleValues=1
+		echo echo Value of paramater \$3 is NONZERO\; WILL SHUFFLE read values.
+	fi
 fi
-# WHETHER NUM tiles across (and down) is specified; if so, use as specified, if not so, do some math to figure for a 2:1 aspect;
+
+# WHETHER NUM tiles across (and down) is specified; if so, use as specified, if not so, do some math to figure for a certain aspect;
 # $4 is across. If $4 is not specified, do some math. Otherwise use $4:
-if [ -z ${4+x} ]
+if [ "$4" ]
 then
-	# Get number of lines (colors). Square root of that x2 will be the number of columns in the rendered palette:
+	tilesAcross=$4
+else
+	# Get number of lines (colors). Square root of that X a number will be the number of columns in the rendered palette:
 	# Works around potential incorrect line count; re: https://stackoverflow.com/a/28038682/1397555 :
-echo attempting awk command\:
-echo "awk 'END{print NR}' $hexColorSrcFullPath"
+	# echo attempting awk command\:
+	# echo "awk 'END{print NR}' $hexColorSrcFullPath"
 	# numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
 	numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
 			echo number of colors found in $paletteFile is $numColors.
 	sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
-			echo sqrtOfColorCount is $sqrtOfColorCount \(first check\)
-	tilesAcross=$(( $sqrtOfColorCount * 2 ))
-			echo tilesAcross is $tilesAcross\.
-else
-	tilesAcross=$4
+			# echo sqrtOfColorCount is $sqrtOfColorCount \(first check\)
+	# OPTIONS FOR ASPECT; uncomment only one:
+	# FOR 2:1 aspect:
+	# tilesAcross=$(( $sqrtOfColorCount * 2 ))
+	# FOR ~1:1 aspect:
+	tilesAcross=$(( $sqrtOfColorCount + 2 ))
+			# echo tilesAcross is $tilesAcross\.
 fi
-# $5 is down. If $5 is not specified, do some math. Otherwise use $5.
-if [ -z ${5+x} ]
+
+# $5 is down. If $5 is specified, use it Otherwise do some math to figure tiles down.
+if [ "$5" ]
 then
-	# Get number of lines (colors, yes again, if so). Square root of that / 2 will be the number of rows in the rendered palette.
+	tilesDown=$5
+else
+	# Get number of lines (colors, yes again, if so). This / $tilesAcross will be number of rows in the rendered palette.
 # TO DO: Update all scripts that count lines with the following form of fix:
 	numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
-			echo numColors is $numColors\.
+			# echo numColors is $numColors\.
 	sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
-			echo sqrtOfColorCount is $sqrtOfColorCount
-	tilesDown=$(( $sqrtOfColorCount / 2 ))
+			# echo sqrtOfColorCount is $sqrtOfColorCount
+	tilesDown=$(( $tilesAcross / $numColors ))
 	# If the value of ($tilesAcross times $tilesDown) is less than $numColors (the total number of colors), we will fail to print all colors in the palette; add rows to the print queue for as long as necessary:
 	tilesToRender=$(( $tilesAcross * $tilesDown ))
-	echo tilesToRender is $tilesToRender\.
+	# echo tilesToRender is $tilesToRender\.
 	while [ $tilesToRender -lt $numColors ]
 	do
-		echo tilesDown was $tilesDown.
+				# echo tilesDown was $tilesDown.
 		tilesDown=$(( $tilesDown + 1 ))
 		tilesToRender=$(( $tilesAcross * $tilesDown ))
 				# TO DO: checking that twice . . . is that a code smell? Rework for more concise/elegant/sensical logic?
+				# echo tilesDown is $tilesDown\.
 	done
-			echo tilesDown is $tilesDown\.
-else
-	tilesDown=$5
 fi
 # END SETUP GLOBAL VARIABLES
 # =============
