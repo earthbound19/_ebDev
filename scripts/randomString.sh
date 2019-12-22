@@ -21,8 +21,8 @@
 # PREFERRED method for performance; alternate two--change the number in -c (n) to change length of string:
 # NOTE: The fastest possible random output I've found is: cat /dev/urandom | tr -dc 'your chosen characters here'
 
-if [ -z ${1+x} ]; then howMany=1; else howMany=$1; fi
-if [ -z ${2+x} ]; then length=9; else length=$2; fi
+if [ "$1" ]; then howMany=$1; else howMany=1; fi
+if [ "$2" ]; then length=$2; else length=9; fi
 
 for (( i=1; i<=$howMany; i++ ))
 do
