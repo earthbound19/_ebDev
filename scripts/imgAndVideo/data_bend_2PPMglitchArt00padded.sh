@@ -1,8 +1,21 @@
 # DESCRIPTION
-# Variant of data_bend_2PPMglitchArt.sh. Makes glitch art from any data source by creating a ppm header approximating a defined image size (at this writing square) into which that data would fit; takes that image header and slaps raw copied hex value pairs (converted to decimal) into an RGB value array which composes the remainder of the PPM format file. However, this variant pads those hex values with 00 in what would be the R and B of RGB values in the result, to produce a monochrome image of varying shades of green to "display" varying data values. (Actually, it may pad with arbitrary values I've hard coded for any other color; the commends explain how to set those values to anything *you* want.) The result may be converted to any other image format, apparently only by IrfanView (GraphicsMagick and NConvert choke on ppm files with hex values; IrfanView doesn't).
+# Variant of data_bend_2PPMglitchArt.sh. Represents arbitrary bytes (from any
+# file) as data where each byte becomes one of the components of an RGB color
+# (hard-coded to result in blue to violet depending on the 0 to 255
+# value of the raw data which is made into a component of <VALUE 0 255>, where
+# VALUE is the data value from the source data). This is accomplished by making
+# a ppm header approximating a square image size that the data will fit into,
+# generating so many RGB values with the data as one component of the RGB values
+# (as described), writing that as a ppm body, then combining the body with the
+# ppm head. This is different from data_bend_2PPMglitchArt, where RGB values
+# have an essentially random value. The result may be converted to any other
+# image format via graphicsmagick, imagemagick, IrfanView, photoshop, or any
+# other utility that reads ppms files.
 
-# USAGE
-# ./thisScript.sh dataSource.file
+# USAGE:
+# ./data_bend_2PPMglitchArt00padded.sh dataSource.file
+# See also all_data_bend_type2PPMglitchArt.sh, which will call this script
+# against every file of a given time in a path.
 
 # DEPENDENCIES
 # a 'nix environment including the od utility, and optionally IrfanView and irfanView2imgNN.sh
@@ -17,7 +30,7 @@
 
 
 # CODE
-imgFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
+imgFileNoExt=`echo $1 | gsed 's/\(.*\)\..\{1,4\}/\1/g' | tr -d '\15\32'`
 ppmDestFileName="$imgFileNoExt""_asPPM.ppm"
 
 inputDataFile=$1
@@ -28,23 +41,35 @@ echo will create image of dimensions $IMGsideLength x $IMGsideLength.
 
 # Make P3 PPM format header:
 echo "P3" > PPMheader.txt
-echo "# P3 means text file, $IMGsideLength $IMGsideLength is cols x rows, ff is max color (hex 255), triplets of hex vals per RGB val." >> PPMheader.txt
+echo "# P3 means text file, $IMGsideLength $IMGsideLength is cols x rows, 255 is max color (RGB 255), triplets of hex vals per RGB val." >> PPMheader.txt
 echo $IMGsideLength $IMGsideLength >> PPMheader.txt
-echo ff >> PPMheader.txt
+	# DEPRECATED: ff as max color (hex) ; now it's 255:
+echo 255 >> PPMheader.txt
 
 # Make P3 PPM body:
-od -t x1 -w$IMGsideLength $inputDataFile > PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
-# NOTE: to make a green tint any other color you can make with only blue and red (whatever sense it makes to say green tint here), you can change the zeros in the following sed regex to anything from 00 to ff hex; 00 would look like: ..  00 \1 00  ..
-# some options;
-# "green tints" of medium dark, dimmish purple:												68 \1 b6
-# "blue tints" of dim green:																00 5b \1
-# varied pink or purple bordering a slightly greenish dimmish shade of eggshell blue:		\1 7f ff
-# For other possibilities, see: RGB_combos_of_255_127_and_0_repetition_allowed.hexplt
-sed -i 's/ \([0-9a-z]\{2\}\)/ 00 5b \1 /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
-# strip off the byte offset count (I think it is) info at the start of each row, via sed:
-sed -i 's/^[0-9]\{1,\} \(.*\)/\1/g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
-# reduce any double-spaces (which may result from earlier text processing) to single:
-sed -i 's/  / /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+		# DEPRECATED HEX option (seems not to be standard; result rejected by graphicsmagick and imagemagick, but accepted by IrfanView:
+		# od -t x1 -w$IMGsideLength $inputDataFile > PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+# DECIMAL option:
+od -An -t d1 -w$IMGsideLength $inputDataFile > PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+# NOTE: to make a green tint any other color you can make with only blue and red (whatever sense it makes to say green tint here), you can change the zeros in the following gsed regex to anything from 00 to ff hex; 00 would look like: ..  00 \1 00  ..
+		# some options (NOTE that the hex options are deprecated) ;
+		# "green tints" of medium dark, dimmish purple:												68 \1 b6			decimal: 105 \1 182
+		# "blue tints" of dim green:																00 5b \1			decimal: 00 91 \1
+		# varied pink or purple bordering a slightly greenish dimmish shade of eggshell blue:		\1 7f ff			decimal: \1 127 255
+		# but really for that I prefer, at least for RGB:																decimal: \1 0 255
+		# shades of blue, no other hues:															0 0 \1				decimal: 0 0 \1
+		# For other possibilities, see: RGB_combos_of_255_127_and_0_repetition_allowed.hexplt
+		# DEPRECATED gsed command focused on converting hex:
+		# gsed -i 's/ \([0-9a-z]\{2\}\)/ 00 5b \1 /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+gsed -i 's/ \([0-9]\{1,\}\)/ \1 0 255 /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+# strip off the byte offset count (I think it is) info at the start of each row, via gsed;
+# DEPRECATED as unecessary via adding -An flag to od call:
+# gsed -i 's/^[0-9]\{1,\} \(.*\)/\1/g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+# reduce any double-spaces (which may result from earlier text processing) to single, twice:
+gsed -i 's/  / /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+gsed -i 's/  / /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+# delete still-resulting double spaces at start:
+# gsed -i 's/^  //g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 
 # Concatenate the header and body into a new, complete PPM format file:
 cat PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt > $ppmDestFileName
