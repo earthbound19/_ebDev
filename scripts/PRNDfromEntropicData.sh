@@ -10,7 +10,7 @@
 # xxd, rehash, and unless rehash is available on other platforms, Windows. On Cygwin install it via `apt-cyg install hxd`
 
 # PROCESS
-# This script: creates a .dat file by 1a-4) concatenating all data in a directory into one file, moving that new file out of the way, deleting all files in the directory, moving the concatenated file back, and 2) cutting the file (binary split) into files of a size of bytes psuedo-randomly chosen between 242-512 bytes, extracting noise from all of them via non-cryptographic hashing (and collating the hashes into one hex string and interpreting that as binary values written to a new random data file (.dat). It then moves the new random data file into an archive folder and concatenating all the split files into one file which may be "recycled" with this same "chaos machine" process. 
+# This script: creates a .dat file by 1) concatenating all data in a directory into one file, moving that new file out of the way, deleting all files in the directory, moving the concatenated file back, and 2) cutting the file (binary split) into files of a size of bytes psuedo-randomly chosen between 242-512 bytes, extracting noise from all of them via non-cryptographic hashing (and collating the hashes into one hex string and interpreting that as binary values written to a new random data file (.dat). It then moves the new random data file into an archive folder and concatenates all the split files into one file which may be "recycled" with this same "chaos machine" process. 
 
 # TO DO
 # - If applicable? : adapt this to have output in pure hex to begin with via e.g. hexData=`xxd -ps dataFile.dat`
@@ -28,6 +28,10 @@
 # MD5
 # openssl dgst -md5 path/to/myfile
 #  - re https://stackoverflow.com/q/11066171/1397555
+# OH: openssl can do a lot of hash types; see them with:
+# openssl list -digest-algorithms
+# re: https://wiki.openssl.org/index.php/Command_Line_Utilities
+# . . . see list after code!
 
 
 # CODE
@@ -84,3 +88,52 @@ mv ../_superblock_SOURCE_notPRND__$timestamp.dat ./
 
 # usage of xhd to convert a hex string to a binary file (of corresponding actual hex binary values):
 # https://stackoverflow.com/a/7826789/1397555 -- e.g. `xxd -r -p in.txt out.bin` OR `echo 17F6EC7100437960F8EEDFD0A2D33B514DCC9726 | xxd -r > out.dat`
+
+# openssl digest algoriths:
+# blake2b512        blake2s256        gost              md4               
+# md5               mdc2              rmd160            sha1              
+# sha224            sha256            sha3-224          sha3-256          
+# sha3-384          sha3-512          sha384            sha512            
+# sha512-224        sha512-256        shake128          shake256          
+# sm3
+# . .
+# invoke any of these with binary output, converted to hex, without extranous print information, for example, this way; re https://unix.stackexchange.com/a/90242/110338 :
+# openssl dgst -md5 Photo_on_11-6-19_at_10.41_PM.jpg
+
+# what hash functions are unique to what tool (preferring openssl where multiple tools have it;
+# --openssl:
+# blake2b512
+# blake2s256
+# gost
+# md4               
+# md5
+# mdc2
+# rmd160
+# sha1              
+# sha224
+# sha256
+# sha3-224
+# sha3-256          
+# sha3-384
+# sha3-512
+# sha384
+# sha512            
+# sha512-224
+# sha512-256
+# shake128
+# shake256          
+# sm3
+# --rehash:
+# adler32
+# crc16
+# crc16c
+# crc16x
+# crc32
+# elf32
+# fcs16
+# fnv32
+# fnv64
+# ghash3
+# ghash5
+# rmd120
+# xum32
