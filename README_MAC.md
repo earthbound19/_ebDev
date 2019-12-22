@@ -11,4 +11,3 @@ Other mac-related scripts in this repo:
 - macOpenWithMenuCleanup.sh
 - MacKillDSstoreFiles.sh
 - rebuildMacSpotlightIndex.sh
-- 

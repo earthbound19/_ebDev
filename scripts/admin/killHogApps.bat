@@ -9,6 +9,13 @@ sc stop "Apple Mobile Device Service"
 sc stop SbieSvc
 sc stop PcaSvc
 sc stop AeLookupSvc
+sc stop fdPHost
+sc stop FDResPub
+sc stop RpcSs
+sc stop RpcEptMapper
+sc stop ss_conn_service
+sc stop ss_conn_service2
+sc stop VSStandardCollectorService150
 REM sc stop MBAMScheduler
 REM sc stop MBAMService
 sc stop wscsvc
@@ -44,6 +51,8 @@ sc stop "AMD External Events Utility"
 sc stop WerSvc
 sc stop BEService
 sc DELETE BEService
+process -k ducservice
+process -k amdacpusrsvc
 process -k sizer.exe
 process -k iexplore.exe
 process -k dropbox.exe
@@ -67,7 +76,7 @@ process -k iCloudServices.exe
 process -k steamwebhelper.exe
 process -k Steam.exe
 process -k RadeonSettings.exe
-porcess -k amdow.exe
+process -k amdow.exe
 process -k sqlwriter.exe
 REM Adobe CC-related processes:
 process -k "Adobe Desktop Service.exe"

@@ -1,8 +1,18 @@
 # DESCRIPTION
+# blink1 USB LED programming script to create work/break timer: slower speed random light changes
+# for work period, faster speed random color changes for break period. 
 # Stripped down version of blink1BreakTimer.sh which instead writes instructions to a blink device
 # (flashes the device memory) so that it will play the pattern when connected to USB power
-# (when it is not connected to a computer). Even though the math here "should" produce
-# accurate minute/second intervals, in practice it doesn't.
+# (when it is not connected to a computer).
+
+# USAGE: with blink1-tool in your PATH (https://blink1.thingm.com/blink1-tool/), run this script:
+# ./ blink1BreakTimerWriteToBlink.sh
+
+# NOTES: Even though the math here "should" produce accurate minute/second intervals, in
+# practice it doesn't. ALSO, the hard-coded math results in 1 faster flash before all the slower flash.
+
+# TO DO: option get color palettes and use them from some external source (a palette serving API
+# which maybe I want to develop).
 
 # DEVELOPER NOTES
 # For a long time this script had a minute defined as 60000 ms (which is accurate), but
@@ -10,21 +20,36 @@
 # two lights, and it waits for the delay of one light to finish before it controls the other
 # light. It therefore took twice as long with work minutes and break minutes.
 # The solution is to define a minute as half a minute.
+# ALSO, for a very long time I never noticed that write commands to the blink wrap around to 1
+# if you tell it to write to a line higher than 255; OR IN OTHER WORDS, on an mk3 model,
+# you are limited to 255 pattern lines (if you go out of bounds it simply wraps around; it also
+# seems to write the value to line 32 and on and other places). Which this scripts' original
+# design didn't consider, and I wondered why it didn't seem to play back for the time periods
+# I programmed. That there are 256 lines available is not clearly, prominently
+# documented ANYWHERE, and I had to figure this out by trial and error.
+#
+# TO READ BACK THE WRITTEN PATTERN to a text file, use this command:
+# echo > wut.txt && for p in {0..255}; do blink1-tool --getpattline $p >> wut.txt; done
 
+
+# CODE
+# NOTE: the sum of workMinutesInMSdivisor + breakBlinkColorChangeMS may not exceed 255--
+# or you will not get the result you expect!
+workBlinkNtimes=12
+breakBlinkNtimes=243
 
 workMinutes=35
   workMinutesInMS=$((workMinutes * 30000))
-  workBlinkColorChangeMS=$((workMinutesInMS / 12))
-  workBlinkChangeColorTimes=`echo "$workMinutesInMS / $workBlinkColorChangeMS" | bc`
+  workBlinkColorChangeMS=$((workMinutesInMS / workBlinkNtimes))
 breakMinutes=8
   breakMinutesInMS=$((breakMinutes * 30000))
-  breakBlinkColorChangeMS=1400
-  breakBlinkChangeColorTimes=`echo "$breakMinutesInMS / $breakBlinkColorChangeMS + $workBlinkChangeColorTimes" | bc`
+  breakBlinkColorChangeMS=$((breakMinutesInMS / breakBlinkNtimes))
 
+echo "Will program $workBlinkNtimes color changes at $workBlinkColorChangeMS ms each (for work period) and $breakBlinkNtimes at $breakBlinkColorChangeMS ms each (for break period)."
 # blink1-tool --playpattern '5,#ff00ff,0.4,0,#00ffff,0.4,0';
 blink1-tool --clearpattern
 blink1-tool --savepattern
-for i in $(seq 0 2 $workBlinkChangeColorTimes)
+for i in $(seq 0 2 $workBlinkNtimes)
 do
   iPlusOne=$((i + 1))
  rndR=`shuf -i 0-255 -n 1`
@@ -35,7 +60,7 @@ do
  blink1-tool -m $workBlinkColorChangeMS --rgb $rndR,$rndG,$rndB -l 2 --setpattline $iPlusOne
 done
 
-for j in $(seq $((workBlinkChangeColorTimes +1)) 2 $breakBlinkChangeColorTimes)
+for j in $(seq $((workBlinkNtimes +1)) 2 $breakBlinkNtimes)
 do
   jPlusOne=$((j + 1))
   rndR=`shuf -i 0-255 -n 1`
