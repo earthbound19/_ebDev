@@ -14,9 +14,10 @@
 # CODE
 echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
 
-# Get count of files we want, and from that digits to pad to. Use sort because ls doesn't do sensible sorting on some platforms:
-filesCount=`gfind . -maxdepth 1 -iname \*.$1 | sort | wc -l`
-digitsToPadTo=`expr $filesCount : '.*'`
+# Get count of files we want, and from that digits to pad to.
+# The necessity of deleting leading blank space is because of Mac. Re: https://stackoverflow.com/a/30927885 : GYAH! This doom was had 2018-04-19 Thursday 07:33 PM:
+filesCount=`gfind . -maxdepth 1 -iname \*.$1 | sort | wc -l | tr -d ' '`
+digitsToPadTo=${#filesCount}
 
 # Create array to use to loop over files.
 filesArray=`gfind . -maxdepth 1 -iname "*.$1" | sort`
