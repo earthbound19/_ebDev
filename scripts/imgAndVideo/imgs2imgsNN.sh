@@ -15,38 +15,37 @@
 # DEPENDENCIES
 # GraphicsMagick, possibly IrfanView, both in your $PATH.
 
+# NOTES:
+# A previous verson of this script conditionally used IrfanView for ppms
+# because another script I developed made ppms that only IrfanView could convert
+# to pngs (I think I was making non-standard ppms). That script now makes
+# proper ppms (it fills them with integer instead of hex RGB values). If you
+# have ppms with hex values, hack this script to use the IrfanView option,
+# though it might be better to recreate or conver the ppms to a format that
+# has wider acceptance.
+
 # TO DO
-# Make irfanvew call alter if $4 parameter present. [alter how?]
-# Deprecate irfanview?-- or conditionally don't use it? gm convert may work on all platforms.
 # Assign script paramaters to named variables and use the named variables.
 
 
 # CODE
-	# DEPRECATED command for unexpected behavior; it may be that the following command somehow caused nconvert to iterate over every source file format by wildcard? Removing the . from the command, it iterates over the list; whereas with the . it did so twice:
-	# find . *.$1 > all_$1.txt
-find *.$1 > all_$1.txt
 
-while read img
+array=(`gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
+for img in ${array[@]}
 do
 	imgFileNoExt=${img%.*}
 	imgFileExt=${img##*.}
 	targetFileName=$imgFileNoExt.$2
 	if [ ! -f $targetFileName ]; then
-		echo RENDERING target file $targetFileName as it does not exist . . .
-		# If the source file format is ppm, use Irfanview to do the conversion (at this writing, I find that only IrfanView reads ppm format). Otherwise, use GraphicsMagick.
-#		if [ $imgFileExt == "ppm" ]; then
-			# option that forces a given size:
-#			i_view32.exe $img /resize=\($3,$4\) /convert=$targetFileName
-			# option that preserves aspect setting dimension for longest side:
+			# IrfanView option:
 			# i_view32.exe $img /resize_long=$3 /aspectratio /convert=$targetFileName
-#		else
 				# ex. GraphicsMagick command:
 				# gm convert 6x5gridRND_2017_05_06__01_51_14__099842100.ppm -scale 1200 out.png
 			# If params $3 or $4 were not passed to the script, the command will simply be empty where they are (on the following line of code), and it should still work:
 			gm convert $img -scale $3 $4 $targetFileName
 #		fi
-		echo ~~
+		echo converted to $targetFileName . .
+	else
+		echo target file $targetFileName already exists\; skipping.
 	fi
-done < all_$1.txt
-
-rm all_$1.txt
+done
