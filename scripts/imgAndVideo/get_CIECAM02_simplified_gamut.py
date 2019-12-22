@@ -26,6 +26,7 @@
 # CIECAM02 produces multiple correlates, like H, J, z, Q, t, C, M, s. Some of them represent similar concepts, such as C means chroma and M colorfulness s saturation correlate the same thing in different density. We need only 3 major property of these arguments to completely represent a color, and we can get other properties or reverse algorithms..
 # Color type jch is a float list like [j, c, h], where 0.0 < j < 100.0, 0.0 < h < 360.0, and 0.0 < c. the max value of c does not limit, and may produce exceeds when transform to rgb. The effective value of max c varies. Probably for red color h 0.0, and brightness j 50.0, c reach the valid maximum, values about 160.0.
 # IN OTHER WORDS: j (brightness) range is 0 to 100, h (hue) is 0 to 360, c (chroma) can be 0 to any number (I don't beleive that there _is_ a max from whatever correlary/inputs produces the max), maybe max 160. I'll start with max 182 (this seemed a thing with L in HCL).
+# colorspacious doc: "The three axes in this space are conventionally called 'J' (for lightness), 'C' (for chroma), and 'h' (for hue)."
 
 # NOTE my eyes said, assuming those values, for HCL, do these step values: L_step 18, C_domain 24, H_step 7
 # (later self: WHAT?! 7 colors? How about 12 * how many perceived steps in between all?!)
