@@ -10,7 +10,11 @@
 # gfind, gsed, ffmpeg.
 
 
+
 # CODE
+# NOTE that the next two varaibles will be useless if $1 and $2 aren't passed, hence the checks and conditional exits:
+srcIMGformat=$1
+destIMGformat=$2
 if ! [ -z ${1+x} ]
 	then
 		IMGconvertList=(`gfind . -maxdepth 1 -type f -iname \*.$srcIMGformat -printf '%f\n'`)
@@ -31,15 +35,19 @@ fi
 	# Pad video to a given size, with the video in the center:
 	# additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2"
 	# Scale video to given pixels X, maintain aspect ratio, no padding:
-	# additionalParams="-vf scale=-1:720:force_original_aspect_ratio=1"
+	# additionalParams="-vf scale=-1:640:force_original_aspect_ratio=1"
 
-IMGfilenameNoExt=${element%.*}
-if [ -a $IMGfilenameNoExt.$destIMGformat ]
-then
-	echo conversion target candidate is $IMGfilenameNoExt.$destIMGformat
-	echo target already exists\; will not render.
-	echo . . .
-else
-	echo converting $element . . .
-	ffmpeg -i "$IMGfilenameNoExt"."$srcIMGformat" $additionalParams -crf 17 "$IMGfilenameNoExt"."$destIMGformat"
-fi
+
+for element in ${IMGconvertList[@]}
+do
+	IMGfilenameNoExt=${element%.*}
+	if [ -a $IMGfilenameNoExt.$destIMGformat ]
+	then
+		echo conversion target candidate is $IMGfilenameNoExt.$destIMGformat
+		echo target already exists\; will not render.
+		echo . . .
+	else
+		echo converting $element . . .
+		ffmpeg -i "$IMGfilenameNoExt"."$srcIMGformat" $additionalParams -crf 17 "$IMGfilenameNoExt"."$destIMGformat"
+	fi
+done
