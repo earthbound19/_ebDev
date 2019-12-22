@@ -8,6 +8,12 @@
 # n latest
 # popd
 
+# NOTE:
+# If it's your preference, revert from newer MacOS Zsh shell to bash with this command:
+# chsh -s /bin/bash
+# To go to Zsh again, run:
+# chsh -s /bin/zshcd
+
 ./install_global_node_modules.sh
 
 # Enable "Allow from Anywhere" in app gatekeeper on macOS Sierra (seriously, Apple, you are AWOL with your controls--I have to enable even the *option* to install apps from anywhere by entering a super-user terminal command?! Isn't that anti-competitive?), re: http://osxdaily.com/2016/09/27/allow-apps-from-anywhere-macos-gatekeeper/
@@ -43,9 +49,32 @@ sudo chmod 000 ./Stocks.app
 # sudo chmod 000 ./TextEdit.app
 popd
 
+# homebrew sbin:
+printf '
+export PATH="/usr/local/sbin:$PATH"
+' >> ~/.bash_profile
+
 printf "" >> ~/.bash_profile
 printf "# Reduces homebrew auto-update on _every flipping install of anything_ annoyance:" >> ~/.bash_profile
 printf "export HOMEBREW_NO_AUTO_UPDATE=1" >> ~/.bash_profile
+printf "export BASH_SILENCE_DEPRECATION_WARNING=1" >> ~/.bash_profile
+
+printf '
+
+# openimageIO:
+export DYLD_LIBRARY_PATH="${OCIO_EXECROOT}/lib:${DYLD_LIBRARY_PATH}"
+
+' >> ~/.bash_profile
+
+# tcl-tk for python idle? :
+# printf '
+# 
+# # for python idle in pyenv:
+# export LDFLAGS="-L/usr/local/opt/tcl-tk/lib"
+# export CPPFLAGS="-I/usr/local/opt/tcl-tk/include"
+# export PATH=$PATH:/usr/local/opt/tcl-tk/bin
+# 
+# ' >> ~/.bash_profile
 
 # NOTE: ntfs-3g location: /usr/local/Cellar/ntfs-3g/2017.3.23
 
