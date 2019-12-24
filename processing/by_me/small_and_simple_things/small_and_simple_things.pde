@@ -20,14 +20,55 @@
 // will be incrementally numbered IF saveAllFrames was true for the entire program run.
 // if that boolean was toggled off and on during run, the SVG file names won't be strictly
 // contiguous, but will still be ordered by higher number last.
+// - You can dynamically load external palette files and use them for random
+// selection of background, light shape fill, dark shape fill, and
+// stroke (outline) color. These palettes have the .hexplt extension, and
+// are in the /data subfolder. The file format is a list of RGB color codes
+// (in hexadecimal format), one color code per line preceded by #. Whether
+// it loads from these palette files is controlled by the global boolean
+// variable loadColorsFromHexplts (hard-coded default set to = true). Set
+// loadColorsFromHexplts to false and the program will only use the internal
+// hard-coded color palettes, which are more varied. The external palettes
+// are hard-coded to more pastel colors, sorted into background, light,
+// dark, and stroke colors. You may alter the color lists in those external
+// files to your liking to more quickly try different colors (more quickly
+// than finding the hard-coded color lists in the source code and hacking
+// them).
+// - You can either use only the hard-coded palettes, or load from the
+// external palettes and use those, or randomly alternate between both.
+// To use the hardcoded, set loadColorsFromHexplts to false. To use the
+// external, set loadColorsFromHexplts to true and rndSwapPalettes
+// (you'll find that varaible nearby) to false. To randomly alternate between
+// both, set loadColorsFromHexplts to true and set rndSwapPalettes to
+// true (which is the default hard-coded).
+// - the colorMode global variable controls color modes, and works this way:
+// if hard-coded to 1, the program will render everything in full color.
+// If set to 2, everything will be rendered grayscale. If set to 3, everything
+// will be rendered in the three override background, fill and stroke
+// colors set in altBackgroundColor, altFillColor, and altStrokeColor.
+// However, by default, it reverts to color mode when every time the program
+// creates and renders a new variation (which you can manually do by
+// pressing the forward (right) arrow key on the keyboard. You can also go back one
+// variation with the back (left) arrow key. To have it keep the same color
+// mode through every variation, set keepColorModeOnVariantChange to true.
+// - You can double-click (or for a kiosk or tablet, double-tap on the screen)
+// to cycle color modes in this order: color -> grayscale -> color override
+// -> back to color.
 
 
-// v1.11.7 work log:
-// - animation scaling values weren't updating (function did nothing!) fixed. Does it look more..
-// fluid / dynamic now?
-// - toyed with jitter and got it working in a way that I like by itself, but I don't like
-// it with everything else. Funciton call commented out ::shrug::
-String versionString = "v1.11.7";
+// v2.3.3 work log:
+// - Grayscale color mode option (in addition to previously developed color override option)
+// - Double-tap or click cycles through these color modes:
+// from color to grayscale, override colors, then back to color.
+// - Option to force color mode set (initially via colorMode hard-coded value
+// OR via user interaction) on variation change. Controlled by
+// boolean keepColorModeOnVariantChange (default hard-coded false).
+// - New global colorMode controls color mode; see comments near it.
+// - Option to dynamically load external palette files and initialize
+// arrays with them (from /data subfolder, .hexplt files).
+// - Optionally shows loaded palette or randomly uses it or hard-coded palette
+// See now expanded USAGE section for details.
+String versionString = "v2.3.3";
 
 // TO DO; * = doing:
 // * ATTEMPT MADE; may need to work off new fake size/dist values in object: (concentricity
@@ -78,29 +119,28 @@ int GridOfShapesNumRows;    // "
 // -- becomes: ~1382.4 ALSO NOTE this was with ShapesGridXmaxPercent = 0.64, where circle size max was then 691.2; ALSO with motionVectorMax = 0.273 . . .
 // but then I futzed it to 187 anyway because I like that speed better at all scales. ::shrug:: ANYWAY:
 int motionVectorScaleBaseReference = 168;
-color globalBackgroundColor;
-boolean overrideBackgroundColor = false;
-color altBackgroundColor = color(30,0,60);
-boolean overrideFillColor = false;      // set to true, and the following RGB color will override random color fills:
-color altFillColor = color(255,0,255);
-boolean overrideStrokeColor = false;    // set to true, and the following RGB stroke color will override random colors:
-color altStrokeColor = color(80,80,120);
+color globalBackgroundColor; color globalBackgroundColorBackup;
+color altBackgroundColor = color(0);    // though I quite like: color(30,0,60);
+color altFillColor = color(255);    // though I quite like: color(255,0,255);
+color altStrokeColor = color(117);    // though I quite like: color(80,80,120);
+int colorMode = 1;	// 1 = color mode, 2 = grayscale, 3 = color override
+boolean keepColorModeOnVariantChange = false;		// If set, whatever colorMode is at launch, it will stay thus until user changes it. Then it will keep that changed mode for every new variant.
 // for "frenetic option", loop creates a list of size gridNesting (of ints) :
 // IntList nestedGridRenderOrder = new IntList();    // because this list has a shuffle() member function, re: https://processing.org/reference/IntList.html
 // TESTING NOTES: states to test:
 // true / false for savePNGs, saveSVGs, saveEveryVariation, and (maybe--though I'm confident it works regardless) saveAllFrames, and saveAllFramesWasFalse:
 // START VARIABLES RELATED TO image save:
-boolean savePNGs = false;  // Save PNG images or not
+boolean savePNGs = true;  // Save PNG images or not
 boolean saveSVGs = true;  // Save SVG images or not
 boolean saveAllFrames = false;    // if true, all frames up to renderNtotalFrames are saved (and then the program is terminated), so that they can be strung together in a video. Overrieds saveSVGs, but not savePNGs.
 boolean saveAllFramesInteractOverride = false;		// overrides saveAllFrames + saveSVGs on user interact 'till end of variant.
-boolean initialSaveAllFramesState = saveAllFrames;		// stores initial state to revert to after override period.
-boolean initialSaveSVGsState = saveSVGs;							// stores initial state to revert to after override period.
+boolean initialSaveAllFramesState = saveAllFrames;		// stores initial state (boolean copy) to revert to after override period.
+boolean initialSaveSVGsState = saveSVGs;							// stores initial state (boolean copy) to revert to after override period.
 // TEMP OR PERMANENT KLUDGE: not using the following. Could cut off user and close program at museum! :
 // int renderNtotalFrames = 7200;    // see saveAllFrames comment
 int totalFramesRendered;    // incremented during each frame of a running variation. reset at new variation.
 int framesRenderedThisVariation;
-boolean saveEveryVariation = true;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
+boolean saveEveryVariation = false;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
 boolean doFixedTimePerVariation = false;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
 int fixedMillisecondsPerVariation = (int) (1000 * 11.5);         // milliseconds to display each variation, if previous boolean is true
 int minMillisecondsPerVariation = (int) (1000 * 16.5);      // 1000 milliseconds * 16.5 = 16.5 seconds
@@ -121,86 +161,207 @@ float ShapesGridXminPercent = 0.231;   // minimum diameter/apothem of shape vs. 
 float ShapesGridXmaxPercent = 0.681;   // maximum ""                                       Maybe best ~ .67
 int minimumNgonSides = -11;    // If negative number, n*-1*-1 (many more) chance of choosing circle on rnd shape draw.
 int maximumNgonSides = 7;      // Preferred: 7. Max number of shape sides randomly chosen. 0, 1 and 2 will be circles. 3 will be a triangle, 4 a square, 5 a pentagon, and so on.
-float parentMaxWanderDistMultiple = 1.372;		// how far beyond origin + max radius, as percent, a parent shape can wander. Default hard-coding: 1.14 (14 percent past max origin)
+float parentMaxWanderDistMultiple = 1.372;		// how far beyond origin + max radius, as percent, a parent shape can wander. Default hard-coding: 1.372 (~137% percent past max origin)
 float strokeMinWeightMult = 0.0064;		// stroke or outline min size multiplier vs. shape diameter--diameters change! 
 float strokeMaxWeightMult = 0.0307;		// stroke or outline max size multiplier vs. shape diameter
 float diameterMorphRateMin = 0.0004;	// minimum rate of shape size contract or expand
 float diameterMorphRateMax = 0.0031;	// maximum "
 float motionVectorMax = 0.6;          // maximum pixels (I think?) an object moves per frame. Randomizes between this and (this * -1) * a downscale multiplier, per shapes' diameter.
-float orbitRadiansRateMax = 8.84;					// how many degrees maximum any shape may orbit per call of orbit()
+float orbitRadiansRateMax = 8.84;			// how many degrees maximum any shape may orbit per call of orbit()
 float rotationRadiansRateMax = 4;			// how many degrees maximum any shape may orbit per call of shapeRotate();
 boolean lazyParentBoundaryConstraint = false;		// If true, every N ms (13?), shape wander is constrained within parent shape. If false, ALL frames are constrained.
 int disableColorMorphAfter_ms = 21426;
+//TO IMPLEMENT: int disableWanderIfRoll = 4;
+boolean loadColorsFromHexplts = true;    // If set to true, palettes are dynamically loaded from files in the /data folder and used. Otherwise the hard-coded palettes are used.
+boolean rndSwapPalettes = true;                  // If set to true, palettes will randomly swap from hard-coded to the dynamically loaded ones IF loadColorsFromHexplts is also true.
+//TO IMPLEMENT: int loadColorsFromCodeIfRoll = 7;
 
-// Marker-like colors array -- may have a lot of Prismacolor marker colors:
-color[] backgroundColors = {
-	#FD0E35, #EF3312, #C23B22, #D13352, #E14E6D, #F45674, #EA5287, #E54D93, #D8308F,
-	#CA4587, #C14F6E, #B34958, #AA4662, #8E4C5C, #8F4772, #934393, #AF62A2, #8D6CA9,
-	#72727D, #615F6B, #62555E, #745D5F, #877072, #8D6E64, #9B685D, #A45A52, #BD6E6B,
-	#C87F73, #C97B8E, #D96A6E, #CA5A62, #F86060, #F98973, #EE8A74, #FA855B, #FD9863,
-	#EBB28B, #FEC29F, #F9C0BC, #F6C6D0, #F5D3DD, #F0D9DC, #F5DCD5, #F0CCC4, #E0BFB5,
-	#F8D9BE, #EEE2C7, #F2D8A4, #FADFA7, #F7D580, #FFC874, #FDFD96, #F5FFA1, #F0FFF0,
-	#FFFFFF, #F1E5E9, #E5E4E9, #C7C6CD, #C9CBE0, #97C1DA, #91BACB, #93b0c7, #7ba7cf,
-	#74B3E3, #69A2BE, #4da2c7, #06b2d7, #00B3DB, #4CC8D9, #0cc5cf, #0BBDC4, #2ec1b1,
-	#6cc4c3, #79dacf, #6cdac5, #88D8C0, #4ae2ba, #2dd1aa, #36B191, #00A693, #009B7D,
-	#00A86B, #2E8B57, #1E7C72, #4F8584, #008D94, #367793, #6389AB, #7B91A2, #7699c7,
-	#A1A6D0, #B1A1C9, #AC9EB8, #B7A1AF, #BFA9A8, #B19491, #A58E9A, #9B98A2, #A2B1A2,
-	#8db8ae, #95B6BA, #7AD2E2, #93EDF7, #00FFEF, #7FFFD4, #7bf0af, #4bf197, #00FA9A,
-	#73ED91, #93CD87, #abd4a3, #82B079, #59746E, #405F89, #435BA3, #33549B, #3344BB,
-	#3344EF, #5773c4, #574C70, #333351, #333366, #333388, #32127A, #002147, #003153,
-	#414141, #524547, #79443B, #4E1609, #000000, #E323DB, #F895AC, #E497A4, #FA9394,
-	#E0FFFF, #A1FA2A, #7EF100
+// Colors arrays designated as HC for Hard Coded, which may copied or not copied to what
+// the script uses:
+color[] backgroundColors_HC = {
+	// colors from _ebArt/blob/master/palettes/fundamental_vivid_hues.hexplt :
+	#FF00FF, #FF00E2, #FF007F, #FF0070, #FC2273, #FF0000, #FF1200, #FF5100, #FD730A, #FFA100,
+	#FFB700, #FFCD00, #FAE000, #FFFF00, #FAFF54, #AFE300, #75FF00, #00FF00, #25FD73, #52FE79,
+	#7FFF7F, #40F37E, #33EB80, #00E77D, #1DCF00, #65D700, #76F1A8, #7FFFFF, #00FFFF, #00E4FF,
+	#00CFFF, #00C4FF, #007FFF, #6060FF, #7F40FF, #7202FF, #5F00BE, #4D00A6, #40007F, #3C1CB3,
+	#3325D6, #0000FF, #4040FF, #6A6AFF, #7F7FFF, #407FBF, #007F7F, #2B2BAB, #00007F, #54007F,
+	#7F007F, #7F0038, #7F0000
 };
+
+color[] darkFillColors_HC = {
+	// from: _ebArt/blob/master/palettes/fundamental_vivid_hues_darks.hexplt
+	#B300BC, #A938A5, #B500A3, #9F0091, #962494, #9E00AA, #870098, #820782, #86007D, #6D006F,
+	#6D0085, #590D84, #54007F, #52007C, #460071, #3B007A, #2D006E, #320062, #380044, #490055,
+	#55005A, #6C2997, #5D349E, #5C2AB7, #6417C4, #5F00BE, #5000B4, #4D02A6, #4D00A6, #4900A8,
+	#4300B1, #4300BA, #3C1CB3, #391CAD, #3D00AE, #3800AE, #3A00A5, #3D009E, #2E00A6, #21009B,
+	#002091, #001587, #001175, #00156F, #001865, #001A62, #001E57, #0D234C, #002342, #003268,
+	#003074, #192775, #003092, #00399A, #0042A0, #0E4DB4, #0048CF, #0027FF, #1300FC, #0000FF,
+	#3400E8, #3325D6, #322FC8, #3631DB, #3721F2, #3F00ED, #422BDA, #442FD1, #471FDA, #5100E8,
+	#5B00EC, #5D00E8, #6400E1, #6700F3, #7000FF, #7202FF, #7125F0, #7335D4, #6C40C8, #6D47B0,
+	#7D58C1, #7B53D9, #8249E5, #8037FF, #7F40FF, #7F41FF, #635DE2, #5E5BF1, #5B59F9, #4C57FF,
+	#5464DB, #446DC9, #0070CC, #006BC3, #3374B3, #0074A5, #00719E, #00748E, #00637C, #005F8D,
+	#005490, #004A83, #00447E, #003F7E, #003B56, #00506A, #004A4B, #005757, #006162, #006759,
+	#007667, #007674, #007F7F, #008454, #008548, #007439, #007547, #00663A, #00622A, #00562C,
+	#004E19, #00451E, #003B00, #003800, #173000, #072800, #002B00, #002100, #001C01, #041800,
+	#001300, #041100, #151300, #1C1000, #210C00, #351600, #431B00, #4A2500, #3D2100, #362500,
+	#412B00, #4C3900, #403E00, #323300, #2C2A00, #212200, #291E00, #2A1D00, #2E1B00, #491400,
+	#440000, #4C0000, #590000, #680000, #720E00, #731900, #7B0000, #810000, #850000, #901107,
+	#960000, #9A0F00, #A20000, #AD0200, #B31E00, #C11700, #BC0000, #C62700, #D50000, #BD3523,
+	#A72515, #A23100, #AD4000, #B84100, #A35700, #995F00, #8E6600, #826C00, #767200, #727300,
+	#626200, #666100, #715C00, #7C5600, #864F00, #8F4700, #7A3700, #723F00, #6E4200, #694500,
+	#5F4B00, #555000, #515100, #3C5800, #385900, #2E5B00, #176100, #006000, #006700, #026F00,
+	#007500, #007815, #197E00, #128500, #008700, #008616, #2E7300, #467900, #557C00, #557600,
+	#476B00, #496700, #005300, #005000, #284500, #304800, #00320E, #142600, #192911, #003429,
+	#003637, #00393C, #00262C, #002225, #001F22, #001F20, #00463A, #00574A, #1F63A2, #005CB4,
+	#335CB8, #005CDF, #0B5EFF, #006DEF, #006EEF, #0047FF, #4040FF, #424AEA, #4E45E9, #5047E1,
+	#544CCE, #4735C1, #4637BD, #373FB9, #2B2BAB, #2927A9, #3500BB, #3800C8, #3900CD, #2E00CE,
+	#002EC1, #0000BA, #0000AE, #100080, #00007F, #00095C, #4C1D8C, #4B00BC, #5800D4, #5E00FF,
+	#5F00FF, #9300FF, #9A00FF, #8E4EBA, #7D3DA9, #A22551, #A20040, #9F0036, #A20035, #B80046,
+	#BB0044, #BB0050, #CE0054, #D20053, #B73660, #8C1041, #7F0038, #740030, #860030, #840026,
+	#860025, #650015, #58001E, #3E0004, #350000, #2A0300, #5C3400, #8B2100, #8D1D00
+};
+
+color[] lightFillColors_HC = {
+	// from: _ebArt/blob/master/palettes/fundamental_vivid_hues_lights.hexplt
+	#FF00FF, #FF00E2, #FF007F, #FF0070, #FC2273, #FF0000, #FF1200, #FF5100, #FD730A, #FFA100,
+	#FFB700, #FFCD00, #FAE000, #FFFF00, #FAFF54, #AFE300, #75FF00, #00FF00, #25FD73, #52FE79,
+	#7FFF7F, #40F37E, #33EB80, #00E77D, #1DCF00, #65D700, #76F1A8, #7FFFFF, #00FFFF, #00E4FF,
+	#00CFFF, #00C4FF, #007FFF, #6060FF, #6A6AFF, #7F7FFF, #6A7FEA, #557FD5, #407FBF, #6666CC,
+	#8C4CD8, #B233E5, #D819F1, #FE00FE, #FF2CFF, #FF30F4, #FF45FF, #FF56FF, #EC75E4, #FC83F2,
+	#FF90FF, #E7A5FF, #D6A6FF, #CEA1FF, #C999FF, #C396FF, #C292FF, #BB8AFF, #B894FF, #C19FFF,
+	#CFADFF, #D3AFFF, #D998FF, #CB8AF9, #BC7CEA, #AD6EDB, #9E5ECB, #8C68D2, #8964E9, #915BF5,
+	#8D4EFF, #9A62FF, #9F6CFF, #9874F9, #A878FF, #AD7CFF, #A683FF, #AA86F1, #9B77E2, #8D8CFF,
+	#8C8DFF, #868CFF, #838BFF, #7E93FF, #7F9BFF, #849EFF, #909AFF, #949AFF, #9A9BFF, #9A9CFF,
+	#9DA8FF, #A7AAFF, #A7A9FF, #A9B6FF, #B4B8FF, #B4B7FF, #A6BDFF, #9EBAFF, #99B0FF, #8CAAFF,
+	#7EA9FF, #709BF9, #54A2FF, #3C9EFF, #4593FF, #268FFF, #3483FF, #2271FF, #586AFF, #5C6FFF,
+	#686BFF, #6B6CFF, #716EF2, #716FEF, #6275EB, #657CFF, #6A7FFF, #7084FB, #728CFF, #628CE9,
+	#537DDA, #4583C4, #5593D3, #64A1E3, #72AFF2, #62B1FF, #4DADFF, #5DBBFF, #70BFFF, #80BDFF,
+	#8CB7FF, #99C4FF, #8ECBFF, #6CC9FF, #1CCAFF, #00CCFC, #3AD7FF, #2ADAFF, #00DEF9, #00D0EB,
+	#00C2DC, #00B3CE, #00A4BE, #0095AF, #0091BF, #008FC8, #009ED8, #00A1CF, #00AFDE, #00ADE7,
+	#00BCF6, #00BEED, #30BFC0, #00C6C7, #45CDCE, #1FD1D2, #00D4D5, #2FD8D8, #56DBDB, #27DFDF,
+	#00E2E3, #42DBDC, #78D6D6, #6AC9C8, #5BBBBA, #00B8B8, #0EB1B1, #00A9AA, #00A2A3, #3A9E9D,
+	#00999A, #009393, #258E8E, #00898A, #008384, #00859F, #0081AF, #007FB8, #307ED4, #497DE3,
+	#617DF1, #797CFF, #9553FF, #B12AFF, #CE00FF, #DB00DE, #ED00EF, #F100D6, #FF10E5, #DE00C5,
+	#CA00B5, #C700CE, #C318C6, #BF30BE, #BB49B6, #CC59C5, #DC67D5, #FF56B2, #FF56A3, #FF60A5,
+	#FF5298, #FF4796, #FF438B, #FF3689, #FF337E, #FF227C, #FC007D, #FF218A, #FF3698, #FF47A5,
+	#EF628B, #FF7099, #FF7DA6, #FF8AB3, #FF898F, #FF876A, #FF7B5F, #FF6E53, #F86047, #FF5937,
+	#FF5537, #FF4B2B, #FF472C, #FF3C20, #FF3720, #FF2B12, #FF2513, #FF1501, #FF0802, #ED0000,
+	#EB0000, #DB3700, #F04600, #FF5404, #FF6117, #FF6E25, #FF7B31, #FF7812, #FF8521, #FF912E,
+	#F99C00, #FFA912, #FAB300, #EBA600, #DDAE00, #ECBB00, #DCC300, #CCCA00, #C7CB21, #BEBD00,
+	#BABD0C, #B1AE00, #ACAF00, #9EA100, #A2A000, #B19900, #BF9200, #CC8A00, #D98100, #E98F00,
+	#DC9800, #CEA000, #C0A800, #CEB500, #98C900, #A4D700, #6FE218, #5DE500, #40E728, #00EC00,
+	#00DD00, #2ED915, #50D700, #62D400, #55C500, #41C800, #12CA00, #00CE00, #00BF00, #00BB00,
+	#47B600, #00AF00, #00AB00, #1EA900, #38A600, #009E00, #009800, #279600, #009D21, #009726,
+	#009B33, #1FA734, #00AD2F, #00AB41, #34B641, #00BA40, #00BA56, #00BB58, #00C963, #00C94D,
+	#00CC4A, #45C54E, #54D45A, #17D859, #05D867, #00D86F, #2BE67C, #2DE673, #33E765, #63E266,
+	#63DF98, #54D18B, #44C37E, #46BB8D, #49B49C, #4BACAC, #43AF99, #3BB185, #32B471, #19A564,
+	#009556, #008B2F, #008A2E, #008A25, #008A14, #008C0E, #008D00, #008900, #638D00, #719C00,
+	#7EAC00, #8BBA00, #909200, #949100, #A28B00, #AF8400, #BC7C00, #C87400, #B66500, #AA6E00,
+	#9F7500, #937C00, #858200, #818300, #DF5D00, #F26B00, #CC4F00, #D1442F, #E5533B, #DD547D,
+	#CA466F, #D20060, #E40063, #E7006E, #F81E70, #E73400, #E63D00, #D74F00, #CF5800, #DF6400,
+	#E85A00, #FF6200, #FF6400, #FF6D00, #FF7700, #FF7B00, #FF8200, #FF8600, #FF9000, #FF9100,
+	#FF9600, #FF9A00, #FF9B00, #FFA000, #FFA502, #FFA501, #FFAA06, #FFAF17, #FFAF18, #FFBA25,
+	#FABC0A, #FFC431, #FFC71D, #FFCE3B, #FFD22A, #FFDD35, #FFDC00, #FFE718, #FFE740, #FCED42,
+	#FFF249, #FFF84C, #FFFF55, #FFFF67, #FFF960, #FFF65E, #FEEB54, #F3E04B, #F0E237, #E5D72C,
+	#E8D541, #DCCA37, #DACB1F, #E8C600, #F4D100, #DCBA00, #D1BE2C, #CEC00E, #C2B400, #C5B320,
+	#D0AF00, #E1A500, #EEB100, #DD8B00, #EE8900, #EF6F00, #FF4C00, #D52700, #CD2E00, #BF4C00,
+	#C64300, #AB7600, #B98200, #927A00, #7A7F00, #608300, #518700, #298C08, #379919, #43A726,
+	#4FB432, #5BC03C, #66CD47, #71D951, #7CE55B, #86F165, #90FD6E, #9BFF78, #A5FF81, #AFFF8B,
+	#B0F800, #BAFF00, #C4FF0B, #CCFF00, #CEFF21, #D6FF0B, #E0FF21, #E9F600, #F3FF13, #FEFF25,
+	#FFFD34, #FFF228, #DEEA00, #D3DF00, #C8D300, #BDC800, #B2BC00, #A6AF00, #9BA300, #82AB00,
+	#72AF00, #7CBC00, #8DB800, #98C400, #87C800, #91D500, #A2D000, #ADDC00, #B7E800, #A6ED00,
+	#9CE100, #00DEA5, #09EAB0, #2DF6BB, #40FFC6, #51FFD0, #5FFFDB, #6CFFE5, #00FFE4, #00FFED,
+	#00F6E2, #00EAD6, #00DECB, #00D2BF, #00C6B3, #00B9A7, #00AD9B, #009F8E, #009282, #009290,
+	#009F9D, #00ACAA, #00B9B6, #00C5C3, #00D2CF, #00DEDB, #00E9E6, #00F5F2, #00FDFF, #36FFFF,
+	#42FFFF, #00FFFD, #24FFF8, #00F5FF, #00F4FF, #00EAFF, #00E7FF, #00E6FF, #00DFFF, #00DEFF,
+	#00DCFF, #00DBFF, #00D3FF, #00C7FF, #00C2FF, #00C4F6, #00B8E9, #00B6F3, #00BAFF, #51BDFF,
+	#5EC8FF, #6AD4FF, #76DFFF, #82EBFF, #8DF6FF, #98FFFF, #A3FFFF, #82F6EB, #62EDD7, #41E4C2,
+	#21DBAE, #00D29A, #00C68F, #00B984, #00AC78, #009F6C, #009260, #008474, #008482, #0083B3,
+	#0082BA, #0081BD, #008FCB, #0090C1, #009ECF, #009DD5, #009CD9, #00A9E6, #00AAE3, #00ABDC,
+	#00AEFF, #42B1FF, #32A4FF, #00A2FC, #00A1FA, #1C98F6, #0095EE, #0094ED, #008BE8, #0087E0,
+	#0087DF, #007EDA, #007AD2, #0079D1, #0076F3, #008BFF, #0E8ACC, #1C8899, #298766, #378533,
+	#458400, #5C9500, #6C9100, #779E00, #67A200, #85BD00, #A3D800, #C2F400, #CBD200, #D4B000,
+	#DD8E00, #E76C00, #F04B00, #F92900
+};
+
+color[] allFillColors_HC = {
+	// from: github.com/earthbound19/_ebArt/blob/master/palettes/rainbowHexColorsByMyEyeManyShadesLoop.hexplt
+	#FF1200, #E73400, #E63D00, #D74F00, #CF5800, #DF6400, #E85A00, #FF6200, #FF6400, #FF6D00,
+	#FF7700, #FF7B00, #FF8200, #FF8600, #FF9000, #FF9100, #FF9600, #FF9B00, #FFA000, #FFA502,
+	#FFA501, #FFAA06, #FFAF17, #FFAF18, #FFB700, #FFBA25, #FABC0A, #FFC431, #FFC71D, #FFCE3B,
+	#FFD22A, #FFDD35, #FFDC00, #FAE000, #FFE740, #FCED42, #FFF84C, #FAFF54, #FFFF67, #FFF960,
+	#FFF65E, #FEEB54, #F3E04B, #F0E237, #E8D541, #DCCA37, #DACB1F, #E8C600, #F4D100, #DCBA00,
+	#D1BE2C, #C2B400, #D0AF00, #E1A500, #EEB100, #DD8B00, #EE8900, #EF6F00, #FF4C00, #D52700,
+	#CD2E00, #C11700, #B31E00, #AD0200, #9A0F00, #980000, #8D1D00, #882700, #9B3400, #A12A00,
+	#B43700, #AD4000, #BF4C00, #C64300, #BD5400, #B46500, #AB7600, #B98200, #927A00, #7A7F00,
+	#608300, #518700, #298C08, #379919, #43A726, #4FB432, #5BC03C, #66CD47, #71D951, #7CE55B,
+	#86F165, #90FD6E, #9BFF78, #A5FF81, #AFFF8B, #B0F800, #BAFF00, #C4FF0B, #CEFF21, #D6FF0B,
+	#E0FF21, #E9F600, #F3FF13, #FFFD34, #FFF228, #DEEA00, #D3DF00, #C8D300, #BDC800, #B2BC00,
+	#A6AF00, #9BA300, #82AB00, #72AF00, #7CBC00, #8DB800, #98C400, #87C800, #91D500, #A2D000,
+	#ADDC00, #AFE300, #B7E800, #A6ED00, #9CE100, #65D700, #1DCF00, #00E77D, #00DEA5, #09EAB0,
+	#2DF6BB, #40FFC6, #51FFD0, #5FFFDB, #6CFFE5, #00FFE4, #00FFED, #00F6E2, #00EAD6, #00DECB,
+	#00D2BF, #00C6B3, #00B9A7, #00AD9B, #009F8E, #009282, #009290, #009F9D, #00ACAA, #00B9B6,
+	#00C5C3, #00D2CF, #00DEDB, #00E9E6, #00F5F2, #00FDFF, #00FFFF, #13FFFF, #2BFFFF, #3DFFFF,
+	#42FFFF, #4FFFFF, #24FFF8, #00F6FF, #00F2FF, #00E8FF, #00E6FF, #00DFFF, #00DCFF, #00DBFF,
+	#00D0FF, #00C7FF, #00C4F6, #00B8E9, #00B6F3, #00BBFF, #51BDFF, #5EC8FF, #6AD4FF, #76DFFF,
+	#82EBFF, #8DF6FF, #98FFFF, #A3FFFF, #82F6EB, #62EDD7, #41E4C2, #21DBAE, #00D29A, #00C68F,
+	#00B984, #00AC78, #009F6C, #009260, #008454, #007547, #00663A, #00562C, #00451E, #00320E,
+	#002B00, #072800, #142600, #212200, #291E00, #2A1D00, #2E1B00, #351600, #4A2500, #412B00,
+	#5C3400, #6E4200, #731900, #680000, #810000, #4C0000, #470000, #440000, #2B0000, #270000,
+	#041100, #001300, #001C01, #003429, #00463A, #004647, #005757, #00574A, #006759, #006766,
+	#007674, #007667, #008474, #008482, #0083B3, #0081BD, #008FC8, #0090C1, #009DD5, #009CD9,
+	#00AAE3, #00ABDC, #00AEFF, #42B1FF, #32A4FF, #00A2FC, #00A1FA, #1C98F6, #0095EE, #008BE8,
+	#0087DF, #007AD2, #0070CC, #006BC3, #005CB4, #0E4DB4, #0042A0, #003998, #002091, #0B0097,
+	#0000AE, #001175, #00156F, #001A62, #003074, #003170, #003268, #004381, #00447E, #004577,
+	#00558D, #005490, #005686, #006696, #0064A0, #0073AE, #0074A5, #006DEF, #0076F3, #008BFF,
+	#4146E5, #3325D6, #2B2EB5, #3A1FB6, #3C1CB3, #4300BA, #4300B1, #4400AD, #3E00AA, #3D00AE,
+	#3A00A5, #3900A5, #4810B6, #5000B4, #5F00BE, #6400D2, #6900E5, #7000FF, #5B10ED, #471FDA,
+	#322FC8, #262B9F, #192775, #0D234C, #001F22, #192911, #323300, #304800, #3C5800, #2E5B00,
+	#006000, #026F00, #197E00, #467900, #557600, #496700, #005000, #176100, #2E7300, #458400,
+	#5C9500, #6C9100, #779E00, #67A200, #85BD00, #A3D800, #C2F400, #CBD200, #D4B000, #DD8E00,
+	#E76C00, #F04B00, #F92900
+};
+// the color palettes that will actually be used, by copy of the avove and or creation and
+// assingment from other palettes; and associated variables; initialization of them is done
+// here (in earlier revisions they weren't and that was a bad idea), and they may
+// be reinistiliazed elsewhere:
+color[] backgroundColors = backgroundColors_HC.clone();
+color[] darkFillColors = darkFillColors_HC.clone();
+color[] lightFillColors = lightFillColors_HC.clone();
+color[] allFillColors = allFillColors_HC.clone();
 int backgroundColorsArrayLength = backgroundColors.length;
-int RNDbgColorIDX;	    // to be used as random index from array of colors
-
-color[] darkFillColors = {
-	#D8308F, #CA4587, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E, #CA5A62,
-	#C14F6E, #B34958, #AA4662, #8E4C5C, #8F4772, #934393, #AF62A2, #8D6CA9, #72727D,
-	#615F6B, #62555E, #745D5F, #877072, #8D6E64, #9B685D, #A45A52, #BD6E6B, #C87F73,
-	#C97B8E, #F895AC, #FA9394, #F98973, #EE8A74, #FA855B, #FD9863, #FFC874, #F7D580,
-	#FDFD96, #abd4a3, #93CD87, #73ED91, #4bf197, #7bf0af, #4ae2ba, #6cdac5, #79dacf,
-	#6cc4c3, #0cc5cf, #2ec1b1, #2dd1aa, #8db8ae, #4da2c7, #06b2d7, #7699c7, #5773c4,
-	#33549B, #3344BB, #333388, #333366, #333351, #003153, #002147, #32127A, #574C70,
-	#524547, #414141, #79443B, #4E1609
-};
 int darkFillColorsArrayLength = darkFillColors.length;
-
-color[] lightFillColors = {
-	#E497A4, #F9C0BC, #F6C6D0, #F5D3DD, #F5DCD5, #F0CCC4, #E0BFB5, #FEC29F, #EBB28B,
-	#FADFA7, #F8D9BE, #EEE2C7, #F1E5E9, #E5E4E9, #C7C6CD, #C9CBE0, #97C1DA, #91BACB,
-	#95B6BA, #A2B1A2, #BFA9A8, #B7A1AF, #AC9EB8, #B1A1C9, #A1A6D0, #9B98A2, #A58E9A,
-	#B19491, #93b0c7, #7ba7cf, #69A2BE, #74B3E3, #00B3DB, #4CC8D9, #7AD2E2, #93EDF7,
-	#00FFEF, #7FFFD4, #88D8C0, #E0FFFF, #F0FFF0, #F5FFA1, #F0D9DC, #F5DCD5, #F0CCC4,
-	#E0BFB5, #F8D9BE, #EEE2C7, #F2D8A4, #FADFA7, #F7D580, #FFC874, #FDFD96, #F5FFA1,
-	#F0FFF0, #E0FFFF, #E5E4E9, #F1E5E9, #C7C6CD, #C9CBE0, #97C1DA, #91BACB, #A2B1A2,
-	#BFA9A8, #B7A1AF, #69A2BE, #74B3E3, #00B3DB, #4CC8D9, #7AD2E2, #93EDF7, #00FFEF,
-#7FFFD4, #88D8C0, #0BBDC4
-};
 int lightFillColorsArrayLength = lightFillColors.length;
-
-color[] allFillColors = {
-	#D8308F, #CA4587, #E54D93, #EA5287, #E14E6D, #F45674, #F86060, #D96A6E, #CA5A62,
-	#C14F6E, #B34958, #AA4662, #8E4C5C, #8F4772, #934393, #AF62A2, #8D6CA9, #72727D,
-	#615F6B, #62555E, #745D5F, #877072, #8D6E64, #9B685D, #A45A52, #BD6E6B, #C87F73,
-	#C97B8E, #E497A4, #F895AC, #FA9394, #F98973, #EE8A74, #FA855B, #FD9863, #EBB28B,
-	#FEC29F, #F9C0BC, #F6C6D0, #F5D3DD, #F0D9DC, #F5DCD5, #F0CCC4, #E0BFB5, #F8D9BE,
-	#EEE2C7, #F2D8A4, #FADFA7, #F7D580, #FFC874, #FDFD96, #F5FFA1, #F0FFF0, #E0FFFF,
-	#E5E4E9, #F1E5E9, #C7C6CD, #C9CBE0, #97C1DA, #91BACB, #93b0c7, #7ba7cf, #74B3E3,
-	#69A2BE, #4da2c7, #06b2d7, #00B3DB, #4CC8D9, #0cc5cf, #0BBDC4, #2ec1b1, #6cc4c3,
-	#79dacf, #6cdac5, #88D8C0, #4ae2ba, #2dd1aa, #7bf0af, #4bf197, #73ED91, #93CD87,
-	#abd4a3, #A2B1A2, #8db8ae, #95B6BA, #7AD2E2, #93EDF7, #00FFEF, #7FFFD4, #BFA9A8,
-	#B7A1AF, #AC9EB8, #B1A1C9, #A1A6D0, #7699c7, #5773c4, #33549B, #3344BB, #333388,
-	#333366, #333351, #003153, #002147, #32127A, #574C70, #524547, #414141, #79443B,
-	#4E1609, #A58E9A, #B19491, #9B98A2
-};
 int allFillColorsArrayLength = allFillColors.length;
+int RNDbgColorIDX = (int) random(backgroundColorsArrayLength);	    // to be used as random index from array of colors
+// For backup and reload of palettes when grayscale mode is toggled:
+color[] bgColorsBAK = backgroundColors.clone();
+color[] darkFillColorsBAK = darkFillColors.clone();
+color[] lightFillColorsBAK = lightFillColors.clone();
+color[] allFillColorsBAK = allFillColors.clone();
 // END GLOBAL VARIABLES
 
 
-
-
 // BEGIN GLOBAL FUNCTIONS
+// LOADS palettes from external files:
+// I can't return multiple values or alter an external (dynamic?) object
+// from within a java function, so I have to settle for returning a new object,
+// then altering the external variables that help work with the object, from
+// outside this function:
+color[] loadColorsToArray(String source_hexplt) {
+	if (loadColorsFromHexplts == false)
+	{ print("WARNING: loadColorsToArray called but boolean loadColorsFromHexplts false.\n"); }
+		String[] textColors = loadStrings(source_hexplt);
+		int[] colorColors;
+	  colorColors = new int[textColors.length];
+	  for( int i=0; i < textColors.length; i++) {
+	    colorColors[i] = color( unhex( textColors[i].substring(1,3) ), unhex( 										textColors[i].substring(3,5) ), unhex( textColors[i].substring(5,7) ) );
+	    	// println( textColors[i] + " => (" + int(red(colorColors[i])) + ", " + int(green(colorColors[i])) + ", " + int(blue(colorColors[i])) + ") => " + textColors[i] );
+	  }
+	return colorColors;
+}
+
+
 // To initialize and subsequently reinitialize delay to creating and animating next variant:
 void setDelayToNextVariant() {
   // SETUP DELAY until this function will be called again by altering the timer control values;
@@ -213,6 +374,7 @@ void setDelayToNextVariant() {
     runSetupAtMilliseconds = currentTimeMilliseconds + tmp_MS_to_add_till_next_variation;
   }
 }
+
 
 // if less than short number of seconds until next variant, add that + more seconds 'till next variant
 // (in circumstances where this function call will be executed) :
@@ -240,10 +402,10 @@ void change_mode_at_XY(int Xpos, int Ypos, int eventType) {
       // for loops in modern computers), activate color morph mode for that shape and all nested shapes in it:
         if (dist(Xpos, Ypos, shape_center_x, shape_center_y) < shape_radius) {
         // int hooman_column = grid_X + 1; int hooman_row = grid_Y + 1;    // compensate for humans; compy starts count at 0
-            //print("Click is within shape at row " + hooman_row + " column " + hooman_column + "!\n");
+            // print("Click is within shape at row " + hooman_row + " column " + hooman_column + "!\n");
             // activate color morph mode on all AnimatedShapes in AnimatedShapesArray:
         for (int N = 0; N < gridNesting; N ++) {
-					GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[N].change_mode(eventType);
+			GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].AnimatedShapesArray[N].change_mode(eventType);
         }
       }
     }
@@ -412,6 +574,14 @@ void createFile(File f) {
   }
 }
 
+
+void global_shapes_grid_update_colors() {
+  for (int grid_Y = 0; grid_Y < GridOfShapesNumRows; grid_Y ++) {
+    for (int grid_X = 0; grid_X < GridOfShapesNumCols; grid_X ++) {
+      GridOfShapes.ShapesGridOBJ[grid_Y][grid_X].updateNestedShapesColors();
+    }
+  }
+}
 // END GLOBAL FUNCTIONS
 
 
@@ -664,12 +834,15 @@ class AnimatedShape {
 		// int allFillColorsArrayLength = allFillColors.length;
     int localMillis = millis();
     if ((localMillis - milliseconds_at_last_color_change_elapsed) > milliseconds_elapse_to_color_morph && color_morph_on == true) {
+// KLUDGE try statements all over heck and gone :(
 			stroke_color_palette_idx += 1;		// reset that if it went out of bounds of array indices:
 			if (stroke_color_palette_idx >= allFillColorsArrayLength) {
 				stroke_color_palette_idx = 0;
 			}    
-			stroke_color = allFillColors[stroke_color_palette_idx];
-
+				try {	stroke_color = allFillColors[stroke_color_palette_idx]; }
+				catch (Exception e) {
+					//print("WARNING: attempted to change stroke color with null value.\n");
+				}
 			// morph dark or light color fill index and color, depending on whether shape in dark or light mode:
 			fill_color_palette_idx += 1;
 			if (use_dark_color_fill == true) {
@@ -677,29 +850,50 @@ class AnimatedShape {
 				if (fill_color_palette_idx >= darkFillColorsArrayLength) {
 					fill_color_palette_idx = 0;
 				}
-				fill_color = darkFillColors[fill_color_palette_idx];
+					try {	fill_color = darkFillColors[fill_color_palette_idx]; }
+					catch (Exception e) {
+						//print("WARNING: attempted to change (dark) fill color with null value.\n");
+					}
 			} else {		// light mode, so adjust idx / color for light palette:
 				if (fill_color_palette_idx >= lightFillColorsArrayLength) {
 					fill_color_palette_idx = 0;
 				}
-				fill_color = lightFillColors[fill_color_palette_idx];
+					try {	fill_color = lightFillColors[fill_color_palette_idx]; }
+					catch (Exception e) {
+						//print("WARNING: attempted to change (light) fill color with null value.\n");
+					}
 			}
 	    milliseconds_at_last_color_change_elapsed = millis();
     }
+  }
+	
+	// returns 1 if error, 0 if no error.
+	int updateColor() {
+		try {
+			stroke_color = allFillColors[stroke_color_palette_idx];
+			if (use_dark_color_fill == true) {		// if dark mode, fill with dark color:
+				fill_color = darkFillColors[fill_color_palette_idx];
+			} else {		// if light mode, fill with light color:
+// Also, stack overflow exception here :( if I recursively call updateColor().
+				fill_color = lightFillColors[fill_color_palette_idx];
+			}
+	    milliseconds_at_last_color_change_elapsed = millis();
+			return 0;
+		} catch (Exception e) {
+	    //print("WARNING: Attempted to update color while value null.\n");
+			return 1;
+		}
   }
 
   void drawShape() {
 		// NOTE: it's a weird semantic, but this function always uses alt_fill_color.
 		// fill_color is then simply a backup of a preferred color . . . which may not be preferred.
 				// OPTIONAL STROKE AND FILL color overrides!
-				if (overrideFillColor == true) {
+				if (colorMode == 3) {
 					alt_fill_color = altFillColor;		// the latter taken from a global
-				} else {
-					alt_fill_color = fill_color;
-				}
-				if (overrideStrokeColor == true) {
 					alt_stroke_color = altStrokeColor;		// the latter taken from a global
 				} else {
+					alt_fill_color = fill_color;
 					alt_stroke_color = stroke_color;
 				}
 				// END OPTIONAL STROKE AND FILL color overrides!
@@ -830,8 +1024,9 @@ class NestedAnimatedShapes {
 		// AnimatedShapesArray[i].rotation = new_RND_rotate_origin_for_nesting;
 		// AnimatedShapesArray[i].nGon.rotate(radians(new_RND_rotate_origin_for_nesting));
     }
-   }
-   void drawAndChangeNestedShapes() {
+  }
+
+	void drawAndChangeNestedShapes() {
     for (int j = 0; j < nesting; j++) {
       AnimatedShapesArray[j].drawShape();
       AnimatedShapesArray[j].morphDiameter();
@@ -888,6 +1083,14 @@ class NestedAnimatedShapes {
 			AnimatedShapesArray[j].disable_color_morph_if_time();	// But let's stop it after an interval. Interaction will restart it.
     }
   }
+
+	void updateNestedShapesColors() {
+		 // 1 means error; so default here is keep trying until there's NOT an error:
+		 int error_code = 1;
+		 for (int j = 0; j < nesting; j++) {
+			 error_code = AnimatedShapesArray[j].updateColor();
+		 }
+	}
 
 }
 
@@ -963,10 +1166,17 @@ class GridOfNestedAnimatedShapes {
       }
     }
   }
+
+  void ShapesGridUpdateColors() {
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        ShapesGridOBJ[i][j].updateNestedShapesColors();
+      }
+    }
+  }
+
 }
 // END CLASSES
-
-
 
 
 // BEGIN MAIN FUNCTIONS
@@ -977,6 +1187,26 @@ void settings() {
   } else {
     size(globalWidth, globalHeight);
   }
+
+	// If loadColorsFromHexplts is true, the following creates dynamically loaded color
+	// palettes to use! :
+	if (loadColorsFromHexplts == true) {
+			print("Palettes loaded from files available for use.\n");
+			backgroundColors = loadColorsToArray("backgroundColors.hexplt");
+			darkFillColors = loadColorsToArray("darks.hexplt");
+			lightFillColors = loadColorsToArray("lights.hexplt");
+			allFillColors = loadColorsToArray("colorLoop.hexplt");
+		} else {		// If we got "tails" (0) from that virtual coin toss:
+			print("External palettes will not be loaded; will use hard-coded palettes.\n");
+			backgroundColors = backgroundColors_HC.clone();
+			darkFillColors = darkFillColors_HC.clone();
+			lightFillColors = lightFillColors_HC.clone();
+			allFillColors = allFillColors_HC.clone();
+		}
+	backgroundColorsArrayLength = backgroundColors.length;
+	darkFillColorsArrayLength = darkFillColors.length;
+	lightFillColorsArrayLength = lightFillColors.length;
+	allFillColorsArrayLength = allFillColors.length;
 
   // initializes runSetupAtMilliseconds before draw() is called:
   setDelayToNextVariant();
@@ -1004,63 +1234,109 @@ boolean savePNGnow = false;                    // Controls when to save PNGs. Ma
 boolean recordSVGnow = false;                  // Controls when to save SVGs. Manipulated by script logic.
 boolean userInteractedThisVariation = false;   // affects those booleans via script logic.
 String animFramesSaveSubdir = "";
+
+
 // handles values etc. for new animated variation to be displayed:
 void prepareNextVariation() {
-	  if (booleanOverrideSeed == true) {
-	    seed = previousSeed;
-	    booleanOverrideSeed = false;
-	  } else {
-	    previousSeed = seed;
-	    seed = (int) random(-2147483648, 2147483647);
-	  }
-	  randomSeed(seed);
-	  ellipseMode(CENTER);
+  if (booleanOverrideSeed == true) {
+    seed = previousSeed;
+    booleanOverrideSeed = false;
+  } else {
+    previousSeed = seed;
+    seed = (int) random(-2147483648, 2147483647);
+  }
+  randomSeed(seed);
+  ellipseMode(CENTER);
 
-	  // Randomly change the background color to any color from backgroundColors array at each run;
-		// OR, if a global override boolean is set, use a global override color:
-		if (overrideBackgroundColor == true) {
-			globalBackgroundColor = altBackgroundColor;
-		} else {
-	  	RNDbgColorIDX = (int) random(backgroundColorsArrayLength);
-			globalBackgroundColor = backgroundColors[RNDbgColorIDX];
+	if (loadColorsFromHexplts == true && rndSwapPalettes == true) {
+		int rnd_tmp_num = int(random(0, 2));	// non-inclusive (returns one less than highest num)
+		if (rnd_tmp_num == 1) {		// If we got "heads" (1) from that virtual coin toss:
+				// print("Randomly using palettes that were imported at program launch.\n");
+			backgroundColors = loadColorsToArray("backgroundColors.hexplt");
+			darkFillColors = loadColorsToArray("darks.hexplt");
+			lightFillColors = loadColorsToArray("lights.hexplt");
+			allFillColors = loadColorsToArray("colorLoop.hexplt");
+		} else {		// If we got "tails" (0) from that virtual coin toss:
+				// print("Randomly using hard-coded palettes.\n");
+			backgroundColors = backgroundColors_HC.clone();
+			darkFillColors = darkFillColors_HC.clone();
+			lightFillColors = lightFillColors_HC.clone();
+			allFillColors = allFillColors_HC.clone();
 		}
-		
-	  int gridXcount = (int) random(minColumns, maxColumns + 1);  // +1 because random doesn't include max range. Also, see comments where those values are set.
+	} else {		// How can I compress this logic?
+			// print("Boolean settings determine to always use imported palettes; will do.\n");
+		backgroundColors = loadColorsToArray("backgroundColors.hexplt");
+		darkFillColors = loadColorsToArray("darks.hexplt");
+		lightFillColors = loadColorsToArray("lights.hexplt");
+		allFillColors = loadColorsToArray("colorLoop.hexplt");
+	}
+	backgroundColorsArrayLength = backgroundColors.length;
+	darkFillColorsArrayLength = darkFillColors.length;
+	lightFillColorsArrayLength = lightFillColors.length;
+	allFillColorsArrayLength = allFillColors.length;
 
-	  GridOfShapes = new GridOfNestedAnimatedShapes(width, height, gridXcount, ShapesGridXminPercent, ShapesGridXmaxPercent, gridNesting);
+  // Randomly change the background color to any color from backgroundColors array at each run;
+	RNDbgColorIDX = (int) random(backgroundColorsArrayLength);
+	globalBackgroundColor = backgroundColors[RNDbgColorIDX];
 
-	  GridOfShapesNumCols = GridOfShapes.cols;
-	  GridOfShapesNumRows = GridOfShapes.rows;
+	backupCurrentColors();
 
-	  // for "frenetic option" :
-	  //for (int x = 0; x < gridNesting; x++) {
-	  //  nestedGridRenderOrder.append(x);
-	  //  //print(x + "\n");
-	  //}
+	// Necessary for if we are in another mode when this function is called; also note
+	// this backs up the color mode for reference of this if -> switch block:
+	int previousColorMode = colorMode;
+	colorMode = 1;
+	// If a boolean is set to maintain a certain mode between variations, do so:
+	if (keepColorModeOnVariantChange == true && previousColorMode != 1) {
+		// print("Will try to change from color mode back to previous, other mode.\n");
+		switch(previousColorMode)
+		{
+			case 2:	// if grayscale, reset to grayscale (all the above provided colors set
+				// up for that adjustment:
+				enableGrayscaleMode();
+				break;
+			case 3:	// if color override mode, reset to that mode (after
+				// all the above set it to color):
+				enableColorsOverrideMode();
+				break;
+		}
+	}
+	
+  int gridXcount = (int) random(minColumns, maxColumns + 1);  // +1 because random doesn't include max range. Also, see comments where those values are set.
 
-	  userInteractionString = "";
-	  framesRenderedThisVariation = 0;  // reset here and incremented in every loop of draw()
-	  runSetup = false;
-	  savePNGnow = false;
-	  recordSVGnow = false;
-	  userInteractedThisVariation = false;
-		// restore these to whatever was backed up when changed elsewhere
-		// (even if "restore" is to the same) :
-		saveAllFrames = initialSaveAllFramesState;
-		saveSVGs = initialSaveSVGsState;
-		
-		// prep for subfolder names capturing every frame as SVG if script will do so:
-		variationNumberThisRun += 1;
-		String variationNumberThisRun_padded = nf(variationNumberThisRun, 6);
-		String seedFolderNameCollisionAvoidance_extra_RND = get_random_string(5);
-		// prep actual subfolder name:
-		animFramesSaveSubdir = "_anims/"
-		+ "BSaST_run_"
-		+ formattedDateTime + "_"
-		+ subdirRunNumberNameCollisionAvoidString + "/"
-		+ variationNumberThisRun_padded +
-		"__frames__seed_" + seed
-		+ "_" + seedFolderNameCollisionAvoidance_extra_RND;
+  GridOfShapes = new GridOfNestedAnimatedShapes(width, height, gridXcount, ShapesGridXminPercent, ShapesGridXmaxPercent, gridNesting);
+
+  GridOfShapesNumCols = GridOfShapes.cols;
+  GridOfShapesNumRows = GridOfShapes.rows;
+
+  // for "frenetic option" :
+  // for (int x = 0; x < gridNesting; x++) {
+  //	nestedGridRenderOrder.append(x);
+  //  print(x + "\n");
+  //}
+
+  userInteractionString = "";
+  framesRenderedThisVariation = 0;  // reset here and incremented in every loop of draw()
+  runSetup = false;
+  savePNGnow = false;
+  recordSVGnow = false;
+  userInteractedThisVariation = false;
+	// restore these to whatever was backed up when changed elsewhere
+	// (even if "restore" is to the same) :
+	saveAllFrames = initialSaveAllFramesState;
+	saveSVGs = initialSaveSVGsState;
+	
+	// prep for subfolder names capturing every frame as SVG if script will do so:
+	variationNumberThisRun += 1;
+	String variationNumberThisRun_padded = nf(variationNumberThisRun, 6);
+	String seedFolderNameCollisionAvoidance_extra_RND = get_random_string(5);
+	// prep actual subfolder name:
+	animFramesSaveSubdir = "_anims/"
+	+ "BSaST_run_"
+	+ formattedDateTime + "_"
+	+ subdirRunNumberNameCollisionAvoidString + "/"
+	+ variationNumberThisRun_padded +
+	"__frames__seed_" + seed
+	+ "_" + seedFolderNameCollisionAvoidance_extra_RND;
 }
 
 String formattedDateTime = "";
@@ -1088,7 +1364,10 @@ void animate() {
     beginRecord(SVG, svg_file_name_no_ext + ".svg");
   }
 
+// TO DO? refactor so this try/catch isn't necessary because globalBackgroundColor is never null:
+	try {
   background(globalBackgroundColor);  // clears canvas to white before next animaton frame (so no overlap of smaller shapes this frame on larger from last frame) :
+	} catch (Exception e) {}
 
   // randomizes list--for frenetic option (probably will never want) :
   //nestedGridRenderOrder.shuffle();
@@ -1167,8 +1446,111 @@ void draw() {
 }
 
 
-void mousePressed() {
-  change_mode_at_XY(mouseX, mouseY, 1);			// 1 means event type: click
+
+
+// START Functions that alter color palettes used.
+// backup palettes and background color:
+void backupCurrentColors() {
+	globalBackgroundColorBackup = globalBackgroundColor;
+	bgColorsBAK = backgroundColors.clone();
+	darkFillColorsBAK = darkFillColors.clone();
+	lightFillColorsBAK = lightFillColors.clone();
+	allFillColorsBAK = allFillColors.clone();
+}
+
+void restoreColors() {
+	globalBackgroundColor = globalBackgroundColorBackup;
+	backgroundColors = bgColorsBAK.clone();
+	darkFillColors = darkFillColorsBAK.clone();
+	lightFillColors = lightFillColorsBAK.clone();
+	allFillColors = allFillColorsBAK.clone();
+	GridOfShapes.ShapesGridUpdateColors();
+}
+
+// Creates and returns a grayscale palette from (a copy of) whatever palette you pass to it:
+color[] getGrayscalePaletteCopy(color[] palette_to_copy) {
+	int paletteLength = palette_to_copy.length;
+	color[] grayscalePaletteDynamicCopy = new color[palette_to_copy.length];
+	for (int i=0; i < paletteLength; i++) {
+		color tmp_color = palette_to_copy[i];
+		String tmp_str = hex(tmp_color);
+		int R = unhex( tmp_str.substring(2,4) );
+		int G = unhex( tmp_str.substring(4,6) );
+		int B = unhex( tmp_str.substring(6,8) );
+		int average = int((R + G + B) / 3);
+		// print(R + "," + G + "," + B + "\n");
+		// print("average: " + average + "\n");
+		//averaged_gray = color(average);
+		grayscalePaletteDynamicCopy[i] = color(average);
+	}
+	return grayscalePaletteDynamicCopy.clone();
+}
+
+void changeToNextColorMode() {
+	switch(colorMode)
+	{
+		case 1:	// if color, enable grayscale:
+			enableGrayscaleMode();
+			break;
+		case 2:	// if grayscale, enable color override:
+			enableColorsOverrideMode();
+			break;
+		case 3:	// if color override, loop back to color:
+			enableColorMode();
+			break;
+	}
+}
+
+void enableGrayscaleMode() {
+	if (colorMode != 2) {
+		colorMode = 2;
+		// colors (including selected background color) are backed up in prepareNextVariation()
+		// after they are instantiated (which happens before this function call is made--I hope?!--
+		// unless somehow a user calls this funciton before that one completes?), so there'void setup() {
+		// no need to do it here.
+		// convert loaded palettes to grayscale and overwrite loaded palettes with that:
+		// It's not necessary to get a grayscale copy of backgroundColors,
+		// as no function cycles through background colors (it will be necessary to do that if
+		// the program is changed thus), and all we need to do is update the already selected.
+		// backgroundColors = getGrayscalePaletteCopy(backgroundColors);
+		float R = red(globalBackgroundColor);
+		float G = green(globalBackgroundColor);
+		float B = blue(globalBackgroundColor);
+		int average_gray_of_those = int( (R + G + B) / 3);
+		globalBackgroundColor = average_gray_of_those;
+		darkFillColors = getGrayscalePaletteCopy(darkFillColors);
+		lightFillColors = getGrayscalePaletteCopy(lightFillColors);
+		allFillColors = getGrayscalePaletteCopy(allFillColors);
+		GridOfShapes.ShapesGridUpdateColors();
+	}
+}
+
+void enableColorsOverrideMode() {
+	if (colorMode != 3) {
+		colorMode = 3;
+		// globalBackgroundColorBackup = globalBackgroundColor;    // back up so we can restore when this mode toggled off
+		globalBackgroundColor = altBackgroundColor;    // render users global bg is why
+		// animate();
+		// print("Color override mode enabled.\n");
+	}
+}
+
+void enableColorMode() {
+	if (colorMode != 1) {
+		colorMode = 1;
+		restoreColors();
+		GridOfShapes.ShapesGridUpdateColors();
+		// print("Standard color mode enabled.\n");
+	}
+}
+// END Functions that alter color palettes used.
+
+
+// This function can, via double-click, call functions that alter palettes used:
+void mousePressed(MouseEvent evt) {
+
+	//things that happen no matter what:
+	addGracePeriodToNextVariant();
   userInteractionString = "__user_interacted";    // intended use by other functions / reset to "" by other functions
 
   if (userInteractedThisVariation == false) {    // restricts the functionality in this block to once per variation
@@ -1197,10 +1579,12 @@ void mousePressed() {
 		
 		try_to_tweet();
   }
-
-// formerly tweet attempt code was here!
-  
-  addGracePeriodToNextVariant();
+	
+  if (evt.getCount() == 2) {
+		changeToNextColorMode();
+  }	else {		// if event was any kind of mouse press event besides double-click:
+		change_mode_at_XY(mouseX, mouseY, 1);			// 1 means event type: click
+	}
 }
 
 
