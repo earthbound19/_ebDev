@@ -2,7 +2,7 @@
 
 int foo;
 int bar;
-Blorf blor;
+Blorf blorf_obj_one;
 
 class Blorf {
   int foo;
@@ -18,7 +18,7 @@ void settings() {
   foo = 5;
   bar = foo;
   foo += 1;
-  blor = new Blorf(foo,bar);
+  blorf_obj_one = new Blorf(foo,bar);
 }
 
 void draw() {
@@ -26,10 +26,10 @@ void draw() {
 
 void mousePressed() {
   print(foo + ", " + bar + "\n");
-  print("blor " + blor.foo + ", " + blor.bar + "\n");
-  Blorf glar = blor;
-  glar.foo += 1;
-  print("because glar is a reference to blor, the values of the ints of one change when we change the values of the other:\n");
-  print("now blor " + blor.foo + ", " + blor.bar + "\n");
-  print("and glar " + glar.foo + ", " + glar.bar + "\n");
+  print("blorf_obj_one " + blorf_obj_one.foo + ", " + blorf_obj_one.bar + "\n");
+  Blorf blorf_obj_two = blorf_obj_one;
+  blorf_obj_two.foo += 1;
+  print("because blorf_obj_two is a reference to blorf_obj_one, the values of the ints of one change when we change the values of the other:\n");
+  print("now blorf_obj_one " + blorf_obj_one.foo + ", " + blorf_obj_one.bar + "\n");
+  print("and blorf_obj_two " + blorf_obj_two.foo + ", " + blorf_obj_two.bar + "\n");
 }
