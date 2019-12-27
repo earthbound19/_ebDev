@@ -19,6 +19,7 @@ void settings() {
   bar = foo;
   foo += 1;
   blorf_obj_one = new Blorf(foo,bar);
+  print("Click the mouse to see info printout.\n");
 }
 
 void draw() {
