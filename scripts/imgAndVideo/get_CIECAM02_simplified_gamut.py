@@ -96,17 +96,3 @@ for element in simplified_jch_gamut_as_RGB_hex:
 # for i in all_three_permutations:
 # 	outfile.write(i[0] +i[1] +i[2] +'\n')
 # outfile.close()
-
-
-# BONEYARD
-# import colormath
-# from colormath.color_conversions import convert_color
-# from colormath.color_objects import LCHabColor, sRGBColor
-# this_color = colormath.color_objects.LCHabColor(100, 50, 40)
-# converted_color = convert_color(this_color, sRGBColor)
-# converted_color.clamped_rgb_b
-# 0.763059175368764
-# converted_color.get_rgb_hex
-# this_hex = converted_color.get_rgb_hex()
-# this_hex
-# '#153e1c3'

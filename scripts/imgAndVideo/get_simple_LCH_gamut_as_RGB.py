@@ -13,9 +13,6 @@
 
 # CODE
 import spectra
-# from colormath.color_objects import LabColor
-# from colormath.color_objects import LCHabColor
-# from colormath.color_diff import delta_e_cie2000
 
 # FAILED to do what I want implemented with color print; from the spectra tutorial page; but handy reference for creating gradients (scales) :
 # scale = spectra.scale([ start, end ])
@@ -64,38 +61,6 @@ for i in range(C_max, C_min, -C_step):
 # -- or TO DO--this without importing another library, re: https://thispointer.com/python-how-to-remove-duplicates-from-a-list/
 from more_itertools import unique_everseen
 simplified_gamut = list(unique_everseen(simplified_gamut))
-
-
-# WIP: DELETE COLORS WHICH ARE SO SIMILAR as to be practically the same, via colormath (to reduce the list further) :
-#list_len = len(simplified_gamut)
-#print("list_len val:", list_len)
-#for outer_idx in range(list_len -1, 0, -1):
-#	outer_check_hex = simplified_gamut[outer_idx]
-#	compare_color1 = spectra.html(outer_check_hex).to("lch")
-#	LabColor_compare1 = LCHabColor(lch_l=compare_color1.values[0], lch_c=compare_color1.values[1], lch_h=compare_color1.values[2])
-#	print("----? :")
-#	print(outer_check_hex)
-#	print(compare_color1.hexcode)	# DOESN'T ALWAYS MATCH outer_check_hex!
-#	spectra_color_reconstructed = spectra.lab(LabColor_compare1.lch_l, LabColor_compare1.lch_c, LabColor_compare1.lch_h)
-#	print(spectra_color_reconstructed.hexcode)
-# TO DO: rework this script to use only colormath?! Because THE COLORS CHANGE IN A ROUNDTRIP FROM SPECTRA TO COLORMATH. Maybe that's inevitable?
-# color2.lab_a, color2.lab_b, color2.lab_l
-#	for inner_idx in range(outer_idx-1, 0, -1):
-		# print("outer check val is:", outer_check_hex, "idx", outer_idx)
-		# print("inner check val is:", inner_check_hex, "idx", inner_idx)
-		# color comparison reference; re: https://python-colormath.readthedocs.io/en/latest/delta_e.html
-		# (import statements moved to start of script)
-		# # Reference color.
-		# color1 = LabColor(lab_l=0.9, lab_a=16.3, lab_b=-2.22)
-		# # Color to be compared to the reference.
-		# color2 = LabColor(lab_l=0.7, lab_a=14.2, lab_b=-1.80)
-		# # This is your delta E value as a float.
-		# delta_e = delta_e_cie1976(color1, color2)
-#		inner_check_hex = simplified_gamut[inner_idx]
-#		compare_color2 = spectra.html(inner_check_hex).to("lab")
-		# LabColor_compare1 = LabColor(lab_l=compare_color1.values[0], lab_a=compare_color1.values[1], lab_b=compare_color1.values[2])
-		# delta_e = delta_e_cie2000(compare_color1, compare_color2)
-
 
 for element in simplified_gamut:
 	print(element)
