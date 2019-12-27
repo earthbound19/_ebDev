@@ -1,6 +1,7 @@
-Artwork display information:
+Artwork information:
 - Display dimensions: kiosk, 6'5"(77")H x 2'6"(30")W x 1'10"(22")D, rolls on wheels and can be secured on built-in screw-out pegs.
 - Weight: 300lbs?
+- Program version v1.2.5 was on display at the kiosk in the Springville Museum of Art, Springville UT, as part of the 34th ANNUAL SPIRITUAL AND RELIGIOUS ART OF UTAH exhibit, beginning October 16, 2019.
 
 Artist Statement:
 ----
