@@ -38,7 +38,7 @@ repoFolderName=`ls`
 cp ../../bfg.jar .
 
 # OPTIONAL; uncomment if you want this; you must have lfs in your PATH to do this; the following extracts all files of the specified extensions into lfs (which makes cloning and checkout far less painful with large repos) :
-extraParams="--convert-to-git-lfs '*.{zip,7z,exe,dll,clbin,chm,bin,pyd,pdf,png,jpg,gif,psd,tif,tiff,bmp,ppm,ico,mp4,mov,mgk}'"
+# extraParams="--convert-to-git-lfs '*.{zip,7z,exe,dll,clbin,chm,bin,pyd,pdf,png,jpg,gif,psd,tif,tiff,bmp,ppm,ico,mp4,mov,mgk}'"
 
 java -jar bfg.jar --strip-blobs-bigger-than 1K --massive-non-file-objects-sized-up-to 10M $extraParams $repoFolderName
 rm ./bfg.jar

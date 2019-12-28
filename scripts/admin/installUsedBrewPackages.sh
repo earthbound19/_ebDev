@@ -7,7 +7,7 @@
 # TO DO: always install gnu-sed with default names (override mac sed?!) : brew install gnu-sed --with-default-names : re https://stackoverflow.com/a/27834828/1397555 -- also see: https://developer.apple.com/library/content/documentation/OpenSource/Conceptual/ShellScripting/PortingScriptstoMacOSX/PortingScriptstoMacOSX.html -- https://unix.stackexchange.com/questions/13711/differences-between-sed-on-mac-osx-and-other-standard-sed ("complex history")
 
 brewPackages=" \
-gnu-sed \
+gnu-sed --with-default=names \
 ffmpeg \
 pandoc \
 coreutils \
@@ -70,5 +70,5 @@ openimageio"
 
 for element in ${brewPackages[@]}
 do
-  brew install $element
+  brew uninstall $element
 done
