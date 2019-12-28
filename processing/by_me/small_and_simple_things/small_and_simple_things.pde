@@ -102,13 +102,13 @@ boolean tryToTweet = true;
 // BEGIN GLOBAL VARIABLES:
 // NOTE: to control additional information contained in saved file names, see comments in the get_detailed_image_file_name_no_ext() function further below.
 int variationNumberThisRun = 0;
-boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly.
-int overrideSeed = 858293248;    // some favorites are: -161287679, 858293248 
+boolean booleanOverrideSeed = true;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly.
+int overrideSeed = 617092096;    // some favorites are: -161287679, 858293248 
 int previousSeed = overrideSeed;
 int seed = overrideSeed;
-boolean USE_FULLSCREEN = true;  // if set to true, overrides the following values; if false, they are used:
-int globalWidth = 600;
-int globalHeight = 600;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
+boolean USE_FULLSCREEN = false;  // if set to true, overrides the following values; if false, they are used:
+int globalWidth = 1280;
+int globalHeight = 720;    // dim. of kiosk entered in SMOFA: 1080x1920. scanned 35mm film: 5380x3620
 int gridNesting = 4;    // controls how many nests of shapes there are for each shape on the grid.
 GridOfNestedAnimatedShapes GridOfShapes;
 int GridOfShapesNumCols;    // to be reinitialized in each loop of prepareNextVariation()
@@ -130,10 +130,10 @@ boolean keepColorModeOnVariantChange = false;		// If set, whatever colorMode is 
 // TESTING NOTES: states to test:
 // true / false for savePNGs, saveSVGs, saveEveryVariation, and (maybe--though I'm confident it works regardless) saveAllFrames, and saveAllFramesWasFalse:
 // START VARIABLES RELATED TO image save:
-boolean savePNGs = true;  // Save PNG images or not
+boolean savePNGs = false;  // Save PNG images or not
 boolean saveSVGs = true;  // Save SVG images or not
 boolean saveAllFrames = false;    // if true, all frames up to renderNtotalFrames are saved (and then the program is terminated), so that they can be strung together in a video. Overrieds saveSVGs, but not savePNGs.
-boolean saveAllFramesInteractOverride = false;		// overrides saveAllFrames + saveSVGs on user interact 'till end of variant.
+boolean saveAllFramesInteractOverride = true;		// overrides saveAllFrames + saveSVGs on user interact 'till end of variant.
 boolean initialSaveAllFramesState = saveAllFrames;		// stores initial state (boolean copy) to revert to after override period.
 boolean initialSaveSVGsState = saveSVGs;							// stores initial state (boolean copy) to revert to after override period.
 // TEMP OR PERMANENT KLUDGE: not using the following. Could cut off user and close program at museum! :

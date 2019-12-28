@@ -9,7 +9,7 @@
 
 # DEPENDENCIES: ffmpeg and a 'nix system (can be cygwin for Windows).
 
-if [ ! -z ${1+x} ]
+if [ "$1" ]
 	then
 	vidExt=$1
 	else

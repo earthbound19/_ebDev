@@ -17,7 +17,7 @@
 # CODE
 abortScript=0
 
-if [ -z ${1+x} ]
+if [ -z "$1" ]
 	then
 		echo No paramater 1 passed. Will not run script. See USAGE comment at start of script.
 		abortScript=1
@@ -25,7 +25,7 @@ if [ -z ${1+x} ]
 	findPairsFor=$1
 fi
 
-if [ -z ${2+x} ]
+if [ -z "$2" ]
 	then
 		echo No paramater 2 passed. Will not run script. See USAGE comment at start of script.
 		abortScript=1

@@ -22,7 +22,7 @@
 
 
 # CODE
-if [ ! -z ${5+x} ]
+if [ "$5" ]
 then
 	if [ $5 != "NULL" ]		# If we want to use $6 but not $5 (as $6 is positional), we use NULL for $5.
 	then
@@ -58,7 +58,7 @@ ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $rescaleParams -vf 
 # ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $rescaleParams -vf fps=$2 -crf $3 -codec:v utvideo _out.avi
 
 # If $6 is passed to the script, create a looped still video ($6 seconds long) from the last frame and append it to the video:
-if [ ! -z ${6+x} ]
+if [ "$6" ]
 then
 	ffmpeg -y -loop 1 -i $lastFoundTypeFile -vf fps=$2 -t $6 -crf $3 _append.mp4
 	printf "" > tmp_ft2N854f.txt

@@ -22,7 +22,7 @@ paletteFile=$3
 
 
 # If no $3 parameter passed to script, create an array of 18 random hex RGB color values. Otherwise, create the array from the list in the filename specified in $3.
-if [ -z ${3+x} ]
+if [ -z "$3" ]
 	then
 		echo no parameter \$3 passed to script\; generating random hex colors array . . .
 		for i in $( seq 9 );

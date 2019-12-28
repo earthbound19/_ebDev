@@ -6,7 +6,7 @@
 
 
 # CODE
-if [ -z ${1+x} ]; then echo No paramater one \(length of random string to prepend\)\. Defaulting to 20\.; rndStringlength=20; else rndStringlength=$1; fi
+if [ -z "$1" ]; then echo No paramater one \(length of random string to prepend\)\. Defaulting to 20\.; rndStringlength=20; else rndStringlength=$1; fi
 
 ls > meerp_gvucavE6ahYEWmEJq267.txt
 while read n

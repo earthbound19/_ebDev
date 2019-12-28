@@ -12,8 +12,8 @@
 
 
 # CODE
-if [ -z ${1+x} ]; then howMany=1; else howMany=$1; fi
-if [ -z ${2+x} ]; then length=44; else length=$2; fi
+if [ -z "$1" ]; then howMany=1; else howMany=$1; fi
+if [ -z "$2" ]; then length=44; else length=$2; fi
 
 # To force tr to operate on non-text (urandom) output:
 export LC_CTYPE=C

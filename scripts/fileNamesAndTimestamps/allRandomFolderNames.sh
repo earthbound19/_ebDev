@@ -7,7 +7,7 @@
 # --where you can change that number to specify how many random characters you want in the new file name. If you don't specify any number, it defaults to 4.
 
 # GLOBAL VAR SET; if numeric parameter $1 is passed to script, set $getNrandChars to that; otherwise default it to 4:
-if ! [ -z ${1+x} ]; then echo parameter passed to script\; will set getNrandChars to passed value of $1.; getNrandChars="$1"; else getNrandChars=4; echo no parameter passed to script\; using default value of \4 for getNrandChars.; fi
+if [ "$1" ]; then echo parameter passed to script\; will set getNrandChars to passed value of $1.; getNrandChars="$1"; else getNrandChars=4; echo no parameter passed to script\; using default value of \4 for getNrandChars.; fi
 		# echo val of 1 is $1.
 
 find ./* -type d > allDirs.txt

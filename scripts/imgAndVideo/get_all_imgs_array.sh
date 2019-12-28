@@ -11,7 +11,7 @@
 # -- the -r switch is appended to sort, which causes the array (list) to reverse order.
 # NOTE: to be useful, this script must be invoked via `source`, as directed. This causes the array named imgs_arr to persist in the local bash environment after this script terminates.
 
-if ! [ -z ${1+x} ]; then invisibl_switch='-r'; else invisibl_switch=''; fi
+if [ "$1" ]; then invisibl_switch='-r'; else invisibl_switch=''; fi
 echo "invisibl_switch set to $invisibl_switch"
 echo "(if that was a sentence fragment, invisibl_switch was blank)"
 

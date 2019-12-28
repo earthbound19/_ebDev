@@ -6,7 +6,7 @@ exit
 # USAGE:
 # Optional parameter: $1 an image format (e.g. jpg) to scan for. Defaults to png if not present.
 
-if [ ! -z ${1+x} ]
+if [ "$1" ]
 	then
 		imgFormat=$1
 		echo Paramater 1 passed\, scanning for image format $imgFormat

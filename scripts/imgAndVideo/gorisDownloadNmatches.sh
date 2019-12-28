@@ -23,7 +23,7 @@
 # BEGIN SETUP GLOBALS
 fileName=$1
 
-if [ -z ${2+x} ]
+if [ -z "$2" ]
 then
 	numberToDownload=7
 else

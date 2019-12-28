@@ -1,3 +1,5 @@
+echo "TO DO: TEST THIS SCRIPT according to its documentation, by setting up a test directory. Then re-code if necessary to fix. If/when it passes tests, delete the first two lines of this script, and keep it that way. I'm writing this because I spotted what I think is a logic error in simplifying parameter detection in this script, and _I think_ I fixed the error (handling of parameter $2), but haven't tested it. - RAH 2019-12-27 07:52 PM Friday"
+exit
 # DESCRIPTION
 # Renames files with random character strings of length n (per paramater passed to script or default 4), preserving file extension.
 
@@ -15,7 +17,7 @@
 # Throw an error and exit if no files of type parameter 2 found.
 
 # GLOBAL VAR SET; if numeric parameter $1 is passed to script, set $getNrandChars to that; otherwise default it to 4:
-if ! [ -z ${1+x} ]
+if [ "$1" ]
 	then
 		getNrandChars="$1"
 				echo parameter passed to script\; will set getNrandChars to passed value of $1.
@@ -23,11 +25,10 @@ if ! [ -z ${1+x} ]
 		getNrandChars=4
 				echo no parameter passed to script\; using default value of \4 for getNrandChars.
 fi
-		# echo val of 1 is $1.
 
-if ! [ -z ${2+x} ]
+if [ "$2" ]
 	then
-		array=(`gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
+		array=(`gfind . -maxdepth 1 -type f -iname \*.$2 -printf '%f\n'`)
 	else
 		array=(`gfind . -maxdepth 1 -type f -iname \* -printf '%f\n'`)
 fi

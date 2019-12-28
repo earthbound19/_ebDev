@@ -18,7 +18,7 @@
 
 
 # If no $1 parameter, warn and exit.
-if [ -z ${1+x} ]
+if [ -z "$1" ]
 then
 	echo "No paramter \$1 passed to script; will exit. Re-run script with an image format extension (without any .) as the only parameter to the script; e.g.:"
 	echo "	./imgsGetSimilar.sh png"
@@ -28,7 +28,7 @@ else
 fi
 # DEPRECATED until it is tested to see whether the presence of text files in list (will result from no $1 passed to script) will mess up process:
 	# change search regex depending on presence or absense of parameter $1:
-	# if [ -z ${1+x} ]
+	# if [ -z "$1" ]
 	# then
 	# 	searchRegex='*'
 	# else

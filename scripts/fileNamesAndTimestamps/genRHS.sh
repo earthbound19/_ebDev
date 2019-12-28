@@ -12,7 +12,7 @@ echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
 find ./*.$1 > xQpr95b2N_list.txt
 
 # For optional paramater 2 to shuffle list:
-if ! [ -z ${2+x} ]
+if [ "$2" ]
 	then
 		shuf xQpr95b2N_list.txt > temp_fjioem882.txt
 		rm xQpr95b2N_list.txt

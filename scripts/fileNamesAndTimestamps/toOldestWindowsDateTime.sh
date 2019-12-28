@@ -11,7 +11,7 @@
 
 
 # CODE
-if [ -z ${1+x} ]; then echo "NO source file \$1 passed to script. Exiting."; exit; fi
+if [ -z "$1" ]; then echo "NO source file \$1 passed to script. Exiting."; exit; fi
 
 exiftool $1 > temp.txt
 printf "" > temp2.txt

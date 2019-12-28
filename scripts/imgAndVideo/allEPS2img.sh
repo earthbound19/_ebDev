@@ -22,9 +22,9 @@ img_size=$1
 img_format=$2
 
 # If no image size parameter, set default image size of 1280.
-if [ -z ${1+x} ]; then img_size=1280; echo SET img_size to DEFAULT 1280; else img_size=$1; echo SET img_size to $1; fi
+if [ -z "$1" ]; then img_size=1280; echo SET img_size to DEFAULT 1280; else img_size=$1; echo SET img_size to $1; fi
 # If no image format parameter, set default image format of jpg.
-if [ -z ${2+x} ]; then img_format=jpg; echo SET img_format to DEFAULT jpg; else img_format=$2; echo SET img_format to $2; fi
+if [ -z "$2" ]; then img_format=jpg; echo SET img_format to DEFAULT jpg; else img_format=$2; echo SET img_format to $2; fi
 
 gfind \*.eps > all_eps.txt
 while read element
