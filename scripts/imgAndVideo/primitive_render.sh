@@ -24,10 +24,10 @@
 
 
 # CODE
-if [ -z ${1+x} ]; then echo "NO INPUT FILE NAME. Re-run and pass this script an input image file name."; exit; else filename=$1; fi
-if [ -z ${2+x} ]; then count=100; else count=$2; fi
-if [ -z ${3+x} ]; then mode=5; else mode=$3; fi
-if [ -z ${4+x} ]; then output_format=png; else output_format=$4; fi
+if [ -z "$1" ]; then echo "NO INPUT FILE NAME. Re-run and pass this script an input image file name."; exit; else filename=$1; fi
+if [ -z "$2" ]; then count=100; else count=$2; fi
+if [ -z "$3" ]; then mode=5; else mode=$3; fi
+if [ -z "$4" ]; then output_format=png; else output_format=$4; fi
 
 # override default shrinking of images by default in this script :) by getting largest dimension and passing it later via -s:
 identStr=`gm identify $filename`

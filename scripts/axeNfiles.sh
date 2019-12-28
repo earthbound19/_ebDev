@@ -10,7 +10,7 @@
 # ====
 # BEGIN SET GLOBALS
 # Parse for parameters and set defaults for missing ones\; if they are present\, use them.
-if [ -z ${1+x} ]
+if [ -z "$1" ]
 then
 	echo No file format parameter \$1 passed to script\; setting to default png.
 	fileExt=png
@@ -18,7 +18,7 @@ else
 	fileExt=$1; echo fileExt set to parameter \$1\, $1\.
 fi
 
-if [ -z ${2+x} ]
+if [ -z "$2" ]
 then
 	echo No axe by N files paramater \$2 passed to script\; setting to default 8\.
 	numberToAxeOn=8
@@ -26,7 +26,7 @@ else
 	numberToAxeOn=$2; echo numberToAxeOn set to parameter \$2\, $2\.
 fi
 
-if [ -z ${3+x} ]
+if [ -z "$3" ]
 then
 	echo No _folderPrefixName parameter \$3 passed to script\; setting to default _toEndFR_.
 	folderPrefix=_toEndFR_

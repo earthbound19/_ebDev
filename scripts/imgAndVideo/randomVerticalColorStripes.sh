@@ -39,7 +39,7 @@ source findHEXPLT.sh $7
 
 # The logic of this variable check is: if not no value for this var, do something (in other words, if there is this var with a value, do something) ;
 # UNFORTUNATELY, it seems this type of check only works with environment parameter variables [by this do I mean e.g. $1, $2, $3 etc.?], not assigned [script or named?] variables that have no value, WHICH MEANS that the following must be hard-coded for the parameter:
-if [ ! -z ${7+x} ]
+if [ "$7" ]
 	then
 	echo IMPORTING COLOR LIST from file name\:
 	echo $hexColorSrcFullPath
@@ -67,7 +67,7 @@ for a in $( seq $howManyImages )
 do
 
 			# Check and make changes for optional random negative variation of max random number pick range:
-			if [ ! -z ${6+x} ]
+			if [ "$6" ]
 				then
 					randomVariation=`shuf -i 0-"$6" -n 1`
 					maxRange=$(( $maxColorColumnRepeat - $randomVariation ))
@@ -80,7 +80,7 @@ do
 	do
 					echo Generating stripe for image number $a . . .
 						repeatColumnColorCount=`shuf -i $minColorColumnRepeat-$maxColorColumnRepeat -n 1`
-				if [ ! -z ${7+x} ]
+				if [ "$7" ]
 					then
 						# empty temp.txt before writing new color columns to it:
 						printf "" > temp.txt

@@ -33,7 +33,7 @@ numRows=$2
 howManyImages=$3
 
 # if $6 was passed to script (if $6 not null), "randomly" shuffle the elements of the source file into a temp file, and generate the array from that. If no $6, just copy the file (without shuffling it) into a temp file, create the array from the temp file, and destroy the temp file.
-if [ ! -z ${6+x} ]
+if [ "$6" ]
 then
 	gshuf $4 > tmp_feoijwefjojeoo.txt
 else
@@ -41,7 +41,7 @@ else
 fi
 
 # If a color list file is specified, count the number of items in it and store them in an array.
-if [ ! -z ${4+x} ]
+if [ "$4" ]
 then
 	mapfile -t hexColorsArray < tmp_feoijwefjojeoo.txt
 	rm tmp_feoijwefjojeoo.txt
@@ -61,14 +61,14 @@ do
 					echo Generating row for image number $a . . .
 		rowCount=$(( rowCount + 1 ))
 		# If a hex color list is specified, pick a color from it (using conditions below); otherwise, generate a random color.
-		if [ ! -z ${4+x} ]
+		if [ "$4" ]
 		then
 			# empty temp.txt before writing new color columns to it:
 			printf "" > temp.txt
 			for columnsThingCountDerp in $( seq $numCols )
 			do
 						# If param $5 passed to script, pick the index for the next (sequential) color in that list. If no param $5 passed to script, pick a random color from the file-imported color list. 
-						if [ ! -z ${5+x} ]
+						if [ "$5" ]
 						then
 							pick=$colorListIterate
 							colorListIterate=$(( colorListIterate + 1 ))
