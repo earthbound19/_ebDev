@@ -32,7 +32,7 @@ fileNameNoExt=${1%.*}
 
 # if optional parameter 2 provided, join semantic linefeeds into a temp doc and swap it for
 # the original before PDF print:
-if [ ${2+x} ]
+if [ "$2" ]
 then
 	# Kludgy and arbitrarily inflexible (instead of pattern matching any title page elements
 	# and temporarily cutting them out), but:
@@ -90,7 +90,7 @@ wrap pdf $1 --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensed
 rm CourierMegaRS-SemiCondensed.ttf CourierMegaRS-SemiCondensedBold.ttf CourierMegaRS-SemiCondensedBoldItalic.ttf CourierMegaRS-SemiCondensedItalic.ttf
 
 # If we joined semantic linefeeds, restore backed-up fountain file over original:
-if ! [ -z ${2+x} ]
+if [ "$2" ]
 then
 	mv ./$1.fountain-bak.txt ./$1
 fi

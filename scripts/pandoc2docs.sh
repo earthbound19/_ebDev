@@ -7,8 +7,8 @@
 # USAGE
 # pandoc2doc.sh source_docs_extension dest_docs_extension
 
-if ! [ -z ${1+x} ]; then src_format=$1; echo "Source format \$1 $1 passed to script\; using that."; else echo "NO source format \$1 passed to script. Exiting."; exit; fi
-if ! [ -z ${2+x} ]; then dest_format=$2; echo "Source format \$2 $2 passed to script\; using that."; else echo "NO destination format \$2 passed to script. Exiting."; exit; fi
+if [ "$1" ]; then src_format=$1; echo "Source format \$1 $1 passed to script\; using that."; else echo "NO source format \$1 passed to script. Exiting."; exit; fi
+if [ "$2" ]; then dest_format=$2; echo "Source format \$2 $2 passed to script\; using that."; else echo "NO destination format \$2 passed to script. Exiting."; exit; fi
 
 # recurse through all directories under this path, and in each directory, convert all $1 (source) format files to $2 (destination format), then copy the timestamp of each source file to its file name match corresponding .txt file.
 directories=(`gfind . -type d -iname \*`)

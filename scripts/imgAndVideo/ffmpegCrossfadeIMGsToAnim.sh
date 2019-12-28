@@ -39,11 +39,11 @@ codecParam="-vcodec rawvideo"
 
 # ====
 # SET GLOBALS START
-if [ -z ${1+x} ]; then echo No paramater \$1 \(start input image\)\. Will exit.; exit; else imgOne=$1; echo SET imgOne to $1; fi
-if [ -z ${2+x} ]; then echo No paramater \$2 \(end input image\)\. Will exit.; exit; else imgTwo=$2; echo SET imgOne to $2; fi
+if [ -z "$1" ]; then echo No paramater \$1 \(start input image\)\. Will exit.; exit; else imgOne=$1; echo SET imgOne to $1; fi
+if [ -z "$2" ]; then echo No paramater \$2 \(end input image\)\. Will exit.; exit; else imgTwo=$2; echo SET imgOne to $2; fi
 
 # Initializing from $4 before initializing $3 (if $4 passed; otherwise set default), because 3 needs 4.
-if [ -z ${4+x} ]
+if [ -z "$4" ]
 then
 	echo No paramater \$4 \(still image padding before and after crossfade\). Will default to 4.36.
 	clipPaddingSeconds=4.36
@@ -52,7 +52,7 @@ else
 	echo SET clipPaddingSeconds to $4
 fi
 
-if [ -z ${3+x} ]
+if [ -z "$3" ]
 then
 	echo No paramater \$3 \(crossfade length\). Will default to 7.; xFadeLen=7
 else

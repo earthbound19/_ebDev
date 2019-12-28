@@ -17,7 +17,7 @@
 # ? make it name the output file after the ../.. parent folder name?
 # Adapt the script from which this is derived to handle parameter $4 here (and then scrap this script)?
 
-if [ ! -z ${5+x} ]
+if [ "$5" ]
 then
 	rescaleParams="-vf scale=$5:-1:flags=neighbor"
 		# echo rescaleParams val is\:

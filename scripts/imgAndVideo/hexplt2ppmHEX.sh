@@ -85,7 +85,7 @@ else
 fi
 # WHETHER NUM tiles across (and down) is specified; if so, use as specified, if not so, do some math to figure for a 2:1 aspect;
 # $4 is across. If $4 is not specified, do some math. Otherwise use $4:
-if [ -z ${4+x} ]
+if [ -z "$4" ]
 then
 	# Get number of lines (colors). Square root of that x2 will be the number of columns in the rendered palette:
 	# Works around potential incorrect line count; re: https://stackoverflow.com/a/28038682/1397555 :
@@ -102,7 +102,7 @@ else
 	tilesAcross=$4
 fi
 # $5 is down. If $5 is not specified, do some math. Otherwise use $5.
-if [ -z ${5+x} ]
+if [ -z "$5" ]
 then
 	# Get number of lines (colors, yes again, if so). Square root of that / 2 will be the number of rows in the rendered palette.
 # TO DO: Update all scripts that count lines with the following form of fix:

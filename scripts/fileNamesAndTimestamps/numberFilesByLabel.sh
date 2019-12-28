@@ -57,7 +57,6 @@ rm _batchNumbering/tmp.txt _batchNumbering/tmp2.txt
 # Number list has already been sorted such that we can grab the highest number from the end of it:
 fileLabelNumber=`tail -1 ./_batchNumbering/numbersFromFileNames.txt`
 
-		# FAIL: if [ -z ${fileLabelNumber+x} ]
 if [[ $fileLabelNumber == "" ]]
 	then
 		echo !================================!

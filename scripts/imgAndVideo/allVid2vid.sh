@@ -14,14 +14,14 @@
 srcIMGformat=$1
 destIMGformat=$2
 
-if ! [ -z ${1+x} ]
+if [ "$1" ]
 	then
 		IMGconvertList=(`gfind . -maxdepth 1 -type f -iname \*.$srcIMGformat -printf '%f\n'`)
 	else
 		echo "No parameter 1 (source format) passed to script. Will exit script."
 		exit
 fi
-if ! [ -z ${2+x} ]
+if [ "$2" ]
 	then
 		destIMGformat=$2
 	else

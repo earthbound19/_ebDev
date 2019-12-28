@@ -36,7 +36,7 @@
 
 # CODE
 
-if [ -z ${1+x} ]
+if [ -z "$1" ]
 	then
 		echo No split block size passed to script. Picking one at random \(for super-concatenated superBlock.dat to be made\) . . .
 		blockSplitSize=`shuf -i 242-512 -n 1`

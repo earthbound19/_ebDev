@@ -11,9 +11,9 @@
 rndFileNameLen=8
 colorsInThisScheme=7
 
-if [ -z ${1+x} ]; then howManySchemesToCreate=1; else howManySchemesToCreate=$1; fi
+if [ -z "$1" ]; then howManySchemesToCreate=1; else howManySchemesToCreate=$1; fi
 # If no paramater $2 passed, set a string that later is used to instruct to randomly pick a number between 1 and 7:
-if [ -z ${2+x} ]; then pickNcolorsPerScheme="r"; else pickNcolorsPerScheme=$2; colorsInThisScheme=$pickNcolorsPerScheme; fi
+if [ -z "$2" ]; then pickNcolorsPerScheme="r"; else pickNcolorsPerScheme=$2; colorsInThisScheme=$pickNcolorsPerScheme; fi
 
 # Pregenerate random hex chars to be used in palettes:
 allRndHexChars=$(( $howManySchemesToCreate * $colorsInThisScheme * 6 ))	# some waste here, because if pickNcolorsPerScheme == r, a number of colors in a range will be selected for each generated scheme, and the number of hex characters generated against allRndHexChars won't all be used.

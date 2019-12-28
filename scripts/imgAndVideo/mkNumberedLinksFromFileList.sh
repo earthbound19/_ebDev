@@ -29,7 +29,7 @@
 
 # CODE
 # IF NO list file provided, assume it is IMGlistByMostSimilar.txt:
-if [ -z ${1+x} ]
+if [ -z "$1" ]
 then
 	fileList=IMGlistByMostSimilar.txt; echo No file list parameter \(\$\1\) passed to script\; setting fileList to default IMGlistByMostSimilar.txt
 else

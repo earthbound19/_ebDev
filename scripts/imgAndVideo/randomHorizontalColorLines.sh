@@ -31,7 +31,7 @@ echo colorSelectionList val\:
 # $3 How many such random images you want to create
 # $4 A file list of hex color values to randomly pick from (instead of 
 
-if [ ! -z ${4+x} ]
+if [ "$4" ]
 	then
 	mapfile -t hexColorsArray < $colorSelectionList
 	sizeOf_hexColorsArray=${#hexColorsArray[@]}
