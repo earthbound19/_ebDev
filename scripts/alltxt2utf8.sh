@@ -19,7 +19,7 @@ rm allFiles
 for filename in "${filesArray[@]}"
 do
 	temp=`file -bi $filename`
-	type=`echo $temp | sed 's/.*=\(.*\)/\1/g'`
+	type=`echo $temp | gsed 's/.*=\(.*\)/\1/g'`
 	echo type of $filename is:
 	echo $type
 	

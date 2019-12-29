@@ -13,7 +13,7 @@
 # TO DO
 # Various data mapping, signal processing/pattern matching type things to data to more meaningfully map it to color values. e.g. for every  raw RGB (three values from 0 to 255)-aligned datum map to fewer values approximating the range of that datum?
 
-imgFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
+imgFileNoExt=`echo $1 | gsed 's/\(.*\)\..\{1,4\}/\1/g'`
 ppmDestFileName="$imgFileNoExt"_asBMP.bmp
 
 fileToMakeCorruptedCopyOf=$1

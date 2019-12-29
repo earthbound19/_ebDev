@@ -1,7 +1,7 @@
 # DESCRIPTION
 # Invokes svgo_optimize.sh repeatedly. See comments in that script.
 
-find *.svg > allSVGs.txt
+gfind *.svg > allSVGs.txt
 while read line
 do
 	svgo_optimize.sh "$line"

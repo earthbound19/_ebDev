@@ -19,15 +19,15 @@
 
 count=0
 
-find *.$1 > tmp_lst.txt
+gfind *.$1 > tmp_lst.txt
 
 while read listItem
 do
   count=$(($count + 1))
   tmp=`gm identify $listItem`
-  xPix=`echo $tmp | sed 's/.*PNG \([0-9]\{1,\}\).*/\1/'`
+  xPix=`echo $tmp | gsed 's/.*PNG \([0-9]\{1,\}\).*/\1/'`
   # echo xPix is $xPix
-  yPix=`echo $tmp | sed 's/.*PNG [0-9]\{1,\}x\([0-9]\{1,\}\).*/\1/'`
+  yPix=`echo $tmp | gsed 's/.*PNG [0-9]\{1,\}x\([0-9]\{1,\}\).*/\1/'`
   # echo yPix is $yPix
   gm convert -size "$xPix"x"$yPix" -font Helvetica label:"$2 $count" $listItem
 done < tmp_lst.txt

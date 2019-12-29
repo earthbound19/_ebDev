@@ -23,13 +23,13 @@
 	# re: http://stackoverflow.com/questions/6598848/extract-layers-from-psd-with-imagemagick-preserving-layout --and -help info (-verbose switch)
 # perhaps kludgy, but all I can figure to do; figures out and stores number of images' layers in $numLayers:
 gm identify -verbose $1 > temp_j4EQD83qVYb74ZKeZaMRrWXxw8CBu53uN5.txt
-sed -i -n '/Scene/p' temp_j4EQD83qVYb74ZKeZaMRrWXxw8CBu53uN5.txt
+gsed -i -n '/Scene/p' temp_j4EQD83qVYb74ZKeZaMRrWXxw8CBu53uN5.txt
 thisStr=`wc -l temp_j4EQD83qVYb74ZKeZaMRrWXxw8CBu53uN5.txt | tr -d ' '`
-numLayers=`echo $thisStr | sed 's/^\([0-9]\{1,\}\) .*/\1/g'`
+numLayers=`echo $thisStr | gsed 's/^\([0-9]\{1,\}\) .*/\1/g'`
 echo numLayers is $numLayers
 exit
 rm temp_j4EQD83qVYb74ZKeZaMRrWXxw8CBu53uN5.txt
-imgFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
+imgFileNoExt=`echo $1 | gsed 's/\(.*\)\..\{1,4\}/\1/g'`
 
 # create subdir named after image to extract layers ("scenes") to:
 if [ ! -d "$imgFileNoExt"_scenes ]; then mkdir "$imgFileNoExt"_scenes; fi

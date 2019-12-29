@@ -19,7 +19,7 @@
 error_code=`echo $?`
 # echo error_code is $error_code
 
-# If no png files were found (if gfind threw an error), destroy any README.md gallery file and exit the script:
+# If no png files were found (if find threw an error), destroy any README.md gallery file and exit the script:
 if (( error_code == "1" ))
 then
 	echo "--NO png files were found. DESTROYING README.md and will then exit script!";

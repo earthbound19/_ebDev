@@ -11,7 +11,7 @@
 # The following command, for example, will select 20 jpg images, make 10 corrupted copies of each, corrupting each copy by 2 percent:
 # thisScript.sh jpg 20 10 2
 
-find *$1 > _alles.txt
+gfind *$1 > _alles.txt
 mapfile -t allFilesOfExtension < _alles.txt
 rm ./_alles.txt
 sizeOfallFilesOfExtension=${#allFilesOfExtension[@]}
@@ -57,4 +57,4 @@ chmod 777 ./_glitched/*
 
 
 # dev scrap:
-# find png_512_smileys_ff_output_glitchMods/*$1 > _alles.txt
+# gfind png_512_smileys_ff_output_glitchMods/*$1 > _alles.txt

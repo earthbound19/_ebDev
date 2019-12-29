@@ -16,7 +16,7 @@ yTiles=$2
 echo yTiles is $yTiles
 totalTiles=$((xTiles * yTiles))
 
-find ./_selected/* > alles.txt
+gfind ./_selected/* > alles.txt
 mapfile -t alles < alles.txt
 allesSize=${#alles[@]}
 

@@ -26,7 +26,7 @@
 		# f f f f f f f f f
 		# f f f f f f f f f = 3 rows of 9 vals = 27 = orig. data length.
 
-imgFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
+imgFileNoExt=`echo $1 | gsed 's/\(.*\)\..\{1,4\}/\1/g'`
 ppmDestFileName="$imgFileNoExt""_asPPM.ppm"
 
 inputDataFile=$1
@@ -44,8 +44,8 @@ echo ff >> PPMheader.txt
 # Make P3 PPM body:
 # Dump file to one-byte hex columns $valsPerRow per row, via od
 od -t x1 -w$valsPerRow $inputDataFile > PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
-# strip off the byte offset count (I think it is) info at the start of each row, via sed:
-sed -i 's/^[0-9]\{1,\} \(.*\)/\1/g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+# strip off the byte offset count (I think it is) info at the start of each row, via gsed:
+gsed -i 's/^[0-9]\{1,\} \(.*\)/\1/g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 
 # Concatenate the header and body into a new, complete PPM format file:
 cat PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt > $ppmDestFileName

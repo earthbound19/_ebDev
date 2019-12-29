@@ -2,7 +2,7 @@
 # Creates a bash array of many image types from all such files in the current path. Must be invoked via `source` to be useful. See USAGE.
 
 # DEPENDENCIES
-# a 'nixy environment, gfind
+# a 'nixy environment, gfind (find)
 
 # USAGE Invoke with or without an optional parameter. If invoked without a parameter:
 # source get_all_imgs_array.sh

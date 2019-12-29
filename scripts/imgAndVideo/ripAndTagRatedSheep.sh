@@ -12,8 +12,8 @@ sheep_avis_local_path=`cygpath -u 'C:\ProgramData\ElectricSheep\content\mpeg'`
 sheep_transcodedDestPath='C:\ratedSheep'
 # END global PATH VARIABLES
 
-sed -n 's/.*rating=\"\([0-9]\{1,\}\)\".*url=\"\(.*\)\".*/\1 \2/p' $sheep_content_XML_path\\$sheep_content_XML_file > ratedSheepAndURLs.txt
-sed '/^0 .*/d' ratedSheepAndURLs.txt > temp.txt
+gsed -n 's/.*rating=\"\([0-9]\{1,\}\)\".*url=\"\(.*\)\".*/\1 \2/p' $sheep_content_XML_path\\$sheep_content_XML_file > ratedSheepAndURLs.txt
+gsed '/^0 .*/d' ratedSheepAndURLs.txt > temp.txt
 sort -g -r temp.txt > temp2.txt
 rm temp.txt ratedSheepAndURLs.txt
 mv temp2.txt ratedSheepAndURLs.txt
@@ -25,15 +25,15 @@ mapfile -t sortedRatedSheep < ratedSheepAndURLs.txt
 for element in "${sortedRatedSheep[@]}"
 do
 	# get rating:
-	rating=`echo $element | sed 's/^\([0-9]\{1,\}\) .*/\1/g'`
+	rating=`echo $element | gsed 's/^\([0-9]\{1,\}\) .*/\1/g'`
 		echo rating is\: $rating
 	# get URL:
-	URL=`echo $element | sed 's/^[0-9]\{1,\} \(.*\)/\1/g'`
+	URL=`echo $element | gsed 's/^[0-9]\{1,\} \(.*\)/\1/g'`
 		# echo URL is\: $URL
-	localFile=`echo $URL | sed 's/.*\/\(.*\)/\1/g'`
+	localFile=`echo $URL | gsed 's/.*\/\(.*\)/\1/g'`
 	localFile="$sheep_avis_local_path/$localFile"
 		echo local file name is\: $localFile
-	localFileNoEXT=`echo $localFile | sed 's/.*\/\(.*\)\.avi/\1/g'`
+	localFileNoEXT=`echo $localFile | gsed 's/.*\/\(.*\)\.avi/\1/g'`
 		# echo local file name without extension is\: $localFileNoEXT
 	# Losslessly transcode and embed rating in metadata only if target file does not already exist:
 	i=0

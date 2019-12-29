@@ -14,13 +14,13 @@ do
 	# Get an 8-byte random number; re http://www.cyberciti.biz/faq/bash-shell-script-generating-random-numbers/ ; output should be in the range 0- ~18.4 quintillion re: https://en.wikipedia.org/wiki/Integer_%28computer_science%29#Words
 		
 	seed=`od -vAn -N8 -tu8 < /dev/urandom`
-	seed=`echo $seed | sed 's/ //g'`		# Trims unwanted space from front of number.
+	seed=`echo $seed | gsed 's/ //g'`		# Trims unwanted space from front of number.
 	numRandomPoints=$[ 3 + $[ RANDOM % 11 ]]	# Random number between 3 and 11.
 	lineWidth=$[ 3 + $[ RANDOM % 7 ]]	# Random number between 3 and 11.
 	interpolationPoints=1
 # TO DO: Make note somewhere that the preceding line may be a preferred method of generating random numbers in an extremely large range. NOTE: I don't know how randomblob.sh handles the -S parameter, but it seems there's no upper bound to the number you can throw at it. I've tried ~4* 18 quintillion, the approximate max range of a 16 byte unsigned int, and it still worked and produced original output.
 	outfile="randomBlob S$seed n$numRandomPoints p$interpolationPoints l$lineWidth.png"
-	outfile=`echo "$outfile" | sed 's/ /_/g'`	# Replaces spaced with underscores, where the variables won't assign to a string properly in the first place with underscores.
+	outfile=`echo "$outfile" | gsed 's/ /_/g'`	# Replaces spaced with underscores, where the variables won't assign to a string properly in the first place with underscores.
 	command="randomblob.sh -S $seed -n $numRandomPoints -p $interpolationPoints -l $lineWidth -d straight $outfile"
 	echo command is $command
 	$command

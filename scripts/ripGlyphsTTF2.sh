@@ -17,9 +17,8 @@ while read -r line; do
 done < printableBasicLatinUnicode_codepages.txt
 
 # rename resultant files after font file name.
-# //using mac find; dunno whether this will work with cygwin or other 'nix environments; re: http://apple.stackexchange.com/a/1449
-fontFileNameNoExt=`echo $1 | sed 's/\(.*\)\.ttf/\1/g'`
-epsArray=`find . -type f -name "*.eps"`
+fontFileNameNoExt=`echo $1 | gsed 's/\(.*\)\.ttf/\1/g'`
+epsArray=`gfind . -type f -name "*.eps"`
 for epsFileName in ${epsArray[@]}
 do
   epsFileName=`basename "$epsFileName"`
