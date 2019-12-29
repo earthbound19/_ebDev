@@ -7,7 +7,7 @@
 # ALSO, see the "ADDITIONAL PARAMTERS" comment section.
 
 # DEPENDENCIES
-# gsed, gfind, ffmpeg
+# gsed, gfind (find), ffmpeg
 
 
 # CODE

@@ -5,7 +5,7 @@
 echo BEGINNING correcting of timestamps to match any EXIF data . . .
 
 # TO DO: remove file extensions from the following list which will never contain metadata.
-# Another (easier to read and change?) way to do the following: find . -type f -iregex '\.\/.*.\(tif\|tiff\|png\|.psd\|ora\|kra\|rif\|riff\|jpg\|jpeg\|gif\|bmp\|cr2\|crw\|pdf\|ptg\)' -printf '%TY %Tm %Td %TH %TM %TS %p\n' | sort -g > _batchNumbering/fileNamesWithNumberTags.txt
+# Another (easier to read and change?) way to do the following: gfind . -type f -iregex '\.\/.*.\(tif\|tiff\|png\|.psd\|ora\|kra\|rif\|riff\|jpg\|jpeg\|gif\|bmp\|cr2\|crw\|pdf\|ptg\)' -printf '%TY %Tm %Td %TH %TM %TS %p\n' | sort -g > _batchNumbering/fileNamesWithNumberTags.txt
 gfind . -iname \*.tif -o -iname \*.tiff -o -iname \*.psd -o -iname \*.mov -o -iname \*.mp4 -o -iname \*.m4a > dateByImageInfoFilesListTemp.txt
 
 while read filename
@@ -36,12 +36,12 @@ rm ./dateByImageInfoFilesListTemp.txt
 
 
 # DISCARDED (AND DUPLICATE) though potentially useful code/notes:
-	# get and filter timestamps of file via exiftool and sed:
+	# get and filter timestamps of file via exiftool and gsed:
 # exiftool derp.tif > wut_-32.txt
 	# extract file name line to temp file:
-# sed -n 's/\(.*File Name.*\)/\1/p' wut_-32.txt > file_name_line.txt
+# gsed -n 's/\(.*File Name.*\)/\1/p' wut_-32.txt > file_name_line.txt
 	# reduce to only lines with date stamps of format 2011:11:11 18:11:11+00:00; pruning off the extraneous first part of the line meanwhile:
-# sed -i -n 's/\(.*: [0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}.*\)/\1/p' wut_-32.txt
+# gsed -i -n 's/\(.*: [0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}.*\)/\1/p' wut_-32.txt
 		
 	# sort the results, to put the oldest (or "smallest" in a sense) file stamp on the first line:
 # sort wut_-32.txt > YA_DIS_TING.txt

@@ -22,8 +22,8 @@ ghead -n $head_to $1 > tmp_head_wYSNpHgq.fountain
 gtail -n +$tail_from $1 > tmp_tail_wYSNpHgq.fountain
 dos2unix tmp_head_wYSNpHgq.fountain tmp_tail_wYSNpHgq.fountain
 #  - join semantic linefeeds into that tail file, in-place:
-# Adapted from: https://backreference.org/2009/12/23/how-to-match-newlines-in-sed/
-# sed ':begin;$!N;s/FOO\nBAR/FOOBAR/;tbegin;P;D'   # if a line ends in FOO and the next
+# Adapted from: https://backreference.org/2009/12/23/how-to-match-newlines-in-gsed/
+# gsed ':begin;$!N;s/FOO\nBAR/FOOBAR/;tbegin;P;D'   # if a line ends in FOO and the next
 # starts with BAR, join them
 #   - Also don't match [ .@~] characters at start of line (don't join if those fountain syntax
 # marks are present:

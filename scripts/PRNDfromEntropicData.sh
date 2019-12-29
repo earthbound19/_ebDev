@@ -61,7 +61,7 @@ cmd /c 'rehash -none -adler32 -crc16 -crc16c -crc16x -crc32 -elf32 -fcs16 -fnv32
 # because that results in windows "newlines" (\n\r), change them to 'nix:
 dos2unix rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt
 # strip down that output to only hex prints and newlines:
-sed -i -e 's/.*: \(.*\).*/\1/g' -e 's/<.*>//g' rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt
+gsed -i -e 's/.*: \(.*\).*/\1/g' -e 's/<.*>//g' rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt
 timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
 tr -d '\n' < rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt > __trueRandomData_"$timestamp"_HEXsrcTable.txt
 rm rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt

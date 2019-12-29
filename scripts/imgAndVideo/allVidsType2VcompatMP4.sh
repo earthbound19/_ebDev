@@ -6,7 +6,7 @@
 # Vcompat = compatible with Sony (V)egas video editing software. 2016-04-26 9:46 PM -RAH
 
 # DEPENDENCIES
-# gfind (gnu find), ffmpeg, a 'nixy environment.
+# find (gnu find), ffmpeg, a 'nixy environment.
 
 
 # CODE

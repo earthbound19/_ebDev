@@ -8,12 +8,12 @@
 # ./thisScript.sh png
 
 # list all directories in path.
-find -type d > allDirs.txt
+gfind -type d > allDirs.txt
 # remove all directories from listing which are a name match for the extension in paramater $1. Dunno why -i won't work here:
 sedPattern="s/\(.*\/$1.*\)//p"
-sed $sedPattern allDirs.txt > allDirsMinusType.txt
+gsed $sedPattern allDirs.txt > allDirsMinusType.txt
 # strip blank lines from that result.
-sed -i ':a;N;$!ba;s/\n\n//g' allDirsMinusType.txt
+gsed -i ':a;N;$!ba;s/\n\n//g' allDirsMinusType.txt
 mapfile -t allIMGs < allDirsMinusType.txt
 rm allDirs.txt allDirsMinusType.txt
 

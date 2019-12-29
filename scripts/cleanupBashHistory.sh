@@ -10,7 +10,7 @@ function dedup {
 function remove_histignore {
    if [ -n "$HISTIGNORE" ]; then
       # replace : with |, then * with .*
-      local IGNORE_PAT=`echo "$HISTIGNORE" | sed s/\:/\|/g | sed s/\*/\.\*/g`
+      local IGNORE_PAT=`echo "$HISTIGNORE" | gsed s/\:/\|/g | gsed s/\*/\.\*/g`
       # negated grep removes matches
       grep -vx "$IGNORE_PAT" $@
    else

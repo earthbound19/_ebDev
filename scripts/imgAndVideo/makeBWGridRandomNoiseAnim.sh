@@ -43,9 +43,9 @@ do
 	cat /dev/urandom | tr -dc '0-1' | head -c $squaresPerImage > grid.pbm
 # TO DO: See if you can make all this data in files in-memory and cat therefrom.
 	# Split it into new lines by the number of columns ("digits") per line that should be in the image:
-	sed -i "s/\(.\{$numCols\}\)/\1\n/g" grid.pbm
+	gsed -i "s/\(.\{$numCols\}\)/\1\n/g" grid.pbm
 	# Intersperse all the digits with spaces:
-	sed -i 's/\([0-9]\)/\1 /g' grid.pbm
+	gsed -i 's/\([0-9]\)/\1 /g' grid.pbm
 
 	printf "P1
 $numCols $numRows
