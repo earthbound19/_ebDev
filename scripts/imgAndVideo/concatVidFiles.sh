@@ -10,9 +10,9 @@
 # DEPENDENCIES: ffmpeg and a 'nix system (can be cygwin for Windows).
 
 if [ "$1" ]
-	then
+then
 	vidExt=$1
-	else
+else
 	vidExt=mp4
 fi
 
