@@ -15,3 +15,8 @@ if [ "$CONDITION" == "y" ]; then
 	else
 		echo D\'oh!; exit;
 fi
+
+# Overwrites fstab that comes with bad evil pointlessly restrictive
+# (for my purposes) permissions defaults with defaults we actually want;
+# RE: https://superuser.com/a/392598/130772 :
+cp ./CYGWIN_fstab /etc/fstab
