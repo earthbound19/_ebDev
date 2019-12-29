@@ -12,7 +12,7 @@ exit
 # closed issues.
 
 # DEPENDENCES
-# hub (on Mac: brew install hub) (a CLI interface for the GitHub API), gsed (gnu sed)
+# hub (on Mac: brew install hub) (a CLI interface for the GitHub API), gsed (gnu gsed)
 
 # CODE
 # use the GitHub API to assign no users [] to the issue,
