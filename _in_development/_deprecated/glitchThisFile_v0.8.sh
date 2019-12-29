@@ -13,8 +13,8 @@
 skipHeaderBytes=8
 
 # Retrieve extension of source file; thanks re http://stackoverflow.com/a/1665574 :
-fileExt=`echo $1 | sed -n 's/.*\.\(.\{1,5\}\).*/\1/p'`
-mvDir=`echo $1 | sed "s/\(.*\)\.$fileExt/\1/g"`
+fileExt=`echo $1 | gsed -n 's/.*\.\(.\{1,5\}\).*/\1/p'`
+mvDir=`echo $1 | gsed "s/\(.*\)\.$fileExt/\1/g"`
 if [ ! -d "$mvDir"_corrupted ]; then mkdir "$mvDir"_corrupted; fi
 
 __ln=( $( ls -Lon "$1" ) )

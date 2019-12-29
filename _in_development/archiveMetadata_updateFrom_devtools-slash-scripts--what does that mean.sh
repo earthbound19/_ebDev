@@ -34,5 +34,5 @@ for element in ${list[@]}
 
 
 # ==VERSION HISTORY==
-# 01/19/2019 06:32:32 AM -- revived development by fixing functionality of find -> gfind in so many scripts. I think this is intended to back up metadata. Don't I already have something that does that though?
+# 01/19/2019 06:32:32 AM -- revived development by fixing functionality of find -> find in so many scripts. I think this is intended to back up metadata. Don't I already have something that does that though?
 # 01/05/2016 01:17:42 AM -- seriously . . . good night. Got working in tandem with companion script, getShorterImageName.ahk/.exe. Added feature that it's smart enough to properly create and write to _originalMetaData subfolders for respective image directories.

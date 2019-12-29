@@ -51,8 +51,8 @@ then
 	# deletes the line and the line after it (I think?--it leaves one space instead of two) :
 	gsed -i ':begin;$!N;/\!\[.*/d;tbegin;P;D' tmp_tail_wYSNpHgq.fountain
 	#  - join semantic linefeeds into that tail file, in-place:
-	# Adapted from: https://backreference.org/2009/12/23/how-to-match-newlines-in-sed/
-	# sed ':begin;$!N;s/FOO\nBAR/FOOBAR/;tbegin;P;D'   # if a line ends in FOO and the next
+	# Adapted from: https://backreference.org/2009/12/23/how-to-match-newlines-in-gsed/
+	# gsed ':begin;$!N;s/FOO\nBAR/FOOBAR/;tbegin;P;D'   # if a line ends in FOO and the next
 	# starts with BAR, join them
 	#   - Also don't match [ .@~] characters at start of line (don't join if those fountain syntax
 	# marks are present:

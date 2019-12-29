@@ -45,7 +45,7 @@ while :; do
 
     # we are at the beginning of a fresh block
     # remove optional leading hyphen and strip trailing whitespaces
-    opt=$(echo "$1" | sed 's/^-\?\([a-zA-Z0-9\?-]*\)/\1/')
+    opt=$(echo "$1" | gsed 's/^-\?\([a-zA-Z0-9\?-]*\)/\1/')
 
   fi
 

@@ -30,7 +30,7 @@ gfind \*.eps > all_eps.txt
 while read element
 do
 # TO DO: fix base file name format to the more elegant "echo" means. Also do this for allSVG2img.sh.
-		epsFilenameNoExtension=`echo $element | sed 's/\(.*\)\.svg/\1/g'`
+		epsFilenameNoExtension=`echo $element | gsed 's/\(.*\)\.svg/\1/g'`
 	if [ -a $epsFilenameNoExtension.$img_format ]
 	then
 		echo render candidate is $epsFilenameNoExtension.$img_format

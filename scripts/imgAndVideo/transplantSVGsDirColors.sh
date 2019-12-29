@@ -9,7 +9,7 @@
 SVGcolorTransplantRecipient=$1
 SVGcolorTransplantSRCsDIR=$2
 
-find $SVGcolorTransplantSRCsDIR -maxdepth 1 -iname \*.svg > SVGcolorTransplantSRCs.txt
+gfind $SVGcolorTransplantSRCsDIR -maxdepth 1 -iname \*.svg > SVGcolorTransplantSRCs.txt
 SVGcolorTransplantSRCs=( $( < SVGcolorTransplantSRCs.txt) )
 
 for SVGcolorTransplantSRC in ${SVGcolorTransplantSRCs[@]}

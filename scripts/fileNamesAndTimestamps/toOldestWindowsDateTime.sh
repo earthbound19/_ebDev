@@ -7,7 +7,7 @@
 # toOldestWindowsDateTime.sh source_file.txt
 
 # DEPENDENCIES
-# exiftool, gsed (sed), head, tail, binarez_touch http://www.binarez.com/touch_dot_exe/ or my _ebSuperBin repo
+# exiftool, gsed (gsed), head, tail, binarez_touch http://www.binarez.com/touch_dot_exe/ or my _ebSuperBin repo
 
 
 # CODE

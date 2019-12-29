@@ -8,7 +8,7 @@
 # !!===============DANGER ZONE===============!!
 
 # thisDir=`pwd`
-# find "$thisDir/" -type f > ../allFiles.txt
+# gfind "$thisDir/" -type f > ../allFiles.txt
 # while read p
 # do
 	# rm "$p"

@@ -5,12 +5,12 @@
 # TO DO: upgrade listing to all possible image types.
 # TO DO: make a private fork of Fred's scripts that use graphicsmagick, since I've migrated to that for all of my scripts? Keep a legacy imagemagick install? :/
 
-find . -iname \*.png > crop_imgs.txt
+gfind . -iname \*.png > crop_imgs.txt
 
 i=0
 while read element
 do
-	imgFileNoExt=`echo $element | sed 's/\(.*\)\..\{1,4\}/\1/g'`
+	imgFileNoExt=`echo $element | gsed 's/\(.*\)\..\{1,4\}/\1/g'`
 	if [ -a $imgFileNoExt.bmp ]
 	then
 		der=duh

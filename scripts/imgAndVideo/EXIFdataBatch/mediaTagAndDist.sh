@@ -9,7 +9,7 @@
 # A self-hosted intstall of polr URL shortener and the API key for it saved to ~/PolrAPIkey.txt, wget, exiftool, cygwin (this is tied to windows at the moment) . . ?
 
 # TO DO; * = done, / = in progress:
-# FIND OUT: can the problem of sed not searching paths for the urlencode.sed file be fixed without a kludge absolute path hard-coded? If not, store that path in a text file in ~./
+# FIND OUT: can the problem of gsed not searching paths for the urlencode.gsed file be fixed without a kludge absolute path hard-coded? If not, store that path in a text file in ~./
 # Don't do any copying and metadata then copy again operations if the target file in _dist already exists (it's recreating them but shouldn't--maybe this is a bug, as I already coded for that.)
 # Figure out why this updates metadata ok to __tagAndDistPrepImage.jpg with e.g. 9000x6000 px jpgs, but chokes on copying them to _dist; fix that. WAIT: I think the real problem was I couldn't rename a file to a duplicate target file name. Catch errors when that happens? Verify this is what happens (the "WAIT" hypothesis).
 # ? Don't update metadata template with a shortened URL (and retrieve a short URL) if one already exists.
@@ -44,18 +44,18 @@ echo "This script will erase all metadata from applicable image files in the ent
 # END SCRIPT WARNING =======================================
 
 
-find . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
+gfind . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
 mapfile -t images_MD_ADDS_list < images_MD_ADDS_list.txt
 for element in "${images_MD_ADDS_list[@]}"
 do
 	# Retrieve image title from ~MD_ADDS.txt for use in adding search engine query for original image source--adding that to the description tag:
-	imageTitle=`sed -n 's/^-IPTC:ObjectName="\(.*\)"$/\1/p' $element`
+	imageTitle=`gsed -n 's/^-IPTC:ObjectName="\(.*\)"$/\1/p' $element`
 	# Strip out characters (from imageTitle) which may choke the Sphider search engine which I use; adapted from ftun.sh; dunno why, but that backtick \` had to be triple-escaped \\\ and also a backslash double-escaped, and even that only worked if everything is surrounded by single-quote marks ':
 	imageTitleForURLencode=`echo $imageTitle | tr -d '\=\@\\\`~\!#$%^\&\(\)+[{<]}>\*\;\|\/\\\,'`
 	# re: https://gimi.name/snippets/urlencode-and-urldecode-for-bash-scripting-using-sed/ :
 			# OR? : https://gist.github.com/cdown/1163649 :
 	oy="http://earthbound.io/q/search.php?search=1&query=$imageTitleForURLencode"
-	oy=`echo "$oy" | sed -f /cygdrive/c/_ebdev/scripts/urlencode.sed`
+	oy=`echo "$oy" | gsed -f /cygdrive/c/_ebdev/scripts/urlencode.sed`
 	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=""$PolrAPIkey""&is_secret=false&response_type=plain_text&url=$oy"
 echo command to run will be\:
 			# DEPRECATED as it stopped working and I'm not figuring out why, when a working alternative is available:
@@ -64,28 +64,28 @@ echo command to run will be\:
 	curl "$wgetArg" > oy.txt
 			# Insert that with a search query URL into the description tag; roundabout means via invoking script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:
 	# parse that result and store it in a variable $descriptionAddendum:
-	sed -i 's/\//\\\//g' oy.txt
+	gsed -i 's/\//\\\//g' oy.txt
 	descriptionAddendum=$( < oy.txt)
 			# echo descriptionAddendum value is\:
 			# echo $descriptionAddendum
 			# echo element is\:
 			# echo $element
 	# strip placeholder URL from description and replace it with URL from $descriptionAddendum:
-	# sed -i 's/\(.*See\) http:\/\/[^ ]* for \(.*\)/ \1 $descriptionAddendum for \2/g' $element
-	sed -i -e s/"\(.*See\) http:\/\/[^ ]* \(for .*\)"/"\1 $descriptionAddendum \2"/g $element
+	# gsed -i 's/\(.*See\) http:\/\/[^ ]* for \(.*\)/ \1 $descriptionAddendum for \2/g' $element
+	gsed -i -e s/"\(.*See\) http:\/\/[^ ]* \(for .*\)"/"\1 $descriptionAddendum \2"/g $element
 	rm oy.txt
 	tr '\n' ' ' < $element > ghor.txt
 	exifTagArgs=$( < ghor.txt)
 	rm ghor.txt
 	# Retrieve extension of source final master file name (SFMFN) from ~MD_ADDS; and store it in a variable; thanks re http://stackoverflow.com/a/1665574 :
-	SFMFNextension=`sed -n 's/.*from master file.*\(\..\{1,4\}\)"/\1/p' $element`
-	# Retrieve and store full ~ file name with extension; the \.\/ part escapes ./ (which ./ this sed command also strips) :
-				# SFMFNnoExtension=`sed -n 's/.*from master file: \.\/\(.*\)\..\{1,4\}"/\1/p' $element`
+	SFMFNextension=`gsed -n 's/.*from master file.*\(\..\{1,4\}\)"/\1/p' $element`
+	# Retrieve and store full ~ file name with extension; the \.\/ part escapes ./ (which ./ this gsed command also strips) :
+				# SFMFNnoExtension=`gsed -n 's/.*from master file: \.\/\(.*\)\..\{1,4\}"/\1/p' $element`
 	# SFMFNpath will preserve any subdirectory paths and duplicate them to the target ./_dist path:
-	SFMFNpath=`sed -n 's/.*from master file: \.\/\(.*\/\).*\"/\1/p' $element`
+	SFMFNpath=`gsed -n 's/.*from master file: \.\/\(.*\/\).*\"/\1/p' $element`
 # e.g. result val of SFMFNpath: subdir/
 # OR if no subdir, it is blank.
-	SFMFNwithExtension=`sed -n 's/.*from master file: \.\/\(.*\..\{1,4\}\)"/\1/p' $element`
+	SFMFNwithExtension=`gsed -n 's/.*from master file: \.\/\(.*\..\{1,4\}\)"/\1/p' $element`
 					# echo ~~~~
 						# echo SFMFNwithExtension is $SFMFNwithExtension
 						# echo SFMFNnoExtension is $SFMFNnoExtension

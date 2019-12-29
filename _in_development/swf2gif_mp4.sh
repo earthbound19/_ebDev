@@ -8,7 +8,7 @@
 
 # An alternative approach: https://gist.github.com/hfossli/6003302
 
-find *.swf > swfs.txt
+gfind *.swf > swfs.txt
 mapfile -t swfs < swfs.txt
 rm swfs.txt
 for element in "${swfs[@]}"

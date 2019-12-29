@@ -41,33 +41,33 @@
 	# --and from: http://stackoverflow.com/a/23208069
 	# --and from (re CASE INSENSITIVE REGEX!):
 	# http://alvinalexander.com/blog/post/linux-unix/case-insensitive-file-searching-unix-linux-mac-osx
-find . -regex '.*' -printf '%T@ %c %p\n' | sort -k 1n,1 -k 7 | cut -d' ' -f2- > fileNamesWithNumberTags.txt
+gfind . -regex '.*' -printf '%T@ %c %p\n' | sort -k 1n,1 -k 7 | cut -d' ' -f2- > fileNamesWithNumberTags.txt
 	# Trim that to only the file names (no paths or date info) :
-sed -i 's/.*\/\(.*\)/\1/g' fileNamesWithNumberTags.txt
-	# Trim that to only file names with the tag _final_ (no longer paying mind to the path since that was deleted), by deleting lines that do *not* match _final_; the [fF] etc. that follows causes case-insensitive search (the Cygwin sed I use doesn't seem to support that):
-sed -i '/.*_[fF][iI][nN][aA][lL]_.*/!d' fileNamesWithNumberTags.txt
+gsed -i 's/.*\/\(.*\)/\1/g' fileNamesWithNumberTags.txt
+	# Trim that to only file names with the tag _final_ (no longer paying mind to the path since that was deleted), by deleting lines that do *not* match _final_; the [fF] etc. that follows causes case-insensitive search (the Cygwin gsed I use doesn't seem to support that):
+gsed -i '/.*_[fF][iI][nN][aA][lL]_.*/!d' fileNamesWithNumberTags.txt
 	# Trim that to only file names that do *not* include the label variant (without the quote marks) ; by deleting all lines (file names) from the list that match _variant_ (and also search cAse INsenSitiVE):
-sed -i 's/.*[vV][aA][rR][iI][aA][nN][tT].*//g' fileNamesWithNumberTags.txt
+gsed -i 's/.*[vV][aA][rR][iI][aA][nN][tT].*//g' fileNamesWithNumberTags.txt
 	# To count, we don't need to worry about exluding file names from the list that don't match the regex _[-09]{5}_, we simply only search for . . . well, reduce all the text to that, for each line. But that must happen only against a list where the file names (not paths) match the regex _final_. Thank you for listening to my jumbled brain.
 		# DEPRECATED; explanation follows:
 		# Reduce that to only include file names with five-digit numbers; by deleting lines that do *not* match _[0-9]{5}_:
-		# sed -i '/.*_[0-9]\{5\}_.*/!d' fileNamesWithNumberTags.txt
+		# gsed -i '/.*_[0-9]\{5\}_.*/!d' fileNamesWithNumberTags.txt
 		# PROBLEM: That means filenames like e.g. _final_00003.psd (which has a valid number tag) were *not* matched, and therefore the highest number found could be erroneous; also, it would mismatch non-number tags such as in file names like _stub_FINal_image383.99829.png and  _FINal_imageWithWierdNumbers_87398x44386.png
 		# SOLUTION: Use also the regex .*_[0-9]\{5\}\.[^0-9]\{1,4\} which will match e.g. _final_00003.psd (with prejudice against any five-letter image format file extensions).
 		# COMBINING those, this is the monstrous regex I get, and it works!
-sed -i '/.*_[0-9]\{5\}_.*\|.*_[0-9]\{5\}\.[^0-9]\{1,4\}/!d' fileNamesWithNumberTags.txt
+gsed -i '/.*_[0-9]\{5\}_.*\|.*_[0-9]\{5\}\.[^0-9]\{1,4\}/!d' fileNamesWithNumberTags.txt
 	# Reduce that to only the five digit numbers, then read it into an array which will be sorted by highest number:
 	# TO DO: Fix the following to 's/.*_\([0-9]\{5\}\)_.*/\1/g'; but that causes problems with e.g. the filename _FINAL_abstraction_00375_-2014-12-10__08.11.18_AM__202.60985_and_202.52834_interpolate-size2560x1920__FFmulti__.tif; fix the preceding code line in this file to solve that problem. DONE. Fixed by adding underscores to the following regex, then after that a regex that strips every line that has underscores. 2015-11-30 -RAH
-sed 's/.*_\([0-9]\{5\}\)_.*/\1/g' fileNamesWithNumberTags.txt > numbersFromFileNames.txt
-sed -i 's/.*_.*//g' numbersFromFileNames.txt
+gsed 's/.*_\([0-9]\{5\}\)_.*/\1/g' fileNamesWithNumberTags.txt > numbersFromFileNames.txt
+gsed -i 's/.*_.*//g' numbersFromFileNames.txt
 	# Clean that up to eliminate any resultant blank lines (wouldn't be necessary with a more elegant solution) :
 		# TO DO: fix problem that follows? :
 		# YES, IT'S RIDICULOUS . . .
-		sed -i ':a;N;$!ba;s/\n\n\n\n/\n/g' numbersFromFileNames.txt
-		sed -i ':a;N;$!ba;s/\n\n\n/\n/g' numbersFromFileNames.txt
-		sed -i ':a;N;$!ba;s/\n\n/\n/g' numbersFromFileNames.txt
-		sed -i ':a;N;$!ba;s/\n\n/\n/g' numbersFromFileNames.txt
-		sed -i ':a;N;$!ba;s/\n\n/\n/g' numbersFromFileNames.txt
+		gsed -i ':a;N;$!ba;s/\n\n\n\n/\n/g' numbersFromFileNames.txt
+		gsed -i ':a;N;$!ba;s/\n\n\n/\n/g' numbersFromFileNames.txt
+		gsed -i ':a;N;$!ba;s/\n\n/\n/g' numbersFromFileNames.txt
+		gsed -i ':a;N;$!ba;s/\n\n/\n/g' numbersFromFileNames.txt
+		gsed -i ':a;N;$!ba;s/\n\n/\n/g' numbersFromFileNames.txt
 # Put those numbers into an array, and sort it to find the highest one (the sort command could as easily do) :
 mapfile -t numbersArray < numbersFromFileNames.txt
 # rm numbersFromFileNames.txt
@@ -84,24 +84,24 @@ echo highest found labeled number is $num.
 
 # RENAMING
 	# Create a list of all filenames with these criteria: has _final_ in the filename, but doesn't have a number in the format _nnnnn_ (e.g. _00020_); create a list of files which are tagged to be auto-numbered by this script.
-find . -regex '.*' -printf '%T@ %c %p\n' | sort -k 1n,1 -k 7 | cut -d' ' -f2- > filesWithTagAndNoNumber.txt
+gfind . -regex '.*' -printf '%T@ %c %p\n' | sort -k 1n,1 -k 7 | cut -d' ' -f2- > filesWithTagAndNoNumber.txt
 	# Prune the date stamp info before the paths start:
-sed -i 's/.*\ \(\.\/.*\)/\1/g' filesWithTagAndNoNumber.txt
+gsed -i 's/.*\ \(\.\/.*\)/\1/g' filesWithTagAndNoNumber.txt
 	# DELETE EVERY line that does *not* match the expression \(.*\/\)\(.*_final_.*\) ; re: http://stackoverflow.com/a/9544146
-	# NOTE: the [fF] etc groups make the search case-insensitive. There apparently isn't a Cygwin sed option for that.
-sed -i '/.*\/.*_[fF][iI][nN][aA][lL]_.*/!d' filesWithTagAndNoNumber.txt
+	# NOTE: the [fF] etc groups make the search case-insensitive. There apparently isn't a Cygwin gsed option for that.
+gsed -i '/.*\/.*_[fF][iI][nN][aA][lL]_.*/!d' filesWithTagAndNoNumber.txt
 	# DELETE EVERY line that *matches* the expression .*_[0-9]\{5\}_.* OR e.g. the pattern _00024.png ; to include all file names that do not have valid number tags, but do have other number formats, e.g. .*203.55461.* or .*1280x720.* :
 		# DEPRECATED; because it doesn't catch cases like _00024.png:
-		# sed -i 's/.*\/.*_[0-9]\{5\}_.*//g' filesWithTagAndNoNumber.txt
+		# gsed -i 's/.*\/.*_[0-9]\{5\}_.*//g' filesWithTagAndNoNumber.txt
 	# UPGRADED to add support for pattern e.g. _00024.png:
-sed -i 's/.*\/.*_[0-9]\{5\}_.*\|.*_[0-9]\{5\}\.[^0-9]\{1,4\}//g' filesWithTagAndNoNumber.txt
+gsed -i 's/.*\/.*_[0-9]\{5\}_.*\|.*_[0-9]\{5\}\.[^0-9]\{1,4\}//g' filesWithTagAndNoNumber.txt
 # Delete double newlines (empty lines):
 		# BLERGH also fix (TO DO):
-		sed -i ':a;N;$!ba;s/\n\n\n\n/\n/g' filesWithTagAndNoNumber.txt
-		sed -i ':a;N;$!ba;s/\n\n\n/\n/g' filesWithTagAndNoNumber.txt
-		sed -i ':a;N;$!ba;s/\n\n/\n/g' filesWithTagAndNoNumber.txt
-		sed -i ':a;N;$!ba;s/\n\n/\n/g' filesWithTagAndNoNumber.txt
-		sed -i ':a;N;$!ba;s/\n\n/\n/g' filesWithTagAndNoNumber.txt
+		gsed -i ':a;N;$!ba;s/\n\n\n\n/\n/g' filesWithTagAndNoNumber.txt
+		gsed -i ':a;N;$!ba;s/\n\n\n/\n/g' filesWithTagAndNoNumber.txt
+		gsed -i ':a;N;$!ba;s/\n\n/\n/g' filesWithTagAndNoNumber.txt
+		gsed -i ':a;N;$!ba;s/\n\n/\n/g' filesWithTagAndNoNumber.txt
+		gsed -i ':a;N;$!ba;s/\n\n/\n/g' filesWithTagAndNoNumber.txt
 	# Read those into an array:
 mapfile -t filesToNumberArray < filesWithTagAndNoNumber.txt
 # rm filesWithTagAndNoNumber.txt
@@ -115,17 +115,17 @@ do
 	num=$(printf %05d "$((10#$num + 1))")
 		# echo num value is $num
 		# echo fileName value is $fileName.
-	# The following only works if I have a space before and after the $num variable, so it must be subsequently altered with a sed command to replace those spaces with underscores:
+	# The following only works if I have a space before and after the $num variable, so it must be subsequently altered with a gsed command to replace those spaces with underscores:
 	echo mv \"$fileName\" \"${fileName/_final_/_final_abstraction $num }\" >> mv_commands.txt
 	echo >> mv_commands.txt
 done
 	# RE THE most recent comment:
-sed -i 's/\(.*_abstraction\) \([0-9]\{5\}\) \(.*\)/\1_\2_\3/g' mv_commands.txt
+gsed -i 's/\(.*_abstraction\) \([0-9]\{5\}\) \(.*\)/\1_\2_\3/g' mv_commands.txt
 
 # CREATE unintended duplicates check file:
 	# Adapted from a genius breath yon: http://unix.stackexchange.com/a/44739
-	# Print all files minus extensions to a file via find, a pipe, and sed:
-find | sed 's/\(.*\)\..*/\1/' > possible_unwanted_duplicates.txt
+	# Print all files minus extensions to a file via find, a pipe, and gsed:
+gfind | gsed 's/\(.*\)\..*/\1/' > possible_unwanted_duplicates.txt
 	# Prep a file with instructions, to list duplicates:
 echo FOLLOWS a list of paths and filenames without file extensions. There are duplicate file names with different extensions in the given paths for each file. Depending on your workflow, you may want move e.g. web-ready .tif or .png files from different image format masters into an entirely separate /dist directory tree, to keep intended file numbering proper here, thar, then, yet. > temp.txt
 	# Filter that down to only one listing per duplicate line:

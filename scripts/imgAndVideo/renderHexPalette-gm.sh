@@ -46,7 +46,7 @@ else	# Search for specified palette file in palettesRootDir (if that dir exists;
 				echo for file $paletteFile . . .
 						# FAIL:
 						# hexColorSrcFullPath=`gfind "$palettesRootDir" -iname *$paletteFile`
-		hexColorSrcFullPath=`find $palettesRootDir -iname "$paletteFile"`
+		hexColorSrcFullPath=`gfind $palettesRootDir -iname "$paletteFile"`
 		echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 		if [ "$hexColorSrcFullPath" == "" ]
 			then
@@ -165,7 +165,7 @@ fi
 # make directory of color tiles from palette:
 while IFS= read -r line || [ -n "$line" ]
 do
-	# IF A SCRIPT THAT I DEVELOPED WORKED ONCE UPON A TIME BUT DOESN'T ANYMORE, it is because sed on windows is inserting $#@! windows newlines into stdin/out! &@*(@!! FIXED with tr -d '\15\32':
+	# IF A SCRIPT THAT I DEVELOPED WORKED ONCE UPON A TIME BUT DOESN'T ANYMORE, it is because gsed on windows is inserting $#@! windows newlines into stdin/out! &@*(@!! FIXED with tr -d '\15\32':
 	hexNoHash=`echo $line | gsed 's/\#//g' | tr -d '\15\32'`
 	gm convert -size "$tileEdgeLen"x"$tileEdgeLen" xc:\#"$hexNoHash" _hexPaletteIMGgenTMP_2bbVyVxD/"$hexNoHash".png
 done < $hexColorSrcFullPath

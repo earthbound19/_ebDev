@@ -12,7 +12,7 @@
 # $3 approx img size X
 
 # DEPENDENCIES
-# imagemagick, gfind, CourierMegaRS.ttf (Courier Mega Rounded Slab Regular font), a directory full of .ttf and/or .otf fonts you wish to render a phrase from.
+# imagemagick, gfind (find), CourierMegaRS.ttf (Courier Mega Rounded Slab Regular font), a directory full of .ttf and/or .otf fonts you wish to render a phrase from.
 
 
 # CODE
