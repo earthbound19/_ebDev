@@ -56,19 +56,27 @@
 // -> back to color.
 
 
-// v2.3.3 work log:
-// - Grayscale color mode option (in addition to previously developed color override option)
-// - Double-tap or click cycles through these color modes:
-// from color to grayscale, override colors, then back to color.
-// - Option to force color mode set (initially via colorMode hard-coded value
-// OR via user interaction) on variation change. Controlled by
-// boolean keepColorModeOnVariantChange (default hard-coded false).
-// - New global colorMode controls color mode; see comments near it.
-// - Option to dynamically load external palette files and initialize
-// arrays with them (from /data subfolder, .hexplt files).
-// - Optionally shows loaded palette or randomly uses it or hard-coded palette
-// See now expanded USAGE section for details.
-String versionString = "v2.3.3";
+// v2.3.6 work log:
+// - museum mode boolean controlling different functions for museum vs. local mode I'm tired of changing :)
+// BUT some manual code changes are unavoidably necessary (can't do conditional imports, for example)
+// - randomly shut off shape wander, jitter and orbit (jitter has been commented out for some time though)
+// - extend added grace period to next variant, and color morph mode duration
+// TO DO:
+// - revert breaking changes that happened between this commit:
+// 11d8184b38f5dde4daed2d1e710ba166bffe4113
+// v1.11.7 animation values scale update function functionaly did nothing. tweak jitter val but comment out func. call.
+// where shapes ONLY GROW, don't grow/shrink/grow or shrink/grow/shrink etc. (as they should)
+// -- and that commit message does not reflect changes?! -- and this earlier commit:
+// 44401fae0a48f9e389a491bc6b6659daa07fb5bf
+// oops animation scaling and orbit was off--maybe I'll want to reset to previous defaults
+// (both commits versioned v1.11.7) -- where shapes DO grow/shrink/grow etc. as they should.
+String versionString = "v2.3.6";
+
+// if true, simple file names/dropbox folder save + tweet;
+// AND tryToTweet overriden to true;
+// AND fullscreen is overriden to true.
+// if false, complex file names and local save:
+boolean museumMode = false;
 
 // TO DO; * = doing:
 // * ATTEMPT MADE; may need to work off new fake size/dist values in object: (concentricity
@@ -82,6 +90,9 @@ import processing.svg.*;
 // for logging:
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+
+// START TWITTER-RELATED GLOBALS
+// READ THESE COMMENTS before code commits and publication!
 String tweetErrorLogOutfileName = "_tweetErrorLog.txt";
 // TO ENABLE IMAGE TWEETS, uncomment the last section of code with a varaible named simpletweet,
 // uncomment the desired code, then work backward to hunt for the related code earleir that
@@ -97,7 +108,8 @@ String tweetErrorLogOutfileName = "_tweetErrorLog.txt";
 //import gohai.simpletweet.*;
 //SimpleTweet simpletweet;
 String[] twitterAPIauthLines;
-boolean tryToTweet = true;
+boolean tryToTweet = false;  // NOTE: that is overriden in settings() to true if museumMode is set to true!
+// END TWITTER-RELATED GLOBALS
 
 // BEGIN GLOBAL VARIABLES:
 // NOTE: to control additional information contained in saved file names, see comments in the get_detailed_image_file_name_no_ext() function further below.
@@ -157,7 +169,7 @@ int estimatedFPS = 0;    // dynamically modified by program as it runs (and prin
 // smaller original grid size: 19x13, regular circle placement on grid, wobbly concentricity in circles.
 // SMOFA entry configuration for the following values, for ~6' tall kiosk: 1, 21. Before more advanced anim, ~21
 // ~4K resolution horizontally larger monitors: 1, 43
-int minColumns = 2; int maxColumns = 21;
+int minColumns = 2; int maxColumns = 15;
 float ShapesGridXminPercent = 0.231;   // minimum diameter/apothem of shape vs. grid cell size.   Maybe best ~ .2
 float ShapesGridXmaxPercent = 0.681;   // maximum ""                                       Maybe best ~ .67
 int minimumNgonSides = -11;    // If negative number, n*-1*-1 (many more) chance of choosing circle on rnd shape draw.
@@ -171,7 +183,7 @@ float motionVectorMax = 0.6;          // maximum pixels (I think?) an object mov
 float orbitRadiansRateMax = 8.84;			// how many degrees maximum any shape may orbit per call of orbit()
 float rotationRadiansRateMax = 4;			// how many degrees maximum any shape may orbit per call of shapeRotate();
 boolean lazyParentBoundaryConstraint = false;		// If true, every N ms (13?), shape wander is constrained within parent shape. If false, ALL frames are constrained.
-int disableColorMorphAfter_ms = 21426;
+int disableColorMorphAfter_ms = 33250;
 //TO IMPLEMENT: int disableWanderIfRoll = 4;
 boolean loadColorsFromHexplts = true;    // If set to true, palettes are dynamically loaded from files in the /data folder and used. Otherwise the hard-coded palettes are used.
 boolean rndSwapPalettes = true;                  // If set to true, palettes will randomly swap from hard-coded to the dynamically loaded ones IF loadColorsFromHexplts is also true.
@@ -383,7 +395,7 @@ void addGracePeriodToNextVariant() {
   int tmp_millis = millis();
   int time_to_next_variant = runSetupAtMilliseconds - tmp_millis;
   if (time_to_next_variant < 13750) {
-    runSetupAtMilliseconds += 28750;
+    runSetupAtMilliseconds += 34750;
     print("ADDED TIME delay until next variation because of user interaction.\n");
   }
 }
@@ -448,15 +460,19 @@ String get_simple_file_name_no_ext() {
 
 // saves whatever is rendered at the moment (expects PNG or other supported raster image file name):
 void save_PNG() {
-  String FNNE = get_detailed_image_file_name_no_ext();
+	String SAVEFILE = "";
+	if (museumMode == true) {
+		String FNNE = get_simple_file_name_no_ext();
+		SAVEFILE = "C:\\Users\\SMOFA_guest\\Dropbox\\By_Small_and_Simple_Things__SMOFA_visitor_image_saves\\"
+		+ FNNE
+		+ ".png";
+	} else {
+  	String FNNE = get_detailed_image_file_name_no_ext();
+		SAVEFILE = FNNE + ".png";
+	}
+  
   //LOCAL FOLDER SAVE:
-  saveFrame(FNNE + ".png");
-
-  // CLOUD SAVE option one (SMOFA kiosk, Windows) ;
-   //saveFrame("C:\\Users\\SMOFA_guest\\Dropbox\\By_Small_and_Simple_Things__SMOFA_visitor_image_saves\\" + FNNE + ".png");
-
-  // CLOUD SAVE option two (RAH collecting images, Mac) :
-  // saveFrame("/Users/earthbound/Dropbox/small_and_simple_things_RAH_image_saves/" + FNNE + ".png");
+  saveFrame(SAVEFILE);
 }
 
 
@@ -1032,53 +1048,53 @@ class NestedAnimatedShapes {
       AnimatedShapesArray[j].drawShape();
       AnimatedShapesArray[j].morphDiameter();
       AnimatedShapesArray[j].udpate_animation_scale_multiplier();
-			AnimatedShapesArray[j].orbit();
 			AnimatedShapesArray[j].rotateShape();
-      // AnimatedShapesArray[j].jitter();    // so dang silky smooth without jitter; also maybe edge collisions are now less spastic _without_ that (the opposite case used to be).
-///*
-        // START WANDERING
-        for (int k = j + 1; k < nesting; k++) {
-          PVector tmp_vec;
-          // if we're at the outmost shape or circle, pass made-up PVector and diameter by extrapolation from max_distance;
-          // otherwise pass those properties of the parent shape:
-          if (j == 0) {     // wander under these conditions:
-            PVector INVISIBL_PARENT_XY = AnimatedShapesArray[0].originXY.copy();
-            float INVISIBL_RADIUS = AnimatedShapesArray[0].max_wander_dist;
-            tmp_vec = AnimatedShapesArray[0].wander(INVISIBL_PARENT_XY, INVISIBL_RADIUS);
-          } else {          // or under these conditions (one or the other) :
-            PVector parent_center_XY = AnimatedShapesArray[j].centerXY.copy();
-            tmp_vec = AnimatedShapesArray[k].wander(parent_center_XY, AnimatedShapesArray[j].diameter);
+      if (disableOrbitWanderAndJitter == false) {
+        AnimatedShapesArray[j].orbit();
+        // AnimatedShapesArray[j].jitter();    // so dang silky smooth without jitter; also maybe edge collisions are now less spastic _without_ that (the opposite case used to be).
+          // START WANDERING
+          for (int k = j + 1; k < nesting; k++) {
+            PVector tmp_vec;
+            // if we're at the outmost shape or circle, pass made-up PVector and diameter by extrapolation from max_distance;
+            // otherwise pass those properties of the parent shape:
+            if (j == 0) {     // wander under these conditions:
+              PVector INVISIBL_PARENT_XY = AnimatedShapesArray[0].originXY.copy();
+              float INVISIBL_RADIUS = AnimatedShapesArray[0].max_wander_dist;
+              tmp_vec = AnimatedShapesArray[0].wander(INVISIBL_PARENT_XY, INVISIBL_RADIUS);
+            } else {          // or under these conditions (one or the other) :
+              PVector parent_center_XY = AnimatedShapesArray[j].centerXY.copy();
+              tmp_vec = AnimatedShapesArray[k].wander(parent_center_XY, AnimatedShapesArray[j].diameter);
+            }
+            // drag all inner circles/shapes with outer translated circle/shape, using that gotten vector;
+            // this won't always actually move anything (as sometimes tmp_vec is (0,0), but it's a waste to check if it will:
+            AnimatedShapesArray[k].translate(tmp_vec);
+            // DONE WANDERING
+  				// CONSTRAINING inner shapes within borders of outer ones
+  				// if shape has wandered beyond border of parent, drag it within parent, tangent on nearest edge;
+  				// ONLY EVERY N milliseconds, as controlled by functions that set detect_collision_now true;
+  				// UNLESS lazyParentBoundaryConstraint is false (always do this in that case) :
+  				if (detect_collision_now == true && lazyParentBoundaryConstraint == true || lazyParentBoundaryConstraint == false) {
+  					boolean is_within_parent = is_shape_within_shape(
+  					AnimatedShapesArray[j].centerXY,
+  					AnimatedShapesArray[j].diameter,
+  					AnimatedShapesArray[k].centerXY,
+  					AnimatedShapesArray[k].diameter);
+  					if (is_within_parent == false) {      // CONSTRAIN it:
+  								// print(is_within_parent + "\n");
+  						PVector relocate_XY = get_larger_to_smaller_shape_interior_tangent_PVector(
+  						AnimatedShapesArray[j].centerXY,
+  						AnimatedShapesArray[j].diameter,
+  						AnimatedShapesArray[k].centerXY,
+  						AnimatedShapesArray[k].diameter
+  						);
+  								// print(relocate_XY + "\n");
+  						AnimatedShapesArray[k].centerXY = relocate_XY.copy();		// could probably get away with reference here? Eh.
+  					}
+  				}
+  				  // DONE CONSTRAINING
           }
-          // drag all inner circles/shapes with outer translated circle/shape, using that gotten vector;
-          // this won't always actually move anything (as sometimes tmp_vec is (0,0), but it's a waste to check if it will:
-          AnimatedShapesArray[k].translate(tmp_vec);
-          // DONE WANDERING
-				// CONSTRAINING inner shapes within borders of outer ones
-				// if shape has wandered beyond border of parent, drag it within parent, tangent on nearest edge;
-				// ONLY EVERY N milliseconds, as controlled by functions that set detect_collision_now true;
-				// UNLESS lazyParentBoundaryConstraint is false (always do this in that case) :
-				if (detect_collision_now == true && lazyParentBoundaryConstraint == true || lazyParentBoundaryConstraint == false) {
-					boolean is_within_parent = is_shape_within_shape(
-					AnimatedShapesArray[j].centerXY,
-					AnimatedShapesArray[j].diameter,
-					AnimatedShapesArray[k].centerXY,
-					AnimatedShapesArray[k].diameter);
-					if (is_within_parent == false) {      // CONSTRAIN it:
-								// print(is_within_parent + "\n");
-						PVector relocate_XY = get_larger_to_smaller_shape_interior_tangent_PVector(
-						AnimatedShapesArray[j].centerXY,
-						AnimatedShapesArray[j].diameter,
-						AnimatedShapesArray[k].centerXY,
-						AnimatedShapesArray[k].diameter
-						);
-								// print(relocate_XY + "\n");
-						AnimatedShapesArray[k].centerXY = relocate_XY.copy();		// could probably get away with reference here? Eh.
-					}
-				}
-				  // DONE CONSTRAINING
-        }
-				// END WANDERING
-//*/
+  				// END WANDERING
+      }
       // COLOR MORPHING makes it freaking DAZZLING, if I may say so:
       AnimatedShapesArray[j].morphColor();
 			AnimatedShapesArray[j].disable_color_morph_if_time();	// But let's stop it after an interval. Interaction will restart it.
@@ -1183,11 +1199,18 @@ class GridOfNestedAnimatedShapes {
 // BEGIN MAIN FUNCTIONS
 void settings() {
   // SEE these controlling variables in the global variables section near start of script:
-  if (USE_FULLSCREEN == true) {
+  // NOTE THAT museumMode overrides tryToTweet to true and forces use of fullScreen():
+  if (museumMode == true) {
+    tryToTweet = true;
     fullScreen();
   } else {
-    size(globalWidth, globalHeight);
+    if (USE_FULLSCREEN == true) {
+      fullScreen();
+    } else {
+      size(globalWidth, globalHeight);
+    }
   }
+  
 
 	// If loadColorsFromHexplts is true, the following creates dynamically loaded color
 	// palettes to use! :
@@ -1236,7 +1259,8 @@ boolean recordSVGnow = false;                  // Controls when to save SVGs. Ma
 boolean userInteractedThisVariation = false;   // affects those booleans via script logic.
 String animFramesSaveSubdir = "";
 
-
+boolean RNDdisableOrbitWanderAndJitter = true;
+boolean disableOrbitWanderAndJitter = false;
 // handles values etc. for new animated variation to be displayed:
 void prepareNextVariation() {
   if (booleanOverrideSeed == true) {
@@ -1248,6 +1272,16 @@ void prepareNextVariation() {
   }
   randomSeed(seed);
   ellipseMode(CENTER);
+
+  // if RNDdisableOrbitAndWobble says to, randomly set disableOrbitAndWobble true:
+  if (RNDdisableOrbitWanderAndJitter == true) {
+    int die_roll = int(random(1,4));
+    if (die_roll == 1) {
+      disableOrbitWanderAndJitter = true;
+    } else {
+      disableOrbitWanderAndJitter = false;
+    }
+  }
 
 	if (loadColorsFromHexplts == true && rndSwapPalettes == true) {
 		int rnd_tmp_num = int(random(0, 2));	// non-inclusive (returns one less than highest num)
@@ -1361,8 +1395,15 @@ void animate() {
 
   // SVG RECORD, CONDITIONALLY:
   if (recordSVGnow == true) {
-    String svg_file_name_no_ext = get_detailed_image_file_name_no_ext();
-    beginRecord(SVG, svg_file_name_no_ext + ".svg");
+		String SAVEFILE = "";
+		if (museumMode == true) {
+			String FNNE = get_simple_file_name_no_ext();
+			SAVEFILE = "C:\\Users\\SMOFA_guest\\Dropbox\\By_Small_and_Simple_Things__SMOFA_visitor_image_saves\\" + FNNE + ".svg";
+		}	else {
+			String FNNE = get_detailed_image_file_name_no_ext();
+			SAVEFILE = FNNE + ".svg";
+		}
+    beginRecord(SVG, SAVEFILE);
   }
 
 // TO DO? refactor so this try/catch isn't necessary because globalBackgroundColor is never null:
@@ -1620,12 +1661,11 @@ boolean try_to_tweet() {
 	if (tryToTweet == true) {
 		String simpleFileNameNoExt = get_simple_file_name_no_ext();
 		try {
-			
-		// OPTION ONE--uncomment if this is what you want:
-			// String tweet = simpletweet.tweetImage(get(), simpleFileNameNoExt + " saved via visitor interaction at Springville Museum of Art! More visitor images at: http://s.earthbound.io/BSaST #generative #generativeArt #processing #processingLanguage #creativeCoding"); println("Posted " + tweet);
-		// OR:
-		// OPTION TWO--uncomment if this is what you want:
-			//String tweet = simpletweet.tweetImage(get(), simpleFileNameNoExt + " created during development or manual run of program. #generative #generativeArt #processing #processingLanguage #creativeCoding"); println("Posted " + tweet);
+			if (museumMode == true) {
+				 //String tweet = simpletweet.tweetImage(get(), simpleFileNameNoExt + " saved via visitor interaction at Springville Museum of Art! Archive at: http://s.earthbound.io/BSaST #generative #generativeArt #processing #processingLanguage #creativeCoding"); println("Posted " + tweet);
+			} else {
+				//String tweet = simpletweet.tweetImage(get(), simpleFileNameNoExt + " saved via interaction during development or other program run. #generative #generativeArt #processing #processingLanguage #creativeCoding"); println("Posted " + tweet);
+			}
 			tweet_success = true;
 		} catch (Exception e) {
 			print("Failure during tweet attempt. Attempting to log..\n");
