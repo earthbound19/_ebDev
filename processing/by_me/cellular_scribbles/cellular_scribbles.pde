@@ -58,54 +58,57 @@ PVector RNDpvectorWithinArea(PVector upper_left, PVector lower_right) {
 // called first by setup(), then
 // TO DO: repeatedly called after rnd delay interval:
 void prepare_next_variant() {
-  regions_counter = 0;
-  stroke(light_stroke_color);
-  regions_indices.clear();
-
-  // if boolean says to, override hard-coded cols and rows with rnd selection of them in range:
-  // NOTE that the minimum in the following MUST be 2, or errors will occur:
-  if (pickRNDcolsXrowsSizes == true) {
-    cols = int(random(2, maxRNDcols + 1));		// +1 because random() doesn't include max of range
-    rows = int(random(2, maxRNDrows + 1));		// +1 because random() doesn't include max of range
-  }
-  // if boolean says to, randomize RNDconnectPointsPerCell:
-  if ( pickRNDconnectPointsPerCell == true) {
-    RNDconnectPointsPerCell = int(random(2, maxRNDconnPoints + 1));    // + 1 because RND not include max
-  }
+  if (regions_counter == regions_indices_length && make_variants_infinitely == true) {
+    background(bg_color);
+    regions_counter = 0;
+    stroke(light_stroke_color);
+    regions_indices.clear();
   
-  columnWidth = int(width / cols);
-  rowHeight = int(height / rows);
-  // init rectangularRegion array:
-  rectangularRegions = new rectangularRegion[cols * rows];
-  int rowsLoop = 0; int colsLoop = 0;
-  while (rowsLoop < rows) {
-    while (colsLoop < cols) {
-      int UL_x = int(colsLoop * columnWidth); int UL_y = int(rowsLoop * rowHeight); 
-          // print("UL.x " + UL_x + " UL.y: " + UL_y + "\n");
-      int LR_x = int((colsLoop * columnWidth) + columnWidth);
-      int LR_y = int((rowsLoop * rowHeight) + rowHeight);
-          // print("LR.x " + LR_x + " LR.y: " + LR_y + "\n\n");
-      PVector UL_xy_param = new PVector(UL_x, UL_y);
-      PVector LR_xy_param = new PVector(LR_x, LR_y);
-      rectangularRegions[regions_counter] = new rectangularRegion(UL_xy_param, LR_xy_param);
-      colsLoop += 1;
-      regions_indices.append(regions_counter);
-      regions_counter += 1;
+    // if boolean says to, override hard-coded cols and rows with rnd selection of them in range:
+    // NOTE that the minimum in the following MUST be 2, or errors will occur:
+    if (pickRNDcolsXrowsSizes == true) {
+      cols = int(random(2, maxRNDcols + 1));		// +1 because random() doesn't include max of range
+      rows = int(random(2, maxRNDrows + 1));		// +1 because random() doesn't include max of range
     }
-  colsLoop = 0;
-  rowsLoop += 1;
-  }
+    // if boolean says to, randomize RNDconnectPointsPerCell:
+    if ( pickRNDconnectPointsPerCell == true) {
+      RNDconnectPointsPerCell = int(random(2, maxRNDconnPoints + 1));    // + 1 because RND not include max
+    }
+    
+    columnWidth = int(width / cols);
+    rowHeight = int(height / rows);
+    // init rectangularRegion array:
+    rectangularRegions = new rectangularRegion[cols * rows];
+    int rowsLoop = 0; int colsLoop = 0;
+    while (rowsLoop < rows) {
+      while (colsLoop < cols) {
+        int UL_x = int(colsLoop * columnWidth); int UL_y = int(rowsLoop * rowHeight); 
+            // print("UL.x " + UL_x + " UL.y: " + UL_y + "\n");
+        int LR_x = int((colsLoop * columnWidth) + columnWidth);
+        int LR_y = int((rowsLoop * rowHeight) + rowHeight);
+            // print("LR.x " + LR_x + " LR.y: " + LR_y + "\n\n");
+        PVector UL_xy_param = new PVector(UL_x, UL_y);
+        PVector LR_xy_param = new PVector(LR_x, LR_y);
+        rectangularRegions[regions_counter] = new rectangularRegion(UL_xy_param, LR_xy_param);
+        colsLoop += 1;
+        regions_indices.append(regions_counter);
+        regions_counter += 1;
+      }
+    colsLoop = 0;
+    rowsLoop += 1;
+    }
+    
+    // init "previous" point x and y with rnd x,y from first region:
+    PVector tmp_vec = RNDpvectorWithinArea(
+      rectangularRegions[0].UL_xy,
+      rectangularRegions[0].LR_xy
+      ); previous_point_x = tmp_vec.x; previous_point_y = tmp_vec.y;
   
-  // init "previous" point x and y with rnd x,y from first region:
-  PVector tmp_vec = RNDpvectorWithinArea(
-    rectangularRegions[0].UL_xy,
-    rectangularRegions[0].LR_xy
-    ); previous_point_x = tmp_vec.x; previous_point_y = tmp_vec.y;
-
-  regions_indices_length = regions_indices.size();
-  change_to_foreground_stroke_at_index = int(regions_indices_length * (1 - percent_dark_stroke));
-  regions_counter = 0;
-  regions_indices.shuffle();
+    regions_indices_length = regions_indices.size();
+    change_to_foreground_stroke_at_index = int(regions_indices_length * (1 - percent_dark_stroke));
+    regions_counter = 0;
+    regions_indices.shuffle();
+  }
 }
 
 void draw_iteration() {
@@ -138,12 +141,21 @@ void draw_iteration() {
         rectangularRegions[regions_idx].LR_xy
         );
     }
-    // line from last point in previous cell to first point in current cell:
+// MY INTENDED ALTERATIONS, using curve function; reference:
+//curve(cpx1, cpy1, x1, y1, x2, y2, cpx2, cpy2);
+//cpx1, cpy1  Coordinates of the first control point
+//x1, y1  Coordinates of the curve’s starting point
+//x2, y2  Coordinates of the curve’s ending point
+//cpx2, cpy2  Coordinates of the second control point
+//MY INTENDED USE:
+//(cpx1, cpy1), (x1, y1) different. (x2, y2), (cpx2, cpy2) same.
+//then (cpx2, cpy2) are (cpx1, cpy1).
     line(previous_point_x, previous_point_y, vertices[0].x, vertices[0].y);
     // that declared, use the vertices to draw things with them:
     int vertices_array_length = vertices.length;
     for (int j = 1; j < vertices_array_length; j++) {
       line(vertices[j - 1].x, vertices[j - 1].y, vertices[j].x, vertices[j].y);
+      //curve(previous_point_x, previous_point_y, vertices[0].x, vertices[0].y, vertices[j].x, vertices[j].y, vertices[j].x, vertices[j].y);
       previous_point_x = vertices[j].x; previous_point_y = vertices[j].y;    // redundant use but unavoidable
       }
     regions_counter += 1;
@@ -158,6 +170,7 @@ void setup() {
   fullScreen();
   // size(1200, 800);
   ellipseMode(CENTER);
+  noFill();
   stroke(light_stroke_color);
   strokeWeight(globalLineStrokeWeight);
   strokeJoin(ROUND);
@@ -170,11 +183,12 @@ void setup() {
 
 void draw() {
   draw_iteration();
-  if (make_variants_infinitely == true) {
-// TO DO: should these variables be reset in functions that use them as early back as possible? :
-    if (regions_counter == regions_indices_length) {
-      background(bg_color);
-      prepare_next_variant();
-    }
-  }
+}
+
+//void keyPressed() {
+//  prepare_next_variant();
+//}
+
+void mousePressed() {
+  prepare_next_variant();
 }
