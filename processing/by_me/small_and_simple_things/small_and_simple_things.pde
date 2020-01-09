@@ -54,15 +54,20 @@
 // - You can double-click (or for a kiosk or tablet, double-tap on the screen)
 // to cycle color modes in this order: color -> grayscale -> color override
 // -> back to color.
+// ON INSTALLATION, if you intend to tweet, you must copy twitterAPIauth.txt
+// (from one folder up) into the /data subfolder, and decrypt it so it actually
+// gives the API auth, uh, thingies.
 
 
-// v2.3.6 work log:
-// - museum mode boolean controlling different functions for museum vs. local mode I'm tired of changing :)
-// BUT some manual code changes are unavoidably necessary (can't do conditional imports, for example)
-// - randomly shut off shape wander, jitter and orbit (jitter has been commented out for some time though)
-// - extend added grace period to next variant, and color morph mode duration
-// TO DO:
-// - revert breaking changes that happened between this commit:
+// v2.3.9 work log:
+// - tweets happen unreliably from install at museum; maybe it will be more reliable if
+// twitterAPIauth.txt is not in "../" but in "." (don't even specify path, just
+// "twitterAPIauth.txt" with that file in /data as expected. Therefore made that change.
+// - Something during development on Mac kept making unwelcomed reloads/changes --
+// (from parts of backups or something?) and syntax fixups, and even loading old code?!
+// It seemed to stop when I stopped using Processing's IDE and reloaded and fixed up the source
+// in Atom. What was going on there?!
+// - reverted a breaking change that happened between this commit:
 // 11d8184b38f5dde4daed2d1e710ba166bffe4113
 // v1.11.7 animation values scale update function functionaly did nothing. tweak jitter val but comment out func. call.
 // where shapes ONLY GROW, don't grow/shrink/grow or shrink/grow/shrink etc. (as they should)
@@ -70,7 +75,10 @@
 // 44401fae0a48f9e389a491bc6b6659daa07fb5bf
 // oops animation scaling and orbit was off--maybe I'll want to reset to previous defaults
 // (both commits versioned v1.11.7) -- where shapes DO grow/shrink/grow etc. as they should.
-String versionString = "v2.3.6";
+// THE CULPRIT LINE OF CODE, now commented out, was:
+// diameter_morph_rate = original_diameter_morph_rate * animation_scale_multiplier;
+// (That was patched already in musuem install but not in git version history; not it's in git)
+String versionString = "v2.3.9";
 
 // if true, simple file names/dropbox folder save + tweet;
 // AND tryToTweet overriden to true;
@@ -932,7 +940,8 @@ class AnimatedShape {
   void udpate_animation_scale_multiplier() {
     animation_scale_multiplier = diameter / motionVectorScaleBaseReference;
     motion_vector_max = original_motion_vector_max * animation_scale_multiplier;
-		diameter_morph_rate = original_diameter_morph_rate * animation_scale_multiplier;
+// THIS CAUSED shapes to grow to max size but never shrink again (but grow/srhink is intended):
+		// DON'T DO THIS diameter_morph_rate = original_diameter_morph_rate * animation_scale_multiplier; DON'T DO THIS
 		max_jitter_dist = original_max_jitter_dist * animation_scale_multiplier;
   }
 	
@@ -1239,7 +1248,7 @@ void settings() {
   // also set "don't even try to tweet" boolean to true on failure.
   // This will only fail here if file not found or if there's an error during loading it.
   try {
-    twitterAPIauthLines = loadStrings("../twitterAPIauth.txt");
+    twitterAPIauthLines = loadStrings("twitterAPIauth.txt");
 		if (twitterAPIauthLines.length != 4) { tryToTweet = false; }	// because the expected format is 4 lines; encrytped, it isn't.
     //simpletweet = new SimpleTweet(this);
     //simpletweet.setOAuthConsumerKey(twitterAPIauthLines[0]);
