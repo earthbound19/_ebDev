@@ -9,7 +9,7 @@
 // - first proof of concept stub displaying a 4-tile from loaded SVGs.
 // SVGs are probably in final form. Dang they look nice, if I may say.
 // TO DO: a lot.
-String versionCode = "0.1";
+String versionCode = "0.1.2";
 
 // CODE
 
@@ -20,10 +20,9 @@ int cellsXY = 2;
 float cellXYlength;
 float xScreenCenter;
 float yScreenCenter;
-float cell1A_xCenter; float cell1A_yCenter;
-float cell1B_xCenter; float cell1B_yCenter;
-float cell2A_xCenter; float cell2A_yCenter;
-float cell2B_xCenter; float cell2B_yCenter;
+//vectors that describe the center location (XY) of the four tiles:
+PVector tile_1A_Center; PVector tile_1B_Center;
+PVector tile_2A_Center; PVector tile_2B_Center;
 PShape ZERO;
 PShape FOUR;
 PShape EIGHT;
@@ -38,16 +37,12 @@ void setup() {
   xScreenCenter = width / 2;
   yScreenCenter = height / 2;
   float cellOffsetToCenter = (cellXYlength / 2);
-  cell1A_xCenter = xScreenCenter - cellOffsetToCenter;
-  cell1A_yCenter = yScreenCenter - cellOffsetToCenter;
-  cell1B_xCenter = xScreenCenter + cellOffsetToCenter;
-  cell1B_yCenter = yScreenCenter - cellOffsetToCenter;
-  cell2A_xCenter = xScreenCenter - cellOffsetToCenter;
-  cell2A_yCenter = yScreenCenter + cellOffsetToCenter;
-  cell2B_xCenter = xScreenCenter + cellOffsetToCenter;
-  cell2B_yCenter = yScreenCenter + cellOffsetToCenter;
-  // The file "bot1.svg" must be in the data folder
-  // of the current sketch to load successfully
+  tile_1A_Center = new PVector(xScreenCenter - cellOffsetToCenter, yScreenCenter - cellOffsetToCenter);
+  tile_1B_Center = new PVector(xScreenCenter + cellOffsetToCenter, yScreenCenter - cellOffsetToCenter);
+  tile_2A_Center = new PVector(xScreenCenter - cellOffsetToCenter, yScreenCenter + cellOffsetToCenter);
+  tile_2B_Center = new PVector(xScreenCenter + cellOffsetToCenter, yScreenCenter + cellOffsetToCenter);
+  // These files must be in the /data folder
+  // of the current sketch to load successfully:
   ZERO = loadShape("0-3.svg");
   FOUR = loadShape("4-7.svg");
   EIGHT = loadShape("8-B.svg");
@@ -61,12 +56,19 @@ void change_drawing() {
   // The syntax shapeMode(CENTER) [which was set in setup()] draws the shape from its center point and
   // uses the third and forth parameters of shape() to specify the width and height.
   // re: https://processing.org/reference/shapeMode_.html
-  shape(ZERO, cell1A_xCenter, cell1A_yCenter, cellXYlength, cellXYlength);
-  shape(FOUR, cell1B_xCenter, cell1B_yCenter, cellXYlength, cellXYlength);
-  shape(EIGHT, cell2A_xCenter, cell2A_yCenter, cellXYlength, cellXYlength);
-  shape(C, cell2B_xCenter, cell2B_yCenter, cellXYlength, cellXYlength);
-// TO DO: figure out why this doesn't rotate on the axis I expected:
-  ZERO.rotate(90); FOUR.rotate(90); EIGHT.rotate(90); C.rotate(90);
+    // svg style override re: https://processing.org/examples/disablestyle.html
+    //ZERO.disableStyle();  // Ignore the colors in the SVG
+    //fill(0, 102, 153);    // Set the SVG fill to blue
+    //stroke(255);          // Set the SVG fill to white
+    //strokeWeight(50);
+  shape(ZERO, tile_1A_Center.x, tile_1A_Center.y, cellXYlength, cellXYlength);
+  shape(FOUR, tile_1B_Center.x, tile_1B_Center.y, cellXYlength, cellXYlength);
+  shape(EIGHT, tile_2A_Center.x, tile_2A_Center.y, cellXYlength, cellXYlength);
+  shape(C, tile_2B_Center.x, tile_2B_Center.y, cellXYlength, cellXYlength);
+  // TO DO: Tile rotation from their center; re? : https://stackoverflow.com/a/41654779/1397555
+  //ZERO.rotate(radians(4));
+  //ZERO.translate(tile_1A_Center.x, tile_1A_Center.y);
+  //ZERO.rotate(90); FOUR.rotate(90); EIGHT.rotate(90); C.rotate(90);
 }
 
 
