@@ -2,7 +2,7 @@
 # Takes a list of RGB colors expressed in hex (one per line) and sorts them 
 # using an advanced color appearance model for human color vision: CIECAM02, sorting into
 # lists of darks and lights (nearest to black and nearest to white), via the colorspacious library.
-# Adapted from RGBhexColorSortIn2CIECAM02.py.
+# Adapted from RGBhexColorSortInCIECAM02.py.
 # A test array for this: #E33200 #FF8B94 #54F1F1 #499989 #AAEFCB #8E4C5C #F7B754 #8AC2B0 #DE9D38 #FA9394 #ADDCCA #2DD1AA #E5E4E9 #02547D #78BF82 #745D5F #414141 #958F95 #FDE182 #7699C7 #FF5933 #D9BB93 #F1E5E9 #EA5287 #E3DB9A #95B6BA #59746E #333388 #008D94 #2EC1B1 #FF534E #367793 #00A693
 
 # NOTES: this script expects perfect data. If there's a blank line anywhere in the
@@ -15,7 +15,7 @@
 # Python RGBhexColorSortToDarksAndLightsIn2CIECAM02.py inputColors.hexplt
 # --
 # It will print the results to new files named darks.hexplt and lights.hexplt
-# you may sort those results by next nearest color via e.g. RGBhexColorSortIn2CIECAM02.py.
+# you may sort those results by next nearest color via e.g. RGBhexColorSortInCIECAM02.py.
 
 # LICENSE
 # This is my original code and I release it to the Public Domain. -RAH 2019-12-03 03:17 AM
