@@ -6,10 +6,16 @@
 // 16 views pick 4 all possible combos allow repeat = 65535 4-tile views.
 
 // DEV LOG
-// v0.9.1:
-// - rework colors (turned into fundamental_vivid_hues_v2.hexplt)
-// - delete incorrect extraneous print statement
-String versionCode = "0.9.1";
+// v0.9.3
+// - displayed variant logging (currently rendered variant written to data/lastDisplayedVariant.txt)
+// TO DO NEXT:
+// 1. load variant from that file if exists
+// 2. load from data/all16products.txt
+// 3. if no error finding loaded variant in all16products:
+// 3B find variant following loaded variant (in all16products)
+// 3C iterate through variants starting with that and following sequence
+// 4. otherwise, start sequence from start of all16products, logging each to lastDisplayedVariant
+String versionCode = "0.9.3";
 
 // ----------------
 // CODE
@@ -45,10 +51,14 @@ color[] colors = {
 float millis_since_last_change;
 float now;
 float millisecondsPerDrawingChange = 468.75 * 4;
+// for logging every displayed variant to a file so we can restore from that variant on program relaunch:
+PrintWriter output;
+// hex digit array:
+char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 void setup() {
-  // size(800, 1000);
-  fullScreen();
+   size(800, 800);
+  //fullScreen();
   int lengthToUse;
   if (width <= height) { lengthToUse = width; } else { lengthToUse = height; }
   gridXYlength = lengthToUse - (gridPaddingFromEdge * 2);
@@ -105,7 +115,7 @@ color[] getNrndColors(int howMany, color[] palette) {
       numbers[i] = rnd;
   }
   // use rnd unique number indeces to create palette of 5 unique colors from other palette:
-  print("\n");
+  //print("\n");
   for (int j = 0; j < numbers.length; j++) {
     //print(numbers[j] + "\n");
     returnColors[j] = colors[numbers[j]];
@@ -123,13 +133,23 @@ void change_drawing() {
   color[] RND5colors = getNrndColors(9, colors);
   background(RND5colors[0]);
   setFillAndStroke(RND5colors[1]);
-  shape(allTiles[int(random(0, allTilesLength))], tile_1A_Center.x, tile_1A_Center.y, cellXYlength, cellXYlength);
+    int tileA = int(random(0, allTilesLength));
+  shape(allTiles[tileA], tile_1A_Center.x, tile_1A_Center.y, cellXYlength, cellXYlength);
   setFillAndStroke(RND5colors[2]);
-  shape(allTiles[int(random(0, allTilesLength))], tile_1B_Center.x, tile_1B_Center.y, cellXYlength, cellXYlength);
+    int tileB = int(random(0, allTilesLength));  
+  shape(allTiles[tileB], tile_1B_Center.x, tile_1B_Center.y, cellXYlength, cellXYlength);
   setFillAndStroke(RND5colors[3]);
-  shape(allTiles[int(random(0, allTilesLength))], tile_2A_Center.x, tile_2A_Center.y, cellXYlength, cellXYlength);
+    int tileC = int(random(0, allTilesLength));
+  shape(allTiles[tileC], tile_2A_Center.x, tile_2A_Center.y, cellXYlength, cellXYlength);
   setFillAndStroke(RND5colors[4]);
-  shape(allTiles[int(random(0, allTilesLength))], tile_2B_Center.x, tile_2B_Center.y, cellXYlength, cellXYlength);
+    int tileD = int(random(0, allTilesLength));
+  shape(allTiles[tileD], tile_2B_Center.x, tile_2B_Center.y, cellXYlength, cellXYlength);
+  output = createWriter("data/lastDisplayedVariant.txt");
+  //String referenceSTR = str(tileA);
+  String variant = str(hexDigits[tileA]) + str(hexDigits[tileB]) + str(hexDigits[tileC]) + str(hexDigits[tileD]);
+  output.println(variant);
+  output.flush();
+  output.close();
 }
 
 void draw(){
@@ -144,6 +164,6 @@ void mousePressed() {
   change_drawing();
 }
 
-void keyPressed() {
-  change_drawing();
-}
+//void keyPressed() {
+//  change_drawing();
+//}
