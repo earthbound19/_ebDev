@@ -6,24 +6,10 @@
 // 16 views pick 4 all possible combos allow repeat = 65535 4-tile views.
 
 // DEV LOG
-// work up to v0.9.0:
-// - use PVectors for tile centers
-// - reconfigure for transparent bg
-// - add commodore vic palette obtained from colodore.com, get_color_sample_grid_hex.py
-// - function to get rnd unique 5 colors (indices for color array)
-// - tiles array, demo rnd tile load
-// - expand rnd color function to retrieve arr. of arbitrary N colors
-// - code for 16 discrete tiles; accompanying SVGs
-// - offsetting of tiles to crowd toward middle
-// - replaced SVG tiles with alternate versions that have no borders--interesting stuff happens with overlap
-// - no, scrap commodore vic palette -- garish. adopt instead from fundamental_vivid_hues.hexplt.
-// - no, tiles look better with borders and no crowding. If they tesellated maybe without borders it could be cool.
-// - changes drawing at regular intervals
-// TO DO:
-// - iterate through all combos from all16products.txt.
-// - save iteration state on every change
-// - load and proceed from saved iteration state on program launch
-String versionCode = "0.9.0";
+// v0.9.1:
+// - rework colors (turned into fundamental_vivid_hues_v2.hexplt)
+// - delete incorrect extraneous print statement
+String versionCode = "0.9.1";
 
 // ----------------
 // CODE
@@ -49,11 +35,11 @@ float OT; // Offset Tweak
 float OTmultiplier = 0.0;    // the higher this is toward 1, the more tiles will crowd toward center. 0 = no crowding.
 
 color[] colors = {
-  #FF00FF, #FF00E2, #FF007F, #FC2273, #FF0000, #FF5100, #FD730A, #FFA100, #FFB700, #FFCD00,
-  #FAE000, #FFFF00, #FAFF54, #AFE300, #75FF00, #00FF00, #52FE79, #40F37E, #00E77D, #1DCF00,
-  #65D700, #76F1A8, #7FFFFF, #00FFFF, #00E4FF, #00CFFF, #00C4FF, #007FFF, #6060FF, #7F40FF,
-  #7202FF, #5F00BE, #40007F, #3C1CB3, #3325D6, #0000FF, #4040FF, #6A6AFF, #7F7FFF, #407FBF,
-  #007F7F, #2B2BAB, #00007F, #54007F, #7F007F, #7F0038, #7F0000
+	#FF00FF, #FF00C0, #FF007F, #7F007F, #40007F, #5F00BE, #7F40FF, #6060FF,
+	#6A6AFF, #7F7FFF, #4894EA, #00AFCF, #00CFFF, #00C4FF, #00E4FF, #7FFFFF,
+	#76E1A8, #40F37E, #52FE79, #00E77D, #1DCF00, #65D700, #AFE300, #85FF00,
+	#00FF00, #B5FF00, #FFFF00, #FFD500, #FFB700, #FD730A, #FF5100, #FF0000,
+	#7F0000, #3325D6, #4040FF, #00007F, #0000FF, #007FFF
 };
 // variables for timing:
 float millis_since_last_change;
@@ -149,7 +135,6 @@ void change_drawing() {
 void draw(){
   now = millis();
   if ((now - millis_since_last_change) > millisecondsPerDrawingChange) {
-    print("1 second elapsed.\n");
     change_drawing();
   }
 }
