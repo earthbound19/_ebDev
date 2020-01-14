@@ -48,7 +48,10 @@ STR_LEN=$((${#CHARSET} - 1))
 for ELEMENT in $(seq $N_CHARS_TO_GENERATE)
 do
   NUMBER=`shuf -i 0-$STR_LEN -n 1`
-  printf "${CHARSET:$NUMBER:1}"
+  # for a curious slow terminal effect, pause between character renders:
+  # sleep 0.2
+  # printf "${CHARSET:$NUMBER:1}"
+  printf "${CHARSET:$NUMBER:1}" >> rndCharsSuperCollection.txt
 done
 
 
