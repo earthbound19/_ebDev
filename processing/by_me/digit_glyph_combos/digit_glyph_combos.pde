@@ -23,10 +23,13 @@ float yScreenCenter;
 //vectors that describe the center location (XY) of the four tiles:
 PVector tile_1A_Center; PVector tile_1B_Center;
 PVector tile_2A_Center; PVector tile_2B_Center;
-PShape ZERO;
-PShape FOUR;
-PShape EIGHT;
-PShape C;
+PShape TILE_0;
+PShape TILE_4;
+PShape TILE_8;
+PShape TILE_C;
+// array of all those tiles:
+PShape[] allTiles = new PShape[4];
+int allTilesLength = allTiles.length;
 
 color[] commodoreVicColors = {
   #C250D0, #8E8BFF, #4844E4, #696969, #9E9E9E, #D7D7D7, #FFFFFF, #BEFFB0,
@@ -47,11 +50,11 @@ void setup() {
   tile_2B_Center = new PVector(xScreenCenter + cellOffsetToCenter, yScreenCenter + cellOffsetToCenter);
   // These files must be in the /data folder
   // of the current sketch to load successfully:
-  ZERO = loadShape("0-3.svg"); ZERO.disableStyle();
-  FOUR = loadShape("4-7.svg"); FOUR.disableStyle();
-  EIGHT = loadShape("8-B.svg"); EIGHT.disableStyle();
-  //EIGHT = loadShape("8-B-alt.svg"); EIGHT.disableStyle();
-  C = loadShape("C-F.svg"); C.disableStyle();
+  TILE_0 = loadShape("0-3.svg"); TILE_0.disableStyle(); allTiles[0] = TILE_0;
+  TILE_4 = loadShape("4-7.svg"); TILE_4.disableStyle(); allTiles[1] = TILE_4;
+  TILE_8 = loadShape("8-B.svg"); TILE_8.disableStyle(); allTiles[2] = TILE_8;
+  //TILE_8 = loadShape("8-B-alt.svg"); TILE_8.disableStyle(); allTiles[2] = TILE_8;
+  TILE_C = loadShape("C-F.svg"); TILE_C.disableStyle(); allTiles[3] = TILE_C;
   shapeMode(CENTER);
   strokeWeight(0);
   change_drawing();    // only called once here in setup (as setup is only called once)
@@ -100,17 +103,17 @@ void change_drawing() {
   color[] RND5colors = get5RNDcolors(commodoreVicColors);
   background(RND5colors[0]);
   setFillAndStroke(RND5colors[1]);
-  shape(ZERO, tile_1A_Center.x, tile_1A_Center.y, cellXYlength, cellXYlength);
+  shape(allTiles[int(random(0, allTilesLength))], tile_1A_Center.x, tile_1A_Center.y, cellXYlength, cellXYlength);
   setFillAndStroke(RND5colors[2]);
-  shape(FOUR, tile_1B_Center.x, tile_1B_Center.y, cellXYlength, cellXYlength);
+  shape(TILE_4, tile_1B_Center.x, tile_1B_Center.y, cellXYlength, cellXYlength);
   setFillAndStroke(RND5colors[3]);
-  shape(EIGHT, tile_2A_Center.x, tile_2A_Center.y, cellXYlength, cellXYlength);
+  shape(TILE_8, tile_2A_Center.x, tile_2A_Center.y, cellXYlength, cellXYlength);
   setFillAndStroke(RND5colors[4]);
-  shape(C, tile_2B_Center.x, tile_2B_Center.y, cellXYlength, cellXYlength);
+  shape(TILE_C, tile_2B_Center.x, tile_2B_Center.y, cellXYlength, cellXYlength);
   // TO DO: Tile rotation from their center; re? : https://stackoverflow.com/a/41654779/1397555
-  //ZERO.rotate(radians(4));
-  //ZERO.translate(tile_1A_Center.x, tile_1A_Center.y);
-  //ZERO.rotate(90); FOUR.rotate(90); EIGHT.rotate(90); C.rotate(90);
+  //TILE_0.rotate(radians(4));
+  //TILE_0.translate(tile_1A_Center.x, tile_1A_Center.y);
+  //TILE_0.rotate(90); TILE_4.rotate(90); TILE_8.rotate(90); C.rotate(90);
 }
 
 
