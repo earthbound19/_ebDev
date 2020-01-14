@@ -1,10 +1,8 @@
 # DESCRIPTION
 # Invokes svgo_optimize.sh repeatedly. See comments in that script.
 
-gfind *.svg > allSVGs.txt
-while read line
+array=(`gfind . -maxdepth 1 -type f -iname \*.svg -printf '%f\n'`)
+for element in ${array[@]}
 do
-	svgo_optimize.sh "$line"
-done < allSVGs.txt
-
-rm ./allSVGs.txt
+	svgo_optimize.sh "$element"
+done

@@ -16,6 +16,14 @@
 # file to the end of that command, like this:
 # > darks-v2.hexplt
 
+# NOTE: may fail if only one row or column in source image.
+
+# DEPENDENCIES
+# python libraries imported at start of script, however you get those installed :|
+# pip install colorgram.py
+
+
+# CODE
 import colorgram, sys, ast
 from PIL import Image
 import numpy as np
