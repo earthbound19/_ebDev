@@ -11,7 +11,7 @@
 # NOTE that the CLIopts variables, if you uncomment them, override the .svgo.yml config file.
 # ALSO NOTE that this may misbehave when invoked via cygwin. I've at times found that if I copy and paste the printed command to a cmd prompt, it works ok . . . except the result displays wonky in Internet Explorer and inkscape. :(
 
-fileNameNoExt=${1%.}
+fileNameNoExt=${1%.*}
 
 # CLIopts="--enable=convertColors --enable=collapseGroups --disable=convertPathData"
 
@@ -22,7 +22,7 @@ echo . . .
 $SVGOcommand
 
 # OPTIONAL and DANGER: will toast original file--comment out if you do not want that! :
-rm $1 && mv "$fileNameNoExt"_opt.svg $1
+# rm $1 && mv "$fileNameNoExt"_opt.svg $1
 
 
 # SVGO CLI OPTIONS NOTES
