@@ -1,7 +1,7 @@
 # DESCRIPTION
-# variant of RGBhexColorSortIn2CIECAM02.py which uses the color-science library
+# variant of RGBhexColorSortInCIECAM02.py which uses the color-science library
 # and CAM16 color model for color sorting (supposedly superior to CIECAM02).
-# In my tests, RGBhexColorSortIn2CIECAM02.py (which uses the colorspacious library) does
+# In my tests, RGBhexColorSortInCIECAM02.py (which uses the colorspacious library) does
 # better for hue matching independent of brightness; this (which uses colour-science) does
 # better for matching first brightness/saturation, then hue. Both give good results. To my eye colorspacious
 # is better overall (maybe I reckon hue before brightness/saturation).
