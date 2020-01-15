@@ -43,8 +43,7 @@ then
 	tail_from=`awk '/> FADE IN:/{print NR;exit}' $1`
 	let head_to=tail_from-1
 	ghead -n $head_to $1 > tmp_head_wYSNpHgq.fountain
-	gtail -n +$tail_from $1 > tmp_tail_wYSNpHgq.fountain
-	dos2unix tmp_head_wYSNpHgq.fountain tmp_tail_wYSNpHgq.fountain
+	tail -n +$tail_from $1 > tmp_tail_wYSNpHgq.fountain
 	#  - delete lines that start with markdown image syntax (used to double for eBook output via fountain2ePub (using pandoc), but they'll interfere here:
 		# deletes the line:
 		# gsed -i '/\!\[.*/d' tmp_tail_wYSNpHgq.fountain
@@ -75,12 +74,19 @@ if [ -e ../CourierMegaRS-SemiCondensedItalic.ttf ]; then cp ../CourierMegaRS-Sem
 # if those copies work (we assume from one check), set an opt to use them:
 # if [ -e ./CourierMegaRS-SemiCondensed.ttf ]; then FONT_ARG="\"--font \"CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf\""; fi
 
+# Eleven billionth time windows silly line endings mucked with a script; this fixes it:
+if [ "$OS" == "Windows_NT" ]
+then
+	unix2dos $1
+else
+	dos2unix $1
+fi
 # ====
 # START PDF RENDER OPTIONS:
 # UNCOMMENT THIS: "wrap" CLI option, uses specific fonts--
-wrap pdf $1 --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf"
+# wrap pdf $1 --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf"
 # _OR_ UNCOMMENT THIS: "afterwriting" CLI option--
-# afterwriting --source $1 --overwrite --pdf
+afterwriting --source $1 --overwrite --pdf
 # I gave my best effort and the following method of loading fonts is *stupid* arcane (*_two_ json files?!_*) and doesn't seem to work:
 # --config courierMegaConfig.json --fonts CourierMega.json
 # END PDF RENDER OPTIONS
