@@ -27,6 +27,7 @@ basictex \
 dcraw \
 blink1 \
 tcl-tk \
+nkf \
 openimageio"
 
 # See pyenvFrameworkInstallMac.sh.
