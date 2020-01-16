@@ -7,6 +7,7 @@
 # A file ~/palettesRootDir.txt (in your home folder) which contains one line, being a unixy path to the folder where you keep hex palette (.hexplt) files.
 
 # USAGE
+# NOTE: this script seems not to work on cygwin/windows, but it does work on Mac and probably nix' variants.
 # Invoke this script with the following parameters:
 # $1 hex color palette flat file list (input file).
 # $2 edge length of each square tile to be composited into final image.
@@ -156,7 +157,8 @@ fi
 # make directory of color tiles from palette:
 while IFS= read -r line || [ -n "$line" ]
 do
-	hexNoHash=`echo $line | gsed 's/\#//g'`
+	# IF A SCRIPT THAT I DEVELOPED WORKED ONCE UPON A TIME BUT DOESN'T ANYMORE, it is because gsed on windows is inserting $#@! windows newlines into stdin/out! &@*(@!! FIXED with tr -d '\15\32':
+	hexNoHash=`echo $line | gsed 's/\#//g' | tr -d '\15\32'`
 	gm convert -size "$tileEdgeLen"x"$tileEdgeLen" xc:\#$hexNoHash _hexPaletteIMGgenTMP_2bbVyVxD/$hexNoHash.png
 done < $hexColorSrcFullPath
 
@@ -168,8 +170,8 @@ done < $hexColorSrcFullPath
 # make temporary script to create a grid montage of the colors:
 echo "gm montage -tile $tilesAcross"x"$tilesDown -background gray -geometry $tileEdgeLen"x"$tileEdgeLen+0+0 \\" > mkGridHead.txt
 
-  # convert hex color scheme text list file to parameter list for ~magick:
-gsed 's/.*#\(.*\)$/_hexPaletteIMGgenTMP_2bbVyVxD\/\1.png \\/' $hexColorSrcFullPath > ./mkGridSRCimgs.txt
+  # convert hex color scheme text list file to parameter list for ~magick; AGAIN WITH THE NEED to unbork windows newlines (via tr):
+gsed 's/.*#\(.*\)$/_hexPaletteIMGgenTMP_2bbVyVxD\/\1.png \\/' $hexColorSrcFullPath | tr -d '\15\32' > ./mkGridSRCimgs.txt
 # IF $shuffleValues is nonzero, randomly sort that list:
 	if [ $shuffleValues -ne 0 ]; then shuf ./mkGridSRCimgs.txt > ./tmp_3A7u2ZymRgdss4rsXuxs.txt; rm ./mkGridSRCimgs.txt; mv ./tmp_3A7u2ZymRgdss4rsXuxs.txt ./mkGridSRCimgs.txt; fi
 echo $renderTarget > mkGridTail.txt
