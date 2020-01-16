@@ -5,3 +5,4 @@
 /bin/FilterForgeBatchWrapper/ffBatch_FAWKES.ini
 node_modules
 *__pycache__*
+/processing/by_me/digit_glyph_combos/data/lastDisplayedVariant.txt
