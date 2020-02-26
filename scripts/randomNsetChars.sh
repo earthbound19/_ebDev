@@ -1,8 +1,12 @@
-# DESCRIPTION: returns N ($1) characters randomly chosen from hackable string CHARSET. If parameter 1 not provided, a default number is used.
+# DESCRIPTION: returns approximately N ($1) characters randomly chosen from hackable
+# string CHARSET. If parameter 1 not provided, a default number is used.
 
 # USAGE: Run this script with one parameter, being the number of characters desired,
 # and pipe the output to a text file, like this:
-# ./randomBlockCharsString.sh 48 > block_chars_art.txt
+# ./randomBlockCharsString.sh 800 > block_chars_art.txt
+# The script by default prints hard newlines after 72 characters per line. To override that
+# e.g. with 60 characters, provide that as a second parameter:
+# ./randomBlockCharsString.sh 800 60 > block_chars_art.txt
 # NOTE that you may alter the declaration of CHARSET to include any characters which
 # the toolset may handle (possibly Unicode), including repeating characters in CHARSET
 # to make it more likely that they will appear, for different pattern types/effects.
@@ -19,13 +23,16 @@
 
 
 # CODE
-
 # Init N_CHARS_TO_GENERATE from $1 or set defaullt if $1 is not provided:
 if [ "$1" ]; then N_CHARS_TO_GENERATE=$1; else N_CHARS_TO_GENERATE=1024; fi
 
+if [ "$2" ]; then HARD_NEWLINE_AT_CHARACTER=$2; else HARD_NEWLINE_AT_CHARACTER=72; fi
+
 # Other potentially interesting characters to copy and paste into the CHARSET declaration;
 # re https://en.wikipedia.org/wiki/Geometric_Shapes :
-# ■□▢▣▤▥▦▧▨▩▪▫▬▭▮▯▰▱▲△▴▵▶▷▸▹►▻▼▽▾▿◀◁◂◃◄◅◆◇◈◉◊○◌◍◎●◐◑◒◓◔◕◖◗◘◙◚◛◜◝◞◟◠◡◢◣◤◥◦◧◨◩◪◫◬◭◮◯◰◱◲◳◴◵◶◷◸◹◺◻◼◽◾◿
+# CHARSET="■□▢▣▤▥▦▧▨▩▪▫▬▭▮▯▰▱▲△▴▵▶▷▸▹►▻▼▽▾▿◀◁◂◃◄◅◆◇◈◉◊○◌◍◎●◐◑◒◓◔◕◖◗◘◙◚◛◜◝◞◟◠◡◢◣◤◥◦◧◨◩◪◫◬◭◮◯◰◱◲◳◴◵◶◷◸◹◺◻◼◽◾◿"
+# Or + Apple-supported emoji:
+# CHARSET="🔴🟠🟡🟢🔵🟣🟤⚫️⚪️🔸🔷🔸🔹◆◇♦️💠♢❖♦⃟⋄◈⟐⟡⧰⟢⟣⤝⤞⤟⤠⧪⧰⧱⬖⬗⬘⬙⬥⬦⬩⛋▬▭▮✷✸⋉⋊▯⤳⬿⳻⳺⨲⋋⋌⌧🔺🔻⏃⏄⏅▲△▴▵▷▸▹▼▽▾▿◁▶◀ːˑ∺≋≎≑≣⊪⊹⊿┄┆┅┇◂◃◢◣◤◥◬◭☱☰◿◺◹◸◮☲☳☴☵☶☷🌀▰▱⎖፨჻܀⏢"
 CHARSET="▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟■"
 STR_LEN=$((${#CHARSET} - 1))
 # STR_LEN has a value of CHARSET's length minus one because we will potentially randomly read 1
@@ -34,7 +41,7 @@ STR_LEN=$((${#CHARSET} - 1))
 
 # OPTIONAL: uncomment this next code block if you want to redefine CHARSET as a randomly
 # selected subset of itself:
-NEW_CHARSET_LEN=`shuf -i 3-$STR_LEN -n 1`
+NEW_CHARSET_LEN=`shuf -i 2-$STR_LEN -n 1`
 for ELEMENT in $(seq $NEW_CHARSET_LEN)
 do
   TMP_NUMBER=`shuf -i 0-$STR_LEN -n 1`
@@ -45,15 +52,24 @@ CHARSET=$TMP_CHARSET
 STR_LEN=$((${#CHARSET} - 1))
 
 # CORE FUNCTIONALITY:
-for ELEMENT in $(seq $N_CHARS_TO_GENERATE)
-do
-  NUMBER=`shuf -i 0-$STR_LEN -n 1`
-  # for a curious slow terminal effect, pause between character renders:
-  # sleep 0.2
-  printf "${CHARSET:$NUMBER:1}"
-  # printf "${CHARSET:$NUMBER:1}" >> rndCharsSuperCollection.txt
-done
 
+# HOW IS THIS THE FIRST I've learned of this simpler expression form for native bash arithmetic?!
+# Re: https://ryanstutorials.net/bash-scripting-tutorial/bash-arithmetic.php
+let "HARD_NEWLINES = $N_CHARS_TO_GENERATE / $HARD_NEWLINE_AT_CHARACTER"
+# echo $HARD_NEWLINES
+# exit
+for NEWLINE in $(seq $HARD_NEWLINES)
+do
+  for ELEMENT in $(seq $HARD_NEWLINE_AT_CHARACTER)
+  do
+    NUMBER=`shuf -i 0-$STR_LEN -n 1`
+    # echo $NEWLINE $ELEMENT
+    # for a curious slow terminal effect, pause between character renders:
+    # sleep 0.2
+    printf "${CHARSET:$NUMBER:1}"
+  done
+  printf "\n"
+done
 
 # DEV HISTORY:
 # - 05/04/2016 12:37:50 PM -RAH Created after seeing these interesting characters in an .nfo;

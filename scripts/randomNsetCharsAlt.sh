@@ -1,7 +1,12 @@
-# DESCRIPTION: Faster but more patterned variant of randomNSetChars.sh. returns N ($1) characters randomly chosen from hackable string CHARSET. If parameter 1 not provided, a default number is used. Appends to a file rndCharsSuperCollection.txt, because otherwise the terminal (it seems at least on Mac) doesn't wrap and display everything.
+# DESCRIPTION: Faster but more patterned variant of randomNSetChars.sh. returns N ($1)
+# characters randomly chosen from hackable string CHARSET. If parameter 1 not provided,
+# a default number is used. Appends to a file rndCharsSuperCollection.txt, because otherwise
+# the terminal (it seems at least on Mac) doesn't wrap and display everything.
 # Core function taken from: https://stackoverflow.com/a/26326956/1397555
 
-# USAGE: Run this script with one parameter, being the number of times you want to generate a randomly shuffled group of characters from CHARSET (which you may alter in the code below). CHARSET may be altered to include any characters which the toolset may handle 
+# USAGE: Run this script with one parameter, being the number of times you want to generate
+# a randomly shuffled group of characters from CHARSET (which you may alter in the code below).
+# CHARSET may be altered to include any characters which the toolset may handle 
 # (possibly Unicode). You may repeat characters in CHARSET to make it more likely that
 # they will appear, for different pattern types/effects.
 # ALSO NOTE that the script by default alters the CHARSET string to be a random subset
