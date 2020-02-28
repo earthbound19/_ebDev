@@ -68,6 +68,8 @@ openimageio"
 # x264 \
 # xvid \
 # xz \
+# llvm \
+
 
 for element in ${brewPackages[@]}
 do
