@@ -7,15 +7,35 @@
 # USAGE
 # Invoke this script with one parameter, being a raw image filename in your PATH. e.g.:
 # ./thisScript.sh rawImageFileName.cr2
+# NOTE: to quickly rip the embedded jpegs (if there be any) out of all images, don't
+# even use this script, just do:
+# dcraw -e *.CR2
+# An interesting thing is to see raw sensor values in white scale:
+# dcraw -D -T *.CR2
 
+
+# CODE
 # I feel stupid that this far more efficient and elegant method of extracting file base names and extensions has eluded me for years, re: https://www.cyberciti.biz/faq/unix-linux-extract-filename-and-extension-in-bash/ -- this will speed up at least a few scripts.
 fileName="${1%.*}"
-fileExt=`echo "${1##*.}"`
+# fileExt=`echo "${1##*.}"`
 
 # - SCRATCHED -D switch; it makes the image very white. ? AND -W makes it very black. Together, they make it gray. (I assume that with good paramters they can adjust the white and black points.)
-dcraw -6 -v -w +M -o 1 -W -q 3 -T \
--b 2.2 \
-"$1"
+if [ ! -e $fileName.tif ]
+then
+  echo Target file "$fileName".tif does not exist. Will render.
+    # Something I tried and it didn't help much; maybe I know too little;
+    # Re: http://www.guillermoluijk.com/tutorial/dcraw/index_en.htm 
+    # echo Performing sat. anaylsys pass . . .
+    # dcraw -v -w -H 6 -f -T "$fileName"
+  # dcraw -v -w +M -o 1 -j -W -q 3 -T -H 1 -p embed -h -4 \
+  # "$1"
+  dcraw -T -h -o 1 -g 1 1 -w -H 1 -S 15360 \
+  "$1"
+  # +M -w -6 -W  -q 3 -h \
+  # -S 1 -H 1 -p embed -h \
+else
+  echo Target file "$fileName".tif already exists. Will not overwrite.
+fi
 # -h \
 # NOTE: move those additional optional switches line one up before the "$1" and uncomment them to use them.
 
