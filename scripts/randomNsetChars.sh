@@ -1,5 +1,6 @@
 # DESCRIPTION: returns approximately N ($1) characters randomly chosen from hackable
-# string CHARSET. If parameter 1 not provided, a default number is used.
+# string CHARSET. If parameter 1 not provided, a default number is used. DEPRECATED; use
+# randomNsetChars.py instead: it is far faster, can write to files, and produces unique subsets.
 
 # USAGE: Run this script with one parameter, being the number of characters desired,
 # and pipe the output to a text file, like this:
