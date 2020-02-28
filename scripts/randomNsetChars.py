@@ -4,6 +4,10 @@
 # files; hack the global variable SAVE_TO_RND_FILENAMES to alter that; hack the other globals
 # also for whatever other purposes you might have.
 
+# DEPENDENCIES:
+# Python 3.8 (or maybe any 3.x version) with random and time modules installed. Moroever,
+# python may need to be compiled with UCS2 or UCS4 support (larger text code pages support).
+
 # USAGE
 # - With this script in your path, invoke it with Python:
 # python randomNsetChars.py
@@ -24,10 +28,10 @@ random.seed(None, 2)
 # -- and it will always produce the same output, in that case.
 CHARSET = "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟■"
 CHOOSE_RND_SUBSET = True
-SAVE_TO_RND_FILENAMES = True
+SAVE_TO_RND_FILENAMES = False
 # REFERENCE: 1,000 ms = 1 second:
-VARIANTS_TO_GENERATE = 1000
-CHARS_PER_LINE = 60
+VARIANTS_TO_GENERATE = 1000000
+CHARS_PER_LINE = 80
 LINES_PER_GENERATED_SET = 16    # Also try e.g. 2
 # The following is note used in the script if SAVE_TO_RND_FILENAMES is True:
 WAIT_BETWEEN_LINES_MS = 142     # some oft-used choices: 82, 142
