@@ -1,24 +1,27 @@
 # DESCRIPTION
-# Prints N variants of constructed random character sets (hard-coded but hackable: block
-# characters), at X characters accross and Y lines down each. Prints to either terminal or
-# files; hack the global variable SAVE_TO_RND_FILENAMES to alter that; hack the other globals
-# also for whatever other purposes you might have.
+# Prints N variants of constructed random character sets (hard-coded but
+# hackable: block characters), at X characters accross and Y lines down each.
+# Prints to either terminal or files; hack the global variable
+# SAVE_TO_RND_FILENAMES to alter that (default writes to files) ; hack the
+# other globals also for whatever other purposes you might have.
 
 # DEPENDENCIES:
-# Python 3.8 (or maybe any 3.x version) with random and time modules installed. Moroever,
-# python may need to be compiled with UCS2 or UCS4 support (larger text code pages support).
+# Python 3.8 (or maybe any 3.x version) with random and time modules installed.
 
 # USAGE
 # - With this script in your path, invoke it with Python:
 # python randomNsetChars.py
-# - NOTE that the hard-coded defaults create 1,000 rnd character set variations saved to
-# text files in the directory you run this script from. So be prepared, ha, for a lot of noise.
-# - Also, hack the global variables (under the GLOBALS comment) for your purposes if you wish.
+# - NOTE that the hard-coded defaults create 1,000 rnd character set variations
+# saved to text files in the directory you run this script from (encoded in
+# UTF8. So be prepared for a lot of noise (ha).
+# - Also, hack the global variables (under the GLOBALS comment) for your
+# purposes if you wish.
 
 
 # CODE
 import random
 from time import sleep
+import codecs
 
 # GLOBALS:
 # Seeds rando number generator via current time:
@@ -28,13 +31,13 @@ random.seed(None, 2)
 # -- and it will always produce the same output, in that case.
 CHARSET = "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟■"
 CHOOSE_RND_SUBSET = True
-SAVE_TO_RND_FILENAMES = False
+SAVE_TO_RND_FILENAMES = True
 # REFERENCE: 1,000 ms = 1 second:
-VARIANTS_TO_GENERATE = 1000000
-CHARS_PER_LINE = 80
+VARIANTS_TO_GENERATE = 1000
+CHARS_PER_LINE = 79
 LINES_PER_GENERATED_SET = 16    # Also try e.g. 2
-# The following is note used in the script if SAVE_TO_RND_FILENAMES is True:
-WAIT_BETWEEN_LINES_MS = 142     # some oft-used choices: 82, 142
+# The following is not used in the script if SAVE_TO_RND_FILENAMES is True:
+WAIT_BETWEEN_LINES_MS = 75     # some oft-used choices: 82, 142
 
 # DERIVATIVE VALUES SET FROM GLOBALS:
 SLEEP_TIME = WAIT_BETWEEN_LINES_MS * 0.001
@@ -100,7 +103,7 @@ while n_set_outputs_counter < VARIANTS_TO_GENERATE:
         # for file name; therefore convert n_set_outputs_counter to string for zfill function:
         str_n_set_outputs_counter = str(n_set_outputs_counter)
         file_number_zero_padded = str_n_set_outputs_counter.zfill(digits_to_pad_file_numbers_to)
-        file = open(file_number_zero_padded + "__" + save_file_name + '.txt', "w")
+        file = codecs.open(file_number_zero_padded + "__" + save_file_name + '.txt', "w", "utf-8")
         file.write(super_string)
         file.close()
     # print("DONE creating variant", n_set_outputs_counter, "in run.")
