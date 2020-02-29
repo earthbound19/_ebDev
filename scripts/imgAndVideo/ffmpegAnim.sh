@@ -56,7 +56,7 @@ digitsPadCount=${#lastFoundTypeFileNameNoExt}
 
 echo executing ffmpeg command . . .
 # default codec for file type and UTvideo options both follow; comment out whatever you don't want; for the first you can change the _out.ttt file type to e.g. .mp4, .gif, etc.:
-ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $additionalParams $rescaleParams $-vf fps=$2 -crf $3 _out.mp4
+ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $additionalParams $rescaleParams -vf fps=$2 -crf $3 _out.mp4
 # ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $additionalParams $rescaleParams -vf fps=$2 -crf $3 -codec:v utvideo _out.avi
 
 # If $6 is passed to the script, create a looped still video ($6 seconds long) from the last frame and append it to the video:
