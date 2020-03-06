@@ -1,11 +1,21 @@
-% Re: https://www.reddit.com/r/Windows10/comments/3diylq/powershell_commands_to_uninstall_unwanted_builtin/ctme6iy
 Get-AppxProvisionedPackage -Online | Out-GridView -PassThru | Remove-AppxProvisionedPackage -Online
 
-% but that can fail, so, re: https://www.maketecheasier.com/uninstall-pre-installed-apps-windows-10/
+% remove the user's apps:
+Get-AppXPackage -User | Remove-AppxPackage
+
+% remove all system-wide apps,
 Get-AppxPackage -AllUsers | Remove-AppxPackage
+
 % then prevent them from reinstalling for other users:
 Get-AppXProvisionedPackage -online | Remove-AppxProvisionedPackage –online
 
-% BUT: "Again, the only real advantage to doing this is some mild decluttering of your Start menu.
-% It’s also likely that future updates (especially major updates) could reinstall those apps.
-% re: https://www.howtogeek.com/224798/how-to-uninstall-windows-10s-built-in-apps-and-how-to-reinstall-them/
+% BUT: It’s..likely that future updates (especially major updates) could reinstall those apps.
+
+% References:
+% https://www.reddit.com/r/Windows10/comments/3diylq/powershell_commands_to_uninstall_unwanted_builtin/ctme6iy
+% https://www.maketecheasier.com/uninstall-pre-installed-apps-windows-10/
+% https://www.howtogeek.com/224798/how-to-uninstall-windows-10s-built-in-apps-and-how-to-reinstall-them/
+% https://itvision.altervista.org/why-windows-10-sucks.html
+
+
+
