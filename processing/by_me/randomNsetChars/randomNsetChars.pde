@@ -12,8 +12,8 @@ int subCharSetLength;
 StringList charsetToUse = new StringList();
 
 // float fontPointSize = 83.4;
-//float fontPointSize = 43;
- float fontPointSize = 24;
+float fontPointSize = 43;
+ //float fontPointSize = 24;
  //float fontPointSize = 12;
 
 float characterWidth;
@@ -56,8 +56,8 @@ void setSubCharSet() {
 }
 
 void setup() {
-  //fullScreen();
-  size(480, 650);
+  fullScreen();
+  //size(480, 650);
   int lengthOfThat = stringOfCharsToInitFrom.length();
   for (int i = 0; i < lengthOfThat; i++) {
     masterCharSet.append(str(stringOfCharsToInitFrom.charAt(i)));
@@ -121,6 +121,6 @@ void draw () {
 }
 
 // to change display on every mouse press:
-void mousePressed() {
+//void mousePressed() {
   // renderRNDcharsScreen();
-}
+//}
