@@ -1,3 +1,7 @@
+//TO DO:
+//- describe this project
+//- fix bug: slows down over time. Memory leak? NOW TESTING fix after using .clear instead of reassigning new empty array to it.
+
 PFont myFont;
 String stringOfCharsToInitFrom = "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟■-_|";
 // comment bcse those dble tall!
@@ -8,8 +12,9 @@ int subCharSetLength;
 StringList charsetToUse = new StringList();
 
 // float fontPointSize = 83.4;
-float fontPointSize = 43;
-// float fontPointSize = 24;
+//float fontPointSize = 43;
+ float fontPointSize = 24;
+ //float fontPointSize = 12;
 
 float characterWidth;
 color backGroundColor = #383838;
@@ -31,7 +36,7 @@ int subsetDisplayedLinesCounter = 0;
 void setSubCharSet() {
   masterCharSet.shuffle();
   // empty this array so we can rebuild it:
-  subCharSet = new StringList();
+  subCharSet.clear();
   // choose rnd num between 1 and master char set length:
   int rndLen = int(random(1, (masterCharSetLength + 1) * 0.4));    // orig. python script max range mult.: 0.31
   print(rndLen + "\n");
@@ -51,8 +56,8 @@ void setSubCharSet() {
 }
 
 void setup() {
-  fullScreen();
-  //size(600, 400);
+  //fullScreen();
+  size(480, 650);
   int lengthOfThat = stringOfCharsToInitFrom.length();
   for (int i = 0; i < lengthOfThat; i++) {
     masterCharSet.append(str(stringOfCharsToInitFrom.charAt(i)));
@@ -107,7 +112,7 @@ void renderRNDcharsScreen () {
   }
   //text("█_-█\n-=░_", width/2, height/2);
   text(charsDisplayString, width/2, height/2);
-  delay(26);
+  delay(32);
 }
 
 void draw () {
