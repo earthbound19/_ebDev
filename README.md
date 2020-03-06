@@ -3,6 +3,9 @@ This repository was previously entitled _devtools.
 
 A collection of scripts (most of them developed by me) which I use for development of many kinds--at this writing, mostly visual art development on Windows. It heavily relies on various 'nix/cygwin utilities, which at this writing you can obtain via a URL provided later in this document.
 
+# LICENSE
+Everything in this repository which I have created, I dedicate to the Public Domain, unless comments in or near any code state otherwise.
+
 I believe that everything not created by me in this archive is at least freely available and open source. If you are the copyright owner of anything in this archive and wish for it to be removed, please contact me and I will do so.
 
 [http://earthbound.io/contact](http://earthbound.io/contact "http://earthbound.io/contact")
