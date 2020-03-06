@@ -46,6 +46,8 @@ fi
 # padParams=-vf "pad=width=1920:height=1080:x=0:y=0:color=black"
 # ex commands to fetch and parse src pix dimensions is in getDoesIMGinstagram.sh.
 # an example command wut does some math as would be needed per this algo: echo "scale=5; 3298 / 1296" | bc
+# OR JUST?! :
+# additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2"
 
 # Assumes that all input files have the same character count in the file base name; I wonder whether I've gone full circle on going away from and back to the exact form of the following command, but *right now* it's testing ok on Cygwin and Mac; re https://stackoverflow.com/a/40876071 ; ALSO gnuWin32 find it seems has a bug; the command throws an error. Here using Cygwin find on Windows and find on Mac; maybe I'll do that everywhere..
 lastFoundTypeFile=`gfind . -iname \*.$4 | sort | tail -n 1 | gsed 's/\.\/\(.*\)/\1/g'`
@@ -54,8 +56,8 @@ digitsPadCount=${#lastFoundTypeFileNameNoExt}
 
 echo executing ffmpeg command . . .
 # default codec for file type and UTvideo options both follow; comment out whatever you don't want; for the first you can change the _out.ttt file type to e.g. .mp4, .gif, etc.:
-ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $rescaleParams -vf fps=$2 -crf $3 _out.mp4
-# ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $rescaleParams -vf fps=$2 -crf $3 -codec:v utvideo _out.avi
+ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $additionalParams $rescaleParams -vf fps=$2 -crf $3 _out.mp4
+# ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $additionalParams $rescaleParams -vf fps=$2 -crf $3 -codec:v utvideo _out.avi
 
 # If $6 is passed to the script, create a looped still video ($6 seconds long) from the last frame and append it to the video:
 if [ "$6" ]
