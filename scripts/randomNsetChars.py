@@ -3,6 +3,7 @@
 # characters), at X characters accross and Y lines down each. Prints to either terminal or
 # files; hack the global variable SAVE_TO_RND_FILENAMES to alter that; hack the other globals
 # also for whatever other purposes you might have.
+# SEE ALSO randomNSetChars.pde.
 
 # DEPENDENCIES:
 # Python 3.8 (or maybe any 3.x version) with random and time modules installed. Moroever,
@@ -26,7 +27,9 @@ random.seed(None, 2)
 # OR you can seed with a specific number, e.g.:
 # random.seed(5, 2)
 # -- and it will always produce the same output, in that case.
+
 CHARSET = "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟■"
+
 CHOOSE_RND_SUBSET = True
 SAVE_TO_RND_FILENAMES = False
 # REFERENCE: 1,000 ms = 1 second:
