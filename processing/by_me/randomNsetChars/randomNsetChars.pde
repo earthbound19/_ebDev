@@ -3,34 +3,30 @@
 //- fix bug: slows down over time. Memory leak? NOW TESTING fix after using .clear instead of reassigning new empty array to it.
 
 PFont myFont;
-String stringOfCharsToInitFrom = "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟■-_|";
-// comment bcse those dble tall!
-StringList masterCharSet = new StringList();   // because has .shuffle();
-int masterCharSetLength;
-StringList subCharSet = new StringList();
-int subCharSetLength;
-StringList charsetToUse = new StringList();
+String stringOfCharsToInitFrom;
 
-// float fontPointSize = 83.4;
-float fontPointSize = 43;
- //float fontPointSize = 24;
- //float fontPointSize = 12;
+StringList masterCharSet;
+int masterCharSetLength;
+StringList subCharSet;
+int subCharSetLength;
+StringList charsetToUse;
+
+float fontPointSize;
 
 float characterWidth;
-color backGroundColor = #383838;
-// color backGroundColor = #00FFFF;
-// color fillColor = #FD00FD;
-// color fillColor = #0000FF;
-color fillColor = #00FFFF;
+color backGroundColor;
+color fillColor;
 float columnWidth;
 int columns;
 int rows;
 
-String charsDisplayString = "";
+String charsDisplayString;
 
-boolean displayRNDsubsets = true;
-int numRowsToDisplaySubset = 12;
-int subsetDisplayedLinesCounter = 0;
+boolean displayRNDsubsets;
+int numRowsToDisplaySubset;
+int reloadAfterNlines;
+int totalRenderedLines;
+int subsetDisplayedLinesCounter;
 
 // Alters a global! : Sets charsetToUse to rnd chars and length from masterCharSet:
 void setSubCharSet() {
@@ -57,7 +53,32 @@ void setSubCharSet() {
 
 void setup() {
   fullScreen();
-  //size(480, 650);
+  // size(480, 650);
+
+  stringOfCharsToInitFrom = "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟■-_|";
+  charsDisplayString = "";
+  
+  masterCharSet = new StringList();   // because has .shuffle();
+  subCharSet = new StringList();
+  charsetToUse = new StringList();
+
+  // fontPointSize = 83.4;
+  fontPointSize = 43;
+  // fontPointSize = 24;
+  // fontPointSize = 12;
+
+  backGroundColor = #383838;
+  // backGroundColor = #00FFFF;
+  // fillColor = #FD00FD;
+  // fillColor = #0000FF;
+  fillColor = #00FFFF;
+
+  displayRNDsubsets = true;
+  numRowsToDisplaySubset = 12;
+  reloadAfterNlines = numRowsToDisplaySubset * 42;
+  totalRenderedLines = 0;
+  subsetDisplayedLinesCounter = 0;
+
   int lengthOfThat = stringOfCharsToInitFrom.length();
   for (int i = 0; i < lengthOfThat; i++) {
     masterCharSet.append(str(stringOfCharsToInitFrom.charAt(i)));
@@ -113,6 +134,14 @@ void renderRNDcharsScreen () {
   //text("█_-█\n-=░_", width/2, height/2);
   text(charsDisplayString, width/2, height/2);
   delay(32);
+  
+  // to mitigate mysterious slowdown via periodic reload of script:
+  totalRenderedLines += 1;
+  if (totalRenderedLines == reloadAfterNlines) {
+    print("Calling setup again at totalRenderedLines == " + totalRenderedLines + "!\n");
+    setup();
+  }
+
 }
 
 void draw () {
