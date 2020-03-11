@@ -27,7 +27,8 @@
 
 # DEPENDENCIES
 # Python 3, various python packages (see import list at start of code) which you may install with
-# easy_install or pip.
+# easy_install or pip; NOTE that the colour import is actually from the colour-science package;
+# you must install colour-science.
 
 # KNOWN ISSUES
 # The same input sorted in a different order always produces the same output, but you must
