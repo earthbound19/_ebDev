@@ -3,6 +3,11 @@
 // # characters), scrolling down the screen, with character color morph (randomization).
 
 // TO DO:
+// - revert rnd color changing combined _with_ scroll; it doesn't work.
+// some other color changing would work.
+// - pixelwise scrolling (very smooth scrolling) (difficult to code)
+// - static series of images
+//  - AND/OR writes over itself via lines (difficult to code)
 // - unique rnd colors of rows? Would entail:
 //  - converting text to PShape; possibly re: https://discourse.processing.org/t/convert-text-to-pshape/15552/2
 //  - accurately dividing screen by row height, rows
@@ -34,7 +39,7 @@ color[] fillColors = {
 };
 int fillColorsLength = fillColors.length;
 int fillColorsArrayIndex = 0;
-boolean rndColorChangeMode = true;
+boolean rndColorChangeMode = false;
 
 PFont myFont;
 String stringOfCharsToInitFrom;
@@ -116,8 +121,8 @@ void setSubCharSet() {
 }
 
 void setup() {
-  // fullScreen();
-  size(1280, 720);
+  fullScreen();
+  // size(1280, 720);
   // size(413, 258);
 
   fillColorsArrayIndex = int(random(0, fillColorsLength));
