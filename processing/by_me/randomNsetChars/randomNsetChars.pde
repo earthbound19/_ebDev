@@ -1,6 +1,40 @@
-//TO DO:
-//- describe this project
-//- fix bug: slows down over time. Memory leak? NOW TESTING fix after using .clear instead of reassigning new empty array to it.
+// DESCRIPTION
+// Prints variants of constructed random character sets (hard-coded but hackable: block
+// # characters), scrolling down the screen, with character color morph (randomization).
+
+// TO DO:
+// - unique rnd colors of rows? Would entail:
+//  - converting text to PShape; possibly re: https://discourse.processing.org/t/convert-text-to-pshape/15552/2
+//  - accurately dividing screen by row height, rows
+//  - rendering a series of text() -> PShapes down the screen
+//  - popping the last PShape off the top, adding a new one to the bottom
+//  - an array of PShapes with reflective positions to do that? Yyech.
+// - touch interaction:
+//   - pops color to rnd something else?
+//   - saves img and
+//    - tweets image with current char set text?
+//   - saves SVG?
+//    - svg numbering and save anim mode, for anims?
+
+
+// CODE
+
+// GLOBALS DECLARATIONS
+String versionNumber = "0.5";
+
+// palette tweaked (and expanded with more cyans and greens, and lighter those) from:
+// https://github.com/earthbound19/_ebArt/blob/master/palettes/fundamental_vivid_hues_v2.hexplt
+color[] fillColors = {
+	#FF00FF, #FF00C0, #FF007F, #DB12A3, #C91BB5, #B624C8, #A42DDA, #7F40FF,
+	#6060FF, #6A6AFF, #7F7FFF, #608BF3, #4894EA, #00AFCF, #00C1EA, #00CFFF, #00C4FF,
+	#00E4FF, #2DEEFF, #3EF1FF, #7FFFFF, #6DFFFF, #5BFFFF, #25FFFF, #00FFFF,
+  #32F2DA, #43EECD, #54EAC1, #76E1A8, #40F37E, #52FE79, #00E77D, #1DCF00,
+	#65D700, #85FF00, #00FF00, #B5FF00, #B2F300, #AFE300, #D1EF00, #FFD500,
+	#FFB700, #FD730A, #FF5100, #FF0000, #FF0047, #FF006B, #FF009C
+};
+int fillColorsLength = fillColors.length;
+int fillColorsArrayIndex = 0;
+boolean rndColorChangeMode = true;
 
 PFont myFont;
 String stringOfCharsToInitFrom;
@@ -17,8 +51,10 @@ float characterWidth;
 color backGroundColor;
 color fillColor;
 float columnWidth;
+float rowHeight;
 int columns;
 int rows;
+int rowLoopCounter;
 
 String charsDisplayString;
 
@@ -27,6 +63,34 @@ int numRowsToDisplaySubset;
 int reloadAfterNlines;
 int totalRenderedLines;
 int subsetDisplayedLinesCounter;
+// END GLOBALS DECLARATIONS
+
+
+// FUNCTION ALTERS A GLOBAL! :
+// randomly changes index to select foreground color from self, before, or after,
+// looping around if past either edge of array index, but only if an rnd color mode bool is true:
+void setRNDfillColor() {
+  if (rndColorChangeMode == true) {
+    // roll a three-sided die; if one is rolled, do rnd color change:
+    int rndChoiceOne = int(random(1, 4));
+    if (rndChoiceOne == 1) {
+      int rndChoiceTwo = int(random(-2, 2));
+      fillColorsArrayIndex += rndChoiceTwo;
+      // if less than zero, set to array max.:
+      if (fillColorsArrayIndex < 0) {
+        fillColorsArrayIndex = fillColorsLength;
+      }
+      // if more than array max., set to zero:
+      if (fillColorsArrayIndex >= fillColorsLength) {
+        fillColorsArrayIndex = 0;
+      }
+      // print("fillColorsArrayIndex val: " + fillColorsArrayIndex + "\n");
+      
+      fillColor = fillColors[fillColorsArrayIndex];
+      fill(fillColor);
+    }
+  }
+}
 
 // Alters a global! : Sets charsetToUse to rnd chars and length from masterCharSet:
 void setSubCharSet() {
@@ -35,7 +99,7 @@ void setSubCharSet() {
   subCharSet.clear();
   // choose rnd num between 1 and master char set length:
   int rndLen = int(random(1, (masterCharSetLength + 1) * 0.4));    // orig. python script max range mult.: 0.31
-  print(rndLen + "\n");
+  // print("Random length chosen for subset is: " + rndLen + "\n");
   for (int j = 0; j < rndLen; j++) {
     subCharSet.append(masterCharSet.get(j));
   }
@@ -52,64 +116,77 @@ void setSubCharSet() {
 }
 
 void setup() {
-  fullScreen();
-  // size(480, 650);
+  // fullScreen();
+  size(1280, 720);
+  // size(413, 258);
 
-  stringOfCharsToInitFrom = "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟■-_|";
-  charsDisplayString = "";
+  fillColorsArrayIndex = int(random(0, fillColorsLength));
+
+  // it seems those block glyphs are literally double tall?! :
   
+  stringOfCharsToInitFrom = "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟■";
+  charsDisplayString = "";
   masterCharSet = new StringList();   // because has .shuffle();
   subCharSet = new StringList();
   charsetToUse = new StringList();
-
-  // fontPointSize = 83.4;
-  fontPointSize = 43;
-  // fontPointSize = 24;
-  // fontPointSize = 12;
-
-  backGroundColor = #383838;
-  // backGroundColor = #00FFFF;
-  // fillColor = #FD00FD;
-  // fillColor = #0000FF;
-  fillColor = #00FFFF;
-
-  displayRNDsubsets = true;
-  numRowsToDisplaySubset = 12;
-  reloadAfterNlines = numRowsToDisplaySubset * 42;
-  totalRenderedLines = 0;
-  subsetDisplayedLinesCounter = 0;
-
-  int lengthOfThat = stringOfCharsToInitFrom.length();
-  for (int i = 0; i < lengthOfThat; i++) {
+  int lengthOfChars = stringOfCharsToInitFrom.length();
+  for (int i = 0; i < lengthOfChars; i++) {
     masterCharSet.append(str(stringOfCharsToInitFrom.charAt(i)));
-    }
+  }
   masterCharSetLength = masterCharSet.size();
   // inits subCharSet
   setSubCharSet();
   if (displayRNDsubsets == true) {
     charsetToUse = subCharSet;
-  } else {
-    charsetToUse = masterCharSet;
+    } else {
+      charsetToUse = masterCharSet;
+    }
+
+  // fontPointSize = 83.4;
+  fontPointSize = 32;
+  // fontPointSize = 24;
+  // fontPointSize = 12;
+
+  backGroundColor = #383838;
+  fillColor = #00FFFF;
+  // NOTE: the following overrides that with an RND color if rndColorChangeMode is true:
+  if (rndColorChangeMode == true) {
+    fillColor = fillColors[int(random(0, fillColorsLength))];
   }
+  
+  background(backGroundColor);
+  fill(fillColor);
+
+  displayRNDsubsets = true;
+  numRowsToDisplaySubset = 7;
+  reloadAfterNlines = numRowsToDisplaySubset * 42;
+  totalRenderedLines = 0;
+  subsetDisplayedLinesCounter = 0;
+  
   // Uncomment the following two lines to see the available fonts 
   //String[] fontList = PFont.list();
   //printArray(fontList);
   myFont = createFont("FiraMono-Bold.otf", fontPointSize);    // on Mac, leads to rendered monospace width of ~49.79
   textFont(myFont);
   textAlign(CENTER, CENTER);
-  fill(fillColor);
-  background(backGroundColor);
-  characterWidth = textWidth('█');
-  // characterHeight = textHeight('█')'
-  columnWidth = (width / characterWidth);
-  columns = int(width / characterWidth);
+
   textSize(fontPointSize);    // Also sets vertical leading; re
-  // https://processing.org/reference/textLeading_.html -- so reset that with:
-  textLeading(fontPointSize * 1.486);   // EXACT min/max contact at 83.4 point size, FiraMono-Bold.otf!
-  // it seems those block glyphs are literally double tall?!
-    rows = 1;
-  print("columns: " + columns + " rows: " + rows + "\n");
-  renderRNDcharsScreen();
+  // https://processing.org/reference/textLeading_.html -- so reset that with textLeading():
+  characterWidth = textWidth('█');
+      // Trying and failing to figure out vertical metrics via variables instead of manual value here:
+      // float doubleTallCharacterHeight = (textAscent() * 2)  +  (textDescent() * 2);   
+      // print("height of double tall characters may be: " + doubleTallCharacterHeight + "\n");
+      // columnWidth = (width / characterWidth);
+  columns = int(width / characterWidth);
+  // print(characterWidth + "\n");
+  float leadingMultiplier = 1.485;    // hard-coded multiplier figured for Fira Mono Bold double-tall glyphs
+  rowHeight = fontPointSize * leadingMultiplier;
+  // I'm mystified why (textAscent() + textDescent() would give a wrong leading value here:
+  textLeading(rowHeight);
+  
+  rows = int(height / rowHeight);
+  rowLoopCounter = 1;
+      // print("columns: " + columns + " rows: " + rows + "\n");
 }
 
 void renderRNDcharsScreen () {
@@ -120,10 +197,10 @@ void renderRNDcharsScreen () {
   }
   
   background(backGroundColor);
-  // print(characterWidth + "\n");
+  setRNDfillColor();
   
   int charsetToUseLength = charsetToUse.size();
-  for (int row = 0; row < rows; row++) {
+  for (int row = 0; row < rowLoopCounter; row++) {
     for (int column = 0; column < columns; column++) {
       // for dev testing spacing:
       // charsDisplayString += "_";
@@ -133,12 +210,12 @@ void renderRNDcharsScreen () {
   }
   //text("█_-█\n-=░_", width/2, height/2);
   text(charsDisplayString, width/2, height/2);
-  delay(32);
+  delay(60);
   
   // to mitigate mysterious slowdown via periodic reload of script:
   totalRenderedLines += 1;
   if (totalRenderedLines == reloadAfterNlines) {
-    print("Calling setup again at totalRenderedLines == " + totalRenderedLines + "!\n");
+    // print("Calling setup again at totalRenderedLines == " + totalRenderedLines + "!\n");
     setup();
   }
 
