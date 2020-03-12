@@ -4,33 +4,22 @@
 
 // TO DO:
 // - something with this? https://stackoverflow.com/questions/51702011/can-we-create-partially-colored-text-in-processing
-// - revert rnd color changing combined _with_ scroll; it doesn't work.
-// some other color changing would work.
-// - pixelwise scrolling (very smooth scrolling) (difficult to code)
-// - static series of images
-//  - AND/OR writes over itself via lines (difficult to code)
-// - unique rnd colors of rows? Would entail:
+// - unique rnd colors of rows? Might entail:
 //  - converting text to PShape; possibly re: https://discourse.processing.org/t/convert-text-to-pshape/15552/2
-//  - accurately dividing screen by row height, rows
-//  - rendering a series of text() -> PShapes down the screen
-//  - popping the last PShape off the top, adding a new one to the bottom
-//  - an array of PShapes with reflective positions to do that? Yyech.
-// - touch interaction:
-//   - pops color to rnd something else?
-//   - saves img and
-//    - tweets image with current char set text?
-//   - saves SVG?
-//    - svg numbering and save anim mode, for anims?
+// - tweet image with current char set text?
+// - save SVG?
+// - svg numbering and save anim mode, for anims?
 
 
 // CODE
 
 // GLOBALS DECLARATIONS
-String versionNumber = "0.5.2";
+String versionNumber = "0.6.0";
 // Changes this version:
-// - tweak defaults
-// - set rnd color change per run of setup() (may rnd change and keep for shortish run duration)
-// - expand TO DO
+// - render noise over entire view, delay, then render new of same type of noise for period,
+// and periodically call setup() which may rnd change color. This is _much_ more interesting.
+
+int delayBetweenRenders = 141;
 
 // palette tweaked (and expanded with more cyans and greens, and lighter those) from:
 // https://github.com/earthbound19/_ebArt/blob/master/palettes/fundamental_vivid_hues_v2.hexplt
@@ -64,15 +53,14 @@ float columnWidth;
 float rowHeight;
 int columns;
 int rows;
-int rowLoopCounter;
 
 String charsDisplayString;
 
 boolean displayRNDsubsets;
-int numRowsToDisplaySubset;
-int reloadAfterNlines;
-int totalRenderedLines;
-int subsetDisplayedLinesCounter;
+int numRendersToDisplaySubset;
+int reloadAfterNrenders;
+int renderCount;
+int subsetDisplayedrendersCounter;
 // END GLOBALS DECLARATIONS
 
 
@@ -154,7 +142,9 @@ void setup() {
     }
 
   // fontPointSize = 83.4;
-  fontPointSize = 43;
+  // fontPointSize = 51.5;
+  // fontPointSize = 43;
+  fontPointSize = 39.1;
   // fontPointSize = 32;
   // fontPointSize = 24;
   // fontPointSize = 12;
@@ -170,17 +160,17 @@ void setup() {
   fill(fillColor);
 
   displayRNDsubsets = true;
-  numRowsToDisplaySubset = 7;
-  reloadAfterNlines = numRowsToDisplaySubset * 42;
-  totalRenderedLines = 0;
-  subsetDisplayedLinesCounter = 0;
+  numRendersToDisplaySubset = 18;
+  reloadAfterNrenders = numRendersToDisplaySubset * 30;
+  renderCount = 0;
+  subsetDisplayedrendersCounter = 0;
   
-  // Uncomment the following two lines to see the available fonts 
+  // Uncomment the following two renders to see the available fonts 
   //String[] fontList = PFont.list();
   //printArray(fontList);
   myFont = createFont("FiraMono-Bold.otf", fontPointSize);    // on Mac, leads to rendered monospace width of ~49.79
   textFont(myFont);
-  textAlign(CENTER, CENTER);
+  textAlign(CENTER, TOP);
 
   textSize(fontPointSize);    // Also sets vertical leading; re
   // https://processing.org/reference/textLeading_.html -- so reset that with textLeading():
@@ -197,36 +187,33 @@ void setup() {
   textLeading(rowHeight);
   
   rows = int(height / rowHeight);
-  rowLoopCounter = 1;
       // print("columns: " + columns + " rows: " + rows + "\n");
 }
 
 void renderRNDcharsScreen () {
-  subsetDisplayedLinesCounter += 1;
-  if (subsetDisplayedLinesCounter == numRowsToDisplaySubset) {
-    subsetDisplayedLinesCounter = 0;
+  subsetDisplayedrendersCounter += 1;
+  if (subsetDisplayedrendersCounter == numRendersToDisplaySubset) {
+    subsetDisplayedrendersCounter = 0;
     setSubCharSet();
   }
   
   background(backGroundColor);
   
   int charsetToUseLength = charsetToUse.size();
-  for (int row = 0; row < rowLoopCounter; row++) {
+  charsDisplayString = "";
+  for (int row = 0; row < rows + 1; row++) {
     for (int column = 0; column < columns; column++) {
-      // for dev testing spacing:
-      // charsDisplayString += "_";
       charsDisplayString += charsetToUse.get(int(random(0, charsetToUseLength)));
     }
     charsDisplayString += "\n";
   }
-  //text("█_-█\n-=░_", width/2, height/2);
-  text(charsDisplayString, width/2, height/2);
-  delay(45);
+  text(charsDisplayString, width/2, 0);
+  delay(delayBetweenRenders);
   
   // to mitigate mysterious slowdown via periodic reload of script:
-  totalRenderedLines += 1;
-  if (totalRenderedLines == reloadAfterNlines) {
-    // print("Calling setup again at totalRenderedLines == " + totalRenderedLines + "!\n");
+  renderCount += 1;
+  if (renderCount == reloadAfterNrenders) {
+    print("Calling setup again at renderCount == " + renderCount + "!\n");
     setup();
   }
 
