@@ -14,12 +14,16 @@
 // CODE
 
 // GLOBALS DECLARATIONS
-String versionNumber = "0.6.0";
+String versionNumber = "1.0.0";
 // Changes this version:
-// - render noise over entire view, delay, then render new of same type of noise for period,
-// and periodically call setup() which may rnd change color. This is _much_ more interesting.
+// - use unifont-12.1.04.ttf font instead of Fira Mono. Has non-crazy vertical metrics for block chars.
+// - Hack-Regular.ttf is good alternate.
+// Tossup: I like the finer "gray" or "hatch" block chars of unifont; I like the more square glyphs of Hack. ?
+// - add optional other char supersets as comments.
+// - reintroduce color morph per render (variant) as it looks good with full-screen changing noise.
+// - tweak defaults
 
-int delayBetweenRenders = 141;
+int delayBetweenRenders = 84;    // has been: 141;
 
 // palette tweaked (and expanded with more cyans and greens, and lighter those) from:
 // https://github.com/earthbound19/_ebArt/blob/master/palettes/fundamental_vivid_hues_v2.hexplt
@@ -121,9 +125,16 @@ void setup() {
   fillColorsArrayIndex = int(random(0, fillColorsLength));
   setRNDfillColor();
 
-  // it seems those block glyphs are literally double tall?! :
-  
-  stringOfCharsToInitFrom = "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟■";
+  // SUPER SET DEFINITION from which subsets may be randomly drawn; combining any of these can produce interesting results:
+  // COULD USE: BOX DRAWING unicode block set, re: https://en.wikipedia.org/wiki/Box_Drawing_(Unicode_block)
+  //stringOfCharsToInitFrom = "─━│┃┄┅┆┇┈┉┊┋┌┍┎┏┐┑┒┓└┕┖┗┘┙┚┛├┝┞┟┠┡┢┣┤┥┦┧┨┩┪┫┬┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏═║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬╭╮╯╰╱╲╳╴╵╶╷╸╹╺╻╼╽╾╿";
+  // OR: Block Elements; re: https://en.wikipedia.org/wiki/Block_Elements
+   stringOfCharsToInitFrom = "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟";
+  // OR: GEOMETRIC SHAPES unicode block:
+  // stringOfCharsToInitFrom = "■□▢▣▤▥▦▧▨▩▪▫▬▭▮▯▰▱▲△▴▵▶▷▸▹►▻▼▽▾▿◀◁◂◃◄◅◆◇◈◉◊○◌◍◎●◐◑◒◓◔◕◖◗◘◙◚◛◜◝◞◟◠◡◢◣◤◥◦◧◨◩◪◫◬◭◮◯◰◱◲◳◴◵◶◷◸◹◺◻◼◽◾◿";
+  // OR: MATH OPERATORS block:
+  // stringOfCharsToInitFrom = "∀∁∂∃∄∅∆∇∈∉∊∋∌∍∎∏∐∑−∓∔∕∖∗∘∙√∛∜∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿";
+  // There's also a Commodore 64 character set, PETSCII, an Atari one, etc..
   charsDisplayString = "";
   masterCharSet = new StringList();   // because has .shuffle();
   subCharSet = new StringList();
@@ -141,17 +152,10 @@ void setup() {
       charsetToUse = masterCharSet;
     }
 
-  // fontPointSize = 83.4;
-  // fontPointSize = 51.5;
-  // fontPointSize = 43;
-  fontPointSize = 39.1;
-  // fontPointSize = 32;
-  // fontPointSize = 24;
-  // fontPointSize = 12;
+  fontPointSize = 44;    // tried sizes list: 83.4 51.5 43 39.1 32 24 12
 
   backGroundColor = #383838;
-  fillColor = #00FFFF;
-  // NOTE: the following overrides that with an RND color if rndColorChangeMode is true:
+  fillColor = #00FFFF;  // NOTE: the following may override that with RND color:
   if (rndColorChangeMode == true) {
     fillColor = fillColors[int(random(0, fillColorsLength))];
   }
@@ -160,34 +164,27 @@ void setup() {
   fill(fillColor);
 
   displayRNDsubsets = true;
-  numRendersToDisplaySubset = 18;
-  reloadAfterNrenders = numRendersToDisplaySubset * 30;
+  numRendersToDisplaySubset = 21;
+  reloadAfterNrenders = numRendersToDisplaySubset * 7;
   renderCount = 0;
   subsetDisplayedrendersCounter = 0;
   
   // Uncomment the following two renders to see the available fonts 
   //String[] fontList = PFont.list();
   //printArray(fontList);
-  myFont = createFont("FiraMono-Bold.otf", fontPointSize);    // on Mac, leads to rendered monospace width of ~49.79
+  myFont = createFont("unifont-12.1.04.ttf", fontPointSize);
   textFont(myFont);
   textAlign(CENTER, TOP);
 
   textSize(fontPointSize);    // Also sets vertical leading; re
   // https://processing.org/reference/textLeading_.html -- so reset that with textLeading():
-  characterWidth = textWidth('█');
-      // Trying and failing to figure out vertical metrics via variables instead of manual value here:
-      // float doubleTallCharacterHeight = (textAscent() * 2)  +  (textDescent() * 2);   
-      // print("height of double tall characters may be: " + doubleTallCharacterHeight + "\n");
-      // columnWidth = (width / characterWidth);
+  characterWidth = textWidth('▆');
   columns = int(width / characterWidth);
-  // print(characterWidth + "\n");
-  float leadingMultiplier = 1.485;    // hard-coded multiplier figured for Fira Mono Bold double-tall glyphs
-  rowHeight = fontPointSize * leadingMultiplier;
-  // I'm mystified why (textAscent() + textDescent() would give a wrong leading value here:
+  rowHeight = fontPointSize * 0.987;
+  // I'm mystified why (textAscent() + textDescent() gave wrong val here with Fira Mono:
   textLeading(rowHeight);
   
   rows = int(height / rowHeight);
-      // print("columns: " + columns + " rows: " + rows + "\n");
 }
 
 void renderRNDcharsScreen () {
@@ -198,6 +195,7 @@ void renderRNDcharsScreen () {
   }
   
   background(backGroundColor);
+  setRNDfillColor();
   
   int charsetToUseLength = charsetToUse.size();
   charsDisplayString = "";
@@ -216,7 +214,6 @@ void renderRNDcharsScreen () {
     print("Calling setup again at renderCount == " + renderCount + "!\n");
     setup();
   }
-
 }
 
 void draw () {
