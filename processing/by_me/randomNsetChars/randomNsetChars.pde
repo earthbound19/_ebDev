@@ -3,6 +3,7 @@
 // # characters), scrolling down the screen, with character color morph (randomization).
 
 // TO DO:
+// - something with this? https://stackoverflow.com/questions/51702011/can-we-create-partially-colored-text-in-processing
 // - revert rnd color changing combined _with_ scroll; it doesn't work.
 // some other color changing would work.
 // - pixelwise scrolling (very smooth scrolling) (difficult to code)
@@ -25,7 +26,11 @@
 // CODE
 
 // GLOBALS DECLARATIONS
-String versionNumber = "0.5";
+String versionNumber = "0.5.2";
+// Changes this version:
+// - tweak defaults
+// - set rnd color change per run of setup() (may rnd change and keep for shortish run duration)
+// - expand TO DO
 
 // palette tweaked (and expanded with more cyans and greens, and lighter those) from:
 // https://github.com/earthbound19/_ebArt/blob/master/palettes/fundamental_vivid_hues_v2.hexplt
@@ -39,7 +44,7 @@ color[] fillColors = {
 };
 int fillColorsLength = fillColors.length;
 int fillColorsArrayIndex = 0;
-boolean rndColorChangeMode = false;
+boolean rndColorChangeMode = true;
 
 PFont myFont;
 String stringOfCharsToInitFrom;
@@ -126,6 +131,7 @@ void setup() {
   // size(413, 258);
 
   fillColorsArrayIndex = int(random(0, fillColorsLength));
+  setRNDfillColor();
 
   // it seems those block glyphs are literally double tall?! :
   
@@ -148,7 +154,8 @@ void setup() {
     }
 
   // fontPointSize = 83.4;
-  fontPointSize = 32;
+  fontPointSize = 43;
+  // fontPointSize = 32;
   // fontPointSize = 24;
   // fontPointSize = 12;
 
@@ -202,7 +209,6 @@ void renderRNDcharsScreen () {
   }
   
   background(backGroundColor);
-  setRNDfillColor();
   
   int charsetToUseLength = charsetToUse.size();
   for (int row = 0; row < rowLoopCounter; row++) {
@@ -215,7 +221,7 @@ void renderRNDcharsScreen () {
   }
   //text("█_-█\n-=░_", width/2, height/2);
   text(charsDisplayString, width/2, height/2);
-  delay(60);
+  delay(45);
   
   // to mitigate mysterious slowdown via periodic reload of script:
   totalRenderedLines += 1;
