@@ -3,6 +3,9 @@
 // # characters), scrolling down the screen, with character color morph (randomization).
 
 // TO DO:
+// - fix that it is non-deterministic randomness apparently. If an override seed is used, it
+// starts deterministically; but then it stops being deterministic (is unpredictable; not the same
+// every time. Does something alter the machine after start?
 // - something with this? https://stackoverflow.com/questions/51702011/can-we-create-partially-colored-text-in-processing
 // - unique rnd colors of rows? Might entail:
 //  - converting text to PShape; possibly re: https://discourse.processing.org/t/convert-text-to-pshape/15552/2
@@ -14,16 +17,16 @@
 // CODE
 
 // GLOBALS DECLARATIONS
-String versionNumber = "1.0.0";
+String versionNumber = "1.1.0";
 // Changes this version:
-// - use unifont-12.1.04.ttf font instead of Fira Mono. Has non-crazy vertical metrics for block chars.
-// - Hack-Regular.ttf is good alternate.
-// Tossup: I like the finer "gray" or "hatch" block chars of unifont; I like the more square glyphs of Hack. ?
-// - add optional other char supersets as comments.
-// - reintroduce color morph per render (variant) as it looks good with full-screen changing noise.
-// - tweak defaults
+// - new global booleans controlling new PNG animation series save feature.
+// - comment out RND manual seeding unless/until I can sort out why and fix that it's not deterministic.
 
 int delayBetweenRenders = 84;    // has been: 141;
+boolean booleanOverrideSeed = true;
+// int overrideSeed = 1117351680;    // 1117351680 starts out with a magenta/violet weirdly seeming growing optical illusion!
+boolean saveAllFrames = false;
+boolean savePNGs = false;
 
 // palette tweaked (and expanded with more cyans and greens, and lighter those) from:
 // https://github.com/earthbound19/_ebArt/blob/master/palettes/fundamental_vivid_hues_v2.hexplt
@@ -31,7 +34,7 @@ color[] fillColors = {
 	#FF00FF, #FF00C0, #FF007F, #DB12A3, #C91BB5, #B624C8, #A42DDA, #7F40FF,
 	#6060FF, #6A6AFF, #7F7FFF, #608BF3, #4894EA, #00AFCF, #00C1EA, #00CFFF, #00C4FF,
 	#00E4FF, #2DEEFF, #3EF1FF, #7FFFFF, #6DFFFF, #5BFFFF, #25FFFF, #00FFFF,
-  #32F2DA, #43EECD, #54EAC1, #76E1A8, #40F37E, #52FE79, #00E77D, #1DCF00,
+	#32F2DA, #43EECD, #54EAC1, #76E1A8, #40F37E, #52FE79, #00E77D, #1DCF00,
 	#65D700, #85FF00, #00FF00, #B5FF00, #B2F300, #AFE300, #D1EF00, #FFD500,
 	#FFB700, #FD730A, #FF5100, #FF0000, #FF0047, #FF006B, #FF009C
 };
@@ -67,6 +70,20 @@ int renderCount;
 int subsetDisplayedrendersCounter;
 // END GLOBALS DECLARATIONS
 
+
+String get_random_string(int length) {
+	// https://programming.guide/java/generate-random-character.html
+	String felf = "";
+	String rnd_string_components = "abcdeghjkmnpqruvwyzABCDEGHJKMNPQRUVWYZ23456789";
+	for (int i = 0; i < length; i++)
+	{
+	int rnd_choice = (int) random(0, rnd_string_components.length());
+	felf+= rnd_string_components.charAt(rnd_choice);
+	}
+	return felf;
+}
+String rndString = get_random_string(12);
+String animFramesSaveSubdir = "_anim_run_" + rndString + "/";
 
 // FUNCTION ALTERS A GLOBAL! :
 // randomly changes index to select foreground color from self, before, or after,
@@ -117,11 +134,14 @@ void setSubCharSet() {
   // text(tmp_one + "\n", width/2, height/2);
 }
 
-void setup() {
+void settings() {
   fullScreen();
   // size(1280, 720);
-  // size(413, 258);
+  //randomSeed(overrideSeed);
+}
 
+
+void setup() {
   fillColorsArrayIndex = int(random(0, fillColorsLength));
   setRNDfillColor();
 
@@ -129,7 +149,7 @@ void setup() {
   // COULD USE: BOX DRAWING unicode block set, re: https://en.wikipedia.org/wiki/Box_Drawing_(Unicode_block)
   //stringOfCharsToInitFrom = "─━│┃┄┅┆┇┈┉┊┋┌┍┎┏┐┑┒┓└┕┖┗┘┙┚┛├┝┞┟┠┡┢┣┤┥┦┧┨┩┪┫┬┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏═║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬╭╮╯╰╱╲╳╴╵╶╷╸╹╺╻╼╽╾╿";
   // OR: Block Elements; re: https://en.wikipedia.org/wiki/Block_Elements
-   stringOfCharsToInitFrom = "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟";
+  stringOfCharsToInitFrom = "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟";
   // OR: GEOMETRIC SHAPES unicode block:
   // stringOfCharsToInitFrom = "■□▢▣▤▥▦▧▨▩▪▫▬▭▮▯▰▱▲△▴▵▶▷▸▹►▻▼▽▾▿◀◁◂◃◄◅◆◇◈◉◊○◌◍◎●◐◑◒◓◔◕◖◗◘◙◚◛◜◝◞◟◠◡◢◣◤◥◦◧◨◩◪◫◬◭◮◯◰◱◲◳◴◵◶◷◸◹◺◻◼◽◾◿";
   // OR: MATH OPERATORS block:
@@ -154,7 +174,7 @@ void setup() {
 
   fontPointSize = 44;    // tried sizes list: 83.4 51.5 43 39.1 32 24 12
 
-  backGroundColor = #383838;
+  backGroundColor = #383838;    // favorites: #383838 -- which causes weird magenta/violet/red growing shrinking optical illusions! -- or #000000
   fillColor = #00FFFF;  // NOTE: the following may override that with RND color:
   if (rndColorChangeMode == true) {
     fillColor = fillColors[int(random(0, fillColorsLength))];
@@ -206,8 +226,16 @@ void renderRNDcharsScreen () {
     charsDisplayString += "\n";
   }
   text(charsDisplayString, width/2, 0);
-  delay(delayBetweenRenders);
-  
+  // only delay if we are not saving PNG images:
+  if (savePNGs == false) {
+	delay(delayBetweenRenders);
+  }
+
+  // SAVE PNG FRAME AS PART OF ANIMATION FRAMES conditioned on boolean:
+  if (saveAllFrames == true && savePNGs == true) {
+    saveFrame(animFramesSaveSubdir + "/##########.png");
+  }
+
   // to mitigate mysterious slowdown via periodic reload of script:
   renderCount += 1;
   if (renderCount == reloadAfterNrenders) {
