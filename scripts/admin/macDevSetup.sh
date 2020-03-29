@@ -20,9 +20,10 @@
 # USE WITH CAUTION:
 sudo spctl --master-disable
 # to revert that: sudo spctl --master-enable
-# OR PERHAPS PREFERABLY USE:
-# spctl --add /Path/To/Application.app
-# re: http://osxdaily.com/Ω2015/07/15/add-remove-gatekeeper-app-command-line-mac-os-x/
+# DISABLES ALL app checking:
+defaults write com.apple.LaunchServices LSQuarantine -bool NO
+# TO ENABLE THAT AGAIN: end that with YES instead.
+# re: https://appletoolbox.com/why-is-macos-catalina-verifying-applications-before-i-can-open-them/
 
 # Enable cut-paste in Mac Finder (why would you *not* have that there by default, Apple?) :
 defaults write com.apple.finder AllowCutForItems 1
