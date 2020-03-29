@@ -37,10 +37,8 @@ scramble() {
 # Init N_CHARS_TO_GENERATE from $1 or set defaullt if $1 is not provided:
 if [ "$1" ]; then N_CHARS_TO_GENERATE=$1; else N_CHARS_TO_GENERATE=1024; fi
 
-# Other potentially interesting characters to copy and paste into the CHARSET declaration;
-# re https://en.wikipedia.org/wiki/Geometric_Shapes :
-# ■□▢▣▤▥▦▧▨▩▪▫▬▭▮▯▰▱▲△▴▵▶▷▸▹►▻▼▽▾▿◀◁◂◃◄◅◆◇◈◉◊○◌◍◎●◐◑◒◓◔◕◖◗◘◙◚◛◜◝◞◟◠◡◢◣◤◥◦◧◨◩◪◫◬◭◮◯◰◱◲◳◴◵◶◷◸◹◺◻◼◽◾◿
-CHARSET="▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟■"
+# FOR OTHER POSSIBLE characters to use in superset, see: http://s.earthbound.io/RNDblockChars
+CHARSET="▀▁▃▅▇█▋▌▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟"
 STR_LEN=$((${#CHARSET} - 1))
 # STR_LEN has a value of CHARSET's length minus one because we will potentially randomly 
 # read 1 char starting at the position of length (of the string CHARSET) minus 1. We would 
