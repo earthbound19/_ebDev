@@ -3,7 +3,7 @@ SendMode Input
 SetWorkingDir %A_ScriptDir%
 #Persistent
 #SingleInstance force
-#NoTrayIcon
+; #NoTrayIcon
 
 MsgBox Sending one pixel left/right mouse movement every 50 seconds so the computer will not go to screensaver, sleep, or hibernate.
 

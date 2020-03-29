@@ -3,6 +3,7 @@
 
 # USAGE
 # ./thisScript.sh fileExtension numberOfFilesToAxePerFolder _folderPrefixName_
+# NOTE the comments which say "works on cygwin" vs. "works on Mac", and uncomment the line needed for your platform.
 
 
 # CODE
@@ -61,9 +62,9 @@ do
 	if [ $i == $n ]; then helpLastFolderName=$folderName; fi    # Store last folder name in variable for later help text.
 	if ! [ -d $folderName ]; then mkdir $folderName; fi
 	# WORKS ON CYGWIN:	
-	# gfind . -maxdepth 1 -iname "*.$fileExt" | head -n $numberToAxeOn | xargs -i mv "{}" $folderName
+	gfind . -maxdepth 1 -iname "*.$fileExt" | gsort -n | head -n $numberToAxeOn | xargs -i mv "{}" $folderName
 	# WORKS ON MAC where the cygwin command *doesn't* work--! will it work on cygwin also? :
-	gfind . -maxdepth 1 -iname "*.$fileExt" | head -n $numberToAxeOn | xargs -I {} mv {} $folderName
+	# gfind . -maxdepth 1 -iname "*.$fileExt" | gsort -n | head -n $numberToAxeOn | xargs -I {} mv {} $folderName
 		# Only do anything with IMGlistByMostSimilar.txt if it exists:
 	if [ -f ./IMGlistByMostSimilar.txt ]
 	# re: https://unix.stackexchange.com/a/47423/110338
