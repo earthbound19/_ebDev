@@ -24,18 +24,20 @@
 
 // CODE
 // Changes this version:
-// - introduce subtly varied (very dark) bg colors palette with opt. random mutation through palette
-// - tighten vertical metrics to eliminate gap between lines
+// - add comments about cool variants (rnd seeds)
 
 // GLOBAL VARIABLE DECLARATIONS
-String versionNumber = "1.5.1";
+String versionNumber = "1.5.2";
 
 int delayBetweenRenders = 84;    // has been: 84, 112, 141;
 // to figure ffmpegAnim.sh "source" framerate, calculate: 1000 / delayBetweenRenders
 
 boolean booleanOverrideSeed = false;
 // rnd seed may be in range (-2147483648, 2147483647) :
-int seed = 2097156352;		// blue-cyan interesting pattern start
+int seed = 71028736;
+// RND seeds and their emergent properties:
+// 71028736 starts blue-cyan and gets really interesting fast.
+// 1980151040 starts blue-cyan interesting pattern start. Leads to 71028736 (above).
 // NOTE: At this writing both of the following booleans must be true to save anims; indiv.
 // frames are not saved:
 boolean saveAllFrames = false;
