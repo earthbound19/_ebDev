@@ -24,39 +24,30 @@
 
 // CODE
 // Changes this version:
-// - rearrange and further reduce reduced block characters more visually-logically.
-// - use BabelStone geometric shapes font: has the block characters, many other interesting glyphs, glyphs square, open license.
-// - move function to decide rnd folder name string outside of settings() so that it runs *after* rnd is seeded (if it is seeded).
-// - mouse or keyboard press starts new rnd variant
-// - Bug fix: rnd fill color change function didn't update index, so color morph always
-// reverted to prior color. Now it actually randomizes color and _sticks_ to the new randomization.
-// - defaults tweaks
+// - introduce subtly varied (very dark) bg colors palette with opt. random mutation through palette
+// - tighten vertical metrics to eliminate gap between lines
 
 // GLOBAL VARIABLE DECLARATIONS
-String versionNumber = "1.4.4";
+String versionNumber = "1.5.1";
 
 int delayBetweenRenders = 84;    // has been: 84, 112, 141;
 // to figure ffmpegAnim.sh "source" framerate, calculate: 1000 / delayBetweenRenders
 
 boolean booleanOverrideSeed = false;
 // rnd seed may be in range (-2147483648, 2147483647) :
-int seed = 552549120;
-// VARIOUS SEEDS and their characteristics; NOTE that these may drastically change with program feature additions:
-// 1117351680 magenta violet magenta violet mmmm -- some really interesting patterns after a while.
-// -1833731840 starts on violet; interesting and varied.
-// -1506814976 starts on an orange and interesting color and pattern series start that I like.
-// 552549120 starts on sparse chocolate minty pattern
+int seed = 2097156352;		// blue-cyan interesting pattern start
 // NOTE: At this writing both of the following booleans must be true to save anims; indiv.
 // frames are not saved:
 boolean saveAllFrames = false;
 boolean savePNGs = false;
 
+color[] bgColors = {
+	#1C1C1C, #151D1D,	#0E1D1F, #031E21,	#06161E, #0A0E1C,	#0B0B1B, #080813,
+	#030308, #000000,	#0D0B00, #171201,	#201901
+};
+int bgColorsLength = bgColors.length;
+int bgColorsArrayIndex = 0;
 
-// favorites for bg color: #383838 -- which causes weird magenta/violet/red growing
-// shrinking optical illusions! -- or #1C1C1C, or #000000 -- OR #00CFCF is far more
-// varied/interesting in color combination effects, but is kinda yecchy and gets lost with
-// the cyans. Settled for now any maybe forever on a dark chocolatey brown: #201901 OR #2a2102
-color backGroundColor = #2a2102;
 // palette tweaked (and expanded with more cyans and greens, and lighter those) from:
 // https://github.com/earthbound19/_ebArt/blob/master/palettes/fundamental_vivid_hues_v2.hexplt
 color[] fillColors = {
@@ -69,7 +60,9 @@ color[] fillColors = {
 };
 int fillColorsLength = fillColors.length;
 int fillColorsArrayIndex = 0;
+
 boolean rndColorChangeMode = true;
+color bgColor;
 color fillColor;
 
 PFont myFont;
@@ -134,10 +127,35 @@ String getRNDcharsSubset(String srcString) {
   return rndSubSet;
 }
 
+void setRNDbgColor() {
+	bgColorsArrayIndex = int(random(0, bgColorsLength));
+	bgColor = bgColors[bgColorsArrayIndex];
+	background(bgColor);
+}
+
+// FUNCTION ALTERS A GLOBAL! :
+// randomly changes index to select bg color from self, before, or after,
+// looping around if past either edge of array index, but only if an rnd color mode bool is true:
+void mutateBGcolor() {
+  if (rndColorChangeMode == true) {
+      int rndChoiceTwo = int(random(-2, 2));
+      bgColorsArrayIndex += rndChoiceTwo;
+      // if less than zero, set to array max.:
+      if (bgColorsArrayIndex <= 0) {
+        bgColorsArrayIndex = bgColorsLength;
+      }
+      // if more than array max., set to zero:
+      if (bgColorsArrayIndex >= bgColorsLength) {
+        bgColorsArrayIndex = 0;
+      }
+      bgColor = bgColors[bgColorsArrayIndex];
+	background(bgColor);
+  }
+}
+
 void setRNDfillColor() {
-	int newFillColorIDX = int(random(0, fillColorsLength));
-	fillColorsArrayIndex = newFillColorIDX;
-	fillColor = fillColors[newFillColorIDX];
+	fillColorsArrayIndex = int(random(0, fillColorsLength));
+	fillColor = fillColors[fillColorsArrayIndex];
 	fill(fillColor);
 }
 
@@ -146,8 +164,8 @@ void setRNDfillColor() {
 // looping around if past either edge of array index, but only if an rnd color mode bool is true:
 void mutateFillColor() {
   if (rndColorChangeMode == true) {
-      int rndChoiceTwo = int(random(-2, 2));
-      fillColorsArrayIndex += rndChoiceTwo;
+      int rndChoiceOne = int(random(-2, 2));
+      fillColorsArrayIndex += rndChoiceOne;
       // if less than zero, set to array max.:
       if (fillColorsArrayIndex <= 0) {
         fillColorsArrayIndex = fillColorsLength;
@@ -194,7 +212,8 @@ void setup() {
   fontPointSize = width/43;    // tried sizes list: 83.4 51.5 43 39.1 32 24 12; unifont was last width/28.46
 
 	subCharSetRND = getRNDcharsSubset(masterCharset);
-	background(backGroundColor);
+
+	setRNDbgColor();
 	setRNDfillColor();
 
   displayRNDsubsets = true;
@@ -214,7 +233,7 @@ void setup() {
   // https://processing.org/reference/textLeading_.html -- so reset that with textLeading():
   characterWidth = textWidth('_');
   columns = int(width / characterWidth);
-  rowHeight = fontPointSize * 0.975;    // for unifont-12.1.04.ttf: = * 1.987;
+  rowHeight = fontPointSize * 0.965;    // for unifont-12.1.04.ttf: = * 1.987;
   // I'm mystified why (textAscent() + textDescent() gave wrong val here with Fira Mono:
   textLeading(rowHeight);
   
@@ -224,12 +243,13 @@ void setup() {
 
 // EXCEPT MOAR CUSTOM FUNCTION
 void renderRNDcharsScreen () {
+	clear();
   subsetDisplayedrendersCounter += 1;
   if (subsetDisplayedrendersCounter == numRendersToDisplaySubset) {
     subsetDisplayedrendersCounter = 0;
   }
   
-  background(backGroundColor);
+  mutateBGcolor();
   mutateFillColor();
   
   // length of subCharSetRND can be changed, so this needs to be done every call of this func.:
