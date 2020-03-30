@@ -1,0 +1,23 @@
+▔	Upper one eighth block
+▀	Upper half block
+▆	Lower three quarters block
+▄	Lower half block
+▂	Lower one quarter block
+▌	Left half block
+▐	Right half block
+█	Full block
+▊	Left three quarters block
+▎	Left one quarter block
+░	Light shade
+▒	Medium shade
+▓	Dark shade
+▖	Quadrant lower left
+▗	Quadrant lower right
+▘	Quadrant upper left
+▙	Quadrant upper left and lower left and lower right
+▚	Quadrant upper left and lower right
+▛	Quadrant upper left and upper right and lower left
+▜	Quadrant upper left and upper right and lower right
+▝	Quadrant upper right
+▞	Quadrant upper right and lower left
+▟	Quadrant upper right and lower left and lower right
