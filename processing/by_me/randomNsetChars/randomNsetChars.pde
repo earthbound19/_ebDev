@@ -7,10 +7,12 @@
 // Public Domain, with the exception of the font files, which have their respective
 // open (but not Public Domain) licenses. - RAH 2020-03-17 09:18 AM Tuesday
 
+// KNOWN ISSUES
+// - if you save images and it gets to hundreds or thousands of frames, the displayed
+// framerate and file saving lags.
+
 // TO DO:
-// - figure why starting on a seed doesn't produce the same colors (now color is non-deterministic?)
-// - see if saving to axed folders for every Nth saved image will mitigate slowdown.
-// OR just accept that as a thing if you save all frames? Doesn't happen if no image saves.
+// - mitigate long-running lag by splitting into folders every thousandth file?
 // - log seed / frame numbers for reference?
 // - something with this? https://stackoverflow.com/questions/51702011/can-we-create-partially-colored-text-in-processing
 // - unique rnd colors of rows? Might entail:
@@ -22,26 +24,28 @@
 
 // CODE
 // Changes this version:
-// - coded my own function to get rnd subset of a string (not using string list shuffle
-// anymore), and non-determinism of strings IS FIXED. (The very same glyph sequence will
-// always happen if you give it a specific seed.)
-// - added rnd change fill color function for randomization of color with setup() calls
-// - bug fix: call fill(fillColor); in text render function so that color morph actually showed!
-// - defaults tweaks (including add space to block characters (negative space)
+// - rearrange and further reduce reduced block characters more visually-logically.
+// - use BabelStone geometric shapes font: has the block characters, many other interesting glyphs, glyphs square, open license.
+// - move function to decide rnd folder name string outside of settings() so that it runs *after* rnd is seeded (if it is seeded).
+// - mouse or keyboard press starts new rnd variant
+// - Bug fix: rnd fill color change function didn't update index, so color morph always
+// reverted to prior color. Now it actually randomizes color and _sticks_ to the new randomization.
+// - defaults tweaks
 
 // GLOBAL VARIABLE DECLARATIONS
-String versionNumber = "1.3.3";
+String versionNumber = "1.4.4";
 
-int delayBetweenRenders = 88;    // has been: 84, 112, 141;
+int delayBetweenRenders = 84;    // has been: 84, 112, 141;
 // to figure ffmpegAnim.sh "source" framerate, calculate: 1000 / delayBetweenRenders
 
 boolean booleanOverrideSeed = false;
 // rnd seed may be in range (-2147483648, 2147483647) :
-int seed = -1833731840;
-// VARIOUS SEEDS and their characteristics:
-// 1117351680 has magenta/violet weirdly seeming growing optical illusion
-// 1392839338 has hard maze-like vert./horiz. lines at one point.
-// -1833731840 starts on a cyan and interesting pattern I like.
+int seed = 552549120;
+// VARIOUS SEEDS and their characteristics; NOTE that these may drastically change with program feature additions:
+// 1117351680 magenta violet magenta violet mmmm -- some really interesting patterns after a while.
+// -1833731840 starts on violet; interesting and varied.
+// -1506814976 starts on an orange and interesting color and pattern series start that I like.
+// 552549120 starts on sparse chocolate minty pattern
 // NOTE: At this writing both of the following booleans must be true to save anims; indiv.
 // frames are not saved:
 boolean saveAllFrames = false;
@@ -74,12 +78,12 @@ PFont myFont;
 // SUPER SET DEFINITION from which subsets may be randomly drawn; combining any of these can produce interesting results:
 // -- here are some possible subsets of them to use as supersets (from which sub-subsets would
 // be made) :
-// String masterCharset = "┈┉┊┋┌└├┤┬┴┼╌╍╎╭╮╯╰╱╲╳╴╵╶╷";     // box drawing subset
-// String masterCharset = "▲△◆◇○◌◍◎●◜◝◞◟◠◡◢◣◤◥◸◹◺◿◻◼";     // geometric shapes subset
-// String masterCharset = "∧∨∩∪∴∵∶∷∸∹∺⊂⊃⊏⊐⊓⊔⊢⊣⋮⋯⋰⋱";      // math operators subset
-// String masterCharset = "◈⟐⟢ːˑ∺≋≎≑≣⊪⊹☱☰☲☳☴☵☶☷፨჻܀";   //Apple emoji subset
-// String masterCharset = "─│┌┐└┘├┤┬┴┼╭╮╯╰╱╲╳▂▃▄▌▍▎▏▒▕▖▗▘▚▝○●◤◥♦";	// Commodore 64 font/drawing glyphs set--which, it happens, combines characters from some of the others interestingly.
-String masterCharset = "▀▁▃▅▇█▋▌▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟";			// block characters subset
+ //String masterCharset = "┈┉┊┋┌└├┤┬┴┼╌╍╎╭╮╯╰╱╲╳╴╵╶╷";     // box drawing subset
+ //String masterCharset = "▲△◆◇○◌◍◎●◜◝◞◟◠◡◢◣◤◥◸◹◺◿◻◼";     // geometric shapes subset
+ //String masterCharset = "∧∨∩∪∴∵∶∷∸∹∺⊂⊃⊏⊐⊓⊔⊢⊣⋮⋯⋰⋱";      // math operators subset
+ //String masterCharset = "◈⟐⟢ːˑ∺≋≎≑≣⊪⊹☱☰☲☳☴☵☶☷፨჻܀";   //Apple emoji subset
+ //String masterCharset = "─│┌┐└┘├┤┬┴┼╭╮╯╰╱╲╳▂▃▄▌▍▎▏▒▕▖▗▘▚▝○●◤◥♦";	// Commodore 64 font/drawing glyphs set--which, it happens, combines characters from some of the others interestingly.
+String masterCharset = "▔▀▆▄▂▌▐█▊▎░▒▓▖▗▘▙▚▛▜▝▞▟";			// block characters subset
 int masterCharsetLength = masterCharset.length();
 
 String subCharSetRND;
@@ -131,7 +135,10 @@ String getRNDcharsSubset(String srcString) {
 }
 
 void setRNDfillColor() {
-	fillColor = fillColors[int(random(0, fillColorsLength))];
+	int newFillColorIDX = int(random(0, fillColorsLength));
+	fillColorsArrayIndex = newFillColorIDX;
+	fillColor = fillColors[newFillColorIDX];
+	fill(fillColor);
 }
 
 // FUNCTION ALTERS A GLOBAL! :
@@ -139,24 +146,18 @@ void setRNDfillColor() {
 // looping around if past either edge of array index, but only if an rnd color mode bool is true:
 void mutateFillColor() {
   if (rndColorChangeMode == true) {
-    // roll an N-sided die (may change hard-coding on my whim);
-		// if one is rolled, do rnd color change:
-    int rndChoiceOne = int(random(1, 3));
-    if (rndChoiceOne == 1) {
-      int rndChoiceTwo = int(random(-1, 2));
+      int rndChoiceTwo = int(random(-2, 2));
       fillColorsArrayIndex += rndChoiceTwo;
       // if less than zero, set to array max.:
-      if (fillColorsArrayIndex < 0) {
+      if (fillColorsArrayIndex <= 0) {
         fillColorsArrayIndex = fillColorsLength;
       }
       // if more than array max., set to zero:
       if (fillColorsArrayIndex >= fillColorsLength) {
         fillColorsArrayIndex = 0;
       }
-      
       fillColor = fillColors[fillColorsArrayIndex];
-      fill(fillColor);
-    }
+	fill(fillColor);
   }
 }
 // END CUSTOM FUNCTIONS
@@ -165,16 +166,16 @@ void mutateFillColor() {
 void settings() {
   fullScreen();
   // size(1280, 720);
-	
+
   // get a random string and use it as an animation save frames subdir name component:
-  String rndString = "";
-	String rnd_string_components = "abcdeghjkmnpqruvwyzABCDEGHJKMNPQRUVWYZ23456789";
-	for (int i = 0; i < 12; i++)
-	{
-		int rnd_choice = (int) random(0, rnd_string_components.length());
-		rndString+= rnd_string_components.charAt(rnd_choice);
-	}
-	animFramesSaveSubdir = "_anim_run_" + rndString + "/";
+	String rndString = "";
+  String rnd_string_components = "abcdeghjkmnpqruvwyzABCDEGHJKMNPQRUVWYZ23456789";
+  for (int i = 0; i < 12; i++)
+  {
+    int rnd_choice = (int) random(0, rnd_string_components.length());
+    rndString+= rnd_string_components.charAt(rnd_choice);
+  }
+  animFramesSaveSubdir = "_anim_run_" + rndString + "/";
 }
 
 
@@ -190,23 +191,22 @@ void setup() {
   }
 	print("Seed " + seed + "\n");
 
-  fontPointSize = width/28.46;    // tried sizes list: 83.4 51.5 43 39.1 32 24 12
+  fontPointSize = width/43;    // tried sizes list: 83.4 51.5 43 39.1 32 24 12; unifont was last width/28.46
 
 	subCharSetRND = getRNDcharsSubset(masterCharset);
 	background(backGroundColor);
 	setRNDfillColor();
-	fill(fillColor);
 
   displayRNDsubsets = true;
-  numRendersToDisplaySubset = 18;
-  reloadAfterNrenders = numRendersToDisplaySubset * 6;
+  numRendersToDisplaySubset = 15;
+  reloadAfterNrenders = numRendersToDisplaySubset * 4;
   renderCount = 0;
   subsetDisplayedrendersCounter = 0;
   
   // Uncomment the following two renders to see the available fonts 
   //String[] fontList = PFont.list();
   //printArray(fontList);
-  myFont = createFont("unifont-12.1.04.ttf", fontPointSize);
+  myFont = createFont("BabelStoneShapes.ttf", fontPointSize);
   textFont(myFont);
   textAlign(CENTER, TOP);
 
@@ -214,7 +214,7 @@ void setup() {
   // https://processing.org/reference/textLeading_.html -- so reset that with textLeading():
   characterWidth = textWidth('_');
   columns = int(width / characterWidth);
-  rowHeight = fontPointSize * 0.987;
+  rowHeight = fontPointSize * 0.975;    // for unifont-12.1.04.ttf: = * 1.987;
   // I'm mystified why (textAscent() + textDescent() gave wrong val here with Fira Mono:
   textLeading(rowHeight);
   
@@ -231,8 +231,6 @@ void renderRNDcharsScreen () {
   
   background(backGroundColor);
   mutateFillColor();
-	// visible change wadnae happen without this afore! :
-	fill(fillColor);
   
   // length of subCharSetRND can be changed, so this needs to be done every call of this func.:
   charsDisplayString = "";
@@ -269,7 +267,10 @@ void draw () {
   renderRNDcharsScreen();
 }
 
-// to change display on every mouse press:
-//void mousePressed() {
-  // renderRNDcharsScreen();
-//}
+// call setup() for new variation on mouse press AND/OR key press:
+void mousePressed() {
+  setup();
+}
+void keyPressed() {
+  setup();
+}
