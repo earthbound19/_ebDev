@@ -1,3 +1,5 @@
+# DEPRECATED in favor of rename.pl.
+
 # DESCRIPTION
 # FTUN stands for "Fix Terminal Unfriendly [folder and file] Names." This script does just that by building a proposed mv command shell script for every folder and file name under the path from which this script is executed.
 
@@ -5,10 +7,11 @@
 # From a terminal, in a folder with terminal-processing-unfriendly names, execute this script and follow the prompts.
 
 # TO DO
+# figure out why file names result in a junk character that makes Windows bork the file extension.
 # use rename.pl from the _in_development folder instead of this; deprecate this. NOTE: on mac that can be very easily made available via `brew install rename`. ALL THE BELOW CODE then becomes: `rename -z *` or to preview renames: `rename -n -z *`.
 # Eliminate "rename" commands that would attempt to rename a directory or file to itself.
 # NOT TO DO
-# - Use the elegant means I found somewhere of eliminating lines that are identical between alles and alles2.txt etc. (as this would avoid time-wasting and error-trowing renames of a file to itself) before further marking up and pasting them. Reason: I couldn't manage to find that.
+# - Use the elegant means I found somewhere of eliminating lines that are identical between alles and alles2.txt etc. (as this would avoid time-wasting and error-throwing renames of a file to itself) before further marking up and pasting them. Reason: I couldn't manage to find that.
 # - use http://www.techrepublic.com/blog/linux-and-open-source/how-to-remove-weird-characters-from-file-and-directory-names-automatically/
 
 # SCRIPT WARNING ==========================================

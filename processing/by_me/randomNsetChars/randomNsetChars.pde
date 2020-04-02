@@ -2,10 +2,18 @@
 // Prints variants of constructed random character sets (hard-coded but hackable: block
 // # characters), scrolling down the screen, with character color morph (randomization).
 
+// LICENSE
+// This code and accompanying files are my original work and I dedicate it to th
+// Public Domain, with the exception of the font files, which have their respective
+// open (but not Public Domain) licenses. - RAH 2020-03-17 09:18 AM Tuesday
+
+// KNOWN ISSUES
+// - if you save images and it gets to hundreds or thousands of frames, the displayed
+// framerate and file saving lags.
+
 // TO DO:
-// - fix that it is non-deterministic randomness apparently. If an override seed is used, it
-// starts deterministically; but then it stops being deterministic (is unpredictable; not the same
-// every time. Does something alter the machine after start?
+// - mitigate long-running lag by splitting into folders every thousandth file?
+// - log seed / frame numbers for reference?
 // - something with this? https://stackoverflow.com/questions/51702011/can-we-create-partially-colored-text-in-processing
 // - unique rnd colors of rows? Might entail:
 //  - converting text to PShape; possibly re: https://discourse.processing.org/t/convert-text-to-pshape/15552/2
@@ -15,18 +23,32 @@
 
 
 // CODE
-
-// GLOBALS DECLARATIONS
-String versionNumber = "1.1.0";
 // Changes this version:
-// - new global booleans controlling new PNG animation series save feature.
-// - comment out RND manual seeding unless/until I can sort out why and fix that it's not deterministic.
+// - add comments about cool variants (rnd seeds)
 
-int delayBetweenRenders = 84;    // has been: 141;
-boolean booleanOverrideSeed = true;
-// int overrideSeed = 1117351680;    // 1117351680 starts out with a magenta/violet weirdly seeming growing optical illusion!
+// GLOBAL VARIABLE DECLARATIONS
+String versionNumber = "1.5.2";
+
+int delayBetweenRenders = 84;    // has been: 84, 112, 141;
+// to figure ffmpegAnim.sh "source" framerate, calculate: 1000 / delayBetweenRenders
+
+boolean booleanOverrideSeed = false;
+// rnd seed may be in range (-2147483648, 2147483647) :
+int seed = 71028736;
+// RND seeds and their emergent properties:
+// 71028736 starts blue-cyan and gets really interesting fast.
+// 1980151040 starts blue-cyan interesting pattern start. Leads to 71028736 (above).
+// NOTE: At this writing both of the following booleans must be true to save anims; indiv.
+// frames are not saved:
 boolean saveAllFrames = false;
 boolean savePNGs = false;
+
+color[] bgColors = {
+	#1C1C1C, #151D1D,	#0E1D1F, #031E21,	#06161E, #0A0E1C,	#0B0B1B, #080813,
+	#030308, #000000,	#0D0B00, #171201,	#201901
+};
+int bgColorsLength = bgColors.length;
+int bgColorsArrayIndex = 0;
 
 // palette tweaked (and expanded with more cyans and greens, and lighter those) from:
 // https://github.com/earthbound19/_ebArt/blob/master/palettes/fundamental_vivid_hues_v2.hexplt
@@ -40,22 +62,31 @@ color[] fillColors = {
 };
 int fillColorsLength = fillColors.length;
 int fillColorsArrayIndex = 0;
+
 boolean rndColorChangeMode = true;
+color bgColor;
+color fillColor;
 
 PFont myFont;
-String stringOfCharsToInitFrom;
 
-StringList masterCharSet;
-int masterCharSetLength;
-StringList subCharSet;
-int subCharSetLength;
-StringList charsetToUse;
+// FOR OTHER POSSIBLE characters to use in superset, see: http://s.earthbound.io/RNDblockChars
+// SUPER SET DEFINITION from which subsets may be randomly drawn; combining any of these can produce interesting results:
+// -- here are some possible subsets of them to use as supersets (from which sub-subsets would
+// be made) :
+ //String masterCharset = "┈┉┊┋┌└├┤┬┴┼╌╍╎╭╮╯╰╱╲╳╴╵╶╷";     // box drawing subset
+ //String masterCharset = "▲△◆◇○◌◍◎●◜◝◞◟◠◡◢◣◤◥◸◹◺◿◻◼";     // geometric shapes subset
+ //String masterCharset = "∧∨∩∪∴∵∶∷∸∹∺⊂⊃⊏⊐⊓⊔⊢⊣⋮⋯⋰⋱";      // math operators subset
+ //String masterCharset = "◈⟐⟢ːˑ∺≋≎≑≣⊪⊹☱☰☲☳☴☵☶☷፨჻܀";   //Apple emoji subset
+ //String masterCharset = "─│┌┐└┘├┤┬┴┼╭╮╯╰╱╲╳▂▃▄▌▍▎▏▒▕▖▗▘▚▝○●◤◥♦";	// Commodore 64 font/drawing glyphs set--which, it happens, combines characters from some of the others interestingly.
+String masterCharset = "▔▀▆▄▂▌▐█▊▎░▒▓▖▗▘▙▚▛▜▝▞▟";			// block characters subset
+int masterCharsetLength = masterCharset.length();
+
+String subCharSetRND;
+int subCharSetRNDlength;
 
 float fontPointSize;
 
 float characterWidth;
-color backGroundColor;
-color fillColor;
 float columnWidth;
 float rowHeight;
 int columns;
@@ -68,160 +99,169 @@ int numRendersToDisplaySubset;
 int reloadAfterNrenders;
 int renderCount;
 int subsetDisplayedrendersCounter;
-// END GLOBALS DECLARATIONS
+
+String animFramesSaveSubdir;
+// END GLOBAL VARIABLES DECLARATIONS
 
 
-String get_random_string(int length) {
-	// https://programming.guide/java/generate-random-character.html
-	String felf = "";
-	String rnd_string_components = "abcdeghjkmnpqruvwyzABCDEGHJKMNPQRUVWYZ23456789";
-	for (int i = 0; i < length; i++)
-	{
-	int rnd_choice = (int) random(0, rnd_string_components.length());
-	felf+= rnd_string_components.charAt(rnd_choice);
-	}
-	return felf;
+// BEGIN CUSTOM FUNCTIONS
+// given a string, returns a subset of unique random characters from the string,
+// of random length from 1 to the length of the string.
+String getRNDcharsSubset(String srcString) {
+  String rndSubSet = "";
+  int rndSubSetBuildToLength = int(random(0, masterCharsetLength + 1));
+  for (int i = 0; i <= rndSubSetBuildToLength; i++) {
+   boolean isAlreadyInSubset = false;
+   while (isAlreadyInSubset == false) {
+     int rndSubsetIDX = int(random(0, masterCharsetLength));
+     char pickedChar = srcString.charAt(rndSubsetIDX);
+     for (int j = 0; j < rndSubSet.length(); j++) {
+       if (pickedChar == rndSubSet.charAt(j)) {
+         isAlreadyInSubset = true;
+       }
+     }
+     if (isAlreadyInSubset == false) {
+       rndSubSet += pickedChar;
+       isAlreadyInSubset = true;
+     }
+   }
+  }
+  return rndSubSet;
 }
-String rndString = get_random_string(12);
-String animFramesSaveSubdir = "_anim_run_" + rndString + "/";
+
+void setRNDbgColor() {
+	bgColorsArrayIndex = int(random(0, bgColorsLength));
+	bgColor = bgColors[bgColorsArrayIndex];
+	background(bgColor);
+}
+
+// FUNCTION ALTERS A GLOBAL! :
+// randomly changes index to select bg color from self, before, or after,
+// looping around if past either edge of array index, but only if an rnd color mode bool is true:
+void mutateBGcolor() {
+  if (rndColorChangeMode == true) {
+      int rndChoiceTwo = int(random(-2, 2));
+      bgColorsArrayIndex += rndChoiceTwo;
+      // if less than zero, set to array max.:
+      if (bgColorsArrayIndex <= 0) {
+        bgColorsArrayIndex = bgColorsLength;
+      }
+      // if more than array max., set to zero:
+      if (bgColorsArrayIndex >= bgColorsLength) {
+        bgColorsArrayIndex = 0;
+      }
+      bgColor = bgColors[bgColorsArrayIndex];
+	background(bgColor);
+  }
+}
+
+void setRNDfillColor() {
+	fillColorsArrayIndex = int(random(0, fillColorsLength));
+	fillColor = fillColors[fillColorsArrayIndex];
+	fill(fillColor);
+}
 
 // FUNCTION ALTERS A GLOBAL! :
 // randomly changes index to select foreground color from self, before, or after,
 // looping around if past either edge of array index, but only if an rnd color mode bool is true:
-void setRNDfillColor() {
+void mutateFillColor() {
   if (rndColorChangeMode == true) {
-    // roll a three-sided die; if one is rolled, do rnd color change:
-    int rndChoiceOne = int(random(1, 4));
-    if (rndChoiceOne == 1) {
-      int rndChoiceTwo = int(random(-2, 2));
-      fillColorsArrayIndex += rndChoiceTwo;
+      int rndChoiceOne = int(random(-2, 2));
+      fillColorsArrayIndex += rndChoiceOne;
       // if less than zero, set to array max.:
-      if (fillColorsArrayIndex < 0) {
+      if (fillColorsArrayIndex <= 0) {
         fillColorsArrayIndex = fillColorsLength;
       }
       // if more than array max., set to zero:
       if (fillColorsArrayIndex >= fillColorsLength) {
         fillColorsArrayIndex = 0;
       }
-      // print("fillColorsArrayIndex val: " + fillColorsArrayIndex + "\n");
-      
       fillColor = fillColors[fillColorsArrayIndex];
-      fill(fillColor);
-    }
+	fill(fillColor);
   }
 }
+// END CUSTOM FUNCTIONS
 
-// Alters a global! : Sets charsetToUse to rnd chars and length from masterCharSet:
-void setSubCharSet() {
-  masterCharSet.shuffle();
-  // empty this array so we can rebuild it:
-  subCharSet.clear();
-  // choose rnd num between 1 and master char set length:
-  int rndLen = int(random(1, (masterCharSetLength + 1) * 0.4));    // orig. python script max range mult.: 0.31
-  // print("Random length chosen for subset is: " + rndLen + "\n");
-  for (int j = 0; j < rndLen; j++) {
-    subCharSet.append(masterCharSet.get(j));
-  }
-  subCharSetLength = subCharSet.size();
-  
-  charsetToUse = subCharSet;
-  // for testing:
-  // int subCharSetLength = subCharSet.size();
-  // String tmp_one = "";
-  // for (int floref = 0; floref < subCharSetLength; floref++) {
-  //   tmp_one += subCharSet.get(floref);
-  // }
-  // text(tmp_one + "\n", width/2, height/2);
-}
 
 void settings() {
   fullScreen();
   // size(1280, 720);
-  //randomSeed(overrideSeed);
+
+  // get a random string and use it as an animation save frames subdir name component:
+	String rndString = "";
+  String rnd_string_components = "abcdeghjkmnpqruvwyzABCDEGHJKMNPQRUVWYZ23456789";
+  for (int i = 0; i < 12; i++)
+  {
+    int rnd_choice = (int) random(0, rnd_string_components.length());
+    rndString+= rnd_string_components.charAt(rnd_choice);
+  }
+  animFramesSaveSubdir = "_anim_run_" + rndString + "/";
 }
 
 
 void setup() {
-  fillColorsArrayIndex = int(random(0, fillColorsLength));
-  setRNDfillColor();
-
-  // SUPER SET DEFINITION from which subsets may be randomly drawn; combining any of these can produce interesting results:
-  // COULD USE: BOX DRAWING unicode block set, re: https://en.wikipedia.org/wiki/Box_Drawing_(Unicode_block)
-  //stringOfCharsToInitFrom = "─━│┃┄┅┆┇┈┉┊┋┌┍┎┏┐┑┒┓└┕┖┗┘┙┚┛├┝┞┟┠┡┢┣┤┥┦┧┨┩┪┫┬┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏═║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬╭╮╯╰╱╲╳╴╵╶╷╸╹╺╻╼╽╾╿";
-  // OR: Block Elements; re: https://en.wikipedia.org/wiki/Block_Elements
-  stringOfCharsToInitFrom = "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟";
-  // OR: GEOMETRIC SHAPES unicode block:
-  // stringOfCharsToInitFrom = "■□▢▣▤▥▦▧▨▩▪▫▬▭▮▯▰▱▲△▴▵▶▷▸▹►▻▼▽▾▿◀◁◂◃◄◅◆◇◈◉◊○◌◍◎●◐◑◒◓◔◕◖◗◘◙◚◛◜◝◞◟◠◡◢◣◤◥◦◧◨◩◪◫◬◭◮◯◰◱◲◳◴◵◶◷◸◹◺◻◼◽◾◿";
-  // OR: MATH OPERATORS block:
-  // stringOfCharsToInitFrom = "∀∁∂∃∄∅∆∇∈∉∊∋∌∍∎∏∐∑−∓∔∕∖∗∘∙√∛∜∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿";
-  // There's also a Commodore 64 character set, PETSCII, an Atari one, etc..
-  charsDisplayString = "";
-  masterCharSet = new StringList();   // because has .shuffle();
-  subCharSet = new StringList();
-  charsetToUse = new StringList();
-  int lengthOfChars = stringOfCharsToInitFrom.length();
-  for (int i = 0; i < lengthOfChars; i++) {
-    masterCharSet.append(str(stringOfCharsToInitFrom.charAt(i)));
+	// this check ensures manual seed is only done once, expecting no other code to ever set
+	// booleanOverrideSeed to true again:
+	if (booleanOverrideSeed == true) {
+    randomSeed(seed);
+    booleanOverrideSeed = false;
+  } else {
+    seed = (int) random(-2147483648, 2147483647);
+		randomSeed(seed);
   }
-  masterCharSetLength = masterCharSet.size();
-  // inits subCharSet
-  setSubCharSet();
-  if (displayRNDsubsets == true) {
-    charsetToUse = subCharSet;
-    } else {
-      charsetToUse = masterCharSet;
-    }
+	print("Seed " + seed + "\n");
 
-  fontPointSize = 44;    // tried sizes list: 83.4 51.5 43 39.1 32 24 12
+  fontPointSize = width/43;    // tried sizes list: 83.4 51.5 43 39.1 32 24 12; unifont was last width/28.46
 
-  backGroundColor = #383838;    // favorites: #383838 -- which causes weird magenta/violet/red growing shrinking optical illusions! -- or #000000
-  fillColor = #00FFFF;  // NOTE: the following may override that with RND color:
-  if (rndColorChangeMode == true) {
-    fillColor = fillColors[int(random(0, fillColorsLength))];
-  }
-  
-  background(backGroundColor);
-  fill(fillColor);
+	subCharSetRND = getRNDcharsSubset(masterCharset);
+
+	setRNDbgColor();
+	setRNDfillColor();
 
   displayRNDsubsets = true;
-  numRendersToDisplaySubset = 21;
-  reloadAfterNrenders = numRendersToDisplaySubset * 7;
+  numRendersToDisplaySubset = 15;
+  reloadAfterNrenders = numRendersToDisplaySubset * 4;
   renderCount = 0;
   subsetDisplayedrendersCounter = 0;
   
   // Uncomment the following two renders to see the available fonts 
   //String[] fontList = PFont.list();
   //printArray(fontList);
-  myFont = createFont("unifont-12.1.04.ttf", fontPointSize);
+  myFont = createFont("BabelStoneShapes.ttf", fontPointSize);
   textFont(myFont);
   textAlign(CENTER, TOP);
 
   textSize(fontPointSize);    // Also sets vertical leading; re
   // https://processing.org/reference/textLeading_.html -- so reset that with textLeading():
-  characterWidth = textWidth('▆');
+  characterWidth = textWidth('_');
   columns = int(width / characterWidth);
-  rowHeight = fontPointSize * 0.987;
+  rowHeight = fontPointSize * 0.965;    // for unifont-12.1.04.ttf: = * 1.987;
   // I'm mystified why (textAscent() + textDescent() gave wrong val here with Fira Mono:
   textLeading(rowHeight);
   
   rows = int(height / rowHeight);
 }
 
+
+// EXCEPT MOAR CUSTOM FUNCTION
 void renderRNDcharsScreen () {
+	clear();
   subsetDisplayedrendersCounter += 1;
   if (subsetDisplayedrendersCounter == numRendersToDisplaySubset) {
     subsetDisplayedrendersCounter = 0;
-    setSubCharSet();
   }
   
-  background(backGroundColor);
-  setRNDfillColor();
+  mutateBGcolor();
+  mutateFillColor();
   
-  int charsetToUseLength = charsetToUse.size();
+  // length of subCharSetRND can be changed, so this needs to be done every call of this func.:
+  charsDisplayString = "";
+  int subCharSetRNDlength = subCharSetRND.length();
   charsDisplayString = "";
   for (int row = 0; row < rows + 1; row++) {
     for (int column = 0; column < columns; column++) {
-      charsDisplayString += charsetToUse.get(int(random(0, charsetToUseLength)));
+      int rndInt = int(random(0, subCharSetRNDlength));
+      charsDisplayString += subCharSetRND.charAt(rndInt);
     }
     charsDisplayString += "\n";
   }
@@ -239,7 +279,7 @@ void renderRNDcharsScreen () {
   // to mitigate mysterious slowdown via periodic reload of script:
   renderCount += 1;
   if (renderCount == reloadAfterNrenders) {
-    print("Calling setup again at renderCount == " + renderCount + "!\n");
+    // print("Calling setup again at renderCount == " + renderCount + "!\n");
     setup();
   }
 }
@@ -249,7 +289,10 @@ void draw () {
   renderRNDcharsScreen();
 }
 
-// to change display on every mouse press:
-//void mousePressed() {
-  // renderRNDcharsScreen();
-//}
+// call setup() for new variation on mouse press AND/OR key press:
+void mousePressed() {
+  setup();
+}
+void keyPressed() {
+  setup();
+}

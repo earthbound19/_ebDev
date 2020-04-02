@@ -1,0 +1,6 @@
+The "Bedstead" font has great glyphs, and the block characters not where I expect. Tall though, where I want square.
+InputSans-Light.ttf has sqaure glyphs, and finder holes in the hash block characters, but not an open license. Not selected.
+"Symbola" has the block characters, and many other interesting glyphs, open license, the block characters almost square, not open license.
+BabelStone Shapes has square block characters, square, open license, if I make money with this art I am paying a donation amount. SELECTED.
+
+Fonts surveyed and found okay but wanting for square glyphs: gnu free font, gnu unifont
