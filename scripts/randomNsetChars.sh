@@ -26,15 +26,28 @@
 # CODE
 # Init N_CHARS_TO_GENERATE from $1 or set defaullt if $1 is not provided:
 if [ "$1" ]; then N_CHARS_TO_GENERATE=$1; else N_CHARS_TO_GENERATE=1024; fi
-
 if [ "$2" ]; then HARD_NEWLINE_AT_CHARACTER=$2; else HARD_NEWLINE_AT_CHARACTER=72; fi
 
-# Other potentially interesting characters to copy and paste into the CHARSET declaration;
-# re https://en.wikipedia.org/wiki/Geometric_Shapes :
-# CHARSET="■□▢▣▤▥▦▧▨▩▪▫▬▭▮▯▰▱▲△▴▵▶▷▸▹►▻▼▽▾▿◀◁◂◃◄◅◆◇◈◉◊○◌◍◎●◐◑◒◓◔◕◖◗◘◙◚◛◜◝◞◟◠◡◢◣◤◥◦◧◨◩◪◫◬◭◮◯◰◱◲◳◴◵◶◷◸◹◺◻◼◽◾◿"
+# COULD USE: BOX DRAWING unicode block set, re: https://en.wikipedia.org/wiki/Box_Drawing_(Unicode_block)
+# ─━│┃┄┅┆┇┈┉┊┋┌┍┎┏┐┑┒┓└┕┖┗┘┙┚┛├┝┞┟┠┡┢┣┤┥┦┧┨┩┪┫┬┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏═║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬╭╮╯╰╱╲╳╴╵╶╷╸╹╺╻╼╽╾╿
+# A SUBSET OF THAT WHICH I MAY LIKE: ┈┉┊┋┌└├┤┬┴┼╌╍╎╭╮╯╰╱╲╳╴╵╶╷
+#
+# OR: GEOMETRIC SHAPES unicode block:
+# ■□▢▣▤▥▦▧▨▩▪▫▬▭▮▯▰▱▲△▴▵▶▷▸▹►▻▼▽▾▿◀◁◂◃◄◅◆◇◈◉◊○◌◍◎●◐◑◒◓◔◕◖◗◘◙◚◛◜◝◞◟◠◡◢◣◤◥◦◧◨◩◪◫◬◭◮◯◰◱◲◳◴◵◶◷◸◹◺◻◼◽◾◿
+# A SUBSET OF THAT WHICH I MAY LIKE: ▲△◆◇○◌◍◎●◜◝◞◟◠◡◢◣◤◥◸◹◺◿◻◼
+#
+# OR: MATH OPERATORS block:
+# ∀∁∂∃∄∅∆∇∈∉∊∋∌∍∎∏∐∑−∓∔∕∖∗∘∙√∛∜∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿
+# A SUBSET OF THAT WHICH I MAY LIKE: ∧∨∩∪∴∵∶∷∸∹∺⊂⊃⊏⊐⊓⊔⊢⊣⋮⋯⋰⋱
+# There's also a Commodore 64 character set, PETSCII, an Atari one, etc..
 # Or + Apple-supported emoji:
-# CHARSET="🔴🟠🟡🟢🔵🟣🟤⚫️⚪️🔸🔷🔸🔹◆◇♦️💠♢❖♦⃟⋄◈⟐⟡⧰⟢⟣⤝⤞⤟⤠⧪⧰⧱⬖⬗⬘⬙⬥⬦⬩⛋▬▭▮✷✸⋉⋊▯⤳⬿⳻⳺⨲⋋⋌⌧🔺🔻⏃⏄⏅▲△▴▵▷▸▹▼▽▾▿◁▶◀ːˑ∺≋≎≑≣⊪⊹⊿┄┆┅┇◂◃◢◣◤◥◬◭☱☰◿◺◹◸◮☲☳☴☵☶☷🌀▰▱⎖፨჻܀⏢"
-CHARSET="▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟■"
+# 🔴🟠🟡🟢🔵🟣🟤⚫️⚪️🔸🔷🔸🔹◆◇♦️💠♢❖♦⃟⋄◈⟐⟡⧰⟢⟣⤝⤞⤟⤠⧪⧰⧱⬖⬗⬘⬙⬥⬦⬩⛋▬▭▮✷✸⋉⋊▯⤳⬿⳻⳺⨲⋋⋌⌧🔺🔻⏃⏄⏅▲△▴▵▷▸▹▼▽▾▿◁▶◀ːˑ∺≋≎≑≣⊪⊹⊿┄┆┅┇◂◃◢◣◤◥◬◭☱☰◿◺◹◸◮☲☳☴☵☶☷🌀▰▱⎖፨჻܀⏢
+# A SUBSET OF THAT WHICH I MAY LIKE: ◈⟐ːˑ∺≋≎≑≣⊪⊹☱☰☲☳☴☵☶☷፨჻܀
+#
+# OR: BLOCK ELEMENTS; re: https://en.wikipedia.org/wiki/Block_Elements
+# original more detailed set that I simplified from: ▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟
+
+CHARSET="▀▁▃▅▇█▋▌▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟"
 STR_LEN=$((${#CHARSET} - 1))
 # STR_LEN has a value of CHARSET's length minus one because we will potentially randomly read 1
 # char starting at the position of length (of the string CHARSET) minus 1. We would probably
