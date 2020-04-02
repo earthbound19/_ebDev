@@ -59,26 +59,11 @@
 // gives the API auth, uh, thingies.
 
 
-// v2.3.9 work log:
-// - tweets happen unreliably from install at museum; maybe it will be more reliable if
-// twitterAPIauth.txt is not in "../" but in "." (don't even specify path, just
-// "twitterAPIauth.txt" with that file in /data as expected. Therefore made that change.
-// - Something during development on Mac kept making unwelcomed reloads/changes --
-// (from parts of backups or something?) and syntax fixups, and even loading old code?!
-// It seemed to stop when I stopped using Processing's IDE and reloaded and fixed up the source
-// in Atom. What was going on there?!
-// - reverted a breaking change that happened between this commit:
-// 11d8184b38f5dde4daed2d1e710ba166bffe4113
-// v1.11.7 animation values scale update function functionaly did nothing. tweak jitter val but comment out func. call.
-// where shapes ONLY GROW, don't grow/shrink/grow or shrink/grow/shrink etc. (as they should)
-// -- and that commit message does not reflect changes?! -- and this earlier commit:
-// 44401fae0a48f9e389a491bc6b6659daa07fb5bf
-// oops animation scaling and orbit was off--maybe I'll want to reset to previous defaults
-// (both commits versioned v1.11.7) -- where shapes DO grow/shrink/grow etc. as they should.
-// THE CULPRIT LINE OF CODE, now commented out, was:
-// diameter_morph_rate = original_diameter_morph_rate * animation_scale_multiplier;
-// (That was patched already in musuem install but not in git version history; not it's in git)
-String versionString = "v2.3.9";
+// v2.3.10 work log:
+// - added exitAtRenderNtotalFrames boolean (hard-coded default: false) which
+// causes program to exit after it renders renderNtotalFrames (with comment to
+// help calculate), and uncommented/moved code to make that so.
+String versionString = "v2.3.10";
 
 // if true, simple file names/dropbox folder save + tweet;
 // AND tryToTweet overriden to true;
@@ -157,11 +142,11 @@ boolean saveAllFrames = false;    // if true, all frames up to renderNtotalFrame
 boolean saveAllFramesInteractOverride = false;		// overrides saveAllFrames + saveSVGs on user interact 'till end of variant.
 boolean initialSaveAllFramesState = saveAllFrames;		// stores initial state (boolean copy) to revert to after override period.
 boolean initialSaveSVGsState = saveSVGs;							// stores initial state (boolean copy) to revert to after override period.
-// TEMP OR PERMANENT KLUDGE: not using the following. Could cut off user and close program at museum! :
-// int renderNtotalFrames = 7200;    // see saveAllFrames comment
+boolean exitAtRenderNtotalFrames = false;    // if set to true, when the program has rendered renderNtotalFrames (next line), it exits.
+int renderNtotalFrames = 7200;    // assuming 30fps, duration formula for frames up to N hours is: 30*60*60*hours in decimal. 367,200 frames = 3.4 hrs. 
 int totalFramesRendered;    // incremented during each frame of a running variation. reset at new variation.
 int framesRenderedThisVariation;
-boolean saveEveryVariation = false;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
+boolean saveEveryVariation = true;    // Saves last frame of every variation, IF savePNGs and/or saveSVGs is (are) set to true. Also note that if saveEveryVariation is set to true, you can use doFixedTimePerVariation and a low fixedMillisecondsPerVariation to rapidly generate and save variations.
 boolean doFixedTimePerVariation = false;    // if true, each variation will display for N frames, per fixedMillisecondsPerVariation
 int fixedMillisecondsPerVariation = (int) (1000 * 11.5);         // milliseconds to display each variation, if previous boolean is true
 int minMillisecondsPerVariation = (int) (1000 * 16.5);      // 1000 milliseconds * 16.5 = 16.5 seconds
@@ -1461,10 +1446,11 @@ void draw() {
   // SAVE PNG FRAME AS PART OF ANIMATION FRAMES conditioned on boolean:
   if (saveAllFrames == true && savePNGs == true) {
     saveFrame(animFramesSaveSubdir + "/##########.png");
-// TEMP OR PERMANENT KLUDGE; NO:
-//    if (totalFramesRendered == renderNtotalFrames) {
-//      exit();
-//    }
+    }
+
+  // exit program if desired number of frames is reached and boolean saying to do so is set to true:
+  if (totalFramesRendered == renderNtotalFrames && exitAtRenderNtotalFrames == true) {
+    exit();
   }
 
   // NOTE: runSetupAtMilliseconds (on which this block depends) is initialized in settings() :
