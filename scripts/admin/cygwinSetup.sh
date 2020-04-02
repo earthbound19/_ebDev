@@ -15,6 +15,9 @@ installParams="-q -P perl -P gcc-g++ -P make -P diffutils -P libmpfr-devel -P li
 # ./Cygwin_setup-x86.exe $installParams
 ./Cygwin_setup-x86_64.exe $installParams
 
+# re: https://stackoverflow.com/a/12010346/1397555
+chere -i -t mintty -s bash
+
 lynx -source rawgit.com/transcode-open/apt-cyg/master/apt-cyg > apt-cyg
 dos2unix apt-cyg
 install apt-cyg /bin
