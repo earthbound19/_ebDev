@@ -18,7 +18,7 @@ fi
 
 ls *.$vidExt > all$vidExt.txt
 gsed -i "s/^\(.*\)/file '\1'/g" all$vidExt.txt
-echo ffmpeg -f concat -i all$vidExt.txt -c copy _"$vidExt"sConcatenated.$vidExt
-# rm all$vidExt.txt
+ffmpeg -f concat -i all$vidExt.txt -c copy _"$vidExt"sConcatenated.$vidExt
+rm all$vidExt.txt
 
 echo DONE. See result file _"$vidExt"sConcatenated.$vidExt and move or copy it where you will.
