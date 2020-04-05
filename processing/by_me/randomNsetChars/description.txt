@@ -1,0 +1,22 @@
+Animated block character noise programmed in the Processing language. The Processing script randomly selects a characters from this set:
+
+▔▀▆▄▂▌▐█▊▎░▒▓▖▗▘▙▚▛▜▝▞▟
+
+-- and repeatedly fills the screen with a random selection of characters from that subset, as it randomly morphs the background and fill color through palettes.
+
+Examples of subsets the script might select and then randomly fill the screen with:
+
+▔▀▆▄▂
+
+▔▂▌▎░▓▖▗
+
+▔▌▒▖▟
+
+The source code is released to the Public Domain, at: 
+https://github.com/earthbound19/_ebDev/tree/master/processing/by_me/randomNsetChars
+
+The accompanying font file is under an open license (free for commercial use).
+
+
+YouTube post of video from v1.5.2:
+https://youtu.be/A0legASRcpU
