@@ -2,15 +2,15 @@
 # SEE USAGE. Prints unique presets from an XML file containing multiple Filter Forge filter user presets (which XML files are stored in a "My Presets" user folder with a Filter Forge install). This printout may be pasted over the entire original preset list again and saved. Has the effect of deleting duplicate presets (which appear when I merge presets by hand from multiple sources).
 
 # DEPENDENCIES
-# xmlstarlet installed in your PATH as 'xml'.
+# xmlstarlet installed in your PATH as 'xml', sed installed as gsed.
 
 # USAGE
-# - suppose you have two different versions of a Filter Forge user preset file (e.g. Library_14934.xml) from different machines. If you cut and pasted all of the <element> fields of one into the other (combined all those fields), you would end up with new unique elements but a lot of duplicated elements. This script assists in eliminating the duplicate elements. Do this: 
+# - suppose you have two different versions of a Filter Forge user preset file (e.g. Library_14934.xml) from different machines (from the "My Presets" subfolder in the Filter Forge user data folder). If you cut and pasted all of the <element> fields of one into the other (combined all those fields), you would end up with new unique elements but a lot of duplicated elements. This script assists in eliminating the duplicate elements. Do this: 
 # - cut and paste the <presets> XML elements from one file into the other (right after all of the <element> fields of the other; combining them; we'll say we've cut and pasted them into a file named Library_14934.xml). Then run this script like this:
 # ./sort_uniq_FFXML_user_filters.sh Library_14934.xml > deduped_elements.xml
 # - then cut and paste deduped_elements.xml over the elements in Library_14934.xml (replacing all of the <element> fields, not appending to them).
 # - copy the merged and deduplicated user presets file over the original in the "/My Presets" user folder of your Filter Forge install
-# - at this writing, Filter Forge sadly doesn't detect stale preset image caches, and goes right on using the same images even if presets were reordered/deleted/inserted, meaning that you'll get wrong thumbnails. An inconvenient workaround: delete the files in the /System/Cache and /System/Thumbnails user folders for your Filter Forge install.
+# - at this writing, Filter Forge sadly doesn't detect stale preset image caches, and goes right on using the same images even if presets were reordered/deleted/inserted outside the program, meaning that you'll get wrong thumbnails. As a workaround, delete the thumbnail data file named after the filter you deduplicate. You'll find it inin the /System/Thumbnails subfolder of the user folder for your Filter Forge install.
 # - start Filter Forge and verify that it has all the new presets but no duplicates.
 # - once you know that worked, discard the file from which you have now successfully merged and deduplicated fields.
 
@@ -22,7 +22,7 @@ xml sel -t -m 'MyPresets/Preset' -c '.' -nl $1 | tr -d '\n' > tmp_rSnzR26vhdi8Uy
 gsed -i 's/<\/Preset>/<\/Preset>\n/g' tmp_rSnzR26vhdi8Uy.txt
 # delete tabs (which fortunately only appear between > and <):
 gsed -i "s/\t//g" tmp_rSnzR26vhdi8Uy.txt
-# sort and uniq that to another text file:
+# sort and uniq that, printing to stdout:
 sort < tmp_rSnzR26vhdi8Uy.txt | uniq
 rm ./tmp_rSnzR26vhdi8Uy.txt
 
