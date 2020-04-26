@@ -12,8 +12,6 @@
 // framerate and file saving lags.
 
 // TO DO:
-// - mitigate long-running lag by splitting into folders every thousandth file?
-// - log seed / frame numbers for reference in regular mode?
 // - something with this? https://stackoverflow.com/questions/51702011/can-we-create-partially-colored-text-in-processing
 // - unique rnd colors of rows? Might entail:
 //  - converting text to PShape; possibly re: https://discourse.processing.org/t/convert-text-to-pshape/15552/2
@@ -24,14 +22,15 @@
 
 // CODE
 // Changes this version:
-// - use block character width instead of underscore for column width calculation.
-// - move and reference font(s) one folder up so other scripts can share them (avoid duplicating files)
-// - introduce boolean rapidBWhdAlphaGenMode, which if true overrides some values for the
-// purpose of rapidly saving BW HD alpha pngs
-// - major refactoring to support those features and speed up load / variation changes
+// - mitigate lag as run of program gets long by splitting every
+// variant into numbered subfolder of run name folder. This will also help
+// isolate variants for individual renders (with scripted varying "source"
+// frame rate per variant).
+// - log seed in text file per variant subfolder, in text file named after
+// variant, with clarifying description in same text file of what that means.
 
 // GLOBAL VARIABLE DECLARATIONS
-String versionNumber = "1.7.2";
+String versionNumber = "1.9.0";
 
 int delayBetweenRenders;
 // to figure ffmpegAnim.sh "source" framerate, calculate: 1000 / delayBetweenRenders
@@ -62,7 +61,7 @@ float rowHeight;
 int columns;
 int rows;
 
-boolean saveImageSeries = false;
+boolean saveImageSeries = true;
 boolean rapidBWhdAlphaGenMode = false;		// overrides some of the above globals
 
 // FOR OTHER POSSIBLE characters to use in superset, see: http://s.earthbound.io/RNDblockChars
@@ -87,8 +86,12 @@ int numRendersToDisplaySubset;
 int reloadAfterNrenders;
 int renderCount;
 int subsetDisplayedrendersCounter;
+int variantCount = 0;
 
-String animFramesSaveSubdir;
+String animFramesSaveDir;
+String animFramesSaveSUBdir;
+
+PrintWriter output;
 // END GLOBAL VARIABLES DECLARATIONS
 
 
@@ -168,6 +171,21 @@ void mutateFillColor() {
 	fill(fillColor);
   }
 }
+
+
+  // ALTERS A GLOBAL:
+  // get a random string and use it as an animation save frames subdir name component:
+void setRNDanimFramesSaveDirName() {
+  String rndString = "";
+  String rnd_string_components = "abcdeghjkmnpqruvwyzABCDEGHJKMNPQRUVWYZ23456789";
+  for (int i = 0; i < 12; i++)
+  {
+    int rnd_choice = (int) random(0, rnd_string_components.length());
+    rndString+= rnd_string_components.charAt(rnd_choice);
+  }
+  animFramesSaveDir = "_anim_run_" + "_" + rndString + "/";
+}
+
 // END CUSTOM FUNCTIONS
 
 
@@ -200,7 +218,7 @@ void settings() {
 	} else {
 		// fullScreen();
 		// OR:
-	  size(1280, 720);
+	  size(1920, 1080);
 		bgColors = new color[]{
 			#1C1C1C, #151D1D,	#0E1D1F, #031E21,	#06161E, #0A0E1C,	#0B0B1B, #080813,
 			#030308, #000000,	#0D0B00, #171201,	#201901
@@ -228,19 +246,11 @@ void settings() {
     fontPointSize = width/43;    // tried sizes list: 83.4 51.5 43 39.1 32 24 12; unifont was last width/28.46
 	}
 
-	// get a random string and use it as an animation save frames subdir name component:
-	String rndString = "";
-  String rnd_string_components = "abcdeghjkmnpqruvwyzABCDEGHJKMNPQRUVWYZ23456789";
-  for (int i = 0; i < 12; i++)
-  {
-    int rnd_choice = (int) random(0, rnd_string_components.length());
-    rndString+= rnd_string_components.charAt(rnd_choice);
-  }
-  animFramesSaveSubdir = "_anim_run_" + rndString + "/";
-
+	setRNDanimFramesSaveDirName();
 }
 
 void setupNewVariant() {
+	variantCount += 1;
   // this check ensures manual seed is only done once, expecting no other code to ever set
   // booleanOverrideSeed to true again:
   if (booleanOverrideSeed == true) {
@@ -250,7 +260,6 @@ void setupNewVariant() {
     seed = (int) random(-2147483648, 2147483647);
     randomSeed(seed);
   }
-  print("Seed " + seed + "\n");
 
   subCharSetRND = getRNDcharsSubset(masterCharset);
 
@@ -260,12 +269,20 @@ void setupNewVariant() {
   displayRNDsubsets = true;
   renderCount = 0;
   subsetDisplayedrendersCounter = 0;
+  
+  String variantCountPaddedString = nf(variantCount, 5);
+  animFramesSaveSUBdir = animFramesSaveDir + "/" + variantCountPaddedString + "/";
+  String variantString = str(seed);
+  output = createWriter(animFramesSaveSUBdir + variantString + ".txt"); 
+  output.println("The random seed for the variant that produced the images in this folder is " + variantString + ".\n");
+  output.flush();
+  output.close();
 }
 
 void setup() {
   setupNewVariant();
   
-  // Uncomment the following two renders to see the available fonts 
+  // Uncomment the following two lines to see the available fonts 
   //String[] fontList = PFont.list();
   //printArray(fontList);
   myFont = createFont("../BabelStoneShapes.ttf", fontPointSize);
@@ -314,7 +331,7 @@ void renderRNDcharsScreen () {
 
   // SAVE PNG AS PART OF ANIMATION FRAMES conditioned on boolean;
   if (rapidBWhdAlphaGenMode == false && saveImageSeries == true) {
-    saveFrame(animFramesSaveSubdir + "/##########.png");
+    saveFrame(animFramesSaveSUBdir + "/##########.png");
   }
   // OR HD BW png named after variation (if in that mode AND
   // the defaults hard-coded for that mode say save pngs:):
