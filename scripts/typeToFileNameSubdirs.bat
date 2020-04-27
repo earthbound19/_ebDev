@@ -1,4 +1,8 @@
-REM move all files of the given extension(s) (as may be passed to this script) into subdirectories named after each files' name.
+REM TO DO: rework this as a .sh script, accepting any number of extensions (the comment
+REM said this DOS batch does that, but I doubt it: I bet it only uses %1).
+
+REM DESCRIPTION
+REM Moves all files of a given extension (parameter 1) into subdirectories named after each files' name.
 
 ECHO ~
 ECHO USAGE:
