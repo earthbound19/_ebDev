@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Makes an expanded bytes copy of an input file; repeats X ($2) bytes Y ($3) times to output file __dataStretched__"$filenameNoExt".dat ($filenameNoExt being parameter A or $1--the input file), over the span of however many bytes long the input file is. Intended for data bending / glitching e.g. importing the result file as raw uLaw data in Audacity audio to "hear" it in terms of a pattern more clearly. This would also be a good basic way to hide data, because someone expert enough would have to write a program that detects and reverses the obfuscation pattern.
+# Makes an expanded bytes copy of an input file ($1); repeats X ($2) bytes Y ($3) times to output file __dataStretched__"$filenameNoExt".dat ($filenameNoExt being parameter A or $1--the input file), over the span of however many bytes long the input file is. Intended for data bending / glitching e.g. importing the result file as raw uLaw data in Audacity audio to "hear" it in terms of a pattern more clearly. This would also be a good basic way to hide data, because someone expert enough would have to write a program that detects and reverses the obfuscation pattern.
 
 # USAGE
 		# OPTIONAL for .bmp -> .wav data bending purposes: FIRST, create a one-line many column bitmap with this command:
