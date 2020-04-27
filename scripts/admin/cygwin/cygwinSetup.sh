@@ -6,7 +6,9 @@
 # and the other files it needs (CYGWIN_fstab, my.minttyrc.settings.txt) in
 # your PATH, or copy the cygwin installer to this directory before executing
 # this script. Comment out the line for the cygwin installer version you don't
-#want to use.
+# want to use.
+# To run it, open the cygwin prompt, cd to this path, then run:
+# ./cygwinSetup.sh
 
 
 # CODE
@@ -21,6 +23,13 @@ chere -i -t mintty -s bash
 lynx -source rawgit.com/transcode-open/apt-cyg/master/apt-cyg > apt-cyg
 dos2unix apt-cyg
 install apt-cyg /bin
+
+# temporarily switch apt-cyg mirror to source that has XXD; install that and
+# switch it back:
+apt_cyg_mirror=`apt-cyg mirror`
+apt-cyg mirror "ftp://mirrors.syringanetworks.net/cygwin/"
+apt-cyg install xxd
+apt-cyg mirror "$apt_cyg_mirror"
 
 username=`whoami`
 echo "Username is $username. OVERWRITING configuration of /home/$username/.minttyrc with my.minttyrc.settings.txt. Continue?"
