@@ -38,6 +38,7 @@ osrss \
 UsoSvc \
 sedsvc \
 wisvc \
+nvUpdatusService \
 MozillaMaintenance"
 
 for element in ${deleteServices[@]}
@@ -77,6 +78,9 @@ IEEtwCollectorService \
 wlidsvc \
 CDPSvc \
 tiledatamodelsvc \
+tapi \
+TrkWks \
+wcncsvc \
 BITS"
 
 for element in ${disableServices[@]}
