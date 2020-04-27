@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Original: from https://github.com/ryuichiueda/TomoTool
+# Taken from (original at) : from https://github.com/ryuichiueda/TomoTool
 # ===============================================================
 # The MIT License
 #
