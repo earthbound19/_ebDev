@@ -7,8 +7,8 @@
 # USAGE
 # pandoc2doc.sh source_docs_extension dest_docs_extension
 
-if [ "$1" ]; then src_format=$1; echo "Source format \$1 $1 passed to script\; using that."; else echo "NO source format \$1 passed to script. Exiting."; exit; fi
-if [ "$2" ]; then dest_format=$2; echo "Source format \$2 $2 passed to script\; using that."; else echo "NO destination format \$2 passed to script. Exiting."; exit; fi
+if [ "$1" ]; then src_format=$1; echo "Source format \$1 $1 passed to script; using that."; else echo "NO source format \$1 passed to script. Exiting."; exit; fi
+if [ "$2" ]; then dest_format=$2; echo "Source format \$2 $2 passed to script; using that."; else echo "NO destination format \$2 passed to script. Exiting."; exit; fi
 
 # recurse through all directories under this path, and in each directory, convert all $1 (source) format files to $2 (destination format), then copy the timestamp of each source file to its file name match corresponding .txt file.
 directories=(`gfind . -type d -iname \*`)
@@ -21,9 +21,11 @@ do
 	do
 		file_name_no_ext=${src_doc%.*}
 		dest_file="$file_name_no_ext".$dest_format
-		pandoc -t plain -o $dest_file $src_doc
+# WIP hoping to format documents via templates:		
+#		if [ -e ./template."$dest_format" ]; then echo FOUND template."$dest_format" FILE in this path.; fi
+		pandoc -t $dest_format -o $dest_file $src_doc
 			# OPTIONAL: to clear out start of line gobbledygook resulting from src_doc -> txt conversion, uncomment this next line:
-			gsed -i 's/^[\{\}0-9 ;]\{1,\}//g' $dest_file
+			# gsed -i 's/^[\{\}0-9 ;]\{1,\}//g' $dest_file
 		# update the new docs' creation and modification file time stamps (windows) or just modification time stamp ('nix):
 		# OPTIONS: on windows if you have binarez_touch, comment out the first line here, and uncomment the second. For 'nix platforms, do visa-versa:
 		touch --reference="$src_doc" $dest_file
