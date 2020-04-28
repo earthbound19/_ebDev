@@ -4,8 +4,11 @@
 # USAGE
 # NOTE that `source` isn't working right now. This script only works for me called directly from the shell, not from another script. EXCEPT MAYBE THAT DOESN'T EVEN WORK.
 # Invoke this script via `source` (to keep an environment variable it creates), and pass one parameter, being the name of a .hexplt file to find. Example:
-# source ./thisScript.sh turtleGreenTetradicEtcHex.hexplt
-# NOTE Sets an environment variable hexColorSrcFullPath which is either the full path to the .hexplt file searched for or a bogus file name (with a warning printed to the terminal before), depending on whether the intended .hexplt file is found.
+# FIRST, find the full path to this script (it must be in your PATH) with:
+# which findHEXPLT.sh
+# SECOND, invoke this script with the full path to it, and the .hexplt file you want the path for as the first parameter:
+# source /full/path/to-this/script/findHEXPLT.sh turtleGreenTetradicEtcHex.hexplt
+# NOTE: This script sets an environment variable hexColorSrcFullPath which is either the full path to the .hexplt file searched for or a bogus file name (with a warning printed to the terminal before), depending on whether the intended .hexplt file is found.
 
 
 # CODE
@@ -32,13 +35,13 @@ else	# Search for specified palette file in palettesRootDir (if that dir exists;
 					echo WARNING\: no file of name $paletteFileName found in the path this script was invoked from OR in path \"$palettesRootDir\" \! Setting a bogus file name which will give you errors\!
 				hexColorSrcFullPath=BOGUS_HEXPALETTE_FILE_NAME_qwcUMANpceH22b.hexplt
 			else
-					echo File name $paletteFileName found via path \"$hexColorSrcFullPath\"\. This script will use that file. PROCEEDING. IN ALL CAPS.
+					echo File name $paletteFileName found via path \"$hexColorSrcFullPath\"\. Is now set in variable named hexColorSrcFullPath.
 		fi
 	else
 			echo !--------------------------------------------------------!
 			echo WARNING\: File ~/palettesRootDir.txt \(in your root user path\) not found. This file should exist and have one line, being the path of your palette text files e.g.:
 			echo
-			echo /cygdrive/c/_ebdev/scripts/imgAndVideo/palettes
+			echo /cygdrive/c/_ebArt/palettes
 			echo
 			echo Setting a bogus file name which will give you errors!
 			echo !--------------------------------------------------------!
