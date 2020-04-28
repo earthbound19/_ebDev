@@ -12,6 +12,7 @@
 
 # NOTES
 # TO DO
+# refactor to discard $3 and $4 resize options. That is what imgs2imgsNN.sh is for.
 # This script was adapted from randomColorTilesGen.sh -- adapt any necessary comments therefrom.
 
 # VARS ARE
