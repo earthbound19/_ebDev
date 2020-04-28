@@ -2,7 +2,8 @@
 # Splits all files in the current directory of type $1 into subdirectories by multiples of $2 (axe files into folders), with folder prefix name $3. If a IMGlistByMostSimilar.txt file (used by some scripts in _ebDev) is present, splits that into copies in the subfolders, these partitioned text file copies reflecting the files in the subfolders.
 
 # USAGE
-# ./thisScript.sh fileExtension numberOfFilesToAxePerFolder _folderPrefixName_
+# with this script in your PATH:
+# axeNfiles.sh fileExtension numberOfFilesToAxePerFolder _folderPrefixName_
 # NOTE the comments which say "works on cygwin" vs. "works on Mac", and uncomment the line needed for your platform.
 
 
@@ -62,9 +63,7 @@ do
 	if [ $i == $n ]; then helpLastFolderName=$folderName; fi    # Store last folder name in variable for later help text.
 	if ! [ -d $folderName ]; then mkdir $folderName; fi
 	# WORKS ON CYGWIN:	
-	gfind . -maxdepth 1 -iname "*.$fileExt" | gsort -n | head -n $numberToAxeOn | xargs -i mv "{}" $folderName
-	# WORKS ON MAC where the cygwin command *doesn't* work--! will it work on cygwin also? :
-	# gfind . -maxdepth 1 -iname "*.$fileExt" | gsort -n | head -n $numberToAxeOn | xargs -I {} mv {} $folderName
+	gfind . -maxdepth 1 -iname "*.$fileExt" | sort -n | head -n $numberToAxeOn | tr -d '\15\32' | xargs -i mv "{}" $folderName
 		# Only do anything with IMGlistByMostSimilar.txt if it exists:
 	if [ -f ./IMGlistByMostSimilar.txt ]
 	# re: https://unix.stackexchange.com/a/47423/110338
