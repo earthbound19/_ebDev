@@ -1,1 +1,0 @@
-randomVerticalColorStripes.sh 3 80 1280 720 1478 0
