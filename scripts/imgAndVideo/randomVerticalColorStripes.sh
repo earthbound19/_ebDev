@@ -1,15 +1,31 @@
 # DESCRIPTION
-# Creates a .ppm (plain text file bitmap format) image of a random number of color columns, each column repeating one color a random number of times, to effectively make a vertical stripe of a random width. Colors used can be random or configurable via input file parameter (of a list of hex color values). Converts the resultant .ppm to a .png image with hard edges preserved (to preserve hard-edged stripes), of dimensions NxN. (EXCEPT NOT at this writing, if ever.) Generates Z such images. All random ranges, dimensions, and colors to use configurable; see USAGE for script parameters and example.
+# Creates a .ppm (plain text file bitmap format) image of a random number
+# of color columns, each column repeating one color a random number of times,
+# to effectively make a vertical stripe of a random width. Colors used can be
+# random or configurable via input file parameter (of a list of hex color
+# values). Converts the resultant .ppm to a .png image with hard edges preserved
+# (to preserve hard-edged stripes), of dimensions NxN. (EXCEPT NOT at this
+# writing, if ever.) Generates Z such images. All random ranges, dimensions,
+# and colors to use configurable; see USAGE for script parameters and example.
 
 # USAGE
 # Pass this script the following parameters; the last being optional.
-# $1 The minimum number of columnar pixels to repeat a color (note that this is *before*) the image upscale).
-# $2 The maximum number of columnar pixels to repeat a color (note that this is *before*) the image upscale).
+# $1 The minimum number vertical color stripes to make (note that this is *before*) the image upscale).
+# $2 The minimum number vertical color stripes to make (note that this is *before*) the image upscale).
 # $3 How many pixels wide to scale the final image
 # $4 How many pixels tall to scale the final image
 # $5 How many such random images you want to create
-# $6 Randomly vary max. number of columns by subtraction between 0 and the number given in this variable. SET THIS TO 0 if no variation desired.
-# $7 Optional. A file list of hex color values to randomly pick from. If not provided, every stripe is a pseudo-randomly generated color (the color created from entropy at run time).
+# $6 Randomly vary max. number of columns by subtraction between 0 and the
+#  number given in this variable. SET THIS TO 0 if no variation desired.
+# $7 Optional. The name of a file list of hex color values to randomly pick
+#  from, findeable in any of the directories or sub-directories of a path given
+#  in ~/palettesRootDir.txt (the script uses another script, findHEXPLT.sh,
+# to search subfolders in the path listed in that file). If not provided,
+#  every stripe is a pseudo-randomly generated color (the color created from
+#  entropy at run time). FOR HELP creating that file, see
+#  createPalettesRootDirTXT.sh in the _ebArt repository.
+# EXAMPLE:
+# randomVerticalColorStripes.sh 3 80 1920 1080 5 30 sparkleHeartHexColors.txt
 
 # TO DO
 # Invoke imgs2imgsNN.sh for ppm to png conversion, passing resize params.
@@ -65,7 +81,6 @@ fi
 
 for a in $( seq $howManyImages )
 do
-
 			# Check and make changes for optional random negative variation of max random number pick range:
 			if [ "$6" ]
 				then
@@ -78,7 +93,7 @@ do
 	count=0
 	for i in $( seq $howManyStripes )
 	do
-					echo Generating stripe for image number $a . . .
+					echo Generating a stripe for image number $a . . .
 						repeatColumnColorCount=`shuf -i $minColorColumnRepeat-$maxColorColumnRepeat -n 1`
 				if [ "$7" ]
 					then
@@ -139,5 +154,4 @@ do
 	# OPTION THAT OVERRIDES X dimension to be half of what the parameter gives:
 	# scalePixY=$(( $scalePixX / 2 ))
 	# nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png $ppmFileName.ppm
-
 done
