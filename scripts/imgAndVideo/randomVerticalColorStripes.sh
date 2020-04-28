@@ -3,21 +3,17 @@
 # of color columns, each column repeating one color a random number of times,
 # to effectively make a vertical stripe of a random width. Colors used can be
 # random or configurable via input file parameter (of a list of hex color
-# values). Converts the resultant .ppm to a .png image with hard edges preserved
-# (to preserve hard-edged stripes), of dimensions NxN. (EXCEPT NOT at this
-# writing, if ever.) Generates Z such images. All random ranges, dimensions,
+# values). Generates Z such images. All random ranges, dimensions,
 # and colors to use configurable; see USAGE for script parameters and example.
 
 # USAGE
 # Pass this script the following parameters; the last being optional.
 # $1 The minimum number vertical color stripes to make (note that this is *before*) the image upscale).
 # $2 The minimum number vertical color stripes to make (note that this is *before*) the image upscale).
-# $3 How many pixels wide to scale the final image
-# $4 How many pixels tall to scale the final image
-# $5 How many such random images you want to create
-# $6 Randomly vary max. number of columns by subtraction between 0 and the
+# $3 How many such random images you want to create
+# $4 Randomly vary max. number of columns by subtraction between 0 and the
 #  number given in this variable. SET THIS TO 0 if no variation desired.
-# $7 Optional. The name of a file list of hex color values to randomly pick
+# $5 Optional. The name of a file list of hex color values to randomly pick
 #  from, findeable in any of the directories or sub-directories of a path given
 #  in ~/palettesRootDir.txt (the script uses another script, findHEXPLT.sh,
 # to search subfolders in the path listed in that file). If not provided,
@@ -25,11 +21,8 @@
 #  entropy at run time). FOR HELP creating that file, see
 #  createPalettesRootDirTXT.sh in the _ebArt repository.
 # EXAMPLE:
-# randomVerticalColorStripes.sh 3 80 1920 1080 5 30 sparkleHeartHexColors.txt
-
-# TO DO
-# Invoke imgs2imgsNN.sh for ppm to png conversion, passing resize params.
-# Set new subfolder name "RND" or summat if no .hexplt file name passed to script.
+# randomVerticalColorStripes.sh 3 80 5 30 sparkleHeartHexColors.txt
+# ALSO, see imgs2imgsNN.sh for resizing results to arbitrary size.
 
 
 # CODE
@@ -42,20 +35,21 @@ hexColorSchemesRootSubPath="/scripts/imgAndVideo/ColorSchemesHex"
 hexColorListsRootPath="$devToolsPath""$hexColorSchemesRootSubPath"
 minColorColumnRepeat=$1
 maxColorColumnRepeat=$2
-scalePixX=$3
-scalePixY=$4
-howManyImages=$5
-maxColorColumnsVariation=$6
+howManyImages=$3
+maxColorColumnsVariation=$4
 maxPossibleColumns=$(( $maxColorColumnRepeat + $maxColorColumnsVariation))
 padDigitsTo=${#maxPossibleColumns}
 # set hexColorSrcFullPath environment variable via the following script:
-source findHEXPLT.sh $7
-		# echo hexColorSrcFullPath value is\:
-		# echo $hexColorSrcFullPath
-
-# The logic of this variable check is: if not no value for this var, do something (in other words, if there is this var with a value, do something) ;
-# UNFORTUNATELY, it seems this type of check only works with environment parameter variables [by this do I mean e.g. $1, $2, $3 etc.?], not assigned [script or named?] variables that have no value, WHICH MEANS that the following must be hard-coded for the parameter:
-if [ "$7" ]
+source findHEXPLT.sh $5
+		echo hexColorSrcFullPath value is\:
+		echo $hexColorSrcFullPath
+# The logic of this variable check is: if not no value for this var, do
+#  something (in other words, if there is this var with a value, do something) ;
+#  UNFORTUNATELY, it seems this type of check only works with environment
+#  parameter variables [by this do I mean e.g. $1, $2, $3 etc.?], not assigned
+#  [script or named?] variables that have no value, WHICH MEANS that the
+#  following must be hard-coded for the parameter; CHECK THE WHOLE SCRIPT for it:
+if [ "$5" ]
 	then
 	echo IMPORTING COLOR LIST from file name\:
 	echo $hexColorSrcFullPath
@@ -82,9 +76,9 @@ fi
 for a in $( seq $howManyImages )
 do
 			# Check and make changes for optional random negative variation of max random number pick range:
-			if [ "$6" ]
+			if [ "$4" ]
 				then
-					randomVariation=`shuf -i 0-"$6" -n 1`
+					randomVariation=`shuf -i 0-"$4" -n 1`
 					maxRange=$(( $maxColorColumnRepeat - $randomVariation ))
 				else
 					maxRange=$maxColorColumnRepeat
@@ -95,7 +89,7 @@ do
 	do
 					echo Generating a stripe for image number $a . . .
 						repeatColumnColorCount=`shuf -i $minColorColumnRepeat-$maxColorColumnRepeat -n 1`
-				if [ "$7" ]
+				if [ "$5" ]
 					then
 						# empty temp.txt before writing new color columns to it:
 						printf "" > temp.txt
@@ -147,11 +141,4 @@ do
 	cat ppmheader.txt grid.ppm > $ppmFileName.ppm
 	echo wrote new ppm file $ppmFileName.ppm
 	rm ppmheader.txt grid.ppm
-
-# OPTIONAL -- TO DO: invoke what is given in TO DO above instead:
-# echo Creating enlarged png version with hard edges maintained . . .
-# nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png $ppmFileName.ppm
-	# OPTION THAT OVERRIDES X dimension to be half of what the parameter gives:
-	# scalePixY=$(( $scalePixX / 2 ))
-	# nconvert -rtype quick -resize $scalePixX $scalePixY -out png -o $ppmFileName.png $ppmFileName.ppm
 done
