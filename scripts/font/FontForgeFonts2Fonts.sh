@@ -37,8 +37,9 @@ then
 fi
 
 currDir=`pwd`
-array=`gfind *.$sourceFormat | tr -d '\15\32'`
-for element in ${array[@]}
+IFS=""
+gfind . -maxdepth 1 -type f -iname \*.$sourceFormat -printf '%f\n' > all_"$sourceFormat"s.txt
+while IFS= read -r element || [ -n "$element" ]
 do
 	# If we're running Windows, assume cygwin and convert to windows path.
 	# otherwise leave path as-is:
@@ -57,11 +58,19 @@ do
 	# in-line; but it will if run from a variable with
 	# the same string?! Is something weird with
 	# double-quote marks and/or spaces in paths going on? :
-	command="fontforge -script $fullPathToFFscript $fullPathToSourceFile .$destFormat"
-	$command
-done
+	# AMENDED: no, I can only get it to work if I create and execute a temp
+	# script! :
+	echo "fontforge -script \"$fullPathToFFscript\" \"$fullPathToSourceFile\" .$destFormat" > gs42BeyT_tmpScript.sh
+	chmod +x ./gs42BeyT_tmpScript.sh
+	source ./gs42BeyT_tmpScript.sh
+done < all_"$sourceFormat"s.txt
+rm all_"$sourceFormat"s.txt ./gs42BeyT_tmpScript.sh
+
 
 # DEV HISTORY:
 # - revamped to use simpler script. 08/29/2014 12:49:24 PM -RAH
 # - rewrote as bash script, parameterizing source and dest format.
 #   2020-04-30 -RAH
+# 2020-04-30 10:23 PM pulled my hair out with problems of spaces in file
+#  name and arrays, made "array" with text file and iterated over lines of
+#  it instead. -RAH
