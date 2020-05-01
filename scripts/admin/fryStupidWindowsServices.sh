@@ -39,7 +39,12 @@ UsoSvc \
 sedsvc \
 wisvc \
 nvUpdatusService \
+brave \
+bravem \
 MozillaMaintenance"
+# The above deletes Brave browser-related services because brave
+# is cowardly and evil.
+# Re: https://practicaltypography.com/the-cowardice-of-brave.html
 
 for element in ${deleteServices[@]}
 do
@@ -52,7 +57,6 @@ done
 disableServices="
 NgcSvc \
 DoSvc \
-DiagTrack \
 NgcCtnrSvc \
 Themes \
 LicenseManager \
@@ -83,6 +87,7 @@ TrkWks \
 wcncsvc \
 BITS"
 
+
 for element in ${disableServices[@]}
 do
 	echo RUNNING COMMAND\:
@@ -104,6 +109,7 @@ SharedAccess \
 StorSvc \
 WinRM \
 WerSvc \
+DiagTrack \
 WPCSvc"
 
 for element in ${onDemandServices[@]}
