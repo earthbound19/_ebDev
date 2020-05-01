@@ -1,3 +1,0 @@
-Open($argv[1])
-Generate($argv[1]:r + ".otf")
-Generate($argv[1]:r + ".woff")
