@@ -1,0 +1,2 @@
+Open($argv[1])
+Generate($argv[1]:r + $argv[2])
