@@ -1,3 +1,6 @@
+echo "TO DO: rework this for changed randomVerticalColorStripes parameters. ALSO move this to _ebDev."
+exit
+
 # This is a template script for using the script at the begin of each line to create so many random stripe images form a give hex color scheme text file. I don't recall at this writing, but I think all such generated images are output to the same directory as this script; you may want to thereafter move them into subfolders named after the hex color scheme.
 randomVerticalColorStripes.sh 3 80 1280 640 50 85CQd_HexColors.txt
 randomVerticalColorStripes.sh 3 80 1280 640 50 aVqga_HexColors.txt
