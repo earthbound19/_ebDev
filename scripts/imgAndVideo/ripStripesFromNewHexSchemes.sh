@@ -1,3 +1,6 @@
+echo "TO DO: rework this for changed randomVerticalColorStripes parameters. ALSO, move this to _ebDev."
+exit
+
 randomVerticalColorStripes.sh 3 80 1280 640 300 40 rainbowHexColorsByMyEye.txt
 
 randomVerticalColorStripes.sh 3 80 1280 640 300 40 rainbowHexColorsTooSimpleTooDark.txt
