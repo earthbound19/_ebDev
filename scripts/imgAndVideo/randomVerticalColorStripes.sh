@@ -7,16 +7,20 @@
 # and colors to use configurable; see USAGE for script parameters and example.
 
 # USAGE
-# Pass this script the following parameters; the last being optional.
-# $1 The minimum number vertical color stripes to make (note that this is *before*) the image upscale).
-# $2 The minimum number vertical color stripes to make (note that this is *before*) the image upscale).
-# $3 How many such random images you want to create
-# $4 Randomly vary max. number of columns by subtraction between 0 and the
-#  number given in this variable. SET THIS TO 0 if no variation desired.
-# $5 Optional. The name of a file list of hex color values to randomly pick
+# NOTE: the number of and purpose of positional parameters has altered through
+#  this script's development history. If you developed a script that uses
+#  this script, re-examine the parameters help above and adapt as
+#  needed. (It used to have a parameter to randomly vary min. number of columns,
+#  which is redundant. You can vary that . . . by varying the min number to
+#  begin with.)
+# PASS THIS SCRIPT the following parameters:
+# $1 The minimum number vertical color stripes to make (before* image upscale).
+# $2 The maximum number "
+# $3 How many such images to make
+# $4 Optional. The name of a file list of hex color values to randomly pick
 #  from, findeable in any of the directories or sub-directories of a path given
 #  in ~/palettesRootDir.txt (the script uses another script, findHEXPLT.sh,
-# to search subfolders in the path listed in that file). If not provided,
+#  to search subfolders in the path listed in that file). If not provided,
 #  every stripe is a pseudo-randomly generated color (the color created from
 #  entropy at run time). FOR HELP creating that file, see
 #  createPalettesRootDirTXT.sh in the _ebArt repository.
@@ -31,25 +35,19 @@ if [ -e temp.txt ]; then rm temp.txt; fi
 if [ -e *.temp ]; then rm *.temp; fi
 
 # GLOBAL VARIABLES
-hexColorSchemesRootSubPath="/scripts/imgAndVideo/ColorSchemesHex"
-hexColorListsRootPath="$devToolsPath""$hexColorSchemesRootSubPath"
 minColorColumnRepeat=$1
 maxColorColumnRepeat=$2
+padDigitsTo=${#maxColorColumnRepeat}
 howManyImages=$3
-maxColorColumnsVariation=$4
-maxPossibleColumns=$(( $maxColorColumnRepeat + $maxColorColumnsVariation))
-padDigitsTo=${#maxPossibleColumns}
 # set hexColorSrcFullPath environment variable via the following script:
-source findHEXPLT.sh $5
-		echo hexColorSrcFullPath value is\:
-		echo $hexColorSrcFullPath
+source findHEXPLT.sh $4
 # The logic of this variable check is: if not no value for this var, do
 #  something (in other words, if there is this var with a value, do something) ;
 #  UNFORTUNATELY, it seems this type of check only works with environment
 #  parameter variables [by this do I mean e.g. $1, $2, $3 etc.?], not assigned
 #  [script or named?] variables that have no value, WHICH MEANS that the
 #  following must be hard-coded for the parameter; CHECK THE WHOLE SCRIPT for it:
-if [ "$5" ]
+if [ "$4" ]
 	then
 	echo IMPORTING COLOR LIST from file name\:
 	echo $hexColorSrcFullPath
@@ -75,21 +73,13 @@ fi
 
 for a in $( seq $howManyImages )
 do
-			# Check and make changes for optional random negative variation of max random number pick range:
-			if [ "$4" ]
-				then
-					randomVariation=`shuf -i 0-"$4" -n 1`
-					maxRange=$(( $maxColorColumnRepeat - $randomVariation ))
-				else
-					maxRange=$maxColorColumnRepeat
-			fi
-	howManyStripes=`shuf -i $minColorColumnRepeat-$maxRange -n 1`
+	howManyStripes=`shuf -i $minColorColumnRepeat-$maxColorColumnRepeat -n 1`
 	count=0
 	for i in $( seq $howManyStripes )
 	do
 					echo Generating a stripe for image number $a . . .
 						repeatColumnColorCount=`shuf -i $minColorColumnRepeat-$maxColorColumnRepeat -n 1`
-				if [ "$5" ]
+				if [ "$4" ]
 					then
 						# empty temp.txt before writing new color columns to it:
 						printf "" > temp.txt
