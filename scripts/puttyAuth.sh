@@ -10,4 +10,4 @@
 
 # CODE
 pw=$(< ~/puttyAuth.txt)
-putty.exe ussinsor@ussins.org -pw $pw
+putty.exe ussinsor@ussins.org -pw $pw &
