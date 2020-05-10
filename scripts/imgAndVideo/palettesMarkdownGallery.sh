@@ -31,7 +31,7 @@ fi
 # Otherwise, proceed with gallery creation:
 printf "# Palettes\n\nClick any image to go to the source image; the text line above the image to go to the source .hexplt file.\n\n" > README.md
 
-array=(`gfind . -maxdepth 1 -type f -iname \*.png -printf '%f\n'`)
+array=(`gfind . -maxdepth 1 -type f -iname \*.png -printf '%f\n' | tr -d '\15\32' | gsort -n`)
 
 for element in ${array[@]}
 do
