@@ -2,11 +2,12 @@
 # Deletes all files in the current folder (non-recursive) with a given extension (e.g. .png) that have no companion file with the same base file name and a different extension (e.g. .ppm, .hexplt, anything). Useful for discarding e.g. undesired source format files whose undesirability have been ascertained by converting them to a target format and viewing, then deleting the rendered target image. NOTE that this will not actually execute any delete commands: rather, it makes a proposed script for the delete commands, with instructions on how to run it.
 
 # WARNING
-# If you use this on files with unintented dissimilar base file names such as thisFractalRenderFlame.flame.png, you will lose work!
+# If you use this on files with unintended dissimilar base file names such as thisFractalRenderFlame.flame.png, you will lose work!
 
 # USAGE
-# ./thisScript.sh extensionOfSourceFilesToDelete ifNoMatchedFileNameWithThisExtension, e.g.:
-# ./thisScript.sh hexplt png
+# With this script in your PATH:
+# pruneByUnmatchedExtension.sh extensionOfSourceFilesToDelete ifNoMatchedFileNameWithThisExtension, e.g.:
+# pruneByUnmatchedExtension.sh hexplt png
 # -- will result in the delete of every file with an extension .hexplt that has no same-named file with a .png extension. NOTE that extensions passed as parameters must not include the dot (.).
 # READ ON for a detailed explanation.
 # Suppose you have so many .ppm files which you have converted to .png:
@@ -56,8 +57,8 @@ do
 	if ! [ -f $searchFileName ]
 	then
 # FOR SAFE MODE, uncomment the next line and comment out the line after it! For DANGER MODE, reverse those directions!
-	echo File matching source file name $element but with $2 extension NOT FOUND\; will PROPOSE TO DELETE source file\! && echo "rm $element" >> tmp_Dn6M_proposed_deletes.sh.txt
-    # echo "File matching source file name $element but with $2 extension NOT FOUND\: DELETING\!" && rm $element
+	# echo File matching source file name $element but with $2 extension NOT FOUND\; will PROPOSE TO DELETE source file\! && echo "rm $element" >> tmp_Dn6M_proposed_deletes.sh.txt
+    echo "File matching source file name $element but with $2 extension NOT FOUND\: DELETING\!" && rm $element
 	fi
 done
 
