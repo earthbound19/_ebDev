@@ -5,23 +5,22 @@
 # USAGE
 # Invoke this script with the following parameters:
 #  $1 hex color palette flat file list (input file).
-#  $2 OPTIONAL. Edge length of each square tile to be composited into final (png) image. SEE COMMENTED OUT CODE at end of script; if you wish to invoke a script on windows (cygwin) that blows up ppm images via irfanview, uncomment that code at the end of the script.
-#  $3 OPTIONAL. IF PRESENT, must be zero or any other value. If 0, hex colors will be used in the order found in the source .hexplt file. If anything besides zero, the script will randomly shuffle the hex color files before compositing them to one image.
-#  $4 OPTIONAL. Number of tiles across of tiles-assembled image (columns). If not provided, automatically calculated as approximate square root of total number of colors in source .hexplt file.
-#  $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).
-#  -->
-#  EXAMPLE COMMAND:
+#  $2 OPTIONAL. Number of tiles across of tiles-assembled image (columns). If not provided, automatically calculated as approximate square root of total number of colors in source .hexplt file.
+#  $3 OPTIONAL. IF $2 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $3. Number of tiles down of tiles-assembled image (rows).
+#  EXAMPLE COMMANDS:
 # With this script in your PATH:
-#  hexplt2ppm.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
-#  --creates a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, squares in the palette are rendered in random order, and the palette image will be 5 columns wide and 6 rows down:
-#  FOR THIS EXAMPLE, changing the parameter foo to 0 will not shuffle the colors.
+#  hexplt2ppm.sh RAHfavoriteColorsHex.hexplt 5 40
+#  --creates a tiny ppm palette image from the hex color list RAHfavoriteColorsHex.hexplt,
+#  which is 5 tiles across and 40 tiles down.
+#  hexplt2ppm.sh RAHfavoriteColorsHex.hexplt
+#  -- creates a tiny ppm image of that palette file, with columns and rows calculated by the script.
 
 # KNOWN ISSUES
+# - Uh, this seems to not even produce the colors intended at all in the resultant ppm on Windows.
+#  I wonder whether that is also an issue on Mac.
 # - Sometimes Cygwin awk throws errors as invoked by this script. Not sure why. I run it twice and one time awk throws an error, another it doesn't.
 
-# TO DO
-# - Drop parameter 2 (other scripts can do that) and move $3 to $2, and all subsequent parameters also back one position. Update all scripts that reference this.
-# - Make gray padding optional, as it substantially slows down ppm creation.
+# - Make gray padding optional? Does it substantially slow down ppm creation?
 
 
 # CODE
@@ -79,42 +78,28 @@ gsed -n -e "s/^\s\{1,\}//g" -n -e "s/#\([0-9a-fA-F]\{6\}\).*/\L\1/p" $hexColorSr
 # Reassign name of that temp file to hexColorSrcFullPath to work from:
 hexColorSrcFullPath=tmp_djEAM2XJ9w.hexplt
 
-# Whether to shuffle colors:
-if [[ $3 == 0 ]]
-then
-	echo Value of paramater \$3 is zero\; WILL NOT shuffle read values.
-	# Don't do any shuffling of tmp_djEAM2XJ9w.hexplt.
-else
-	echo Value of paramater \$3 is NONZERO\; WILL SHUFFLE read values.
-	# Shuffle the values (lines) in tmp_djEAM2XJ9w.hexplt into a new temp file:
-	gshuf ./tmp_djEAM2XJ9w.hexplt > ./tmp_NpKH7mFEHg58UsNQ5JX3.txt
-	# Assign the name of this new shuffled temp file to hexColorSrcFullPath, and remove the previous temp file:
-	hexColorSrcFullPath=tmp_NpKH7mFEHg58UsNQ5JX3.txt
-	rm ./tmp_djEAM2XJ9w.hexplt
-fi
 # WHETHER NUM tiles across (and down) is specified; if so, use as specified, if not so, do some math to figure for a 2:1 aspect;
-# $4 is across. If $4 is not specified, do some math. Otherwise use $4:
-if [ -z "$4" ]
+# $2 is across. If $2 is not specified, do some math. Otherwise use $2:
+if [ -z "$2" ]
 then
 	# Get number of lines (colors). Square root of that x2 will be the number of columns in the rendered palette:
 	# Works around potential incorrect line count; re: https://stackoverflow.com/a/28038682/1397555 :
 		# echo attempting awk command\:
-echo "awk 'END{print NR}' $hexColorSrcFullPath"
-	# numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
+# echo "awk 'END{print NR}' $hexColorSrcFullPath"
 	numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
-			# echo number of colors found in $paletteFile is $numColors.
+	numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
+			echo number of colors found in $paletteFile is $numColors.
 	sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
 			# echo sqrtOfColorCount is $sqrtOfColorCount \(first check\)
 	tilesAcross=$(( $sqrtOfColorCount * 2 ))
 			# echo tilesAcross is $tilesAcross\.
 else
-	tilesAcross=$4
+	tilesAcross=$2
 fi
-# $5 is down. If $5 is not specified, do some math. Otherwise use $5.
-if [ -z "$5" ]
+# $3 is down. If $3 is not specified, do some math. Otherwise use $3.
+if [ -z "$3" ]
 then
 	# Get number of lines (colors, yes again, if so). Square root of that / 2 will be the number of rows in the rendered palette.
-# TO DO: Update all scripts that count lines with the following form of fix:
 	numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
 			# echo numColors is $numColors\.
 	sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
@@ -131,11 +116,10 @@ then
 	done
 			# echo tilesDown is $tilesDown\.
 else
-	tilesDown=$5
+	tilesDown=$3
 fi
 # END SETUP GLOBAL VARIABLES
 # =============
-
 
 # IF RENDER TARGET already exists, abort script. Otherwise continue.
 if [ -f ./$renderTargetFile ]
@@ -152,13 +136,15 @@ else
 	echo "255" >> PPMheader.txt
 
 	# each hex color is a triplet of hex pairs (corresponding to 0-255 RGB values) ; concatenate temp hexplt file to uninterrupted hex pairs (no newlines) to parse as one long string into the ppm body:
-	ppmBodyValues=`tr -d '\n' < $hexColorSrcFullPath`
+	# with | tr -d '\15\32' to delete windows newlines from the resultant array
+	#  and this is the seventeen-thousandth time this doom has caused issues withuot this:
+	ppmBodyValues=`tr -d '\n' < $hexColorSrcFullPath | tr -d '\15\32'`
 			rm $hexColorSrcFullPath
 	# Split that superstring with spaces every two hex chars:
-	ppmBodyValues=`echo $ppmBodyValues | gsed 's/../& /g'`
+	ppmBodyValues=`echo $ppmBodyValues | gsed 's/../& /g' | tr -d '\15\32'`
 	# TO DO for hexplt2ppm.sh: convert that to decimal; first work it up into a string formatted for echo in base-16, e.g.:
 	# ppmBodyValues=`echo $((16#"$thisHexString")) $((16#"$thatHexString"))`
-	ppmBodyValues=`echo $ppmBodyValues | gsed 's/[a-zA-Z0-9]\{2\}/$((16#&))/g'`
+	ppmBodyValues=`echo $ppmBodyValues | gsed 's/[a-zA-Z0-9]\{2\}/$((16#&))/g' | tr -d '\15\32'`
 	# If I echo that\, it prints it literally instead of interpretively. Ach! Workaround: make a temp shell script that echoes it interpretively (and assign the result to a variable) :
 	printf "echo $ppmBodyValues" > tmp_hsmwzuF64fEWmcZ2.sh
 	chmod +x tmp_hsmwzuF64fEWmcZ2.sh
@@ -210,13 +196,3 @@ else
 	# remove temp files:
 	rm PPMheader.txt ppmBody.txt
 fi
-
-
-# If $2 (tile size) parameter passed, blow up the image via mathy math and another script:
-# if [ "$2" ]
-# then
-	# tileEdgeLen=$2
-	# blowupIMGtoXpix=$(( $tileEdgeLen * $tilesAcross ))
-	# blowupIMGtoYpix=$(( $tileEdgeLen * $tilesDown ))
-	# img2imgNN.sh $renderTargetFile png $blowupIMGtoXpix $blowupIMGtoYpix
-# fi
