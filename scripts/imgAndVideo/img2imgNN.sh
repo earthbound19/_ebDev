@@ -36,10 +36,13 @@ if [ ! -f $targetFileName ]; then
 	if [ $imgFileExt == ppm ]; then
 		echo converting ppm file via i_view32 . . .
 		# re: http://www.etcwiki.org/wiki/IrfanView_Command_Line_Options
-		# ROTATE 90 DEGREES OPTION; uncomment next line (used with other options) :
+		# NOTE that with an MSYS2 terminal (maybe it would happen with Cygwin also),
+		# it simply opened the image in irfanview, unless I provide the escaped double-quote
+		# marks in the below command. ?
+			# ROTATE 90 DEGREES OPTION; uncomment next line (used with other options) :
 		# extraIrfanViewParam1="/rotate_r"
-			# FORCE ARBITRARY DIMENSIONS (aspect) OPTION:
-		i_view32.exe $1 /resize_long=$3 /resize_short=$4 $extraIrfanViewParam1 /convert=$targetFileName
+			# FORCE ARBITRARY DIMENSIONS (aspect) by passing /resize_long=$3 AND /resize_short=$4
+		i_view32.exe "$1 /resize_long=$3 /resize_short=$4 $extraIrfanViewParam1 /convert=$targetFileName"
 			# MAINTAIN ASPECT OPTION:
 		# i_view32.exe $1 /resize_long=$3 /aspectratio $extraIrfanViewParam1 $extraIrfanViewParam2 /convert=$targetFileName
 	# otherwise use graphicsmagic:
