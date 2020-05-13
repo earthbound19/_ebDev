@@ -15,13 +15,6 @@
 #  hexplt2ppm.sh RAHfavoriteColorsHex.hexplt
 #  -- creates a tiny ppm image of that palette file, with columns and rows calculated by the script.
 
-# KNOWN ISSUES
-# - Uh, this seems to not even produce the colors intended at all in the resultant ppm on Windows.
-#  I wonder whether that is also an issue on Mac.
-# - Sometimes Cygwin awk throws errors as invoked by this script. Not sure why. I run it twice and one time awk throws an error, another it doesn't.
-
-# - Make gray padding optional? Does it substantially slow down ppm creation?
-
 
 # CODE
 
