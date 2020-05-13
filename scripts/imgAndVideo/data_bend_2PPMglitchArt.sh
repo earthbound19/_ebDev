@@ -5,7 +5,7 @@
 # ./thisScript.sh dataSource.file
 
 # DEPENDENCIES
-# a 'nix environment including the od utility, and optionally IrfanView and irfanView2imgNN.sh
+# a 'nix environment including the od utility, and optionally IrfanView and img2imgNN.sh
 
 # NOTES
 # You *may* be able to reliably reverse the process to recreate an original file a PPM was made from: all of the hex values for a source file are recorded in a resulting PPM via this script. In other words, this may be a way to obfuscate data (but note that the obfuscation is easily unmaked or reversed).
@@ -60,8 +60,8 @@ echo creation of $ppmDestFileName DONE. Undergoing any further optional steps . 
 	# Optionally open the file in the default associated program (Windows) :
 # cygstart $ppmDestFileName
 
-	# optionally scale up by NN method by N pix, saving to png format:
-# upscaleX=$((IMGsideLength * 36)) && irfanView2imgNN.sh $ppmDestFileName png $upscaleX
+	# optionally scale up by NN method by N pix, saving to png format; check the i_view32 option:
+# upscaleX=$((IMGsideLength * 36)) && img2imgNN.sh $ppmDestFileName png $upscaleX
 
 echo DONE.
 

@@ -19,9 +19,9 @@
 #  lines area for options to maintain aspect and/or rotate image (wanted
 #  for my purposes at times).
 # Example command:
-# imgs2imgsnn.sh input.ppm png 640
+# img2imgNN.sh input.ppm png 640
 # OR, to force a given x by y dimension for a ppm:
-# imgs2imgsNN.sh input.ppm png 640 480
+# img2imgNN.sh input.ppm png 640 480
 
 # DEPENDENCIES
 # GraphicsMagick and/or IrfanView, both in your $PATH.
