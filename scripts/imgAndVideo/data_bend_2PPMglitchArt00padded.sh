@@ -61,7 +61,7 @@ od -An -t d1 -w$IMGsideLength $inputDataFile > PPMtableTemp_huuRgKWvYvNtw5jd5CWP
 		# For other possibilities, see: RGB_combos_of_255_127_and_0_repetition_allowed.hexplt
 		# DEPRECATED gsed command focused on converting hex:
 		# gsed -i 's/ \([0-9a-z]\{2\}\)/ 00 5b \1 /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
-gsed -i 's/ \([0-9]\{1,\}\)/ \1 0 255 /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+gsed -i 's/ \([0-9]\{1,\}\)/ 105 \1 182 /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 # strip off the byte offset count (I think it is) info at the start of each row, via gsed;
 # DEPRECATED as unecessary via adding -An flag to od call:
 # gsed -i 's/^[0-9]\{1,\} \(.*\)/\1/g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
