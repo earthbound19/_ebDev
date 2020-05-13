@@ -1,6 +1,6 @@
 # DESCRIPTION
-# Makes a teensy ppm palette image (one pixel per color) from a hex palette .hexplt source file. Result is useable as a basis for a scaled up palette image via e.g.:
-# imgs2imgsNN.sh ppm png 640
+# Makes a teensy ppm palette image (one pixel per color) from a hex palette .hexplt source file. Result is usable as a basis for a scaled up palette image via e.g.:
+# img2imgNN.sh ppm png 640 480
 
 # USAGE
 # Invoke this script with the following parameters:
@@ -11,7 +11,8 @@
 #  $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).
 #  -->
 #  EXAMPLE COMMAND:
-#  ./thisScript.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
+# With this script in your PATH:
+#  hexplt2ppm.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
 #  --creates a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, squares in the palette are rendered in random order, and the palette image will be 5 columns wide and 6 rows down:
 #  FOR THIS EXAMPLE, changing the parameter foo to 0 will not shuffle the colors.
 
@@ -19,8 +20,8 @@
 # - Sometimes Cygwin awk throws errors as invoked by this script. Not sure why. I run it twice and one time awk throws an error, another it doesn't.
 
 # TO DO
-# Fix that the `if [ "$2" ]` -conditioned block at the end of the script isn't doing anything--or maybe just don't do that? Other scripts can.
-# Make gray padding optional, as it substantially slows down ppm creation.
+# - Drop parameter 2 (other scripts can do that) and move $3 to $2, and all subsequent parameters also back one position. Update all scripts that reference this.
+# - Make gray padding optional, as it substantially slows down ppm creation.
 
 
 # CODE
@@ -158,7 +159,7 @@ else
 	# TO DO for hexplt2ppm.sh: convert that to decimal; first work it up into a string formatted for echo in base-16, e.g.:
 	# ppmBodyValues=`echo $((16#"$thisHexString")) $((16#"$thatHexString"))`
 	ppmBodyValues=`echo $ppmBodyValues | gsed 's/[a-zA-Z0-9]\{2\}/$((16#&))/g'`
-	# If I echo that\, it prints it literally instead of interpretively. Ach! Workaround: make a temp shell script that echos it interpretively (and assign the result to a variable) :
+	# If I echo that\, it prints it literally instead of interpretively. Ach! Workaround: make a temp shell script that echoes it interpretively (and assign the result to a variable) :
 	printf "echo $ppmBodyValues" > tmp_hsmwzuF64fEWmcZ2.sh
 	chmod +x tmp_hsmwzuF64fEWmcZ2.sh
 	ppmBodyValues=`./tmp_hsmwzuF64fEWmcZ2.sh`
@@ -214,7 +215,8 @@ fi
 # If $2 (tile size) parameter passed, blow up the image via mathy math and another script:
 # if [ "$2" ]
 # then
-# 	tileEdgeLen=$2
-# 	blowupIMGtoXpix=$(( $tileEdgeLen * $tilesAcross ))
-# irfanView2imgNN.sh $renderTargetFile png $blowupIMGtoXpix
+	# tileEdgeLen=$2
+	# blowupIMGtoXpix=$(( $tileEdgeLen * $tilesAcross ))
+	# blowupIMGtoYpix=$(( $tileEdgeLen * $tilesDown ))
+	# img2imgNN.sh $renderTargetFile png $blowupIMGtoXpix $blowupIMGtoYpix
 # fi
