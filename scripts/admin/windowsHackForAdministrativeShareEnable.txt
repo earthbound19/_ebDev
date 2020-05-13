@@ -1,0 +1,11 @@
+Too glib directions:
+
+- in advanced networking, enable file and printer sharing
+- make sure that's allowed through windows firewall
+- import windowsHackForAdministrativeShareEnable.reg
+- create the shares in Computer Management
+- start or restart the server and computer browser services
+
+also see:
+https://social.technet.microsoft.com/Forums/en-US/fb5518e8-67ea-43fc-a2e6-cca935c123b1/how-to-enable-administrative-shares?forum=win10itprogeneral
+REM https://en.wikipedia.org/wiki/Administrative_share#Management
