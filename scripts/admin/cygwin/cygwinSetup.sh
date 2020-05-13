@@ -47,3 +47,13 @@ fi
 # (for my purposes) permissions defaults with defaults we actually want;
 # RE: https://superuser.com/a/392598/130772 :
 cp ./CYGWIN_fstab /etc/fstab
+
+# DESTROY . . . okay, just rename . . . the utils I use a lot but adopt
+#  in _ebSuperBin from MSYS2, but which here cause problems; this first
+#  rename is funny because not finding it is exactly what will happen:
+mv /usr/bin/find.exe /usr/bin/no-find.exe
+mv /usr/bin/sed.exe /usr/bin/no-sed.exe
+mv /usr/bin/sort.exe /usr/bin/no-sort.exe
+# "You are all unique, you are all different!"
+mv /usr/bin/uniq.exe /usr/bin/no-uniq.exe
+# "...I'm not."
