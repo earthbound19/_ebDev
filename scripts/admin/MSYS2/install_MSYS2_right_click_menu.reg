@@ -1,0 +1,46 @@
+Windows Registry Editor Version 5.00
+
+;; THIS SECTION is for right-click on a folder background.
+[HKEY_CLASSES_ROOT\Directory\Background\shell\mingw32]
+@="MinGW &32 Bash Here"
+"Icon"="\"C:\\msys64\\mingw32.exe\""
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\mingw32\command]
+@="C:\\msys64\\msys2_shell.cmd -mingw32 -where \"%v\""
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\mingw64]
+@="MinGW 64 Ba&sh Here"
+"Icon"="\"C:\\msys64\\mingw64.exe\""
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\mingw64\command]
+@="C:\\msys64\\msys2_shell.cmd -mingw64 -where \"%v\""
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\msys2]
+@="MSYS2 Bash Here"
+"Icon"="\"C:\\msys64\\msys2.ico\""
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\msys2\command]
+@="C:\\msys64\\msys2_shell.cmd -msys -where \"%v\""
+
+
+;; THIS SECTION is for right-click on a folder.
+[HKEY_CLASSES_ROOT\Directory\shell\mingw32]
+@="MinGW &32 Bash Here"
+"Icon"="\"C:\\msys64\\mingw32.exe\""
+
+[HKEY_CLASSES_ROOT\Directory\shell\mingw32\command]
+@="C:\\msys64\\msys2_shell.cmd -mingw32 -where \"%v\""
+
+[HKEY_CLASSES_ROOT\Directory\shell\mingw64]
+@="MinGW 64 Ba&sh Here"
+"Icon"="\"C:\\msys64\\mingw64.exe\""
+
+[HKEY_CLASSES_ROOT\Directory\shell\mingw64\command]
+@="C:\\msys64\\msys2_shell.cmd -mingw64 -where \"%v\""
+
+[HKEY_CLASSES_ROOT\Directory\shell\msys2]
+@="MSYS2 Bash Here"
+"Icon"="\"C:\\msys64\\msys2.ico\""
+
+[HKEY_CLASSES_ROOT\Directory\shell\msys2\command]
+@="C:\\msys64\\msys2_shell.cmd -msys -where \"%v\""

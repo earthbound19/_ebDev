@@ -1,7 +1,0 @@
-To inherit the windows PATH in the MSYS2 terminal, uncomment lines in the MSYS2 launch batch scripts (such as msys2_shell.cmd) and/or .ini files which set this value:
-
-MSYS2_PATH_TYPE=inherit
-
-h/t: https://www.rjh.io/blog/20190722-msys2_setup/
-
-To get a right-click menu to open any folder in the MSYS2 terminal, try ShellMenuView and ShellExView. The repo that generates a .reg in an answer over here -- https://superuser.com/questions/801072/add-open-msys-terminal-here-in-the-windows-right-click-context-menu -- didn't work. It indeed made a .reg file, but no .bat; and the .reg didn't accomplish it.
