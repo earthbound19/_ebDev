@@ -2,8 +2,38 @@
 use strict;
 use warnings;
 
-# Source: http://plasmasturm.org/code/rename/rename via http://plasmasturm.org/code/rename/
+# DECRIPTION
+# Advanced file renamer.
 
+# SOURCE
+# http://plasmasturm.org/code/rename/rename via http://plasmasturm.org/code/rename/
+
+# USAGE
+#  Two ways to get the path to this script, assuming it is in your PATH, are:
+# which rename.pl
+# whereis rename.pl
+#  AS THIS WILL NOT convert or or remove these characters, which I personally
+#  also do not want in files:
+#  ~@#%^+[]{},.
+#  -- to make it remove those also from all files in the current
+#  directory, run:
+# perl /path/to/this/script/rename.pl -e 's/[^\w.-]+//g' *
+#  OR for example to remove those characters from png files, run:
+# perl /path/to/this/script/rename.pl -e 's/[^\w.-]+//g' *.png
+#  To convert many terminal-unfriendly file names (but not everything)
+#  in that list!) in all files in the current directory to _:
+# perl /path/to/this/script/rename.pl -z *
+#  To preview what would be renamed without actually doing it, use -n:
+# perl /path/to/this/script/rename.pl -n -z *
+#  To see other options:
+# perl /path/to/this/script/rename.pl --help
+
+# OTHER NOTES
+# All that characters that Windows allows in file names but IMO should not:
+# ~`!@#$%^&()=+[]{};',
+
+
+# CODE
 use Getopt::Long 2.24, qw( :config bundling no_ignore_case no_auto_abbrev );
 
 my ( $N, $EXT, @EXT, @USE, $DECODE, $ENCODE );
