@@ -20,7 +20,10 @@ filesCount=`gfind . -maxdepth 1 -iname \*.$1 | sort | wc -l | tr -d ' '`
 digitsToPadTo=${#filesCount}
 
 # Create array to use to loop over files.
-filesArray=`gfind . -maxdepth 1 -iname "*.$1" | sort`
+# previous version of command; doesn't sort by file date:
+# filesArray=`gfind . -maxdepth 1 -iname "*.$1" | sort`
+# new command; sorts by file date (oldest first); re: https://superuser.com/a/546900/130772
+filesArray=`gfind . -maxdepth 1 -iname "*.$1" -printf "%T@ %Tc %p\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`
 
 counter=0
 for filename in ${filesArray[@]}
@@ -33,6 +36,7 @@ do
 done
 
 # DEVELOPMENT HISTORY
+# 2020/05/22 update array sort to sort by found file date
 # 2018/04/19 Take `mapfile` out (fails on Mac) and create array in-memory. Wrangle how to get digitsToPadTo value meanwhile. (Do it before.)
 # 2016/07/17 I wish it hadn't taken me a silly half hour (more?) to write this. It used to be it would take much longer, so there's that. -RAH
-# 2016/10/12 7:16 PM Fixed bug (via workaround) for echo bug that throws in extra \r charactesr in some situations.
+# 2016/10/12 7:16 PM Fixed bug (via workaround) for echo bug that throws in extra \r character in some situations.
