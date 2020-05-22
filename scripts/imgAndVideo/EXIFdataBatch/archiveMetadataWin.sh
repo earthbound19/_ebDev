@@ -3,7 +3,6 @@
 # Thanks to: http://stackoverflow.com/a/4909968 and http://stackoverflow.com/a/4040324
 
 # TO DO
-# - make this script cross-platform (use a cygwin .sh call instead of .bat)?
 # - use the -args flag to archive this in a format suitable for re-entering into metadata (in -argument format for exiftool).
 # NOT TO DO: update this to only work on file names that include _final_. I do actually want to archive metadata from everything. Even if it means it takes longer the first run.
 
