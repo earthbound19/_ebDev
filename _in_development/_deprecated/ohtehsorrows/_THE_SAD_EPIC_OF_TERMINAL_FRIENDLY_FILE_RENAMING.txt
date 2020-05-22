@@ -1,0 +1,9 @@
+At this writing, the best solution I have found for renaming files such that they have terminal-friendly characters only (no spaces or other non-alphanumeric characters) is rename.pl, which you may find in this repository. See comments I have added to it for usage.
+
+PREVIOUS solutions used and their notes:
+
+- http://sourceforge.net/projects/file-folder-ren/?source=typ_redirect with the Metamorphose1BadFileNameCharacterRemoval ~ .cfg files I've created (steps 01, 02 and 03), adjusting the search/select folder as necessary). When it asks about creating a t_e_m_p folder, you may answer no (it only creates a folder maintaining the folder structure of the renamed files, which you may paste back into the root operating folder. Depending on circumstance, you may want to do that). metamorphose2 was dropped in favor of a newer version, because it ~2 has a strange bug listing files to be renamed (it shows an entirely wrong target file name which is from anoter file name in the tree).
+
+- RenameFiles2.3b.exe (*without* using the white spaces option) and flexible file renamer 7.3 (flex73.exe), which freaks out unless you put a \ at the end of the path to scan. THEN fixIMGnames.sh, which worked in conjunction with getCorrectedImageName.ahk/exe, and failed on some or perhaps too many special characters repair :/ but that is mitigated by using the first mentioned tools.
+
+- That previous option failed, and I developed cleanupGarbageFileNames.sh. Metamorphose was needed for folder renames and ftun.sh for file renaming??
