@@ -10,7 +10,7 @@
 # $3 desired constant quality (crf)
 # $4 the flat text file list of image file names to string into an animation _out.mp4.
 # Optional: $5 rescale target resolution expressed as nnnnXnnnn. Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution.
-# NOTES that the expected list format is:
+# NOTE that the expected list format is:
 # file 0001.png
 # file 0002.png
 # file 0003.png
