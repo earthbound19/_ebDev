@@ -1,15 +1,32 @@
-# DESCRIPTION: Prepares image metadata text file for insertion into images via exiftool (I forget the command or batch that does that; TO DO: implement that.)
+# DESCRIPTION
+# Prepares image metadata text file for insertion into images
+#  via exiftool (I forget the command or batch that does that;
+#  TO DO: implement that.)
 
-# USAGE: CORRECT. SEE DESCRIPTION. Run this from a cygwin prompt in a directory with images in the directory tree for which you wish to create custom metadata ~_MD_ADDS.txt files which another script will use to set image metadata tags. NOTE: for videos, copy the generated title into the description field of the final metadata source file.
+# USAGE
+# - Create a ~/metaDataTemplatesPath.txt file, which contains
+# the path to your metadata template files as seen by whatever
+# unixy tool you use to run this script (e.g. MSYS2 or cygwin)
+# - Uncomment the line with the metadata template you want to use,
+# comment out the others. Additional usage details: CORRECT.
+# SEE DESCRIPTION. Run this from a unixy prompt in a directory
+# with images in the directory tree for which you wish to create
+# custom metadata ~_MD_ADDS.txt files which another script will
+# use to set image metadata tags. NOTE: for videos, copy the
+# generated title into the description field of the final metadata
+# source file.
 
-# DEV NOTE: if you make only temporary changes to this for ripping art, revert the changes so there aren't a lot of extraneous repository commits of unnecessary changes.
+# DEV NOTE: if you make only temporary changes to this for ripping art,
+# revert the changes so there aren't a lot of extraneous repository
+# commits of unnecessary changes.
+
 
 # Q. Should those be _FINAL_ and _EXPORTED_, not _FINAL and _EXPORTED ? :
 # _MTPL=_FINAL
 _MTPL=_EXPORTED_
 
 # NOTE: cygpath use else err next:
-metaDataTemplatePath=`cygpath -u "C:\_ebdev\scripts\imgAndVideo\EXIFdataBatch\metaDataTemplates"`
+metaDataTemplatePath=$(<~/metaDataTemplatesPath.txt)
 	# Pick and uncomment one:
 	metaDataTemplateFile=customImageMetadataTemplate.txt
 	# metaDataTemplateFile=electricSheep_CC_by_sa_template.txt
