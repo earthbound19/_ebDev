@@ -20,6 +20,8 @@ use warnings;
 # perl /path/to/this/script/rename.pl -e 's/[^\w.-]+//g' *
 #  OR for example to remove those characters from png files, run:
 # perl /path/to/this/script/rename.pl -e 's/[^\w.-]+//g' *.png
+#  OR to replace them with underscores, run:
+# perl /path/to/this/script/rename.pl -e 's/[^\w.-]+/_/g' *.png
 #  To convert many terminal-unfriendly file names (but not everything)
 #  in that list!) in all files in the current directory to _:
 # perl /path/to/this/script/rename.pl -z *
