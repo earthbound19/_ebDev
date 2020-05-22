@@ -1,0 +1,28 @@
+Key: * = done. ! = in progress. All other listed tasks need doing.
+
+*AGH! The following will fail wherever dimensions that include more than 5 digits (e.g. 12250x950) are in file names. The first thing it should do before the renaming step, therefore, is: it should open up to the user a list of all matched files, and prompt the user to screen them for erroneous matches and rename and "false positive" matches to not include those numbers.
+
+To make use of this, art files which are finalized and ready for publication must be named beginning with _FINAL or _final (case doesn't matter). The script will sort and rename finalized works (so named) by date of creation.
+
+(For the as-yet undescribed foldo mojo, that must also be _final_)
+
+Any file name with the phrase _final in it but without a five-digit number in the filename will be renamed to include [optional label]_xxxxx (where xxxxx is a five-digit number that increments as a count of all final, sorted, publication-ready files.* The procedure for this follows.
+		*NOTE: make it possible to pass the optional label to the program as an argument.
+		*NOTE: make it possible to pass a folder to search through as an argument (for selective renaming by arbitrary criteria by the user).
+PROCEDURE:
+	* Precursor: search all folders and files in the given folder to match the regex [0-9]{5} (a five-digit number), add all matched folder and file names to an array, then bubble-sort the array to determine the highest five-digit number present in the files and folders.
+	Search-and-rename procedure: search and index all files and subfolders in the given folder, by these criteria:
+		In all these cases: IF the folder name does not match the regex [0-9]{5} AND the folder name includes the phrase _final_
+	!  AND IF ALL file names within that folder do not match the regex [-_]{1}final[-_]{1} AND ALL file names do not match the regex [0-9]{5}
+		ADD THEM TO THE INDEX, including file creation time (a value/key index?).
+		-
+		In all these cases: IF the folder name does not match the regex [0-9]{5} AND the folder name does not include the phrase _final AND any file in the folder does not match the regex [0-9]{5} and matches the regex [-_]{1}final[-_]{1}
+		ADD THEM TO THE INDEX (only add file names, not folders.)
+	Renaming procedure:
+		Sort the matched filenames index by creation date, oldest first, and
+			Rename them sequentially after the last highest available five-digit number, including any optional user-specified label, e.g. ~_abstraction_xxxxx (where xxxxx is the next higher number) -- BUT do not number and rename any files that include the labels variant, variation, var, alternate, or alt.
+				FOR NOW, rename the folders by hand to match the renamed files, by the highest number of all renamed files.
+				TO DO: add an algorithm that auto-renames the parent folders of so many renamed files.
+				TO DO: also make it create new folder names for renamed files that are in the given (root search) folder.
+
+Art that doubles as resources for other art and as standalone art should be . . . placed in subfolders named _RESOURCES?
