@@ -1,0 +1,19 @@
+To get PowerShell 5 and TLS v1.2 installed on Windows 7, which are prerequisites to install Chocolatey; dunno if these steps are all necessary but they worked:
+
+- open powershell as administrator, then run these commands:
+- Set-ExecutionPolicy -ExecutionPolicy Unrestricted
+- then test that that "took" by viewing the execution policy with:
+- Get-ExecutionPolicy
+- install KB3191566 for Windows 7 (x32 or x64 depending on your version of Windows; if you're running 64-bit windows, use x64). You can find them at Microsoft's update catalog web site, but I have them in a windows updates collection folder in an archive named ~ neededForChocolatey ~. Reboot if prompted to.
+- install KB3140245. Reboot if prompted to.
+- run ~ MicrosoftEasyFix51044 .
+- from powershell run this command:
+- $PSVersionTable.PSVersion
+- if that returns a major version 5, you now have powershell 5 installed.
+- now hopefully you can:
+- open a powershell prompt as admin, and
+- cd into the directory with the following script (which you can find from chocolaty.org), and run it like so:
+- ./installChocolatey.ps1
+- if it runs without errors, hopefully chocolaty has been successfully installed.
+- if it ran with errors, you can try running this command from powershell (as admin) to force powershell to use tls 1.2 by default:
+- [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
