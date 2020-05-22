@@ -15,8 +15,8 @@ use warnings;
 #  AS THIS WILL NOT convert or or remove these characters, which I personally
 #  also do not want in files:
 #  ~@#%^+[]{},.
-#  -- to make it remove those also from all files in the current
-#  directory, run:
+#  -- to make it remove those also from all files AND folder in the
+#  current directory, run:
 # perl /path/to/this/script/rename.pl -e 's/[^\w.-]+//g' *
 #  OR for example to remove those characters from png files, run:
 # perl /path/to/this/script/rename.pl -e 's/[^\w.-]+//g' *.png
@@ -32,7 +32,7 @@ use warnings;
 
 # OTHER NOTES
 # All that characters that Windows allows in file names but IMO should not:
-# ~`!@#$%^&()=+[]{};',
+# ~`!@#$%^&()=+[]{};' -,
 
 
 # CODE
