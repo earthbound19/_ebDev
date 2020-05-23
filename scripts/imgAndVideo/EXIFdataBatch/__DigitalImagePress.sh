@@ -3,9 +3,9 @@
 
 # USAGE
 # Not currently well documented. A start at documentation:
-# - If necessary, use rename.pl to get all files this script will operate
-#  on to have only terminal-friendly characters in their files names.
-#  This is a manual process to do before running this script. Find it in
+# - If necessary, use ftun.sh and/or rename.pl to get all files this script
+#  will operate on to have only terminal-friendly characters in their file
+#  names. This is a manual process to do before running this script. Find it in
 #  rename.pl in this repository and read the USAGE comments I have added to it.
 #  Previous solutions are in:
 #  _THE_SAD_EPIC_OF_TERMINAL_FRIENDLY_FILE_RENAMING.txt.
