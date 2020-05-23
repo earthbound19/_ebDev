@@ -14,7 +14,45 @@
 labelOne=_FINAL_
 labelTwo=_work_
 
-echo WARNING\: This script will produce undesired results if any file names in the directory tree you run it from include the phrase var\, variant\, or variation. Nope\, you have to rename those files to avoid problems\, sorry. IMPORTANT NOTES\: This script will find\, and build a script to optionally batch rename files for this goal\: incrementally number files which include the full phrase $labelOne in their file name \(it must have underscores on both sides of it\)\. The incremental numbering will start off the highest found five-padded number \(format nnnnn\) alongside $labelOne *and* the full phrase $labelTwo\, followed by a five-digit number \(e\.g\. "$labelTwo"_00088\)\. ALSO NOTE\: filenames must be properly named with underscores _ instead of spaces\, and also any nnnnn numbers must be surrounded by underscores\, for this to work. To get files nearer to or at that standard\, see the notes at the start of __DigitalImagePress.sh.
+echo ""
+echo "WARNING\: This script will produce undesired results if"
+echo " any file names in the directory tree you run it from include"
+echo " the phrase \"var\", \"variant\", or \"variation\"."
+echo " This script will find, and build a script to optionally batch"
+echo " rename files for this goal: incrementally number files which"
+echo " include the full phrase $labelOne in their file name (it must"
+echo " have underscores on both sides of it). The incremental"
+echo " numbering will start off the highest found five-padded number"
+echo " (format nnnnn) alongside $labelOne *and* the full phrase"
+echo " $labelTwo, followed by a five-digit number (e.g."
+echo " ""$labelTwo""_00088). ALSO NOTE: filenames must be properly named"
+echo " with underscores _ instead of spaces\, and also any nnnnn"
+echo " numbers must be surrounded by underscores\, for this to work."
+echo " To get files nearer to or at that standard\, see the notes at"
+echo " the start of __DigitalImagePress.sh."
+
+PASS_STRING=FLORF
+
+echo "If this is what you want, type:"
+echo ""
+echo "$PASS_STRING"
+echo ""
+echo "--and then press ENTER (or return, as the case may be)."
+echo "If that is NOT what you want to do, press CTRL+z or CTRL+c,"
+echo " or type something else and press ENTER, to terminate this"
+echo "script."
+
+read -p "TYPE HERE: " USERINPUT
+
+if [ $USERINPUT == $PASS_STRING ]
+then
+	echo "User input equals pass string; proceeding."
+else
+	echo "User input does not equal $PASS_STRING."
+	echo "script will exit without doing anything."
+	exit
+fi
+
 
 echo Finding files to number by label . . .
 if [ -a _batchNumbering ]
