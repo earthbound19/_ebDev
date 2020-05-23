@@ -11,9 +11,12 @@
 # $2 OPTIONAL. Approximate intended width of the final montage image,
 #  in pixels. Tiles in the image will not be enlarged to fill up space (only
 #  shrunk if necessary). For smaller images, if you set an outsized
-#  montage size ($2), this could lead to a lot of gray padding
+#  montage size, this could lead to a lot of gray padding
 #  around images in the montage. IF NOT PROVIDED, montage size will be
-#  ~= to first image found.
+#  ~= to first image found. IF PROVIDED as keyword FULL, the tile width
+#  for each image in the montage will be set to the original image width
+#  of the first found image, which tiles combined will produce a montage
+#  of roughly the size of all original images combined.
 # Example invocation that will create a montage of ~800 px wide
 #  using all png images in the current directory:
 # autoMontageIM.sh png 800
@@ -21,6 +24,8 @@
 
 # CODE
 # If user did not pass parameter $1, warn and exit.
+
+# START GLOBALS SETUP
 if ! [ "$1" ]
 then
 	echo No parameter \$1 \(image type\) passed to script. Exit.
@@ -34,18 +39,34 @@ fi
 firstImage=`gfind . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | head -n 1`
 originalIMGwidth=`gm identify -format "%w" $firstImage`
 originalIMGheight=`gm identify -format "%h" $firstImage`
-
-if ! [ "$2" ]
-then
-	echo No parameter \$2 \(montage width in pixels\) passed to script\; will set montage width to width of first image found.
-	montageWidthInPixels=$originalIMGwidth
-else
-	montageWidthInPixels=$2
-fi
-
 numImagesFound=`gfind . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | wc -l`
 SQRTofNumImagesFound=`echo "scale=0; sqrt($numImagesFound) + 1" | bc`
-tileWidth=`echo "scale=0; $montageWidthInPixels / $SQRTofNumImagesFound" | bc`
+
+if [ "$2" ]
+then
+	if ! [ "$2" == "FULL" ]
+	then
+		echo ""
+		echo "Parameter \$2 (montage width in pixels) passed to script;"
+		echo " will set montage tile size so that a montage of approximately"
+		echo " that size is created."
+		tileWidth=`echo "scale=0; $2 / $SQRTofNumImagesFound" | bc`
+	else
+		echo ""
+		echo "keyword FULL passed as \$2 to script;"
+		echo " Will not resize images in montage; the montage will be"
+		echo " roughly the area of all pixels of all original images"
+		echo " combined."
+		tileWidth=$originalIMGwidth
+	fi
+else
+	echo ""
+	echo "No parameter \$2 (montage width in pixels) passed to script;"
+	echo " will set montage width to width of first image found, and"
+	echo " scale tileWidth ~ accordingly."
+	tileWidth=`echo "scale=0; $originalIMGwidth / $SQRTofNumImagesFound" | bc`
+fi
+# END GLOBALS SETUP
 
 heightToWidthAspect=`echo "scale=5; $originalIMGwidth / $originalIMGheight" | bc`
 tileHeight=`echo "scale=0; $tileWidth / $heightToWidthAspect" | bc`
