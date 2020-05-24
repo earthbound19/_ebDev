@@ -1,0 +1,20 @@
+NODEJS VERSION MANAGEMENT
+Windows: nvm
+Mac: ?
+
+To use a globally installed node module locally, make a symlink--which git may just put in the repo anyway :( unless you .gitignore it; re https://stackoverflow.com/a/42445768 :
+npm link <module_name>
+OR USE? : https://www.npmjs.com/package/requireg
+
+node packages under consideration:
+https://www.npmjs.com/package/psd
+
+VERSIONS MANAGEMENT
+?
+?
+
+PACKAGE MANAGEMENT UTILITIES
+Mac: brew, ?, ?,
+
+Windows:
+Chocolatey https://chocolatey.org/install
