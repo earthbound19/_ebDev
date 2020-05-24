@@ -1,7 +1,8 @@
 # DESCRIPTION
 # Uses imagemagick montage to pack all images of type $1 in the current
 # directory into a montage of approximate size $2. Tiles are padded
-# with a dark gray, and the entire result image is padded with a darker gray.
+# with a dark gray, and the entire result image is padded with a darker
+# gray. Result file will be named __montage_<name_of_current_directory>.
 
 # DEPENDENCIES
 # A nixy' environment and imagemagick / montage + convert.
@@ -26,6 +27,7 @@
 #  all original images combined. IF NOT PROVIDED, montage width will be
 #  approximately the size of the first image found. In that case, montage
 #  width is approximated as: (tile width * tiles across) = montage width.
+# Result file will be named __montage_<name_of_current_directory>.
 # Example invocation that will create a montage from all png files in
 #  the current directory, with number of tiles across auto-decided, and
 #  each tile ~800 px wide:
@@ -102,22 +104,18 @@ then
 	then
 		echo ""
 		echo "keyword FULL passed as \$3 to script;"
-		echo " Will not resize images in montage; the montage will be"
-		echo " roughly the area of all pixels of all original images"
-		echo " combined."
+		echo " montage will be roughly the area of all original"
+		echo " images combined."
 		tileWidth=$originalIMGwidth
 	else
 		echo ""
-		echo "Parameter \$3 (montage width in pixels) passed to script;"
-		echo " will set montage tile size so that a montage of approximately"
-		echo " that size is created."
+		echo " will create montage approximately $3 pixels wide."
 		tileWidth=`echo "scale=0; $3 / $SQRTofNumImagesFound" | bc`
 	fi
 else
 	echo ""
 	echo "No parameter \$3 (montage width in pixels) passed to script;"
-	echo " will set montage width to width of first image found, and"
-	echo " scale tileWidth ~ accordingly."
+	echo " montage will be roughly the same width of first image found."
 	tileWidth=`echo "scale=0; $originalIMGwidth / $SQRTofNumImagesFound" | bc`
 fi
 # END GLOBALS SETUP
@@ -126,7 +124,8 @@ heightToWidthAspect=`echo "scale=5; $originalIMGwidth / $originalIMGheight" | bc
 tileHeight=`echo "scale=0; $tileWidth / $heightToWidthAspect" | bc`
 widthPadding=`echo "scale=0; $tileWidth - ($tileWidth * 95.5 / 100)" | bc`
 heightPadding=`echo "scale=0; $tileHeight - ($tileHeight * 95.5 / 100)" | bc`
-echo "tilesAcross $tilesAcross tilesAcrossParam $tilesAcrossParam numImagesFound=$numImagesFound SQRTofNumImagesFound=$SQRTofNumImagesFound tileWidth=$tileWidth firstImage=$firstImage originalIMGwidth=$originalIMGwidth originalIMGheight=$originalIMGheight heightToWidthAspect=$heightToWidthAspect tileHeight=$tileHeight widthPadding=$widthPadding heightPadding=$heightPadding"
+# Dev. testing only:
+# echo "tilesAcross $tilesAcross tilesAcrossParam $tilesAcrossParam numImagesFound=$numImagesFound SQRTofNumImagesFound=$SQRTofNumImagesFound tileWidth=$tileWidth firstImage=$firstImage originalIMGwidth=$originalIMGwidth originalIMGheight=$originalIMGheight heightToWidthAspect=$heightToWidthAspect tileHeight=$tileHeight widthPadding=$widthPadding heightPadding=$heightPadding"
 
 # Create the montage to a temp image file.
 # Because I can't seem to find the escape sequence necessary to do this from bash+cmd, print the command to a bash script, then execute the script:
@@ -140,7 +139,12 @@ originalIMGheight=`gm identify -format "%h" ___oooot_n4yR24PG.png`
 paddedImageW=`echo "$originalIMGwidth + ($widthPadding * 2.25)" | scale=0 bc`
 paddedImageH=`echo "$originalIMGheight + ($widthPadding * 2.25)" | scale=0 bc`
 echo Will pad final montage from $originalIMGwidth to $paddedImageW and $originalIMGheight to $paddedImageH . . .
-# Pad temp image file to final result file:
-gm convert ___oooot_n4yR24PG.png -gravity center -background '#454444' -extent "$paddedImageW"x"$paddedImageH" _montage.png
+# Pad temp image file to final result file;
+# Construct final file name first:
+thisPath=`pwd`
+parentDirectoryName="$(basename "$(dirname "$thisPath")")"
+gm convert ___oooot_n4yR24PG.png -gravity center -background '#454444' -extent "$paddedImageW"x"$paddedImageH" _montage__"$parentDirectoryName".png
 # Remove temp image file:
 rm ___oooot_n4yR24PG.png
+
+echo DONE. Result file is _montage__"$parentDirectoryName".png.
