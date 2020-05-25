@@ -81,7 +81,7 @@ if ! [ "$2" ] || [ "$2" == "AUTO" ]
 then
 	echo ""
 	echo "No parameter \$2 passed to script, or passed as AUTO;"
-	echo "ImageMagic will set tiles across automatically."
+	echo " ImageMagick will set tiles across automatically."
 	tilesAcrossParam=
 else
 	tilesAcross=$2
@@ -103,13 +103,13 @@ then
 	if [ "$3" == "FULL" ]
 	then
 		echo ""
-		echo "keyword FULL passed as \$3 to script;"
+		echo "Keyword FULL passed as \$3 to script;"
 		echo " montage will be roughly the area of all original"
 		echo " images combined."
 		tileWidth=$originalIMGwidth
 	else
 		echo ""
-		echo " will create montage approximately $3 pixels wide."
+		echo "Will create montage approximately $3 pixels wide."
 		tileWidth=`echo "scale=0; $3 / $SQRTofNumImagesFound" | bc`
 	fi
 else
@@ -142,8 +142,8 @@ echo Will pad final montage from $originalIMGwidth to $paddedImageW and $origina
 # Pad temp image file to final result file;
 # Construct final file name first:
 thisPath=`pwd`
-parentDirectoryName="$(basename "$(dirname "$thisPath")")"
-gm convert ___oooot_n4yR24PG.png -gravity center -background '#454444' -extent "$paddedImageW"x"$paddedImageH" _montage__"$parentDirectoryName".png
+thisFolderName=`basename $thisPath`
+gm convert ___oooot_n4yR24PG.png -gravity center -background '#454444' -extent "$paddedImageW"x"$paddedImageH" _montage__"$thisFolderName".png
 # Remove temp image file:
 rm ___oooot_n4yR24PG.png
 
