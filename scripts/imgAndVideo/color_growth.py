@@ -59,7 +59,7 @@ from PIL import Image
 
 # START GLOBALS
 # Defaults which will be overriden if arguments of the same name are provided to the script:
-ColorGrowthPyVersionString = 'v2.3.4'
+ColorGrowthPyVersionString = 'v2.3.5'
 WIDTH = 400
 HEIGHT = 200
 RSHIFT = 8
@@ -563,7 +563,7 @@ if SAVE_EVERY_N > 0:
 if SAVE_PRESET:
     file = open(file_base_name + '.cgp', "w")
     file.write(SCRIPT_ARGS_STR)
-    if LOAD_PRESET:
+    if ARGS.LOAD_PRESET:
         file.write('\n\nPARENT PRESET: ' + LOAD_PRESET + '\n')
     file.close()
 
@@ -690,7 +690,7 @@ print('Render complete and image saved.')
 # ## v2 sped up by the volunteer work of someone who forked it and
 # did a pull request! File name: color_growth_fast.py
 # # Starting with this log:
-# ## v2.3.3 New features:
+# ## v2.3.5 New features:
 #  - will move color_growth.py (slow) script to /_deprecated folder,
 #  and this script will "overwrite" (just rename to/take over) that
 #  script name (this will now just be color_growth.py)
@@ -719,3 +719,4 @@ print('Render complete and image saved.')
 #  known. Now, every call of this script from another script can
 #  use --SAVE_PRESET which will also record the --RANDOM_SEED.
 #  The --RANDOM_SEED in a .cgp can recreate the same image.
+# ## v2.3.5 bug fix check for ARGS.LOAD_PRESET not LOAD_PRESET
