@@ -50,11 +50,6 @@ See comments under the same heading in this module.
 #  - pyinstaller compiled packages were ~the same speed. Not exciting.
 # - Make default variables that are tuples and lists either those or strings, not both
 #   for (consistency). If strings, you'll want to remove redundant str() conversion in help.
-#   - Destroy -n option and associated functionality because of the problems described in the
-#   help for that option. I would rather that I or others be forced to script repeat runs of
-#   this script, which is more unixy (leave that function to another program) and to fix this
-#   I'd have to refactor this to mess with sys.argv[] to save the new deterministically
-#   generated seed to .cgp files at each new image creation loop which just seems unduly messy.
 # - Option and function to explicitly set start coords from set of tuple coordinates
 # - Option to suppress progress print to save time
 # - Fixes re pylint comments at end, also things listed in development code with TO DO comments
