@@ -55,11 +55,7 @@ See comments under the same heading in this module.
 #   this script, which is more unixy (leave that function to another program) and to fix this
 #   I'd have to refactor this to mess with sys.argv[] to save the new deterministically
 #   generated seed to .cgp files at each new image creation loop which just seems unduly messy.
-# - Fix "KNOWN ISSUE" described in help for --RANDOM_SEED.
 # - Option and function to explicitly set start coords from set of tuple coordinates
-# - Initialize COLOR_MUTATION_BASE by random selection from a .hexplt color scheme
-# - Option to set start coords color mutation bases from .hexplt color scheme (would override)
-#   initialization from set of tuple coords
 # - Option to suppress progress print to save time
 # - Fixes re pylint comments at end, also things listed in development code with TO DO comments
 # - Option: instead of randomly mutating color for each individual chosen neighbor coordinate,
@@ -611,7 +607,7 @@ for n in range(1, (NUMBER_OF_IMAGES + 1)):        # + 1 because it iterates n *a
         # NOTE: There are two options for looping here. Mode 0 (which was the first developed
         # mode) makes a copy of allocd_coords, and loops through that. The result is that the
         # loop doesn't continue because of changes to allocd_coords (as it is working on a
-        # copy which becomes outdates as the loop progresses). Mode 1 loops through
+        # copy which becomes outdated as the loop progresses). Mode 1 loops through
         # allocd_coords itself, and since this loop changes allocd_coords, it makes the
         # loop run longer. In mode 1 similar color meanders more (runaway streams of color
         # are possible). It also finishes the image faster. Mode 1 spreads more uniformly
