@@ -1,3 +1,8 @@
+""" NOTE the print statement below! """
+
+print("YOU PROBABLY want to use color_growth.py. This script is deprecated. It used to be named color_growth.py. color_growth.py was forked and substantially sped up as a new file, color_growth_fast.py. However, color_growth_fast.py became the main development file for changes/fixes, so the previous script, color_growth.py, was renamed (and moved to a _deprecated folder) as color_growth_v1.py (the file you're looking at now), and color_growth_fast.py, at version 2.3.3, was renamed to color_growth.py (in the same location as the original script which is now somewhere else as a historical artifact). HOWEVER, at this writing, the ability to have negative or high out-of-range clip values may work in this old v1 script but not in v2.3.3. So, as a someday or neverday or maybe a compiled language port of the algorithm, I want to re-introduce out-of-range clip rates. Until then or never, this remains here as reference.")
+quit()
+
 """Renders a PNG image like bacteria that mutate color as they spread.
 
 NOTE: an improved version of this script which produces results many orders of magnitude
