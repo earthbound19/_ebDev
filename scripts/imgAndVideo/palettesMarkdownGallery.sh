@@ -2,8 +2,8 @@
 # Creates a markdown image listing of all palette files (rendered from .hexplt source files) in the current path. Gallery file is README.md. WARNING: this will overwrite any other such file! DOUBLE WARNING: it will delete any (presumably erroneous) README.md if there are no .pngs in the directory you run this in!
 
 # USAGE
-# Invoke this script without any parameters: markdown gallery from; e.g.:
-# ./thisScript.sh
+# Invoke this script without any parameters:
+# palettesMarkdownGallery.sh
 
 # NOTES
 # On Mac (at least) this script throws an error about test, and yet it still works as intended (the test causes a zero or nonzero return code).
