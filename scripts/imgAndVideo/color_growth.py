@@ -31,7 +31,7 @@ See comments under documentation heading in this module.
 # - https://github.com/earthbound19/_ebDev/issues/97 (close issue when fixed)
 # - test this extensively and determine if suitable as replacement of prior
 # script with no downsides.
-# - possibly things in the color_growth.py's TO DO list.
+# - possibly things in the color_growth_v1.py's TO DO list.
 # - run pylint against this new version and work on recommended changes?
 # - determine whether any code or comments are vestigal with this updated script, and
 # delete them if so.
@@ -59,7 +59,7 @@ from PIL import Image
 
 # START GLOBALS
 # Defaults which will be overriden if arguments of the same name are provided to the script:
-ColorGrowthPyVersionString = 'v2.3.3'
+ColorGrowthPyVersionString = 'v2.3.4'
 WIDTH = 400
 HEIGHT = 200
 RSHIFT = 8
