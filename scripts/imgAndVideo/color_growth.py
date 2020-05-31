@@ -29,14 +29,10 @@ See comments under documentation heading in this module.
 
 # TO DO:
 # - https://github.com/earthbound19/_ebDev/issues/97 (close issue when fixed)
-# - test this extensively and determine if suitable as replacement of prior
-# script with no downsides.
 # - possibly things in the color_growth_v1.py's TO DO list.
-# - run pylint against this new version and work on recommended changes?
 # - determine whether any code or comments are vestigal with this updated script, and
 # delete them if so.
 # - investigate: is this forcing growth clip values to not be negative -- where earlier color_growth.py did? It saved a preset that was loaded with neg. value, changing that neg. value to 0. ALTERNATELY, verify whether clipping values dramatically slows down scripts. If so, maybe scrap that feature (of the original color_growth.py) and save it for a more efficient implementation in a compiled or more performant language.
-
 
 # VERSION HISTORY
 # See "VERSION HISTORY (FOOTER) comment at end of script.
@@ -53,20 +49,21 @@ import re
 import subprocess
 import shlex
 import queue
+# I'm also using another psuedorandom number generator built into numpy as np:
 import numpy as np
 from PIL import Image
 
 
 # START GLOBALS
 # Defaults which will be overriden if arguments of the same name are provided to the script:
-ColorGrowthPyVersionString = 'v2.3.5'
+ColorGrowthPyVersionString = 'v2.5.5'
 WIDTH = 400
 HEIGHT = 200
 RSHIFT = 8
 STOP_AT_PERCENT = 1
 SAVE_EVERY_N = 0
-START_COORDS_RANGE = (1, 13)
-GROWTH_CLIP = (0, 5)
+START_COORDS_RANGE = (1,13)
+GROWTH_CLIP = (0,5)
 SAVE_PRESET = True
 # BACKGROUND color options;
 # any of these (uncomment only one) are made into a list later by ast.literal_eval(BG_COLOR) :
@@ -76,6 +73,7 @@ BG_COLOR = "[255,63,52]"        # Scarlet-scarlet-orange
 RECLAIM_ORPHANS = True
 BORDER_BLEND = True
 TILEABLE = False
+SCRIPT_ARGS_STR = ''
 # END GLOBALS
 
 
@@ -87,116 +85,166 @@ class versionStringPrintAction(argparse.Action):
         print('color_growth.py', ColorGrowthPyVersionString)
         parser.exit()
 
-PARSER = argparse.ArgumentParser(description='Renders a PNG image like bacteria that produce \
-random color mutations as they grow over a surface. Output file names are after the date plus \
-random characters. Inspired by and drastically evolved from colorFibers.py, which was horked \
-and adapted from https://scipython.com/blog/computer-generated-contemporary-art/')
+PARSER = argparse.ArgumentParser(description=
+'Renders a PNG image like bacteria that produce random color mutations \
+as they grow over a surface. Output file names are after the date plus \
+random characters. Inspired by and drastically evolved from \
+colorFibers.py, which was horked and adapted from \
+https://scipython.com/blog/computer-generated-contemporary-art/'
+)
 PARSER.register('action', 'versionStringPrint', versionStringPrintAction)
 PARSER.add_argument('-v', '--VERSION', nargs=0, action='versionStringPrint', help='Print version number and exit.')
-PARSER.add_argument('--WIDTH', type=int, help='WIDTH of output image(s). Default ' \
-+ str(WIDTH) + '.')
-PARSER.add_argument('--HEIGHT', type=int, help='HEIGHT of output image(s). Default ' \
-+ str(HEIGHT) + '.')
-PARSER.add_argument('-r', '--RSHIFT', type=int, help='Vary R, G and B channel values randomly \
-in the range negative this value or positive this value. Note that this means the range is \
-RSHIFT times two. Defaut ' + str(RSHIFT) + '.')
-PARSER.add_argument('-b', '--BG_COLOR', type=str, help='Canvas color. Expressed as a python \
-list or single number that will be assigned to every value in an RGB triplet. If a list, give \
-the RGB values in the format \'[255,70,70]\' (if you add spaces after the commas, you must \
-surround the parameter in single or double quotes). This example would produce a deep red, as \
-Red = 255, Green = 70, Blue = 70). A single number example like just 150 will result in a \
-medium-light gray of [150,150,150] (Red = 150, Green = 150, Blue = 150). All values must be \
-between 0 and 255. Default ' + str(BG_COLOR) + '.')
-PARSER.add_argument('-c', '--COLOR_MUTATION_BASE', type=str, help='Base initialization color \
-for pixels, which randomly mutates as painting proceeds. If omitted, defaults to whatever \
-BG_COLOR is. If included, may differ from BG_COLOR. This option must be given in the same \
-format as BG_COLOR. You may make the base initialization color of each origin random by \
-specifying "--COLOR_MUTATION_BASE random".')
-PARSER.add_argument('--RECLAIM_ORPHANS', type=str, help='With higher --VISCOSITY, coordinates \
-can be painted around (by coordinate and color mutation of surrounding coordinates) but never \
-themselves painted. This option coralls these orphan coordinates and, after all other living \
-coordinates evolve (die), revives these orphans. If there are orphans after that, it repeats, \
-and so on, until every coordinate is painted. Default on. To disable pass --RECLAIM_ORPHANS \
-False or --RECLAIM_ORPHANS 0.')
-PARSER.add_argument('--BORDER_BLEND', type=str, help='If this is enabled, the hard edges \
-between different colonies will be blended together. Enabled by default. To disable pass \
---BORDER_BLEND False or --BORDER_BLEND 0.')
-PARSER.add_argument('--TILEABLE', type=str, help='Make the generated image seamlessly tile. \
-Disabled by default. Enable with "--TILEABLE True".')
-PARSER.add_argument('--STOP_AT_PERCENT', type=float, help='What percent canvas fill to stop \
-painting at. To paint until the canvas is filled (which can take extremely long for higher \
-resolutions), pass 1 (for 100 percent). If not 1, value should be a percent expressed as a \
-decimal (float) between 0 and 1 (e.g 0.4 for 40 percent. Default ' + str(STOP_AT_PERCENT) + \
-'. For high --failedMutationsThreshold or random walk (neither of which is implemented at \
-this writing), 0.475 (around 48 percent) is recommended. Stop percent is adhered to \
-approximately (it could be much less efficient to make it exact).')
-PARSER.add_argument('-a', '--SAVE_EVERY_N', type=int, help='Every N successful coordinate and \
-color mutations, save an animation frame into a subfolder named after the intended final art \
-file. To save every frame, set this to 1, or to save every 3rd frame set it to 3, etc. Saves \
-zero-padded numbered frames to a subfolder which may be strung together into an animation of \
-the entire painting process (for example via ffmpegAnim.sh). May substantially slow down \
-render, and can also create many, many gigabytes of data, depending. ' + str(SAVE_EVERY_N) + \
-' by default. To disable, set it to 0 with: -a 0 OR: --SAVE_EVERY_N 0')
-PARSER.add_argument('-s', '--RANDOM_SEED', type=int, help='Seed for random number generators \
-(random and numpy.random are used). Default generated by random library itself and added to \
-render file name for reference. Can be any integer in the range 0 to 4294967296 (2^32). If \
-not provided, it will be randomly chosen from that range (meta!). If --SAVE_PRESET is used, \
-the chosen seed will be saved with the preset .cgp file. KNOWN ISSUE at this writing: \
- evidently functional differences between random generators of different versions of Python \
- and/or Python on different platforms produce different output from the same random seed.')
-PARSER.add_argument('-q', '--START_COORDS_N', type=int, help='How many origin coordinates to \
-begin coordinate and color mutation from. Default randomly chosen from range in \
---START_COORDS_RANGE (see). Random selection from that range is performed *after* random \
-seeding by --RANDOM_SEED, so that the same random seed will always produce the same number \
-of start coordinates. I haven\'t tested whether this will work if the number exceeds the \
-number of coordinates possible in the image. Maybe it would just overlap itself until \
-they\'re all used?')
-PARSER.add_argument('--START_COORDS_RANGE', help='Random integer range to select a random \
-number of --START_COORDS_N if --START_COORDS_N is not provided. Default (' \
-+ str(START_COORDS_RANGE[0]) + ',' + str(START_COORDS_RANGE[1]) + '). Must be provided in \
-that form (a string surrounded by double quote marks (for Windows) which can be evaluated to \
- a python tuple), and in the range 0 to 4294967296 (2^32), but I bet that sometimes \
- nothing will render if you choose a max range number orders of magnitude higher than the \
- number of pixels available in the image. I probably would never make the max range higher \
- than (number of pixesl in image) / 62500 (which is 250 squared). Will not be used if \
- [-q | START_COORDS_N] is provided.')
-PARSER.add_argument('--GROWTH_CLIP', type=str, help='Affects seeming "thickness" \
- (or viscosity) of the liquid. A Python tuple expressed as a string (must be surrounded by \
- double quote marks for Windows). Default ' + str(GROWTH_CLIP) + '. In growth into \
- adjacent coordinates, the maximum number of possible neighbor coordinates to grow into is \
- 8 (which may only ever happen with a start coordinate: in practical terms, the most \
- coordinates that may usually be expanded into is 7). The first number in the tuple is \
- the minimum number of coordinates to randomly select, and the second number is the \
- maximum. The second must be greater than the first. The first may be lower than 0 and \
- will be clipped to 1, making selection of only 1 neighbor coordinate more common. The \
- second number may be higher than 8 (or the number of available coordinates as the case \
- may be), and will be clipped to the maximum number of available coordinates, making \
- selection of all available coordinates more common. If the first number is a positive \
- integer <= 7, at least that many coordinates will always be selected when possible. If the \
- second number is a positive integer >= 1, at most that many coordinates will ever be selected. \
- A negative first number or low first number clip will tend toward a more evenly spreading \
- liquid appearance, and a lower second number clip will cause a more stringy/meandering/splatty \
- path or form\ (as it spreads less uniformly). With an effectively more viscous clip like \
- "(2, 4)", smaller streamy/flood things may traverse a distance faster. Some tuples make \
- --RECLAIM_ORPHANS quickly fail, some make it virtually never fail.')
-PARSER.add_argument('--SAVE_PRESET', type=str, help='Save all parameters (which are passed to \
-this script) to a .cgp (color growth preset) file. If provided, --SAVE_PRESET must be a string \
-representing a boolean state (True or False or 1 or 0). Default '+ str(SAVE_PRESET) +'. \
-The .cgp file can later be loaded with the --LOAD_PRESET switch to create either new or \
-identical work from the same parameters (whether it is new or identical depends on the \
-switches, --RANDOM_SEED being the most consequential). This with [-a | --SAVE_EVERY_N] can \
-recreate gigabytes of exactly the same animation frames using just a preset. NOTES: \
---START_COORDS_RANGE and its accompanying value are not saved to config files, and the \
-resultantly generated [-q | --START_COORDS_N] is saved instead. Note: you may add arbitrary \
- text (such as notes) to the second and subsequent lines of a saved preset, as only the first \
- line is used.')
-PARSER.add_argument('--LOAD_PRESET', type=str, help='A preset file (as first created by \
---SAVE_PRESET) to use. Empty (none used) by default. Not saved to any preset. At this \
-writing only a single file name is handled, not a path, and it is assumed the file is in \
-the current directory. NOTE: use of this switch discards all other parameters and loads all \
-parameters from the preset. A .cgp preset file is a plain text file on one line, which is a \
-collection of SWITCHES to be passed to this script, written literally the way you would pass \
-them to this script.')
+PARSER.add_argument('--WIDTH', type=int, help=
+'WIDTH of output image(s). Default ' + str(WIDTH) + '.')
+PARSER.add_argument('--HEIGHT', type=int, help=
+'HEIGHT of output image(s). Default ' + str(HEIGHT) + '.')
+PARSER.add_argument('-r', '--RSHIFT', type=int, help=
+'Vary R, G and B channel values randomly in the range negative this \
+value or positive this value. Note that this means the range is RSHIFT \
+times two. Defaut ' + str(RSHIFT) + '.'
+)
+PARSER.add_argument('-b', '--BG_COLOR', type=str, help=
+'Canvas color. Expressed as a python list or single number that will be \
+assigned to every value in an RGB triplet. If a list, give the RGB \
+values in the format \'[255,70,70]\' (if you add spaces after the \
+commas, you must surround the parameter in single or double quotes). \
+This example would produce a deep red, as Red = 255, Green = 70, Blue = \
+70). A single number example like just 150 will result in a medium-light \
+gray of [150,150,150] (Red = 150, Green = 150, Blue = 150). All values \
+must be between 0 and 255. Default ' + str(BG_COLOR) + '.'
+)
+PARSER.add_argument('-c', '--COLOR_MUTATION_BASE', type=str, help=
+'Base initialization color for pixels, which randomly mutates as \
+painting proceeds. If omitted, defaults to whatever BG_COLOR is. If \
+included, may differ from BG_COLOR. This option must be given in the \
+same format as BG_COLOR. You may make the base initialization color of \
+each origin random by specifying "--COLOR_MUTATION_BASE random".'
+)
+PARSER.add_argument('--RECLAIM_ORPHANS', type=str, help=
+'With higher --VISCOSITY, coordinates can be painted around (by \
+coordinate and color mutation of surrounding coordinates) but never \
+themselves painted. This option coralls these orphan coordinates and, \
+after all other living coordinates evolve (die), revives these orphans. \
+If there are orphans after that, it repeats, and so on, until every \
+coordinate is painted. Default on. To disable pass --RECLAIM_ORPHANS \
+False or --RECLAIM_ORPHANS 0.'
+)
+PARSER.add_argument('--BORDER_BLEND', type=str, help=
+'If this is enabled, the hard edges between different colonies will be \
+blended together. Enabled by default. To disable pass \
+--BORDER_BLEND False or --BORDER_BLEND 0.'
+)
+PARSER.add_argument('--TILEABLE', type=str, help=
+'Make the generated image seamlessly tile. Colonies will wrap around \
+the edge when they encounter it. Disabled by default. Enable with \
+--TILEABLE True or --TILEABLE 1.'
+)
+PARSER.add_argument('--STOP_AT_PERCENT', type=float, help=
+'What percent canvas fill to stop painting at. To paint until the canvas \
+is filled (which can take extremely long for higher resolutions), pass 1 \
+(for 100 percent). If not 1, value should be a percent expressed as a \
+decimal (float) between 0 and 1 (e.g 0.4 for 40 percent. Default ' + \
+str(STOP_AT_PERCENT) + '. For high --failedMutationsThreshold or random \
+walk (neither of which is implemented at this writing), 0.475 (around 48 \
+percent) is recommended. Stop percent is adhered to approximately (it \
+could be much less efficient to make it exact).'
+)
+PARSER.add_argument('-a', '--SAVE_EVERY_N', type=int, help=
+'Every N successful coordinate and color mutations, save an animation \
+frame into a subfolder named after the intended final art file. To save \
+every frame, set this to 1, or to save every 3rd frame set it to 3, etc. \
+Saves zero-padded numbered frames to a subfolder which may be strung \
+together into an animation of the entire painting process (for example \
+via ffmpegAnim.sh). May substantially slow down render, and can also \
+create many, many gigabytes of data, depending. ' + str(SAVE_EVERY_N) + \
+' by default. To disable, set it to 0 with: -a 0 OR: --SAVE_EVERY_N 0'
+)
+PARSER.add_argument('-s', '--RANDOM_SEED', type=int, help=
+'Seed for random number generators (random and numpy.random are used). \
+Default generated by random library itself and added to render file name \
+for reference. Can be any integer in the range 0 to 4294967296 (2^32). \
+If not provided, it will be randomly chosen from that range (meta!). If \
+--SAVE_PRESET is used, the chosen seed will be saved with the preset \
+.cgp file. KNOWN ISSUE at this writing: evidently functional differences \
+between random generators of different versions of Python and/or Python \
+on different platforms produce different output from the same random \
+seed. ALSO, before v2.5.5, this script had code that accidentally \
+altered the pseudorandom number sequence for something other than the \
+color growth algorithm. If you get different output than before from the \
+same --RANDOM_SEED, search for and examine the VESTIGAL CODE comment, \
+and try uncommenting the line of code it details.'
+)
+PARSER.add_argument('-q', '--START_COORDS_N', type=int, help=
+'How many origin coordinates to begin coordinate and color mutation \
+from. Default randomly chosen from range in --START_COORDS_RANGE (see). \
+Random selection from that range is performed *after* random seeding by \
+--RANDOM_SEED, so that the same random seed will always produce the same \
+number of start coordinates. I haven\'t tested whether this will work if \
+the number exceeds the number of coordinates possible in the image. \
+Maybe it would just overlap itself until they\'re all used?'
+)
+PARSER.add_argument('--START_COORDS_RANGE', help=
+'Random integer range to select a random number of --START_COORDS_N if \
+--START_COORDS_N is not provided. Default (' + \
+str(START_COORDS_RANGE[0]) + ',' + str(START_COORDS_RANGE[1]) + '). Must \
+be provided in that form (a string surrounded by double quote marks (for \
+Windows) which can be evaluated to a python tuple), and in the range 0 \
+to 4294967296 (2^32), but I bet that sometimes nothing will render if \
+you choose a max range number orders of magnitude higher than the number \
+of pixels available in the image. I probably would never make the max \
+range higher than (number of pixesl in image) / 62500 (which is 250 \
+squared). Will not be used if [-q | START_COORDS_N] is provided.'
+)
+PARSER.add_argument('--GROWTH_CLIP', type=str, help=
+'Affects seeming "thickness" (or viscosity) of the liquid. A Python \
+tuple expressed as a string (must be surrounded by double quote marks \
+for Windows). Default ' + str(GROWTH_CLIP) + '. In growth into adjacent \
+coordinates, the maximum number of possible neighbor coordinates to grow \
+into is 8 (which may only ever happen with a start coordinate: in \
+practical terms, the most coordinates that may usually be expanded into \
+is 7). The first number in the tuple is the minimum number of \
+coordinates to randomly select, and the second number is the maximum. \
+The second must be greater than the first. The first may be lower than 0 \
+and will be clipped to 1, making selection of only 1 neighbor coordinate \
+more common. The second number may be higher than 8 (or the number of \
+available coordinates as the case may be), and will be clipped to the \
+maximum number of available coordinates, making selection of all \
+available coordinates more common. If the first number is a positive \
+integer <= 7, at least that many coordinates will always be selected \
+when possible. If the second number is a positive integer >= 1, at most \
+that many coordinates will ever be selected. A negative first number or \
+low first number clip will tend toward a more evenly spreading liquid \
+appearance, and a lower second number clip will cause a more \
+stringy/meandering/splatty path or form\ (as it spreads less uniformly). \
+With an effectively more viscous clip like "(2,4)", smaller \
+streamy/flood things may traverse a distance faster. Some tuples make \
+--RECLAIM_ORPHANS quickly fail, some make it virtually never fail.'
+)
+PARSER.add_argument('--SAVE_PRESET', type=str, help=
+'Save all parameters (which are passed to this script) to a .cgp (color \
+growth preset) file. If provided, --SAVE_PRESET must be a string \
+representing a boolean state (True or False or 1 or 0). Default '+ \
+str(SAVE_PRESET) +'. The .cgp file can later be loaded with the \
+--LOAD_PRESET switch to create either new or identical work from the \
+same parameters (whether it is new or identical depends on the switches, \
+--RANDOM_SEED being the most consequential). This with [-a | \
+--SAVE_EVERY_N] can recreate gigabytes of exactly the same animation \
+frames using just a preset. NOTES: --START_COORDS_RANGE and its \
+accompanying value are not saved to config files, and the resultantly \
+generated [-q | --START_COORDS_N] is saved instead. Note: you may add \
+arbitrary text (such as notes) to the second and subsequent lines of a \
+saved preset, as only the first line is used.'
+)
+PARSER.add_argument('--LOAD_PRESET', type=str, help=
+'A preset file (as first created by --SAVE_PRESET) to use. Empty (none \
+used) by default. Not saved to any preset. At this writing only a single \
+file name is handled, not a path, and it is assumed the file is in the \
+current directory. NOTE: use of this switch discards all other \
+parameters and loads all parameters from the preset. A .cgp preset file \
+is a plain text file on one line, which is a collection of SWITCHES to \
+be passed to this script, written literally the way you would pass them \
+to this script.'
+)
 
 # START ARGUMENT PARSING
 # DEVELOPER NOTE: Throughout the below argument checks, wherever a user does not specify
@@ -218,7 +266,7 @@ class ARGUMENTS_NAMESPACE:
 
 argumentsNamespace = ARGUMENTS_NAMESPACE()
 
-    # Weirdly, for the behavior I want, I must call parse_args many times:
+    # Weirdly, for the behavior I want, I must call parse_args a few times:
     # - first to get the --LOAD_PRESET CLI argument if there is any
     # - then potentially many times to iterate over arguments got from the
     # .cgp config file specified
@@ -230,13 +278,20 @@ argumentsNamespace = ARGUMENTS_NAMESPACE()
 # re: https://docs.python.org/3/library/argparse.html#argparse.Namespace
 # re: https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser.parse_args
 ARGS = PARSER.parse_args(args=sys.argv[1:], namespace=argumentsNamespace)
+# Build dictionary from ARGS and use it to build global SCRIPT_ARGS_STR;
+# clean it up later (we don't want elements in it with value "None":
+argsDict = vars(ARGS)
+# modify like this:
+# argsDict['COLOR_MUTATION_BASE'] = '[0,0,0]'
 
 # IF A PRESET file is given, load its contents and make its parameters override anything else that was just parsed through the argument parser:
 if ARGS.LOAD_PRESET:
     LOAD_PRESET = ARGS.LOAD_PRESET
-    print('LOAD_PRESET is', LOAD_PRESET)
     with open(LOAD_PRESET) as f:
         SWITCHES = f.readline()
+    # Remove spaces from parameters in tuples like (1, 13), because it
+    # mucks up this parsing:
+    SWITCHES = re.sub('(\([0-9]*),\s*([0-9]*\))', r'\1,\2', SWITCHES)
     # removes any start and end whitespace that can throw off
     # the following parsing:
     SWITCHES = SWITCHES.strip()
@@ -256,11 +311,6 @@ if ARGS.LOAD_PRESET:
 
 # Doing this again here so that anything in the command line overrides:
 ARGS = PARSER.parse_args(args=sys.argv[1:], namespace=argumentsNamespace)      # When this 
-
-# Dictionary from ARGS:
-argsDict = vars(ARGS)
-# modify like this:
-# argsDict['COLOR_MUTATION_BASE'] = '[0,0,0]'
 
 # If a user supplied an argument (so that WIDTH has a value (is not None), use that:
 if ARGS.WIDTH:
@@ -378,9 +428,11 @@ if ARGS.START_COORDS_N:        # If --START_COORDS_N is provided by the user, us
         # .. and delete any --START_COORDS_RANGE and its value from argsparse (as it will
         # not be used and would best not be stored in the .cgp config file via --SAVE_PRESET:
         argsDict.pop('START_COORDS_RANGE', None)
-        print('** NOTE: ** You provided both [-q | --START_COORDS_N] and --START_COORDS_RANGE, \
- but the former overrides the latter (the latter will not be used). This program disregards \
- the latter from the parameters list.')
+        print(
+'** NOTE: ** You provided both [-q | --START_COORDS_N] and --START_COORDS_RANGE, \
+but the former overrides the latter (the latter will not be used). This program \
+disregards  the latter from the parameters list.'
+)
 else:        # If --START_COORDS_N is _not_ provided by the user..
     if ARGS.START_COORDS_RANGE:
         # .. but if --START_COORDS_RANGE _is_ provided, assign from that:
@@ -398,15 +450,6 @@ if ARGS.GROWTH_CLIP:        # See comments in ARGS.BG_COLOR handling. Handled th
     GROWTH_CLIP = re.sub(' ', '', GROWTH_CLIP)
     argsDict['GROWTH_CLIP'] = GROWTH_CLIP
     GROWTH_CLIP = ast.literal_eval(GROWTH_CLIP)
-#    For optional code at the end of the script that renames to parameter demo file names;
-#    intended for use with an _ebArt repo script, color_growth_growth_clip_tests.py:
-#    growth_clip_tst_file_name = re.sub('\(', '', GROWTH_CLIP)
-#    growth_clip_tst_file_name = re.sub('\)', '', growth_clip_tst_file_name)
-#    growth_clip_tst_file_name_base = '__' + re.sub(',', '_', growth_clip_tst_file_name) + '__'
-#    zax_blor = ('%03x' % random.randrange(16**6))
-#    png_rename = growth_clip_tst_file_name_base + '__' + zax_blor + '.png'
-#    cgp_rename = growth_clip_tst_file_name_base + '__' + zax_blor + '.cgp'
-#    mp4_rename = growth_clip_tst_file_name_base + '__' + zax_blor + '.mp4'
 else:
     temp_str = str(GROWTH_CLIP)
     temp_str = re.sub(' ', '', temp_str)
@@ -416,19 +459,20 @@ if ARGS.SAVE_PRESET:
     SAVE_PRESET = ast.literal_eval(ARGS.SAVE_PRESET)
 else:
     argsDict['SAVE_PRESET'] = SAVE_PRESET
-
-if SAVE_PRESET:
-    SCRIPT_ARGS_STR = ''
-    for key in argsDict:
-        # if the key value is 'None', don't bother saving it; otherwise save it:
-        if key != 'None':
-            keyValStr = '--' + key + ' ' + str(argsDict[key])
-            SCRIPT_ARGS_STR += keyValStr + ' '
-    # removes whitespace from start and end that would mess
-    # up parse code earlier in the script (if I didn't do this
-    # there also) :
-    SCRIPT_ARGS_STR = SCRIPT_ARGS_STR.strip()
 # END ARGUMENT PARSING
+
+# Remove arguments from argsDict whose values are 'None' from that
+# (they cause problems when doing things with the arguments list
+# via CLI, as intended) :
+for key in argsDict:
+    # if the key value is 'None', don't bother saving it; otherwise save it:
+    if argsDict[key] != None:
+        keyValStr = '--' + key + ' ' + str(argsDict[key])
+        SCRIPT_ARGS_STR += keyValStr + ' '
+# removes whitespace from start and end that would mess
+# up parse code earlier in the script (if I didn't do this
+# there also) :
+SCRIPT_ARGS_STR = SCRIPT_ARGS_STR.strip()
 
 
 ALL_PIXELS_N = WIDTH * HEIGHT
@@ -480,13 +524,13 @@ def find_adjacent_color(y, x, canvas):
         y, x = random.choice(allocd_neighbors)
         return canvas[y][x]
 
-def coords_set_to_image(canvas, image_file_name):
+def coords_set_to_image(canvas, render_target_file_name):
     """Creates and saves image from dict of Coordinate objects, HEIGHT and WIDTH definitions,
     and a filename string."""
     tmp_array = [[BG_COLOR if x[0] < 0 else x for x in row] for row in canvas]
     tmp_array = np.asarray(tmp_array)
     image_to_save = Image.fromarray(tmp_array.astype(np.uint8)).convert('RGB')
-    image_to_save.save(image_file_name)
+    image_to_save.save(render_target_file_name)
 
 def print_progress(newly_painted_coords):
     """Prints coordinate plotting statistics (progress report)."""
@@ -540,16 +584,59 @@ for coord in RNDcoord:
 report_stats_every_n = 5000
 report_stats_nth_counter = 0
 
-# Create unique, date-time informative image file name. Note that this will represent
-# when the painting began, not when it ended (~State filename will be based off this).
-now = datetime.datetime.now()
-time_stamp = now.strftime('%Y_%m_%d__%H_%M_%S__')
-# Returns six random lowercase hex characters:
+# VESTIGAL CODE; all versions of this script before v2.5.5 here
+# altered the pseudorandom sequence of --RANDOM_SEED with the 
+# following line of code, UNCOMMENT it if you want pre-v2.3.6 output:
 rndStr = ('%03x' % random.randrange(16**6))
-file_base_name = time_stamp + rndStr + '_colorGrowth-Py'
-image_file_name = file_base_name + '.png'
-state_img_file_name = file_base_name + '-state.png'
-anim_frames_folder_name = file_base_name + '_frames'
+#
+# Render target file name generation; differs in different scenarios:
+# If a preset was loaded, base the render target file name on it.
+if ARGS.LOAD_PRESET:
+    # take trailing .cgp off it:
+    render_target_file_base_name = LOAD_PRESET.rstrip('.cgp')
+else:
+# Otherwise, create render target file name based on time painting began.
+    now = datetime.datetime.now()
+    time_stamp = now.strftime('%Y_%m_%d__%H_%M_%S__')
+    render_target_file_base_name = time_stamp + '_colorGrowthPy'
+# Check if render target file with same name (but .png) extension exists.
+    # This logic is very slightly risky: if
+    # render_target_file_base_name does not exist, I will
+    # assume that state image file name and anim frames folder names
+    # also do not exist; if I am wrong, those may get overwritten (by
+    # other logic in this script).
+target_render_file_exists = os.path.exists(render_target_file_base_name + '.png')
+print('\nState of target_render_file_exists: ', target_render_file_exists, '\nIf you see that as True a lot, something may be wrong.')
+# If it does not exist, set render target file name to that ( + '.png').
+# In that case, the following following "while" block will never
+# execute. BUT if it does exist, the following "while" block _will_
+# execute, and do this: rename the render target file name by appending six
+# rnd hex chars to it plus 'var', e.g. 'var_32ef5f' to file base name,
+# and keep checking and doing that over again until there's no target name
+# conflict:
+cgp_rename_count = 1
+while target_render_file_exists == True:
+    # Returns six random lowercase hex characters:
+    cgp_rename_count += 1; variantNameStr = str(cgp_rename_count)
+    variantNameStr = variantNameStr.zfill(4)
+    tst_str = render_target_file_base_name + '__variant_' + variantNameStr
+    target_render_file_exists = os.path.exists(tst_str + '.png')
+    if cgp_rename_count > 10000:
+        print(
+"Encountered 10,000 naming collisions making new render target file \
+names. Please make a copy of and rename the source .cgp file before \
+continuning, Sparkles McSparkly. Exiting."
+        )
+        sys.exit()
+    if target_render_file_exists == False:
+        render_target_file_base_name = tst_str
+render_target_file_name = render_target_file_base_name + '.png'
+# state_img_file_name = render_target_file_base_name + '__render_state.png'
+anim_frames_folder_name = render_target_file_base_name + '_frames'
+print('\nrender_target_file_name: ', render_target_file_name)
+# print('state_img_file_name: ', state_img_file_name)
+print('anim_frames_folder_name: ', anim_frames_folder_name)
+
 
 # If SAVE_EVERY_N has a value greater than zero, create a subfolder to write frames to;
 # Also, initailize a varialbe which is how many zeros to pad animation save frame file
@@ -560,11 +647,21 @@ if SAVE_EVERY_N > 0:
 
 # If bool set saying so, save arguments to this script to a .cgp file with the target
 # render base file name:
+import platform
 if SAVE_PRESET:
-    file = open(file_base_name + '.cgp', "w")
-    file.write(SCRIPT_ARGS_STR)
+    # strip the --LOAD_PRESET parameter and value from SCRIPT_ARGS_STR
+    # before writing it to preset file (and save it in a new variable),
+    # as it would be redundant (and, if the parameters are based on
+    # loading another preset and overriding some parameters, it would
+    # moreover be wrong) :
+    SCRIPT_ARGS_WRITE_STR = re.sub('--LOAD_PRESET [^ ]*', r'', SCRIPT_ARGS_STR)
+    file = open(render_target_file_base_name + '.cgp', "w")
+    file.write(SCRIPT_ARGS_WRITE_STR + '\n\n')
     if ARGS.LOAD_PRESET:
-        file.write('\n\nPARENT PRESET: ' + LOAD_PRESET + '\n')
+        file.write('# Derived of preset: ' + LOAD_PRESET + '\n')
+    file.write('# Created with color_growth.py ' + ColorGrowthPyVersionString + '\n')
+    file.write('# Python version: ' + sys.version + '\n')
+    file.write('# Platform: ' + platform.platform() + '\n')
     file.close()
 
 # ----
@@ -641,7 +738,9 @@ while coord_queue:
         
         # This will terminate all coordinate and color mutation at an arbitary number of mutations.
         if painted_coordinates >= TERMINATE_PIXELS_N:
-            print('Painted coordinate termination count', painted_coordinates, 'reached (or recently exceeded). Ending paint algorithm.')
+            print(
+'Painted coordinate termination count', painted_coordinates, 'reached (or recently exceeded). Ending paint algorithm.'
+            )
             contains_invalid_colors = False
             break
         
@@ -659,42 +758,27 @@ while coord_queue:
 # ----
 
 # Save final image file and delete progress (state, temp) image file:
-print('Saving image ', image_file_name, ' . . .')
-coords_set_to_image(canvas, image_file_name)
+print('Saving image ', render_target_file_name, ' . . .')
+coords_set_to_image(canvas, render_target_file_name)
 print('Render complete and image saved.')
 #os.remove(state_img_file_name)
 # END MAIN FUNCTIONALITY.
 
 
-# OPTIONAL, sys cd into anim frames subfolder and invoke ffmpegAnim.sh to make an animation
-# and/or rename files to GROWTH_CLIP parameter demo files names:
-# os.chdir(anim_frames_folder_name)
-# subprocess.call('ffmpegAnim.sh 30 30 7 png', shell = True)
-# subprocess.call('open _out.mp4', shell=True)
-# Danger Will Robinson! :
-# subprocess.call('rm *.png', shell=True)
-# OPTIONAL, TO RENAME THE OUTPUT files to a GROWTH_CLIP parameter demo file; ASSUMES only one image made:
-# mv_png_command = 'mv ../' + image_file_name + ' ../' + png_rename
-# mv_cgp_command = 'mv ../' + file_base_name + '.cgp ../' + cgp_rename
-# mv_mp4_command = 'mv ./_out.mp4 ' + '../' + mp4_rename
-# subprocess.call(mv_png_command, shell=True)
-# subprocess.call(mv_cgp_command, shell=True)
-# subprocess.call(mv_mp4_command, shell=True)
-# os.chdir('..')
-# subprocess.call('rm -rf ' + anim_frames_folder_name, shell = True)
-
-
 # VERSION HISTORY (FOOTER)
 # # Before this log was made:
-# ## v1 essential features complete. Slow. File name: color_growth.py
-# ## v2 sped up by the volunteer work of someone who forked it and
-# did a pull request! File name: color_growth_fast.py
-# # Starting with this log:
-# ## v2.3.5 New features:
-#  - will move color_growth.py (slow) script to /_deprecated folder,
+# ## v1:
+#  - Essential features complete. Slow. File name: color_growth.py
+# ## v2:
+#  - Sped up by the volunteer work of someone who forked it and
+#  did a pull request! File name: color_growth_fast.py
+#  that pull request also added -BORDER_BLEND BORDER_BLEND and
+#  --TILEABLE TILEABLE options!
+# ## v2.3.5:
+#  - Will move color_growth.py (slow) script to /_deprecated folder,
 #  and this script will "overwrite" (just rename to/take over) that
 #  script name (this will now just be color_growth.py)
-#  - passes values from any --LOAD_PRESET ~.cgp preset file right
+#  - Passes values from any --LOAD_PRESET ~.cgp preset file right
 #  into script dynamically (previously, called a new subprocess of
 #  the script, passing those values into the new process). Reason:
 #  this allows loading a .cgp but overriding any values in it with
@@ -702,16 +786,16 @@ print('Render complete and image saved.')
 #  in what is passed via CLI, the VLI values override. Reason:
 #  scripts that call this and alter parameters can programmatically
 #  produce variations etc. (alter parameters rapidly/repeatedly).
-#  - bug fix inherent to the refactor that allowed that:
+#  - Bug fix inherent to the refactor that allowed that:
 #  no more -a redundant CLI options saved in presets.
-#  - improvement inherent to that: .cgp presets have the
+#  - Improvement inherent to that: .cgp presets have the
 #  clearer --LONG_OPTIONS.
 #  - If .cgp loaded and new preset saved, parent .cgp notes in
 #  preset comments of new saved .cgp.
-#  - starting/trailing whitespace removed from presets on load/save
+#  - Starting/trailing whitespace removed from presets on load/save
 #  (necessary fix for how I parse presets)
-#  - some extinct comments removed.
-#  - eliminated -n --NUMBER_OF_IMAGES argument. Repeat calls of this
+#  - Some extinct comments removed.
+#  - Eliminated -n --NUMBER_OF_IMAGES argument. Repeat calls of this
 #  script can be done from another script. This also eliminates
 #  mystery of cases where a long-run of so many NUMBER_OF_IMAGES
 #  renders would create images that (did not) don't save the random
@@ -719,4 +803,36 @@ print('Render complete and image saved.')
 #  known. Now, every call of this script from another script can
 #  use --SAVE_PRESET which will also record the --RANDOM_SEED.
 #  The --RANDOM_SEED in a .cgp can recreate the same image.
-# ## v2.3.5 bug fix check for ARGS.LOAD_PRESET not LOAD_PRESET
+#  - Bug fix check for ARGS.LOAD_PRESET not LOAD_PRESET
+#  - Added --VERSION switch which prints script version and exits
+# ## v2.5.5:
+#  - If render target exists, assumes rendering new configuration
+#  and renames target and config file to save after loaded preset
+#  + variation_nnnn incremental numbers (whichever doesn't have
+#  conflict), up to 1,000, and quits and complains if that number
+#  reached. This is MUCH better than random date and letters
+#  file variations that can't be traced back to preset. This can
+#  be traced (in addition to saved preset information in .cgp
+#  added last version).
+#  - Writes color_growth.py version, Python version, and platform
+#  info comments to .cgp preset files.
+#  - Hunted down cause of psuedorandomness sequence change (what was
+#  produced by --RANDOM_SEED changed); it was removing code in
+#  this version which is now commented out under the VESTIGAL CODE
+#  comment, and referenced in help for --RANDOM_SEED.
+#  - Redo forced line breaks in help print that had too-short
+#  first line. A python linter encouraged those. I hate them, but
+#  they display better in some code and web views with them.
+#  - Retcon descriptions in this version log to mention new features
+#  added in fork and last version
+#  - omit --LOAD_PRESET parameter in saved preset (redundant and
+#  could be wrong in case of loading preset but overriding some
+#  parameters. May only have been needed for refactor of this
+#  version; don't know if that was saved in preset in previous
+#  versions.
+#  - Bug fix: if ARGS.whatever is None, don't write it in preset
+#  (caused issues) (fix by never adding these to SCRIPT_ARGS_STR
+#  - Bug fix: preset parameters with space between tuple elements
+#  breaks parsing in argsparser converted to dict. Fix is delete
+#  space in load. Also, fix defaults to not have that format :p
+#  (they were in format .e.g (1, 13) where the parser needs (1,13).
