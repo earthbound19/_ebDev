@@ -67,6 +67,13 @@ export DYLD_LIBRARY_PATH="${OCIO_EXECROOT}/lib:${DYLD_LIBRARY_PATH}"
 
 ' >> ~/.bash_profile
 
+# DISABLE blasted dysfunctional IPv6.
+# To list the network servics, run: networksetup -listallnetworkservices
+# To re-enable, use -setv6automatic instead of -setv6off
+# networksetup -setv6off "USB 10/100/1000 LAN"
+# networksetup -setv6off Wi-Fi
+
+
 # tcl-tk for python idle? :
 # printf '
 # 
