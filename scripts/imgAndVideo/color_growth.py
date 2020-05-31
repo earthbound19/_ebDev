@@ -35,7 +35,12 @@ See comments under documentation heading in this module.
 # - investigate: is this forcing growth clip values to not be negative -- where earlier color_growth.py did? It saved a preset that was loaded with neg. value, changing that neg. value to 0. ALTERNATELY, verify whether clipping values dramatically slows down scripts. If so, maybe scrap that feature (of the original color_growth.py) and save it for a more efficient implementation in a compiled or more performant language.
 
 # VERSION HISTORY
-# See "VERSION HISTORY (FOOTER) comment at end of script.
+# v2.5.6:
+# - Only write animation frame if it does not exist. Allows resume
+# of aborted renders and avoids duplicating work in them.
+# - Bug fix: check for anim frames folder before attempting to create
+# (else it throws an error and quits the script).
+# See "VERSION HISTORY" changes in git history for prior versions.
 
 
 # CODE
@@ -56,7 +61,7 @@ from PIL import Image
 
 # START GLOBALS
 # Defaults which will be overriden if arguments of the same name are provided to the script:
-ColorGrowthPyVersionString = 'v2.5.5'
+ColorGrowthPyVersionString = 'v2.5.6'
 WIDTH = 400
 HEIGHT = 200
 RSHIFT = 8
@@ -643,7 +648,9 @@ print('anim_frames_folder_name: ', anim_frames_folder_name)
 # (numbers) to, based on how many frames will be rendered:
 if SAVE_EVERY_N > 0:
     pad_file_name_numbers_n = len(str(TERMINATE_PIXELS_N))
-    os.mkdir(anim_frames_folder_name)
+    # Only create the anim frames folder if it does not exist:
+    if os.path.exists(anim_frames_folder_name) == False:
+        os.mkdir(anim_frames_folder_name)
 
 # If bool set saying so, save arguments to this script to a .cgp file with the target
 # render base file name:
@@ -722,7 +729,13 @@ while coord_queue:
             if (animation_save_counter_n % SAVE_EVERY_N) == 0:
                 strOfThat = str(animation_frame_counter)
                 img_frame_file_name = anim_frames_folder_name + '/' + strOfThat.zfill(pad_file_name_numbers_n) + '.png'
-                coords_set_to_image(canvas, img_frame_file_name)
+                # Only write frame if it does not already exist
+                # (allows resume of suspended / crashed renders) :
+                if os.path.exists(img_frame_file_name) == False:
+                    # print("Animation render frame file does not exist; writing frame.")
+                    coords_set_to_image(canvas, img_frame_file_name)
+                # else:
+                    # print("Animation render frame file exists; will not overwrite.")
                 # Increment that *after*, for image tools expecting series starting at 0:
                 animation_frame_counter += 1
             animation_save_counter_n += 1
@@ -763,76 +776,3 @@ coords_set_to_image(canvas, render_target_file_name)
 print('Render complete and image saved.')
 #os.remove(state_img_file_name)
 # END MAIN FUNCTIONALITY.
-
-
-# VERSION HISTORY (FOOTER)
-# # Before this log was made:
-# ## v1:
-#  - Essential features complete. Slow. File name: color_growth.py
-# ## v2:
-#  - Sped up by the volunteer work of someone who forked it and
-#  did a pull request! File name: color_growth_fast.py
-#  that pull request also added -BORDER_BLEND BORDER_BLEND and
-#  --TILEABLE TILEABLE options!
-# ## v2.3.5:
-#  - Will move color_growth.py (slow) script to /_deprecated folder,
-#  and this script will "overwrite" (just rename to/take over) that
-#  script name (this will now just be color_growth.py)
-#  - Passes values from any --LOAD_PRESET ~.cgp preset file right
-#  into script dynamically (previously, called a new subprocess of
-#  the script, passing those values into the new process). Reason:
-#  this allows loading a .cgp but overriding any values in it with
-#  CLI values. If the same parameters exist in the .cgp preset and
-#  in what is passed via CLI, the VLI values override. Reason:
-#  scripts that call this and alter parameters can programmatically
-#  produce variations etc. (alter parameters rapidly/repeatedly).
-#  - Bug fix inherent to the refactor that allowed that:
-#  no more -a redundant CLI options saved in presets.
-#  - Improvement inherent to that: .cgp presets have the
-#  clearer --LONG_OPTIONS.
-#  - If .cgp loaded and new preset saved, parent .cgp notes in
-#  preset comments of new saved .cgp.
-#  - Starting/trailing whitespace removed from presets on load/save
-#  (necessary fix for how I parse presets)
-#  - Some extinct comments removed.
-#  - Eliminated -n --NUMBER_OF_IMAGES argument. Repeat calls of this
-#  script can be done from another script. This also eliminates
-#  mystery of cases where a long-run of so many NUMBER_OF_IMAGES
-#  renders would create images that (did not) don't save the random
-#  seed in a preset, so that how to reproduce an image couldn't be
-#  known. Now, every call of this script from another script can
-#  use --SAVE_PRESET which will also record the --RANDOM_SEED.
-#  The --RANDOM_SEED in a .cgp can recreate the same image.
-#  - Bug fix check for ARGS.LOAD_PRESET not LOAD_PRESET
-#  - Added --VERSION switch which prints script version and exits
-# ## v2.5.5:
-#  - If render target exists, assumes rendering new configuration
-#  and renames target and config file to save after loaded preset
-#  + variation_nnnn incremental numbers (whichever doesn't have
-#  conflict), up to 1,000, and quits and complains if that number
-#  reached. This is MUCH better than random date and letters
-#  file variations that can't be traced back to preset. This can
-#  be traced (in addition to saved preset information in .cgp
-#  added last version).
-#  - Writes color_growth.py version, Python version, and platform
-#  info comments to .cgp preset files.
-#  - Hunted down cause of psuedorandomness sequence change (what was
-#  produced by --RANDOM_SEED changed); it was removing code in
-#  this version which is now commented out under the VESTIGAL CODE
-#  comment, and referenced in help for --RANDOM_SEED.
-#  - Redo forced line breaks in help print that had too-short
-#  first line. A python linter encouraged those. I hate them, but
-#  they display better in some code and web views with them.
-#  - Retcon descriptions in this version log to mention new features
-#  added in fork and last version
-#  - omit --LOAD_PRESET parameter in saved preset (redundant and
-#  could be wrong in case of loading preset but overriding some
-#  parameters. May only have been needed for refactor of this
-#  version; don't know if that was saved in preset in previous
-#  versions.
-#  - Bug fix: if ARGS.whatever is None, don't write it in preset
-#  (caused issues) (fix by never adding these to SCRIPT_ARGS_STR
-#  - Bug fix: preset parameters with space between tuple elements
-#  breaks parsing in argsparser converted to dict. Fix is delete
-#  space in load. Also, fix defaults to not have that format :p
-#  (they were in format .e.g (1, 13) where the parser needs (1,13).
