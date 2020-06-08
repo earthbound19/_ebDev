@@ -28,19 +28,32 @@ See comments under documentation heading in this module.
 """
 
 # TO DO:
-# - https://github.com/earthbound19/_ebDev/issues/97 (close issue when fixed)
+# - make naming convention of variables consistent? I think I'm
+# all over the place with this . . . :p
 # - possibly things in the color_growth_v1.py's TO DO list.
-# - determine whether any code or comments are vestigal with this updated script, and
-# delete them if so.
-# - investigate: is this forcing growth clip values to not be negative -- where earlier color_growth.py did? It saved a preset that was loaded with neg. value, changing that neg. value to 0. ALTERNATELY, verify whether clipping values dramatically slows down scripts. If so, maybe scrap that feature (of the original color_growth.py) and save it for a more efficient implementation in a compiled or more performant language.
+# - determine whether any code in the fast fork (now this script)
+# are leftover from color_growth_v1.py, and delete them (EXCEPT
+# what is commented as VESTIGAL) from this?
+# - make it properly use negative or > 8 growth-clip values again?
+# since the color_growth_fast.py fork it isn't.
 
 # VERSION HISTORY
-# v2.5.6:
-# - Only write animation frame if it does not exist. Allows resume
-# of aborted renders and avoids duplicating work in them.
-# - Bug fix: check for anim frames folder before attempting to create
-# (else it throws an error and quits the script).
-# See "VERSION HISTORY" changes in git history for prior versions.
+# v2.5.7:
+# - Bug fix: move code related to animation save frames into separate
+# functions called in middle _and_ end of script, to avoid issue that
+# final animation frame sometimes (always?) leaves unpainted
+# coordinates if # STOP_AT_PERCENT == 1 (100 percent)
+# - Clarified comment about vestigal (and left intact) code that
+# alters random state
+# - Updated comments in TO DO
+# - Deleted commented code that saves snapshots. It is better
+# to use the save anim frames options to do that (doing both
+# duplicates work; doing one serves the same purpose)
+# - Delete other outdated comments
+# - Start work (commented out) on new feature to make animation
+# growth visually more linear over space (sped up/more painted
+# coordinates between saves, so animation doesn't seem to slow
+# down toward middle and end)
 
 
 # CODE
@@ -61,16 +74,21 @@ from PIL import Image
 
 # START GLOBALS
 # Defaults which will be overriden if arguments of the same name are provided to the script:
-ColorGrowthPyVersionString = 'v2.5.6'
+ColorGrowthPyVersionString = 'v2.5.7'
 WIDTH = 400
 HEIGHT = 200
 RSHIFT = 8
 STOP_AT_PERCENT = 1
+# CONTINUE CODING HERE when I am sure my test alteration works as intended:
 SAVE_EVERY_N = 0
+saveNextFrameNumber = 1
 START_COORDS_RANGE = (1,13)
 GROWTH_CLIP = (0,5)
 SAVE_PRESET = True
-# BACKGROUND color options;
+animationFrameCounter = 0
+renderedFrameCounter = 0
+imageFrameFileName = ''
+# SOME BACKGROUND COLOR options;
 # any of these (uncomment only one) are made into a list later by ast.literal_eval(BG_COLOR) :
 # BG_COLOR = "[157,140,157]"        # Medium purplish gray
 # BG_COLOR = "[252,251,201]"        # Buttery light yellow
@@ -479,10 +497,19 @@ for key in argsDict:
 # there also) :
 SCRIPT_ARGS_STR = SCRIPT_ARGS_STR.strip()
 
-
-ALL_PIXELS_N = WIDTH * HEIGHT
-TERMINATE_PIXELS_N = int(ALL_PIXELS_N * STOP_AT_PERCENT)
-
+# ADDITIONAL GLOBALS defined here:
+allPixelsN = WIDTH * HEIGHT
+stopRenderAtPixelsN = int(allPixelsN * STOP_AT_PERCENT)
+# CONTINUE CODING HERE for feature I'm adding . . .
+# howManyFrames = 32
+# divisor = 1 / howManyFrames
+# saveFramesAtCoordsPaintedTuple = tuple(np.arange(0, 1, divisor))
+# saveFramesAtCoordsPaintedTupleLength = len(saveFramesAtCoordsPaintedTuple)
+# print('stopRenderAtPixelsN ', stopRenderAtPixelsN)
+# print('divisor ', divisor)
+# print('saveFramesAtCoordsPaintedTuple is ', saveFramesAtCoordsPaintedTuple)
+# print('that len is', saveFramesAtCoordsPaintedTupleLength)
+# saveFramesAtCoordsPaintedTupleIndex = 0
 def is_coord_in_bounds(y, x):
     return y >= 0 and y < HEIGHT and x >= 0 and x < WIDTH
 
@@ -541,16 +568,37 @@ def print_progress(newly_painted_coords):
     """Prints coordinate plotting statistics (progress report)."""
     print('newly painted : total painted : target : canvas size : reclaimed orphans') 
     print(newly_painted_coords, ':', painted_coordinates, ':', \
-    TERMINATE_PIXELS_N, ':', ALL_PIXELS_N, ':', orphans_to_reclaim_n)
+    stopRenderAtPixelsN, ':', allPixelsN, ':', orphans_to_reclaim_n)
+
+def set_img_frame_file_name():
+    global renderedFrameCounter
+    global imageFrameFileName
+    renderedFrameCounter += 1
+    frameNumberStr = str(renderedFrameCounter)
+    imageFrameFileName = anim_frames_folder_name + '/' + frameNumberStr.zfill(pad_file_name_numbers_n) + '.png'
+
+def save_animation_frame():
+    # Tells the function we are using global variables:
+    global animationFrameCounter
+    global saveNextFrameNumber
+    animationFrameCounter += 1
+    if SAVE_EVERY_N:
+        # DEPRECATED conditional, as I assume division is slower, and modulo even slower:
+        # if (animationFrameCounter % SAVE_EVERY_N) == 0:
+        if (animationFrameCounter == saveNextFrameNumber):
+            saveNextFrameNumber = animationFrameCounter + SAVE_EVERY_N
+            set_img_frame_file_name()
+            # Only write frame if it does not already exist
+            # (allows resume of suspended / crashed renders) :
+            if os.path.exists(imageFrameFileName) == False:
+                # print("Animation render frame file does not exist; writing frame.")
+                coords_set_to_image(canvas, imageFrameFileName)
 # END GLOBAL FUNCTIONS
 # END OPTIONS AND GLOBALS
 
 
 """START MAIN FUNCTIONALITY."""
 print('Initializing render script..')
-
-animation_save_counter_n = 0
-animation_frame_counter = 0
 
 # A dict of Coordinate objects which is used with tracking sets to fill a "canvas:"
 canvas = []
@@ -591,7 +639,10 @@ report_stats_nth_counter = 0
 
 # VESTIGAL CODE; all versions of this script before v2.5.5 here
 # altered the pseudorandom sequence of --RANDOM_SEED with the 
-# following line of code, UNCOMMENT it if you want pre-v2.3.6 output:
+# following line of code; this has been left here uncommented  
+# since (and a bit before?) v2.3.6, preferring psuedorandom
+# continuity with how the script had already made art, even
+# though technically this altered "pure" psuedorandom intent:
 rndStr = ('%03x' % random.randrange(16**6))
 #
 # Render target file name generation; differs in different scenarios:
@@ -636,18 +687,16 @@ continuning, Sparkles McSparkly. Exiting."
     if target_render_file_exists == False:
         render_target_file_base_name = tst_str
 render_target_file_name = render_target_file_base_name + '.png'
-# state_img_file_name = render_target_file_base_name + '__render_state.png'
 anim_frames_folder_name = render_target_file_base_name + '_frames'
 print('\nrender_target_file_name: ', render_target_file_name)
-# print('state_img_file_name: ', state_img_file_name)
 print('anim_frames_folder_name: ', anim_frames_folder_name)
 
 
 # If SAVE_EVERY_N has a value greater than zero, create a subfolder to write frames to;
-# Also, initailize a varialbe which is how many zeros to pad animation save frame file
+# Also, initialize a variable which is how many zeros to pad animation save frame file
 # (numbers) to, based on how many frames will be rendered:
 if SAVE_EVERY_N > 0:
-    pad_file_name_numbers_n = len(str(TERMINATE_PIXELS_N))
+    pad_file_name_numbers_n = len(str(stopRenderAtPixelsN))
     # Only create the anim frames folder if it does not exist:
     if os.path.exists(anim_frames_folder_name) == False:
         os.mkdir(anim_frames_folder_name)
@@ -716,43 +765,21 @@ while coord_queue:
                 canvas[new_y][new_x] = (np.array(new_allocd_coords_color) + np.array(canvas[2*new_y-y][2*new_x-x])) / 2
             else:
                 canvas[new_y][new_x] = new_allocd_coords_color
-# Potential and actual orphan coordinate handling:
-#                Set color in Coordinate object in canvas dict via potential_orphan_coords_one:
-        # set union (| "addition," -ish) :
-        #potential_orphan_coords_two = potential_orphan_coords_two | potential_orphan_coords_one
-#        Conditionally reclaim orphaned coordinates. Code here to reclaim coordinates gradually (not in spurts as at first coded) is harder to read and inelegant. I'm leaving it that way. Because GEH, DONE.
+        # Save an animation frame (function only does if SAVE_EVERY_N True):
+        save_animation_frame()
 
-# TO DO: I might like it if this stopped saving new frames after every coordinate was
-# colored (it can (always does?) save extra redundant frames at the end;
-        # Save an animation frame if that variable has a value:
-        if SAVE_EVERY_N:
-            if (animation_save_counter_n % SAVE_EVERY_N) == 0:
-                strOfThat = str(animation_frame_counter)
-                img_frame_file_name = anim_frames_folder_name + '/' + strOfThat.zfill(pad_file_name_numbers_n) + '.png'
-                # Only write frame if it does not already exist
-                # (allows resume of suspended / crashed renders) :
-                if os.path.exists(img_frame_file_name) == False:
-                    # print("Animation render frame file does not exist; writing frame.")
-                    coords_set_to_image(canvas, img_frame_file_name)
-                # else:
-                    # print("Animation render frame file exists; will not overwrite.")
-                # Increment that *after*, for image tools expecting series starting at 0:
-                animation_frame_counter += 1
-            animation_save_counter_n += 1
-
-        # Save a snapshot/progress image and print progress:
+        # Print progress:
         if report_stats_nth_counter == 0 or report_stats_nth_counter == report_stats_every_n:
-            # print('Saving prograss snapshot image ', state_img_file_name, ' . . .')
-            #coords_set_to_image(canvas, state_img_file_name)
             print_progress(newly_painted_coords)
             newly_painted_coords = 0
             report_stats_nth_counter = 0
         report_stats_nth_counter += 1
         
-        # This will terminate all coordinate and color mutation at an arbitary number of mutations.
-        if painted_coordinates >= TERMINATE_PIXELS_N:
+        # Terminate all coordinate and color mutation at an
+        # arbitary number of mutations:
+        if painted_coordinates > stopRenderAtPixelsN:
             print(
-'Painted coordinate termination count', painted_coordinates, 'reached (or recently exceeded). Ending paint algorithm.'
+'Painted coordinate termination count', painted_coordinates, 'exceeded. Ending paint algorithm.'
             )
             contains_invalid_colors = False
             break
@@ -770,9 +797,15 @@ while coord_queue:
 # END IMAGE MAPPING
 # ----
 
+# Works around problem that this setup can (always does?) save
+# everything _except_ for a last frame with every coordinate painted
+# if painted_coordinates >= stopRenderAtPixelsN &&
+# STOP_AT_PERCENT == 1; is there a better-engineered way to fix this
+# problem? But this works:
+set_img_frame_file_name()
+coords_set_to_image(canvas, imageFrameFileName)
 # Save final image file and delete progress (state, temp) image file:
 print('Saving image ', render_target_file_name, ' . . .')
 coords_set_to_image(canvas, render_target_file_name)
 print('Render complete and image saved.')
-#os.remove(state_img_file_name)
 # END MAIN FUNCTIONALITY.
