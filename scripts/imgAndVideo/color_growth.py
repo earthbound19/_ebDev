@@ -38,19 +38,10 @@ See comments under documentation heading in this module.
 # since the color_growth_fast.py fork it isn't.
 
 # VERSION HISTORY
-# v2.5.7:
-# - Bug fix: move code related to animation save frames into separate
-# functions called in middle _and_ end of script, to avoid issue that
-# final animation frame sometimes (always?) leaves unpainted
-# coordinates if # STOP_AT_PERCENT == 1 (100 percent)
-# - Clarified comment about vestigal (and left intact) code that
-# alters random state
-# - Updated comments in TO DO
-# - Deleted commented code that saves snapshots. It is better
-# to use the save anim frames options to do that (doing both
-# duplicates work; doing one serves the same purpose)
-# - Delete other outdated comments
-# - Start work (commented out) on new feature to make animation
+# v2.5.8:
+# Bug fix: it didn't stop rendering at --STOP_AT_PERCENT if
+# --STOP_AT_PERCENT < 1 e.g. 0.59.
+# - Continued work (commented out) on new feature to make animation
 # growth visually more linear over space (sped up/more painted
 # coordinates between saves, so animation doesn't seem to slow
 # down toward middle and end)
@@ -74,12 +65,11 @@ from PIL import Image
 
 # START GLOBALS
 # Defaults which will be overriden if arguments of the same name are provided to the script:
-ColorGrowthPyVersionString = 'v2.5.7'
+ColorGrowthPyVersionString = 'v2.5.8'
 WIDTH = 400
 HEIGHT = 200
 RSHIFT = 8
 STOP_AT_PERCENT = 1
-# CONTINUE CODING HERE when I am sure my test alteration works as intended:
 SAVE_EVERY_N = 0
 saveNextFrameNumber = 1
 START_COORDS_RANGE = (1,13)
@@ -501,15 +491,25 @@ SCRIPT_ARGS_STR = SCRIPT_ARGS_STR.strip()
 allPixelsN = WIDTH * HEIGHT
 stopRenderAtPixelsN = int(allPixelsN * STOP_AT_PERCENT)
 # CONTINUE CODING HERE for feature I'm adding . . .
-# howManyFrames = 32
-# divisor = 1 / howManyFrames
-# saveFramesAtCoordsPaintedTuple = tuple(np.arange(0, 1, divisor))
-# saveFramesAtCoordsPaintedTupleLength = len(saveFramesAtCoordsPaintedTuple)
-# print('stopRenderAtPixelsN ', stopRenderAtPixelsN)
-# print('divisor ', divisor)
-# print('saveFramesAtCoordsPaintedTuple is ', saveFramesAtCoordsPaintedTuple)
-# print('that len is', saveFramesAtCoordsPaintedTupleLength)
-# saveFramesAtCoordsPaintedTupleIndex = 0
+#allPixelsNdividedBy_SAVE_EVERY_N = allPixelsN / SAVE_EVERY_N
+#divisor = 1 / allPixelsNdividedBy_SAVE_EVERY_N
+#saveFramesAtCoordsPaintedMultipliersTuple = tuple(np.arange(0, 1, divisor))
+#saveFramesAtCoordsPaintedArray = []
+#for multiplier in saveFramesAtCoordsPaintedMultipliersTuple:
+#    mod_w = WIDTH * multiplier
+#    mod_h = HEIGHT * multiplier
+#    mod_area = mod_w * mod_h
+#    saveFramesAtCoordsPaintedArray.append(int(mod_area))
+# deduplicate elements in the list but maintain order:
+#from more_itertools import unique_everseen
+#saveFramesAtCoordsPaintedArray = list(unique_everseen(saveFramesAtCoordsPaintedArray))
+# else the list starts with 0, which will lead to no frames ever rendering:
+#saveFramesAtCoordsPaintedArray.remove(0)
+# Because the range doesn't include the stop render count:
+#saveFramesAtCoordsPaintedArray.append(stopRenderAtPixelsN)
+#lengthOfList = len(saveFramesAtCoordsPaintedArray)
+#print(allPixelsN, ' >? ', stopRenderAtPixelsN, ' >? ', saveFramesAtCoordsPaintedArray[lengthOfList-1])
+
 def is_coord_in_bounds(y, x):
     return y >= 0 and y < HEIGHT and x >= 0 and x < WIDTH
 
@@ -738,9 +738,11 @@ coords_painted_since_reclaim = 0
 print('Generating image . . . ')
 newly_painted_coords = 0        # This is reset at every call of print_progress()
 
-contains_invalid_colors = True
+continue_painting = True
 
 while coord_queue:
+    if continue_painting == False:
+        break
     while coord_queue:
         index = np.random.randint(0, len(coord_queue))
         y, x = coord_queue[index]
@@ -778,10 +780,8 @@ while coord_queue:
         # Terminate all coordinate and color mutation at an
         # arbitary number of mutations:
         if painted_coordinates > stopRenderAtPixelsN:
-            print(
-'Painted coordinate termination count', painted_coordinates, 'exceeded. Ending paint algorithm.'
-            )
-            contains_invalid_colors = False
+            print('Painted coordinate termination count', painted_coordinates, 'exceeded. Ending paint algorithm.')
+            continue_painting = False
             break
         
     if RECLAIM_ORPHANS:
