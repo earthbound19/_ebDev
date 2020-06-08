@@ -9,7 +9,7 @@ To get PowerShell 5 and TLS v1.2 installed on Windows 7, which are prerequisites
 - run ~ MicrosoftEasyFix51044 .
 - from powershell run this command:
 - $PSVersionTable.PSVersion
-- if that returns a major version 5, you now have powershell 5 installed.
+- if that returns a major version 5, you now have powershell 5 installed. If it does not, check that you opened the correct version (there can be multiple start menu shortcuts to multiple versions installed).
 - now hopefully you can:
 - open a powershell prompt as admin, and
 - cd into the directory with the following script (which you can find from chocolaty.org), and run it like so:

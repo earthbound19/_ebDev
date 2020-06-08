@@ -26,6 +26,9 @@
 #  To operate on ALL files (regardless of extension), run this
 #   script withuot any parameter:
 # ftun.sh
+#  To operate on all files of a given type in all subpaths (and it
+#   operates on folders, too!), pass anything as a second parameter:
+# ftun.sh png foo
 
 
 if [ "$1" ]
@@ -65,6 +68,21 @@ then
 		# Option that removes dashes also:
 		# perl $pathToRenamePerl -e 's/[^\w.]+/_/g' $extension
 	perl $pathToRenamePerl -e 's/[^\w.-]+/_/g' $extension
+	# if $2 was passed to script, do the same thing recursively in all directories:
+	if [ "$2" ]
+	then
+		directories=(`gfind . -type d`)
+		# remove the first element in that array by reassigning to itself without that:
+		directories=(${directories[@]:1})
+
+		for element in ${directories[@]}
+		do
+			pushd .
+			cd $element
+			perl $pathToRenamePerl -e 's/[^\w.-]+/_/g' $extension
+			popd
+		done
+	fi
 else
 	echo "User input does not equal $PASS_STRING."
 	echo "script will exit without doing anything."
