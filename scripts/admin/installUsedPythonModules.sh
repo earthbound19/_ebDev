@@ -1,3 +1,5 @@
+python -m pip install --upgrade pip
+
 pythonModules=" \
 more_itertools \
 colorspacious \
@@ -19,10 +21,11 @@ Pillow"
 # Pillow is a maintained fork of PIL and imports as name PIL.
 
 # Uncomment whichever applies to your python version:
-#pipExeName=pip
+# pipExeName=pip
 pipExeName=pip3
 
 for element in ${pythonModules[@]}
 do
-  $pipExeName install $element
+	echo "Attempting to install $element via $pipExeName . . ."
+	$pipExeName install $element
 done
