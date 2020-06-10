@@ -2,8 +2,7 @@
 
 An earlier incarnation of this script by earthbound19 was dramatically sped up by changes
 from one GitHub user "scribblemaniac" (like many orders of magnitude faster--an image
-that used to take 7 minutes to render now takes 5 seconds). I may paste the code from this
-script on to that one after testing.
+that used to take 7 minutes to render now takes 5 seconds).
 
 Output file names are based on the date and time and random characters.
 Inspired and drastically evolved from color_fibers.py, which was horked and adapted
@@ -11,13 +10,13 @@ from https://scipython.com/blog/computer-generated-contemporary-art/
 
 # USAGE
 Run this script without any parameters, and it will use a default set of parameters:
-python thisScript.py
-To see available parameters, run this script with the -h switch:
-python thisScript.py -h
+python color_growth.py
+To see available parameters, run this script with the --help switch:
+python color_growth.py --help
 
 # DEPENDENCIES
-python 3 with numpy, queue, and pyimage modules installed (and maybe others--see the
-import statements).
+python 3 with numpy, queue, and pyimage modules installed (and others--see the import
+statements).
 
 # KNOWN ISSUES
 See help for --RANDOM_SEED.
@@ -28,23 +27,41 @@ See comments under documentation heading in this module.
 """
 
 # TO DO:
+# - figure out whether I broke RND continuity? It would seem
+# the same presets are no longer producing the same results?
+# - isolate what situation didn't create a new preset / anim folder
+# when I expected it to, and fix that (or document in help).
 # - make naming convention of variables consistent? I think I'm
 # all over the place with this . . . :p
 # - possibly things in the color_growth_v1.py's TO DO list.
 # - determine whether any code in the fast fork (now this script)
-# are leftover from color_growth_v1.py, and delete them (EXCEPT
+# is leftover from color_growth_v1.py, and delete them (EXCEPT
 # what is commented as VESTIGAL) from this?
 # - make it properly use negative or > 8 growth-clip values again?
 # since the color_growth_fast.py fork it isn't.
 
 # VERSION HISTORY
-# v2.5.8:
-# Bug fix: it didn't stop rendering at --STOP_AT_PERCENT if
-# --STOP_AT_PERCENT < 1 e.g. 0.59.
-# - Continued work (commented out) on new feature to make animation
-# growth visually more linear over space (sped up/more painted
+# v2.6.6:
+# - New feature: --RAMP_UP_SAVE_EVERY_N makes animation growth
+# visually more linear over any growth vector (sped up/more painted
 # coordinates between saves, so animation doesn't seem to slow
-# down toward middle and end)
+# down toward middle and end). THIS IS A BREAKING CHANGE. .cgp
+# presets or scripts which used a version of this before 2.6.0 did
+# not use this option, as it did not exist. This option is False
+# by default (thought it is in my opinion probably always desirable).
+# To recreate animations created with earlier versions of this
+# script, if you want them to ratain the constant growth rate of
+# --SAVE_EVERY_N, (which I suggest you do not want), you must set
+# --RAMP_UP_SAVE_EVERY_N to False.
+# - Bug fix: attempted use of undeclared global variable (somehow
+# I broke that? It wasn't broken before), also renamed to
+# padFileNameNumbersDigitsWidth
+# - Bug fix: don't save last animation frame (before final normal
+# file name save, at end of script--workaround described in comment)
+# if we aren't even saving animation frames (if SAVE_EVERY_N == 0)
+# - Comment and help fixes.
+# - Moved all import statements to start of script.
+# - Added preset switches override info to help for --LOAD_PRESET.
 
 
 # CODE
@@ -58,6 +75,8 @@ import re
 import subprocess
 import shlex
 import queue
+from more_itertools import unique_everseen
+import platform
 # I'm also using another psuedorandom number generator built into numpy as np:
 import numpy as np
 from PIL import Image
@@ -65,19 +84,21 @@ from PIL import Image
 
 # START GLOBALS
 # Defaults which will be overriden if arguments of the same name are provided to the script:
-ColorGrowthPyVersionString = 'v2.5.8'
+ColorGrowthPyVersionString = 'v2.6.6'
 WIDTH = 400
 HEIGHT = 200
 RSHIFT = 8
 STOP_AT_PERCENT = 1
 SAVE_EVERY_N = 0
-saveNextFrameNumber = 1
+RAMP_UP_SAVE_EVERY_N = False
 START_COORDS_RANGE = (1,13)
 GROWTH_CLIP = (0,5)
 SAVE_PRESET = True
 animationFrameCounter = 0
 renderedFrameCounter = 0
+saveNextFrameNumber = 0
 imageFrameFileName = ''
+padFileNameNumbersDigitsWidth = 0
 # SOME BACKGROUND COLOR options;
 # any of these (uncomment only one) are made into a list later by ast.literal_eval(BG_COLOR) :
 # BG_COLOR = "[157,140,157]"        # Medium purplish gray
@@ -100,10 +121,14 @@ class versionStringPrintAction(argparse.Action):
 
 PARSER = argparse.ArgumentParser(description=
 'Renders a PNG image like bacteria that produce random color mutations \
-as they grow over a surface. Output file names are after the date plus \
-random characters. Inspired by and drastically evolved from \
-colorFibers.py, which was horked and adapted from \
-https://scipython.com/blog/computer-generated-contemporary-art/'
+as they grow over a surface. Output file names are named after the date \
+and time. Inspired by and drastically evolved from colorFibers.py, which \
+was horked and adapted from \
+https://scipython.com/blog/computer-generated-contemporary-art/ \
+NOTE: CLI options have had breaking changes over time. If reusing settings \
+from a previous version, check those settings first if you get errors. \
+NOTE: by default the --RAMP_UP_SAVE_EVERY_N switch has a False value, but \
+you probably want it True if you save animation frames (--SAVE_EVERY_N).'
 )
 PARSER.register('action', 'versionStringPrint', versionStringPrintAction)
 PARSER.add_argument('-v', '--VERSION', nargs=0, action='versionStringPrint', help='Print version number and exit.')
@@ -170,7 +195,32 @@ Saves zero-padded numbered frames to a subfolder which may be strung \
 together into an animation of the entire painting process (for example \
 via ffmpegAnim.sh). May substantially slow down render, and can also \
 create many, many gigabytes of data, depending. ' + str(SAVE_EVERY_N) + \
-' by default. To disable, set it to 0 with: -a 0 OR: --SAVE_EVERY_N 0'
+' by default. To disable, set it to 0 with: -a 0 OR: --SAVE_EVERY_N 0. \
+NOTE: If this is nonzero and you do not set --RAMP_UP_SAVE_EVERY_N to \
+either True or False (see), the default --RAMP_UP_SAVE_EVERY_N False \
+will override to True, as it is strongly suggested you want that if \
+you render an animation. If that is not what you want, manually set \
+--RAMP_UP_SAVE_EVERY_N False.'
+)
+PARSER.add_argument('--RAMP_UP_SAVE_EVERY_N', type=str, help=
+'Increase the value of --SAVE_EVERY_N over time. Without this, the \
+animation may seem to slow toward the middle and end, because the \
+interval --SAVE_EVERY_N is constant; the same number of new mutated \
+coordinates is spread over a wider area every save frame. \
+--RAMP_UP_SAVE_EVERY_N causes the value of --SAVE_EVERY_N to increase \
+over time, like dragging the corner of a selection rectangle to increase \
+rendered area over the whole canvas. The result is an apparently \
+more visually linear growth (in all growth vectors) and a faster \
+animation (and faster animation render, as less time is made saving \
+fewer frames), but technically the growth rate (vs. saved animation frames) \
+actually increases over time. Default ' + str(RAMP_UP_SAVE_EVERY_N) + '. \
+NOTES: 1) Relies on --SAVE_EVERY_N being nonzero. Script will warn and exit \
+if --RAMP_UP_SAVE_EVERY_N is True and --SAVE_EVERY_N is 0 (zero). \
+2) Save frame intervals near start of animation may be similar to \
+--SAVE_EVERY_N value, but as noted increase (and can increase a lot) \
+over time. 3) To re-render animations created prior to v2.6.6 the same \
+as at their creation --RAMP_UP_SAVE_EVERY_N must be False (as this feature \
+was introduced in v2.6.6). 4) See related NOTE for --SAVE_EVERY_N.'
 )
 PARSER.add_argument('-s', '--RANDOM_SEED', type=int, help=
 'Seed for random number generators (random and numpy.random are used). \
@@ -178,14 +228,15 @@ Default generated by random library itself and added to render file name \
 for reference. Can be any integer in the range 0 to 4294967296 (2^32). \
 If not provided, it will be randomly chosen from that range (meta!). If \
 --SAVE_PRESET is used, the chosen seed will be saved with the preset \
-.cgp file. KNOWN ISSUE at this writing: evidently functional differences \
-between random generators of different versions of Python and/or Python \
-on different platforms produce different output from the same random \
-seed. ALSO, before v2.5.5, this script had code that accidentally \
-altered the pseudorandom number sequence for something other than the \
-color growth algorithm. If you get different output than before from the \
-same --RANDOM_SEED, search for and examine the VESTIGAL CODE comment, \
-and try uncommenting the line of code it details.'
+.cgp file. KNOWN ISSUE: functional differences between random generators \
+of different versions of Python and/or Python, maybe on different platforms, \
+produce different output from the same random seed. ALSO, some versions of \
+this script had code that accidentally altered the pseudorandom number \
+sequence via something outside the intended color growth algorithm. The \
+result was different output from the same --RANDOM_SEED. If you get \
+different output than before from the same --RANDOM_SEED, search for and \
+examine the VESTIGAL CODE comment, and try uncommenting the line of code \
+it details.'
 )
 PARSER.add_argument('-q', '--START_COORDS_N', type=int, help=
 'How many origin coordinates to begin coordinate and color mutation \
@@ -242,9 +293,9 @@ str(SAVE_PRESET) +'. The .cgp file can later be loaded with the \
 same parameters (whether it is new or identical depends on the switches, \
 --RANDOM_SEED being the most consequential). This with [-a | \
 --SAVE_EVERY_N] can recreate gigabytes of exactly the same animation \
-frames using just a preset. NOTES: --START_COORDS_RANGE and its \
+frames using just a preset. NOTES: 1) --START_COORDS_RANGE and its \
 accompanying value are not saved to config files, and the resultantly \
-generated [-q | --START_COORDS_N] is saved instead. Note: you may add \
+generated [-q | --START_COORDS_N] is saved instead. 2) You may add \
 arbitrary text (such as notes) to the second and subsequent lines of a \
 saved preset, as only the first line is used.'
 )
@@ -252,11 +303,13 @@ PARSER.add_argument('--LOAD_PRESET', type=str, help=
 'A preset file (as first created by --SAVE_PRESET) to use. Empty (none \
 used) by default. Not saved to any preset. At this writing only a single \
 file name is handled, not a path, and it is assumed the file is in the \
-current directory. NOTE: use of this switch discards all other \
-parameters and loads all parameters from the preset. A .cgp preset file \
-is a plain text file on one line, which is a collection of SWITCHES to \
-be passed to this script, written literally the way you would pass them \
-to this script.'
+current directory. A .cgp preset file is a plain text file on one line, \
+which is a collection of SWITCHES to be passed to this script, written \
+literally the way you would pass them to this script. NOTE: you may load \
+a preset and override any switches in the preset by using the override \
+after --LOAD_PRESET. For example, if a preset contains --RANDOM SEED \
+98765 but you want to override it with 12345, pass --LOAD_PRESET \
+<preset_filename.cgp> --RANDOM_SEED 12345 to this script.'
 )
 
 # START ARGUMENT PARSING
@@ -270,8 +323,8 @@ to this script.'
 # I do is check for None (and then supply a default and add to argsparse if None is found).
 # The check for None isn't literal: it's in the else: clause after an if (value) check
 # (if the if check fails, that means the value is None, and else: is invoked) :
-print('~-')
-print('~- Processing any arguments to script . . .')
+print('')
+print('Processing any arguments to script . . .')
 
 # allows me to override parser arguments declared in this namespace:
 class ARGUMENTS_NAMESPACE:
@@ -317,7 +370,7 @@ if ARGS.LOAD_PRESET:
     # repr() found at: http://code.activestate.com/recipes/65211-convert-a-string-into-a-raw-string/#c5
     # repr() fixes some problem with shlex.split string handling of Windows paths.
     # print('Subprocess hopefully completed successfully. Will now exit script.')
-    # sys.exit()
+    # sys.exit(0)
     # INSTEAD, AS CODED BEFORE THAT DEPRECATION NOTICE:
     # those parameters add anything not passed via CLI, but also, CLI overrides
     # anything from .cgp.
@@ -408,6 +461,19 @@ if ARGS.SAVE_EVERY_N:
 else:
     argsDict['SAVE_EVERY_N'] = SAVE_EVERY_N
 
+# Conditional override:
+if ARGS.SAVE_EVERY_N and not ARGS.RAMP_UP_SAVE_EVERY_N:
+    RAMP_UP_SAVE_EVERY_N = True
+    argsDict['RAMP_UP_SAVE_EVERY_N'] = 'True'
+
+if ARGS.RAMP_UP_SAVE_EVERY_N:
+    RAMP_UP_SAVE_EVERY_N = ast.literal_eval(ARGS.RAMP_UP_SAVE_EVERY_N)
+    if SAVE_EVERY_N == 0 and RAMP_UP_SAVE_EVERY_N == True:
+        print('--RAMP_UP_SAVE_EVERY_N is True, but --SAVE_EVERY_N is 0. --SAVE_EVERY_N must be nonzero if --RAMP_UP_SAVE_EVERY_N is True. Either set --SAVE_EVERY_N to something other than 0, or set RAMP_UP_SAVE_EVERY_N to False. Exiting script.')
+        sys.exit(2)
+else:
+    argsDict['RAMP_UP_SAVE_EVERY_N'] = RAMP_UP_SAVE_EVERY_N
+
 if ARGS.RANDOM_SEED:
     RANDOM_SEED = ARGS.RANDOM_SEED
 else:
@@ -490,25 +556,33 @@ SCRIPT_ARGS_STR = SCRIPT_ARGS_STR.strip()
 # ADDITIONAL GLOBALS defined here:
 allPixelsN = WIDTH * HEIGHT
 stopRenderAtPixelsN = int(allPixelsN * STOP_AT_PERCENT)
-# CONTINUE CODING HERE for feature I'm adding . . .
-#allPixelsNdividedBy_SAVE_EVERY_N = allPixelsN / SAVE_EVERY_N
-#divisor = 1 / allPixelsNdividedBy_SAVE_EVERY_N
-#saveFramesAtCoordsPaintedMultipliersTuple = tuple(np.arange(0, 1, divisor))
-#saveFramesAtCoordsPaintedArray = []
-#for multiplier in saveFramesAtCoordsPaintedMultipliersTuple:
-#    mod_w = WIDTH * multiplier
-#    mod_h = HEIGHT * multiplier
-#    mod_area = mod_w * mod_h
-#    saveFramesAtCoordsPaintedArray.append(int(mod_area))
-# deduplicate elements in the list but maintain order:
-#from more_itertools import unique_everseen
-#saveFramesAtCoordsPaintedArray = list(unique_everseen(saveFramesAtCoordsPaintedArray))
-# else the list starts with 0, which will lead to no frames ever rendering:
-#saveFramesAtCoordsPaintedArray.remove(0)
-# Because the range doesn't include the stop render count:
-#saveFramesAtCoordsPaintedArray.append(stopRenderAtPixelsN)
-#lengthOfList = len(saveFramesAtCoordsPaintedArray)
-#print(allPixelsN, ' >? ', stopRenderAtPixelsN, ' >? ', saveFramesAtCoordsPaintedArray[lengthOfList-1])
+# If RAMP_UP_SAVE_EVERY_N is True, create list saveFramesAtCoordsPaintedArray
+# with increasing values for when to save N evolved coordinates to animation frames:
+saveFramesAtCoordsPaintedArray = []
+if SAVE_EVERY_N != 0 and RAMP_UP_SAVE_EVERY_N == True:
+    allPixelsNdividedBy_SAVE_EVERY_N = allPixelsN / SAVE_EVERY_N
+    divisor = 1 / allPixelsNdividedBy_SAVE_EVERY_N
+    saveFramesAtCoordsPaintedMultipliers = [x * divisor for x in range(0, int(allPixelsNdividedBy_SAVE_EVERY_N)+1)]
+    for multiplier in saveFramesAtCoordsPaintedMultipliers:
+        mod_w = WIDTH * multiplier
+        mod_h = HEIGHT * multiplier
+        mod_area = mod_w * mod_h
+        saveFramesAtCoordsPaintedArray.append(int(mod_area))
+    # Deduplicate elements in the list but maintain order:
+    saveFramesAtCoordsPaintedArray = list(unique_everseen(saveFramesAtCoordsPaintedArray))
+    # Because that resulting list doesn't include the ending number, add it:
+    saveFramesAtCoordsPaintedArray.append(stopRenderAtPixelsN)
+# If RAMP_UP_SAVE_EVERY_N is False, create list saveFramesAtCoordsPaintedArray with
+# values at constant intervals for when to save animation frames:
+if SAVE_EVERY_N != 0 and RAMP_UP_SAVE_EVERY_N == False:
+    saveFramesAtCoordsPaintedArray = [x * SAVE_EVERY_N for x in range(0, int(stopRenderAtPixelsN/SAVE_EVERY_N)+1 )]
+    # Because that range doesn't include the end of the range:
+    saveFramesAtCoordsPaintedArray.append(stopRenderAtPixelsN)
+    # Because that resulting list doesn't include the ending number, add it:
+    saveFramesAtCoordsPaintedArray.append(stopRenderAtPixelsN)
+# Values of these used elsewhere:
+saveFramesAtCoordsPaintedArrayIDX = 0
+saveFramesAtCoordsPaintedArrayMaxIDX = (len(saveFramesAtCoordsPaintedArray) - 1)
 
 def is_coord_in_bounds(y, x):
     return y >= 0 and y < HEIGHT and x >= 0 and x < WIDTH
@@ -571,28 +645,33 @@ def print_progress(newly_painted_coords):
     stopRenderAtPixelsN, ':', allPixelsN, ':', orphans_to_reclaim_n)
 
 def set_img_frame_file_name():
+    global padFileNameNumbersDigitsWidth
     global renderedFrameCounter
     global imageFrameFileName
     renderedFrameCounter += 1
     frameNumberStr = str(renderedFrameCounter)
-    imageFrameFileName = anim_frames_folder_name + '/' + frameNumberStr.zfill(pad_file_name_numbers_n) + '.png'
+    imageFrameFileName = anim_frames_folder_name + '/' + frameNumberStr.zfill(padFileNameNumbersDigitsWidth) + '.png'
 
 def save_animation_frame():
     # Tells the function we are using global variables:
     global animationFrameCounter
     global saveNextFrameNumber
-    animationFrameCounter += 1
-    if SAVE_EVERY_N:
-        # DEPRECATED conditional, as I assume division is slower, and modulo even slower:
-        # if (animationFrameCounter % SAVE_EVERY_N) == 0:
+    global saveFramesAtCoordsPaintedArrayIDX
+    global saveFramesAtCoordsPaintedArrayMaxIDX
+#    print('animationFrameCounter', animationFrameCounter, 'saveNextFrameNumber', saveNextFrameNumber)
+    if SAVE_EVERY_N != 0:
         if (animationFrameCounter == saveNextFrameNumber):
-            saveNextFrameNumber = animationFrameCounter + SAVE_EVERY_N
+            # only increment the ~IDX if it will be in array bounds:
+            if (saveFramesAtCoordsPaintedArrayIDX + 1) < saveFramesAtCoordsPaintedArrayMaxIDX:
+                saveFramesAtCoordsPaintedArrayIDX += 1
+                saveNextFrameNumber = saveFramesAtCoordsPaintedArray[saveFramesAtCoordsPaintedArrayIDX]
             set_img_frame_file_name()
             # Only write frame if it does not already exist
             # (allows resume of suspended / crashed renders) :
             if os.path.exists(imageFrameFileName) == False:
                 # print("Animation render frame file does not exist; writing frame.")
                 coords_set_to_image(canvas, imageFrameFileName)
+        animationFrameCounter += 1
 # END GLOBAL FUNCTIONS
 # END OPTIONS AND GLOBALS
 
@@ -637,14 +716,13 @@ for coord in RNDcoord:
 report_stats_every_n = 5000
 report_stats_nth_counter = 0
 
-# VESTIGAL CODE; all versions of this script before v2.5.5 here
-# altered the pseudorandom sequence of --RANDOM_SEED with the 
-# following line of code; this has been left here uncommented  
-# since (and a bit before?) v2.3.6, preferring psuedorandom
-# continuity with how the script had already made art, even
-# though technically this altered "pure" psuedorandom intent:
+# VESTIGAL CODE; most versions of this script here altered the
+# pseudorandom sequence of --RANDOM_SEED with the following line
+# of code; this had been commented out around v2.3.6 - v2.5.5
+# (maybe?), which broke with psuedorandom continuity as originally
+# developed in the script. For continuity (and because output seemed
+# randomly better _with_ this code), it is left here:
 rndStr = ('%03x' % random.randrange(16**6))
-#
 # Render target file name generation; differs in different scenarios:
 # If a preset was loaded, base the render target file name on it.
 if ARGS.LOAD_PRESET:
@@ -656,13 +734,11 @@ else:
     time_stamp = now.strftime('%Y_%m_%d__%H_%M_%S__')
     render_target_file_base_name = time_stamp + '_colorGrowthPy'
 # Check if render target file with same name (but .png) extension exists.
-    # This logic is very slightly risky: if
-    # render_target_file_base_name does not exist, I will
-    # assume that state image file name and anim frames folder names
-    # also do not exist; if I am wrong, those may get overwritten (by
-    # other logic in this script).
+# This logic is very slightly risky: if render_target_file_base_name does
+# not exist, I will assume that state image file name and anim frames
+# folder names also do not exist; if I am wrong, those may get overwritten
+# (by other logic in this script).
 target_render_file_exists = os.path.exists(render_target_file_base_name + '.png')
-print('\nState of target_render_file_exists: ', target_render_file_exists, '\nIf you see that as True a lot, something may be wrong.')
 # If it does not exist, set render target file name to that ( + '.png').
 # In that case, the following following "while" block will never
 # execute. BUT if it does exist, the following "while" block _will_
@@ -683,7 +759,7 @@ while target_render_file_exists == True:
 names. Please make a copy of and rename the source .cgp file before \
 continuning, Sparkles McSparkly. Exiting."
         )
-        sys.exit()
+        sys.exit(1)
     if target_render_file_exists == False:
         render_target_file_base_name = tst_str
 render_target_file_name = render_target_file_base_name + '.png'
@@ -696,14 +772,13 @@ print('anim_frames_folder_name: ', anim_frames_folder_name)
 # Also, initialize a variable which is how many zeros to pad animation save frame file
 # (numbers) to, based on how many frames will be rendered:
 if SAVE_EVERY_N > 0:
-    pad_file_name_numbers_n = len(str(stopRenderAtPixelsN))
+    padFileNameNumbersDigitsWidth = len(str(stopRenderAtPixelsN))
     # Only create the anim frames folder if it does not exist:
     if os.path.exists(anim_frames_folder_name) == False:
         os.mkdir(anim_frames_folder_name)
 
 # If bool set saying so, save arguments to this script to a .cgp file with the target
 # render base file name:
-import platform
 if SAVE_PRESET:
     # strip the --LOAD_PRESET parameter and value from SCRIPT_ARGS_STR
     # before writing it to preset file (and save it in a new variable),
@@ -799,12 +874,14 @@ while coord_queue:
 
 # Works around problem that this setup can (always does?) save
 # everything _except_ for a last frame with every coordinate painted
-# if painted_coordinates >= stopRenderAtPixelsN &&
+# if painted_coordinates >= stopRenderAtPixelsN and
 # STOP_AT_PERCENT == 1; is there a better-engineered way to fix this
 # problem? But this works:
-set_img_frame_file_name()
-coords_set_to_image(canvas, imageFrameFileName)
-# Save final image file and delete progress (state, temp) image file:
+if SAVE_EVERY_N != 0:
+    set_img_frame_file_name()
+    coords_set_to_image(canvas, imageFrameFileName)
+
+# Save final image file:
 print('Saving image ', render_target_file_name, ' . . .')
 coords_set_to_image(canvas, render_target_file_name)
 print('Render complete and image saved.')
