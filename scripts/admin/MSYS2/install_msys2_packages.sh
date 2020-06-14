@@ -1,6 +1,10 @@
 # DESCRIPTION
 # Installs desired msys2 packages.
 
+# TO DO
+# Auto-mod (on install) the files mentioned in MSYS2_notes.txt
+# so that MSYS2 inherits the system PATH.
+
 
 # CODE
 echo "u go kaboomy haha now you dead moldy voldy -Snep"
