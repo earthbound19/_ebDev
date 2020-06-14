@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates an mp4 video (AVC) from a series of numbered input images. Automatically detects the number of digits in the input frames. Expects *only* digits in the input filenames. Creates the animation at _out.mp4.
+# Creates an mp4 video (AVC) from a series of numbered input images. Automatically detects the number of digits in the input frames. Expects *only* digits in the input filenames. Creates the animation at _out.mp4. NOTE: you may want to use x264anim.sh instead.
 
 # WARNING: AUTOMATICALLY overwrites _out.mp4 if it already exists.
 
@@ -13,6 +13,7 @@
 # Optional: $6 how many seconds to loop the last frame, to create a long still of the last frame appended to the end of the video. Creates the still loop as _append.mp4, then muxes _out.mp4 and _append.mp4 to a temp mp4, deletes both the originals and renames the temp to _out.mp4. UGLY KLUDGE: if you want to use this but not $5, pass the word NULL as $5.
 # EXAMPLE
 # thisScript.sh 29.97 29.97 13 png
+# ALSO, search for the additionalParams options and uncomment or modify them (or don't) as you wish.
 
 # NOTE: You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).
 
@@ -34,6 +35,13 @@ then
 	fi
 fi
 
+# Assumes that all input files have the same character count in the file base name; I wonder whether I've gone full circle on going away from and back to the exact form of the following command, but *right now* it's testing ok on Cygwin and Mac; re https://stackoverflow.com/a/40876071 ; ALSO it seems as if gnuWin32 `find`has a bug; the command throws an error.
+array=(`gfind . -maxdepth 1 -type f -iname \*.$4 -printf '%f\n' | tr -d '\15\32'`)
+# last element of array is last found file type $4 :
+lastFoundFileType=${array[-1]}
+lastFoundTypeFileNameNoExt=${lastFoundFileType%.*}
+digitsPadCount=${#lastFoundTypeFileNameNoExt}
+
 # IN DEVELOPMENT: automatic centering of image in black matte borders (padding):
 # steps:
 # - get matte WxH intended
@@ -48,16 +56,15 @@ fi
 # an example command wut does some math as would be needed per this algo: echo "scale=5; 3298 / 1296" | bc
 # OR JUST?! :
 # additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2"
+# ASSUMING 1920x1420 input image, crop to center; NOTE that it necessarily escapes double-quote marks with \:
+# additionalParams=-filter:v "crop=1920:1080"
+# echo "-filter:v \"crop=1920:1080\"" > tmp_blaheryeag_nbD9X44rCJev.txt && additionalParams=$(<tmp_blaheryeag_nbD9X44rCJev.txt) && rm tmp_blaheryeag_nbD9X44rCJev.txt
 
-# Assumes that all input files have the same character count in the file base name; I wonder whether I've gone full circle on going away from and back to the exact form of the following command, but *right now* it's testing ok on Cygwin and Mac; re https://stackoverflow.com/a/40876071 ; ALSO gnuWin32 find it seems has a bug; the command throws an error. Here using Cygwin find on Windows and find on Mac; maybe I'll do that everywhere..
-lastFoundTypeFile=`gfind . -iname \*.$4 | sort | tail -n 1 | gsed 's/\.\/\(.*\)/\1/g'`
-lastFoundTypeFileNameNoExt=${lastFoundTypeFile%.*}
-digitsPadCount=${#lastFoundTypeFileNameNoExt}
-
-echo executing ffmpeg command . . .
-# default codec for file type and UTvideo options both follow; comment out whatever you don't want; for the first you can change the _out.ttt file type to e.g. .mp4, .gif, etc.:
-ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $additionalParams $rescaleParams -vf fps=$2 -crf $3 _out.mp4
-# ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $additionalParams $rescaleParams -vf fps=$2 -crf $3 -codec:v utvideo _out.avi
+# Because something funky and evil in DOS and/or unix emulation chokes on some forms of $additionalParams inline, but not if printed to and executed from a script;
+# FOR LOSSLESS BUT COMPRESSED AVI, end the command instead with: -codec:v utvideo _out.avi :
+echo "ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $additionalParams $rescaleParams -r $2 _out.mp4" > tmp_enc_script_P4b3ApXC.sh
+./tmp_enc_script_P4b3ApXC.sh
+rm ./tmp_enc_script_P4b3ApXC.sh
 
 # If $6 is passed to the script, create a looped still video ($6 seconds long) from the last frame and append it to the video:
 if [ "$6" ]
