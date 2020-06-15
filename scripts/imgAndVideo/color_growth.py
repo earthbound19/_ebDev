@@ -35,33 +35,23 @@ See comments under documentation heading in this module.
 # all over the place with this . . . :p
 # - possibly things in the color_growth_v1.py's TO DO list.
 # - determine whether any code in the fast fork (now this script)
-# is leftover from color_growth_v1.py, and delete them (EXCEPT
-# what is commented as VESTIGAL) from this?
+# is leftover from color_growth_v1.py, and delete them?
 # - make it properly use negative or > 8 growth-clip values again?
 # since the color_growth_fast.py fork it isn't.
 
 # VERSION HISTORY
-# v2.6.6:
-# - New feature: --RAMP_UP_SAVE_EVERY_N makes animation growth
-# visually more linear over any growth vector (sped up/more painted
-# coordinates between saves, so animation doesn't seem to slow
-# down toward middle and end). THIS IS A BREAKING CHANGE. .cgp
-# presets or scripts which used a version of this before 2.6.0 did
-# not use this option, as it did not exist. This option is False
-# by default (thought it is in my opinion probably always desirable).
-# To recreate animations created with earlier versions of this
-# script, if you want them to ratain the constant growth rate of
-# --SAVE_EVERY_N, (which I suggest you do not want), you must set
-# --RAMP_UP_SAVE_EVERY_N to False.
-# - Bug fix: attempted use of undeclared global variable (somehow
-# I broke that? It wasn't broken before), also renamed to
-# padFileNameNumbersDigitsWidth
-# - Bug fix: don't save last animation frame (before final normal
-# file name save, at end of script--workaround described in comment)
-# if we aren't even saving animation frames (if SAVE_EVERY_N == 0)
-# - Comment and help fixes.
-# - Moved all import statements to start of script.
-# - Added preset switches override info to help for --LOAD_PRESET.
+# v2.6.7:
+# - COMMENT CHANGES ONLY; no code (meaning no functional) changes:
+# Found this code: zax_blor = ('%03x' % random.randrange(16**6)) --
+# commented out of the first version of color_growth_fast.py (which
+# I later pasted right over color_growth.py and continued development
+# into the script you're reading now), and put it back in this script
+# at the point where it had been, but COMMENTED OUT, and labeled
+# vestigal in a comment right above it. I doubt I had ever reintroduced
+# that code in any color_growth.py renders I did, yet I also I don't
+# know where or how determinism got mucked up for some renders that
+# I want to upgrade to animations. In tests, uncommenting it doesn't
+# recover the mystery determinism of those renders.
 
 
 # CODE
@@ -84,7 +74,7 @@ from PIL import Image
 
 # START GLOBALS
 # Defaults which will be overriden if arguments of the same name are provided to the script:
-ColorGrowthPyVersionString = 'v2.6.6'
+ColorGrowthPyVersionString = 'v2.6.7'
 WIDTH = 400
 HEIGHT = 200
 RSHIFT = 8
@@ -235,8 +225,8 @@ this script had code that accidentally altered the pseudorandom number \
 sequence via something outside the intended color growth algorithm. The \
 result was different output from the same --RANDOM_SEED. If you get \
 different output than before from the same --RANDOM_SEED, search for and \
-examine the VESTIGAL CODE comment, and try uncommenting the line of code \
-it details.'
+examine the VESTIGAL CODE comment(s!), and try uncommenting the line of code \
+they detail.'
 )
 PARSER.add_argument('-q', '--START_COORDS_N', type=int, help=
 'How many origin coordinates to begin coordinate and color mutation \
@@ -529,6 +519,10 @@ if ARGS.GROWTH_CLIP:        # See comments in ARGS.BG_COLOR handling. Handled th
     GROWTH_CLIP = re.sub(' ', '', GROWTH_CLIP)
     argsDict['GROWTH_CLIP'] = GROWTH_CLIP
     GROWTH_CLIP = ast.literal_eval(GROWTH_CLIP)
+# NOTE: VESTIGAL CODE HERE that may will alter things if commented vs. not commented out;
+# if render from a preset doesn't produce the same result as it once did, try uncommenting
+# the next line! :
+    # zax_blor = ('%03x' % random.randrange(16**6))
 else:
     temp_str = str(GROWTH_CLIP)
     temp_str = re.sub(' ', '', temp_str)
