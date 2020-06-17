@@ -25,7 +25,7 @@
 # CODE
 if [ "$5" ]
 then
-	if [ $5 != "NULL" ]		# If we want to use $6 but not $5 (as $6 is positional), we use NULL for $5.
+	if [ "$5" != "NULL" ]		# If we want to use $6 but not $5 (as $6 is positional), we use NULL for $5.
 	then
 		rescaleParams="-vf scale=$5:-1:flags=neighbor"
 			# echo rescaleParams val is\:
@@ -36,7 +36,9 @@ then
 fi
 
 # Assumes that all input files have the same character count in the file base name; I wonder whether I've gone full circle on going away from and back to the exact form of the following command, but *right now* it's testing ok on Cygwin and Mac; re https://stackoverflow.com/a/40876071 ; ALSO it seems as if gnuWin32 `find`has a bug; the command throws an error.
-array=(`gfind . -maxdepth 1 -type f -iname \*.$4 -printf '%f\n' | tr -d '\15\32'`)
+# EXCEPT all those notes may only apply to the next line's DEPRECATED (indented, commented) command? :
+	# array=(`gfind . -maxdepth 1 -type f -iname \*.$4 -printf '%f\n' | tr -d '\15\32'`)
+array=(`gfind . -maxdepth 1 -type f -name "*.$4" -printf '%f\n'`)
 # last element of array is last found file type $4 :
 lastFoundFileType=${array[-1]}
 lastFoundTypeFileNameNoExt=${lastFoundFileType%.*}
@@ -69,7 +71,7 @@ rm ./tmp_enc_script_P4b3ApXC.sh
 # If $6 is passed to the script, create a looped still video ($6 seconds long) from the last frame and append it to the video:
 if [ "$6" ]
 then
-	ffmpeg -y -loop 1 -i $lastFoundTypeFile -vf fps=$2 -t $6 -crf $3 _append.mp4
+	ffmpeg -y -loop 1 -i $lastFoundFileType -vf fps=$2 -t $6 -crf $3 _append.mp4
 	printf "" > tmp_ft2N854f.txt
 	echo _out.mp4 >> tmp_ft2N854f.txt
 	echo _append.mp4 >> tmp_ft2N854f.txt
