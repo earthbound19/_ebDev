@@ -9,11 +9,20 @@
 # e.g.:
 # ./allSVG2img.sh 4200 png 000066
 
+if ! [ "$1" ]; then echo "No parameter \$1. Exit."; exit; fi
+if ! [ "$2" ]; then echo "No parameter \$2. Exit."; exit; fi
+if [ "$3" ]
+then
+	bgColorParam=$3
+else
+	echo "No parameter \$3; setting to default hex 000000 background color."
+	bgColorParam='000000'
+fi
 
 # CODE
 # NOTE: to render svgs in subdirectories as well, remove "-maxdepth 1" from the following command:
-array=`gfind *.svg | tr -d '\15\32'`
+array=(`gfind . -maxdepth 1 -type f -iname \*.svg -printf '%f\n'`)
 for element in ${array[@]}
 do
-	SVG2img.sh $element $1 $2 $3
+	SVG2img.sh $element $1 $2 $bgColorParam
 done
