@@ -40,18 +40,19 @@ See comments under documentation heading in this module.
 # since the color_growth_fast.py fork it isn't.
 
 # VERSION HISTORY
-# v2.6.7:
-# - COMMENT CHANGES ONLY; no code (meaning no functional) changes:
-# Found this code: zax_blor = ('%03x' % random.randrange(16**6)) --
-# commented out of the first version of color_growth_fast.py (which
-# I later pasted right over color_growth.py and continued development
-# into the script you're reading now), and put it back in this script
-# at the point where it had been, but COMMENTED OUT, and labeled
-# vestigal in a comment right above it. I doubt I had ever reintroduced
-# that code in any color_growth.py renders I did, yet I also I don't
-# know where or how determinism got mucked up for some renders that
-# I want to upgrade to animations. In tests, uncommenting it doesn't
-# recover the mystery determinism of those renders.
+# v2.7.3:
+# - Added --CUSTOM_COORDS_AND_COLORS option that can init
+# coordinates and associated canvas colors from complex array string
+# evaluated by ast.literal_eval. See help print for it.
+# - Delete ancient commented code about subprocesses / windows
+# argument processing, and also ancient unused associated shlex
+# and subprocess module imports.
+# - Rearranged help items order and update --RECLAIM_ORPHANS to
+# mention --GROWTH_CLIP (not --VISCOSITY, which is an ancient
+# vestigal reference).
+# - Deleted speculated TO DO (faster random sampling) that would
+# alter RND state continuity. Will save faster for maybe C++
+# implementation or a faster Python interpreter.
 
 
 # CODE
@@ -62,8 +63,6 @@ import ast
 import os.path
 import sys
 import re
-import subprocess
-import shlex
 import queue
 from more_itertools import unique_everseen
 import platform
@@ -74,7 +73,7 @@ from PIL import Image
 
 # START GLOBALS
 # Defaults which will be overriden if arguments of the same name are provided to the script:
-ColorGrowthPyVersionString = 'v2.6.7'
+ColorGrowthPyVersionString = 'v2.7.3'
 WIDTH = 400
 HEIGHT = 200
 RSHIFT = 8
@@ -147,15 +146,6 @@ painting proceeds. If omitted, defaults to whatever BG_COLOR is. If \
 included, may differ from BG_COLOR. This option must be given in the \
 same format as BG_COLOR. You may make the base initialization color of \
 each origin random by specifying "--COLOR_MUTATION_BASE random".'
-)
-PARSER.add_argument('--RECLAIM_ORPHANS', type=str, help=
-'With higher --VISCOSITY, coordinates can be painted around (by \
-coordinate and color mutation of surrounding coordinates) but never \
-themselves painted. This option coralls these orphan coordinates and, \
-after all other living coordinates evolve (die), revives these orphans. \
-If there are orphans after that, it repeats, and so on, until every \
-coordinate is painted. Default on. To disable pass --RECLAIM_ORPHANS \
-False or --RECLAIM_ORPHANS 0.'
 )
 PARSER.add_argument('--BORDER_BLEND', type=str, help=
 'If this is enabled, the hard edges between different colonies will be \
@@ -249,10 +239,31 @@ of pixels available in the image. I probably would never make the max \
 range higher than (number of pixesl in image) / 62500 (which is 250 \
 squared). Will not be used if [-q | START_COORDS_N] is provided.'
 )
+PARSER.add_argument('--CUSTOM_COORDS_AND_COLORS', type=str, help=
+'Custom coordinate locations and colors list to initialized coordinate \
+mutation queue with. In complex nested lists of tuples _and lists_ \
+formt (I know, it\'s crazy), surrounded by single or double quote marks, \
+OR passed without any space characters in the parameter, like: \
+\'[[(coordinate),[color]], [(coordinate),[color]], [(coordinate),[color]]]\', \
+or more accurately like: \
+[[(50,40),[255,0,255]],[(88,84),[0,255,255]]]. NOTES: \
+1) Because this overrides --START_COORDS_N, --START_COORDS_RANGE, and \
+--COLOR_MUTATION_BASE, if you want random numbers of coordinates and \
+coordinate positions with this, contrive them via another custom script \
+or program, and pass them to this. 2) Internally in code the coordinates \
+are zero-index-based, which means 0 is 1, 1 is 2, 4 is 5, etc.; BUT \
+that\'s not human-friendly, so use the actual values (1 is 1!) \
+and the program will just subtract 1 for the zero-based indexing. 3) \
+Although internally in code, coordinates are represented as (y,x) tuples \
+(or (down,accross), that confuses me and isn\'t standard or expected for \
+humans, so in this parameter coordinate are represented as (x,y) (or \
+(accross,down), and the code swaps them before assignment to real, \
+internal tuples. You\'re welcome.'
+)
 PARSER.add_argument('--GROWTH_CLIP', type=str, help=
-'Affects seeming "thickness" (or viscosity) of the liquid. A Python \
-tuple expressed as a string (must be surrounded by double quote marks \
-for Windows). Default ' + str(GROWTH_CLIP) + '. In growth into adjacent \
+'Affects seeming "thickness" (or viscosity) of growth. A Python tuple \
+expressed as a string (must be surrounded by double quote marks for \
+Windows). Default ' + str(GROWTH_CLIP) + '. In growth into adjacent \
 coordinates, the maximum number of possible neighbor coordinates to grow \
 into is 8 (which may only ever happen with a start coordinate: in \
 practical terms, the most coordinates that may usually be expanded into \
@@ -269,10 +280,19 @@ when possible. If the second number is a positive integer >= 1, at most \
 that many coordinates will ever be selected. A negative first number or \
 low first number clip will tend toward a more evenly spreading liquid \
 appearance, and a lower second number clip will cause a more \
-stringy/meandering/splatty path or form\ (as it spreads less uniformly). \
+stringy/meandering/splatty path or form (as it spreads less uniformly). \
 With an effectively more viscous clip like "(2,4)", smaller \
 streamy/flood things may traverse a distance faster. Some tuples make \
 --RECLAIM_ORPHANS quickly fail, some make it virtually never fail.'
+)
+PARSER.add_argument('--RECLAIM_ORPHANS', type=str, help=
+'Coordinates can end up never mutating color, and remain the same color \
+as --BG_COLOR (which may result in the appearance of pixels that seem \
+like flecks or discontiguous color). This may be more likely with a \
+--GROWTH_CLIP range nearer zero (higher viscosity). This option coralls \
+these orphan coordinates and revives them so that their color will \
+mutate. Default ' + str(RECLAIM_ORPHANS) + '. To disable pass \
+--RECLAIM_ORPHANS False or --RECLAIM_ORPHANS 0.'
 )
 PARSER.add_argument('--SAVE_PRESET', type=str, help=
 'Save all parameters (which are passed to this script) to a .cgp (color \
@@ -301,6 +321,7 @@ after --LOAD_PRESET. For example, if a preset contains --RANDOM SEED \
 98765 but you want to override it with 12345, pass --LOAD_PRESET \
 <preset_filename.cgp> --RANDOM_SEED 12345 to this script.'
 )
+
 
 # START ARGUMENT PARSING
 # DEVELOPER NOTE: Throughout the below argument checks, wherever a user does not specify
@@ -354,16 +375,6 @@ if ARGS.LOAD_PRESET:
     SWITCHES = SWITCHES.split(' ')
     for i in range(0, len(SWITCHES), 2):
         ARGS = PARSER.parse_args(args=[SWITCHES[i], SWITCHES[i+1]], namespace=argumentsNamespace)
-    # DEPRECATED: invoke a new call of this script with those .cgp parameters:
-    # subprocess.call(shlex.split('python ' + repr(sys.argv[0]) + ' ' + SWITCHES))
-    # sys.argv[0] is the path to this script.
-    # repr() found at: http://code.activestate.com/recipes/65211-convert-a-string-into-a-raw-string/#c5
-    # repr() fixes some problem with shlex.split string handling of Windows paths.
-    # print('Subprocess hopefully completed successfully. Will now exit script.')
-    # sys.exit(0)
-    # INSTEAD, AS CODED BEFORE THAT DEPRECATION NOTICE:
-    # those parameters add anything not passed via CLI, but also, CLI overrides
-    # anything from .cgp.
 
 # Doing this again here so that anything in the command line overrides:
 ARGS = PARSER.parse_args(args=sys.argv[1:], namespace=argumentsNamespace)      # When this 
@@ -401,26 +412,28 @@ else:
 # by this script, re: https://stackoverflow.com/a/1894296/1397555
 BG_COLOR = ast.literal_eval(BG_COLOR)
 
-if ARGS.COLOR_MUTATION_BASE:        # See comments in ARGS.BG_COLOR handling. Handled the same.
-    COLOR_MUTATION_BASE = ARGS.COLOR_MUTATION_BASE
-    COLOR_MUTATION_BASE = re.sub(' ', '', COLOR_MUTATION_BASE)
-    argsDict['COLOR_MUTATION_BASE'] = COLOR_MUTATION_BASE
-    if ARGS.COLOR_MUTATION_BASE.lower() == 'random':
-        COLOR_MUTATION_BASE = 'random'
-    else:
-        COLOR_MUTATION_BASE = ast.literal_eval(COLOR_MUTATION_BASE)
-else:       # Write same string as BG_COLOR, after the same silly string manipulation as
-            # for COLOR_MUTATION_BASE, but more ridiculously now _back_ from that to
-            # a string again:
-    BG_COLOR_TMP_STR = str(BG_COLOR)
-    BG_COLOR_TMP_STR = re.sub(' ', '', BG_COLOR_TMP_STR)
-    argsDict['COLOR_MUTATION_BASE'] = BG_COLOR_TMP_STR
-    # In this case we're using a list as already assigned to BG_COLOR:
-    COLOR_MUTATION_BASE = list(BG_COLOR)
-    # If I hadn't used list(), COLOR_MUTATION_BASE would be a reference to BG_COLOR (which
-    # is default Python list handling behavior with the = operator), and when I changed either,
-    # "both" would change (but they would really just be different names for the same list).
-    # I want them to be different.
+# See comments in ARGS.BG_COLOR handling; handled the same:
+if not ARGS.CUSTOM_COORDS_AND_COLORS:
+    if ARGS.COLOR_MUTATION_BASE:
+        COLOR_MUTATION_BASE = ARGS.COLOR_MUTATION_BASE
+        COLOR_MUTATION_BASE = re.sub(' ', '', COLOR_MUTATION_BASE)
+        argsDict['COLOR_MUTATION_BASE'] = COLOR_MUTATION_BASE
+        if ARGS.COLOR_MUTATION_BASE.lower() == 'random':
+            COLOR_MUTATION_BASE = 'random'
+        else:
+            COLOR_MUTATION_BASE = ast.literal_eval(COLOR_MUTATION_BASE)
+    else:       # Write same string as BG_COLOR, after the same silly string manipulation as
+                # for COLOR_MUTATION_BASE, but more ridiculously now _back_ from that to
+                # a string again:
+        BG_COLOR_TMP_STR = str(BG_COLOR)
+        BG_COLOR_TMP_STR = re.sub(' ', '', BG_COLOR_TMP_STR)
+        argsDict['COLOR_MUTATION_BASE'] = BG_COLOR_TMP_STR
+        # In this case we're using a list as already assigned to BG_COLOR:
+        COLOR_MUTATION_BASE = list(BG_COLOR)
+        # If I hadn't used list(), COLOR_MUTATION_BASE would be a reference to BG_COLOR (which
+        # is default Python list handling behavior with the = operator), and when I changed either,
+        # "both" would change (but they would really just be different names for the same list).
+        # I want them to be different.
 
 # purple = [255, 0, 255]    # Purple. In prior commits of this script, this has been defined
 # and unused, just like in real life. Now, it is commented out or not even defined, just
@@ -490,38 +503,47 @@ np.random.seed(RANDOM_SEED)
     # --
     # I COULD just have four different, independent "if" checks explicitly for those four
     # pairs and work from that, but this is more compact logic (fewer checks).
-if ARGS.START_COORDS_N:        # If --START_COORDS_N is provided by the user, use it..
-    START_COORDS_N = ARGS.START_COORDS_N
-    print('Will use the provided --START_COORDS_N, ', START_COORDS_N)
-    if ARGS.START_COORDS_RANGE:
-        # .. and delete any --START_COORDS_RANGE and its value from argsparse (as it will
-        # not be used and would best not be stored in the .cgp config file via --SAVE_PRESET:
-        argsDict.pop('START_COORDS_RANGE', None)
-        print(
-'** NOTE: ** You provided both [-q | --START_COORDS_N] and --START_COORDS_RANGE, \
-but the former overrides the latter (the latter will not be used). This program \
-disregards  the latter from the parameters list.'
-)
-else:        # If --START_COORDS_N is _not_ provided by the user..
-    if ARGS.START_COORDS_RANGE:
-        # .. but if --START_COORDS_RANGE _is_ provided, assign from that:
-        START_COORDS_RANGE = ast.literal_eval(ARGS.START_COORDS_RANGE)
-        STR_PART = 'from user-supplied range ' + str(START_COORDS_RANGE)
-    else:        # .. otherwise use the default START_COORDS_RANGE:
-        STR_PART = 'from default range ' + str(START_COORDS_RANGE)
-    START_COORDS_N = random.randint(START_COORDS_RANGE[0], START_COORDS_RANGE[1])
-    argsDict['START_COORDS_N'] = START_COORDS_N
-    print('Using', START_COORDS_N, 'start coordinates, by random selection ' + STR_PART)
-    # END STATE MACHINE "Megergeberg 5,000."
+# If --START_COORDS_N is provided by the user, use it, unless there is overriding
+# CUSTOM_COORDS_AND_COLORS:
+if not ARGS.CUSTOM_COORDS_AND_COLORS:
+    if ARGS.START_COORDS_N:
+        START_COORDS_N = ARGS.START_COORDS_N
+        print('Will use the provided --START_COORDS_N, ', START_COORDS_N)
+        if ARGS.START_COORDS_RANGE:
+            # .. and delete any --START_COORDS_RANGE and its value from argsparse (as it will
+            # not be used and would best not be stored in the .cgp config file via --SAVE_PRESET:
+            argsDict.pop('START_COORDS_RANGE', None)
+            print(
+    '** NOTE: ** You provided both [-q | --START_COORDS_N] and --START_COORDS_RANGE, \
+    but the former overrides the latter (the latter will not be used). This program \
+    disregards the latter from the parameters list.'
+    )
+    else:        # If --START_COORDS_N is _not_ provided by the user..
+        if ARGS.START_COORDS_RANGE:
+            # .. but if --START_COORDS_RANGE _is_ provided, assign from that:
+            START_COORDS_RANGE = ast.literal_eval(ARGS.START_COORDS_RANGE)
+            STR_PART = 'from user-supplied range ' + str(START_COORDS_RANGE)
+        else:        # .. otherwise use the default START_COORDS_RANGE:
+            STR_PART = 'from default range ' + str(START_COORDS_RANGE)
+        START_COORDS_N = random.randint(START_COORDS_RANGE[0], START_COORDS_RANGE[1])
+        argsDict['START_COORDS_N'] = START_COORDS_N
+        print('Using', START_COORDS_N, 'start coordinates, by random selection ' + STR_PART)
+        # END STATE MACHINE "Megergeberg 5,000."
+
+if ARGS.CUSTOM_COORDS_AND_COLORS:
+    CUSTOM_COORDS_AND_COLORS = ARGS.CUSTOM_COORDS_AND_COLORS
+    CUSTOM_COORDS_AND_COLORS = re.sub(' ', '', CUSTOM_COORDS_AND_COLORS)
+    argsDict['CUSTOM_COORDS_AND_COLORS'] = CUSTOM_COORDS_AND_COLORS
+    CUSTOM_COORDS_AND_COLORS = ast.literal_eval(ARGS.CUSTOM_COORDS_AND_COLORS)
 
 if ARGS.GROWTH_CLIP:        # See comments in ARGS.BG_COLOR handling. Handled the same.
     GROWTH_CLIP = ARGS.GROWTH_CLIP
     GROWTH_CLIP = re.sub(' ', '', GROWTH_CLIP)
     argsDict['GROWTH_CLIP'] = GROWTH_CLIP
     GROWTH_CLIP = ast.literal_eval(GROWTH_CLIP)
-# NOTE: VESTIGAL CODE HERE that may will alter things if commented vs. not commented out;
-# if render from a preset doesn't produce the same result as it once did, try uncommenting
-# the next line! :
+# NOTE: VESTIGAL CODE HERE that will alter pseudorandom determinism if commented vs.
+# not commented out; if render from a preset doesn't produce the same result as it
+# once did, try uncommenting the next line! :
     # zax_blor = ('%03x' % random.randrange(16**6))
 else:
     temp_str = str(GROWTH_CLIP)
@@ -599,10 +621,10 @@ def get_rnd_unallocd_neighbors(y, x, canvas):
                 if not (i == 0 and j == 0) and is_coord_in_bounds(y+i, x+j) and not is_color_valid(y+i, x+j, canvas):
                     unallocd_neighbors.add((y+i, x+j))
     if unallocd_neighbors:        # If there is anything left in unallocd_neighbors:
-        # START VISCOSITY CONTROL.
+        # START GROWTH_CLIP (VISCOSITY) CONTROL.
         # Decide how many to pick:
         n_neighbors_to_ret = np.clip(np.random.randint(GROWTH_CLIP[0], GROWTH_CLIP[1] + 1), 0, len(unallocd_neighbors))
-        # END VISCOSITY CONTROL.
+        # END GROWTH_CLIP (VISCOSITY) CONTROL.
         rnd_neighbors_to_ret = random.sample(unallocd_neighbors, n_neighbors_to_ret)
         for neighbor in rnd_neighbors_to_ret:
             unallocd_neighbors.remove(neighbor)
@@ -693,19 +715,40 @@ for y in range(0, HEIGHT):        # for columns (x) in row)
         unallocd_coords.add((y, x))
         canvas[y].append([-1,-1,-1])
 
-# Initialize allocd_coords set by random selection from unallocd_coords (and remove
-# from unallocd_coords):
-# for i in range(0, START_COORDS_N):
-# TO DO: check if things here and here would be faster for getting a random sample:
-# https://medium.freecodecamp.org/how-to-get-embarrassingly-fast-random-subset-sampling-with-python-da9b27d494d9
-# https://stackoverflow.com/a/15993515/1397555
-RNDcoord = random.sample(unallocd_coords, START_COORDS_N)
-for coord in RNDcoord:
-    coord_queue.append(coord)
-    if COLOR_MUTATION_BASE == "random":
-        canvas[coord[0]][coord[1]] = np.random.randint(0, 255, 3)
-    else:
-        canvas[coord[0]][coord[1]] = COLOR_MUTATION_BASE
+# DEV CODING CHANGES/ADDITIONS start here!
+# If ARGS.CUSTOM_COORDS_AND_COLORS was not passed to script, initialize allocd_coords set by random
+# selection from unallocd_coords (and remove from unallocd_coords):
+# Structure of coords is (y,x), and the following is four corners of canvas 100y * 200x:
+    # code line WAS: RNDcoord = random.sample(unallocd_coords, START_COORDS_N) :
+if not ARGS.CUSTOM_COORDS_AND_COLORS:
+    print('no --CUSTOM_COORDS_AND_COLORS argument passed to script, so initializing coordinate locations randomly . . .')
+    RNDcoord = random.sample(unallocd_coords, START_COORDS_N)
+    print('value of first of that is', RNDcoord[0])
+    print('type of that is ', type(RNDcoord[0]))
+    for coord in RNDcoord:
+        coord_queue.append(coord)
+        if COLOR_MUTATION_BASE == "random":
+            canvas[coord[0]][coord[1]] = np.random.randint(0, 255, 3)
+        else:
+            canvas[coord[0]][coord[1]] = COLOR_MUTATION_BASE
+# If ARGS.CUSTOM_COORDS_AND_COLORS was passed to script, init coords and their colors from it: 
+else:
+    print('--CUSTOM_COORDS_AND_COLORS argument passed to script, so initializing coords and colors from that. NOTE that this overrides --START_COORDS_N, --START_COORDS_RANGE, and --COLOR_MUTATION_BASE if those were provided.')
+    print('\n')
+    for element in CUSTOM_COORDS_AND_COLORS:
+        # SWAPPING those (on CLI they are x,y; here it wants y,x) ;
+        # ALSO, this program kindly allows hoomans to not bother with zero-based
+        # indexing, which means 1 for hoomans is 0 for program, so substracting 1
+        # from both values:
+        coord = (element[0][1], element[0][0])
+        # print('witohut mod:', coord)
+        coord = (element[0][1]-1, element[0][0]-1)
+        # print('with mod:', coord)
+        coord_queue.append(coord)
+        color_values = np.asarray(element[1])       # np.asarray() gets it into same object type as elsewhere done and expected.
+        print('adding clor to canvas:', color_values)
+        # MINDING the x,y swap AND to modify the hooman 1-based index here, too! :
+        canvas[ element[0][1]-1 ][ element[0][0]-1 ] = color_values     # LORF! 
 
 report_stats_every_n = 5000
 report_stats_nth_counter = 0
