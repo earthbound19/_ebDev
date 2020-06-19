@@ -40,11 +40,10 @@ See comments under documentation heading in this module.
 # since the color_growth_fast.py fork it isn't.
 
 # VERSION HISTORY
-# v2.8.1:
-# - Added rndStr back to generated preset names.
-# - Relocated vestigal rndStr value creation and explained that in comment.
-# - Deleted vestigal dev debug prints.
-# - Trivial comment fixups.
+# v2.8.2:
+# - YORFHAERFLEBLORGHH!
+# - Uncomment rndStr def that wasn't supposed to be commented.
+# - Trivial comment fixes.
 
 
 # CODE
@@ -65,7 +64,7 @@ from PIL import Image
 
 # START GLOBALS
 # Defaults which will be overriden if arguments of the same name are provided to the script:
-ColorGrowthPyVersionString = 'v2.8.1'
+ColorGrowthPyVersionString = 'v2.8.2'
 WIDTH = 400
 HEIGHT = 200
 RSHIFT = 8
@@ -729,12 +728,12 @@ else:
         # indexing, which means 1 for hoomans is 0 for program, so substracting 1
         # from both values:
         coord = (element[0][1], element[0][0])
-        # print('witohut mod:', coord)
+        # print('without mod:', coord)
         coord = (element[0][1]-1, element[0][0]-1)
         # print('with mod:', coord)
         coord_queue.append(coord)
         color_values = np.asarray(element[1])       # np.asarray() gets it into same object type as elsewhere done and expected.
-        print('adding clor to canvas:', color_values)
+        # print('adding color to canvas:', color_values)
         # MINDING the x,y swap AND to modify the hooman 1-based index here, too! :
         canvas[ element[0][1]-1 ][ element[0][0]-1 ] = color_values     # LORF! 
 
@@ -761,7 +760,7 @@ else:
     # think it _would_ have been here (also git history isn't complete on
     # versions, I think, so I'm speculating); if you can't duplicate the rnd
     # state of a render, you may want to try copying it up there.
-    # rndStr = ('%03x' % random.randrange(16**6))
+    rndStr = ('%03x' % random.randrange(16**6))
     render_target_file_base_name = time_stamp + '__' + rndStr + '_colorGrowthPy'
 # Check if render target file with same name (but .png) extension exists.
 # This logic is very slightly risky: if render_target_file_base_name does
