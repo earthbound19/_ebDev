@@ -19,7 +19,7 @@
 # coordinate generation). If not used a hard-coded default will be.
 # If you want to use other parameters but the default for this, pass
 # this as NULL.
-# - $4 OPTIONAL. Height render. Same notes/usage for this as for $3.
+# - $4 OPTIONAL. Height of render. Same notes/usage for this as for $3.
 # - $5 OPTIONAL. Extra parameters as usable by color_growth.py. These
 # muse be enclosed in quote or double-quote marks. See output of -h switch
 # from that script.
@@ -33,7 +33,6 @@
 # - To use --GROWTH_CLIP with this, e.g. --GROWTH_CLIP (1,4), do not
 # enclose the parenthesis in the parameter with double or single-quotes
 # (as you must ordinarily on Windows and maybe other platforms).
-
 
 # DEPENDENCIES
 # A 'nixy environment, color_growth.py, Python 3, hexplt2rgbplt.sh
