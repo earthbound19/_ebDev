@@ -51,6 +51,8 @@ do
 			echo "color_growth_hexplt_multiColor.sh $palette $howManyColors $width $height $extraParameters" > tmp_color_growth_hexplts_multiColor_Ntimes_script__t6KGRUQPBDE7Y4.sh
 			./tmp_color_growth_hexplts_multiColor_Ntimes_script__t6KGRUQPBDE7Y4.sh
 			rm ./tmp_color_growth_hexplts_multiColor_Ntimes_script__t6KGRUQPBDE7Y4.sh
+			echo "sleeping for 300 seconds to let computer cool . . ."
+			sleep 300
 		fi
 	done	
 done
