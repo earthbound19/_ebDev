@@ -26,9 +26,9 @@ renderEachPaletteNtimes=6
 palettes=(`gfind . -maxdepth 1 -type f -name "*.hexplt" -printf '%f\n'`)
 
 # Do everything in the inner for palette .. loop $renderEachPaletteNtimes:
-for ((i=1;i<=renderEachPaletteNtimes;i++))
+for palette in ${palettes[@]}
 do
-	for palette in ${palettes[@]}
+	for ((i=1;i<=renderEachPaletteNtimes;i++))
 	do
 		# check for .rendering stub files and don't render if they exist
 		# (allows interrupt/resume of render batch); if they don't exist,
