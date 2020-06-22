@@ -7,7 +7,7 @@
 
 # USAGE
 # With this script in your PATH:
-# listUnmatchedExtensions.sh sourceExtensionFormat targetExtensionFormat
+# listUnmatchedExtensions.sh sourceExtensionFormat withNotargetExtensionFormatPair
 # For example, if you are rendering so many images from color_growth.py-
 # compatible .cgp files, and want to list all .cgp files that have no
 # corresponding .png file of the same name:
