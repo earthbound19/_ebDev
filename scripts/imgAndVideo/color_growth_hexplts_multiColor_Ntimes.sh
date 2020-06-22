@@ -56,3 +56,5 @@ do
 		fi
 	done	
 done
+
+Echo "color_growth_hexplts_multiColor_Ntimes.sh renders DONE."
