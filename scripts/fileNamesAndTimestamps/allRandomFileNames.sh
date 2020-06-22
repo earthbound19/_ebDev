@@ -1,16 +1,14 @@
-echo "TO DO: TEST THIS SCRIPT according to its documentation, by setting up a test directory. Then re-code if necessary to fix. If/when it passes tests, delete the first two lines of this script, and keep it that way. I'm writing this because I spotted what I think is a logic error in simplifying parameter detection in this script, and _I think_ I fixed the error (handling of parameter $2), but haven't tested it. - RAH 2019-12-27 07:52 PM Friday"
-exit
 # DESCRIPTION
 # Renames files with random character strings of length n (per paramater passed to script or default 4), preserving file extension.
 
 # USAGE
-# WARNING: This will randomly rename *all files in a tree* (including subfolders) and move the renamed files to the root folder this script is invoked from.
-# Put this script in your $PATH, with these parameters:
+# WARNING: This will randomly rename *all files in a tree* (including subfolders) and move the renamed files to the root folder this script is invoked from. It will prompt you for a known (given) password to continue before doing so.
+# Put this script in your $PATH, and run it with these parameters:
 # $1 : The length of random characters to rename the file with. If you don't specify any number for the first parameter, it defaults to 4.
-# $2 : Optional: a file extension (without any . in it) to restrict random renames to. It will not rename any other file types. If this is not provided, it will rename all file types in the current path.
+# $2 : Optional: a file extension (without any . in it) to restrict random renames to. It will not rename any other file types. If this is not provided, it will rename _all_ file types in the current path.
 # WARNING: very bad things might happen (e.g. permanent data loss!) if you do not pass parameters as instructed here under USAGE.
 # EXAMPLE; rename all files with the extension .hexplt to 20-character random strings:
-# ./thisScript.sh 20 hexplt
+# allRandomFileNames.sh 20 hexplt
 
 # TO DO
 # Throw an error and exit if non-numeric first parameter passed.
@@ -29,8 +27,28 @@ fi
 if [ "$2" ]
 	then
 		array=(`gfind . -maxdepth 1 -type f -iname \*.$2 -printf '%f\n'`)
+		fileTypesToRename=$2
 	else
 		array=(`gfind . -maxdepth 1 -type f -iname \* -printf '%f\n'`)
+		fileTypesToRename="*"
+fi
+
+
+# CODE
+echo ""
+echo "WARNING: This script renames all files of type $fileTypesToRename with $1"
+echo "random characters. See comments in script for details. If this is not"
+echo "what you want to do, press ENTER or RETURN, or CTRL+C or CTRL+Z. If this"
+echo "_is_ what you want to do, type SNEERFBLURN and then press ENTER or RETURN."
+read -p "TYPE HERE: " SILLYWORD
+
+if ! [ "$SILLYWORD" == "SNEERFBLURN" ]
+then
+	echo ""
+	echo Typing mismatch\; exit.
+	exit
+else
+	echo continuing . .
 fi
 
 arrSize=${#array[@]}
