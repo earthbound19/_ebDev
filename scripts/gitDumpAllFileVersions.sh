@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Places a copy of every revision of a given file (from a git repo) to files named originalFileName.ext__ver_<nnn>.txt. Files will appear in the same path(s?) as the file for which revisions are scanned. For 
+# Places a copy of every revision of a given file (from a git repo) to files named originalFileName.ext__ver_<nnn>.txt. Files will appear in the same path(s?) as the file for which revisions are scanned. Updates extracted file time stampes with touch and /or exiftool to match git commit time.
 
 # USAGE
 # with this script in your PATH, and from the root directory of a repo, run:
@@ -33,9 +33,10 @@ do
 	# ELEVEN-MILLIONTH TIME THAT WINDOWS @@!&@&!@*#!!! messed up newlines have screwed with script functionality and had to be chopped off via tr:
 	HASH=`echo $HASH | tr -d '\15\32'`
 	INDEX_OUT=$(printf %03d $INDEX)
-	OUT_FILENAME="$FILENAME.$INDEX_OUT.$HASH"
+	OUT_FILENAME="$1"__ver_"$INDEX_OUT"__"$HASH".txt
+	# OUT_FILENAME="$FILENAME.$INDEX_OUT.$HASH"
 	# echo will write to file "$1"__ver_"$INDEX_OUT".txt . . .
-	git cat-file -p "$HASH":$* > "$1"__ver_"$INDEX_OUT".txt
+	git cat-file -p "$HASH":$* > $OUT_FILENAME
 	# retrieve and apply original time stamp of file when commited;
 	# re another genius breath: https://stackoverflow.com/a/30143117/1397555
 	# echo updating timestamp to original commit time . . .
@@ -43,9 +44,9 @@ do
 	# working around $*()!! newline problem again with | tr -d '\15\32':
     TIME2=`echo $TIMESTAMP | gsed 's/-//g;s/ //;s/://;s/:/\./;s/ .*//' | tr -d '\15\32'`
 # 'nix:
-    touch -a -m -t $TIME2 "$1"__ver_"$INDEX_OUT".txt
+    touch -a -m -t $TIME2 $OUT_FILENAME
 # WINDOWS kludge: copy now accurate modify date to create date time stamp via exiftool:
-	ExifTool -overwrite_original "-FileModifyDate>FileCreateDate" "$1"__ver_"$INDEX_OUT".txt
+	ExifTool -overwrite_original "-FileModifyDate>FileCreateDate" $OUT_FILENAME
 	let INDEX=INDEX+1
 done < tmp_7BTRBAqw4rMBBP.txt
 
