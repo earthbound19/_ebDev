@@ -4,7 +4,7 @@
 # (./pa.sh), and not from PATH search and find of this script.
 
 # USAGE
-# Copy this script to a folder containing some git repository local 
+# Copy this script (pull_all.sh) to a folder containing some git repository local 
 # clones, and rename it to pa.sh. Then in the copied script, alter the 
 # repo_directories array (below) for your wishes. Then, to pull all those 
 # clones automatically, open your terminal to that directory (or cd to 
@@ -29,7 +29,7 @@
 if ! [ "$0" == "./pa.sh" ]; then echo "Script not called via ./pa.sh command. Call this script only as ./pa.sh. Exiting script."; exit; fi
 
 repo_directories=" \
-_ebArt \
+_ebPalettes \
 _ebDev \
 _ebPathMan \
 _ebSuperBin \
