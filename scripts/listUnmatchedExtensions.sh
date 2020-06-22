@@ -11,7 +11,9 @@
 # For example, if you are rendering so many images from color_growth.py-
 # compatible .cgp files, and want to list all .cgp files that have no
 # corresponding .png file of the same name:
-# listUnmatchedExtensions.sh cgp png
+#  listUnmatchedExtensions.sh cgp png
+# To count how many unmatched extensions there are, pipe it to wc with a flag:
+#  listUnmatchedExtensions.sh cgp png | wc -l
 
 # KEYWORDS
 # orphan, unmatched, unpaired, no pair, extension, not found, pair
@@ -34,7 +36,7 @@ fi
 
 sourceExtensions=(`gfind . -maxdepth 1 -name "*.cgp" -printf '%f\n'`)
 
-echo "List of files of type $1 for which there is no corresponding file of type $2:"
+# echo "List of files of type $1 for which there is no corresponding file of type $2:"
 for element in ${sourceExtensions[@]}
 do
 	# echo $element
