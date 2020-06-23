@@ -11,5 +11,6 @@ pngsFileNamesArray=(`gfind . -type f -name "*.png"`)
 
 for element in ${pngsFileNamesArray[@]}
 do
+	# TO DO: pngout call here? Then commit and rename and re-commit script?
 	optipng -o7 $element
 done
