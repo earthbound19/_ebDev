@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Takes a list of hex color codes, one per line, and renders a palette image composed of those colors via GraphicsMagick.
+# Takes a list of hex color codes, one per line, and renders a PNG image composed of tiles of those colors (a palette image), via GraphicsMagick.
 
 # DEPENDENCIES
 # GraphicsMagick e.g. for:
@@ -190,9 +190,12 @@ mv _hexPaletteIMGgenTMP_2bbVyVxD $paletteFile.colors
 	# AND, if it annoys you, also delete:
 	rm -rf $paletteFile.colors
 
+# The next three code lines are optional but I leave them uncommented, as it dramatically reduces files size:
+echo ""
+echo OPTIMIZING rendered png . . .
+optipng -o7 $renderTarget
+
+echo ""
 echo DONE--created color palette image is $renderTarget
 
 # TO DO? : make the following statement optionally true (via parameter), and echo it: "You will also find color swatch images from the palette in the folder $paletteFile.colors."
-
-# OPTIONAL on cygwin: open palette image:
-# cygstart $1.png
