@@ -27,7 +27,11 @@
 
  // FOUND AT: https://sourceforge.net/p/fontforge/git/ci/master/tree/fonttools/ttf2eps.c#l1
  // possibly newer alternate at: https://github.com/fontforge/fontforge/blob/master/contrib/fonttools/ttf2eps.c
-
+ // UPDATED since I found it, but the update not copied here. Can't build the new version without more work or knowledge than I care to exert or find; I already tried to much with frustration. BUILD NOTES: CONTRARY to outdated and unhelpful directions at sourceforge which pointed to this script, you do not have to download into any subdirectory any external library. The build script does all that. For Windows, install the latest MSYS2, then open one of the MinGW shortcuts installed by MSYS2, to launch a build environment (can be 64 or 32-bit, I think). Then clone, cd into, and run the ./ffbuild.sh script:
+ // git clone https://github.com/jtanx/fontforgebuilds.git
+ // cd fontforgebuilds
+ // ./ffbuild.sh
+ // I had hoped it would build extras like ttf2eps. That's the whole reason I tried building it. Even passing it -r -n after reading the help for the build script, that doesn't happen. There's probably a way to make it happen (I found a --enable-fontforge-extras flag), but I don't know it.
  // USAGE re: https://github.com/fontforge/fontforge/blob/master/contrib/fonttools/README-ttf2eps
  // ttf2eps [-all] {-name ps-name | -unicode hex | -uni hex | -glyph num} ttf-font
  // COMMANDS that work:
