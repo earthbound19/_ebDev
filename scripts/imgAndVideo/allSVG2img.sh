@@ -8,9 +8,27 @@
 # $3 optional--see parameter $4 description in SVG2img.sh.
 # e.g.:
 # ./allSVG2img.sh 4200 png 000066
+# NOTE: to render svgs in subdirectories as well, remove "-maxdepth 1" from the array build code line.
 
-if ! [ "$1" ]; then echo "No parameter \$1. Exit."; exit; fi
-if ! [ "$2" ]; then echo "No parameter \$2. Exit."; exit; fi
+
+# CODE
+# Set defaults or use parameters passed to script, depending.
+if [ "$1" ]
+then
+	longestImageSide=$1
+else
+	longestImageSide=4200
+	echo "No parameter \$1. Set to default $longestImageSide."
+fi
+
+if [ "$2" ]
+then
+	targetIMGformat=$2
+else
+	targetIMGformat=png
+	echo "No parameter \$2. Set to default $targetIMGformat."
+fi
+
 if [ "$3" ]
 then
 	bgColorParam=$3
@@ -19,10 +37,9 @@ else
 	bgColorParam='000000'
 fi
 
-# CODE
-# NOTE: to render svgs in subdirectories as well, remove "-maxdepth 1" from the following command:
+# Do the conversions.
 array=(`gfind . -maxdepth 1 -type f -iname \*.svg -printf '%f\n'`)
 for element in ${array[@]}
 do
-	SVG2img.sh $element $1 $2 $bgColorParam
+	SVG2img.sh $element $longestImageSide $targetIMGformat $bgColorParam
 done
