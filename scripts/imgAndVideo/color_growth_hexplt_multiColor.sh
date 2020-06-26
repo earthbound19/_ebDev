@@ -97,9 +97,9 @@ fi
 hexplt2rgbplt.sh $sourceHEXPLT
 paletteFileNoExt=`echo "${sourceHEXPLT%.*}"`
 convertedPaletteFile=$paletteFileNoExt.rgbplt
-
-cgpFileName=`date +"%Y_%m_%d__%H_%M_%S__%N"`
-cgpFileName="$cgpFileName"__from_"$paletteFileNoExt".cgp
+rndString=`cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6`
+dateTimeString=`date +"%Y_%m_%d__%H_%M_%S"`
+cgpFileName="$numColors"_from_"$paletteFileNoExt"__"$dateTimeString"__"$rndString".cgp
 shuf $convertedPaletteFile | ghead -n $numColors > tmp_RGBlist_yyy3CHVC5F.rgbplt
 
 # Get first color in that list and set as BG_COLOR:
