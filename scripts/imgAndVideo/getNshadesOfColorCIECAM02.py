@@ -1,14 +1,15 @@
 # DESCRIPTION
-# Gets -n shades of any -c color (default white if not passed) via the CIECAM02 color space, which models human perception of color (and brightnes and other aspects of light) better than any other model at this writing.
+# Gets -n shades of any -c color (default white if not passed) via the CIECAM02 color space, which models human perception of color (and brightnes and other aspects of light) better than any other model at this writing. Writes results to a new .hexplt file named after color.
 
 # USAGE
-# run script with --help parameter for instructions, or read the description sections in the argsparse setup below. Basic default usage for e.g. 16 shades of gray:
+# run script with --help parameter for instructions, or read the description sections in the argsparse setup below. Basic default usage for e.g. 16 shades of gray (as it defaults to shades of white if no --COLOR is specified) :
 # getNshadesOfColorCIECAM02.py -n 16 > 18shadesOf<color>CIECAM02.hexplt
 # NOTES:
 # - it may produce more or less colors than specified. Welcome to inexact float math.
 # - it may produce some unexpected colors. I recommend you use an editor that live previews
 # hex colors (like Atom with the highlight-colors package).
-# NOTE that the script adds the original color to the array at the start or end depending on
+# - it writes results to a file named after the color, e.g. fff585_15shades.hexplt.
+# - it adds the original color to the array at the start or end depending on
 # whether you use -r | --DARK_TO_BRIGHT or not IF you also don't use -b | --BRIGHTNESS_OVERRIDE.
 
 # DEPENDENCIES
@@ -17,6 +18,7 @@
 # DEV NOTES
 # SEE COMMENTS IN get_CIECAM02_simplified_gamut.py, BUT:
 # J (brightness or lightness) range is 0 to 100, h (hue) is 0 to 360, C (chroma) can be 0 to any number (I don't believe that there _is_ a max from whatever correlary/inputs produces the max), maybe max 160. For hard-coded colors, start with max 182 (this seemed a thing with L in HCL).
+# ALSO, I tried the same thing with a different color library, in a now deleted script getNshadesOfColorCAM16-colour-science.py, but I was getting very wonky color results, so I forsook it and deleted the script.
 
 
 # CODE
