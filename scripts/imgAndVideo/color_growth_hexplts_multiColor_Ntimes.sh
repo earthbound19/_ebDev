@@ -1,34 +1,48 @@
 # DESCRIPTION
 # Invokes color_growth_hexplt_multiColor.sh (note that is ~hexplt,
 # where this is ~hexplts) repeatedly, for every .hexplt file in the
-# current directory, with hard-coded settings. Moreover, makes N
-# renders from each hexplt file. Hack the variables at the start of
-# the script to alter preferences.
+# current directory, with custom settings for how many colors to use,
+# and width, and height. See USAGE.
 
 # DEPENDENCIES
-# See the DEPENDENCIES section of the script this calls.
-
-# TO DO
-# Paramaterize this script?
+# See the DEPENDENCIES section of color_growth_hexplt_multiColor.sh
 
 # USAGE
 # With so many .hexplt files of your liking in the directory you
-# want this to work on, run this script.
-
+# want this to work on, run this script, with these optional
+# parameters (which all default to hard-coded values if you don't
+# pass them:
+#  $1 how many colors in the palette to use. May not exceed number
+# of colors in palette. To use all colors in the palette, pass the
+# string 'ALL' in single quote marks. If unused, defaults to the
+# string 'ALL'.
+#  $2 how many renders to make from colors in each palette. If not
+# provided, defaults to a hard-coded value.
+#  $3 width of renders, in pixels. If not provided, defaults to a
+# hard-coded value.
+#  $4 height of renders, in pixels. If not provided, defaults to a
+# hard-coded value.
+#  $5 extra parameters, surrounded by double quote marks, in the
+# format expected by color_growth.py.
 
 # CODE
-howManyColors='ALL'
-width=1920
-height=1080
-extraParameters="'--RSHIFT 1 --SAVE_EVERY_N 7150 --RAMP_UP_SAVE_EVERY_N True --TILEABLE True'"
-renderEachPaletteNtimes=6
+if [ "$1" ]; then howManyColors=$1; else howManyColors='ALL'; fi
+if [ "$2" ]; then renderEachPaletteNtimes=$2; else renderEachPaletteNtimes=6; fi
+if [ "$3" ]; then width=$3; else width=1920; fi
+if [ "$4" ]; then height=$4; else height=1080; fi
+if [ "$5" ]
+then
+	extraParameters="'$5'"
+else
+	extraParameters="'--RSHIFT 1 --SAVE_EVERY_N 7150 --RAMP_UP_SAVE_EVERY_N True --TILEABLE True'"
+fi
 
 palettes=(`gfind . -maxdepth 1 -type f -name "*.hexplt" -printf '%f\n'`)
 
-# Do everything in the inner for palette .. loop $renderEachPaletteNtimes:
-for palette in ${palettes[@]}
+# renderEachPaletteNtimes times, render an image for every palette:
+for ((i=1;i<=renderEachPaletteNtimes;i++))
 do
-	for ((i=1;i<=renderEachPaletteNtimes;i++))
+	for palette in ${palettes[@]}
 	do
 		# check for .rendering stub files and don't render if they exist
 		# (allows interrupt/resume of render batch); if they don't exist,
