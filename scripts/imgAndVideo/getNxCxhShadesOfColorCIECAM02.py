@@ -6,7 +6,7 @@ exit()
 
 # USAGE
 # run script with --help parameter for instructions, or read the description sections in the argsparse setup below. Basic default usage for e.g. 16 shades of gray:
-# getCIECAM02ShadesOfColor.py -n 16 -C 20 - h 12 -d 4 > 18shadesOf<color>CIECAM02.hexplt
+# getNxCxhShadesOfColorCIECAM02.py -n 16 -C 20 - h 12 -d 4 > 18shadesOf<color>CIECAM02.hexplt
 # NOTES:
 # See NOTES comments in script referenced in DESCRIPTION.
 
