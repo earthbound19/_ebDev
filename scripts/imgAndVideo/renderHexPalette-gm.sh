@@ -10,18 +10,19 @@
 # NOTE: this script seems not to work on cygwin/windows, but it does work on Mac and probably nix' variants.
 # Invoke this script with the following parameters:
 # $1 hex color palette flat file list (input file).
-# $2 edge length of each square tile to be composited into final image.
-# $3 MUST HAVE VALUE 0 or nonzero (anything other than 0). If nonzero, the script will randomly shuffle the hex color files before compositing them to one image. PREVIOUSLY WAS $5, PREVIOUSLY WAS OPTIONAL; NOW REQUIRED. OVERWRITES different previous parameter position (from a prior version of this script).
-# $4 OPTIONAL. number of tiles accross of tiles-assembled image (columns). PREVIOUSLY WAS $3.
-# $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows). PREVIOUSLY WAS $4.
+# $2 OPTIONAL. Edge length of each square tile to be composited into final image. If no provided a default is used.
+# $3 OPTIONAL. If not provided, or provided as string 'NULL' (don't use the single quote marks), the order of elements in the palette will be preserved. If provided and anything other than NULL (for example 2 or foo or 1 or 3), the script will randomly shuffle the hex color files before compositing them to one image. I have gone back and forth on requiring this in the history of this script :/
+# $4 OPTIONAL. Number of tiles accross of tiles-assembled image (columns).
+# $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).
 # EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, the palette image being 5 columns wide and 6 rows down, with squares in the palette rendered in random order:
-# renderHexPalette-gm.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
+#  renderHexPalette-gm.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
+# ANOTHER EXAMPLE COMMAND; create a palette image from tigerDogRabbit_many_shades.hexplt, with each tile 300 pixels wide, no shuffling, the script deciding how many accross and down to make the tiles:
+#  renderHexPalette-gm.sh tigerDogRabbit_many_shades.hexplt 300 tigerDogRabbit_many_shades.hexplt
+# ANOTHER EXAMPLE COMMAND; use the same palette and let the script use all defaults:
+#  renderHexPalette-gm.sh tigerDogRabbit_many_shades.hexplt
 
-# KNOWN ISSUES
-# Sometimes Cygwin awk throws errors as invoked by this script. Not sure why. I run it twice and one time awk throws an error, another it doesn't.
 
 # TO DO
-# Adapt this to use new script findHEXPLT.sh to retrieve .hexplt file path.
 # UM. WOULDN'T THIS BE A TON FASTER creating a ppm and then upscaling it by nearest neighbor method?! Redo script (or make variant method script) for that?! -- trying that in hexplt2ppm.sh.
 # Adapt this to do double-wide half-down ratios by multiples of two, e.g. 4:2, 8:4, 16:8 etc. (not just 2:1).
 # Allow handling of a hex color on any line with or without # in front of it.
@@ -68,17 +69,16 @@ else	# Search for specified palette file in palettesRootDir (if that dir exists;
 	fi
 fi
 
+if [ "$2" ]; then tileEdgeLen=$2; else tileEdgeLen=250; fi
 
-tileEdgeLen=$2
-# Whether to shuffle colors:
-if [[ $3 == 0 ]]
+# Set default no shuffle, and only alter if $3 is not equal to 'NULL':
+shuffleValues=0
+if [ "$3" ] && [ "$3" != "NULL" ]
 then
-	shuffleValues=0
-	echo Value of paramater \$3 is zero\; will not shuffle read values.
-else
 	shuffleValues=1
 	echo echo Value of paramater \$3 is NONZERO\; WILL SHUFFLE read values.
 fi
+
 # WHETHER NUM tiles across (and down) is specified; if so, use as specified, if not so, do some math to figure for a 2:1 aspect;
 # $4 is across. If $4 is not specified, do some math. Otherwise use $4:
 if [ ! $4 ]
@@ -121,7 +121,17 @@ then
 else
 	tilesDown=$5
 fi
-# echo tilesDown is $tilesDown\.
+
+# COMMENT out these test echoes and exit statement in production:
+# echo "values:"
+# echo "paletteFile $paletteFile"
+# echo "tileEdgeLen $tileEdgeLen"
+# echo "shuffleValues $shuffleValues"
+# echo "numColors $numColors"
+# echo "sqrtOfColorCount $sqrtOfColorCount"
+# echo "tilesAcross $tilesAcross"
+# echo "tilesDown $tilesDown"
+# exit
 # END SETUP GLOBAL VARIABLES
 # =============
 
