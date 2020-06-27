@@ -2,7 +2,7 @@
 # Takes a .hexplt source file $1 and a number of colors to choose 
 # from it $2, and invokes color_growth.py with the
 # --CUSTOM_COORDS_AND_COLORS option with those colors (converted to
-# RGB vals via hexplt2rgbplt.sh), optinoally with other CLI options.
+# RGB vals via hexplt2rgbplt.sh), optionally with other CLI options.
 # See USAGE.
 
 # USAGE
@@ -10,10 +10,13 @@
 # - $1 a .hexplt format flat file list of RGB colors expressed as hex,
 # with leading pound/hash signs. See collection in /palettes dir of
 # _ebArt repo.
-# - $2 OPTIONAL. How many colors to randomly select from that file. IF NOT
-# PROVIDED, will use all colors in the palette. If you want to use the
-# default (N colors in palette) and also use $3 and $4 (read on), pass
-# this as ALL.
+# - $2 OPTIONAL. How many colors to randomly select from that file.
+# IF NOT PROVIDED, or provided as the string 'ALL' (without the
+# single quote marks), will use all colors in the palette. May be
+# fewer or greater than the number of colors in a palette, e.g. if
+# a palette has 20 colors, you may specify 8 or 64, etc. If more
+# than the number of colors in a palette, colors will be randomly
+# selected from the palette up to this number.
 # - $3 OPTIONAL. Width of render (although this is redundant to a
 # color_growth.py parameter, this script needs to know it for random
 # coordinate generation). If not used a hard-coded default will be.
@@ -21,7 +24,7 @@
 # this as NULL.
 # - $4 OPTIONAL. Height of render. Same notes/usage for this as for $3.
 # - $5 OPTIONAL. Extra parameters as usable by color_growth.py. These
-# muse be enclosed in quote or double-quote marks. See output of -h switch
+# muse be enclosed in double-quote marks. See output of -h switch
 # from that script.
 # Example command, with number of colors in palette used:
 # color_growth_hexplt_multiColor.sh palette.hexplt ALL
@@ -54,15 +57,15 @@ fi
 
 if [ "$2" ] && [ "$2" != "ALL" ]
 then
-	numColors=$2
-	printf "\n~Parameter \$2 passed to script with value $numColors. Will use that many colors."
+	numColorsToUse=$2
+	printf "\n~Parameter \$2 passed to script with value $numColorsToUse. Will use that many colors."
 fi
 # If there was no parameter 2 passed OR it was passed as ALL, set
-# numColors to the number of colors in the palette file:
+# numColorsToUse to the number of colors in the palette file:
 if ! [ "$2" ] || [ "$2" == "ALL" ]
 then
-	numColors=`wc -l < $sourceHEXPLT`
-	printf "\n~ No parameter \$2 passed, or it was passed as keyword ALL.\nDetermined that palette has $numColors colors. Will use that many."
+	numColorsToUse=`wc -l < $sourceHEXPLT`
+	printf "\n~ No parameter \$2 passed, or it was passed as keyword ALL.\nDetermined that palette has $numColorsToUse colors. Will use that many."
 fi
 
 if [ "$3" ] && [ "$3" != "NULL" ]
@@ -99,8 +102,40 @@ paletteFileNoExt=`echo "${sourceHEXPLT%.*}"`
 convertedPaletteFile=$paletteFileNoExt.rgbplt
 rndString=`cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6`
 dateTimeString=`date +"%Y_%m_%d__%H_%M_%S"`
-cgpFileName="$numColors"_from_"$paletteFileNoExt"__"$dateTimeString"__"$rndString".cgp
-shuf $convertedPaletteFile | ghead -n $numColors > tmp_RGBlist_yyy3CHVC5F.rgbplt
+cgpFileName="$numColorsToUse"_from_"$paletteFileNoExt"__"$dateTimeString"__"$rndString".cgp
+# AND NOW FOR SOMETHING COMPLETELY DIFFERENT . . .
+# code that enables use of more colors than are in the palette
+# (randomly repeating some colors):
+# If we don't set the delimiter as newline, it splits up rgb triplet
+# values; we want them as one, which we get if we split on newlines:
+IFS=$'\n'
+numColorsInPalette=`wc -l < $convertedPaletteFile`
+drawFromPaletteNtimesToGetnumColorsToUse=`echo "$numColorsToUse / $numColorsInPalette + 1" | bc`		# +1 because math reasons.
+arrayFromConvertedPaletteFile=(`shuf $convertedPaletteFile`)
+arrayColorPoolToRNDdrawFrom=()
+for ((j=1;j<=drawFromPaletteNtimesToGetnumColorsToUse;j++))
+do
+	tmpArray=( $(shuf -e "${arrayFromConvertedPaletteFile[@]}") )
+	# combines elements of two arrays into one:
+	arrayColorPoolToRNDdrawFrom=("${tmpArray[@]}" "${arrayColorPoolToRNDdrawFrom[@]}")
+done
+colorsToUse=()
+arrayColorPoolToRNDdrawFrom=( $(shuf -e "${arrayColorPoolToRNDdrawFrom[@]}") )
+colorsSelected=0
+for element in ${arrayColorPoolToRNDdrawFrom[@]}
+do
+	if [ $colorsSelected -lt $numColorsToUse ]
+	then
+		colorsToUse+=($element)
+	fi
+	colorsSelected=$((colorsSelected+1))
+done
+printf "" > tmp_RGBlist_yyy3CHVC5F.rgbplt
+for element in ${colorsToUse[@]}
+do
+	echo $element >> tmp_RGBlist_yyy3CHVC5F.rgbplt
+done
+# END AND NOW FOR SOMETHING COMPLETELY DIFFERENT
 
 # Get first color in that list and set as BG_COLOR:
 BG_COLOR=`head -n 1 tmp_RGBlist_yyy3CHVC5F.rgbplt`
@@ -129,5 +164,7 @@ printf ']' >> $cgpFileName
 # INVOKE color_growth.py with that newly constructed preset:
 pathTo_color_growth_py=`whereis color_growth.py | gsed 's/color_growth: \(.*\)/\1/g'`
 command="python $pathTo_color_growth_py --LOAD_PRESET $cgpFileName"
-printf "Executing command:\n$command"
-$command
+printf "$command" > tmp_color_growth_hexplt_multiColor_script_6WRsTNfeU3CEvS.sh
+printf "Well executing command:\n$command\n via temp script tmp_color_growth_hexplt_multiColor_script_6WRsTNfeU3CEvS.sh . . .\n"
+./tmp_color_growth_hexplt_multiColor_script_6WRsTNfeU3CEvS.sh
+rm ./tmp_color_growth_hexplt_multiColor_script_6WRsTNfeU3CEvS.sh
