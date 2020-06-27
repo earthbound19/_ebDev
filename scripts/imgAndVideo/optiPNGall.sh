@@ -1,6 +1,6 @@
 # DESCRIPTION
 # Recursively optimizes all pngs in the current directory and subdirectories,
-# via optpng.
+# via pngquant and optpng, preserving full fidelity of original pixels.
 
 # USAGE
 # optiPNGall.sh
@@ -11,6 +11,6 @@ pngsFileNamesArray=(`gfind . -type f -name "*.png"`)
 
 for element in ${pngsFileNamesArray[@]}
 do
-	# TO DO: pngout call here? Then commit and rename and re-commit script?
+	pngquant --skip-if-larger --ext=.png --force --quality 100 --speed 1 --nofs --strip --verbose $element
 	optipng -o7 $element
 done

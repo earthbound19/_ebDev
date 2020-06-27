@@ -200,9 +200,10 @@ mv _hexPaletteIMGgenTMP_2bbVyVxD $paletteFile.colors
 	# AND, if it annoys you, also delete:
 	rm -rf $paletteFile.colors
 
-# The next three code lines are optional but I leave them uncommented, as it dramatically reduces files size:
+# The next four code lines are optional but I leave them uncommented, as they can dramatically reduce file size:
 echo ""
 echo OPTIMIZING rendered png . . .
+pngquant --skip-if-larger --ext=.png --force --quality 100 --speed 1 --nofs --strip --verbose $renderTarget
 optipng -o7 $renderTarget
 
 echo ""
