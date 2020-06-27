@@ -30,7 +30,7 @@
 # color_growth_hexplt_multiColor.sh palette.hexplt ALL
 # Another example command, using 5 colors of the palette, and adding
 # custom parameters :
-# color_growth_hexplt_multiColor.sh palette.hexplt 5 '--SAVE_PRESET False --RANDOM_SEED 817141 --TILEABLE True --SAVE_EVERY_N 140'
+# color_growth_hexplt_multiColor.sh palette.hexplt 5 '--RANDOM_SEED 817141 --TILEABLE True --SAVE_EVERY_N 140'
 # NOTES:
 # - This script sets the first randomly selected color drawn as --BG_COLOR.
 # - To use --GROWTH_CLIP with this, e.g. --GROWTH_CLIP (1,4), do not
@@ -130,15 +130,19 @@ do
 	fi
 	colorsSelected=$((colorsSelected+1))
 done
-printf "" > tmp_RGBlist_yyy3CHVC5F.rgbplt
+rndStringTwo=`cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6`
+# unique rgb temp file list name for this run of script, to avoid
+# duplicate clobbering if running more than one instance of script:
+tmpRGBlistFileName=tmp_RGBlist_yyy3CHVC5F_"$rndStringTwo".rgbplt
+printf "" > ./$tmpRGBlistFileName
 for element in ${colorsToUse[@]}
 do
-	echo $element >> tmp_RGBlist_yyy3CHVC5F.rgbplt
+	echo $element >> ./$tmpRGBlistFileName
 done
 # END AND NOW FOR SOMETHING COMPLETELY DIFFERENT
 
 # Get first color in that list and set as BG_COLOR:
-BG_COLOR=`head -n 1 tmp_RGBlist_yyy3CHVC5F.rgbplt`
+BG_COLOR=`head -n 1 ./$tmpRGBlistFileName`
 BG_COLOR=`echo $BG_COLOR | gsed 's/ /,/g'`
 
 # Create start of .cgp preset file with starting with our custom settings:
@@ -153,8 +157,8 @@ do
 	rndYcoord=`shuf -i 1-$targetRenderHeight -n 1`
 	RGBlist=`echo $element | gsed 's/ /,/g'`
 	printf "[($rndXcoord,$rndYcoord),[$RGBlist]]," >> $cgpFileName
-done < tmp_RGBlist_yyy3CHVC5F.rgbplt
-rm tmp_RGBlist_yyy3CHVC5F.rgbplt
+done < ./$tmpRGBlistFileName
+rm ./$tmpRGBlistFileName
 
 # remove trailing comma from that command being built:
 gsed -i 's/\(.*\),$/\1/' $cgpFileName
@@ -164,7 +168,10 @@ printf ']' >> $cgpFileName
 # INVOKE color_growth.py with that newly constructed preset:
 pathTo_color_growth_py=`whereis color_growth.py | gsed 's/color_growth: \(.*\)/\1/g'`
 command="python $pathTo_color_growth_py --LOAD_PRESET $cgpFileName"
-printf "$command" > tmp_color_growth_hexplt_multiColor_script_6WRsTNfeU3CEvS.sh
+tmpBashScriptFileName=tmp_color_growth_hexplt_multiColor_script_6WRsTNfeU3CEvS_"$rndString".sh
+printf "$command" > $tmpBashScriptFileName
 printf "Well executing command:\n$command\n via temp script tmp_color_growth_hexplt_multiColor_script_6WRsTNfeU3CEvS.sh . . .\n"
-./tmp_color_growth_hexplt_multiColor_script_6WRsTNfeU3CEvS.sh
-rm ./tmp_color_growth_hexplt_multiColor_script_6WRsTNfeU3CEvS.sh
+./$tmpBashScriptFileName
+printf "Waiting 4 seconds before deleting ~multiColor~ temp script file . . .\n"
+sleep 4
+rm ./$tmpBashScriptFileName

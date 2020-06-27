@@ -12,15 +12,15 @@
 # want this to work on, run this script, with these optional
 # parameters (which all default to hard-coded values if you don't
 # pass them:
-#  $1 OPTIONAL. how many colors in the palette to use. May be fewer
+#  $1 OPTIONAL. How many colors in the palette to use. May be fewer
 # or greater than the number of colors in palette (see USAGE in
 # color_growth_hexplt_multiColor.sh for details). To use all colors
 # in the palette, pass the string 'ALL' in single quote marks. If
 # unused, defaults to the string 'ALL'.
-#  $2 OPTIONAL. how many renders to make from colors in each palette.
+#  $2 OPTIONAL. How many renders to make from colors in each palette.
 # If not provided, defaults to a hard-coded value.
 #  $3 OPTIONAL. Width of renders, in pixels. If not provided,
-# defaults to a hard-coded value.
+# defaults to a ard-coded value.
 #  $4 OPTIONAL. Height of renders, in pixels. If not provided,
 # defaults to a hard-coded value.
 #  $5 OPTIONAL. Extra parameters, surrounded by double quote marks,
@@ -60,13 +60,17 @@ do
 			echo ""
 			echo "Render log file $renderLogFileFile was not found;"
 			echo "Rendering . . ."
-			# If I write this to a script and execute it, the script I call won't wait for Python to terminate before returning, it seems? And the #resulting .cgp files were incomplete; but writing it to a script file and invoking the script works:
-			echo "Writing command to tmp_color_growth_hexplts_multiColor_Ntimes_script__t6KGRUQPBDE7Y4.sh:"
+			# If I write this to a script and execute it, the script I call won't wait for Python to terminate before returning, it seems? And the #resulting .cgp files were incomplete; but writing it to a script file and invoking the script works; also, if we run multiple of this at the same time we want the scripts to have different names, so get an rndStr to add to the temp script name:
+			rndString=`cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6`
+			tmpScriptFileName=tmp_color_growth_hexplts_multiColor_Ntimes_script__t6KGRUQPBDE7Y4_"$rndString".sh
+			echo "Writing command to $tmpScriptFileName:"
 			echo "color_growth_hexplt_multiColor.sh $palette $howManyColors $width $height $extraParameters"
-			echo "color_growth_hexplt_multiColor.sh $palette $howManyColors $width $height $extraParameters" > tmp_color_growth_hexplts_multiColor_Ntimes_script__t6KGRUQPBDE7Y4.sh
-			./tmp_color_growth_hexplts_multiColor_Ntimes_script__t6KGRUQPBDE7Y4.sh
-			rm ./tmp_color_growth_hexplts_multiColor_Ntimes_script__t6KGRUQPBDE7Y4.sh
-			echo "sleeping for 300 seconds to let computer cool . . ."
+			echo "color_growth_hexplt_multiColor.sh $palette $howManyColors $width $height $extraParameters" > ./$tmpScriptFileName
+			./$tmpScriptFileName
+			printf "Waiting 4 seconds before deleting ~multiColor_Ntimes~ temp script file . . .\n"
+			sleep 4
+			rm ./$tmpScriptFileName
+			printf "sleeping for 300 seconds to let computer cool . . .\n"
 			# sleep 300
 		fi
 	done	
