@@ -12,18 +12,19 @@
 # want this to work on, run this script, with these optional
 # parameters (which all default to hard-coded values if you don't
 # pass them:
-#  $1 how many colors in the palette to use. May not exceed number
-# of colors in palette. To use all colors in the palette, pass the
-# string 'ALL' in single quote marks. If unused, defaults to the
-# string 'ALL'.
-#  $2 how many renders to make from colors in each palette. If not
-# provided, defaults to a hard-coded value.
-#  $3 width of renders, in pixels. If not provided, defaults to a
-# hard-coded value.
-#  $4 height of renders, in pixels. If not provided, defaults to a
-# hard-coded value.
-#  $5 extra parameters, surrounded by double quote marks, in the
-# format expected by color_growth.py.
+#  $1 OPTIONAL. how many colors in the palette to use. May be fewer
+# or greater than the number of colors in palette (see USAGE in
+# color_growth_hexplt_multiColor.sh for details). To use all colors
+# in the palette, pass the string 'ALL' in single quote marks. If
+# unused, defaults to the string 'ALL'.
+#  $2 OPTIONAL. how many renders to make from colors in each palette.
+# If not provided, defaults to a hard-coded value.
+#  $3 OPTIONAL. Width of renders, in pixels. If not provided,
+# defaults to a hard-coded value.
+#  $4 OPTIONAL. Height of renders, in pixels. If not provided,
+# defaults to a hard-coded value.
+#  $5 OPTIONAL. Extra parameters, surrounded by double quote marks,
+# in the format expected by color_growth.py.
 
 # CODE
 if [ "$1" ]; then howManyColors=$1; else howManyColors='ALL'; fi
@@ -66,7 +67,7 @@ do
 			./tmp_color_growth_hexplts_multiColor_Ntimes_script__t6KGRUQPBDE7Y4.sh
 			rm ./tmp_color_growth_hexplts_multiColor_Ntimes_script__t6KGRUQPBDE7Y4.sh
 			echo "sleeping for 300 seconds to let computer cool . . ."
-			sleep 300
+			# sleep 300
 		fi
 	done	
 done
