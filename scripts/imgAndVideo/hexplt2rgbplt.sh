@@ -36,14 +36,14 @@ if ! [ "$1" ]; then echo No \.hexplt file name passed to script. Expected as par
 # IF RENDER TARGET already exists, abort script. Otherwise continue.
 if [ -f ./$renderTargetFile ]
 then
-	echo Render target $renderTargetFile already exists\; SKIPPING render.
+	echo Converted color palette target $renderTargetFile already exists\; SKIPPING conversion.
 	exit
 else
 	if [ -e ./$1 ]
 	then
 		hexColorSrcFullPath=$1
 	else
-		echo Render target $renderTargetFile does not exist\; WILL RENDER.
+		echo Converted color palette target $renderTargetFile does not exist\; WILL CONVERT.
 		if [ -e ~/palettesRootDir.txt ]
 		then
 			palettesRootDir=$(< ~/palettesRootDir.txt)
