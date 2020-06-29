@@ -82,9 +82,9 @@ do
 # echo that is $tmp_script_file_name
 		# Works around problems escaping characters by writing the whole command
 		# to a script (which still needs " ( and ) escaped though?!) :
-		echo "python $pathToScript --WIDTH 200 --HEIGHT 100 --RSHIFT $rshiftParam -b [$rgbValForParam] -c [$rgbValForParam] --RECLAIM_ORPHANS True --BORDER_BLEND True --TILEABLE False --STOP_AT_PERCENT 1 -a 0 --RANDOM_SEED $rndSeedValForParam -q 1 --GROWTH_CLIP \($lowGrowthClipParam,$highGrowthClipParam\) --SAVE_PRESET True $extraArgs" > $tmp_script_file_name
+#		echo "python $pathToScript --WIDTH 200 --HEIGHT 100 --RSHIFT $rshiftParam -b [$rgbValForParam] -c [$rgbValForParam] --RECLAIM_ORPHANS True --BORDER_BLEND True --TILEABLE False --STOP_AT_PERCENT 1 -a 0 --RANDOM_SEED $rndSeedValForParam -q 1 --GROWTH_CLIP \($lowGrowthClipParam,$highGrowthClipParam\) --SAVE_PRESET True $extraArgs" > $tmp_script_file_name
 # ALT COMMAND with custom hard-coded coord but still using color parameter:
-# echo "python $pathToScript --WIDTH 200 --HEIGHT 100 --RSHIFT $rshiftParam -b [$rgbValForParam] --CUSTOM_COORDS_AND_COLORS '[[(1799,1799),[$rgbValForParam]]]' --RECLAIM_ORPHANS True --BORDER_BLEND True --TILEABLE False --STOP_AT_PERCENT 1 -a 0 --RANDOM_SEED $rndSeedValForParam -q 1 --GROWTH_CLIP \($lowGrowthClipParam,$highGrowthClipParam\) --SAVE_PRESET True $extraArgs" > $tmp_script_file_name
+echo "python $pathToScript --WIDTH 200 --HEIGHT 100 --RSHIFT $rshiftParam -b [$rgbValForParam] --CUSTOM_COORDS_AND_COLORS '[[(1799,1799),[$rgbValForParam]]]' --RECLAIM_ORPHANS True --BORDER_BLEND True --TILEABLE False --STOP_AT_PERCENT 1 -a 0 --RANDOM_SEED $rndSeedValForParam -q 1 --GROWTH_CLIP \($lowGrowthClipParam,$highGrowthClipParam\) --SAVE_PRESET True $extraArgs" > $tmp_script_file_name
 		./$tmp_script_file_name
 		echo ""
 		echo "pausing 4 seconds before deleting temp shell script . . ."
