@@ -170,7 +170,7 @@ pathTo_color_growth_py=`whereis color_growth.py | gsed 's/color_growth: \(.*\)/\
 command="python $pathTo_color_growth_py --LOAD_PRESET $cgpFileName"
 tmpBashScriptFileName=tmp_color_growth_hexplt_multiColor_script_6WRsTNfeU3CEvS_"$rndString".sh
 printf "$command" > $tmpBashScriptFileName
-printf "Well executing command:\n$command\n via temp script tmp_color_growth_hexplt_multiColor_script_6WRsTNfeU3CEvS.sh . . .\n"
+printf "Executing command:\n$command\n via temp script tmp_color_growth_hexplt_multiColor_script_6WRsTNfeU3CEvS.sh . . .\n"
 ./$tmpBashScriptFileName
 printf "Waiting 4 seconds before deleting ~multiColor~ temp script file . . .\n"
 sleep 4
