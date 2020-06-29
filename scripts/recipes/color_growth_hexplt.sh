@@ -51,7 +51,7 @@ do
 	then
 		# create render stub file so that other or subsequent runs of this script
 		# in the same directory will skip renders in progress or already done:
-		printf "Rendering . . ." > $renderLogFile
+		printf "A render associated with information in this file name is underway by user $USERNAME on $HOSTNAME." > $renderLogFile
 		echo ""
 		echo "Render log file $renderLogFile was not found;"
 		echo "Rendering . . ."
