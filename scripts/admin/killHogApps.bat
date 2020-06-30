@@ -88,3 +88,4 @@ process -k "Adobe CEF Helper.exe"
 process -k upd.exe
 process -k keybase.exe
 process -k jusched.exe
+process -k cnext.exe
