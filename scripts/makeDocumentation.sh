@@ -8,16 +8,15 @@
 # NOTE: that file is expected to be large and freuntly changing, so is is not stored in the repository. Periodic updates of it may be posted to s.earthbound.io/_ebDevDoc.
 
 # CODE
-# create array of all source code / script file names of given types in this directory and subdirectories:
-sourceCodeFilesArray=(`gfind . -type f -name "*.sh"`)
-for fileNameWithPath in ${sourceCodeFilesArray[@]}
-do
-	fileNameWithoutPath=`basename $fileNameWithPath`
-	echo "fileNameWithPath: $fileNameWithPath"
-	echo "fileNameWithoutPath: $fileNameWithoutPath"
-done
+#currentDir=`pwd`
+#currentDirBasename=`basename $currentDir`
+# create array of all source code / script file names of given types in this directory and subdirectories; -printf "%P\n" removes the ./ from the front; re: https://unix.stackexchange.com/a/215236/110338 -- ALSO NOTE: if I use any printf command, it only lists findings for that associated -o option; so printf must be used for every -o:
+#sourceCodeFilesArray=(` gfind . -type f -name '*.sh' -printf "%P\n" -o -name '*.py' -printf "%P\n"`)
+#for fileNameWithPath in ${sourceCodeFilesArray[@]}
+#do
+#	echo "fileNameWithPath: $fileNameWithPath"
+#done
 
-exit
 # Find line number of CODE comment:
 lineNumber=`awk -v search="^#[[:blank:]]*CODE$" '$0~search{print NR; exit}' imgAndVideo/ffmpegAnim.sh`
 # use that line number minus one to print everything up to it to a temp file:
