@@ -11,7 +11,7 @@
 #  $4 OPTIONAL. number of tiles accross of tiles-assembled image (columns).
 #  $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).
 #  EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, the palette image being 5 columns wide and 6 rows down, with squares in the palette rendered in random order:
-#  ./thisScript.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
+#  ./hexplt2ppmHEX.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
 
 # KNOWN ISSUES
 # - It seems that hex as value sources for ppm isn't officially supported in any converter I know; graphicsMagick is doing it, but the results are off what you would expect when converted to png.

@@ -4,17 +4,18 @@
 # NOTE Image aspects and dimensions allowed by Instagram are 0.8:1 through 1.9:1 and it may upload images larger than 1080px on a side but it will always shrink them to that if not to 600 px on a side. re: https://help.instagram.com/1631821640426723 -- and other URLs in comments in this script.
 
 # USAGE
-	# Invoke with one parameter, being the image file name to check for Instagram aspect restraints fit (for upload), e.g.:
-# thisScript.sh ./_EXPORTED_M_variantWork_00099_FFsideToside_v02_PZ-8280x.jpg
-	# NOTE that if you invoke this script with the source command before it, e.g.:
-# source thisScript.sh ./_EXPORTED_M_variantWork_00099_FFsideToside_v02_PZ-8280x.jpg
-	# -- then the boolean variable $doesInstagram created by this script survives in the shell (for e.g. another script to use) after this script returns.
+# Invoke with one parameter, being the image file name to check for Instagram aspect restraints fit (for upload), e.g.:
+#  getDoesIMGinstagram.sh ./_EXPORTED_M_variantWork_00099_FFsideToside_v02_PZ-8280x.jpg
+# NOTE that if you invoke this script with the source command before it, e.g.:
+#  source getDoesIMGinstagram.sh ./_EXPORTED_M_variantWork_00099_FFsideToside_v02_PZ-8280x.jpg
+# -- then the boolean variable $doesInstagram created by this script survives in the shell (for e.g. another script to use) after this script returns.
 
 # DEPENDENCIES
 # graphicsmagick, and a 'nix environment with the bc command-line calculator.
 
 # TO DO
 # Algebra if image is outside allowed aspect range to determine padding necessary to bring it into acceptable range; AND/OR to do that anyway along with padding image with a color scheme printout derived from it.
+
 
 # CODE
 		echo -~-~-~-~-~-~-

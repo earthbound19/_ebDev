@@ -2,9 +2,9 @@
 # Compresses the video and audio from any video container (that ffmpeg will handle) with lossless codecs (utvideo and flac) into a new file of the same container format (e.g. .avi, .mp4). The new video will be named <input_video_losslessCompress>.<inputVideoExtension>.
 
 # USAGE
-# ./thisScript.sh inputVideo.avi
+#  ./utVideoSound.sh inputVideo.avi
 # OR
-# ./thisScript.sh inputVideo.mp4
+#  ./utVideoSound.sh inputVideo.mp4
 # etc.
 
 # TO DO

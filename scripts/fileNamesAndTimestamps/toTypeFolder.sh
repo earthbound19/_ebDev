@@ -5,7 +5,7 @@
 # Pass this script one parameter ($1), being a file type to so sort, without any . in the file extension. NOTE: It does this for every file of that type in a tree (recursive--it scans all subfolers).
 
 # EXAMPLE:
-# ./thisScript.sh png
+#  ./toTypeFolder.sh png
 
 # list all directories in path.
 gfind -type d > allDirs.txt

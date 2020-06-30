@@ -2,7 +2,8 @@
 # Converts all .mov and .avi format video files in the current directory (ignores subdirectories) to .mp4 containers, losslessly (no recompression: direct stream copy).
 
 # USAGE
-# thisScript.sh
+# Invoke without any parameters:
+#  allMOV2mp4Lossless.sh
 
 # The printf command trims any ./ from the start of output:
 list=(`gfind . -maxdepth 1 \( -iname \*.mov -o -iname \*.MOV -o -iname \*.avi \) -printf '%f\n' | sort`)

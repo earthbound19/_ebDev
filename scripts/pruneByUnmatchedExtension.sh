@@ -14,9 +14,8 @@
 # If you use this on files with unintended dissimilar base file names such as thisFractalRenderFlame.flame.png, you will lose work!
 
 # USAGE
-# With this script in your PATH:
 # pruneByUnmatchedExtension.sh extensionOfFilesToMove ifNoMatchedFilesWithThisExtension, e.g.:
-# pruneByUnmatchedExtension.sh hexplt png
+#  pruneByUnmatchedExtension.sh hexplt png
 # -- will sort every file with extension extension .hexplt that has no
 # same-named file with a .png extension into a temporary folder for manual
 # analysis and deletion or recovery. NOTE that extensions passed as
@@ -48,7 +47,7 @@
 # $1 the source file extension to search for matching file names
 # with extension $2, where $1 will be deleted if no file with
 # extension $2 is found. Example:
-# ./thisScript.sh ppm png
+#  pruneByUnmatchedExtension.sh ppm png
 # After the script run, ppm files that had no png with the same
 # base file name:
 # img_02.ppm

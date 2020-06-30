@@ -1,18 +1,20 @@
+# DESCRIPTION
+# Uploads an image to instagram via a reverse-engineered API script call.
+
+# DEPENDENCIES
+# - A text file in your home dir, ~/instagramPassword.txt.
+# - a nixy' environment (e.g. Cygwin or MSYS2 on Windows)
+# - PHP Composer? -- https://getcomposer.org/download/ -- to install the Instagram-API (unofficial! re https://github.com/mgp25/Instagram-API) PHP script packages; UploadPhotoParameters.php should also be in your path.
+# After composer is installed and you have reloaded the %PATH% (e.g. by logging off and on), install Instagram-API via this DOS terminal command:
+# composer require mgp25/instagram-php
+
 # USAGE
 # Invoke with the following parameters:
 # $1 instagram username (e.g. earthbound.io)
 # $2 image file name to upload thereto, which image must be in your current PATH
 # $3 caption for photo (surrounded by double quotes)
 # -- e.g.:
-# thisScript.sh earthbound.io ./_EXPORTED_M_variantWork_00099_FFsideToside_v02_PZ-8280x.jpg
-
-# DEPENDENCIES
-# - A text file in your home dir, ~/instagramPassword.txt.
-# - Cygwin.
-# - PHP Composer? -- https://getcomposer.org/download/ -- to install the Instagram-API (unofficial! re https://github.com/mgp25/Instagram-API) PHP script packages; UploadPhotoParameters.php should also be in your path.
-# After composer is installed and you have reloaded the %PATH% (e.g. by logging off and on), install Instagram-API via this DOS terminal command:
-# composer require mgp25/instagram-php
-
+#  ./call_instagramUploadPhotoParametersPHP.sh earthbound.io ./_EXPORTED_M_variantWork_00099_FFsideToside_v02_PZ-8280x.jpg
 # NOTES
 # This script provides the password parameter to UploadPhotoParameters.php via a text file (which text file you should keep secure in your home path, and out of any repository!), ~/instagramPassword.txt -- ALSO NOTE that the /examples subdir of the Instagram-API repository must be in your PATH, as this script searches for one file UploadPhotoParameters.php in your path, and cds into that directory, AND LASTLY NOTE (or is this still true--? check and document here) that owing to something butchering captions here, the caption parameter will be blanked out in this script until that is fixed.
 

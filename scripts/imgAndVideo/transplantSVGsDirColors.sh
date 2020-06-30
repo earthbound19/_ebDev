@@ -2,7 +2,7 @@
 # Repeatedly invokes transplantSVGcolors.sh against a directory full of svg color transplant source files.
 
 # USAGE
-# ./thisScript.sh transplantDestinationSVGfilename.svg _SVGcolorTransplantSRCs_directoryName
+#  ./transplantSVGsDirColors.sh transplantDestinationSVGfilename.svg _SVGcolorTransplantSRCs_directoryName
 
 
 # CODE

@@ -1,14 +1,13 @@
 # DESCRIPTION
-# Retrieves and lists the EXIF ImageHistory section from the metadata prep field of that name, from all file names of the pattern .*_EXPORTED_.*_MD_ADDS.txt in a directory tree. Results are stored in __ALL_WORK_LABELS.txt
+# For artwork publication tracking via annotated metadata. Retrieves and lists the EXIF ImageHistory section from the metadata prep field of that name, from all file names of a specific pattern, looking for a specific string, and writes the results to a reference file. See USAGE.
 
 # DEPENDENCIES
-# Cygwin (and gsed), Everything search engine CLI (and an install of Everything search engine tool).
+# A 'nixy envirnment (e.g. MSYS2 or Cygwin), Everything search engine CLI (and an install of Everything search engine tool), and therefore Windows (unless/until Everything appears on other platforms.
 
 # USAGE
-# Invoke this script from the root of a directory tree with so many so $1 -patterned text files you wish to index; e.g.:
-# ./thisScript.sh
-# The script will write the full path of all file names with the pattern .*_EXPORTED_.*_MD_ADDS.txt which contain the string "earthound" (in an EXIF ImageHistory tag metadata prep. line) to __ALL_LABELED_WORKS.txt, then copy the ImageHistory metadata prep text from all those files to __ALL_WORK_LABELS.txt, for parsing and sorting by hand.
-
+# From a directory with file names of the pattern .*_EXPORTED_.*_MD_ADDS.txt (in the immediate folder and/or subdirectories), invoke this script:
+#  listAllWorkLabels.sh
+# The script will write the full path of all file names with that pattern in the file name _and_ which contain the string "earthound" (in an EXIF ImageHistory tag metadata prep. line) to __ALL_LABELED_WORKS.txt, then copy the ImageHistory metadata prep text from all those files to __ALL_WORK_LABELS.txt, for parsing and sorting by hand.
 # NOTES
 # SEARCH PATTERN LIMITATIONS: this expects UPPERCASE_LABELS to to be between the text `-EXIF:ImageHistory=` and `. ` (the ImageHistory tag and a period, then space). If any intended labels are otherwise, they will not be found.
 

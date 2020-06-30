@@ -2,9 +2,9 @@
 # Takes an input video, strips the sound, and converts the video stream to an AVI using the lossless utvideo codec.
 
 # USAGE
-# ./thisScript.sh inputVideo.avi
+#  ./utVideoNoSound.sh inputVideo.avi
 # OR
-# ./thisScript.sh inputVideo.mp4
+#  ./utVideoNoSound.sh inputVideo.mp4
 # etc.
 
 

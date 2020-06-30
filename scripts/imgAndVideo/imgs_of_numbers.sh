@@ -4,19 +4,16 @@
 # Overwrites all images of a given type $1 (in the directory you invoke this script from) with a text render of an arbitrary phrase and a number count of which image in the list has been written to.
 
 # DEPENDENCIES
-# run these commands on a Mac with homebrew installed:
-# brew install graphicsmagick
-# brew install ghostscript
-# ALTERNATE POSSIBILITY; re: https://gist.github.com/oalders/1355751#gistcomment-62636
+# graphicsmagick, ghostscript
+# ALTERNATE MAC POSSIBILITY; re: https://gist.github.com/oalders/1355751#gistcomment-62636
 # brew install --use-gcc --with-perlmagick graphicsmagick
 
 # USAGE
 # call this script from the terminal to thusly destroy so many images e.g.:
-# ./thisScript.sh png "SET A"
+#  ./imgs_of_numbers.sh png "SET A"
 # To have global use of it, copy this script to somewhere in your $PATH, or make such a path.
 
 # CODE
-
 count=0
 
 gfind *.$1 > tmp_lst.txt

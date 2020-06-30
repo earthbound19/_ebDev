@@ -17,7 +17,7 @@
 # data.dat source shown as hexadecimal--
 # FF AB 00 GG GG 00
 # script execution and parameters--
-# ./thisScript.sh data.dat 3 5
+#  ./data_bend_repeatXsourceBytesYtimes.sh data.dat 3 5
 # --gives this result (again shown as hexadecimal) in __dataStretched__data.dat:
 # FF AB 00 FF AB 00 FF AB 00 FF AB 00 FF AB 00 GG GG 00 GG GG 00 GG GG 00 GG GG 00 GG GG 00
 

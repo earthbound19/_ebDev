@@ -1,9 +1,7 @@
-# IN DEVELOPMENT
+# IN DEVELOPMENT.
 
 # DESCRIPTION
 # Applies color fills from a source svg to a target svg that has the same path names, saving to a new file.
-
-# USAGE
 
 # DEPENDENCIES
 # - gsed, svgo
@@ -12,7 +10,8 @@
 # - an svg file that colors will be transplanted into from another svg, then the file copied.
 # - a color donor svg file.
 
-# ./thisScript.sh SVGcolorTransplantRecipient.svg SVGcolorTransplantSRCfileName.svg
+# USAGE
+#  transplantSVGcolors.sh SVGcolorTransplantRecipient.svg SVGcolorTransplantSRCfileName.svg
 
 
 # CODE

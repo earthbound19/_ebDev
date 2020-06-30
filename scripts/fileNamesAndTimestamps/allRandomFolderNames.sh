@@ -3,7 +3,7 @@
 
 # USAGE
 # Put this script in your $PATH. From a directory in which you wish to rename all directories (in the current directory--this is not recursive) with n random characters (per optional parameter), invoke this script thusly:
-# thisScriptName.sh 34
+#  allRandomFolderNames.sh 34
 # --where you can change that number to specify how many random characters you want in the new file name. If you don't specify any number, it defaults to 4.
 
 # GLOBAL VAR SET; if numeric parameter $1 is passed to script, set $getNrandChars to that; otherwise default it to 4:

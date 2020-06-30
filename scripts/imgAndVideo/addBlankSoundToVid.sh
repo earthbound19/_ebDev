@@ -9,7 +9,7 @@
 
 # USAGE
 # Pass this script one parameter, being a video file, e.g.:
-# ./thisScript.sh inputVideoFile.mp4
+#  ./addBlankSoundToVid.sh inputVideoFile.mp4
 
 
 # CODE

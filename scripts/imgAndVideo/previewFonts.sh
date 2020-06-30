@@ -2,7 +2,7 @@
 # Renders a phrase to an image from every font in the current path, with a caption giving the font name. The image is named after the font and saved to a ./fontRenders subdirectory.
 
 # USAGE
-# ./thisScript.sh
+#  ./previewFonts.sh
 
 # TO DO:
 # - Document this

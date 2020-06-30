@@ -5,7 +5,8 @@
 # gm (graphicsmagick).
 
 # USAGE
-# thisScript.sh
+# Invoke without any parameters:
+#  ./gm_average_all_img_pairs.sh
 
 
 # CODE

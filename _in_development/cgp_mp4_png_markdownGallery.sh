@@ -1,9 +1,11 @@
 # DESCRIPTION
-# Creates a markdown listing of so many png image renders from so many cgp (color_growth.py preset) files of the same name, with accompanying .mp4 movie renders if applicable. Operates on all such files in the current path. Gallery file is README.md. WARNING: this will overwrite any other such file! The file may subsequently be rendered to HTML5 with video via ____ (this is planned)
+# Creates a markdown listing of so many png image renders from so many cgp (color_growth.py preset) files of the same name, with accompanying .mp4 movie renders if applicable. Operates on all such files in the current path. The output gallery file name is README.md. WARNING: if that file already exists in the current directory, it will overwrite it!
 
 # USAGE
 # Invoke this script without any parameters:
-# ./thisScript.sh
+#  cgp_mp4_png_markdownGallery.sh
+
+# TO DO Subsequently render the video to HTML5 with video via ____ (this is planned). [EDIT: via what?]
 
 
 # CODE

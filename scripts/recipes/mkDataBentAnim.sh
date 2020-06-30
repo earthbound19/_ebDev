@@ -8,7 +8,7 @@
 
 # USAGE
 # From a path containing so many incremental (or otherwise saved!) *.bak files, invoke this script with one parameter $1, being the file extension of so many files to make an animation from. Do not include a . character in the extension. Example:
-# ./mkDataBentAnim.sh bak
+#  ./mkDataBentAnim.sh bak
 # NOTE: Also, it names the result mp4 after the folder containing the
 # .bak files. So, if they are in a folder named
 # hexplt2rgbplt_as_dataBentAnim, the mp4 will be named:
