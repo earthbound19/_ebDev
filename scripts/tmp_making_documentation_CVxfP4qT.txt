@@ -1,21 +1,40 @@
-DESCRIPTION
-Creates an mp4 video (AVC) from a series of numbered input images. Automatically detects the number of digits in the input frames. Expects *only* digits in the input filenames. Creates the animation at _out.mp4. NOTE: you may want to use x264anim.sh instead.
-WARNING: AUTOMATICALLY overwrites _out.mp4 if it already exists.
+Renders a PNG image like bacteria that mutate color as they spread.
+
+An earlier incarnation of this script by earthbound19 was dramatically sped up by changes
+from one GitHub user "scribblemaniac" (like many orders of magnitude faster--an image
+that used to take 7 minutes to render now takes 5 seconds).
+
+Output file names are based on the date and time and random characters.
+Inspired and drastically evolved from color_fibers.py, which was horked and adapted
+from https://scipython.com/blog/computer-generated-contemporary-art/
 
 USAGE
-From the directory with the image animation source images, invoke this script with these parameters:
-$1 input "frame rate" (how to interpret the speed of input images in fps)
-$2 desired output framerate
-$3 desired constant quality (crf)
-$4 the file extension of the input images.
-Optional: $5 nearest neighbor method rescale target resolution expressed as N[NN..]xN[NN..], for example 200x112; OR to scale to one target dimension and calculate the other automatically (to maintain aspect), give e.g. 1280:-1 (to produce an image that is 1280 pix wide by whatever the other dimension should be). Nearest-neighbor keeps hard edges. If you must include this parameter but don't want to resize (because you're using $6), pass the word NULL as $5.
-Optional: $6 how many seconds to loop the last frame, to create a long still of the last frame appended to the end of the video. Creates the still loop as _append.mp4, then muxes _out.mp4 and _append.mp4 to a temp mp4, deletes both the originals and renames the temp to _out.mp4.
-EXAMPLE
- thisScript.sh 29.97 29.97 13 png
-ALSO, search for the additionalParams options and uncomment or modify them (or don't) as you wish.
+Run this script without any parameters, and it will use a default set of parameters:
+python color_growth.py
+To see available parameters, run this script with the --help switch:
+python color_growth.py --help
 
-NOTE: You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).
+DEPENDENCIES
+python 3 with numpy, queue, and pyimage modules installed (and others--see the import
+statements).
 
-TO DO
-- Optional: padding re https://superuser.com/a/690211
-- Make it name the output file after the ../.. parent folder name?
+KNOWN ISSUES
+See help for --RANDOM_SEED.
+
+
+TO DO:
+- figure out whether I broke RND continuity? It would seem
+the same presets are no longer producing the same results?
+- isolate what situation didn't create a new preset / anim folder
+when I expected it to, and fix that (or document in help).
+- make naming convention of variables consistent? I think I'm
+all over the place with this . . . :p
+- possibly things in the color_growth_v1.py's TO DO list.
+- determine whether any code in the fast fork (now this script)
+is leftover from color_growth_v1.py, and delete them?
+- make it properly use negative or > 8 growth-clip values again?
+since the color_growth_fast.py fork it isn't.
+
+VERSION HISTORY
+v2.8.3:
+- Trivial comment/docstring tweaks for better readability.

@@ -8,21 +8,25 @@
 # NOTE: that file is expected to be large and freuntly changing, so is is not stored in the repository. Periodic updates of it may be posted to s.earthbound.io/_ebDevDoc.
 
 # CODE
-#currentDir=`pwd`
-#currentDirBasename=`basename $currentDir`
-# create array of all source code / script file names of given types in this directory and subdirectories; -printf "%P\n" removes the ./ from the front; re: https://unix.stackexchange.com/a/215236/110338 -- ALSO NOTE: if I use any printf command, it only lists findings for that associated -o option; so printf must be used for every -o:
-#sourceCodeFilesArray=(` gfind . -type f -name '*.sh' -printf "%P\n" -o -name '*.py' -printf "%P\n"`)
-#for fileNameWithPath in ${sourceCodeFilesArray[@]}
-#do
-#	echo "fileNameWithPath: $fileNameWithPath"
-#done
-
+currentDir=`pwd`
+currentDirBasename=`basename $currentDir`
+# create array of all source code / script file names of given types in this directory and subdirectories; -printf "%P\n" removes the ./ from the front; re: https://unix.stackexchange.com/a/215236/110338 -- ALSO NOTE: if I use any printf command, it only lists findings for that associated -o option; so printf must be used for every -o; ALSO, the gsord and gsed pipes sort scripts by time stamp, newest first:
+sourceCodeFilesArray=(` gfind . -type f -name '*.sh' -printf "%P\n" -o -name '*.py' -printf "%P\n" | gsort -n | gsed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+for fileNameWithPath in ${sourceCodeFilesArray[@]}
+do
+	printf "## $fileNameWithPath\n\n" > tmp_making_documentation_CVxfP4qT_scriptTitleSection.txt
+done
+exit
 # Find line number of CODE comment:
-lineNumber=`awk -v search="^#[[:blank:]]*CODE$" '$0~search{print NR; exit}' imgAndVideo/ffmpegAnim.sh`
+# scriptFile="imgAndVideo/ffmpegAnim.sh"
+scriptFile="imgAndVideo/color_growth.py"
+lineNumber=`awk -v search="^#[[:blank:]]*CODE$" '$0~search{print NR; exit}' $scriptFile`
 # use that line number minus one to print everything up to it to a temp file:
 lineNumber=$(($lineNumber - 1))
-head -$lineNumber imgAndVideo/ffmpegAnim.sh > tmp_making_documentation_CVxfP4qT.txt
+head -$lineNumber $scriptFile > tmp_making_documentation_CVxfP4qT.txt
 # clear trailing multiple newlines (blank lines):
 sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' tmp_making_documentation_CVxfP4qT.txt
-# strip comments delimiter and whitespace character (only one each if they appear, not all of them) from start of line:
+# strip #-style comments (bash, Python) delimiter and whitespace character (only one each if they appear, not all of them) from start of line:
 sed -i 's/^[# ].//g' tmp_making_documentation_CVxfP4qT.txt
+# strip """ docstring delimiters (Python) from start of lines:
+sed -i 's/^"""//g' tmp_making_documentation_CVxfP4qT.txt
