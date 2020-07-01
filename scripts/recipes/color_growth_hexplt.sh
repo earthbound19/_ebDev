@@ -91,8 +91,8 @@ do
 		# If coordinateSuperParameter was set AND is RND_BASIC_POS (see USAGE), roll six-sided die to assign any of "basic" positions as origin coordinate center (to $coord_tuple); ELSE (if it was set as something else), use its value:
 		if [ "$coordinateSuperParameter" == "RND_BASIC_POS" ]
 		then
-			# Pick a random number between 1-6. If 6 (actually default if not 1-5), pick rnd x,7 coords between 0 and 3599. For 1-4, pick coords matching corners or center of canvas:
-			picked_number=`shuf -i 1-6 | head -n 1`
+			# Pick a random number. If outside range of numbered cases below, pick x,y coordinates in center of canvas (default case). If inside range, pick coordinates from among more fundamental geometric positions among those cases:
+			picked_number=`shuf -i 1-10 | head -n 1`
 			# My first time using a bash case statement . . .
 			case $picked_number in
 				1) coord_tuple="1,1" ;;				# upper left as x,y
@@ -100,15 +100,16 @@ do
 				3) coord_tuple="1,$HEIGHT" ;;			# lower left
 				4) coord_tuple="$WIDTH,$WIDTH" ;;		# lower right
 				5)
-					# get center coords via bc terminal calculator:
-					coord_tuple_element_one=`echo "$WIDTH / 2" | bc`
-					coord_tuple_element_two=`echo "$HEIGHT / 2" | bc`
-					coord_tuple="$coord_tuple_element_one,$coord_tuple_element_two"
-					;;
-				*)
+					# $ get rnd coordinates for anywhere on canvas:
 					first_number=`shuf -i 1-$WIDTH | head -n 1`
 					second_number=`shuf -i 1-$HEIGHT | head -n 1`
 					coord_tuple="$first_number,$second_number"
+					;;
+				*)
+					# DEFAULT case: get center coords via bc terminal calculator:
+					coord_tuple_element_one=`echo "$WIDTH / 2" | bc`
+					coord_tuple_element_two=`echo "$HEIGHT / 2" | bc`
+					coord_tuple="$coord_tuple_element_one,$coord_tuple_element_two"
 					;;
 			esac
 		else
