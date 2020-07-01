@@ -1,7 +1,10 @@
 echo IN DEVELOPMENT. moved from autobrood repo intending to adapt for broader purposes.
 exit
-
-# TO DO: adapt re getFilePairs4up.sh
+# TO DO
+# - Make use of this? http://stackoverflow.com/a/37012114 :
+#  gfind ./ -name "$element" -exec mv '{}' './' ';'
+# - Does this even have to be limited to files 4 paths down? Couldn't it just be of arbitrary depth?
+# - ALSO, DO NOT CLOBBER FILES. Check for file existence in target path before move, and don't copy to if it exists, and write conflict detail to a log file, and prompt user to examine log file.
 
 # USAGE:
 # Optional parameter: $1 an image format (e.g. jpg) to scan for. Defaults to png if not present.
@@ -9,17 +12,12 @@ exit
 if [ "$1" ]
 	then
 		imgFormat=$1
-		echo Paramater 1 passed\, scanning for image format $imgFormat
+		echo Paramater 1 passed\, will operate on files of type $imgFormat
 	else
 		imgFormat=png
 fi
 
-
-CygwinFind *.flame > allFiles.txt
-CygwinFind *.flam3 >> allFiles.txt
-
-mapfile -t seekIMGfiles < allFiles.txt
-
+seekIMGfiles=(`gfind . -type f -name '*.flam3' -printf "%P\n" -o -name '*.flame' -printf "%P\n"`)
 for element in ${seekIMGfiles[@]}
 do
 	# search down directories and moving file here if it exists; re a genius breath yon: http://stackoverflow.com/a/37012114
@@ -54,6 +52,3 @@ do
 			mv -f ../../../../$element.$imgFormat ./
 	fi
 done
-
-
-rm allFiles.txt

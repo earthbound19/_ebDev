@@ -1,5 +1,6 @@
 # DESCRIPTION
 # Creates an mp4 video (AVC) from a series of numbered input images. Automatically detects the number of digits in the input frames. Expects *only* digits in the input filenames. Creates the animation at _out.mp4. NOTE: you may want to use x264anim.sh instead.
+
 # WARNING: AUTOMATICALLY overwrites _out.mp4 if it already exists.
 
 # USAGE
@@ -11,7 +12,7 @@
 # Optional: $5 nearest neighbor method rescale target resolution expressed as N[NN..]xN[NN..], for example 200x112; OR to scale to one target dimension and calculate the other automatically (to maintain aspect), give e.g. 1280:-1 (to produce an image that is 1280 pix wide by whatever the other dimension should be). Nearest-neighbor keeps hard edges. If you must include this parameter but don't want to resize (because you're using $6), pass the word NULL as $5.
 # Optional: $6 how many seconds to loop the last frame, to create a long still of the last frame appended to the end of the video. Creates the still loop as _append.mp4, then muxes _out.mp4 and _append.mp4 to a temp mp4, deletes both the originals and renames the temp to _out.mp4.
 # EXAMPLE
-#  thisScript.sh 29.97 29.97 13 png
+#  ./ffmpegAnim.sh 29.97 29.97 13 png
 # ALSO, search for the additionalParams options and uncomment or modify them (or don't) as you wish.
 
 # NOTE: You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).

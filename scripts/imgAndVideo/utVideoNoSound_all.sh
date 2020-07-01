@@ -4,7 +4,7 @@
 # USAGE:
 # Ensure this script is in your $PATH, and invoke it from a directory with avi files that are too huge. Results will appear as ~UTvideo~ file names.
 # Optional paramater $1 <videoExtension> e.g.:
-# thisScript.sh avi
+#  utVideoNoSound_all.sh avi
 # If no parameter passed, defaults to avi.
 
 # DEPENDENCIES: ffmpeg and a 'nix system (can be cygwin for Windows).

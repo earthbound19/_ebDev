@@ -3,7 +3,7 @@
 
 # USAGE
 # Pass this script one parameter, being a correctly populated ~MD_ADDS.txt metadata prep file name (which file this script will process) ; e.g.
-# ./thisScript.sh _EXPORTED_work_00001__2011-10-16-nearNovatek-IMG_0616-b-postP-layersMerged_MD_ADDS.txt
+#  ./MD_ADDS2markdownGallery.sh _EXPORTED_work_00001__2011-10-16-nearNovatek-IMG_0616-b-postP-layersMerged_MD_ADDS.txt
 
 
 # CODE

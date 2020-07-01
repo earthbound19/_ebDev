@@ -6,7 +6,7 @@
 
 # USAGE
 # Invoke this script with one parameter, being a raw image filename in your PATH. e.g.:
-# ./thisScript.sh rawImageFileName.cr2
+#  ./dcraw2tif.sh rawImageFileName.cr2
 # NOTE: to quickly rip the embedded jpegs (if there be any) out of all images, don't
 # even use this script, just do:
 # dcraw -e *.CR2

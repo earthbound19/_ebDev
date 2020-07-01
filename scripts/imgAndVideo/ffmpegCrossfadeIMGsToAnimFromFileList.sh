@@ -1,12 +1,12 @@
 # DESCRIPTION
 # Render a sequence of image crossfades from a list (e.g. by next most similar image), using ffmpegCrossfadeIMGsToAnim.sh repeatedly.
 
-# USAGE
-# See "DEPENDENCIES" first. Then run:
-# ./thisScript.sh
-
 # DEPENDENCIES
 # a 'nixy environment, gsed, paste, tail, perl, and the tools needed by ffmpegCrossfadeIMGsToAnim.sh
+
+# USAGE
+# See "DEPENDENCIES" first. Then run:
+#  ./ffmpegCrossfadeIMGsToAnimFromFileList.sh
 
 # RECIPE
 # For a recipe that uses this script, see ffmpegCrossfadeIMGsToAnimFromFileList.sh in my _ebArt repository (in /recipes):
@@ -22,7 +22,6 @@
 
 
 # CODE
-
 # ====
 # START GLOBALS
 

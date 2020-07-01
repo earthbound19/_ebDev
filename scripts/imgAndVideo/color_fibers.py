@@ -2,7 +2,7 @@
 # Renders a PNG image like colored horizontal plasma fibers via python's numpy and PIL modules. Output file names are random. Horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
 # USAGE
-# python thisScript.py
+#  python path/to/this/script/color_fibers.py
 
 # DEPENDENCIES
 # python 3 with numpy and PIL modules

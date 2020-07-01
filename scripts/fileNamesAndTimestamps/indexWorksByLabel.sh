@@ -6,7 +6,7 @@
 
 # USAGE
 # Invoke this script from the root of a directory tree with so many so $1 -patterned text files you wish to index; e.g.:
-# ./thisScript.sh earthbound
+#  ./indexWorksByLabel.sh earthbound
 # The script will write the full path of all file names with the pattern .*_EXPORTED_.*_MD_ADDS.txt which contain the string "earthound" (in an EXIF ImageHistory tag metadata prep. line) to __LABEL_MATCHED_WORKS.txt, BY OVERWRITE (the file contents will be replaced). Such file names which do *not* contain that string will be written to __LABEL_NOT_MATCHED_WORKS.txt, also by overwrite.
 # These files are reference for publishing my art work (determining what to publish next).
 # More specifically, it searches for the string:

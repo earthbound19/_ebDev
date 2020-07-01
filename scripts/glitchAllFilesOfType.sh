@@ -8,7 +8,7 @@
 # $3 what percent of each file to corrupt (1 to 100)
 
 # The following command, for example, will make 10 corrupted copies of every jpg in the current path, corrupting each copy by 2 percent:
-# thisScript.sh jpg 10 2
+#  ./glitchAllFilesOfType.sh jpg 10 2
 
 array=(`gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
 

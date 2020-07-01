@@ -9,7 +9,7 @@
 # $1 the input font file name
 # $2 the output format for ripped glyphs
 # For example:
-# thisScript.sh inFontFile.ttf eps
+#  ./ripGlyphsFontForge.sh inFontFile.ttf eps
 
 # NOTES
 # fontforge must be in your %PATH% for this to work; e.g. open:

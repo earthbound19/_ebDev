@@ -6,7 +6,7 @@
 
 # USAGE
 # Invoke this script with two parameters, being $1 the extension of all files in your current directory to operate on, and $2 (optional) the desired final layered format.
-# ./thisScript.sh tif ora
+#  ./allIMGtypeToLayeredIMG.sh tif ora
 
 # NOTES
 # FOR BEST RESULTS start with .tif images that store alpha information. Otherwise, IF YOUR SOURCE images are in a format (even with alpha information) other than .tif, graphicsmagick may replace alpha values in each layer with black, which you'll want to eliminate with an unmultiply filter (in photoshop and/or filter forge).

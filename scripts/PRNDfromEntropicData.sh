@@ -3,7 +3,7 @@
 
 # USAGE
 # Invoke with one optional parameter, being the block size to split the concatenated data into before hashing, e.g.:
-# thisScript.sh 780
+#  PRNDfromEntropicData.sh 780
 # -- if the optional parameter is not chosen it will pseudo-randomly choose a split block size between 464 and 1247.
 
 # DEPENDENCIES

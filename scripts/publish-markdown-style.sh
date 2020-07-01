@@ -3,7 +3,7 @@
 
 # USAGE
 # Invoke this with one parameter, being the input *.md file to create an HTML publication from, e.g.:
-# ./thisScript.sh inputFile.md
+#  publish-markdown-style.sh inputFile.md
 
 # DEPENDENCES
 # Nodejs with markdown-styles (generate-md) installed, my custom witex-invert style installed to that (copy from my source folder for that (find it..TO DO: archive that somewhere public) into summat node_modules/markdown-styles/layouts), and an *.md file to convert.

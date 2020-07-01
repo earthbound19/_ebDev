@@ -11,15 +11,14 @@
 # $3 Duration of crossfade between them
 # $4 OPTIONAL. Padding, in seconds (time for images to be shown without crossfade), at start and end of video. If not specified, defaults to 4.36.
 # EXAMPLE: the following creates a video of a 7-second crossfade from one image to another, with 4.36 seconds padding before and after:
-# ./thisScript.sh inputImageOne.png inputImageTwo.png 7 4.36
-
+#  ./ffmpegCrossfadeIMGsToAnim.sh inputImageOne.png inputImageTwo.png 7 4.36
 # NOTES
 # If this script is called thus from another script:
-# source ./thisScript.sh
+#  source ./ffmpegCrossfadeIMGsToAnim.sh <parameters>
 # -- the variable this script sets named $targetRenderFile will persist in the shell after this script terminates (for a calling script to make use of). The script ffmpegCrossfadeIMGsToAnimFromFileList.sh does this.
 
 # TO DO:
-# - Do not use `exit`. Instead, elegantly skip main logic if no paramaters passed, because `exit` will terminate this script *and* a calling script if the calling script invokes this via `source ./thisScript`.
+# - Do not use `exit`. Instead, elegantly skip main logic if no paramaters passed, because `exit` will terminate this script *and* a calling script if the calling script invokes this via `source ffmpegCrossfadeIMGsToAnim.sh`.
 # - Test with many image pairs, and if necessary fix complex filter timings math (in ffmpeg command). It seems that the crossfade starts and ends later than it should.
 # - Add fps param?
 # - Option to adapt this to automatically detect the duration of two pre-existing input clips and crossfade almost the whole length of the shorter over the longer?

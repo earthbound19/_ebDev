@@ -16,9 +16,9 @@ from https://scipython.com/blog/computer-generated-contemporary-art/
 
 # USAGE
 Run this script without any parameters, and it will use a default set of parameters:
-python thisScript.py
+ python /path/to/this/script/color_growth_v1.py
 To see available parameters, run this script with the -h switch:
-python thisScript.py -h
+ python /path/to/this/script/color_growth_v1.py -h
 
 # DEPENDENCIES
 python 3 with numpy and pyimage modules installed (and maybe others--see the

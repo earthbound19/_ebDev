@@ -9,8 +9,9 @@
 # $1 input .kra (or other formats too?) filename
 # $2 desired output extension, without a period, e.g. png
 # e.g.
-# thisScript.sh input.kra png
-
+#  krita2IMG.sh input.kra png
 # re: https://userbase.kde.org/Krita/Manual/CommandLine (it is actually enabled, apparently, on Windows) :
 
+
+# CODE
 krita $1 --export --export-filename $1.$2

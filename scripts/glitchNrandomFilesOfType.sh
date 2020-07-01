@@ -9,7 +9,7 @@
 # $4 What percent of each file to corrupt (1 to 100)
 
 # The following command, for example, will select 20 jpg images, make 10 corrupted copies of each, corrupting each copy by 2 percent:
-# thisScript.sh jpg 20 10 2
+#  ./glitchNrandomFilesOfType.sh jpg 20 10 2
 
 gfind *$1 > _alles.txt
 mapfile -t allFilesOfExtension < _alles.txt

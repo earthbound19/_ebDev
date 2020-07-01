@@ -3,7 +3,7 @@
 
 # USAGE
 # Because Java apparently doesn't scan environment paths (maybe that's a security feature), first copy bfg.jar into the directory from which you invoke this script. Then invoke this script with one parameter, being the clone (etc.) URL of a git repo, e.g.:
-# thisScript.sh https://github.com/earthbound19/_ebSuperBin.git
+#  BFG_lipoGitRepo.sh https://github.com/earthbound19/_ebSuperBin.git
 
 # REFERENCE
 # https://rtyley.github.io/bfg-repo-cleaner/

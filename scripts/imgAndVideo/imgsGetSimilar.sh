@@ -3,7 +3,7 @@
 
 # USAGE
 # Invoke this script with one parameter, being the file format in the current dir. to operate on, e.g.:
-# ./thisScript.sh png
+#  ./imgsGetSimilar.sh png
 # OPTIONAL: omit variable 1 to compare ALL files in current dir; will throw errors if some files are not images or valid images.
 
 # DEPENDENCIES

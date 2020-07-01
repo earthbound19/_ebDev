@@ -1,17 +1,14 @@
 # DESCRIPTION
-# Makes glitch art from any data source by creating a bmp header approximating a defined image size (at this writing square) into which that data would fit; takes that image header and slaps raw copied data from any source onto the end of it. It breaks the bmp spec and yet many image editors will display and convert the image (to non-broken "glitch" converted images) anyway.
-
-# USAGE
-# ./thisScript.sh dataSource.file
+# Makes glitch art (via data bending) from any data source by creating a bmp header approximating a defined image size (at this writing square) into which that data would fit; takes that image header and slaps raw copied data from any source onto the end of it. It breaks the bmp spec and yet many image editors will display and convert the image (to non-broken "glitch" converted images) anyway.
 
 # DEPENDENCIES
 # GraphicsMagick, dd
 
+# USAGE
+#  ./data_bend_2BMPglitchArt.sh dataSource.file
+
 # DETAILS
 # Does a square root calculation (rounded) from the byte size of the data to determine the bmp X and Y dimensions which this creates a header from.
-
-# TO DO
-# Various data mapping, signal processing/pattern matching type things to data to more meaningfully map it to color values. e.g. for every  raw RGB (three values from 0 to 255)-aligned datum map to fewer values approximating the range of that datum?
 
 imgFileNoExt=`echo $1 | gsed 's/\(.*\)\..\{1,4\}/\1/g'`
 ppmDestFileName="$imgFileNoExt"_asBMP.bmp

@@ -3,9 +3,9 @@
 
 # USAGE
 # Run this script without any paramaters, and it will use a default set of parameters:
-# python thisScript.py
+#  python /path/to/this/script/color_wander.py
 # To see available parameters, run this script with the -h switch:
-# python thisScript.py -h
+#  python /path/to/this/script/color_wander.py -h
 
 # DEPENDENCIES
 # python 3 with the various modules installed that you see in the import statements here near the start of this script.

@@ -2,7 +2,7 @@
 # Renders any image source as a composition of flat primitive shapes, via a Go package named "primitive" (this is a wrapper for primitive). Output file names are the same as input only possibly in a different image format, but add _primitive_count_<count>_mode_<mode>__<8RandomChars> to the file name (extrapolate the meaning--it doesn't literally use angle brackets in the output file name). It adds random strings to the end so you can run it twice on the same input and get a different result (it is different every time!) and keep the original and the new alongside each other. Also, it overrides the (at this writing) default behavior of reducing the image by getting and passing the largest dimenion to the -s switch.
 
 # USAGE
-# ./thisScript.sh input_image.png 100 5 png
+#  ./primitive_render.sh input_image.png 100 5 png
 # where:
 # - input_image.png (as an example) is an input image file name. Required.
 # - 100 (as an example) is how many primitive shapes will be in the render. Default 100 if omitted.

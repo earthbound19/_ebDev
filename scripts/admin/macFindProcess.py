@@ -1,9 +1,9 @@
 # DESCRIPTION
-# Identifies the process associated with a window on Macs. RE: https://superuser.com/a/1171739
+# Identifies the process associated with a window on MacOS. RE: https://superuser.com/a/1171739
 
 # USAGE
-# python thisScript.py
-# -- then follow on-screen prompts
+#  python path/to/this/script/macFindProcess.py
+# -- then follow on-screen prompts.
 
 # DEPENDENCIES
 # pyenv (suggested)
