@@ -2,7 +2,7 @@
 # Fetches a randomly served color scheme from http://colormind.io and converts it to a .hexplt file named after the colors in the palette.
 
 # DEPENDENCIES
-# curl, sed (as gsed), a 'nixy environment to run this bash script.
+# curl, sed (as gsed), a 'nixy environment to run this bash script, and the colormind API documented at: http://colormind.io/api-access/ and https://github.com/dmi3kno/colormind
 
 # USAGE
 #  ./get_colormind_RND_palette.sh
