@@ -1,6 +1,8 @@
 # DESCRIPTION
-# See get_simple_gamut.py. This is adapted for RGB, and the output is horrible and garish, as is RGB math.
+# See scripts with 'get', 'gamut', and '.py' in their file names. This is adapted for RGB, and the output is horrible and garish, as is RGB math.
 
+
+# CODE
 import spectra
 A_min = 0
 A_max = 1

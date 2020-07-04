@@ -1,7 +1,12 @@
 # DESCRIPTION
-# Makes resized copies of all images to fit inside the smallest dimension of the smallest image. The shrunk images are useful as e.g. bases for composites (where overlap would be limited to different ratios, not excess size)
+# For every image (of many types) in the current directory, resizes them to fit inside the smallest dimension of the smallest found image. The shrunk images are useful as bases for composites or comparisons (where otherwise those would operate on pixels in one image out of range of another).
 
-list=(`gfind . \( -iname \*.tif -o -iname \*.tiff -o -iname \*.png -o -iname \*.psd -o -iname \*.ora -o -iname \*.rif -o -iname \*.riff -o -iname \*.jpg -o -iname \*.jpeg -o -iname \*.gif -o -iname \*.bmp -o -iname \*.cr2 -o -iname \*.raw  -o -iname \*.crw -o -iname \*.pdf \) -printf '%f\n' | sort`)
+# USAGE
+# Hack the image format list in the list= command if you need to.
+
+
+# CODE
+list=(`gfind . -maxdepth 1 \( -iname \*.tif -o -iname \*.tiff -o -iname \*.png -o -iname \*.psd -o -iname \*.ora -o -iname \*.rif -o -iname \*.riff -o -iname \*.jpg -o -iname \*.jpeg -o -iname \*.gif -o -iname \*.bmp -o -iname \*.cr2 -o -iname \*.raw  -o -iname \*.crw -o -iname \*.pdf \) -printf '%f\n' | sort`)
 
 printf '' > imgs_dimensions.txt
 for element in ${list[@]}

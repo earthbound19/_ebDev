@@ -4,17 +4,16 @@
 # USAGE
 # BECAUSE I KEEP FORGETTING, $4, $5 and $6 are actually different things.
 # Pass this script the following parameters; the last being optional:
-# $1 How many pixels wide wide you want a random image grid to be
-# $2 How many pixels tall ~
-# $3 How many such random images you want to create
-# $4 Hex color list file name to pick colors from randomly (if omitted, colors are generated randomly). May or may not result in all colors from source list showing up in final image--it depends on psuedo-random "chance."
-# $5 any value (e.g. "foo") pick colors from list (in $4) sequentially.
-# $6 any value (e.g. "florghulment") pick colors from list (in $4) sequentially *after sorting it randomly*.
+# - $1 How many pixels wide wide you want a random image grid to be
+# - $2 How many pixels tall ~
+# - $3 How many such random images you want to create
+# - $4 Hex color list file name to pick colors from randomly (if omitted, colors are generated randomly). May or may not result in all colors from source list showing up in final image--it depends on psuedo-random "chance."
+# - $5 any value (e.g. "foo") pick colors from list (in $4) sequentially.
+# - $6 any value (e.g. "florghulment") pick colors from list (in $4) sequentially *after sorting it randomly*.
 # NOTE that if you provide a source list of colors ($4), but numbers too small in parameters $1 and $2, it will not use all colors from the list (as it will generate tiles against only part of the list).
 # AFTER RUNNING this script you may wish to run e.g.:
 # imgs2imgsNN.sh ppm png 4280 4280
 # -- see the comments in imgs2imgsNN for details.
-
 # EXAMPLE COMMANDS
 # Generate 3 files of randomly generated colors in a 4x2 grid:
 #  ./colorsGridFromRNDorList.sh 4 2 1
@@ -23,10 +22,14 @@
 # The same as the previous command, but reading colors from the list sequentially:
 #  ./colorsGridFromRNDorList.sh 16 9 170 rainbowHexColorsByMyEye.txt foo
 
-# TO DO: get this using the root hex colors list dir location that summat other script then there used.
-# TO DO: as much of this script as possible in-memory instead of on disk, to speed it up dramatically.
-# TO DO make the cols / rows paramater input sequence consistent between this and makeBWGridRandomNoise.sh, if they aren't (check).
-# TO DO: set default values if no $1 $2 and $3 variables passed to script. Make this take string/switch parameters using em wah dut that testing that.
+
+# CODE
+# TO DO
+# - figure out whether it can use .hexplt lists and if not adapt it to (I no longer use .txt palettes)
+# - get this using the root hex colors list dir location that summat other script then there used.
+# - as much of this script as possible in-memory instead of on disk, to speed it up dramatically.
+# - make the cols / rows paramater input sequence consistent between this and makeBWGridRandomNoise.sh, if they aren't (check).
+# - set default values if no $1 $2 and $3 variables passed to script. Make this take string/switch parameters using em wah dut that testing that.
 
 numCols=$1
 numRows=$2

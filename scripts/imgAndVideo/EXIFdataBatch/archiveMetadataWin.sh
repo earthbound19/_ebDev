@@ -1,8 +1,19 @@
+# DESCRIPTION
+# For all images of many types in the current directory, creates metadata archive files in a _originalMetaData subfolder. Metadata archives are named after the original image.
+
+# USAGE
+# Hack the list of image types to archive in the list= assignment code if you wish, and invoke this script.
+
+
+# CODE
 # Re: http://www.sno.phy.queensu.ca/~phil/exiftool/metafiles.html
 # Create XMP (metadata) sidecar file in a subdirectory; the -r option causes sub-directories to be recursively processed:
 # Thanks to: http://stackoverflow.com/a/4909968 and http://stackoverflow.com/a/4040324
 
 # TO DO
+# - integrate functionality from the .bat file this calls into this script
+# - don't clobber existing metadata files
+# - verify archive and delete metadata files (to save file space/clutter)
 # - use the -args flag to archive this in a format suitable for re-entering into metadata (in -argument format for exiftool).
 # NOT TO DO: update this to only work on file names that include _final_. I do actually want to archive metadata from everything. Even if it means it takes longer the first run.
 

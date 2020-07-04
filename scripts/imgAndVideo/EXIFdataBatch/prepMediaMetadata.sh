@@ -1,26 +1,16 @@
 # DESCRIPTION
-# Prepares image metadata text file for insertion into images
-#  via exiftool (I forget the command or batch that does that;
-#  TO DO: implement that.)
+# Prepares image metadata text file for insertion into images via exiftool.
 
 # USAGE
-# - Create a ~/metaDataTemplatesPath.txt file, which contains
-# the path to your metadata template files as seen by whatever
-# unixy tool you use to run this script (e.g. MSYS2 or cygwin)
-# - Uncomment the line with the metadata template you want to use,
-# comment out the others. Additional usage details: CORRECT.
-# SEE DESCRIPTION. Run this from a unixy prompt in a directory
-# with images in the directory tree for which you wish to create
-# custom metadata ~_MD_ADDS.txt files which another script will
-# use to set image metadata tags. NOTE: for videos, copy the
-# generated title into the description field of the final metadata
-# source file.
-
-# DEV NOTE: if you make only temporary changes to this for ripping art,
-# revert the changes so there aren't a lot of extraneous repository
-# commits of unnecessary changes.
+# - Create a ~/metaDataTemplatesPath.txt file, which contains the path to your metadata template files as seen by whatever unixy tool you use to run this script (e.g. MSYS2 or cygwin)
+# - Uncomment the line with the metadata template you want to use, comment out the others. Additional usage details: pending.
+# - Run this from a unixy prompt in a directory with images in the directory tree for which you wish to create custom metadata ~_MD_ADDS.txt files which another script will use to set image metadata tags. NOTE: for videos, copy the generated title into the description field of the final metadata source file.
+# NOTE: if you make only temporary changes to this for ripping art, revert the changes so there aren't a lot of extraneous git repository commits of unnecessary changes.
 
 
+# CODE
+# TO DO
+# - further document as promised in USAGE.
 # Q. Should those be _FINAL_ and _EXPORTED_, not _FINAL and _EXPORTED ? :
 # _MTPL=_FINAL
 _MTPL=_EXPORTED_

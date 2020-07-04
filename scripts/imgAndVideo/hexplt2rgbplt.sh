@@ -1,28 +1,17 @@
 # DESCRIPTION
-# Converts a .hexplt format palette (list of RGB colors in hex
-#  format) to .rgbplt format (a list of RGB values for each
-#  color, in decimal.
+# Converts a .hexplt format palette (list of RGB colors in hex format) to .rgbplt format (a list of RGB values for each color, in decimal.
 
 # USAGE
-# FIRST OF ALL, don't do this. Use Python. Re:
-# https://stackoverflow.com/questions/9210525/how-do-i-convert-hex-to-decimal-in-python
-# BUT IF you do this:
-# Invoke this script with one parameter, being the
-#  .hexplt format file to convert, e.g.:
-# hexplt2RGBplt.sh RAHfavoriteColorsHex.hexplt
-# NOTE that if you have a file ~/palettesRootDir.txt with
-#  a root path to search for .hexplt files in it, this script
-#  will search all paths below that root folder for the file,
-#  IF the file is not in the same directory you invoke this script
-#  from. If the file is in the same directory, it uses it from
-#  the same directory.
+# Invoke this script with one parameter, being the .hexplt format file to convert, e.g.:
+#  hexplt2RGBplt.sh RAHfavoriteColorsHex.hexplt
+# NOTE that if you have a file ~/palettesRootDir.txt with a root path to search for .hexplt files in it, this script will search all paths below that root folder for the file, IF the file is not in the same directory you invoke this script from. If the file is in the same directory, it uses it from the same directory.
 
 # DEV NOTE
-# Much of the code in this was adapted from hexplt2ppm.sh;
-#  see the file for revelation on what all this convoluted mess
-#  is.
+# Much of the code in this was adapted from hexplt2ppm.sh; see the file for revelation on what all this convoluted mess is.
 
 
+# CODE
+# Use Python instead? But then I'd have to fuss with getting Python the full path to the script.. But, re: https://stackoverflow.com/questions/9210525/how-do-i-convert-hex-to-decimal-in-python
 # =============
 # BEGIN SETUP GLOBAL VARIABLES
 paletteFile=$1

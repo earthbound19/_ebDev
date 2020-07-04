@@ -1,3 +1,10 @@
+# DESCRIPTION
+# Force rebuilds the MacOS Spotlight index.
+
+# USAGE
+#  ./rebuildMacSpotlightIndex.sh
+
+# CODE
 # re mdutil help (when run without any switch) :
 sudo mdutil -Esa -i on;
 

@@ -1,16 +1,8 @@
 # DESCRIPTION
-# Replaces terminal-unfriendly characters in all files of type $1
-# in the current directory. If $1 is not provided, does this to
-# ALL files in the current directory.
-# Why ftun.sh? FTUN stands for "Fix Terminal Unfriendly [folder
-# and file] Names." Terminal-unfriendly charactrers in file names
-# are any character that may make a script choke if you attempt
-# to pass a file name (or folder name) containing them to a script.
-# Characters I consider unfriendly (but which may not all actually
-# cause problems) are (with maybe more problematic ones first) :
+# Replaces terminal-unfriendly characters in all files of type $1 in the current directory, via rename.pl. If $1 is not provided, does this to ALL files in the current directory.
+# Why ftun.sh? FTUN stands for "Fix Terminal Unfriendly [folder and file] Names." Terminal-unfriendly charactrers in file names are any character that may make a script choke if you attempt to pass a file name (or folder name) containing them to a script. Characters I consider unfriendly (but which may not all actually cause problems) are (with maybe more problematic ones first) :
 # '@=`~!#$%^&()+[{]};. ,-
-# In my opinion it is also undesirable to have a . character
-# in the middle of a file name.
+# Also, in my opinion it is undesirable to have a . character in the middle of a file name.
 
 # DEPENDENCIES
 # Perl, and rename.pl from http://plasmasturm.org/code/rename/rename
@@ -30,7 +22,15 @@
 #   operates on folders, too!), pass anything as a second parameter:
 # ftun.sh png foo
 
+# DEV NOTES:
+# How to figure out which characters need escaping for a script of a given type: type them into your text editor, and save the file with the intended batch script extension. The characters not recognized as part of a string show in a non-string-highlight color, e.g. :
+# \`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \.
 
+# Example command that WORKS as far as demonstrating replacing characters:
+# echo A\`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \.B | tr \`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \. _
+
+
+# CODE
 if [ "$1" ]
 then
 	extension=\*\.$1
@@ -64,7 +64,8 @@ read -p "TYPE HERE: " USERINPUT
 if [ $USERINPUT == $PASS_STRING ]
 then
 	echo "User input equals pass string; proceeding."
-	pathToRenamePerl=`which rename.pl`
+	pathToRenamePerl=`whereis rename.pl`
+	pathToRenamePerl=`echo $pathToRenamePerl | gsed 's/.* \(.*\/rename.pl\).*/\1/g'`
 		# Option that removes dashes also:
 		# perl $pathToRenamePerl -e 's/[^\w.]+/_/g' $extension
 	perl $pathToRenamePerl -e 's/[^\w.-]+/_/g' $extension
@@ -87,16 +88,3 @@ else
 	echo "User input does not equal $PASS_STRING."
 	echo "script will exit without doing anything."
 fi
-
-
-
-# DEV NOTES:
-# How to figure out which characters need escaping for a script of
-# a given type: type them into your text editor, and save the file
-# with the intended batch script extension. The characters not
-# recognized as part of a string show in a non-string-highlight color,
-# e.g. :
-# \`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \.
-
-# Example command that WORKS as far as demonstrating replacing characters:
-# echo A\`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \.B | tr \`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \. _

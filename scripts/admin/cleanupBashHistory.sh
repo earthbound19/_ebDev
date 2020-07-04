@@ -1,6 +1,16 @@
+# DESCRIPTION
+# Deduplicates listings in bash history.
+
+# USAGE
+# Invoke without any parameters:
+#  ./cleanupBashHistory.sh
+# NOTE: Expects a file ~/.bash_history to contain bash history.
+
 # re: https://stackoverflow.com/a/7449399/1397555
 # SEE ALSO (to do--? implement?) : https://jorge.fbarr.net/2011/03/24/making-your-bash-history-more-efficient/
 
+
+# CODE
 # remove duplicates while preserving input order
 function dedup {
    awk '! x[$0]++' $@
@@ -34,6 +44,11 @@ function history_cleanup {
 }
 
 # actually invoke that function which invokes other functions :)
+# and it seems like this doesn't work as hoped unless I call that repeatedly? Why?
+history_cleanup
+history_cleanup
+history_cleanup
+history_cleanup
 history_cleanup
 
 echo \.bash_history cleanup done.

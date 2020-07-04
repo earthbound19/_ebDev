@@ -1,4 +1,19 @@
-duration=5
+# DESCRIPTION
+# Makes a video of a random color accompanied by a random sound pitch. Because you might want to drive someone insane, or because what is life and what is art and why are you doing this and what is life and what is art and why are you doing this.
+
+# USAGE
+# Invoke with one optional parameter, being a decimal duration in seconds which will be the duration of the generated video, e.g.:
+#  RNDcolorAndPitchVid.sh 0.68
+# If you pass no parameter, it defaults to a hard-coded value.
+
+
+# CODE
+if [ "$1" ]
+then
+	duration=$1
+else
+	duration=5
+fi
 
 # Generate input video animation of random still color:
 hexColor=`cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6`

@@ -1,3 +1,26 @@
+# DESCRIPTION
+# Performs administrative setup per my preferences for MacOS development etc.
+
+# USAGE
+# Examine every line and uncomment what you want, and comment out what you don't want. If you don't know what every line does, don't use this script. To use it, just run it:
+#  ./macDevSetup.sh
+# -- then follow the prompt to really aktully do things if you want (requires a password it tells you).
+
+
+# CODE
+echo ""
+echo "WARNING: WARNING. Um, warning. If you want to run this script, type SNURFBLIM and then press ENTER or RETURN."
+read -p "TYPE HERE: " SILLYWORD
+
+if ! [ "$SILLYWORD" == "SNURFBLIM" ]
+then
+	echo ""
+	echo Typing mismatch\; exit.
+	exit
+else
+	echo continuing . .
+fi
+
 # pushd .
 # NOPE: maybe asdf instead:
 # install n node version manager; re: https://github.com/tj/n/issues/169
@@ -113,3 +136,6 @@ export DYLD_LIBRARY_PATH="${OCIO_EXECROOT}/lib:${DYLD_LIBRARY_PATH}"
 # see: https://coolestguidesontheplanet.com/add-shell-path-osx/
 # 
 # and / or http://hathaway.cc/post/69201163472/how-to-edit-your-path-environment-variables-on-mac
+
+# Don't write those obnoxious .DS_Store metadata files on network drives! That literally gobbles up 4K extra space for every. Single. File. On a typcial NTFS (Windows) drive). No.
+defaults write com.apple.desktopservices DSDontWriteNetworkStores true

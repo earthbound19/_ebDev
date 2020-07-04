@@ -1,5 +1,11 @@
-# USAGE: run from a directory which has only a given set of photos whose essential camera parameter characteristics you wish to compare. The script will automatically open the resultant tab-delimited text file of data.
+# DESCRIPTION
+# For all files in the current directory, attempts to extract basic metadata from exiftool information dumps: File Name (for reference), Exposure Time, F Number, and ISO, and compiles all that to allEssentialImageCameraInfo.txt. Useful for comparing the effects of camera settings on photography.
 
+# USAGE
+# Run from a directory which has only a given set of photos whose essential camera parameter characteristics you wish to compare. The script will automatically open the resultant tab-delimited text file of data.
+
+
+# CODE
 rm allEssentialImageCameraInfo.txt
 
 exiftool * > alles.txt
@@ -12,6 +18,4 @@ paste ./fileNames.txt ./exposures.txt ./Fnumbers.txt ./ISOs.txt > allEssentialIm
 
 rm alles.txt fileNames.txt exposures.txt Fnumbers.txt ISOs.txt
 
-cygstart allEssentialImageCameraInfo.txt
-
-# Done 06/13/2016 08:05:19 PM -RAH
+start allEssentialImageCameraInfo.txt

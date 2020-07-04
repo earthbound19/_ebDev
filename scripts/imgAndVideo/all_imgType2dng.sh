@@ -1,11 +1,12 @@
 # DESCRIPTION
-# Converts all files of a given type in your current path to Adobe digital negatives (.dng).
+# Converts all files of a given type in your current path to Adobe digital negatives (.dng). But don't use DNG. At best you have to keep the original raw image around anyway (in case the DNG toolchain becomes outdated), and DNG has not seen wide adoption.
 
 # USAGE
 # Call this script with one parameter $1, being a file type in the directory from which you run this script--a file type for which all thing whom what this yes you wish to convert to Adobe digital negatives format (.dng), e.g.:
 #  ./all_imgType2dng.sh CR2
 
 
+# CODE
 gfind . -iname \*.$1 > all_wut.txt
 while read element
 do

@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates a .ppm (plain text file bitmap format) image which is W x H pixels of random vertical color stripes, then converts it to a blown-up image of a set scale Y with hard edges preserved--a grid of random color tiles. Generates Z such images. See USAGE for script parameters and example.
+# Creates a .ppm (plain text file bitmap format) image which is W x H pixels of random vertical color stripes, then converts it to a blown-up image of a set scale Y with hard edges preserved--a grid of random color stripes. Generates Z such images. See USAGE for script parameters and example.
 
 # USAGE
 # Pass this script the following parameters; the last being optional:
@@ -15,6 +15,8 @@
 # refactor to discard $3 and $4 resize options. That is what imgs2imgsNN.sh is for.
 # This script was adapted from randomColorTilesGen.sh -- adapt any necessary comments therefrom.
 
+
+# CODE
 # VARS ARE
 minColorColumnRepeat=$1
 maxColorColumnRepeat=$2

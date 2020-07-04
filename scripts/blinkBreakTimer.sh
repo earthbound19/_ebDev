@@ -24,7 +24,6 @@
 # ALSO NOTE that depending on the way timer intervals divide (if the color change interval
 # doesn't divide the break interval evenly), work and break periods may be a bit shorter
 # than what you tell this script.
-
 # WARNING
 # If you terminate this script in an inverval of screen darkness, you will be left in darkness.
 # DARKNESS, Batman. DARKNESS.
@@ -33,6 +32,7 @@
 # `2> /dev/null` suppresses error print.
 
 
+# CODE
 # USER VARIABLES
 # CHANGE THESE VALUES to your liking:
 workMinutes=35

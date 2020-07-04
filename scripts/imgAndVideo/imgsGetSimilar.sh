@@ -1,21 +1,24 @@
+echo "THIS SCRIPT seems to broken. Does so many comparisons and then the result files are empty. TO DO: fix it."
+exit
+
 # DESCRIPTION
 # Produces list of images arranged by most similar to nearest neighbor in list (roughly, with some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list). Some potential uses: use file list with ffmpeg to create an animation jumping from one image to the next most similar, through the list. Render abstract art collections in animation by sort of most similar groups, quasi-un-randomize randomly color-filled (or palette random filled) renders from e.g. colored svg images. Jumble up movie frames from a film scene excerpt in a perhaps wrong but similar frame order, etc.
+
+# DEPENDENCIES
+# Graphicsmagick, image files in a directory to work on, and bash / GNU utilities
 
 # USAGE
 # Invoke this script with one parameter, being the file format in the current dir. to operate on, e.g.:
 #  ./imgsGetSimilar.sh png
 # OPTIONAL: omit variable 1 to compare ALL files in current dir; will throw errors if some files are not images or valid images.
+# NOTES
+# - the comparison algorithm never compares the same image pair more than once.
+# - see re_sort_imgsMostSimilar.sh to sort the result other ways.
 
-# DEPENDENCIES
-# Graphicsmagick, image files in a directory to work on, and bash / GNU utilities
 
-# NOTE
-# The comparison algorithm never compares the same image pair more than once.
-
+# CODE
 # TO DO:
-# - fix for Windows: this script had used gpaste instead of paste, but gpaste isn't in my Windows toolchain; find that for windows OR make it work with a built-in or readily available paste executable on Mac and windows.
 # - refactor to allow continuation of interrupted runs (do not erase temp files; rather append to them.) This means not resizing for comparision any pre-existing files of the pattern __superShrunkRc6d__*, not wiping comparision result temp files, picking up where comparisons left off, and . . . ?
-
 
 # If no $1 parameter, warn and exit.
 if [ -z "$1" ]
@@ -38,7 +41,7 @@ fi
 
 # CODE
 # OPTIONAL wipe of all leftover files from previous run; comment out the next line if you don't want or need that:
-rm __superShrunkRc6d__*
+rm -rf __superShrunkRc6d__*
 
 
 # Because on stupid platforms find produces windows line-endings, convert them to unix after pipe | :
@@ -51,7 +54,7 @@ do
 	then
 				echo COMPARISON SOURCE FILE "__superShrunkRc6d__""$element" already exists\; assuming comparisons against it were already run\; skipping comparison.
 	else
-				echo copying $element to shrunken "__superShrunkRc6d__""$element" to make image comparison much faster . . .
+				echo converting $element to new shrunken image "__superShrunkRc6d__""$element" to make image comparison much faster . . .
 		# gm convert $element -scale 7 __superShrunkRc6d__$element
 		gm convert $element -scale 11 __superShrunkRc6d__$element
 	fi

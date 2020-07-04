@@ -1,13 +1,18 @@
+# DESCRIPTION
+# Crossfades videos with custom fade parameters. See USAGE.
+
 # USAGE
-# Pass this script three parameters, being:
-# $1 the first video
-# $2 the second video
-# $3 the duration of the crossfade between them
-# $4 what time (in seconds, allowing for decimals) the crossfade will start for both videos (in and out).
+# Invoke with these parameters:
+# - $1 file name of the first video
+# - $2 file name of the second video
+# - $3 the duration of the crossfade to make between them them
+# - $4 time in the video that the crossfade will begin (in seconds, allowing for decimals) for both videos (in and out).
+# NOTE; Both videos are assumed to be the same length in my dev tests. I haven't found out what happens if they aren't:
+
+
+# CODE
 # TO DO:
 # Make $3 and $4 optional and default them to 3 and 1, respectively.
-
-# NOTE; Both videos are assumed to be the same length in my dev tests. I haven't found out what happens if they aren't:
 inputVideoOne=$1
 inputVideoTwo=$2
 crossFadeLength=$3			# Set this to half the length of both videos

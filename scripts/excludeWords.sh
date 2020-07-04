@@ -1,12 +1,11 @@
 # DESCRIPTION
-# Changes one text file to exclude all words from another text file; in other words, it deletes every instance of a word in the other file (excludeThese.txt) from the one file (fromThese.txt). Results are written to fromThese_parsed.txt.
-
-# NOTE
-# A variation of this which works only if you have more strict list inputs can be found in numberFilesByLabel.sh.
+# Removes all words from one text file that appear in another text file.
 
 # USAGE
 # Copy a list of exclusion words to excludeThese.txt. Copy the words you want edited (to exclude all words from excludeThese.txt) to fromThese.txt. Run this script. The results will appear in fromThese_parsed.txt.
 
+
+# CODE
 # Thanks yet again to yet another genius breath yonder: http://stackoverflow.com/a/18477228/1397555
 	# THE COMMAND TEMPLATE is:
 	# awk '{if (f==1) { r[$0] } else if (! ($0 in r)) { print $0 } } ' f=1 exclude-these.txt f=2 from-this.txt

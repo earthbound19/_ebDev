@@ -1,22 +1,21 @@
 # DESCRIPTION
-# Gets color palettes (number of colors configurable via parameter) via an image plus color-thief-jimp and imagemagick, parses and combines them into one 18-color palette, and produces a palette image from the result.
-
-# USAGE
-# Invoke this script with two parameters:
-# $1 the image to extract colors from
-# $2 how many colors for color-thief-jimp and imagemagick (respectively--and actually graphicsmagick) to extract. Resultant palette and image will have (n * 2) colors.
+# Gets color palettes (number of colors configurable via parameter) from an image via color-thief-jimp-pallete.js and imagemagick, parses and combines them into one 18-color palette, and produces a palette image from the result.
 
 # DEPENDENCIES
 # nodejs, imagemagick. On Mac imagemagick perhaps ideally via macports; re: https://www.imagemagick.org/script/binary-releases.php -- and node installs should be global:
 # npm install -g jimp
 # npm install -g color-thief-jimp
 
+# USAGE
+# Invoke this script with two parameters:
+# $1 the image to extract colors from
+# $2 how many colors for color-thief-jimp and imagemagick (respectively--and actually graphicsmagick) to extract. Resultant palette and image will have (n * 2) colors.
+
 # INTERESTING AND UNRELATED; posterizes:
 # http://stackoverflow.com/a/27882332/1397555
 
 
-# ==== CODE
-
+# CODE
 # $(($2 + 1)) because it's only giving e.g. 7 colors if I ask for 8:
 node color-thief-jimp-pallete.js $1 $(($2 + 1)) > $1.ctj-colors-hex.txt
 # re: http://stackoverflow.com/questions/26889358/generate-color-palette-from-image-with-imagemagick

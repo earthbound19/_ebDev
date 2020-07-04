@@ -1,10 +1,14 @@
-# DESCRIPTION: Creates cropped .bmp images from all .png images with white borders and a black interior (I think) in a directory tree. Useful e.g. for prepping art for conversion to a vector format without wasted border space.  NOTE: this relies on one of Fred's imagemagick scripts, which are not freely redistributable; you'll have to download it from the source yourself at: http://www.fmwconcepts.com/imagemagick/innercrop/index.php -- However, I use graphicsmagick, so that all imagemagic utilities are executed as `gm (utility name)`.
+# DESCRIPTION
+# Creates cropped .bmp images with white borders and a black interior (I think) from all .png images in a directory tree. Useful for prepping art for conversion to a vector format without wasted border space. NOTE: this relies on one of Fred's imagemagick scripts, which are not freely redistributable; you'll have to download it from the source yourself at: http://www.fmwconcepts.com/imagemagick/innercrop/index.php -- However, I use graphicsmagick, so that all imagemagic utilities are executed as `gm (utility name)`.
 
-# USAGE: call this script from a directory tree full of .png images.
+# USAGE
+# Call this script from a directory tree full of .png images.
 
-# TO DO: upgrade listing to all possible image types.
-# TO DO: make a private fork of Fred's scripts that use graphicsmagick, since I've migrated to that for all of my scripts? Keep a legacy imagemagick install? :/
 
+# CODE
+# TO DO:
+# - upgrade listing to all possible image types.
+# - make a private fork of Fred's scripts that use graphicsmagick, since I've migrated to that for all of my scripts? Keep a legacy imagemagick install? :/
 gfind . -iname \*.png > crop_imgs.txt
 
 i=0

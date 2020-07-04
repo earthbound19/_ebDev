@@ -2,10 +2,12 @@
 # Renames folders with random character strings of length n (per paramater passed to script or default 4), preserving file extension.
 
 # USAGE
-# Put this script in your $PATH. From a directory in which you wish to rename all directories (in the current directory--this is not recursive) with n random characters (per optional parameter), invoke this script thusly:
+# From a directory in which you wish to rename all sub-directories (only one level down--not recursive) to have 34 random characters (per optional parameter), invoke this script thusly:
 #  allRandomFolderNames.sh 34
 # --where you can change that number to specify how many random characters you want in the new file name. If you don't specify any number, it defaults to 4.
 
+
+# CODE
 # GLOBAL VAR SET; if numeric parameter $1 is passed to script, set $getNrandChars to that; otherwise default it to 4:
 if [ "$1" ]; then echo parameter passed to script\; will set getNrandChars to passed value of $1.; getNrandChars="$1"; else getNrandChars=4; echo no parameter passed to script\; using default value of \4 for getNrandChars.; fi
 		# echo val of 1 is $1.

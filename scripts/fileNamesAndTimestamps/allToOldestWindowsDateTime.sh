@@ -1,9 +1,7 @@
 # DESCRIPTION
 # Invokes toOldestWindowsDateTime.sh for all image formats (hard coded) in the current directory.
 
-# USAGE
-# allToOldestWindowsDateTime.sh
-
+# CODE
 list=(`gfind . -maxdepth 1 \( -iname \*.jpg -o -iname \*.png -o -iname \*.cr2 -o -iname \*.tif -o -iname \*.mov \) -printf '%f\n' | sort`)
 
 for element in ${list[@]}

@@ -1,6 +1,8 @@
 # DESCRIPTION
 # Re-sorts result list from imgsGetSimilar.sh according to whatever criteria you alter on the sort code line in this script (if the original results weren't to your liking).
 
+
+# CODE
 # Sort results by erm eh what rank of keys by priority of certain columns in an attempt at something; various options follow; comment out those you don't use:
 # sort -n -b -t\| -k2r -k1r -k3 comparisons__superShrunkRc6d__cols_unsorted.txt > tmp_fx49V6cdmuFp.txt
 # sort -n -b -t\| -k1r -k2 comparisons__superShrunkRc6d__cols_unsorted.txt > tmp_fx49V6cdmuFp.txt

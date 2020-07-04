@@ -1,15 +1,21 @@
-# DESCRIPTION: Copies the video stream (so, lossless transcoding) of rated electric sheep .avi files (from the electric sheep content folder) into .mp4 videos in a specified directory.
+# DESCRIPTION
+# Copies the video stream (so, lossless transcoding) of rated electric sheep .avi files (from the electric sheep content folder) into .mp4 videos in a specified directory. Examines the list_member.xml file to do so.
 
-# USAGE: Set the appropriate path variables at the start of the script, and run the script.
+# DEPENDENCIES
+# Electric Sheep screensaver, a 'nixy envrionment (coded for MSYS2 on Windows)
 
+# USAGE
+# Set the variables at the start of the script per the locations of various files in your Electric Sheep screensaver install, and run the script.
+
+
+# CODE
 # TO DO: only copy files that do not already have a transcoded target, and create a script that runs this periodically (a chron job would do on 'nix systems).
 
 # Global PATH VARIABLES:
-sheep_content_XML_path='C:\ProgramData\ElectricSheep\content\xml'
-cyg_sheep_content_XML_path=`cygpath -u $sheep_content_XML_path`
+sheep_content_XML_path='/c/ProgramData/ElectricSheep/content/xml'
 sheep_content_XML_file='list_member.xml'
-sheep_avis_local_path=`cygpath -u 'C:\ProgramData\ElectricSheep\content\mpeg'`
-sheep_transcodedDestPath='C:\ratedSheep'
+sheep_avis_local_path='/c/ProgramData/ElectricSheep/content/mpeg'
+sheep_transcodedDestPath='/c/ratedSheep'
 # END global PATH VARIABLES
 
 gsed -n 's/.*rating=\"\([0-9]\{1,\}\)\".*url=\"\(.*\)\".*/\1 \2/p' $sheep_content_XML_path\\$sheep_content_XML_file > ratedSheepAndURLs.txt

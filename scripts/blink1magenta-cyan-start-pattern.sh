@@ -1,8 +1,14 @@
+# DESCRIPTION
 # SAVES a boot pattern to a blink1 (USB-powered LED) device via blink1-tool (Mac).
 # reference:
 # https://github.com/todbot/blink1-tool/blob/master/scripts/blink1-pattern-fill.sh
 # https://github.com/todbot/blink1-tool/blob/master/scripts/blink1-patt-tst.sh
 
+# USAGE
+#  ./blink1magenta-cyan-start-pattern.sh
+
+
+# CODE
 # Wipe whatever pattern may be on the device:
 blink1-tool --clearpattern ; blink1-tool --savepattern
 # blink magenta on light 1, cyan on light 2:

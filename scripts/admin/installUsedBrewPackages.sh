@@ -1,3 +1,8 @@
+# DESCRIPTION
+# Installs all the brew packages I commonly use.
+
+# USAGE
+#  ./installUsedBrewPackages.sh
 # NOTES
 # To get a list of all homebrew installed packages to back up here, run:
 # brew list -1 > installedBrewPackages.txt
@@ -6,6 +11,8 @@
 
 # TO DO: always install gnu-gsed with default names (override mac gsed?!) : brew install gnu-gsed --with-default-names : re https://stackoverflow.com/a/27834828/1397555 -- also see: https://developer.apple.com/library/content/documentation/OpenSource/Conceptual/ShellScripting/PortingScriptstoMacOSX/PortingScriptstoMacOSX.html -- https://unix.stackexchange.com/questions/13711/differences-between-gsed-on-mac-osx-and-other-standard-gsed ("complex history")
 
+
+# CODE
 brewPackages=" \
 gnu-gsed \
 ffmpeg \

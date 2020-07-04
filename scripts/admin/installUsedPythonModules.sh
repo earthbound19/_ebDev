@@ -1,3 +1,11 @@
+# DESCRIPTION
+# Installs all the Python modules I commonly use.
+
+# USAGE
+#  ./installUsedPythonModules.sh
+
+
+# CODE
 python -m pip install --upgrade pip
 
 pythonModules=" \

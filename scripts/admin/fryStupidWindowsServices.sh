@@ -1,5 +1,8 @@
-# WARNING: this script is very shotgun "blast everything," including things you might want to keep around.
-#
+# DESCRIPTION
+# Disables and even deletes contemptible or useless Windows services. WARNING: May break essential system functionality or services that program rely on. Use at your own risk. This script is very shotgun "blast everything," including things you might want to keep around.
+
+# USAGE
+#  ./fryStupidWindowsServices.sh
 # NOTES:
 # - As of Aug. 2018 (or earlier), Windows malignantly re-enables windows update and the commands
 # here that seek to disable that don't work--services that switch windows update back
@@ -25,6 +28,8 @@
 # sc config "AeLookupSvc" start= demand
 # sc config "NgcSvc" start= disabled
 
+
+# CODE
 rm -rf "C:\windows10update"
 
 deleteServices="

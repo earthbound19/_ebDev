@@ -3,19 +3,23 @@
 
 # USAGE
 # Pass this script two parameters, being:
-# $1 A file name.
-# $2 What percent of the file to corrupt (in a copy of it)
-# This will produce a corrupted version of the file, named __corrupted_"$2"pct_$timestamp__<originalFileName>.
+# - $1 A file name.
+# - $2 What percent of the file to corrupt (in a copy of it)
+# Example command that will produce a corrupted version of the file input.jpg, corrupting 60 percent of the data in it:
+#  glitchThisFile.sh input.jpg 60
 # NOTE: See comment ALTERNATE OPTIONS HERE for other percent options (which are effective for variously sized files)
 
+
+# CODE
 # TO DO
-# speed up using maths discovered in data2BMPglitchArt.sh (see comments in that) development
-# optional random truncation (deletion) of bytes
-# throw errors for missing paramaters and exit.
-# If the source file is a common movie format, convert it first to a transport stream and corrupt that?
+# - have this put images in a _glitched subfolder (like what other script does that)?
+# - speed up using maths discovered in data2BMPglitchArt.sh (see comments in that) development
+# - optional random truncation (deletion) of bytes
+# - throw errors for missing paramaters and exit.
+# - If the source file is a common movie format, convert it first to a transport stream and corrupt that?
 
 # NOT TO DO
-# In-memory instead of on-disk corruption via xxd. Tried hexStr=`xxd -ps imgData.dat` . . . then (after corruption), with the -r switch reverse the operation. It was prohibitively slow. Piping the output to a file also (resulted in gigabytes-size file).
+# - In-memory instead of on-disk corruption via xxd. Tried hexStr=`xxd -ps imgData.dat` . . . then (after corruption), with the -r switch reverse the operation. It was prohibitively slow. Piping the output to a file also (resulted in gigabytes-size file).
 
 # DEVELOPMENT LOG
 # Discovered by reading help and re-examining that for my purposes (prompted by data2BMPglitchArt.sh development) that I must add bs=1 to dd operations or I am copying way more bytes than I intend (I think?). Updated script accordingly. 11/21/2017 09:37:02 PM -RAH

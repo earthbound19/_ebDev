@@ -1,5 +1,11 @@
+# DESCRIPTION
 # SAVES a boot pattern to a blink1 (USB-powered LED) device via blink1-tool (Mac).
 
+# USAGE
+#  ./blink1blue-red-alternate-start-pattern.sh
+
+
+# CODE
 # Wipe whatever pattern may be on the device:
 blink1-tool --clearpattern ; blink1-tool --savepattern
 # blink magenta on light 1, cyan on light 2:

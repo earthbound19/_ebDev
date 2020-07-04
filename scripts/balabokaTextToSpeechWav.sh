@@ -3,11 +3,13 @@
 
 # USAGE
 # Invoke this script with one paramater, being any text to render to a .wav file (text encased in "quote marks"); e.g.:
-#  balabokaTextToSpeechWav.sh "blarpnoi hoi hoi"
+#  ./balabokaTextToSpeechWav.sh "blarpnoi hoi hoi"
 
 # DEPENDENCIES
 # Balaboka.exe / (windows text-to-speech engine tool) and Cygwin or other 'nix environment
 
+
+# CODE
 textSay=$1
 fileName=$1
 		# OPTIONAL alternate for file names and random text; if you uncomment the next three lines, comment out the previous two:

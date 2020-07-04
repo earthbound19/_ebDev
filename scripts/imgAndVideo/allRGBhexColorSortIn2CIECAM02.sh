@@ -6,6 +6,7 @@
 # ./CIECAM02_sort_all_palettes.sh
 
 
+# CODE
 array=(`gfind . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n'`)
 # or to find every file,`gfind .` . .
 for element in ${array[@]}

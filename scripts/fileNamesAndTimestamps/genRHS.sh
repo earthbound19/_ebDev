@@ -1,12 +1,14 @@
 # DESCRIPTION
 # genRHS.sh = (Gen)erate (R)andom (H)ardlinks (S)ubdir.sh
-# Produces a subdirectory of incrementally numbered (file name) hardlinks to all files of a given file extension $1 in a directory, optionally randomly shuffling the file list before generating hardlinks.
+# For the current directory, takes all files of type $1 (parameter 1), and produces a subdirectory of incrementally numbered (file name) hardlinks to them, optionally randomly shuffling the file list before generating hardlinks.
 
 # USAGE
 # Pass this script one parameter, being the file type to generate a subfolder of numbered hardlinks to; e.g.:
-# genRHS.sh png
-# OPTIONAL: pass anything as a second parameter to this script to randomly shuffle the list of files (of the given extension) before generating numbered hardlinks.
+#  ./genRHS.sh png
+# OPTIONAL: pass anything as a second parameter, and this script will randomly shuffle the list of files (of the given extension) before generating numbered hardlinks.
 
+
+# CODE
 echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
 
 gfind ./*.$1 > xQpr95b2N_list.txt

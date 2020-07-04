@@ -1,38 +1,38 @@
-	echo "!============================================================"
-	echo "The text of all .txt files will be assembled by this script into _allTXTsInUTF8.txt. NOTE: if any characters, in filenames in the directory you run this script against, are not script-friendly (for example if the file names contain spaces), this script may fail. Unmess text file names before running this script."
-	echo "Do you wish to run this script?"
-	echo "!============================================================"
-	echo "IF YOU HAVE READ the above, type the number corresponding to your answer, then press <enter>. If you haven't read the warning, your answer is 2 (No)."
-	select yn in "Yes" "No"
-	do
-		case $yn in
-			Yes ) echo Dokee-okee! Working . . .; break;;
-			No ) echo Doh!; exit;;
-		esac
-	done
+# DESCRIPTION
+# Converts every .txt file in the current directory and all subdirectories to unix line endings and utf8 encoding, IF they are not encoded in us-ascii. Overwrites the original files. I have no idea why I needed or coded this script. Prompts to be sure you want to when you run the script.
+
+# USAGE
+#  ./alltxt2utf8.sh
 
 
-ls *.txt > allFiles
-mapfile -t filesArray < allFiles
-rm allFiles
+# CODE
+echo ""
+echo "WARNING: WARNING. Things. You might not want to run this script. If you do, type VUBKUK and then press ENTER or RETURN. Also, spaces and other terminal-unfriendly characters in text file names may mess up script execution."
+read -p "TYPE HERE: " SILLYWORD
+
+if ! [ "$SILLYWORD" == "VUBKUK" ]
+then
+	echo ""
+	echo Typing mismatch\; exit.
+	exit
+else
+	echo continuing . .
+fi
+
+filesArray=(`gfind . -type f -name "*.txt"`)
 
 for filename in "${filesArray[@]}"
 do
 	temp=`file -bi $filename`
 	type=`echo $temp | gsed 's/.*=\(.*\)/\1/g'`
-	echo type of $filename is:
-	echo $type
-	
 	if [ "$type" != "us-ascii" ]
 	then
-		echo file $filename probably needs conversion to utf8, and/or for (perverted!) DOS line-endings to be converted to unix. Enter dos2unix and iconv. Converting to unix + utf8 and appending to _allTXTsInUTF8.txt . . .
+		printf "\nConverting $filename . . ."
 		dos2unix -l -n $filename out.txt
 		rm $filename
 		iconv -t utf8 out.txt >> $filename
+		rm out.txt
 	else
-		echo file $filename does not need conversion, appending to _allTXTsInUTF8.txt . . .
-		# cat _allTXTsInUTF8.txt $filename >> temp.txt
-		# rm _allTXTsInUTF8.txt
-		# mv temp.txt _allTXTsInUTF8.txt
+		printf "\nNOT converting $filename . . ."
 	fi
 done

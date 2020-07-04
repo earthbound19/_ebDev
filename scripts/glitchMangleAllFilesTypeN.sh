@@ -6,6 +6,8 @@
 
 # DEPENDENCIES bm.exe, uh, byte . . . mangler. The original author named it byte molester, and programmed it to use .fck file extensions. No thanks. And did he want it to be mistakenly thought of as BowelMovement.exe?
 
+
+# CODE
 # if [ ! -d ./out ]; then mkdir out; fi
 
 array=(`gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
