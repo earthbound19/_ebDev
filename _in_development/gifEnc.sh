@@ -1,5 +1,7 @@
-# RE: http://blog.pkh.me/p/21-high-quality-gif-with-ffmpeg.html
+# DESCRIPTION
+# wut
 
+# RE: http://blog.pkh.me/p/21-high-quality-gif-with-ffmpeg.html
 # USAGE:
 # ./gifenc.sh input.mkv output.gif
 

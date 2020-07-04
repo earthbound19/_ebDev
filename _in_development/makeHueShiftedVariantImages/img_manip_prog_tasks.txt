@@ -1,0 +1,5 @@
+make the hueshiftedvariant~ scripts load again (depending) from the image list file.
+
+Integrate those two scripts into one which behaves differently according to? Probably nah, but maybe see . . . or simply test both again. If workie, no changie. I think.
+
+Rename this? What is? : nconvertHueShiftTemplate.bat-notes.txt

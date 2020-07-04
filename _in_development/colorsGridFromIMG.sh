@@ -1,4 +1,4 @@
-# to do: parameterize, describe, instruct
+# TO DO: parameterize, describe, instruct
 # FIX BUGS.
 # - temp color extracting folder renames. get it to actually work in a folder named after input image. maybe by removing terminal-unfriendly characters from generated target folder name?
 # NOTE the text file after image name it expects: $1.hybrid-colors-hex.txt

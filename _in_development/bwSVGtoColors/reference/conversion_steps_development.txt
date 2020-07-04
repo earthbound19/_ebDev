@@ -1,0 +1,22 @@
+Goal: take a two-color b/w image and make color-changed svg and raster images from it. This can be accomplish with a batch running various tools, as follows.
+
+IMPORTANT NOTE: This script relies on the imageMagick toolset as installed to C:\_devtools\bin\ImageMagick, with the main executable renamed to imageMagickConvert.exe to avoid conflict with the windows tool named convert. ALSO, to work, imageMagickConvert.exe requires a full image file name path, e.g.:
+
+ImageMagick_convert D:\Alex\Programming\bwRecolor\2015_04_09__06.53.57_PM.svg D:\Alex\Programming\bwRecolor\2015_04_09__06_53_57_PM_BGhex0a0dbc_FILLhex0ebef3.png
+
+
+SVG TO PNG CONVERSION STEPS:
+
+	Expand canvas by several pixels in src image, to make bg areas filled, so that svg conversion will change all the colors (the next svg conversion step only fills in enclosed white areas with the background color; this encloses all white). The expanded canvas will eventually be cropped back to original size.
+nconvert -out bmp -canvas #10 #10 center -bgcolor 0 0 0 2015-04-09__06.53.57_PM.png
+
+	Bitmap to svg via potrace (MUST start with bmp :/ ) changing foreground and background colors also:
+potrace -n -s -r 300 --group -C #0a0dbc --fillcolor #0ebef3 2015_04_09__06.53.57_PM.bmp
+OR MAYBE without the -r 300 (for 300dpi resolution) switch:
+potrace -n -s --group -C #0a0dbc --fillcolor #0ebef3 2015_04_09__06.53.57_PM.bmp
+
+[need a step that renames files to have no dash--only underscores _.?]
+
+
+OPTION MAYBE NOT LIKIE:
+Converting again to png via ImageMagick's convert tool?

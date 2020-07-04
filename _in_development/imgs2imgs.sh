@@ -1,4 +1,5 @@
-# IN PROGRESS.
+echo Script is in development.
+exit
 
 # DESCRIPTION: converts all images of one type in a directory tree to another.
 
@@ -7,6 +8,8 @@
 # $1 the source file format e.g. bmp or png
 # $2 the target file format e.g. tif or jpg
 
+
+# CODE
 # DEV NOTE: template command: gm -size 850 test.svg result.tif
 # NOTE that for the -size parameter, it scales the images so that the longest side is that many pixels.
 
