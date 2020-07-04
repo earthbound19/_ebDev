@@ -3,10 +3,14 @@
 
 # USAGE
 # Invoke this script with three parameters, being:
-# $1 input file
-# $2 output format
-# $3 px wide to resize to by nearest neighbor method, maintaining aspect
+# - $1 input file
+# - $2 output format
+# - $3 px wide to resize to by nearest neighbor method, maintaining aspect
+# Example:
+#  nconvert2imgNN.sh input.jpg png 1080
 
+
+# CODE
 # template command; resizes to x800 px maintaining aspect ratio:
 # nconvert -ratio -rtype quick -resize 800 -ratio -out jpeg -o outPutFileName.jpg inputFile.png
 
