@@ -4,4 +4,4 @@ spelf () {
 
 spelf
 
-spelf | gsed 's/oo//'
+spelf | sed 's/oo//'

@@ -30,7 +30,7 @@ fi
 
 while read element
 do
-  hexNoHash=`echo $element | gsed 's/\#//g'`
+  hexNoHash=`echo $element | sed 's/\#//g'`
   gm convert -size 256x256 xc:\#$hexNoHash zertsmeh_temp_for_colors/$hexNoHash.png
 done < $1.hybrid-colors-hex.txt
 
@@ -44,7 +44,7 @@ tileParam="-tile 9x500"
 echo gm montage $tileParam -background gray -geometry 300x300+0+0 \\ > mkGridHead.txt
   # convert hex color scheme text list file to parameter list for ~magick:
     # to do? make the following in-memory:
-gsed 's/.*#\(.*\)$/zertsmeh_temp_for_colors\/\1.png \\/' $1.hybrid-colors-hex.txt > mkGridSRCimgs.txt
+sed 's/.*#\(.*\)$/zertsmeh_temp_for_colors\/\1.png \\/' $1.hybrid-colors-hex.txt > mkGridSRCimgs.txt
 echo $1.extracted-colors.png > mkGridTail.txt
 cat mkGridHead.txt mkGridSRCimgs.txt mkGridTail.txt > mkColorPaletteGrid.sh
 rm mkGridHead.txt mkGridSRCimgs.txt mkGridTail.txt

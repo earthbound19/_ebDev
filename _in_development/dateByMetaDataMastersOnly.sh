@@ -36,12 +36,12 @@ rm ./dateByImageInfoFilesListTemp.txt
 
 
 # DISCARDED (AND DUPLICATE) though potentially useful code/notes:
-	# get and filter timestamps of file via exiftool and gsed:
+	# get and filter timestamps of file via exiftool and sed:
 # exiftool derp.tif > wut_-32.txt
 	# extract file name line to temp file:
-# gsed -n 's/\(.*File Name.*\)/\1/p' wut_-32.txt > file_name_line.txt
+# sed -n 's/\(.*File Name.*\)/\1/p' wut_-32.txt > file_name_line.txt
 	# reduce to only lines with date stamps of format 2011:11:11 18:11:11+00:00; pruning off the extraneous first part of the line meanwhile:
-# gsed -i -n 's/\(.*: [0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}.*\)/\1/p' wut_-32.txt
+# sed -i -n 's/\(.*: [0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}.*\)/\1/p' wut_-32.txt
 		
 	# sort the results, to put the oldest (or "smallest" in a sense) file stamp on the first line:
 # sort wut_-32.txt > YA_DIS_TING.txt

@@ -33,14 +33,14 @@ do
 	# if ! (( $count % 2 ))	# EVEN RUN: for the second run, uncomment this and comment out the previous line.
 	then
 		# Re a genius breath yon: https://stackoverflow.com/a/6022431/1397555
-		# Gets Nth line from a file via gsed (fragment of gsed command), set in a variable because I haven't got bash to parse variables and a gsed command the way I want in-line:
+		# Gets Nth line from a file via sed (fragment of sed command), set in a variable because I haven't got bash to parse variables and a sed command the way I want in-line:
 		sedCommand="$count""q;d"
-		# Slowish, but faster than other options if I am to believe said genius breath yon; stores current (even) list item number in a variable; ALSO the tr -d command eliminates a maddening problem of gsed returning windows-style line endings, which much up echo and varaible concatenation commands so that elements after one varaible with a bad line ending disappear; RE: https://stackoverflow.com/a/16768848/1397555
-		secondOfPair=`gsed "$sedCommand" numberedCopies.txt | tr -d '\15\32'`
+		# Slowish, but faster than other options if I am to believe said genius breath yon; stores current (even) list item number in a variable; ALSO the tr -d command eliminates a maddening problem of sed returning windows-style line endings, which much up echo and varaible concatenation commands so that elements after one varaible with a bad line ending disappear; RE: https://stackoverflow.com/a/16768848/1397555
+		secondOfPair=`sed "$sedCommand" numberedCopies.txt | tr -d '\15\32'`
 				# echo secondOfPair is $secondOfPair
 		countMinusOne=$(($count - 1))
 		sedCommand="$countMinusOne""q;d"
-		firstOfPair=`gsed "$sedCommand" numberedCopies.txt | tr -d '\15\32'`
+		firstOfPair=`sed "$sedCommand" numberedCopies.txt | tr -d '\15\32'`
 				# echo firstOfPair is $firstOfPair
 				# echo "$firstOfPair,$secondOfPair"
 		pairArray[$pairArrayCount]="$firstOfPair,$secondOfPair"
@@ -54,8 +54,8 @@ rm ./numberedCopies.txt
 
 for element in ${pairArray[@]}
 do
-	imgOne=`echo $element | gsed 's/\(.*\),.*/\1/g' | tr -d '\15\32'`
-	imgTwo=`echo $element | gsed 's/.*,\(.*\)/\1/g' | tr -d '\15\32'`
+	imgOne=`echo $element | sed 's/\(.*\),.*/\1/g' | tr -d '\15\32'`
+	imgTwo=`echo $element | sed 's/.*,\(.*\)/\1/g' | tr -d '\15\32'`
 	echo invoking ffmpegCrossfadeImagesToAnim.sh with image pair $element . . .
 	ffmpegCrossfadeImagesToAnim.sh $imgOne $imgTwo $crossFadeDuration
 done
