@@ -2,7 +2,7 @@
 # Calls color_growth (python) n ($1) times for preset $2,
 # randomly varying the seed with each run.
 
-pathToScript=`whereis color_growth.py | gsed 's/color_growth: \(.*\)/\1/g'`
+pathToScript=`whereis color_growth.py | sed 's/color_growth: \(.*\)/\1/g'`
 
 for i in `seq 1 $1`
 do

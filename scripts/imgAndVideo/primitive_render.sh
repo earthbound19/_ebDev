@@ -32,8 +32,8 @@ if [ -z "$4" ]; then output_format=png; else output_format=$4; fi
 # override default shrinking of images by default in this script :) by getting largest dimension and passing it later via -s:
 identStr=`gm identify $filename`
 		# echo $identStr
-xPix=`echo $identStr | gsed 's/.* \([0-9]\{1,\}\)x[0-9]\{1,\}.*/\1/g' | tr -d '\15\32'`
-yPix=`echo $identStr | gsed 's/.* [0-9]\{1,\}x\([0-9]\{1,\}\).*/\1/g' | tr -d '\15\32'`
+xPix=`echo $identStr | sed 's/.* \([0-9]\{1,\}\)x[0-9]\{1,\}.*/\1/g' | tr -d '\15\32'`
+yPix=`echo $identStr | sed 's/.* [0-9]\{1,\}x\([0-9]\{1,\}\).*/\1/g' | tr -d '\15\32'`
 largestDimension=`echo $(( $xPix > $yPix ? $xPix : $yPix ))`
 
 fileNameNoExt=${filename%.*}

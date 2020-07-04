@@ -23,17 +23,17 @@
 # CODE
 printf "" > tmp_axdTM39jAC38cr.txt
 while IFS= read -r line || [ -n "$line" ]; do
-	width=`echo $line | gsed 's/\([0-9]\{1,\}\)x.*/\1/g'`
-	height=`echo $line | gsed 's/.*x\([0-9]\{1,\}\)/\1/g'`
+	width=`echo $line | sed 's/\([0-9]\{1,\}\)x.*/\1/g'`
+	height=`echo $line | sed 's/.*x\([0-9]\{1,\}\)/\1/g'`
 	aspect=`echo "scale=2; $width / $height" | bc`
-	aspect=`echo $aspect | gsed 's/\(^\.\)/0\1/'`
+	aspect=`echo $aspect | sed 's/\(^\.\)/0\1/'`
 	nPixels=`echo "scale=0; $width * $height" | bc`
 	echo "Logging information on $line to temp file . . ."
 	echo "$line"",""$aspect"",""$nPixels" >> tmp_axdTM39jAC38cr.txt
 done < export_resolutions_list.txt
 
 # alter the x in NNNNxNNNN format in that to comma (,)
-gsed -i 's/x/,/' tmp_axdTM39jAC38cr.txt
+sed -i 's/x/,/' tmp_axdTM39jAC38cr.txt
 # NOTE: sort doesn't delineate on colons AND commas (or I don't know how to tell it to),
 # so I'll introduce colons in the aspect through reformatting after sort:
 echo "Sorting temp file, then putting a CSV header on it . . ."
@@ -48,7 +48,7 @@ echo "Sorting temp file, then putting a CSV header on it . . ."
 gsort -t , -k 3,3 -k 1,1 -k 2,2 -k 4,4 -r -n tmp_axdTM39jAC38cr.txt | guniq > tmp_deQKEUSjKc9bcB.txt
 	# add :1 to end of last column (making it an aspect ratio expression) :
 	# EXCEPT DON'T (deprecated) :
-	# gsed -i 's/\(.*$\)/\1:1/g' tmp_deQKEUSjKc9bcB.txt
+	# sed -i 's/\(.*$\)/\1:1/g' tmp_deQKEUSjKc9bcB.txt
 printf "width,height,aspect (x:1),pixels\n" > tmp_ANQX4MsYRSFkU2.txt
 cat tmp_ANQX4MsYRSFkU2.txt tmp_deQKEUSjKc9bcB.txt > export_resolutions_list_with_aspects.csv
 rm tmp_ANQX4MsYRSFkU2.txt tmp_axdTM39jAC38cr.txt tmp_deQKEUSjKc9bcB.txt

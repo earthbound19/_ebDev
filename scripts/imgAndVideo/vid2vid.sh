@@ -2,7 +2,7 @@
 # Converts all video files of a given type ($1) to another type ($2) with default crf (constant rate factor or quality) 13 (quite high quality). Conversion may be to the same type, as the target is named after the original but adds "_converted" to the file name.
 
 # DEPENDENCIES
-# gfind (find), gsed, ffmpeg.
+# gnu find, sed, ffmpeg.
 
 # USAGE
 # Invoke this script with two paramaters, the first being the source format and the second being the target. , e.g.:

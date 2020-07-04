@@ -42,10 +42,10 @@ if [ -d numberedCopies ]; then rm -rf numberedCopies; mkdir numberedCopies; else
 tempStr=`ghead -n 1 $fileList`
 # NOTE that this script assumes a closing apostraphe or single quote in the input file! :
 # No, the fileExt=${filename##*.} doesn't work here as there's a trailing ' to trim:
-fileNameExt=`echo $tempStr | gsed "s/.*\.\([^\.]\{1,5\}\)'.*/\1/g"`
+fileNameExt=`echo $tempStr | sed "s/.*\.\([^\.]\{1,5\}\)'.*/\1/g"`
 
 # NOTE this script assumes a list formatted for concatenation by ffmpeg, and makes a temp copy of the list removing that syntax:
-gsed "s/file '\(.*\)'/\1/g" $fileList > tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
+sed "s/file '\(.*\)'/\1/g" $fileList > tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
 dos2unix tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
 
 # Because some platforms pad wc output with spaces:

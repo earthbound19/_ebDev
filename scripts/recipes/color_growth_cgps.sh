@@ -34,7 +34,7 @@
 # extraParameters='--SAVE_EVERY_N 1226'
 # extraParameters='--SAVE_PRESET False'
 
-pathToScript=`whereis color_growth.py | gsed 's/color_growth: \(.*\)/\1/g'`
+pathToScript=`whereis color_growth.py | sed 's/color_growth: \(.*\)/\1/g'`
 presetsArray=(`gfind . -maxdepth 1 -type f -name "*.cgp" -printf '%f\n'`)
 
 for element in ${presetsArray[@]}

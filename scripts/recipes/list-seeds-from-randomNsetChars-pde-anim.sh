@@ -10,11 +10,11 @@
 
 
 # CODE
-array=(`gfind . -iname '*.txt' -print0 -printf "%T@ %Tc %p\n" | gsort -n | gsed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+array=(`gfind . -iname '*.txt' -print0 -printf "%T@ %Tc %p\n" | gsort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 
 printf "" > seeds.txt
 for element in ${array[@]}
 do
 	echo "logging seed from $element . . ."
-	echo $element | gsed 's/.*\/\(.*\).txt/\1/g' >> seeds.txt
+	echo $element | sed 's/.*\/\(.*\).txt/\1/g' >> seeds.txt
 done

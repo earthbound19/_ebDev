@@ -45,7 +45,7 @@ if [ "$5" ] && [ "$5" != "NULL" ]; then extraArgs=$5; printf "\n\nParameter \$5 
 # If the following is false (no $6 passed to script), no SKIP_COOLDOWN varaible will be set, and the script will only skip cooldown if that is set:
 if [ "$6" ]; then SKIP_COOLDOWN='True'; printf "\n\nParameter \$6 passed to script; a variable was set to skip cooldown period between renders."; fi
 
-pathToScript=`whereis color_growth.py | gsed 's/color_growth: \(.*\)/\1/g'`
+pathToScript=`whereis color_growth.py | sed 's/color_growth: \(.*\)/\1/g'`
 # END PARAMETER PARSING AND GLOBALS SETUP.
 
 hexplt2rgbplt.sh $sourcePaletteHexplt
@@ -57,7 +57,7 @@ while read -r element
 do
 	# Only render if there is no .rendering stub file named after the
 	# RGB (decimal) values being used for this proposed render:
-	renderLogFile=`echo "RGB_COLORS__""$element"".rendering" | gsed 's/ /-/g'`
+	renderLogFile=`echo "RGB_COLORS__""$element"".rendering" | sed 's/ /-/g'`
 	if ! [ -e $renderLogFile ]
 	then
 		# create render stub file so that other or subsequent runs of this script

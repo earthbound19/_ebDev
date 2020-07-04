@@ -10,5 +10,5 @@
 #  printBinary.sh anyFile.dat > anyFileBinaryReadout.txt
 
 xxd -b $1 > tmp_28GpWnXdJtjjNKdd8CgXhCw8pxT7WB8bcQ.txt
-gsed 's/^[0-9a-z]*: \(.*\)  .*/\1/g' tmp_28GpWnXdJtjjNKdd8CgXhCw8pxT7WB8bcQ.txt | tr -d '\n '
+sed 's/^[0-9a-z]*: \(.*\)  .*/\1/g' tmp_28GpWnXdJtjjNKdd8CgXhCw8pxT7WB8bcQ.txt | tr -d '\n '
 rm tmp_28GpWnXdJtjjNKdd8CgXhCw8pxT7WB8bcQ.txt

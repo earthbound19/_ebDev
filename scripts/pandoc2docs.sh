@@ -25,7 +25,7 @@ do
 #		if [ -e ./template."$dest_format" ]; then echo FOUND template."$dest_format" FILE in this path.; fi
 		pandoc -t $dest_format -o $dest_file $src_doc
 			# OPTIONAL: to clear out start of line gobbledygook resulting from src_doc -> txt conversion, uncomment this next line:
-			# gsed -i 's/^[\{\}0-9 ;]\{1,\}//g' $dest_file
+			# sed -i 's/^[\{\}0-9 ;]\{1,\}//g' $dest_file
 		# update the new docs' creation and modification file time stamps (windows) or just modification time stamp ('nix):
 		# OPTIONS: on windows if you have binarez_touch, comment out the first line here, and uncomment the second. For 'nix platforms, do visa-versa:
 		touch --reference="$src_doc" $dest_file
