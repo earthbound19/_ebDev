@@ -1,8 +1,9 @@
 # DESCRIPTION
-# Deletes all corrupt images of a type ($1) in a path--meaning recursively.
+# Resursively find all corrupt images of a type ($1) in the current directory and subdirectories, and moves them into an /_irrecoverable subfolder for examination.
 
 # USAGE
-# Invoke this script with one parameter, being an image file extension type without any . in it.
+# Invoke this script with one parameter, being an image file extension type without any . in it, e.g:
+#  identifyCorruptIMGs.sh png
 
 # DEPENDENCIES
 # graphicsmagick (gm identify)
@@ -13,6 +14,7 @@
 
 
 # CODE
+# TO DO: am I doing the same thing as here? And share it there if I am but doing it better: https://www.davidebarranca.com/2018/05/automated-check-for-corrupted-image-files-with-python-and-imagemagick/
 if [ ! -d _irrecoverable ]; then mkdir _irrecoverable; fi
 
 array=`gfind . -maxdepth 1 -type f -name "*.$1" -printf '%f\n' | sort`
@@ -30,6 +32,4 @@ do
 	rm "$filename"_identify_log.txt
 done
 
-echo -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-echo -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-echo FINISHED attempting to identify irrecoverably corrupt image files. All such files have been moved to the new directory \.\/_irrecoverable. You may delete them or inspect them for false negatives.
+printf "\n\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n FINISHED attempting to identify irrecoverably corrupt image files. All such files have been moved to the new directory /_irrecoverable for you to inspect."

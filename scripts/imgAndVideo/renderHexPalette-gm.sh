@@ -10,7 +10,7 @@
 # NOTE: this script seems not to work on cygwin/windows, but it does work on Mac and probably nix' variants.
 # Invoke this script with the following parameters:
 # $1 hex color palette flat file list (input file).
-# $2 OPTIONAL. Edge length of each square tile to be composited into final image. If no provided a default is used.
+# $2 OPTIONAL. Edge length of each square tile to be composited into final image. If not provided a default is used.
 # $3 OPTIONAL. If not provided, or provided as string 'NULL' (don't use the single quote marks), the order of elements in the palette will be preserved. If provided and anything other than NULL (for example 2 or foo or 1 or 3), the script will randomly shuffle the hex color files before compositing them to one image. I have gone back and forth on requiring this in the history of this script :/
 # $4 OPTIONAL. Number of tiles accross of tiles-assembled image (columns).
 # $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).

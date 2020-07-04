@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Converts any camera raw format image file into a .tif file via dcraw.
+# Converts (almost?) any camera raw format image file into a .tif file via dcraw.
 
 # DEPENDENCIES
 # dcraw
