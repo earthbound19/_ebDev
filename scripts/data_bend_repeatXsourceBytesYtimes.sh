@@ -32,7 +32,7 @@
 
 inFile=$1
 # TO DO: change to the following quicker method:
-# filenameNoExt=`echo $1 | gsed 's/\(.*\)\..\{1,4\}/\1/g'`
+# filenameNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
 filenameNoExt=`rev <<< "$inFile" | cut -d"." -f2- | rev`
 outfile=__dataStretched__"$filenameNoExt".dat
 

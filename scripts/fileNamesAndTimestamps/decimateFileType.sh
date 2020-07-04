@@ -20,7 +20,7 @@ read -p "WARNING: all files of type $fileTypeToDelete which are not a multiple o
 if [[ "$florf" != "YORFEL" ]]; then echo "No input match. Exit."; exit; else echo "Input match; continuing . . ."; fi
 
 # Sorts by time stamp:
-array=(`gfind . -maxdepth 1 -name "*.$1" -print0 -printf "%T@ %Tc %p\n" | gsort -n | gsed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+array=(`gfind . -maxdepth 1 -name "*.$1" -print0 -printf "%T@ %Tc %p\n" | gsort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 
 counter=-1
 for element in ${array[@]}

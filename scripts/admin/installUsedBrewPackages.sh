@@ -9,7 +9,7 @@
 # Also, to uninstall every brew package but keep brew, run; re: https://github.com/Homebrew/legacy-homebrew/issues/48792
 # brew list -1 | xargs brew rm
 
-# TO DO: always install gnu-gsed with default names (override mac gsed?!) : brew install gnu-gsed --with-default-names : re https://stackoverflow.com/a/27834828/1397555 -- also see: https://developer.apple.com/library/content/documentation/OpenSource/Conceptual/ShellScripting/PortingScriptstoMacOSX/PortingScriptstoMacOSX.html -- https://unix.stackexchange.com/questions/13711/differences-between-gsed-on-mac-osx-and-other-standard-gsed ("complex history")
+# TO DO: always install gnu-gsed with default names (override mac sed?!) : https://stackoverflow.com/questions/5694228/sed-in-place-flag-that-works-both-on-mac-bsd-and-linux/27834828#comment96137537_27834828  https://developer.apple.com/library/content/documentation/OpenSource/Conceptual/ShellScripting/PortingScriptstoMacOSX/PortingScriptstoMacOSX.html -- https://unix.stackexchange.com/questions/13711/differences-between-sed-on-mac-osx-and-other-standard-sed ("complex history")
 
 
 # CODE

@@ -19,14 +19,14 @@ echo Creating batch script to update time stamps of all files in this path by pa
 		# touch -c -t 201405140809 "./_patreon_cropOfFinal_07-18-2014__11-18-21_AM_FINAL_v04_29-703x12-377_300dpi.tif"
 		# touch -c -t 201405140809.16 "./_patreon_cropOfFinal_07-18-2014__11-18-21_AM_FINAL_v04_29-703x12-377_300dpi.tif"
 		# nested backreference command that works:
-		# echo hello | gsed 's/\(.*\(ll\).*\)/\1 \2/g'
-gfind -type f | gsed -n 's/\(.*\([0-9]\{4\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\).*\)/touch -c -t  \2 \3 \4 \5 \6.\7 "\1"/p' > _UPDtimeStamp.sh
+		# echo hello | sed 's/\(.*\(ll\).*\)/\1 \2/g'
+gfind -type f | sed -n 's/\(.*\([0-9]\{4\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\).*\)/touch -c -t  \2 \3 \4 \5 \6.\7 "\1"/p' > _UPDtimeStamp.sh
 # NOTE: that double-space after the -t flag is intentional (so that there remains a space after later number string processing.
 
 # replace all single-digit space-padded numbers with one zero pad:
-gsed -i 's/ \([0-9][^0-9]\)/ 0\1/g' _UPDtimeStamp.sh
+sed -i 's/ \([0-9][^0-9]\)/ 0\1/g' _UPDtimeStamp.sh
 # remove spaces between numbers:
-gsed -i 's/ \([0-9]\{2\}\)/\1/g' _UPDtimeStamp.sh
+sed -i 's/ \([0-9]\{2\}\)/\1/g' _UPDtimeStamp.sh
 
 # Execute the file time stamp modification batch, then rename it to a date and time stamped .txt file:
 echo Executing ./_UPDtimeStamp.sh . . .

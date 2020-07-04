@@ -13,7 +13,7 @@
 
 
 # CODE
-array=(`gfind . -name "*.$1" -print0 -printf "%T@ %Tc %p\n" | gsort -n -r | gsed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+array=(`gfind . -name "*.$1" -print0 -printf "%T@ %Tc %p\n" | gsort -n -r | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 for element in ${array[@]}
 do
 	cat $element

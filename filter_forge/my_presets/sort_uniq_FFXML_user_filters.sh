@@ -2,7 +2,7 @@
 # SEE USAGE. Prints unique presets from an XML file containing multiple Filter Forge filter user presets (which XML files are stored in a "My Presets" user folder with a Filter Forge install). This printout may be pasted over the entire original preset list again and saved. Has the effect of deleting duplicate presets (which appear when I merge presets by hand from multiple sources).
 
 # DEPENDENCIES
-# xmlstarlet installed in your PATH as 'xml', sed installed as gsed.
+# xmlstarlet installed in your PATH as 'xml', sed.
 
 # USAGE
 # - suppose you have two different versions of a Filter Forge user preset file (e.g. Library_14934.xml) from different machines (from the "My Presets" subfolder in the Filter Forge user data folder). If you cut and pasted all of the <element> fields of one into the other (combined all those fields), you would end up with new unique elements but a lot of duplicated elements. This script assists in eliminating the duplicate elements. Do this: 
@@ -19,9 +19,9 @@
 # select all preset XML, pipe to tr and delete all newlines, and pipe to a temp text file:
 xml sel -t -m 'MyPresets/Preset' -c '.' -nl $1 | tr -d '\n' > tmp_rSnzR26vhdi8Uy.txt
 # split that text file on presets:
-gsed -i 's/<\/Preset>/<\/Preset>\n/g' tmp_rSnzR26vhdi8Uy.txt
+sed -i 's/<\/Preset>/<\/Preset>\n/g' tmp_rSnzR26vhdi8Uy.txt
 # delete tabs (which fortunately only appear between > and <):
-gsed -i "s/\t//g" tmp_rSnzR26vhdi8Uy.txt
+sed -i "s/\t//g" tmp_rSnzR26vhdi8Uy.txt
 # sort and uniq that, printing to stdout:
 sort < tmp_rSnzR26vhdi8Uy.txt | uniq
 rm ./tmp_rSnzR26vhdi8Uy.txt

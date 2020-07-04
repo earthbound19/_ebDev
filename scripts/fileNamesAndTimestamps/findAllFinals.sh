@@ -12,18 +12,18 @@
 		# -- results in listing files that include '.*FINAL.*' in the *path* but not the file name (as well as all that have it in the file name).
 gfind . -type f > ___ALL_FINALS___.txt
 # strip off paths, leaving only file names:
-gsed -i 's/.*\///g' ___ALL_FINALS___.txt
+sed -i 's/.*\///g' ___ALL_FINALS___.txt
 # remove all listings that end with _MD_ADDS.txt:
-gsed -i 's/.*_MD_ADDS.txt//g' ___ALL_FINALS___.txt
+sed -i 's/.*_MD_ADDS.txt//g' ___ALL_FINALS___.txt
 # remove any listing of ___ALL_FINALS___.txt if it existed before this script was executed:
-gsed -i 's/___ALL_FINALS___.txt//g' ___ALL_FINALS___.txt
+sed -i 's/___ALL_FINALS___.txt//g' ___ALL_FINALS___.txt
 # remove all listings that do not include the phrase FINAL; thx to http://stackoverflow.com/a/8255627/1397555 :
 # Block template: if no such parameter this, otherwise that:
 if [ "$1" ]
 	then	# if no paramater passed to script, search for .*FINAL.* :
-		gsed -i -n 's/\(.*FINAL.*\)/\1/p' ___ALL_FINALS___.txt
+		sed -i -n 's/\(.*FINAL.*\)/\1/p' ___ALL_FINALS___.txt
 	else	# if parameter passed to script, search for _FINAL_ :
-		gsed -i -n 's/\(.*_FINAL_.*\)/\1/p' ___ALL_FINALS___.txt
+		sed -i -n 's/\(.*_FINAL_.*\)/\1/p' ___ALL_FINALS___.txt
 fi
 
 echo "DONE. Results are in ___ALL_FINALS___.txt."

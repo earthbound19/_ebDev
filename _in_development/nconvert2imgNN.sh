@@ -14,5 +14,5 @@
 # template command; resizes to x800 px maintaining aspect ratio:
 # nconvert -ratio -rtype quick -resize 800 -ratio -out jpeg -o outPutFileName.jpg inputFile.png
 
-imgFileNoExt=`echo $1 | gsed 's/\(.*\)\..\{1,4\}/\1/g'`
+imgFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
 nconvert -ratio -rtype quick -resize $3 -ratio -out $2 -o outPutFileName.jpg $imgFileNoExt.$2

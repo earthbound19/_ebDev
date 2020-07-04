@@ -65,7 +65,7 @@ if [ $USERINPUT == $PASS_STRING ]
 then
 	echo "User input equals pass string; proceeding."
 	pathToRenamePerl=`whereis rename.pl`
-	pathToRenamePerl=`echo $pathToRenamePerl | gsed 's/.* \(.*\/rename.pl\).*/\1/g'`
+	pathToRenamePerl=`echo $pathToRenamePerl | sed 's/.* \(.*\/rename.pl\).*/\1/g'`
 		# Option that removes dashes also:
 		# perl $pathToRenamePerl -e 's/[^\w.]+/_/g' $extension
 	perl $pathToRenamePerl -e 's/[^\w.-]+/_/g' $extension
