@@ -7,7 +7,7 @@
 # before I fixed randomNsetChars.pde to do it.
 
 # CODE
-folders=(`gfind . -type d -printf '%f\n' | gsort -n | gsed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+folders=(`gfind . -type d -printf '%f\n' | gsort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 # the :1 in the following slices the array to omit
 # the first element, ., which we don't want;
 # re: https://stackoverflow.com/a/2701872/1397555

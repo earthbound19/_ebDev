@@ -45,7 +45,7 @@ do
 	# Trim off extension:
 	element=${element%.*}
 	# Also trim any ./ off the start of the file name:
-	element=`echo $element | gsed 's|^./||' | tr -d '\15\32'`
+	element=`echo $element | sed 's|^./||' | tr -d '\15\32'`
 	echo that is $element
 
 	# search up directories and move the applicable file here if it exists:

@@ -12,7 +12,7 @@ exit
 # closed issues.
 
 # DEPENDENCES
-# hub (on Mac: brew install hub) (a CLI interface for the GitHub API), gsed (gnu gsed)
+# hub (on Mac: brew install hub) (a CLI interface for the GitHub API), sed (gnu sed)
 
 # CODE
 # use the GitHub API to assign no users [] to the issue,
@@ -22,7 +22,7 @@ exit
 # hub api repos/{owner}/{repo}/issues/$ISSUE --assignees [] 
 
 # First create an array of closed issue numbers:
-ARRAY=`hub issue -s closed | gsed 's/.*#\([0-9]\{1,\}\).*/\1/g'`
+ARRAY=`hub issue -s closed | sed 's/.*#\([0-9]\{1,\}\).*/\1/g'`
 
 # Then unassign all users from all those issues:
 for ISSUE in ${ARRAY[@]}

@@ -23,8 +23,8 @@
 		echo gm identify $1
 identStr=`gm identify $1`
 		# echo $identStr
-xPix=`echo $identStr | gsed 's/.* \([0-9]\{1,\}\)x[0-9]\{1,\}.*/\1/g'`
-yPix=`echo $identStr | gsed 's/.* [0-9]\{1,\}x\([0-9]\{1,\}\).*/\1/g'`
+xPix=`echo $identStr | sed 's/.* \([0-9]\{1,\}\)x[0-9]\{1,\}.*/\1/g'`
+yPix=`echo $identStr | sed 's/.* [0-9]\{1,\}x\([0-9]\{1,\}\).*/\1/g'`
 srcAspect=`echo "scale=5; $xPix / $yPix" | bc`		# thas right ima do hundred thousanths re (decimal accuracy) scale=5
 		echo -~-~-~-~-~-~-
 		echo x pix: $xPix
