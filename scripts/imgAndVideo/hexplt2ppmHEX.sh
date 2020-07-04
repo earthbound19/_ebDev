@@ -62,13 +62,13 @@ fi
 # Do whitespace / extraneous lines cleanup of .hexplt source file (saving result to temp file which we will operate from) :
 			# commands iterated through in development:
 			# replaces whitespace with ____:
-			# gsed -e "s/\s/____/g" ColorSchemeHexBurntSandstone.hexplt
+			# sed -e "s/\s/____/g" ColorSchemeHexBurntSandstone.hexplt
 			# isolates six-character hex:
-			# gsed -e "s/#\([0-9a-fA-F]\{6\}\)/\1/g" ColorSchemeHexBurntSandstone.hexplt
+			# sed -e "s/#\([0-9a-fA-F]\{6\}\)/\1/g" ColorSchemeHexBurntSandstone.hexplt
 			# combines stripping leading whitespace and isolating sextuple hex strings:
-			# gsed -e "s/^\s\{1,\}//g" -e "s/#\([0-9a-fA-F]\{6\}\).*/\1/g" ColorSchemeHexBurntSandstone.hexplt
+			# sed -e "s/^\s\{1,\}//g" -e "s/#\([0-9a-fA-F]\{6\}\).*/\1/g" ColorSchemeHexBurntSandstone.hexplt
 # I don't know *how* this combination of flags works; it was a shot in the dark (!), but it works; hints from https://stackoverflow.com/a/1665574/1397555 ; ALSO, the \L converts all preceding characters which are uppercase to lowercase :
-gsed -n -e "s/^\s\{1,\}//g" -n -e "s/#\([0-9a-fA-F]\{6\}\).*/\L\1/p" $hexColorSrcFullPath > tmp_djEAM2XJ9w.hexplt
+sed -n -e "s/^\s\{1,\}//g" -n -e "s/#\([0-9a-fA-F]\{6\}\).*/\L\1/p" $hexColorSrcFullPath > tmp_djEAM2XJ9w.hexplt
 # Reassign name of that temp file to hexColorSrcFullPath to work from:
 hexColorSrcFullPath=tmp_djEAM2XJ9w.hexplt
 
@@ -145,10 +145,10 @@ else
 	ppmBodyValues=`tr -d '\n' < tmp_djEAM2XJ9w.hexplt`
 			rm tmp_djEAM2XJ9w.hexplt
 	# Split that superstring with spaces every two hex chars:
-	ppmBodyValues=`echo $ppmBodyValues | gsed 's/../& /g'`
+	ppmBodyValues=`echo $ppmBodyValues | sed 's/../& /g'`
 	hexPairsPerRow=$(( $tilesAcross * 9 ))		# Why is that 9? I'm just seeing that's what it should be.
 	# Further split that into newlines every N columns (to match hex val triplets to num colors per row) :
-	echo $ppmBodyValues | gsed "s/.\{$hexPairsPerRow\}/&\n/g" > ppmBody.txt
+	echo $ppmBodyValues | sed "s/.\{$hexPairsPerRow\}/&\n/g" > ppmBody.txt
 	# Concatenate temp files into final ppm file:
 	cat PPMheader.txt ppmBody.txt > $renderTargetFile
 			rm PPMheader.txt ppmBody.txt

@@ -75,7 +75,7 @@ then
 	printf "" > tmp_ft2N854f.txt
 	echo _out.mp4 >> tmp_ft2N854f.txt
 	echo _append.mp4 >> tmp_ft2N854f.txt
-	gsed -i "s/^\(.*\)/file '\1'/g" tmp_ft2N854f.txt
+	sed -i "s/^\(.*\)/file '\1'/g" tmp_ft2N854f.txt
 	ffmpeg -y -f concat -i tmp_ft2N854f.txt -c copy _tmp_TXF6PmWe.mp4
 	rm ./tmp_ft2N854f.txt
 	rm ./_out.mp4 ./_append.mp4

@@ -37,7 +37,7 @@ fi
   # if [ "$OS" == "Windows_NT" ]
   # then
 whereScriptIs=`whereis getNshadesOfColorCIECAM02.py`
-whereScriptIs=`echo $whereScriptIs | gsed 's/getNshadesOfColorCIECAM02: //'`
+whereScriptIs=`echo $whereScriptIs | sed 's/getNshadesOfColorCIECAM02: //'`
   # fi
 
 arr=$(<$INFILE)

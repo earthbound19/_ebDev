@@ -2,7 +2,7 @@
 # Render a sequence of image crossfades from a list (e.g. by next most similar image), using ffmpegCrossfadeIMGsToAnim.sh repeatedly.
 
 # DEPENDENCIES
-# a 'nixy environment, gsed, paste, tail, perl, and the tools needed by ffmpegCrossfadeIMGsToAnim.sh
+# a 'nixy environment, sed, paste, tail, perl, and the tools needed by ffmpegCrossfadeIMGsToAnim.sh
 
 # USAGE
 # See "DEPENDENCIES" first. Then run:
@@ -58,35 +58,35 @@ padding=1.1
 echo ~~~~
 echo Creating image crossfade pairs list . . .
 # strip 'file ' string out of IMGlistByMostSimilar.txt, and copy the result into a temp file we'll work from:
-gsed 's/file \(.*\)/\1/g' IMGlistByMostSimilar.txt > tmp_cMQ3nW6QVY5hFn.txt
+sed 's/file \(.*\)/\1/g' IMGlistByMostSimilar.txt > tmp_cMQ3nW6QVY5hFn.txt
 # strip all single-quote marks out of that:
 tr -d "'" < tmp_cMQ3nW6QVY5hFn.txt > tmp_TAQZSDa6cn4EXn.txt
 tmpSrcFile=tmp_TAQZSDa6cn4EXn.txt
 
 # split every even-numbered line of text into listB; re http://www.theunixschool.com/2012/12/how-to-print-every-nth-line-in-file-in.html :
-gsed -n 'n;p;' $tmpSrcFile > listB.txt
+sed -n 'n;p;' $tmpSrcFile > listB.txt
 # remove the first line;
 tail -n +2 $tmpSrcFile > tmp_Ud5EMH7y7fKDn7.txt
 # split every odd-numbered line into listA:
-gsed -n 'n;p;' tmp_Ud5EMH7y7fKDn7.txt > listA.txt
+sed -n 'n;p;' tmp_Ud5EMH7y7fKDn7.txt > listA.txt
 # add the missing first line back to listA:
 firstLineOfList=`head -n 1 $tmpSrcFile`
-gsed -i "1s/^/$firstLineOfList\n/" listA.txt		# Re a genius breath: https://superuser.com/a/246841/130772
+sed -i "1s/^/$firstLineOfList\n/" listA.txt		# Re a genius breath: https://superuser.com/a/246841/130772
 # -- then work up those to versions of the list to a pair list; e.x. command to join list A C E with list B D E as pairs separated by a bar | :
 paste -d '|' listA.txt listB.txt > filePairsFromOddNumberedLines.txt
 # NOW WE HAVE (in filePairsFromOddNumberedLines.txt) a list of pairs for crossfades, starting from odd-numbered lines of $tmpSrcFile.
 # DO ALL OF THAT AGAIN, but building a list starting from even-numbered lines, by stripping the first line off the list before we do the process again (we can reuse tmp_Ud5EMH7y7fKDn7.txt) :
-gsed -n 'n;p;' tmp_Ud5EMH7y7fKDn7.txt > listB.txt
+sed -n 'n;p;' tmp_Ud5EMH7y7fKDn7.txt > listB.txt
 tail -n +2 tmp_Ud5EMH7y7fKDn7.txt > tmp_CdJeVagRZ8n8MS.txt
-gsed -n 'n;p;' tmp_CdJeVagRZ8n8MS.txt > listA.txt
+sed -n 'n;p;' tmp_CdJeVagRZ8n8MS.txt > listA.txt
 firstLineOfList=`head -n 1 tmp_Ud5EMH7y7fKDn7.txt`
-gsed -i "1s/^/$firstLineOfList\n/" listA.txt
+sed -i "1s/^/$firstLineOfList\n/" listA.txt
 paste -d '|' listA.txt listB.txt > filePairsFromEvenNumberedLines.txt
 # NOW WE HAVE (in filePairsFromEvenNumberedLines.txt) a list of pairs for crossfades, starting from odd-numbered lines of $tmpSrcFile.
 # interleave the filePairsFromOdd~ and ~Even~ via this paste magic, re https://stackoverflow.com/a/4011824/1397555 :
 paste -d '\n' filePairsFromOddNumberedLines.txt filePairsFromEvenNumberedLines.txt > allCrossfadePairs.txt
 # strip any excess empty lines out of that:
-gsed -i '/^$/d' allCrossfadePairs.txt
+sed -i '/^$/d' allCrossfadePairs.txt
 # wipe all trailing newlines from result, re https://stackoverflow.com/a/1654042/1397555 :
 perl -pi -e 'chomp if eof' allCrossfadePairs.txt
 # The last line of that is always one file (the last file in the list), which is convenient for dovetailing back to the first file (so that the whole animation loops); let's do that by appending the first listed file from $tmpSrcFile to the end of that line (which the previous perl command prepared for) :
@@ -102,9 +102,9 @@ printf "" > srsly.sh
 while IFS= read -r element || [ -n "$element" ]
 do
 # TO DO? : build arrays here and then iterate through the arrays (instead of this awful following KLUDGE)?
-	imgOne=`echo $element | gsed 's/\(.*\)|.*/\1/g' | tr -d '\15\32'`
+	imgOne=`echo $element | sed 's/\(.*\)|.*/\1/g' | tr -d '\15\32'`
 			# echo imgOne is\: $imgOne
-	imgTwo=`echo $element | gsed 's/.*|\(.*\)/\1/g' | tr -d '\15\32'`
+	imgTwo=`echo $element | sed 's/.*|\(.*\)/\1/g' | tr -d '\15\32'`
 			# echo imgTwo is\: $imgTwo
 # KLUDGE:
 # I DON'T KNOW why bash on Mac won't run every loop of the following commands from this loop, but it won't--it never completes all of them (it completes a random assortment of them--usually only the first). But with the following ugly kludge of writing all the commands to a script, then running the script, it works:

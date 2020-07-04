@@ -30,7 +30,7 @@
 
 
 # CODE
-imgFileNoExt=`echo $1 | gsed 's/\(.*\)\..\{1,4\}/\1/g' | tr -d '\15\32'`
+imgFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g' | tr -d '\15\32'`
 ppmDestFileName="$imgFileNoExt""_asPPM.ppm"
 
 inputDataFile=$1
@@ -51,7 +51,7 @@ echo 255 >> PPMheader.txt
 		# od -t x1 -w$IMGsideLength $inputDataFile > PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 # DECIMAL option:
 od -An -t d1 -w$IMGsideLength $inputDataFile > PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
-# NOTE: to make a green tint any other color you can make with only blue and red (whatever sense it makes to say green tint here), you can change the zeros in the following gsed regex to anything from 00 to ff hex; 00 would look like: ..  00 \1 00  ..
+# NOTE: to make a green tint any other color you can make with only blue and red (whatever sense it makes to say green tint here), you can change the zeros in the following sed regex to anything from 00 to ff hex; 00 would look like: ..  00 \1 00  ..
 		# some options (NOTE that the hex options are deprecated) ;
 		# "green tints" of medium dark, dimmish purple:												68 \1 b6			decimal: 105 \1 182
 		# "blue tints" of dim green:																00 5b \1			decimal: 00 91 \1
@@ -59,17 +59,17 @@ od -An -t d1 -w$IMGsideLength $inputDataFile > PPMtableTemp_huuRgKWvYvNtw5jd5CWP
 		# but really for that I prefer, at least for RGB:																decimal: \1 0 255
 		# shades of blue, no other hues:															0 0 \1				decimal: 0 0 \1
 		# For other possibilities, see: RGB_combos_of_255_127_and_0_repetition_allowed.hexplt
-		# DEPRECATED gsed command focused on converting hex:
-		# gsed -i 's/ \([0-9a-z]\{2\}\)/ 00 5b \1 /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
-gsed -i 's/ \([0-9]\{1,\}\)/ 105 \1 182 /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
-# strip off the byte offset count (I think it is) info at the start of each row, via gsed;
+		# DEPRECATED sed command focused on converting hex:
+		# sed -i 's/ \([0-9a-z]\{2\}\)/ 00 5b \1 /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+sed -i 's/ \([0-9]\{1,\}\)/ 105 \1 182 /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+# strip off the byte offset count (I think it is) info at the start of each row, via sed;
 # DEPRECATED as unecessary via adding -An flag to od call:
-# gsed -i 's/^[0-9]\{1,\} \(.*\)/\1/g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+# sed -i 's/^[0-9]\{1,\} \(.*\)/\1/g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 # reduce any double-spaces (which may result from earlier text processing) to single, twice:
-gsed -i 's/  / /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
-gsed -i 's/  / /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+sed -i 's/  / /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+sed -i 's/  / /g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 # delete still-resulting double spaces at start:
-# gsed -i 's/^  //g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
+# sed -i 's/^  //g' PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt
 
 # Concatenate the header and body into a new, complete PPM format file:
 cat PPMheader.txt PPMtableTemp_huuRgKWvYvNtw5jd5CWPyJMc.txt > $ppmDestFileName

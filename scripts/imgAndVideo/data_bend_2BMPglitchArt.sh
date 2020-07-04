@@ -10,7 +10,7 @@
 # CODE
 # DETAILS
 # Does a square root calculation (rounded) from the byte size of the data to determine the bmp X and Y dimensions which this creates a header from.
-imgFileNoExt=`echo $1 | gsed 's/\(.*\)\..\{1,4\}/\1/g'`
+imgFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
 ppmDestFileName="$imgFileNoExt"_asBMP.bmp
 
 fileToMakeCorruptedCopyOf=$1

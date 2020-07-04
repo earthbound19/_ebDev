@@ -9,10 +9,10 @@
 rm allEssentialImageCameraInfo.txt
 
 exiftool * > alles.txt
-gsed -n 's/\(^File Name*.\)/\1/p' alles.txt > fileNames.txt
-gsed -n 's/\(^Exposure Time*.\)/\1/p' alles.txt > exposures.txt
-gsed -n 's/\(^F Number*.\)/\1/p' alles.txt > Fnumbers.txt
-gsed -n 's/\(^ISO[^0-9]*[0-9].*\)/\1/p' alles.txt > ISOs.txt
+sed -n 's/\(^File Name*.\)/\1/p' alles.txt > fileNames.txt
+sed -n 's/\(^Exposure Time*.\)/\1/p' alles.txt > exposures.txt
+sed -n 's/\(^F Number*.\)/\1/p' alles.txt > Fnumbers.txt
+sed -n 's/\(^ISO[^0-9]*[0-9].*\)/\1/p' alles.txt > ISOs.txt
 
 paste ./fileNames.txt ./exposures.txt ./Fnumbers.txt ./ISOs.txt > allEssentialImageCameraInfo.txt
 

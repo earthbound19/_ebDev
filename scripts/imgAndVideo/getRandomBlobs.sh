@@ -19,12 +19,12 @@ for i in $(seq $1)
 do
 	# Get an 8-byte random number; re http://www.cyberciti.biz/faq/bash-shell-script-generating-random-numbers/ ; output should be in the range 0- ~18.4 quintillion re: https://en.wikipedia.org/wiki/Integer_%28computer_science%29#Words
 	seed=`od -vAn -N8 -tu8 < /dev/urandom`
-	seed=`echo $seed | gsed 's/ //g' | tr -d '\15\32'`		# Trims unwanted space from front of number.
+	seed=`echo $seed | sed 's/ //g' | tr -d '\15\32'`		# Trims unwanted space from front of number.
 	numRandomPoints=$[ 3 + $[ RANDOM % 11 ]]	# Random number between 3 and 11.
 	lineWidth=$[ 3 + $[ RANDOM % 7 ]]	# Random number between 3 and 11.
 	interpolationPoints=1
 	outfile="randomBlob S$seed n$numRandomPoints p$interpolationPoints l$lineWidth.png"
-	outfile=`echo "$outfile" | gsed 's/ /_/g' | tr -d '\15\32'`	# Replaces spaced with underscores, where the variables won't assign to a string properly in the first place with underscores.
+	outfile=`echo "$outfile" | sed 's/ /_/g' | tr -d '\15\32'`	# Replaces spaced with underscores, where the variables won't assign to a string properly in the first place with underscores.
 	command="randomblob.sh -S $seed -n $numRandomPoints -p $interpolationPoints -l $lineWidth -d straight $outfile"
 	echo command is $command
 	$command

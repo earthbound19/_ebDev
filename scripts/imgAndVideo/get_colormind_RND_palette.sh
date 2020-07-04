@@ -2,7 +2,7 @@
 # Fetches a randomly served color scheme from http://colormind.io and converts it to a .hexplt file named after the colors in the palette.
 
 # DEPENDENCIES
-# curl, sed (as gsed), a 'nixy environment to run this bash script, and the colormind API documented at: http://colormind.io/api-access/ and https://github.com/dmi3kno/colormind
+# curl and sed from a 'nixy environment (MSYS2 on Windows may be best) to run this bash script, and the colormind API documented at: http://colormind.io/api-access/ and https://github.com/dmi3kno/colormind
 
 # USAGE
 #  ./get_colormind_RND_palette.sh
@@ -14,8 +14,8 @@
 paletteJSON=`curl 'http://colormind.io/api/' --data-binary '{"model":"default"}'`
 # {"result":[[155,247,24],[218,143,29],[217,43,126],[72,39,74],[31,33,49]]}
 
-# replace all non-numbers with spaces via gsed:
-palette=`echo $paletteJSON | gsed 's/[^0-9]/ /g'`
+# replace all non-numbers with spaces via sed:
+palette=`echo $paletteJSON | sed 's/[^0-9]/ /g'`
 
 # weirdly, print or echo strips redundant whitespace from that, but it turns out the printf format command I use strips it, so there's no need to strip it otherwise:
 fileNameString=`printf '%02X%02X%02X_' $palette`

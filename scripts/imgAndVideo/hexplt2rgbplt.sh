@@ -60,20 +60,20 @@ else
 		fi
 	fi
 
-	gsed -n -e "s/^\s\{1,\}//g" -n -e "s/#\([0-9a-fA-F]\{6\}\).*/\L\1/p" $hexColorSrcFullPath > tmp_d44WYq2HHQ.hexplt
+	sed -n -e "s/^\s\{1,\}//g" -n -e "s/#\([0-9a-fA-F]\{6\}\).*/\L\1/p" $hexColorSrcFullPath > tmp_d44WYq2HHQ.hexplt
 	hexColorSrcTMPpath=tmp_d44WYq2HHQ.hexplt
 	ppmBodyValues=`tr -d '\n' < $hexColorSrcTMPpath`
 	rm tmp_d44WYq2HHQ.hexplt
-	ppmBodyValues=`echo $ppmBodyValues | gsed 's/../& /g' | tr -d '\15\32'`
-	ppmBodyValues=`echo $ppmBodyValues | gsed 's/[a-zA-Z0-9]\{2\}/$((16#&))/g' | tr -d '\15\32'`
+	ppmBodyValues=`echo $ppmBodyValues | sed 's/../& /g' | tr -d '\15\32'`
+	ppmBodyValues=`echo $ppmBodyValues | sed 's/[a-zA-Z0-9]\{2\}/$((16#&))/g' | tr -d '\15\32'`
 	printf "echo $ppmBodyValues" > tmp_hsmwzuF64fEWmcZ2.sh
 	chmod +x tmp_hsmwzuF64fEWmcZ2.sh
 	ppmBodyValues=`./tmp_hsmwzuF64fEWmcZ2.sh`
 	rm tmp_hsmwzuF64fEWmcZ2.sh
 	# echo $ppmBodyValues > tmp_ykSp296krZ6X.txt
-	echo $ppmBodyValues | gsed "s/\( \{0,1\}[0-9]\{1,\}\)\{3\}/&\n/g" > tmp_ykSp296krZ6X.txt
-	gsed -i 's/^ \(.*\)/\1/g' tmp_ykSp296krZ6X.txt
+	echo $ppmBodyValues | sed "s/\( \{0,1\}[0-9]\{1,\}\)\{3\}/&\n/g" > tmp_ykSp296krZ6X.txt
+	sed -i 's/^ \(.*\)/\1/g' tmp_ykSp296krZ6X.txt
 	# removes any resulting trailing double-newlines:
-	gsed '/^$/d' tmp_ykSp296krZ6X.txt > $renderTargetFile
+	sed '/^$/d' tmp_ykSp296krZ6X.txt > $renderTargetFile
 	rm tmp_ykSp296krZ6X.txt
 fi

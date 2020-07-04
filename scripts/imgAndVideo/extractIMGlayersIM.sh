@@ -22,7 +22,7 @@ rm tmp_MeK3vSg5HjdntjPkq6K.txt
 numLayers=$(( numLayers - 1 ))
 echo numLayers is $numLayers
 
-imgFileNoExt=`echo $1 | gsed 's/\(.*\)\..\{1,4\}/\1/g'`
+imgFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
 
 # create subdir named after image to extract layers ("scenes") to:
 if [ ! -d "$imgFileNoExt"_scenes ]; then mkdir "$imgFileNoExt"_scenes; fi

@@ -14,7 +14,7 @@ gfind . -iname \*.png > crop_imgs.txt
 i=0
 while read element
 do
-	imgFileNoExt=`echo $element | gsed 's/\(.*\)\..\{1,4\}/\1/g'`
+	imgFileNoExt=`echo $element | sed 's/\(.*\)\..\{1,4\}/\1/g'`
 	if [ -a $imgFileNoExt.bmp ]
 	then
 		der=duh

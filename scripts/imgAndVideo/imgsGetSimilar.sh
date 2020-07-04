@@ -88,7 +88,7 @@ done
 dos2unix compare__superShrunkRc6d__col1.txt
 paste -d '' compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt > comparisons__superShrunkRc6d__cols.txt
 # Filter out information cruft; NOTE that if the first column isn't preceded by | then the later sort command won't work as intended:
-gsed -i 's/.*Total: \([0-9]\{1,11\}\.[0-9]\{1,11\}\).*|\([^|]*\).*|\([^|]*\).*/\1|\2|\3/g' comparisons__superShrunkRc6d__cols.txt
+sed -i 's/.*Total: \([0-9]\{1,11\}\.[0-9]\{1,11\}\).*|\([^|]*\).*|\([^|]*\).*/\1|\2|\3/g' comparisons__superShrunkRc6d__cols.txt
 # Back that up to a pre-sort text file in case subsequent sorting turns out not so useful:
 cp comparisons__superShrunkRc6d__cols.txt comparisons__superShrunkRc6d__cols_unsorted.txt
 # Sort results by reverse rank of keys by priority of certain columns in an attempt at most similar pairs adjacent (usually) ; or . . . some other thingy similar? Uncomment one option and comment out all others:
@@ -97,10 +97,10 @@ sort -n -b -t\| -k3r -k1 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmu
 	# sort -n -b -t\| -k1r -k2 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
 	# sort -n -b -t\| -k3r -k1 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
 # Strip the numeric column so we can work up a file list of said ordering for animation:
-gsed -i 's/[^|]*|\(.*\)/\1/g' tmp_fx49V6cdmuFp.txt
+sed -i 's/[^|]*|\(.*\)/\1/g' tmp_fx49V6cdmuFp.txt
 # In which my utter frustration at windows newline-related bugs strikes again; re: https://stackoverflow.com/questions/3134791/how-do-i-remove-newlines-from-a-text-file
 dos2unix tmp_fx49V6cdmuFp.txt
-# Strip all newlines so that the following gsed operation that removes all but the 1st appearance of a match will work over every appearance of a match in the entire file (since they are all on one line, where otherwise the replace would only work on every individual line where the match is found):
+# Strip all newlines so that the following sed operation that removes all but the 1st appearance of a match will work over every appearance of a match in the entire file (since they are all on one line, where otherwise the replace would only work on every individual line where the match is found):
 tr '\n' '|' < tmp_fx49V6cdmuFp.txt > comparisons__superShrunkRc6d__cols_sorted.txt
 
 echo -------------------
@@ -109,17 +109,17 @@ for x in ${allIMGs[@]}
 do
 	echo replacing all but first appearance of file name $x in result file . . .
 	# Delete all but first occurance of a word e.g. 'pattern' from a line; the way it works is: change the first 1 (in the following command) to a 2 to remove everything but the 2nd occurances of 'pattern', or 4 to remove everything but the 4th occurance of the pattern, or 1 to remove all but the first etc., the next example code line re; https://unix.stackexchange.com/a/18324/110338 :
-	# gsed -e 's/pattern/_&/1' -e 's/\([^_]\)pattern//g' -e 's/_\(pattern\)/\1/' tstpattern.txt
+	# sed -e 's/pattern/_&/1' -e 's/\([^_]\)pattern//g' -e 's/_\(pattern\)/\1/' tstpattern.txt
 	# ALSO NOTE that the & is a reference to the matched pattern, meaning the matched pattern will be substituted for & in the output.
-	# gsed -e 's/pattern/_&/1' -e 's/\([^_]\)pattern//g' -e 's/_\(pattern\)/\1/' tstpattern.txt
-	gsed -i -e "s/$x/_&/1" -e "s/\([^_]\)$x//g" -e "s/_\($x\)/\1/" comparisons__superShrunkRc6d__cols_sorted.txt
+	# sed -e 's/pattern/_&/1' -e 's/\([^_]\)pattern//g' -e 's/_\(pattern\)/\1/' tstpattern.txt
+	sed -i -e "s/$x/_&/1" -e "s/\([^_]\)$x//g" -e "s/_\($x\)/\1/" comparisons__superShrunkRc6d__cols_sorted.txt
 done
 dos2unix comparisons__superShrunkRc6d__cols_sorted.txt
 # replace | with newlines to prep for final frame list for e.g. ffmpeg to use:
 tr '|' '\n' < comparisons__superShrunkRc6d__cols_sorted.txt > IMGlistByMostSimilar.txt
 rm comparisons__superShrunkRc6d__cols_sorted.txt
 # That's ready after this tweak for file list format ffmpeg needs:
-gsed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
+sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
 dos2unix IMGlistByMostSimilar.txt
 
 rm __superShrunkRc6d__*

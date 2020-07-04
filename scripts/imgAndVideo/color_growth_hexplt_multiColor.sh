@@ -143,7 +143,7 @@ done
 
 # Get first color in that list and set as BG_COLOR:
 BG_COLOR=`head -n 1 ./$tmpRGBlistFileName`
-BG_COLOR=`echo $BG_COLOR | gsed 's/ /,/g'`
+BG_COLOR=`echo $BG_COLOR | sed 's/ /,/g'`
 
 # Create start of .cgp preset file with starting with our custom settings:
 	# woa wut printf must always have format string? then should it always throw an error if it doesn't?
@@ -155,18 +155,18 @@ do
 	# get rnd coord vals for building command:
 	rndXcoord=`shuf -i 1-$targetRenderWidth -n 1`
 	rndYcoord=`shuf -i 1-$targetRenderHeight -n 1`
-	RGBlist=`echo $element | gsed 's/ /,/g'`
+	RGBlist=`echo $element | sed 's/ /,/g'`
 	printf "[($rndXcoord,$rndYcoord),[$RGBlist]]," >> $cgpFileName
 done < ./$tmpRGBlistFileName
 rm ./$tmpRGBlistFileName
 
 # remove trailing comma from that command being built:
-gsed -i 's/\(.*\),$/\1/' $cgpFileName
+sed -i 's/\(.*\),$/\1/' $cgpFileName
 # append closing ] to command in file, to finish creating it:
 printf ']' >> $cgpFileName
 
 # INVOKE color_growth.py with that newly constructed preset:
-pathTo_color_growth_py=`whereis color_growth.py | gsed 's/color_growth: \(.*\)/\1/g'`
+pathTo_color_growth_py=`whereis color_growth.py | sed 's/color_growth: \(.*\)/\1/g'`
 command="python $pathTo_color_growth_py --LOAD_PRESET $cgpFileName"
 tmpBashScriptFileName=tmp_color_growth_hexplt_multiColor_script_6WRsTNfeU3CEvS_"$rndString".sh
 printf "$command" > $tmpBashScriptFileName
