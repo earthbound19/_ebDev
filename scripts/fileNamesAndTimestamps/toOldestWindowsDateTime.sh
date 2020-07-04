@@ -9,7 +9,7 @@
 # To do this for every file (regardless of file type) in the current directory, see allToOldestWindowsDateTime.sh.
 
 # DEPENDENCIES
-# exiftool, gsed (gsed), head, tail, binarez_touch http://www.binarez.com/touch_dot_exe/ (a copy is in my _ebSuperBin repo).
+# exiftool, sed, head, tail, binarez_touch http://www.binarez.com/touch_dot_exe/ (a copy is in my _ebSuperBin repo).
 
 
 # CODE
@@ -18,14 +18,14 @@ if [ -z "$1" ]; then echo "NO source file \$1 passed to script. Exiting."; exit;
 exiftool $1 > tmp_E8eK.txt
 printf "" > tmp2_E8eK5t4aw.txt
 
-gsed -n 's/\(.*File Modification Date\/Time *: \)\([0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\).*/\2/p' tmp_E8eK.txt >> tmp2_E8eK5t4aw.txt
-gsed -n 's/\(.*File Access Date\/Time *: \)\([0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\).*/\2/p' tmp_E8eK.txt >> tmp2_E8eK5t4aw.txt
-gsed -n 's/\(.*File Creation Date\/Time *: \)\([0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\).*/\2/p' tmp_E8eK.txt >> tmp2_E8eK5t4aw.txt
-gsed -n 's/\(.*Create Date *: \)\([0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\).*/\2/p' tmp_E8eK.txt >> tmp2_E8eK5t4aw.txt
-gsed -n 's/\(.*Metadata Date *: \)\([0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\).*/\2/p' tmp_E8eK.txt >> tmp2_E8eK5t4aw.txt
+sed -n 's/\(.*File Modification Date\/Time *: \)\([0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\).*/\2/p' tmp_E8eK.txt >> tmp2_E8eK5t4aw.txt
+sed -n 's/\(.*File Access Date\/Time *: \)\([0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\).*/\2/p' tmp_E8eK.txt >> tmp2_E8eK5t4aw.txt
+sed -n 's/\(.*File Creation Date\/Time *: \)\([0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\).*/\2/p' tmp_E8eK.txt >> tmp2_E8eK5t4aw.txt
+sed -n 's/\(.*Create Date *: \)\([0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\).*/\2/p' tmp_E8eK.txt >> tmp2_E8eK5t4aw.txt
+sed -n 's/\(.*Metadata Date *: \)\([0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\).*/\2/p' tmp_E8eK.txt >> tmp2_E8eK5t4aw.txt
 
 # TRANSFORM FOR BINAREZ_TOUCH; comment this out if you use the exiftool option below:
-gsed -i 's/\([0-9]\{4\}\):\([0-9]\{2\}\):\([0-9]\{2\}\) \([0-9]\{2\}\)/\1-\2-\3T\4/g' tmp2_E8eK5t4aw.txt
+sed -i 's/\([0-9]\{4\}\):\([0-9]\{2\}\):\([0-9]\{2\}\) \([0-9]\{2\}\)/\1-\2-\3T\4/g' tmp2_E8eK5t4aw.txt
 
 sort tmp2_E8eK5t4aw.txt > tmp_E8eK.txt
 dos2unix tmp_E8eK.txt

@@ -20,7 +20,7 @@
 		# tr piped commands re: https://github.com/earthbound19/_ebDev/issues/6
 thisDir=`pwd | tr -d '\15\32'`
 thisDir=`cygpath -w $thisDir | tr -d '\15\32'`
-thisDir=`echo $thisDir | gsed 's/\(.*\)\\$/\1/g' | tr -d '\15\32'`
+thisDir=`echo $thisDir | sed 's/\(.*\)\\$/\1/g' | tr -d '\15\32'`
 everythingCLI "$thisDir\*_EXPORTED_*_MD_ADDS.txt" > _tmp_hXhsyZvaWb6eXp.txt
 		# ALTERNATE which will catch matches outside the directory tree from which this script is run:
 		# everythingCLI *_EXPORTED_*_MD_ADDS.txt > _tmp_hXhsyZvaWb6eXp.txt

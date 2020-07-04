@@ -8,7 +8,7 @@ filesCount=`gfind . -maxdepth 1 -iname \*.$1 | sort | wc -l | tr -d ' '`
 digitsToPadTo=${#filesCount}
 
 # Create array to use to loop over files. Sort by modified date stamp re genius breath yon: https://superuser.com/a/294164
-# filesArray=`gfind . -maxdepth 1 -iname "*.$1" | sort -zk 1n | gsed -z 's/^[^ ]* //' | tr '\0' '\n'`
+# filesArray=`gfind . -maxdepth 1 -iname "*.$1" | sort -zk 1n | sed -z 's/^[^ ]* //' | tr '\0' '\n'`
 # NOPE, that dunna work, but this does:
 filesArray=`ls --sort=time --reverse *$1 | tr '\0' '\n'`
 

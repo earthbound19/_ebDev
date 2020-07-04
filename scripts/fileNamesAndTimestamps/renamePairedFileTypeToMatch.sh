@@ -46,9 +46,9 @@ else
 		# readarray -d '' filesArray1 < <(gfind . -name "*.$1" -print0)
 		# -- from here: https://stackoverflow.com/a/54561526/1397555
 	# -- but so can this; subscriptable; adds stuff that sorts by file date (which I want here):
-	filesArrayOne=(`gfind . -name "*.$1" -print0 -printf "%T@ %Tc %p\n" | gsort -n | gsed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+	filesArrayOne=(`gfind . -name "*.$1" -print0 -printf "%T@ %Tc %p\n" | gsort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 
-	filesArrayTwo=(`gfind . -name "*.$2" -print0 -printf "%T@ %Tc %p\n" | gsort -n | gsed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+	filesArrayTwo=(`gfind . -name "*.$2" -print0 -printf "%T@ %Tc %p\n" | gsort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 	# demonstrates that subscripting works with these arrays:
 	# echo "${filesArrayOne[4]}"
 	# echo "${filesArrayTwo[4]}"

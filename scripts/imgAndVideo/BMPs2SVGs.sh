@@ -9,7 +9,7 @@
 imgs=$(gfind . -iname \*.bmp)
 for element in "${imgs[@]}"
 do
-	imgFileNoExt=`echo $element | gsed 's/\(.*\)\..\{1,4\}/\1/g'`
+	imgFileNoExt=`echo $element | sed 's/\(.*\)\..\{1,4\}/\1/g'`
 	if ! [ -a $imgFileNoExt.svg ]
 	then
 	echo tracing $element . . .

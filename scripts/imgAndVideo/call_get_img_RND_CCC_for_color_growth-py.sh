@@ -37,11 +37,11 @@ else
 fi
 
 # CODE
-pathToCCCgetterScript=`whereis get_img_RND_CCC_for_color_growth.py | gsed 's/get_img_RND_CCC_for_color_growth: \(.*\)/\1/g'`
+pathToCCCgetterScript=`whereis get_img_RND_CCC_for_color_growth.py | sed 's/get_img_RND_CCC_for_color_growth: \(.*\)/\1/g'`
 
 var_CUSTOM_COORDS_AND_COLORS=`python $pathToCCCgetterScript $inputFile $numRNDcoordsToGet`
 
-pathToColorGrowth_py=`whereis color_growth.py | gsed 's/color_growth: \(.*\)/\1/g'`
+pathToColorGrowth_py=`whereis color_growth.py | sed 's/color_growth: \(.*\)/\1/g'`
 
 # some parsing error or summat leads to "out of bounds" error if we just run
 # command directly; so write it to temp script, then execute temp script and

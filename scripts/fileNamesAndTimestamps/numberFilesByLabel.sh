@@ -5,8 +5,8 @@
 # - deprecate sections of this relying on slow (not database of a monitored file system driven) 'nix search commands, and use everythingCLI instead (as in indexWorksByLabel.sh).
 # - break the deprecated sections out into if blocks that run depending on detected platform (windows or 'nixy system).
 # - fix bug where file names which mistakenly have _FINAL_ twice in the name don't register (apparently) as a five-padded number. OR: warn this should never be.
-# - determine whether any gsed flag will make e.g. _[fF][iI][nN][aA][lL] unecessary as a search pattern (case-insenstitive search). My first searches for this said no . . .
-# - In this script, make the following variables actually do anything :) which will mean case-insensitive regexes in gsed maybe, or which whuh i dunno? :
+# - determine whether any sed flag will make e.g. _[fF][iI][nN][aA][lL] unecessary as a search pattern (case-insenstitive search). My first searches for this said no . . .
+# - In this script, make the following variables actually do anything :) which will mean case-insensitive regexes in sed maybe, or which whuh i dunno? :
 # - improve the following description in the line of code starting with 'echo WARNING\:'.
 
 
@@ -67,21 +67,21 @@ fi
 # List all files in tree with $labelOne (upper or lowercase or mix) in their file name; also limited to file types we filter for:
 gfind . -type f -iname "*_[fF][iI][nN][aA][lL]_*" > _batchNumbering/fileNamesWithLabelOne.txt
 # wipe lines that end with file name extensions we don't need to be concerned with:
-gsed -i 's/.*\.txt//g' _batchNumbering/fileNamesWithLabelOne.txt
-gsed -i 's/.*\.xml//g' _batchNumbering/fileNamesWithLabelOne.txt
-gsed -i 's/.*\.ffxml//g' _batchNumbering/fileNamesWithLabelOne.txt
+sed -i 's/.*\.txt//g' _batchNumbering/fileNamesWithLabelOne.txt
+sed -i 's/.*\.xml//g' _batchNumbering/fileNamesWithLabelOne.txt
+sed -i 's/.*\.ffxml//g' _batchNumbering/fileNamesWithLabelOne.txt
 	# NOTE that for determining highest labelTwo count, $labelOne and $labelTwo are both guard-phrases; no file name without *both* those strings will be examined. Now, from fileNamesWithLabelOne.txt, divine the highest five-padded number accompanying the phrase $labelTwo "$labelTwo"00088 (e.g. _work_:00088) :
 # strip all files out of that list that have the following regexes; because in my numbering scheme, color and animated etc. variants of a work don't get whole new work number:
-gsed -i 's/.*[vV][aA][rR][iI][aA][nN][tT].*//g' _batchNumbering/fileNamesWithLabelOne.txt
+sed -i 's/.*[vV][aA][rR][iI][aA][nN][tT].*//g' _batchNumbering/fileNamesWithLabelOne.txt
 	# Also blank out lines that include the word "variation" (again case insensitive):
-gsed -i 's/.*[vV][aA][rR][iI][aA][tT][iI][oO][nN].*//g' _batchNumbering/fileNamesWithLabelOne.txt
-gsed -i 's/.*[vV][aA][rR].*//g' _batchNumbering/fileNamesWithLabelOne.txt
+sed -i 's/.*[vV][aA][rR][iI][aA][tT][iI][oO][nN].*//g' _batchNumbering/fileNamesWithLabelOne.txt
+sed -i 's/.*[vV][aA][rR].*//g' _batchNumbering/fileNamesWithLabelOne.txt
 # delete resulting empty lines (unsure if strictly necessary) :
-gsed -i '/^\s*$/d' _batchNumbering/fileNamesWithLabelOne.txt
+sed -i '/^\s*$/d' _batchNumbering/fileNamesWithLabelOne.txt
 
 # Reduce fileNamesWithLabelOne.txt to only files that also have the phrase $labelTwo in the file name:
-gsed -n 's/\(.*_[wW][oO][rR][kK]_.*\)/\1/p' _batchNumbering/fileNamesWithLabelOne.txt > _batchNumbering/fileNamesWithBothLabels.txt 
-gsed -n 's/.*_[wW][oO][rR][kK]_\([0-9]\{5\}\)_.*/\1/p' _batchNumbering/fileNamesWithBothLabels.txt > _batchNumbering/numbersFromFileNames.txt
+sed -n 's/\(.*_[wW][oO][rR][kK]_.*\)/\1/p' _batchNumbering/fileNamesWithLabelOne.txt > _batchNumbering/fileNamesWithBothLabels.txt 
+sed -n 's/.*_[wW][oO][rR][kK]_\([0-9]\{5\}\)_.*/\1/p' _batchNumbering/fileNamesWithBothLabels.txt > _batchNumbering/numbersFromFileNames.txt
 sort _batchNumbering/numbersFromFileNames.txt > _batchNumbering/tmp.txt
 rm _batchNumbering/numbersFromFileNames.txt
 uniq _batchNumbering/tmp.txt > _batchNumbering/numbersFromFileNames.txt
@@ -117,9 +117,9 @@ mapfile -t filesToLabel < _batchNumbering/filesToLabel.txt
 for element in ${filesToLabel[@]}
 do
 	fileLabelNumber=$(printf %05d "$((10#$fileLabelNumber + 1))")
-		# reference gsed command that prints all such files:
-		# gsed 's/\(.*\)\(_[fF][iI][nN][aA][lL]_\)\(.*\)/\1\2\3/g' filesToLabel.txt
-	targetFileName=`echo $element | gsed "s/\(.*\)\(_[fF][iI][nN][aA][lL]_\)\(.*\)/\1\2\work_$fileLabelNumber\_\3/g"`
+		# reference sed command that prints all such files:
+		# sed 's/\(.*\)\(_[fF][iI][nN][aA][lL]_\)\(.*\)/\1\2\3/g' filesToLabel.txt
+	targetFileName=`echo $element | sed "s/\(.*\)\(_[fF][iI][nN][aA][lL]_\)\(.*\)/\1\2\work_$fileLabelNumber\_\3/g"`
 	echo "mv $element $targetFileName" >> $builtBatchScript
 done
 

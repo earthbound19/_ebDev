@@ -8,6 +8,6 @@
 
 # CODE
 # Get object name (title) from ~MD_ADDS.txt metadata prep file:
-title=`gsed -n 's/.*ObjectName="\(.*\)".*/\1/p' $1`
+title=`sed -n 's/.*ObjectName="\(.*\)".*/\1/p' $1`
 
 WPmedia2markdownGallery.sh "$title"

@@ -109,16 +109,16 @@ do
 			# Write file name to text file and alter for human readability via text search-replacements:
 			echo $imageFileNameNoExt > temp.txt
 				# TO DO: other text replacements besides the following?
-				gsed -i 's/_[fF][iI][nN][aA][lL]//g' temp.txt
-				gsed -i 's/_[fF][iI][nN][aA][lL][vV][aA][rR]/Variation of/g' temp.txt
-				gsed -i 's/FFlib/Filter Forge library/g' temp.txt
-				gsed -i 's/FF\([0-9]\{1,\}..\)/Filter Forge library \1/g' temp.txt
-				gsed -i 's/pre\([0-9]\{1,\}\)/preset \1/g' temp.txt
+				sed -i 's/_[fF][iI][nN][aA][lL]//g' temp.txt
+				sed -i 's/_[fF][iI][nN][aA][lL][vV][aA][rR]/Variation of/g' temp.txt
+				sed -i 's/FFlib/Filter Forge library/g' temp.txt
+				sed -i 's/FF\([0-9]\{1,\}..\)/Filter Forge library \1/g' temp.txt
+				sed -i 's/pre\([0-9]\{1,\}\)/preset \1/g' temp.txt
 				# Delete any leading whitespace from name field:
 				tr '_' ' ' < temp.txt > temp2.txt
-				gsed -i 's/^\s\{1,\}//g' temp2.txt
+				sed -i 's/^\s\{1,\}//g' temp2.txt
 					# ALSO WORKS on that last line: ~   [[:space:]]    instead of    \s
-				gsed -i 's/^[vV][aA][rR] /Variation of /g' temp2.txt
+				sed -i 's/^[vV][aA][rR] /Variation of /g' temp2.txt
 					# Thanks to: http://stackoverflow.com/a/10771857 :
 			imagePreparedTitle=$( < temp2.txt)
 				# Alas, there is no MWG mapping of ObjectName/Title; this is an IPTC only thing; which is another reason the final distribution image will be renamed to the image title:

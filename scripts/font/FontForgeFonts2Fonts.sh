@@ -29,7 +29,7 @@ else
 fi
 
 # get full path to fontforge:
-fullPathToFFscript=`whereis FontForgeConvert.pe | gsed 's/.*: \(.*\)/\1/g' | tr -d '\15\32'`
+fullPathToFFscript=`whereis FontForgeConvert.pe | sed 's/.*: \(.*\)/\1/g' | tr -d '\15\32'`
 # conver to windows path format if Windows:
 if [ $OS == "Windows_NT" ]
 then

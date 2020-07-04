@@ -64,7 +64,7 @@ if [ -z "$3" ]
 			exit
 	fi
 		echo Generating hex colors array from file $paletteFile . . .
-		gsed 's/#//g' $hexColorSrcFullPath > srcHexColorsNoHash.txt
+		sed 's/#//g' $hexColorSrcFullPath > srcHexColorsNoHash.txt
 		mapfile -t rndHexColors < srcHexColorsNoHash.txt
 				for element in ${rndHexColors[@]}
 				do
@@ -96,13 +96,13 @@ do
 		randomHexString="${rndHexColors[$pick]}"
 				# echo pick is $pick
 				echo Randomly picked hex color \#"$randomHexString" for fill . . .
-			# ULTIMATE CLUGE WORKAROUND for problem mixing ' and " in a gsed command; NOTE that the $ is escaped--in some insane way that for some reason the shell insists! :
+			# ULTIMATE CLUGE WORKAROUND for problem mixing ' and " in a sed command; NOTE that the $ is escaped--in some insane way that for some reason the shell insists! :
 			# NOTE: I was at first using $j instead of 1 to delimit which instance should be replaced, but D'OH! : that Nth instance changes (for the next replace by count operation) after any inline replace!
 			# Changing Nth instance of string re: http://stackoverflow.com/a/13818063/1397555
 					# test command that worked [by replacing 5th instance of the string?] :
-					# gsed ':a;N;$!ba;s/FFFFFF/3f2aff/5' test.svg
+					# sed ':a;N;$!ba;s/FFFFFF/3f2aff/5' test.svg
 			# -- expanding on that pattern, the following command changes the first instance of [fF]\{6\} in the file (I think?) :
-		sedCommand=`echo gsed -i \'":a;N;\\$!ba;s/[fF]\{6\}/$randomHexString/1"\' $newFile`
+		sedCommand=`echo sed -i \'":a;N;\\$!ba;s/[fF]\{6\}/$randomHexString/1"\' $newFile`
 				# echo $sedCommand
 		echo $sedCommand > tempCommand.sh
 				chmod 777 ./tempCommand.sh

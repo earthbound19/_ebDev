@@ -12,9 +12,9 @@
 gfind -type d > allDirs.txt
 # remove all directories from listing which are a name match for the extension in paramater $1. Dunno why -i won't work here:
 sedPattern="s/\(.*\/$1.*\)//p"
-gsed $sedPattern allDirs.txt > allDirsMinusType.txt
+sed $sedPattern allDirs.txt > allDirsMinusType.txt
 # strip blank lines from that result.
-gsed -i ':a;N;$!ba;s/\n\n//g' allDirsMinusType.txt
+sed -i ':a;N;$!ba;s/\n\n//g' allDirsMinusType.txt
 mapfile -t allFilesType < allDirsMinusType.txt
 rm allDirs.txt allDirsMinusType.txt
 

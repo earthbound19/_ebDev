@@ -41,7 +41,7 @@ array=(`gfind . -maxdepth 1 -type f -iname \*.eps -printf '%f\n'`)
 for element in ${array[@]}
 do
 	echo element is $element
-	epsFilenameNoExtension=`echo $element | gsed 's/\(.*\)\.svg/\1/g'`
+	epsFilenameNoExtension=`echo $element | sed 's/\(.*\)\.svg/\1/g'`
 	if [ -a $epsFilenameNoExtension.$img_format ]
 	then
 		echo render candidate is $epsFilenameNoExtension.$img_format

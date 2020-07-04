@@ -40,7 +40,7 @@ percentToCorrupt=$2
 
 echo making corrupt copy of $fileToMakeCorruptedCopyOf and corrupting by $percentToCorrupt percent . . .
 # Retrieve extension of source file; thanks re http://stackoverflow.com/a/1665574 :
-fileExt=`echo $fileToMakeCorruptedCopyOf | gsed -n 's/.*\.\(.\{1,5\}\).*/\1/p'`
+fileExt=`echo $fileToMakeCorruptedCopyOf | sed -n 's/.*\.\(.\{1,5\}\).*/\1/p'`
 __ln=( $( ls -Lon "$fileToMakeCorruptedCopyOf" ) )
 __size=${__ln[3]}
 		echo file size in bytes is $__size.

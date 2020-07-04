@@ -2,7 +2,7 @@
 # Indexes all text files in a directory tree with a file name of pattern .*_EXPORTED_.*_MD_ADDS.txt (case-sensitive) which contain an EXIF ImageHistory label (or tag or keyword) containing the string $1 (first parameter to this script); it also lists files that do _not_ contain the label--and files that don't contain that label mean a work has yet to have history (is yet to be published e.g. at a web site, the way I use this script). See USAGE for further explanation.
 
 # DEPENDENCIES
-# Cygwin (and gsed), Everything search engine CLI (and an install of Everything search engine tool).
+# Gnu coreutil ports (probably from MSYS2) including sed, Everything search engine CLI (and an install of Everything search engine tool).
 
 # USAGE
 # Invoke this script from the root of a directory tree with so many so $1 -patterned text files you wish to index; e.g.:
@@ -37,7 +37,7 @@ thisDir=`cygpath -w $thisDir | tr -d '\15\32'`
 echo $thisDir
 		# DEPRECATED; resurrect if necessary for a 'nixy system case:
 		# Strip any \ char off the end of that (from a root dir it shows, but not in other dirs--we always want it not there) :
-thisDir=`echo $thisDir | gsed 's/\(.*\)\\$/\1/g' | tr -d '\15\32'`
+thisDir=`echo $thisDir | sed 's/\(.*\)\\$/\1/g' | tr -d '\15\32'`
 everythingCLI "$thisDir\*_EXPORTED_*_MD_ADDS.txt" > _tmp_4UFKgbkrnpDvZK.txt
 		# ALTERNATE which will catch matches outside the directory tree from which this script is run:
 		# everythingCLI *_EXPORTED_*_MD_ADDS.txt > _tmp_4UFKgbkrnpDvZK.txt
@@ -64,9 +64,9 @@ printf "LIST OF Metadata preparation ~_MD_ADDS.txt files that have a label $labe
 printf "LIST OF Metadata preparation ~_MD_ADDS.txt files that do *not* have a label $label match in the ImageHistory field:\n\n" > __LABEL_NOT_MATCHED_WORKS.txt
 while read element
 do
-			# DEPRECATED on account making list via everything CLI, but may be revived if you use a half-baked "nix" environment on windows using gsed which makes windows newlines (ergo half-baked) :
-			# element=`echo $element | gsed 's/..\(.*\)/\1/g'`
-			# stupid workaround for gsed producing windows line endings:
+			# DEPRECATED on account making list via everything CLI, but may be revived if you use a half-baked "nix" environment on windows using sed which makes windows newlines (ergo half-baked) :
+			# element=`echo $element | sed 's/..\(.*\)/\1/g'`
+			# stupid workaround for sed producing windows line endings:
 			# echo $element > tmp_k6wttBxcPAxjXS7j7c6jknrfMxwkuR35x9.txt
 			# dos2unix -q tmp_k6wttBxcPAxjXS7j7c6jknrfMxwkuR35x9.txt
 			# element=$( < tmp_k6wttBxcPAxjXS7j7c6jknrfMxwkuR35x9.txt)

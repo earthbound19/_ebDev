@@ -38,7 +38,7 @@ printf "*Tap or click any image to open the largest available resolution.*\n\n" 
 
 # URLencode query string passed to script (in preparation for curl query to REST API) :
 queryString=$1
-queryString=`echo "$queryString" | gsed -f /cygdrive/c/_ebdev/scripts/urlencode.gsed`
+queryString=`echo "$queryString" | sed -f /cygdrive/c/_ebdev/scripts/urlencode.sed`
 	# Retrieves all json data related to any media matching query:
 	# queryString="earthbound.io/blog/wp-json/wp/v2/media?filter\[image\]&search=\"$queryString\""
 # Embed the urlencoded query string in a REST API query; query filters results for media title and medium large thumbnail URL; help via wp-api docs, postman and https://jqplay.org/ :
