@@ -18,9 +18,6 @@
 
 
 # CODE
-# OPTIONAL pre-package install steps: upgrade/sync MSYS2:
-# pacman -Syy
-# pacman -Suu
 
 echo "u go kaboomy haha now you dead moldy voldy -Snep"
 
@@ -37,9 +34,19 @@ perl \
 gcc \
 make \
 diffutils \
+mingw-w64-x86_64-libc++ \
+mingw-w64-x86_64-boost \
+mingw-w64-x86_64-gcc \
 bc"
+
+# hoped this would include iostream.h; nope:
+# mingw-w64-x86_64-gcc
 
 for element in ${MSYS2_packages[@]}
 do
 	pacman -S --noconfirm $element
 done
+
+echo "DONE. If MSYS2 is not up to date, you may wish to run these commands, then exit the MSYS2 terminal, and run them again:"
+echo "pacman -Syy"
+echo "pacman -Suu"
