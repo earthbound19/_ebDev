@@ -26,10 +26,10 @@ fi
 
 if [ "$2" ]
 	then
-		array=(`gfind . -maxdepth 1 -type f -iname \*.$2 -printf '%f\n'`)
+		array=(`find . -maxdepth 1 -type f -iname \*.$2 -printf '%f\n'`)
 		fileTypesToRename=$2
 	else
-		array=(`gfind . -maxdepth 1 -type f -iname \* -printf '%f\n'`)
+		array=(`find . -maxdepth 1 -type f -iname \* -printf '%f\n'`)
 		fileTypesToRename="*"
 fi
 

@@ -19,7 +19,7 @@ else
 	echo continuing . .
 fi
 
-filesArray=(`gfind . -type f -name "*.txt"`)
+filesArray=(`find . -type f -name "*.txt"`)
 
 for filename in "${filesArray[@]}"
 do

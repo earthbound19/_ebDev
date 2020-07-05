@@ -12,7 +12,7 @@
 if [ "$1" ]; then echo parameter passed to script\; will set getNrandChars to passed value of $1.; getNrandChars="$1"; else getNrandChars=4; echo no parameter passed to script\; using default value of \4 for getNrandChars.; fi
 		# echo val of 1 is $1.
 
-gfind ./* -type d > allDirs.txt
+find ./* -type d > allDirs.txt
 mapfile -t array < allDirs.txt
 rm allDirs.txt
 

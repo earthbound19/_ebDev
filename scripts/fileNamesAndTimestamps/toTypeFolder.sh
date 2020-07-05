@@ -9,7 +9,7 @@
 
 # CODE
 # list all directories in path.
-gfind -type d > allDirs.txt
+find -type d > allDirs.txt
 # remove all directories from listing which are a name match for the extension in paramater $1. Dunno why -i won't work here:
 sedPattern="s/\(.*\/$1.*\)//p"
 sed $sedPattern allDirs.txt > allDirsMinusType.txt

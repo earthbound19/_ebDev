@@ -11,7 +11,7 @@
 # CODE
 echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
 
-gfind ./*.$1 > xQpr95b2N_list.txt
+find ./*.$1 > xQpr95b2N_list.txt
 
 # For optional paramater 2 to shuffle list:
 if [ "$2" ]

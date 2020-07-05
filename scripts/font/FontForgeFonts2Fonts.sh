@@ -38,7 +38,7 @@ fi
 
 currDir=`pwd`
 IFS=""
-gfind . -maxdepth 1 -type f -iname \*.$sourceFormat -printf '%f\n' > all_"$sourceFormat"s.txt
+find . -maxdepth 1 -type f -iname \*.$sourceFormat -printf '%f\n' > all_"$sourceFormat"s.txt
 while IFS= read -r element || [ -n "$element" ]
 do
 	# If we're running Windows, assume cygwin and convert to windows path.

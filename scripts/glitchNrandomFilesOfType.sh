@@ -12,7 +12,7 @@
 
 
 # CODE
-gfind *$1 > _alles.txt
+find *$1 > _alles.txt
 mapfile -t allFilesOfExtension < _alles.txt
 rm ./_alles.txt
 sizeOfallFilesOfExtension=${#allFilesOfExtension[@]}
@@ -58,4 +58,4 @@ chmod 777 ./_glitched/*
 
 
 # dev scrap:
-# gfind png_512_smileys_ff_output_glitchMods/*$1 > _alles.txt
+# find png_512_smileys_ff_output_glitchMods/*$1 > _alles.txt

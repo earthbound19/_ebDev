@@ -10,7 +10,7 @@
 # CODE
 # if [ ! -d ./out ]; then mkdir out; fi
 
-array=(`gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
+array=(`find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
 
 for element in ${array[@]}
 do

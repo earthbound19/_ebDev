@@ -35,7 +35,7 @@ fi
 
 
 thisDir=`pwd`
-gfind "$thisDir/" -type f > ../allFiles.txt
+find "$thisDir/" -type f > ../allFiles.txt
 while read p
 do
 	rm "$p"

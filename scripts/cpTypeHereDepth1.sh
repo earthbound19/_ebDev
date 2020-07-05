@@ -9,7 +9,7 @@
 
 # CODE
 fileListFileName="all"_"$1".txt
-gfind . -maxdepth 2 -iname \*.$1 > $fileListFileName
+find . -maxdepth 2 -iname \*.$1 > $fileListFileName
 
 while read element
 do

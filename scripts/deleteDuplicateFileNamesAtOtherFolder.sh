@@ -16,7 +16,7 @@ then
 	exit
 fi
 
-filesHere=(`gfind . -maxdepth 1 -type f -iname \*.* -printf '%f\n'`)
+filesHere=(`find . -maxdepth 1 -type f -iname \*.* -printf '%f\n'`)
 for element in "${filesHere[@]}"
 do
   echo "RUNNING COMMAND: rm $1/$element"

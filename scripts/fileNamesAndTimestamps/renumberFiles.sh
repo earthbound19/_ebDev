@@ -16,14 +16,14 @@ echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
 
 # Get count of files we want, and from that digits to pad to.
 # The necessity of deleting leading blank space is because of Mac. Re: https://stackoverflow.com/a/30927885 : GYAH! This doom was had 2018-04-19 Thursday 07:33 PM:
-filesCount=`gfind . -maxdepth 1 -iname \*.$1 | sort | wc -l | tr -d ' '`
+filesCount=`find . -maxdepth 1 -iname \*.$1 | sort | wc -l | tr -d ' '`
 digitsToPadTo=${#filesCount}
 
 # Create array to use to loop over files.
 # previous version of command; doesn't sort by file date:
-# filesArray=`gfind . -maxdepth 1 -iname "*.$1" | sort`
+# filesArray=`find . -maxdepth 1 -iname "*.$1" | sort`
 # new command; sorts by file date (oldest first); re: https://superuser.com/a/546900/130772
-filesArray=`gfind . -maxdepth 1 -iname "*.$1" -printf "%T@ %Tc %p\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`
+filesArray=`find . -maxdepth 1 -iname "*.$1" -printf "%T@ %Tc %p\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`
 
 counter=0
 for filename in ${filesArray[@]}

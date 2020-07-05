@@ -28,7 +28,7 @@
 label=$1
 		# DEPRECATED, use if on non-Windows platform:
 		# echo Listing to temp file all files matching pattern \.\*_EXPORTED_.\*_MD_ADDS.txt . . .
-		# gfind . -regex .*_EXPORTED_.*_MD_ADDS.txt -type f > _tmp_JnhPUNahaRA5BdZdWx_EXPORTED_works_MD_ADDS_files.txt
+		# find . -regex .*_EXPORTED_.*_MD_ADDS.txt -type f > _tmp_JnhPUNahaRA5BdZdWx_EXPORTED_works_MD_ADDS_files.txt
 # To get the current directory in Windows path form to prefix to the search query for everythingCLI, to avoid matches outside of the current path.
 echo Finding all files in this directory tree that match file name pattern \.\*_EXPORTED_.\*_MD_ADDS.txt\, to index . . .
 		# tr piped commands re: https://github.com/earthbound19/_ebDev/issues/6

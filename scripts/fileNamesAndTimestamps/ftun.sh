@@ -72,7 +72,7 @@ then
 	# if $2 was passed to script, do the same thing recursively in all directories:
 	if [ "$2" ]
 	then
-		directories=(`gfind . -type d`)
+		directories=(`find . -type d`)
 		# remove the first element in that array by reassigning to itself without that:
 		directories=(${directories[@]:1})
 

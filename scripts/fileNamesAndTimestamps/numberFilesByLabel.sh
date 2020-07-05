@@ -65,7 +65,7 @@ if [ -a _batchNumbering ]
 fi
 
 # List all files in tree with $labelOne (upper or lowercase or mix) in their file name; also limited to file types we filter for:
-gfind . -type f -iname "*_[fF][iI][nN][aA][lL]_*" > _batchNumbering/fileNamesWithLabelOne.txt
+find . -type f -iname "*_[fF][iI][nN][aA][lL]_*" > _batchNumbering/fileNamesWithLabelOne.txt
 # wipe lines that end with file name extensions we don't need to be concerned with:
 sed -i 's/.*\.txt//g' _batchNumbering/fileNamesWithLabelOne.txt
 sed -i 's/.*\.xml//g' _batchNumbering/fileNamesWithLabelOne.txt

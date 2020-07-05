@@ -7,4 +7,4 @@
 
 # CODE
 # re: https://apple.stackexchange.com/a/32264/219513
-gfind ~ -name .DS_Store -exec /bin/rm -f -- {} \;
+find ~ -name .DS_Store -exec /bin/rm -f -- {} \;

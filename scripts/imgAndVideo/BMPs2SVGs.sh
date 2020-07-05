@@ -6,7 +6,7 @@
 
 
 # CODE
-imgs=$(gfind . -iname \*.bmp)
+imgs=$(find . -iname \*.bmp)
 for element in "${imgs[@]}"
 do
 	imgFileNoExt=`echo $element | sed 's/\(.*\)\..\{1,4\}/\1/g'`

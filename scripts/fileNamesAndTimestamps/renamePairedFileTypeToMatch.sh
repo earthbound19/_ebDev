@@ -9,8 +9,8 @@
 # This script attempts to solve that problem through guesswork.
 # It assumes:
 # 1. The batch that rendered the presets listed them in default
-# gfind sort order
-# 3. The default gfind sort order of the rendered files matches
+# find sort order
+# 3. The default find sort order of the rendered files matches
 # the gsort order of the sources. If so, all $2 can be renamed
 # to match all $1.
 # WARNING: ONLY RUN THIS BATCH ON COPIES of the files. Why?
@@ -42,13 +42,13 @@ then
 	exit
 else
 	echo continuing . .
-		# This can work for building an array from find (I rename it gfind) :
-		# readarray -d '' filesArray1 < <(gfind . -name "*.$1" -print0)
+		# This can work for building an array from find (I rename it find) :
+		# readarray -d '' filesArray1 < <(find . -name "*.$1" -print0)
 		# -- from here: https://stackoverflow.com/a/54561526/1397555
 	# -- but so can this; subscriptable; adds stuff that sorts by file date (which I want here):
-	filesArrayOne=(`gfind . -name "*.$1" -print0 -printf "%T@ %Tc %p\n" | gsort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+	filesArrayOne=(`find . -name "*.$1" -print0 -printf "%T@ %Tc %p\n" | gsort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 
-	filesArrayTwo=(`gfind . -name "*.$2" -print0 -printf "%T@ %Tc %p\n" | gsort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+	filesArrayTwo=(`find . -name "*.$2" -print0 -printf "%T@ %Tc %p\n" | gsort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 	# demonstrates that subscripting works with these arrays:
 	# echo "${filesArrayOne[4]}"
 	# echo "${filesArrayTwo[4]}"
