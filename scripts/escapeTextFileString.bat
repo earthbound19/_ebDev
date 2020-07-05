@@ -31,28 +31,28 @@ SET SEARCH_FILE_NAME=temp_sed_working_file.txt
 
 SET SEARCH_FILE_NAME=temp_sed_working_file.txt
 
-gsed -i s/\\/\\\\/g %SEARCH_FILE_NAME%
-gsed -i s/\./\\./g %SEARCH_FILE_NAME%
-gsed -i s/^;/^^^;/g %SEARCH_FILE_NAME%
-gsed -i s/^,/^^^,/g %SEARCH_FILE_NAME%
-gsed -i s/^=/^^^=/g %SEARCH_FILE_NAME%
-gsed -i s/^(/^^^(/g %SEARCH_FILE_NAME%
-gsed -i s/^)/^^^)/g %SEARCH_FILE_NAME%
-gsed -i s/\[/\\[/g %SEARCH_FILE_NAME%
-gsed -i s/\]/\\]/g %SEARCH_FILE_NAME%
-gsed -i s/%%/%%%%/g %SEARCH_FILE_NAME%
-gsed -i s/^^!/^^^^!)/g %SEARCH_FILE_NAME%
-gsed -i s/^&/^^^&/g %SEARCH_FILE_NAME%
-gsed -i s/^'/^^^'/g %SEARCH_FILE_NAME%
-gsed -i s/^`/^^^`/g %SEARCH_FILE_NAME%
-REM EVIL gsed -i s/^^/^^^^/g %SEARCH_FILE_NAME%
-REM Required only inside the search pattern of the DOS FIND command: gsed -i s/""/"""")/g %SEARCH_FILE_NAME%
-REM And covered already; only relevant inside FINDSTR calls: gsed -i s/\"/\\"/g %SEARCH_FILE_NAME%
-REM ~~ gsed -i s/^</^^^</g %SEARCH_FILE_NAME%
-REM ~~ gsed -i s/^>/^^^>/g %SEARCH_FILE_NAME%
-REM ~~ gsed -i s/^|/^^^|/g %SEARCH_FILE_NAME%
-REM ~~ gsed -i s/\*/\\*/g %SEARCH_FILE_NAME%
-REM ~~ gsed -i s/\?/\\?/g %SEARCH_FILE_NAME%
+sed -i s/\\/\\\\/g %SEARCH_FILE_NAME%
+sed -i s/\./\\./g %SEARCH_FILE_NAME%
+sed -i s/^;/^^^;/g %SEARCH_FILE_NAME%
+sed -i s/^,/^^^,/g %SEARCH_FILE_NAME%
+sed -i s/^=/^^^=/g %SEARCH_FILE_NAME%
+sed -i s/^(/^^^(/g %SEARCH_FILE_NAME%
+sed -i s/^)/^^^)/g %SEARCH_FILE_NAME%
+sed -i s/\[/\\[/g %SEARCH_FILE_NAME%
+sed -i s/\]/\\]/g %SEARCH_FILE_NAME%
+sed -i s/%%/%%%%/g %SEARCH_FILE_NAME%
+sed -i s/^^!/^^^^!)/g %SEARCH_FILE_NAME%
+sed -i s/^&/^^^&/g %SEARCH_FILE_NAME%
+sed -i s/^'/^^^'/g %SEARCH_FILE_NAME%
+sed -i s/^`/^^^`/g %SEARCH_FILE_NAME%
+REM EVIL sed -i s/^^/^^^^/g %SEARCH_FILE_NAME%
+REM Required only inside the search pattern of the DOS FIND command: sed -i s/""/"""")/g %SEARCH_FILE_NAME%
+REM And covered already; only relevant inside FINDSTR calls: sed -i s/\"/\\"/g %SEARCH_FILE_NAME%
+REM ~~ sed -i s/^</^^^</g %SEARCH_FILE_NAME%
+REM ~~ sed -i s/^>/^^^>/g %SEARCH_FILE_NAME%
+REM ~~ sed -i s/^|/^^^|/g %SEARCH_FILE_NAME%
+REM ~~ sed -i s/\*/\\*/g %SEARCH_FILE_NAME%
+REM ~~ sed -i s/\?/\\?/g %SEARCH_FILE_NAME%
 
 DEL "%1%"
 COPY /Y temp_sed_working_file.txt "%1%"
