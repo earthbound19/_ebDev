@@ -7,8 +7,8 @@
 
 
 # CODE
-array=(`gfind . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n'`)
-# or to find every file,`gfind .` . .
+array=(`find . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n'`)
+# or to find every file,`find .` . .
 for element in ${array[@]}
 do
 	Python RGBhexColorSortInCIECAM02.py $element foo

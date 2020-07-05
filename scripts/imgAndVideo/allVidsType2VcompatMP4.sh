@@ -20,7 +20,7 @@ additionalParams_one="-preset slow -tune animation"
 # Makes a video matte by scaling down a bit and placing on a dark dark violet background:
 # additionalParams_three="-vf scale=-1:1054:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=1a171e"
 
-arr=(`gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
+arr=(`find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
 for filename in ${arr[@]}
 do
 	fileNameNoExt=${filename%.*}

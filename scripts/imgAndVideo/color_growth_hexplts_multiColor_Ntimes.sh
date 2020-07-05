@@ -38,7 +38,7 @@ else
 	extraParameters="'--RSHIFT 1 --SAVE_EVERY_N 7150 --RAMP_UP_SAVE_EVERY_N True --TILEABLE True'"
 fi
 
-palettes=(`gfind . -maxdepth 1 -type f -name "*.hexplt" -printf '%f\n'`)
+palettes=(`find . -maxdepth 1 -type f -name "*.hexplt" -printf '%f\n'`)
 
 # renderEachPaletteNtimes times, render an image for every palette:
 for ((i=1;i<=renderEachPaletteNtimes;i++))

@@ -13,9 +13,9 @@
 
 # CODE
 echo "finding all *.hexplt files in the current path and subpaths . . ."
-gfind . -maxdepth 1 -iname "*.hexplt" > all_hexplt.txt
+find . -maxdepth 1 -iname "*.hexplt" > all_hexplt.txt
 		HEXPLTfilesCount=`wc -l < all_hexplt.txt | tr -d ' '`
-gfind . -maxdepth 1 -iname "*.ppm" > all_ppm.txt
+find . -maxdepth 1 -iname "*.ppm" > all_ppm.txt
 		PPMfilesCount=`wc -l < all_ppm.txt | tr -d ' '`
 rm all_ppm.txt
 		echo Number of ppm rendered palette files found\: $PPMfilesCount

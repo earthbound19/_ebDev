@@ -14,7 +14,7 @@
 # CODE
 img_format_1=$1
 
-array=(`gfind . -maxdepth 1 -type f -iname \*.$img_format_1 -printf '%f\n'`)
+array=(`find . -maxdepth 1 -type f -iname \*.$img_format_1 -printf '%f\n'`)
 for element in ${array[@]}
 do
 	data_bend_2PPMglitchArt00padded.sh $element

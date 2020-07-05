@@ -44,7 +44,7 @@ echo "This script will erase all metadata from applicable image files in the ent
 # END SCRIPT WARNING =======================================
 
 
-gfind . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
+find . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
 mapfile -t images_MD_ADDS_list < images_MD_ADDS_list.txt
 for element in "${images_MD_ADDS_list[@]}"
 do

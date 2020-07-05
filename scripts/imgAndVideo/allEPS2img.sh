@@ -36,7 +36,7 @@ else
 	echo SET img_format to DEFAULT $img_format
 fi
 
-array=(`gfind . -maxdepth 1 -type f -iname \*.eps -printf '%f\n'`)
+array=(`find . -maxdepth 1 -type f -iname \*.eps -printf '%f\n'`)
 
 for element in ${array[@]}
 do

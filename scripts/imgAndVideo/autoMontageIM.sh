@@ -92,10 +92,10 @@ fi
 
     # Get dimensions of first image of type $1 found.
     # -printf '%f\n' chops off the ./ at the start which we don't want:
-firstImage=`gfind . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | head -n 1`
+firstImage=`find . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | head -n 1`
 originalIMGwidth=`gm identify -format "%w" $firstImage`
 originalIMGheight=`gm identify -format "%h" $firstImage`
-numImagesFound=`gfind . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | wc -l`
+numImagesFound=`find . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | wc -l`
 SQRTofNumImagesFound=`echo "scale=0; sqrt($numImagesFound) + 1" | bc`
 
 if [ "$3" ]

@@ -9,7 +9,7 @@
 # TO DO:
 # - upgrade listing to all possible image types.
 # - make a private fork of Fred's scripts that use graphicsmagick, since I've migrated to that for all of my scripts? Keep a legacy imagemagick install? :/
-gfind . -iname \*.png > crop_imgs.txt
+find . -iname \*.png > crop_imgs.txt
 
 i=0
 while read element

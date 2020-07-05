@@ -46,7 +46,7 @@ metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 		# exit
 # END IN DEVELOPMENT SECTION
 
-list=(`gfind . -maxdepth 1 \( \
+list=(`find . -maxdepth 1 \( \
 -iname \*$_MTPL*.mp4 \
 -o -iname \*"$_MTPL"var*.mp4 \
 -o -iname \*$_MTPL*.tif \

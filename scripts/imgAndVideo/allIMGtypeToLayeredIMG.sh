@@ -20,7 +20,7 @@
 # Template command:
 # gm convert 1.png 2.png 3.png 4.png out.tif
 
-gfind *.$1 > all_$1.txt
+find *.$1 > all_$1.txt
 dos2unix all_$1.txt
 
 while read element

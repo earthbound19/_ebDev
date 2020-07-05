@@ -9,7 +9,7 @@
 
 # CODE
 # The printf command trims any ./ from the start of output:
-list=(`gfind . -maxdepth 1 \( -iname \*.mov -o -iname \*.MOV -o -iname \*.avi \) -printf '%f\n' | sort`)
+list=(`find . -maxdepth 1 \( -iname \*.mov -o -iname \*.MOV -o -iname \*.avi \) -printf '%f\n' | sort`)
 
 # OPTIONAL EXTRA PARAMETERS
 # Because ffmpeg can't handle pcm for mp4 right now, and that would be a silly waste of space for distribution anyway (compress it to aac) -- and it throws an error instructing me to add -strict -2 to that if I use aac; BUT the following is an option commented out in distribution because encoding to aac isn't lossless! -crf 15 is quite high quality encoding:

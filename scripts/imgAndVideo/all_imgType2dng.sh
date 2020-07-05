@@ -7,7 +7,7 @@
 
 
 # CODE
-gfind . -iname \*.$1 > all_wut.txt
+find . -iname \*.$1 > all_wut.txt
 while read element
 do
 # TO DO: check if target file exists (get base file name of element first), then only create it if it doesn't.

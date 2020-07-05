@@ -38,7 +38,7 @@ else
 fi
 
 # Do the conversions.
-array=(`gfind . -maxdepth 1 -type f -iname \*.svg -printf '%f\n'`)
+array=(`find . -maxdepth 1 -type f -iname \*.svg -printf '%f\n'`)
 for element in ${array[@]}
 do
 	SVG2img.sh $element $longestImageSide $targetIMGformat $bgColorParam

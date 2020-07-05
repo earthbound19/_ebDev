@@ -7,7 +7,7 @@
 # ALSO, see the "ADDITIONAL PARAMTERS" comment section.
 
 # DEPENDENCIES
-# sed, gfind (find), ffmpeg
+# sed, find, ffmpeg
 
 
 # CODE
@@ -16,7 +16,7 @@ destIMGformat=$2
 
 if [ "$1" ]
 	then
-		IMGconvertList=(`gfind . -maxdepth 1 -type f -iname \*.$srcIMGformat -printf '%f\n'`)
+		IMGconvertList=(`find . -maxdepth 1 -type f -iname \*.$srcIMGformat -printf '%f\n'`)
 	else
 		echo "No parameter 1 (source format) passed to script. Will exit script."
 		exit
