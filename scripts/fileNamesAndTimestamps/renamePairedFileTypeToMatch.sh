@@ -11,7 +11,7 @@
 # 1. The batch that rendered the presets listed them in default
 # find sort order
 # 3. The default find sort order of the rendered files matches
-# the gsort order of the sources. If so, all $2 can be renamed
+# the sort order of the sources. If so, all $2 can be renamed
 # to match all $1.
 # WARNING: ONLY RUN THIS BATCH ON COPIES of the files. Why?
 # because it renames all $2 to match all $1 on that assumption,
@@ -46,9 +46,9 @@ else
 		# readarray -d '' filesArray1 < <(find . -name "*.$1" -print0)
 		# -- from here: https://stackoverflow.com/a/54561526/1397555
 	# -- but so can this; subscriptable; adds stuff that sorts by file date (which I want here):
-	filesArrayOne=(`find . -name "*.$1" -print0 -printf "%T@ %Tc %p\n" | gsort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+	filesArrayOne=(`find . -name "*.$1" -print0 -printf "%T@ %Tc %p\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 
-	filesArrayTwo=(`find . -name "*.$2" -print0 -printf "%T@ %Tc %p\n" | gsort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+	filesArrayTwo=(`find . -name "*.$2" -print0 -printf "%T@ %Tc %p\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 	# demonstrates that subscripting works with these arrays:
 	# echo "${filesArrayOne[4]}"
 	# echo "${filesArrayTwo[4]}"
