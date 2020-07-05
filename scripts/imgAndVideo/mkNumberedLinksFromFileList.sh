@@ -39,7 +39,7 @@ fi
 # If the numberedCopies directory already exists, TOAST IT without warning, then recreate it; otherwise create it:
 if [ -d numberedCopies ]; then rm -rf numberedCopies; mkdir numberedCopies; else mkdir numberedCopies; fi
 
-tempStr=`ghead -n 1 $fileList`
+tempStr=`head -n 1 $fileList`
 # NOTE that this script assumes a closing apostraphe or single quote in the input file! :
 # No, the fileExt=${filename##*.} doesn't work here as there's a trailing ' to trim:
 fileNameExt=`echo $tempStr | sed "s/.*\.\([^\.]\{1,5\}\)'.*/\1/g"`

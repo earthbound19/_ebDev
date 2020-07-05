@@ -20,7 +20,7 @@ sort -n imgs_dimensions.txt > tmp_723Qz8KV4fRH5.txt
 mv -f ./tmp_723Qz8KV4fRH5.txt imgs_dimensions.txt
 
 # extract the lowest dimension from this list and store it in a variable:
-lowest_dimension=`ghead -n 1 imgs_dimensions.txt`
+lowest_dimension=`head -n 1 imgs_dimensions.txt`
 
 if [ -d __smaller_img ]; then rm -rf __smaller_img; fi
 mkdir __smaller_img

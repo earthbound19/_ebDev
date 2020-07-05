@@ -18,7 +18,7 @@ fileNameNoExt=${1%.*}
 #  - get line number (of match) to split on:
 tail_from=`awk '/> FADE IN:/{print NR;exit}' $1`
 let head_to=tail_from-1
-ghead -n $head_to $1 > tmp_head_wYSNpHgq.fountain
+head -n $head_to $1 > tmp_head_wYSNpHgq.fountain
 gtail -n +$tail_from $1 > tmp_tail_wYSNpHgq.fountain
 dos2unix tmp_head_wYSNpHgq.fountain tmp_tail_wYSNpHgq.fountain
 #  - join semantic linefeeds into that tail file, in-place:

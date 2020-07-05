@@ -42,7 +42,7 @@ then
 	#  - get line number (of match) to split on:
 	tail_from=`awk '/> FADE IN:/{print NR;exit}' $1`
 	let head_to=tail_from-1
-	ghead -n $head_to $1 > tmp_head_wYSNpHgq.fountain
+	head -n $head_to $1 > tmp_head_wYSNpHgq.fountain
 	tail -n +$tail_from $1 > tmp_tail_wYSNpHgq.fountain
 	#  - delete lines that start with markdown image syntax (used to double for eBook output via fountain2ePub (using pandoc), but they'll interfere here:
 		# deletes the line:
