@@ -45,7 +45,7 @@ echo "Sorting temp file, then putting a CSV header on it . . ."
 # other columns. NOT.
 # https://en.wikipedia.org/wiki/Sort_(Unix)#Columns_or_fields
 # Also telling it to use comma as delimiter with -t ,:
-sort -t , -k 3,3 -k 1,1 -k 2,2 -k 4,4 -r -n tmp_axdTM39jAC38cr.txt | guniq > tmp_deQKEUSjKc9bcB.txt
+sort -t , -k 3,3 -k 1,1 -k 2,2 -k 4,4 -r -n tmp_axdTM39jAC38cr.txt | uniq > tmp_deQKEUSjKc9bcB.txt
 	# add :1 to end of last column (making it an aspect ratio expression) :
 	# EXCEPT DON'T (deprecated) :
 	# sed -i 's/\(.*$\)/\1:1/g' tmp_deQKEUSjKc9bcB.txt

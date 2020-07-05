@@ -8,7 +8,7 @@
 
 
 # CODE
-sort $1 | guniq > _tmp_HWPqYyXjv7pGCN.txt
+sort $1 | uniq > _tmp_HWPqYyXjv7pGCN.txt
 mv -f _tmp_HWPqYyXjv7pGCN.txt $1
 
 
