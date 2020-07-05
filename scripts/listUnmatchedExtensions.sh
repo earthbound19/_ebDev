@@ -35,7 +35,7 @@ else
 	targetExtension=$2
 fi
 
-sourceExtensions=(`gfind . -maxdepth 1 -name "*.cgp" -printf '%f\n'`)
+sourceExtensions=(`find . -maxdepth 1 -name "*.cgp" -printf '%f\n'`)
 
 # echo "List of files of type $1 for which there is no corresponding file of type $2:"
 for element in ${sourceExtensions[@]}

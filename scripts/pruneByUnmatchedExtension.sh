@@ -77,7 +77,7 @@ then
 	exit
 fi
 
-list=`gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n' | tr -d '\15\32'`
+list=`find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n' | tr -d '\15\32'`
 
 RND16HEX=`cat /dev/urandom | tr -dc '0-9A-F' | head -c 16`
 delete_candidates_temp_folder=___delete_candidates_tmp__"$RND16HEX"

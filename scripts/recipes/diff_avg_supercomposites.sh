@@ -11,7 +11,7 @@ idiff_all_img_pairs.sh
 gm_average_all_img_pairs.sh
 
 cd image_pairs_diffs
-array_A=(`gfind . -maxdepth 1 \( \
+array_A=(`find . -maxdepth 1 \( \
 -iname \*.tif \
 -o -iname \*.tiff \
 -o -iname \*.png \
@@ -30,7 +30,7 @@ array_A=(`gfind . -maxdepth 1 \( \
  \) -printf '%f\n' | gshuf`)
 
 cd ../image_pairs_averages
-array_B=(`gfind . -maxdepth 1 \( \
+array_B=(`find . -maxdepth 1 \( \
 -iname \*.tif \
 -o -iname \*.tiff \
 -o -iname \*.png \

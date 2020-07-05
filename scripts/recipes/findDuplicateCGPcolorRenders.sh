@@ -13,7 +13,7 @@
 # CODE
 if ! [ "$1" ]; then echo "No paramater \$1 (an .rgbplt file). Exit."; exit; fi
 
-presetsAndSHsArray=(`gfind . -maxdepth 1 -type f -name "*.cgp" -printf '%f\n' -o -type f -name "*.sh" -printf '%f\n'`)
+presetsAndSHsArray=(`find . -maxdepth 1 -type f -name "*.cgp" -printf '%f\n' -o -type f -name "*.sh" -printf '%f\n'`)
 
 # reading file to array with IFS='\n' isn't working here (causes other problems, or I don't know what I'm doing): 
 foundItems=()

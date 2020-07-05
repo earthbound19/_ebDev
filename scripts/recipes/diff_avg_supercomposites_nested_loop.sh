@@ -18,7 +18,7 @@ gm_average_all_img_pairs.sh
 # make arrays of all files that resulted from the first two scripts; SHUFFLE them so that we get early random output (as the target image pool can be so huge that if your source image set has similar properties from one image to the next in the set, it can labor on similar images forever, but I want to see a random selection early) :
 
 cd image_pairs_diffs
-array_A=(`gfind . -maxdepth 1 \( \
+array_A=(`find . -maxdepth 1 \( \
 -iname \*.tif \
 -o -iname \*.tiff \
 -o -iname \*.png \
@@ -37,7 +37,7 @@ array_A=(`gfind . -maxdepth 1 \( \
  \) -printf '%f\n' | gshuf`)
 
 cd ../image_pairs_averages
-array_B=(`gfind . -maxdepth 1 \( \
+array_B=(`find . -maxdepth 1 \( \
 -iname \*.tif \
 -o -iname \*.tiff \
 -o -iname \*.png \

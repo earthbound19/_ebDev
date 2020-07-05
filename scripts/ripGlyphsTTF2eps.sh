@@ -140,7 +140,7 @@ do
 	ttf2eps -unicode $element $1
 done
 
-epsArray=(`gfind . -maxdepth 1 -type f -iname \*.eps -printf '%f\n'`)
+epsArray=(`find . -maxdepth 1 -type f -iname \*.eps -printf '%f\n'`)
 
 # Rename resultant files after font file name.
 fontFileNameNoExt=${1%.*}

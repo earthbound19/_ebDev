@@ -10,4 +10,4 @@ exit
 # -- will move all files with the extension .png in all subfolders up into the path from which you execute this script.
 
 # From reading the manual and with help from https://stackoverflow.com/a/25111885 :
-gfind -iname "*.$1" -exec mv {} . \;
+find -iname "*.$1" -exec mv {} . \;
