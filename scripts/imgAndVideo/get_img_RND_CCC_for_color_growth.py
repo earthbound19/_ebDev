@@ -49,7 +49,8 @@ except:
     print('No positional parameter 2 (how many random coordinates/colors to get) passed. Exit.')
     sys.exit()
 
-image = imageio.imread(inputFile)
+# To figure out the following additional "format=None, pilmode='RGB'" parameter changes, to prevent it from returning RGBA values (which include alpha values I don't use or expect--they caused an error) (and where mysteriously previous runs of this script with the same code had not), I dug around here: https://imageio.readthedocs.io/en/stable/userapi.html#imageio.imread, and somehow I figured out how to print help for an image format. It _seems_ that it can transform anything on the fly (on read) to RGB? Printing help like this: imageio.help(name='BMP') helped figure it out; this next line of code previously was just image = imageio.imread(inputFile) :
+image = imageio.imread(inputFile, format=None, pilmode='RGB')
 imageWidth = len(image[0])
 imageHeight = len(image)
 # create set of unique rnd coords from that area:
@@ -89,5 +90,5 @@ for element in rnd_coordinates:
 paramString = re.sub(',$', '', paramString)
 # enclose the whole thing in yet another [] (make it list of list of yada yada),
 # with other switches and values that will be needed:
-paramString = '--WIDTH ' + str(imageWidth) + ' --HEIGHT ' + str(imageHeight) + ' --CUSTOM_COORDS_AND_COLORS \'[' + paramString + ']\''
+paramString = '--WIDTH ' + str(imageWidth) + ' --HEIGHT ' + str(imageHeight) + ' --CUSTOM_COORDS_AND_COLORS [' + paramString + ']'
 print(paramString)
