@@ -9,7 +9,7 @@
 
 
 # CODE
-gfind *.cgp > all_cgp.txt
+find *.cgp > all_cgp.txt
 
 printf "# Palettes\n\nClick any image to go to the source image; the text line above the image to go to the source .hexplt file.\n\n" > README.md
 

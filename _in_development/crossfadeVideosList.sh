@@ -20,7 +20,7 @@ crossFadeDuration=5.8
 # cd _temp_numbered
 
 # Use ffmpegCrossfadeImagesToAnim.sh repeatedly on pairs of images by number until there are no more:
-gfind *.mp4 > numberedCopies.txt
+find *.mp4 > numberedCopies.txt
 
 # TO DO: rewrite the loop to do everything in the first and second run in one run, if possible (also in ffmepgCrossfadeIMGsToAnimList.sh, which I am adapting this from):
 

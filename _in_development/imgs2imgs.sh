@@ -19,7 +19,7 @@ img_format_2=$2
 # OPTIONAL e.g. resize command:
 # additionalParams="-scale 1920 "
 
-array=(`gfind . -maxdepth 1 -type f -iname \*.$img_format_1 -printf '%f\n'`)
+array=(`find . -maxdepth 1 -type f -iname \*.$img_format_1 -printf '%f\n'`)
 for element in ${array[@]}
 do
 	fileNameNoExtension=`basename $element .$img_format_1`

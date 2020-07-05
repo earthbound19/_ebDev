@@ -11,7 +11,7 @@
 currentDir=`pwd`
 currentDirBasename=`basename $currentDir`
 # create array of all source code / script file names of given types in this directory and subdirectories; -printf "%P\n" removes the ./ from the front; re: https://unix.stackexchange.com/a/215236/110338 -- ALSO NOTE: if I use any printf command, it only lists findings for that associated -o option; so printf must be used for every -o; ALSO, the gsord and sed pipes sort scripts by time stamp, newest first:
-sourceCodeFilesArray=(` gfind . -type f -name '*.sh' -printf "%P\n" -o -name '*.py' -printf "%P\n" | gsort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+sourceCodeFilesArray=(` find . -type f -name '*.sh' -printf "%P\n" -o -name '*.py' -printf "%P\n" | gsort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 
 # BEGIN check all files for CODE comment, and warn and exit on first one that doesn't:
 errorFiles=()

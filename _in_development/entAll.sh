@@ -1,4 +1,4 @@
-gfind . > _allFiles.txt
+find . > _allFiles.txt
 while read element
 do
 	echo $element

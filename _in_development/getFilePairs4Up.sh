@@ -37,7 +37,7 @@ fi
 echo findPairsFor value\: $findPairsFor
 echo movePairTypesHere value\: $movePairTypesHere
 
-gfind . -maxdepth 1 -iname \*.$findPairsFor > file_list.txt
+find . -maxdepth 1 -iname \*.$findPairsFor > file_list.txt
 echo Scanning parent directories \(up to three levels up\) for $movePairTypesHere pairs of type $findPairsFor . . .
 
 while read element

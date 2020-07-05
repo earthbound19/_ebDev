@@ -1,5 +1,5 @@
 # RENAMING: Create a list of all filenames with these criteria: has _final_ in the filename, but doesn't have a number in the format _nnnnn_ (e.g. _00020_); this will be a list of files to be auto-numbered by this script.
-gfind . -regex '.*' -printf '%T@ %c %p\n' | sort -k 1n,1 -k 7 | cut -d' ' -f2- > filesWithTagAndNoNumber.txt
+find . -regex '.*' -printf '%T@ %c %p\n' | sort -k 1n,1 -k 7 | cut -d' ' -f2- > filesWithTagAndNoNumber.txt
 	# Prune the date stamp info before the paths start:
 sed -i 's/.*\ \(\.\/.*\)/\1/g' filesWithTagAndNoNumber.txt
 	# DELETE EVERY line that does *not* match the expression \(.*\/\)\(.*_final_.*\) ; re: http://stackoverflow.com/a/9544146
