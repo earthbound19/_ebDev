@@ -15,10 +15,10 @@
 if [ "$1" ] && [ "$1" != "NULL" ]
 then
 	# no -maxdepth 1 switch; recurse through subdirectories
-	hexpltFilesArray=(`gfind . -type f -iname \*.hexplt`)
+	hexpltFilesArray=(`find . -type f -iname \*.hexplt`)
 else
 	# -maxdepth 1 switch restricts search to current directory
-	hexpltFilesArray=(`gfind . -maxdepth 1 -type f -iname \*.hexplt`)
+	hexpltFilesArray=(`find . -maxdepth 1 -type f -iname \*.hexplt`)
 fi
 
 for element in ${hexpltFilesArray[@]}

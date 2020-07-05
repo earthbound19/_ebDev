@@ -3,7 +3,7 @@
 fileExt=$1
 allFilesTXTfile="all_""$fileExt"
 
-gfind ./*.$1 > $allFilesTXTfile
+find ./*.$1 > $allFilesTXTfile
 
 while read filename
 do

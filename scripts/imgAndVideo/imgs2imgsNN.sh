@@ -24,7 +24,7 @@
 
 
 # CODE
-array=(`gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n' | tr -d '\15\32'`)
+array=(`find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n' | tr -d '\15\32'`)
 for img in ${array[@]}
 do
 	img2imgNN.sh $img $2 $3 $4

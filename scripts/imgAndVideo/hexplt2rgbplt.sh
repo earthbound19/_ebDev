@@ -39,7 +39,7 @@ else
 					echo palettesRootDir.txt found\;
 					echo searching in path $palettesRootDir --
 					echo for file $paletteFile . . .
-			hexColorSrcFullPath=`gfind $palettesRootDir -iname "$paletteFile"`
+			hexColorSrcFullPath=`find $palettesRootDir -iname "$paletteFile"`
 			echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 			if [ "$hexColorSrcFullPath" == "" ]
 				then

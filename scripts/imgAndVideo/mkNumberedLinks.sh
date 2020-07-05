@@ -24,7 +24,7 @@ if [ -d _temp_numbered ]; then rm -rf _temp_numbered; mkdir _temp_numbered; else
 # cd ./testFiles
 # if [ -a links ]; then rm -d -r links; mkdir links; else mkdir links; fi
 
-arr=(`gfind . -maxdepth 1 -type f -iname \*.$fileType -printf '%f\n' | sort`)
+arr=(`find . -maxdepth 1 -type f -iname \*.$fileType -printf '%f\n' | sort`)
 
 # If there is a paramater $2, shuffle that array:
 if [ "$2" ]; then arr=( $(shuf -e "${arr[@]}") ); fi

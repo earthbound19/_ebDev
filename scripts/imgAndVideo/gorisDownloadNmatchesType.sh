@@ -19,7 +19,7 @@ img_format=$1
 allTypeIMGSlistFileName=all_"$img_format".txt
 
 # -maxdepth 1 limits the search to only the current path (and no subpaths), else running this script twice attempts to find matches for matches in sub-subfolders (and creates sub-sub-subfolders) :
-gfind . -maxdepth 1 -iname \*.$1 > $allTypeIMGSlistFileName
+find . -maxdepth 1 -iname \*.$1 > $allTypeIMGSlistFileName
 while read element
 do
 	gorisDownloadNmatches.sh $element

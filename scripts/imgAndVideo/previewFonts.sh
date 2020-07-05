@@ -12,7 +12,7 @@
 # $3 approx img size X
 
 # DEPENDENCIES
-# imagemagick, gfind (find), CourierMegaRS.ttf (Courier Mega Rounded Slab Regular font), a directory full of .ttf and/or .otf fonts you wish to render a phrase from.
+# imagemagick, find (find), CourierMegaRS.ttf (Courier Mega Rounded Slab Regular font), a directory full of .ttf and/or .otf fonts you wish to render a phrase from.
 
 
 # CODE
@@ -23,7 +23,7 @@ then
 fi
 
 # CODE
-gfind \*.ttf \*.otf | tr -d '\15\32' > all_fonts.txt
+find \*.ttf \*.otf | tr -d '\15\32' > all_fonts.txt
 while IFS= read -r element || [ -n "$element" ]
 do
 	fileName="${element%.*}"

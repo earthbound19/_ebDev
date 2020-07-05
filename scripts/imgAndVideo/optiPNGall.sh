@@ -7,7 +7,7 @@
 
 
 # CODE
-pngsFileNamesArray=(`gfind . -type f -name "*.png"`)
+pngsFileNamesArray=(`find . -type f -name "*.png"`)
 
 for element in ${pngsFileNamesArray[@]}
 do

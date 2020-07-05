@@ -16,7 +16,7 @@ if [ "$1" ]
 	vidExt=avi
 fi
 
-gfind *.$vidExt > allvids.txt
+find *.$vidExt > allvids.txt
 mapfile -t allVids < allvids.txt
 rm allvids.txt
 for element in "${allVids[@]}"

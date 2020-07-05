@@ -37,8 +37,8 @@ else	# Search for specified palette file in palettesRootDir (if that dir exists;
 				echo searching in path $palettesRootDir --
 				echo for file $paletteFile . . .
 						# FAIL:
-						# hexColorSrcFullPath=`gfind "$palettesRootDir" -iname *$paletteFile`
-		hexColorSrcFullPath=`gfind $palettesRootDir -iname "$paletteFile"`
+						# hexColorSrcFullPath=`find "$palettesRootDir" -iname *$paletteFile`
+		hexColorSrcFullPath=`find $palettesRootDir -iname "$paletteFile"`
 		echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 		if [ "$hexColorSrcFullPath" == "" ]
 			then

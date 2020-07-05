@@ -16,7 +16,7 @@
 # CODE
 count=0
 
-gfind *.$1 > tmp_lst.txt
+find *.$1 > tmp_lst.txt
 
 while read listItem
 do

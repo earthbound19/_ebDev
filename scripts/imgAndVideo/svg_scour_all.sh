@@ -9,7 +9,7 @@
 # From a path with svg files you wish to optimize and clean up, run this script:
 # svg_scour_all.sh
 
-array=(`gfind . -maxdepth 1 -type f -iname \*.svg -printf '%f\n'`)
+array=(`find . -maxdepth 1 -type f -iname \*.svg -printf '%f\n'`)
 for element in ${array[@]}
 do
   fileNameNoExt=${element%.*}

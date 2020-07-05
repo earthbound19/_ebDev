@@ -6,7 +6,7 @@
 # ./texts2imgs.sh
 
 # CODE
-array=(`gfind . -maxdepth 1 -type f -iname \*.txt -printf '%f\n'`)
+array=(`find . -maxdepth 1 -type f -iname \*.txt -printf '%f\n'`)
 for element in ${array[@]}
 do
 	fileNameNoExt=${element%.*}

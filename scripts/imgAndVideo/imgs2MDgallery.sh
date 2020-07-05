@@ -8,7 +8,7 @@
 
 
 # CODE
-gfind *.png *.jpg *.gif *.tif *.tiff > all_imgs.txt
+find *.png *.jpg *.gif *.tif *.tiff > all_imgs.txt
 
 printf "# Images Markdown Gallery\n\nClick any image or title header to go to the source image.\n\n" > README.md
 

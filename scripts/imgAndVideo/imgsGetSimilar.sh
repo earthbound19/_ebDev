@@ -45,7 +45,7 @@ rm -rf __superShrunkRc6d__*
 
 
 # Because on stupid platforms find produces windows line-endings, convert them to unix after pipe | :
-allIMGs=(`gfind . -maxdepth 1 -type f -iname \*.$searchRegex -printf '%f\n' | sort`)
+allIMGs=(`find . -maxdepth 1 -type f -iname \*.$searchRegex -printf '%f\n' | sort`)
 # Create heavily shrunken image copies to run comparison on.
 echo Generating severely shrunken image copies to run comparisons against . . .
 for element in "${allIMGs[@]}"
