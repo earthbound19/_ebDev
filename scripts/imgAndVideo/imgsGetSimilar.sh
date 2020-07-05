@@ -120,7 +120,7 @@ sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
 dos2unix IMGlistByMostSimilar.txt
 
 rm __superShrunkRc6d__*
-rm compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt tmp_fx49V6cdmuFp.txt comparisons__superShrunkRc6d__cols.txt
+rm compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt  tmp_fx49V6cdmuFp.txt comparisons__superShrunkRc6d__cols.txt
 
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with e.g. any of these scripts\:

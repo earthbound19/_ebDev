@@ -27,16 +27,17 @@ I believe that everything not created by me in this archive is at least freely a
     <!-- OR instead of wget use curl: -->
     <!-- apt-cyg install curl -->
     <!-- curl http://earthbound.io/dist/_ebSuperBin.7z -->
-- Windows: clone and make use of _setBinBaths.bat from https://github.com/earthbound19/_ebPathMan, which will permanently modify your path to include all relevant paths in this archive.
-- Mac and/or other 'nixy environments (and Windows!) `getDevEnv.sh`
+- Windows: clone and make use of `_setBinBaths.bat` from [_ebPathMan](https://github.com/earthbound19/_ebPathMan), which is designed to modify your PATH to include all relevant paths in this archive.
+- Mac and/or other 'nixy environments (and Windows!) may make use of `getDevEnv.sh` to get scripts in your PATH (in other words to alter a terminal run to become a development environment).
 
 # USAGE
 I try to put accessible usage and other documentation at the start of every script, under headings just like in this README.md itself: DESCRIPTION, USAGE, and sometimes DEPENDENCIES, KNOWN ISSUES, NOTES and maybe other headings.
 
-Many or all scripts need to be in your PATH. If they are not in your PATH you must `cd` into their directory, or copy them to a directory with files they would operate on, and invoke them with `./` (meaning "this directory" to the terminal) and any parameters they require, as documented in each scripts' USAGE section. Examine that start comments in the source code of any script for guidance. If you 
+Many or all scripts are designed to be invoked as scripts residing in your PATH. If they are not in your PATH you must `cd` into their directory, or copy them to a directory with files they would operate on, and invoke them with `./` (meaning "this directory" to the terminal) and any parameters they require, as documented in each scripts' USAGE section. Examine that start comments in the source code of any script for guidance.
+
+For easier interoperation on various platforms, possibly all files in this repo have unix line endings, even if they are developed in Windows (I do this by setting a line ending type preference in more advanced text editors). This is only important if you open a file in a text editor that doesn't even know what unix line endings are. Any modern editor worth using will transparently adapt to whatever line ending style is in any file.
 
 ### Developer notes
-
-Tools and scripts in this repository are subject to high flux, because I edit and develop them as I use them, and/or because I may freely add or remove anything from this archive. Generally I move anything not useful (or redundant) to the `_deprecated` folder. Things under development or suspended for bugs are in the  `_in_development`. folder.
-
 A history of a kludge: I have gone back and forth on using versions of four ported tools from unix: sed, find, sort, and uniq -- as copies from various windows/Mac ports but renamed as gsed, gfind, gsort, and guniq, in a subfolder of the `_ebSuperBin` repository which I keep in my PATH on Windows. But I found that MSYS2 updates would leave me with errors about possible cygwin1.dll version conflicts, and broken script runs. So I stopped copying/renaming those GNU utilities to that repo, and instead I use the ones as provided by MSYS2, which it keeps current and in the MSYS2 user bin folder(s), and as originally named: sed, sort, find, and uniq. But there may be scripts in `/_in_development` and `/_deprecated` that still have the names I don't want to use anymore; to further develop or revive any of those use the proper (not `g`-prefixed) names.
+
+Note that tools and scripts in this repository are subject to high flux, because I edit and develop them as I use them, and/or because I may freely add or remove anything from this archive. Generally I move anything not useful (or redundant) to the `_deprecated` folder. Things under development or suspended for bugs are in the  `_in_development`. folder. I have even deliberately rewritten git history at times in the project (to cut down repo bloat).
