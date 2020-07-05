@@ -14,7 +14,7 @@ I believe that everything not created by me in this archive is at least freely a
 
 # INSTALLATION AND USAGE
 
-Horrible kludge note: for these scripts to work on Windows you may need to rename Cygwin's find.exe to gfind.exe (I _think_ it works the same way as gfind from brew GNU coreutils on Mac?)
+Horrible kludge note: through development history I have gone back and forth on using versions of four ported tools from unix: sed, find, sort, and uniq -- as copies from various windows/Mac ports but renamed as gsed, gfind, gsort, and guniq. At this writing, using renamed copies was more painful than using ones provided by MSYS2 than not. I just use them as sed, sort, find, and uniq. But there may be scripts in `/_in_development` and `/_deprecated` that still have the names I don't want to use anymore; to further develop or revive any of those use the proper (not `g`-prefixed) names.
 
 ## _ebSuperBin dependencies
 - From a cygwin (or adapt for another 'nixy environment on Windows, or for similar utilities on a Mac) run the following command:
