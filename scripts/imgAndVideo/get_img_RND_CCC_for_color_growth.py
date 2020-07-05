@@ -16,7 +16,7 @@
 # Example invocation:
 #  python /path_to_/scriptdir/get_rnd_CCC_for_color_growth.py inputImageFileName.png
 # Results are printed to stdout, and may be captured e.g. by bash this way:
-#  pathToScript=`whereis get_img_RND_CCC_for_color_growth.py | gsed 's/get_img_RND_CCC_for_color_growth: \(.*\)/\1/g'`
+#  pathToScript=`whereis get_img_RND_CCC_for_color_growth.py | sed 's/get_img_RND_CCC_for_color_growth: \(.*\)/\1/g'`
 #  var_CUSTOM_COORDS_AND_COLORS=`python $pathToScript inputImageFileName.png`
 
 # DEV NOTES
