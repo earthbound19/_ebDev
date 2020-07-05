@@ -1,7 +1,9 @@
 # DESCRIPTION
 This repository was previously entitled _devtools.
 
-A collection of scripts (most of them developed by me) which I use for development of many kinds--at this writing, mostly visual art development on Windows. It heavily relies on various 'nix/cygwin utilities, which at this writing you can obtain via a URL provided later in this document.
+A collection of scripts, the vast majority of (if not all?) developed by me (earthbound19/RAH), which I use for development of many kinds--at this writing, maybe mostly development of visual and generative / new media art on Windows. Many of the scripts are tested on Windows and MacOS, and they may also work on many other versions of Linux-like operating systems (or envrionments), depending on which versions of various GNU utilities and Python are on (or which you can get) on those platforms.
+
+See DEPENDENCIES and USAGE.
 
 # LICENSE
 Everything in this repository which I have created, I dedicate to the Public Domain, unless comments in or near any code state otherwise.
@@ -12,9 +14,9 @@ I believe that everything not created by me in this archive is at least freely a
 
 09/02/2015 07:29:00 PM -RAH
 
-# INSTALLATION AND USAGE
+# DEPENDENCIES
 
-## _ebSuperBin dependencies
+## _ebSuperBin / brew / other
 - From an MSYS2 or cygwin prompt (MSYS2 preferred) (or adapt for another 'nixy environment on Windows, or for similar utilities on a Mac), run the following command:
     <!-- DEPRECATED but of potential future use (e.g. to grab the most current release): -->
     <!-- apt-cyg install p7zip -->
@@ -26,10 +28,15 @@ I believe that everything not created by me in this archive is at least freely a
     <!-- apt-cyg install curl -->
     <!-- curl http://earthbound.io/dist/_ebSuperBin.7z -->
 - Windows: clone and make use of _setBinBaths.bat from https://github.com/earthbound19/_ebPathMan, which will permanently modify your path to include all relevant paths in this archive.
-Windows and/or 'nixy environments: OR examine and use getDevEnv.sh per the comments therein.
+- Mac and/or other 'nixy environments (and Windows!) `getDevEnv.sh`
+
+# USAGE
+I try to put accessible usage and other documentation at the start of every script, under headings just like in this README.md itself: DESCRIPTION, USAGE, and sometimes DEPENDENCIES, KNOWN ISSUES, NOTES and maybe other headings.
+
+Many or all scripts need to be in your PATH. If they are not in your PATH you must `cd` into their directory, or copy them to a directory with files they would operate on, and invoke them with `./` (meaning "this directory" to the terminal) and any parameters they require, as documented in each scripts' USAGE section. Examine that start comments in the source code of any script for guidance. If you 
 
 ### Developer notes
 
-Horrible kludge note: through development history I have gone back and forth on using versions of four ported tools from unix: sed, find, sort, and uniq -- as copies from various windows/Mac ports but renamed as gsed, gfind, gsort, and guniq. At this writing, using renamed copies was more painful than using ones provided by MSYS2 than not. I just use them as sed, sort, find, and uniq. But there may be scripts in `/_in_development` and `/_deprecated` that still have the names I don't want to use anymore; to further develop or revive any of those use the proper (not `g`-prefixed) names.
+Tools and scripts in this repository are subject to high flux, because I edit and develop them as I use them, and/or because I may freely add or remove anything from this archive. Generally I move anything not useful (or redundant) to the `_deprecated` folder. Things under development or suspended for bugs are in the  `_in_development`. folder.
 
-Also, the tools and scripts in this repository are subject to high flux, because I edit and develop them as I use them, and/or because I freely add or remove utilities from this archive.
+A history of a kludge: I have gone back and forth on using versions of four ported tools from unix: sed, find, sort, and uniq -- as copies from various windows/Mac ports but renamed as gsed, gfind, gsort, and guniq, in a subfolder of the `_ebSuperBin` repository which I keep in my PATH on Windows. But I found that MSYS2 updates would leave me with errors about possible cygwin1.dll version conflicts, and broken script runs. So I stopped copying/renaming those GNU utilities to that repo, and instead I use the ones as provided by MSYS2, which it keeps current and in the MSYS2 user bin folder(s), and as originally named: sed, sort, find, and uniq. But there may be scripts in `/_in_development` and `/_deprecated` that still have the names I don't want to use anymore; to further develop or revive any of those use the proper (not `g`-prefixed) names.
