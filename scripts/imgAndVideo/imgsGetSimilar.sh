@@ -119,12 +119,9 @@ rm comparisons__superShrunkRc6d__cols_sorted.txt
 sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
 dos2unix IMGlistByMostSimilar.txt
 
-rm __superShrunkRc6d__*
-rm compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt  tmp_fx49V6cdmuFp.txt comparisons__superShrunkRc6d__cols.txt
+rm __superShrunkRc6d__*]
+mv comparisons__superShrunkRc6d__cols.txt IMGlistByMostSimilarComparisons.txt
+rm compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt  tmp_fx49V6cdmuFp.txt
 
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
-echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with e.g. any of these scripts\:
-echo mkNumberedCopiesFromFileList.sh
-echo ffmpegCrossfadeIMGsToAnimFromFileList.sh
-echo ffmpegAnimFromFileList.sh
-echo See comments in any of them. That last will produce an animation of these images in a series of stills of each cutting to the next\, arranged by most similar to nearest list neighbor \(roughly\. There will be some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list\)\.
+echo "FINIS! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with e.g. any of these scripts: mkNumberedCopiesFromFileList.sh, ffmpegCrossfadeIMGsToAnimFromFileList.sh, ffmpegAnimFromFileList.sh, and maybe others. Also, the numeric closeness value that imagemagic thinks all two image pairs of all the images have is in IMGlistByMostSimilarComparisons.txt, which may also be useful for scripting."
