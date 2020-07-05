@@ -1,6 +1,3 @@
-echo "THIS SCRIPT seems to broken. Does so many comparisons and then the result files are empty. TO DO: fix it."
-exit
-
 # DESCRIPTION
 # Produces list of images arranged by most similar to nearest neighbor in list (roughly, with some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list). Some potential uses: use file list with ffmpeg to create an animation jumping from one image to the next most similar, through the list. Render abstract art collections in animation by sort of most similar groups, quasi-un-randomize randomly color-filled (or palette random filled) renders from e.g. colored svg images. Jumble up movie frames from a film scene excerpt in a perhaps wrong but similar frame order, etc.
 
@@ -123,7 +120,7 @@ sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
 dos2unix IMGlistByMostSimilar.txt
 
 rm __superShrunkRc6d__*
-rm compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt tmp_fx49V6cdmuFp.txt tmp_TkU8pQDF5KeH.txt comparisons__superShrunkRc6d__cols.txt
+rm compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt tmp_fx49V6cdmuFp.txt comparisons__superShrunkRc6d__cols.txt
 
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 echo FINIS\! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with e.g. any of these scripts\:
@@ -131,6 +128,3 @@ echo mkNumberedCopiesFromFileList.sh
 echo ffmpegCrossfadeIMGsToAnimFromFileList.sh
 echo ffmpegAnimFromFileList.sh
 echo See comments in any of them. That last will produce an animation of these images in a series of stills of each cutting to the next\, arranged by most similar to nearest list neighbor \(roughly\. There will be some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list\)\.
-
-
-
