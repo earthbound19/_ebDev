@@ -90,26 +90,23 @@ export DYLD_LIBRARY_PATH="${OCIO_EXECROOT}/lib:${DYLD_LIBRARY_PATH}"
 
 ' >> ~/.bash_profile
 
-# DISABLE blasted dysfunctional IPv6.
-# To list the network servics, run: networksetup -listallnetworkservices
-# To re-enable, use -setv6automatic instead of -setv6off
-# networksetup -setv6off "USB 10/100/1000 LAN"
-# networksetup -setv6off Wi-Fi
-
-
+# see: pyenvFrameworkInstallMac.sh
 # tcl-tk for python idle? :
-# printf '
-# 
 # # for python idle in pyenv:
 # export LDFLAGS="-L/usr/local/opt/tcl-tk/lib"
 # export CPPFLAGS="-I/usr/local/opt/tcl-tk/include"
 # export PATH=$PATH:/usr/local/opt/tcl-tk/bin
 # 
 # ' >> ~/.bash_profile
+# Then launch IDLE interactive shell with:
+# pyenv-idle.py
+# -- although just:
+# idle
+# -- may work!
 
 # NOTE: ntfs-3g location: /usr/local/Cellar/ntfs-3g/2017.3.23
 
-# Possible additional commands to setup asdf and pyenv:
+# Possible additional commands to setup asdf:
 # git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.6.0
 # echo -e '\n. $HOME/.asdf/asdf.sh' >> ~/.bash_profile
 # asdf plugin-add nodejs
@@ -137,5 +134,8 @@ export DYLD_LIBRARY_PATH="${OCIO_EXECROOT}/lib:${DYLD_LIBRARY_PATH}"
 # 
 # and / or http://hathaway.cc/post/69201163472/how-to-edit-your-path-environment-variables-on-mac
 
-# Don't write those obnoxious .DS_Store metadata files on network drives! That literally gobbles up 4K extra space for every. Single. File. On a typcial NTFS (Windows) drive). No.
-defaults write com.apple.desktopservices DSDontWriteNetworkStores true
+# DISABLE blasted dysfunctional IPv6.
+# To list the network servics, run: networksetup -listallnetworkservices
+# To re-enable, use -setv6automatic instead of -setv6off
+# networksetup -setv6off "USB 10/100/1000 LAN"
+# networksetup -setv6off Wi-Fi
