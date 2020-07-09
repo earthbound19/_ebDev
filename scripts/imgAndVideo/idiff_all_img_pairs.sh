@@ -15,18 +15,18 @@
 
 # CODE
 # Get array of many images named imgs_arr via dependency script:
-source get_all_imgs_array.sh
+allIMGsArray=(`get_all_imgs_array.sh`)
 # Shuffle that so that any re-run of this script will always go through images in a different order (useful for previewing samples among many choices):
-imgs_arr=( $(gshuf -e "${imgs_arr[@]}") )
+allIMGsArray=( $(gshuf -e "${allIMGsArray[@]}") )
 
-array_size=$((${#imgs_arr[@]}))	# store size of that array
+array_size=$((${#allIMGsArray[@]}))	# store size of that array
 inner_loop_start=1						# set base count for inner loop
 															# (will increment to avoid operating on the same file)
-for outer in ${imgs_arr[@]}			# iterate over all items in array
+for outer in ${allIMGsArray[@]}			# iterate over all items in array
 do
 	for((j = inner_loop_start; j<array_size; j++))	# iterate again to get pairs, but don't repeat used pairs (because we start with the increased inner_loop_start count base every iteration back through this inner loop
 	do
-		inner=${imgs_arr[j]}					# store second file name from array
+		inner=${allIMGsArray[j]}					# store second file name from array
 		inner_no_ext=${inner%.*}	# store that without the file extension
 		outer_no_ext=${outer%.*}	# store first file name without file extension
 		# use those to make an out file name after both:
@@ -45,15 +45,25 @@ do
 done
 
 # All the same things again, but with the lists reversed first, because if you operate on the same pair of file names in different parameter order, you get different results;
-# Get array of many images named imgs_arr via dependency script; the "foo" argument gives us an array in reverse order via that script:
-source get_all_imgs_array.sh foo
-array_size=$((${#imgs_arr[@]}))
+# Reverse the array (into a copy of it) ; re https://unix.stackexchange.com/a/412870 :
+min=0
+max=$(( ${#allIMGsArray[@]} ))
+while [[ min -lt max ]]
+do
+    # Swap current first and last elements
+    x="${allIMGsArray[$min]}"
+    reversedArray[$min]="${allIMGsArray[$max]}"
+    reversedArray[$max]="$x"
+    # Move closer
+    (( min++, max-- ))
+done
+# use the reverse array:
 inner_loop_start=1
-for outer in ${imgs_arr[@]}
+for outer in ${reversedArray[@]}
 do
 	for((j = inner_loop_start; j<array_size; j++))
 	do
-		inner=${imgs_arr[j]}
+		inner=${reversedArray[j]}
 		inner_no_ext=${inner%.*}
 		outer_no_ext=${outer%.*}
 		outfileNoExt="image_pairs_diffs/""$outer_no_ext"__"$inner_no_ext"__diff

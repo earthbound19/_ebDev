@@ -1,19 +1,18 @@
 # DESCRIPTION
-# Creates a bash array of many image types from all such files in the current path. Must be invoked via `source` to be useful. See USAGE.
+# Prints a list of all files matching many image file types (images etc.) in the current directory. To create an array from the list, see USAGE.
 
-# USAGE Invoke with or without an optional parameter. If invoked without a parameter:
-# source get_all_imgs_array.sh
-# -- this script creates an array named imgs_arr in default sort returned by find. If invoked with an optional parameter which may be any string:
-# source get_all_imgs_array.sh foo
-# -- the -r switch is appended to sort, which causes the array (list) to reverse order.
-# NOTE: to be useful, this script must be invoked via `source`, as directed. This causes the array named imgs_arr to persist in the local bash environment after this script terminates.
+# USAGE
+# Invoke without any parameter:
+#  get_all_imgs_array.sh
+# To create an array from the output from another script, do this:
+# allIMGsArray=(`get_all_imgs_array.sh`)
+# -- you may then iterate through it like: for element in ${allIMGsArray[@]}; do <code things with $element>; done
 
-if [ "$1" ]; then invisibl_switch='-r'; else invisibl_switch=''; fi
-echo "invisibl_switch set to $invisibl_switch"
-echo "(if that was a sentence fragment, invisibl_switch was blank)"
 
 # CODE
-imgs_arr=(`find . -maxdepth 1 \( \
+if [ "$1" ]; then invisibl_switch='-r'; else invisibl_switch=''; fi
+
+find . -maxdepth 1 \( \
 -iname \*.tif \
 -o -iname \*.tiff \
 -o -iname \*.png \
@@ -29,4 +28,14 @@ imgs_arr=(`find . -maxdepth 1 \( \
 -o -iname \*.cr2 \
 -o -iname \*.raw \
 -o -iname \*.crw \
- \) -printf '%f\n' | sort $invisibl_switch`)
+-o -iname \*.kra \
+-o -iname \pdf \
+ \) -printf '%f\n'
+
+# Other possible formats: 
+# m4a \
+# mov \
+# mp4 \
+# ptg \
+# eps \
+# svg \
