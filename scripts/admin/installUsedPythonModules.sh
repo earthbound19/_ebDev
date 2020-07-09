@@ -20,7 +20,8 @@ colorgram \
 Quartz \
 Foundation \
 Pillow \
-easydev"
+easydev \
+scour"
 
 # possible future-use modules:
 # matplotlib \
