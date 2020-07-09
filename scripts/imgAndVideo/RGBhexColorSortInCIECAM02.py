@@ -3,56 +3,53 @@
 # using an advanced color appearance model for human color vision: CIECAM02.
 # If you're sorting very different colors, YOU MAY WISH to use
 # RGBhexColorSortinCAM16-UCS.py instead (see). This uses the colorspacious library; that uses colour-science.
-# A test array for this: #E33200 #FF8B94 #54F1F1 #499989 #AAEFCB #8E4C5C #F7B754 #8AC2B0 #DE9D38 #FA9394 #ADDCCA #2DD1AA #E5E4E9 #02547D #78BF82 #745D5F #414141 #958F95 #FDE182 #7699C7 #FF5933 #D9BB93 #F1E5E9 #EA5287 #E3DB9A #95B6BA #59746E #333388 #008D94 #2EC1B1 #FF534E #367793 #00A693
 
-# NOTES: this script expects perfect data. If there's a blank line anywhere in the
-# input file, or any other unexpected data, it may stop with an unhelpful error.
-# ALSO, this script will eliminate duplicates in the input list.
-#
 # USAGE
-# With this script and a .hexplt file both in your immediate path, and
-# Python in your PATH, call this script with one parameter, being a hex palette list:
-# Python RGBhexColorSortInCIECAM02.py inputColors.hexplt
-#
-# It will print the sort result to stdout, so that you may for example redirect the output to a new .hexplt file, e.g.:
-# Python hex2CIECAM02colorSort2hex.py PrismacolorMarkers.hexplt > PrismacolorMarkers_CIECAM02_hsJ_sort.hexplt
-#
-# OR, if you pass an optional 2nd argument (which may be anything), it will overwrite the source file with the sorted colors.
+# With this script and a .hexplt file both in your immediate path, and Python in your PATH, call this script with these positional parameters:
+# - 1 A list of RGB colors as hexadecimal numbers, in .hexplt format (a simple text list, one color per line).
+# - 2 OPTIONAL. May be anything, and if present, the script will overwrite the original hex palette list with the sorted colors. To use positional parameter 3 (the next one) but not overwrite the original hex palette list, pass this as the string 'NULL' (with or without quote marks).
+# - 3 OPTIONAL. Any hex color code string in the format '#000000', which the script will use as the first color to compare other colors to, even if it's not in the list. The list will therefore be sorted by next nearest color starting with this arbitrary color. If the color happens to be in the original list file (first argument), it will remain in the final list. If the color is not in the original list, it will not appear in the final sorted list.
+# Example invocation with only a hexplt file given:
+#  Python RGBhexColorSortInCIECAM02.py PrismacolorMarkers.hexplt
+# The result will be printed to stdout, so that you may for example redirect the output to a new .hexplt file, e.g.:
+#  Python RGBhexColorSortInCIECAM02.py inputColors.hexplt > result.hexplt
+# Example invocation with the optional second parameter, which will cause the script to overwrite the original .hexplt file with the sorted version of it:
+#  Python RGBhexColorSortInCIECAM02.py inputColors.hexplt foo
+# Example invocation with the optional third parameter, an arbitrary color to start comparisons with (here, magenta):
+#  Python RGBhexColorSortInCIECAM02.py inputColors.hexplt foo '#ff00ff'
+# NOTES
+# - This expects perfect data. If there's a blank line anywhere in the
+# input file, or any other unexpected data, it may stop with an unhelpful error.
+# - This will also delete duplicate colors in the list.
+# - The same input always produces the same output, though if you change the order of colors in the list, the results may change. This is because the script uses the first color in the list to begin its comparisons (but you may override that with parameter 3). You therefore may wish to decide which color you want first in the list for those comparison purposes, or pass an arbitrary color via parameter 3.
 
 # DEPENDENCIES
-# Python (probably Python 3.5), various python packages (see import list at start of code) which you may install with
-# easy_install or pip.
-
-# TO DO
-# Try the same function but with different parameters J'a'b' in the colour library? 
-# re: https://colour.readthedocs.io/en/develop/generated/colour.difference.delta_E_CAM16LCD.html
-# re: https://colour.readthedocs.io/en/develop/tutorial.html
-# NOTE that the install package name for that is colour-science, NOT colour (which is valid but
-# something else far more limited!)
-
-# KNOWN ISSUES
-# The same input sorted in a different order always produces the same output, but you must
-# decide what the first color in the list is--because if you change the first color, the
-# sorting changes.
+# Python (probably Python 3.5), various python packages (see import list at start of code) which you may install with easy_install or pip.
 
 # LICENSE
 # This is my original code and I release it to the Public Domain. -RAH 2019-09-23 09:18 PM
 
-# REFERENCE
-# - See URLs in comments in the below code. They all probably were developed because of this
-# paper: https://www.researchgate.net/publication/227991182_CIE_Color_Appearance_Models_and_Associated_Color_Spaces
-# - Chart of all known color spaces / models and how to convert between them, re colour library:
-# https://colour.readthedocs.io/en/develop/index.html#automatic-colour-conversion-graph-colour-graph
-# - I only get the colorio library installing on python 3.8.0 on mac. possible use of cam16 color
-# - another library that does other things: http://markkness.net/colorpy/ColorPy.html
-# space in it: https://github.com/nschloe/colorio/blob/master/test/test_cam16.py
-# - stinking awesome answer that led to some of this: https://stackoverflow.com/a/49346067/1397555
-
-
 # CODE
+# TO DO: Maybe see DEVELOPER NOTES at end of script.
 import sys
 from itertools import combinations
 from colorspacious import cspace_convert, deltaE
+
+# GLOBALS and positional parameters check, with clear boolean/value inits to describe:
+overwriteOriginalList = False
+arbitraryFirstCompareColor = False
+countOfArbitraryFirstColorInOriginalList = 0
+if len(sys.argv) > 1:
+    hexpltFileNamePassedToScript = sys.argv[1]
+else:
+    print('\nNo parameter 1 (source .hexplt file) passed to script. Exit.')
+    sys.exit()
+if len(sys.argv) > 2:
+    if sys.argv[2] != 'NULL':   # Only set the following to true if user did not pass the string NULL (allows using positional parameter 2 without "using" it, and also using positional parameter 3:
+        overwriteOriginalList = True
+if len(sys.argv) > 3:
+    arbitraryFirstCompareColor = sys.argv[3]
+# END GLOBALS and positional parameters check
 
 def hex_to_CIECAM02_JCh(in_string):
     """ Takes an RGB hex value and returns:
@@ -102,12 +99,14 @@ def hex_to_CIECAM02_JCh(in_string):
     CIECAM02_dimResult = cspace_convert(RGB, "sRGB255", CIECAM02_dimSTR)
     return CIECAM02_dimResult, CIECAM02_dimSTR
 
-
 # split input file into list on newlines:
-inputFile = sys.argv[1]
-f = open(inputFile, "r")
+f = open(hexpltFileNamePassedToScript, "r")
 colors_list = list(f.read().splitlines())
 f.close()
+
+if arbitraryFirstCompareColor != False:     # if a parameter was passed to script (arbitrary color in format '#ffffff' to start comparisons with), dynamically alter the list to insert that color at the start. BUT FIRST, track (with the following variable, countOfArbitraryFirstColorInOriginalList) the count of that color in the list before we add it to the list, because if that count is zero before adding, we will want to remove it from the list after comparisons and sorting (we don't want to permanently add it to the list; we only want to add it temporarily). (Because we don't want to add colors permanently to the list that were never there; we want to leave the list as it was found.) But if it _was_ originally in the list, we want to keep it there after adding, because the list will be deduplicated. Because the list will be deduplicated, the color we add to the list (even if it was in the list already before we added it) it would end up appearing only once in the list, and removing it after that would remove it entirely. That is a lot of explanation for the following two lines of code :)
+    countOfArbitraryFirstColorInOriginalList = colors_list.count(arbitraryFirstCompareColor)
+    colors_list.insert(0, arbitraryFirstCompareColor)
 # strip beginning '#' character off every string in that list:
 colors_list = [element[1:] for element in colors_list]
 # deduplicate the list, but maintain same order:
@@ -123,9 +122,6 @@ colors_list = list(unique_everseen(colors_list))
 # may not be valid:
 pair_deltaEs = []
 
-if len(sys.argv) > 1:	# if a second parameter was passed to script, do these things:
-    print('Input file is ', inputFile)
-    print('Getting deltaE for all color combinations . . .')
 for i in range(len(colors_list)):
     for j in range(i + 1, len(colors_list)):
         # print(colors_list[i], colors_list[j])
@@ -135,12 +131,14 @@ for i in range(len(colors_list)):
         pair_deltaEs.append([distance, colors_list[i], colors_list[j]])
 
 # results in lowest deltaE values first; may cause searches to run faster (I don't know):
-if len(sys.argv) > 1:
-    print('Sorting deltaEs . . .')
+# Only print any information if we're overwriting the original list, because if we're not, the user may want to pipe printed output to a new .hexplt file, which they woudln't want cluttered with information that would break the .hexplt format:
+if overwriteOriginalList == True:
+    print('\nSorting deltaEs . . .')
 pair_deltaEs.sort()
 sorted_colors = list()
 
-if len(sys.argv) > 1:
+# Again, conditional print (avoid printing clutter if user isn't ovewriting original file:
+if overwriteOriginalList == True:
     print('Sorting colors by nearest deltaE . . .')
 search_color = colors_list[0]
 sorted_colors.append(search_color)  # starts list
@@ -173,17 +171,41 @@ while len(sorted_colors) < len(colors_list):
 
 
 # FINALE
-# If a second argument (which may be anything) was passed to the script, 
-# overwrite the source read file with the sorted copy of it.
-# Otherwise, print the sorted list to stdout.
-if len(sys.argv) > 2:
+
+# add '#' back to the start of every element in the sorted color list before print:
+for IDX, color in enumerate(sorted_colors):
+    fixedTehColorFormat = '#' + color
+    sorted_colors[IDX] = fixedTehColorFormat
+
+# If we inserted an arbitrary color at start of list (to make first comprarison from), but it wasn't in the original list, remove it from the new sorted colors list; otherwise leave it there:
+if countOfArbitraryFirstColorInOriginalList == 0 and arbitraryFirstCompareColor != False:
+    sorted_colors.remove(arbitraryFirstCompareColor)
+
+# Again, conditional print if we're overwriting original list, and if we are overwriting original list, this is where in code we do that:
+if overwriteOriginalList == True:
     print('Writing sorted color list back over original file . . .')
-    with open(inputFile, 'w') as f:
+    with open(hexpltFileNamePassedToScript, 'w') as f:
         for element in sorted_colors:
-            print_element = '#' + element + '\n'
-            f.write(print_element)
+            f.write(element + '\n')
     f.close()
+# If not ovewriting original list, print the sorted list:
 else:
     for element in sorted_colors:
-        print_element = '#' + element
-        print(print_element)
+        print(element)
+
+
+
+# DEVELOPER NOTES
+# Try the same function but with different parameters J'a'b' in the colour library? 
+# re: https://colour.readthedocs.io/en/develop/generated/colour.difference.delta_E_CAM16LCD.html
+# re: https://colour.readthedocs.io/en/develop/tutorial.html
+# NOTE that the install package name for that is colour-science, NOT colour (which is valid but
+# something else far more limited!)
+# - See URLs in comments in the below code. They all probably were developed because of this
+# paper: https://www.researchgate.net/publication/227991182_CIE_Color_Appearance_Models_and_Associated_Color_Spaces
+# - Chart of all known color spaces / models and how to convert between them, re colour library:
+# https://colour.readthedocs.io/en/develop/index.html#automatic-colour-conversion-graph-colour-graph
+# - I only get the colorio library installing on python 3.8.0 on mac. possible use of cam16 color
+# - another library that does other things: http://markkness.net/colorpy/ColorPy.html
+# space in it: https://github.com/nschloe/colorio/blob/master/test/test_cam16.py
+# - stinking awesome answer that led to some of this: https://stackoverflow.com/a/49346067/1397555
