@@ -14,5 +14,5 @@ array=(`find . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n'`)
 for element in ${array[@]}
 do
 	echo "Running comparisons for file $element . . ."
-	Python $scriptLocation $element foo '#000000'
+	python $scriptLocation $element foo '#000000'
 done
