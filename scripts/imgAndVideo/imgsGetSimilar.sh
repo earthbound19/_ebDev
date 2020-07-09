@@ -86,8 +86,6 @@ dos2unix compare__superShrunkRc6d__col1.txt
 paste -d '' compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt > comparisons__superShrunkRc6d__cols.txt
 # Filter out information cruft; NOTE that if the first column isn't preceded by | then the later sort command won't work as intended:
 sed -i 's/.*Total: \([0-9]\{1,11\}\.[0-9]\{1,11\}\).*|\([^|]*\).*|\([^|]*\).*/\1|\2|\3/g' comparisons__superShrunkRc6d__cols.txt
-# Back that up to a pre-sort text file in case subsequent sorting turns out not so useful:
-cp comparisons__superShrunkRc6d__cols.txt comparisons__superShrunkRc6d__cols_unsorted.txt
 # Sort results by reverse rank of keys by priority of certain columns in an attempt at most similar pairs adjacent (usually) ; or . . . some other thingy similar? Uncomment one option and comment out all others:
 sort -n -b -t\| -k3r -k1 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
 	# sort -n -b -t\| -k2r -k1r -k3 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
@@ -119,9 +117,10 @@ rm comparisons__superShrunkRc6d__cols_sorted.txt
 sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
 dos2unix IMGlistByMostSimilar.txt
 
-rm __superShrunkRc6d__*]
+# Rename comparison results list that has numeric image similarity rankings, and keep it around (don't delete it), so we can make further use of it via other scripts:
 mv comparisons__superShrunkRc6d__cols.txt IMGlistByMostSimilarComparisons.txt
-rm compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt  tmp_fx49V6cdmuFp.txt
+# Delete the other temp files:
+rm *__superShrunkRc6d__* tmp_fx49V6cdmuFp.txt
 
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 echo "FINIS! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with e.g. any of these scripts: mkNumberedCopiesFromFileList.sh, ffmpegCrossfadeIMGsToAnimFromFileList.sh, ffmpegAnimFromFileList.sh, and maybe others. Also, the numeric closeness value that imagemagic thinks all two image pairs of all the images have is in IMGlistByMostSimilarComparisons.txt, which may also be useful for scripting."
