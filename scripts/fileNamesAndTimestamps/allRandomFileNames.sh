@@ -4,26 +4,31 @@
 # USAGE
 # WARNING: This will randomly rename *all files in a tree* (including subfolders) and move the renamed files to the root folder this script is invoked from. It will prompt you for a known (given) password to continue before doing so.
 # Put this script in your $PATH, and run it with these parameters:
-# $1 : The length of random characters to rename the file with. If you don't specify any number for the first parameter, it defaults to 4.
-# $2 : Optional: a file extension (without any . in it) to restrict random renames to. It will not rename any other file types. If this is not provided, it will rename _all_ file types in the current path.
-# WARNING: very bad things might happen (e.g. permanent data loss!) if you do not pass parameters as instructed here under USAGE.
-# EXAMPLE; rename all files with the extension .hexplt to 20-character random strings:
-# allRandomFileNames.sh 20 hexplt
+# - $1 the length of random characters to rename the file with. If you don't specify any number for the first parameter, it uses a default.
+# - $2 OPTIONAL. A file extension (without any . in it) to restrict random renames to. It will not rename any other file types. If this is not provided, it will rename _all_ file types in the current path.
+# WARNING: very bad things might happen (e.g. permanent data loss!) if you do not pass parameters as instructed here under USAGE. The script errors out for at least some scenarios to prevent that though.
+# Example command to rename all files with the extension .hexplt to 20-character random strings:
+#  allRandomFileNames.sh 20 hexplt
 
-# TO DO
-# Throw an error and exit if non-numeric first parameter passed.
-# Throw an error and exit if no files of type parameter 2 found.
 
-# GLOBAL VAR SET; if numeric parameter $1 is passed to script, set $getNrandChars to that; otherwise default it to 4:
+# CODE
+# GLOBAL VAR SETS:
+# if positional parameter 1 is passed to script, check if it is not numeric and throw an error if it is. If it is numeric, use it. If no parameter $1 is passed at all, use a default value and continue.
 if [ "$1" ]
-	then
-		getNrandChars="$1"
-				echo parameter passed to script\; will set getNrandChars to passed value of $1.
+then
+	# Throw an error and exit if $1 is not numeric; re: https://stackoverflow.com/a/806923
+	re='^[0-9]+$'
+	if ! [[ $1 =~ $re ]] ; then
+	   echo "Error: parameter \$1 not a number. Pass a numer value (number of random characters to rename files to) for first parameter."
+	   exit 1
 	else
-		getNrandChars=4
-				echo no parameter passed to script\; using default value of \4 for getNrandChars.
+		getNrandChars="$1"
+		echo "Parameter passed to script; will set getNrandChars to passed value of \$1 ($1)."
+	fi
+else
+	getNrandChars=4
+		echo "No parameter \$1 passed to script\; using default value of 8 for getNrandChars."
 fi
-
 if [ "$2" ]
 	then
 		array=(`find . -maxdepth 1 -type f -iname \*.$2 -printf '%f\n'`)
@@ -36,7 +41,7 @@ fi
 
 # CODE
 echo ""
-echo "WARNING: This script renames all files of type $fileTypesToRename with $1"
+echo "WARNING: This script renames all files of type '*.$fileTypesToRename' with $1"
 echo "random characters. See comments in script for details. If this is not"
 echo "what you want to do, press ENTER or RETURN, or CTRL+C or CTRL+Z. If this"
 echo "_is_ what you want to do, type SNEERFBLURN and then press ENTER or RETURN."
@@ -75,13 +80,13 @@ do
 		multCounter=$(($multCounter + $getNrandChars))
 		# echo getNrandChars val is $getNrandChars
 		newFileBaseName=${randomCharsString:$multCounter:$getNrandChars}
-		echo ~----- "renaming $filename to $newFileBaseName"."$fileExt"
+		echo "~ Renaming $filename to $newFileBaseName"."$fileExt . . ."
 	mv ./$filename ./$newFileBaseName.$fileExt
 done
 
 
 # DEVELOPMENT HISTORY
-# made this keep extensions. this is quick and dirty for flam3 files. 06/12/2016 09:15:44 AM -RAH -- DONE 2016-07-16 6:33 PM -RAH
-# Prior to now: script that was inefficient by reading 4 bytes from /dev/urandom with every single file rename.
+# 2020-07-09 12:22 Throw errors if non-numeric first parameter and exit. Change default rnd chars retrieved to 8.
+# ????-??-?? Made this keep extensions. this is quick and dirty for flam3 files. 06/12/2016 09:15:44 AM -RAH -- DONE 2016-07-16 6:33 PM -RAH
 # 2016-07-16 Made script much more efficient by prefetching necessary number of random characters into a variable, and fetching iterative groups of chars from said variable (in memory, instead of using a file on disk). -RAH
 # 2018-12-01 11:33 PM Generate file list (array) in memory (skip writing temp files), layout niggles, delete some comments
