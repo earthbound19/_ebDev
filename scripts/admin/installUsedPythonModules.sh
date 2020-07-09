@@ -19,7 +19,8 @@ colormap \
 colorgram \
 Quartz \
 Foundation \
-Pillow"
+Pillow \
+easydev"
 
 # possible future-use modules:
 # matplotlib \
