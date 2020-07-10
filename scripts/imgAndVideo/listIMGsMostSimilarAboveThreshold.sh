@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Lists pairs of images that are visually similar to each other above a threshold, $1. Operates on a file created by imgsGetSimilar.sh, which must be run before this, and creates a list of all image pairs in a directory ranked by nearness of similarity one to another. This script filters results from that above float parameter $1. See USAGE.
+# Lists pairs of images that are visually similar to each other above a threshold, $1. Operates on a file created by imgsGetSimilar.sh, which must be run before this, and creates a list of all image pairs in a directory ranked by nearness of similarity to each other. This script filters results from that above float parameter $1. See USAGE.
 
 # USAGE
 # First, run imgsGetSimilar.sh as instructred in its comments. This is necessary to create the file IMGlistByMostSimilarComparisons.txt, which this script relies on. Then run this, with one parameter, being a float value between 0 and 1. Image pairs that have a nearness comparison value above that float will be written to a new file: IMGlistSimilarComparisonsAboveThreshold
