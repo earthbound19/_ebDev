@@ -11,7 +11,7 @@ python -m pip install --upgrade pip
 pythonModules=" \
 more_itertools \
 colorspacious \
-colour \
+colour-science \
 spectra \
 numpy \
 ciecam02 \
