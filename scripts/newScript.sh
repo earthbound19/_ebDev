@@ -8,6 +8,6 @@
 # CODE
 rndString=`cat /dev/urandom | tr -dc 'a-f0-9' | head -c 9`
 
-printf "# DESCRIPTION\n# omigoshomigoshomigoshomigoshomigoshomigoshomigoshomigosh\n\nUSAGE\n#  omigoshomigoshomigosh\n\n\n# CODE\n" > "$rndString".sh.txt
+printf "# DESCRIPTION\n# omigoshomigoshomigoshomigoshomigoshomigoshomigoshomigosh\n\n# USAGE\n#  omigoshomigoshomigosh\n\n\n# CODE\n# DELETE this line and the next if your script doesn't need them; otherwise adapt per your needs:\nif ! [ \"\$1\" ]; then printf \"\\\\nNo parameter \\\$1 (type short explanation of parameter) passed to script. Exit.\"; exit; fi\n" > "$rndString".sh.txt
 
 start "$rndString".sh.txt
