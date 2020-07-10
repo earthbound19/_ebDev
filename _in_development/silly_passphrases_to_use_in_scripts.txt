@@ -8,15 +8,15 @@ LEGEND:
 * VUBKUK
 * FAULHOOF
 * WHEEBWHELM
-- CHORPELF
+* YALBLOR
 - NORTHERP
-- YALBLOR
 - KRIDTALB
 - WABYEG
 - POLSDERF
 - WIDRALP
 - BROGNALF
 - ROGPLIF
+* FLAERGHBLOR
 
 Alas, rejected candidates (too much or too difficult for me to type) :
 
