@@ -1,12 +1,14 @@
 # DESCRIPTION
-# Converts all files of type $1 in a tree to type $2, via pandoc (a wrapper for pandoc). Copies respective timestamps from file types $1 to $2 (via cygin/'nix/mac touch command), so that each newly created (converted) document has the same time stamp.
+# Converts all files of type $1 in a tree to type $2, via pandoc. Copies respective timestamps from file types $1 to $2 (via cygin/'nix/mac touch command), so that each newly created (converted) document has the same time stamp.
 
 # NOTES
 # This script can alternately use binarez_touch on Windows to update file creation dates to match the source. See the OPTIONS comment in the source code below.
 
 # USAGE
-# pandoc2doc.sh source_docs_extension dest_docs_extension
+#  pandoc2doc.sh source_docs_extension dest_docs_extension
 
+
+# CODE
 if [ "$1" ]; then src_format=$1; echo "Source format \$1 $1 passed to script; using that."; else echo "NO source format \$1 passed to script. Exiting."; exit; fi
 if [ "$2" ]; then dest_format=$2; echo "Source format \$2 $2 passed to script; using that."; else echo "NO destination format \$2 passed to script. Exiting."; exit; fi
 
