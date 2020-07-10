@@ -4,13 +4,13 @@
 # you missed it if you didn't read this comment in the source code.)
 
 # USAGE
-# sortuniq.sh fileNameToSortAndDedup.txt
+#  sortuniq.sh fileNameToSortAndDedup.txt
 
 
 # CODE
 sort $1 | uniq > _tmp_HWPqYyXjv7pGCN.txt
 mv -f _tmp_HWPqYyXjv7pGCN.txt $1
 
-
-echo DONE. Mein Krummspugerlt ist nicht mein Krummspugelnd.
+echo ""
+echo "DONE. Mein Krummspugerlt ist nicht mein Krummspugelnd."
 
