@@ -1,74 +1,107 @@
-echo IN DEVELOPMENT. moved from autobrood repo intending to adapt for broader purposes.
-exit
-# TO DO
-# - Get the script getFilePairs4down working as intended, then adapt this (or moveUp.sh) but for 4 dirs up.
-
-
 # DESCRIPTION
-# Moves matching file names (minus extension) from up to four paths up into the current folder. See USAGE.
+# For all files of type $1 in the current directory, searches for files of type $2 that have the same base file name (file minus extension) which reside up to $3 directories up from the current directory, and moves them into the current directory. Checks for and will not move files to the current directory that would clobber (overwrite) files, and logs those duplicates to a file it notifies of at end of script run.
 
 # USAGE
-# getFilePairs4Up.sh sourceFilesExtension targetFilesToMoveHereExtension
-# EXAMPLE: suppose you've got some files named rnd_43aB.png and rnd_44Cd.png in the current path, which you rendered from source files rnd_43aB.flame and rnd43Cd.flame which are scattered one or more directories up from the current path, and that you want to move those matching .flame files into the current path. From the directory with those .png files, invoke this script thusly:
-#  getFilePairs4Up.sh png flame
-# This will result in all those matching .flame file names being moved from up to four paths above this path into this path. WARNING: if there is more than one of the same file name in different directories, one will clobber the other even if they have different content, without warning.
-
+# Invoke with these parameters:
+# - $1 extension of file types in current directory to find files with the same base name (file minus extension).
+# - $2 extension of file types to find that have the same base name as any file $1 plus this extension.
+# - $3 how many directories up to search for files $2 and move them into the current directory.
+# - $4 OPTIONAL. Force overwrite existing files in the current directory, by moving found matches from any directory up to $3 levels up over them.
+# EXAMPLE
+# Suppose you've got some files named rnd_43aB.png and rnd43Cd.png in the current path, which you rendered from source files rnd_43aB.flame and rnd43Cd.flame, which are two directories up from the current directory, and you want to move those matching .flame files into the current directory. To move those matching .flame files from up to two parent directories down to the current directory, invoke this script with these parameters:
+#  getFilePairs4Up.sh png flame 2
+# This will result in all those matching .flame file names being moved from up to two directories above into this directory.
+# NOTES
+# - The script will not overwrite existing files in the current directory with identically named files from any parent directory. If it finds duplicate file names, it will log the full paths to the duplicates to a file named like this: __getFilePairs4Up_run__<sixHexDigits>_log.txt
+# - To override that safe behavior and force overwrite existing files, pass anything for parameter $4. Adapting the example to that purpose, the command to do that would be:
+#  getFilePairs4Up.sh png flame 2 KRIDTALB
 
 
 # CODE
-abortScript=0
-
-if [ -z "$1" ]
-	then
-		echo No paramater 1 passed. Will not run script. See USAGE comment at start of script.
-		abortScript=1
-	else
-	findPairsFor=$1
+# START PARAMETERS CHECK and globals set
+if ! [ "$1" ]
+then
+	printf "\nNo paramater \$1 passed (file type to search for files that have the same base file name). Exit."
+	exit 1
+else
+	findPairsForType=$1
 fi
 
-if [ -z "$2" ]
-	then
-		echo No paramater 2 passed. Will not run script. See USAGE comment at start of script.
-		abortScript=1
-	else
-	movePairTypesHere=$2
+if ! [ "$2" ]
+then
+	printf "\nNo paramater \$2 passed (type of files to search for that have the same base file name as any given file of type $1). Exit"
+	exit 1
+else
+	fileTypeToMoveFoundPairsOf=$2
 fi
 
-echo findPairsFor value\: $findPairsFor
-echo movePairTypesHere value\: $movePairTypesHere
+if ! [ "$3" ]
+then
+	printf "\nNo paramater \$3 (how many directories up to search). Exit."
+	exit 1
+else
+	searchThisManyDirectoriesUp=$3
+fi
 
-find . -maxdepth 1 -iname \*.$findPairsFor > file_list.txt
-echo Scanning parent directories \(up to three levels up\) for $movePairTypesHere pairs of type $findPairsFor . . .
+clobberExistingFiles='False'
+# Override that with 'True' if parameter given such that we should:
+if [ "$4" ]; then clobberExistingFiles='True'; fi
+# END PARAMETERS CHECK and globals set
 
-while read element
+
+# MAIN FUNCTIONALITY
+# for mv target, and to move back to after moving up N directories:
+currentDirectory=`pwd`
+
+filesToFindPairsFor=(`find . -maxdepth 1 -type f -iname \*.$findPairsForType -printf '%f\n'`)
+
+# create unique log file name and initialize log:
+rndHexString=`cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6`
+logFileName="$currentDirectory"/__getFilePairs4Up_run__"$rndHexString"_log.txt
+echo "Duplicate file names in different paths found from run of command: 'getFilePairs4Up.sh $1 $2 $3', separated by bars | :" > $logFileName
+echo "" >> $logFileName
+
+duplicateFileNamesFoundInCurrentAndParentDirectories='False'
+for i in `seq 1 $searchThisManyDirectoriesUp`
 do
-	# Trim off extension:
-	element=${element%.*}
-	# Also trim any ./ off the start of the file name:
-	element=`echo $element | sed 's|^./||' | tr -d '\15\32'`
-	echo that is $element
+	cd ..
+	tmpDirectory=`pwd`
+	printf "\nWorking in directory $tmpDirectory . . ."
+	for element in ${filesToFindPairsFor[@]}
+	do
+		isThisApair=${element%.*}.$fileTypeToMoveFoundPairsOf
+		fullPathToMoveTo="$currentDirectory"/"$isThisApair"
+		# BEGIN STATE MACHINE "Megergeberg 5,000."
+		if [ -e "$isThisApair" ]
+		then
+			if [[ -e "$fullPathToMoveTo" && "$clobberExistingFiles" == "True" ]]
+			then
+				printf "\n~\n Move target already exists for match $isThisApair in $fullPathToMoveTo, AND a parameter was passed to the script instructing to move matching files to existing destination anyway. Will move it there."
+				mv -f $tmpDirectory/$isThisApair $fullPathToMoveTo
+			fi
+			if [[ -e "$fullPathToMoveTo" && "$clobberExistingFiles" == "False" ]]
+			then
+				duplicateFileNamesFoundInCurrentAndParentDirectories='True'
+				printf "\n~\n Move target already exists for match $isThisApair in $fullPathToMoveTo, BUT no parameter was passed to script instructing to move matching files to existing destination. Will NOT move it there, but will log the full paths to both files."
+				printf "$tmpDirectory/$isThisApair | $fullPathToMoveTo\n" >> $logFileName
+			fi
+			if [ ! -e "$fullPathToMoveTo" ]
+			then
+				echo
+				printf "\n~\n Move target does not exist for match $isThisApair in $fullPathToMoveTo. Will move it there."
+				mv $tmpDirectory/$isThisApair $fullPathToMoveTo
+			fi
+		fi
+	done
+done
 
-	# search up directories and move the applicable file here if it exists:
-	if [ -e ../$element.$movePairTypesHere ]
-		then
-			echo running mv -f ../$element.$movePairTypesHere ./
-			mv -f ../$element.$movePairTypesHere ./
-	fi
-	if [ -e ../../$element.$movePairTypesHere ]
-		then
-			echo running mv -f ../../$element.$movePairTypesHere ./
-			mv -f ../../$element.$movePairTypesHere ./
-	fi
-	if [ -e ../../../$element.$movePairTypesHere ]
-		then
-			echo running mv -f ../../../$element.$movePairTypesHere ./
-			mv -f ../../../$element.$movePairTypesHere ./
-	fi
-	if [ -e ../../../../$element.$movePairTypesHere ]
-		then
-			echo running mv -f ../../../../$element.$movePairTypesHere ./
-			mv -f ../../../../$element.$movePairTypesHere ./
-	fi
-done < file_list.txt
+cd $currentDirectory
 
-rm ./file_list.txt
+printf "\n\nDONE."
+if [ "$duplicateFileNamesFoundInCurrentAndParentDirectories" == "True" ]
+then
+	printf "\nDuplicate file names were found between current directory and at least one parent directory. The information is logged to $logFileName."
+else
+	# Delete the log file; we don't need it:
+	rm $logFileName
+fi
