@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Produces list of images arranged by most similar to nearest neighbor in list (roughly, with some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list). Some potential uses: use file list with ffmpeg to create an animation jumping from one image to the next most similar, through the list. Render abstract art collections in animation by sort of most similar groups, quasi-un-randomize randomly color-filled (or palette random filled) renders from e.g. colored svg images. Jumble up movie frames from a film scene excerpt in a perhaps wrong but similar frame order, etc.
+# Produces list of images arranged by most similar to nearest neighbor in list (roughly, with some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list). See USAGE for notes on potential uses.
 
 # DEPENDENCIES
 # Graphicsmagick, image files in a directory to work on, and bash / GNU utilities
@@ -11,6 +11,8 @@
 # NOTES
 # - the comparison algorithm never compares the same image pair more than once.
 # - see re_sort_imgsMostSimilar.sh to sort the result other ways.
+# - see the echo statement at the end of the script for notes on scripts that can do things with the result lists.
+# - some potential uses: use file list with ffmpeg to create an animation jumping from one image to the next most similar, through the list. Render abstract art collections in animation by sort of most similar groups, quasi-un-randomize randomly color-filled (or palette random filled) renders from e.g. colored svg images. Jumble up movie frames from a film scene excerpt in a perhaps wrong but similar frame order, etc.
 
 
 # CODE
@@ -57,7 +59,6 @@ do
 	fi
 done
 i_count=0
-j_count=0
 printf "" > compare__superShrunkRc6d__col1.txt
 printf "" > compare__superShrunkRc6d__col2.txt
 # List all possible pairs of file type $1, order is not important, repetition is not allowed (math algorithm $1 pick 2).
@@ -118,9 +119,9 @@ sed -i "s/^\(.*\)/file '\1'/g" IMGlistByMostSimilar.txt
 dos2unix IMGlistByMostSimilar.txt
 
 # Rename comparison results list that has numeric image similarity rankings, and keep it around (don't delete it), so we can make further use of it via other scripts:
-mv comparisons__superShrunkRc6d__cols.txt IMGlistByMostSimilarComparisons.txt
+mv comparisons__superShrunkRc6d__cols.txt imageDifferenceRankings.txt
 # Delete the other temp files:
 rm *__superShrunkRc6d__* tmp_fx49V6cdmuFp.txt
 
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
-echo "FINIS! You may now use the image list file IMGlistByMostSimilar.txt in conjunction with e.g. any of these scripts: mkNumberedCopiesFromFileList.sh, ffmpegCrossfadeIMGsToAnimFromFileList.sh, ffmpegAnimFromFileList.sh, and maybe others. Also, the numeric closeness value that imagemagic thinks all two image pairs of all the images have is in IMGlistByMostSimilarComparisons.txt, which may also be useful for scripting."
+echo "FINIS! Results are in IMGlistByMostSimilar.txt and imageDifferenceRankings.txt. The former is a list sorted by approximately nearest most similar image. The latter is a list of all image comparison values. NOTE: A value approaching (or actually at!) zero (0) in the list means the compared images are near identical or are identical. A value approaching 1 (or at 1!) means they are nearly totally different (or actually opposite!) Scripts which may process these result lists: mkNumberedCopiesFromFileList.sh, ffmpegCrossfadeIMGsToAnimFromFileList.sh, ffmpegAnimFromFileList.sh, and maybe others."
