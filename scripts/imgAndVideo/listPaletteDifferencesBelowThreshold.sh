@@ -21,7 +21,7 @@ rankings=$(<paletteDifferenceRankings.txt)
 			counter=0		# code associated with this variable is to print updates every 15 loops.
 for element in ${rankings[@]}
 do
-			counter=$((counter + 1)); mod=$((counter % 15)); if [[ $mod -eq 0 ]]; then printf "Examining $element . . ."; fi
+			counter=$((counter + 1)); mod=$((counter % 15)); if [[ $mod -eq 0 ]]; then printf "Examining $element . . .\n"; fi
 	compareVal=`echo $element | sed "s/^\([^|]*\).*/\1/"`
 	if (( $(echo "$compareVal <= $threshold" | bc -l) ));
 	then
