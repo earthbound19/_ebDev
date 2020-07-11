@@ -16,10 +16,12 @@ if [ ! "$1" ]; then printf "\nNo parameter \$1 (similarity threshold float betwe
 # blank result list if it exists/create new one before writing values in the following loop:
 printf "" > paletteDifferencesBelowThreshold.txt
 # Make array from list in file and parse it in a loop:
-files=$(<paletteDifferenceRankings.txt)
+rankings=$(<paletteDifferenceRankings.txt)
 
-for element in ${files[@]}
+			counter=0		# code associated with this variable is to print updates every 15 loops.
+for element in ${rankings[@]}
 do
+			counter=$((counter + 1)); mod=$((counter % 15)); if [[ $mod -eq 0 ]]; then printf "Examining $element . . ."; fi
 	compareVal=`echo $element | sed "s/^\([^|]*\).*/\1/"`
 	if (( $(echo "$compareVal <= $threshold" | bc -l) ));
 	then
