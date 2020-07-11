@@ -21,6 +21,7 @@ do
 			# echo size of arr for inner loop is ${#allHexplts_innerLoop[@]}
 	for j in ${allHexplts_innerLoop[@]}
 	do
+		echo "Comparing $i and $j . . ."
 		deltaE=`python $comparePyScriptFullPath $i $j`
 		# OY! :
 		comparisonLogString="$deltaE""|""$i""|""$j"
