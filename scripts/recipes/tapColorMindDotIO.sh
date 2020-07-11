@@ -25,25 +25,5 @@ allPalettesCompareCIECAM02.sh
 
 listPaletteDifferencesBelowThreshold.sh $deletePalettesBelowDifferenceThreshold
 
-arrayOfFilesToDelete=(`sed 's/.*|\(.*\)/\1/g' paletteDifferencesBelowThreshold.txt`)
+deletePalettesDifferentBelowThreshold.sh
 
-NumberOfFilesInArray=${#arrayOfFilesToDelete[@]}
-
-if [ ! -d tmp_colorMindSort_AYXqmYHefxMYzD ]; then mkdir tmp_colorMindSort_AYXqmYHefxMYzD; fi
-
-for element in ${arrayOfFilesToDelete[@]}
-do
-	# echo element $element
-	fileNameNoExtension=${element%.*}
-	# only move to target dir if file does not exist there:
-	if [ ! -e "./tmp_colorMindSort_AYXqmYHefxMYzD/$element" ]
-	then
-		mv ./$element ./tmp_colorMindSort_AYXqmYHefxMYzD/
-	fi
-	if [ ! -e "./tmp_colorMindSort_AYXqmYHefxMYzD/$fileNameNoExtension.png" ]
-	then
-		mv ./$fileNameNoExtension.png ./tmp_colorMindSort_AYXqmYHefxMYzD
-	fi
-done
-
-echo "DONE. Have moved $NumberOfFilesInArray palettes and coressponding PNG palette renders below similarity threshhold $deletePalettesBelowDifferenceThreshold into temp dir tmp_colorMindSort_AYXqmYHefxMYzD. Examine them, and if you wish to, delete them. (If you delete them, you may also want to delete paletteDifferencesBelowThreshold.txt, as that would be outdated after the delete. Also, you may wish to manually run allPalettesCompareCIECAM02.sh again, because the file it created, paletteDifferenceRankings.txt, would be outdated with those files gone."
