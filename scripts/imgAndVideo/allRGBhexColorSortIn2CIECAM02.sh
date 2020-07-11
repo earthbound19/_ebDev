@@ -3,7 +3,7 @@
 
 # USAGE
 # With more than one .hexplt file in your current directory, and RGBhexColorSortInCIECAM02.py either in your PATH or a copy of it in the current directory, and with this script also in your PATH or the current directory, invoke this script:
-# ./allRGBhexColorSortIn2CIECAM02.sh
+#  allRGBhexColorSortIn2CIECAM02.sh
 
 
 # CODE
