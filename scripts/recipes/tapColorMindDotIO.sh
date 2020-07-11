@@ -5,13 +5,13 @@
 # Hack the global values right after the CODE comment per your want. Then invoke the script:
 #  fetch_and_render_Ncolormind_palettes.sh
 # NOTES
-# To remove palettes for which you manually delete a rendered PNG (because you don't want the palette), see listUnmatchedExtensions.sh or pruneByUnmatchedExtension.sh.
+# - For palette comparison that uses an advanced color model, see paletteCompareCIECAM02.py.
+# - To remove palettes for which you manually delete a rendered PNG (because you don't want the palette), see listUnmatchedExtensions.sh or pruneByUnmatchedExtension.sh.
 
 
 # CODE
 numberOfPalettesToGet=42
-# deletePalettesAboveSimilarityThreshhold 0.43		# for ~1,000 palettes
-deletePalettesAboveSimilarityThreshhold=0.31		# for ~40 palettes
+deletePalettesBelowDifferenceThreshold=0.126
 
 echo "Will obtain, compare and possibly delete similar palettes from $numberOfPalettesToGet palettes."
 
@@ -21,22 +21,29 @@ allRGBhexColorSortIn2CIECAM02.sh
 
 renderAllHexPalettes-gm.sh NULL 250 NULL 5
 
-imgsGetSimilar.sh png
+allPalettesCompareCIECAM02.sh
 
-listIMGsMostSimilarAboveThreshold.sh $deletePalettesAboveSimilarityThreshhold
+listPaletteDifferencesBelowThreshold.sh $deletePalettesBelowDifferenceThreshold
 
-arrayOfFilesToDelete=(`sed 's/.*|\(.*\)/\1/g' IMGlistSimilarComparisonsAboveThreshold.txt`)
+arrayOfFilesToDelete=(`sed 's/.*|\(.*\)/\1/g' paletteDifferencesBelowThreshold.txt`)
 
 NumberOfFilesInArray=${#arrayOfFilesToDelete[@]}
 
-mkdir tmp_colorMindSort_AYXqmYHefxMYzD
+if [ ! -d tmp_colorMindSort_AYXqmYHefxMYzD ]; then mkdir tmp_colorMindSort_AYXqmYHefxMYzD; fi
+
 for element in ${arrayOfFilesToDelete[@]}
 do
-	mv ./$element ./tmp_colorMindSort_AYXqmYHefxMYzD/
+	# echo element $element
 	fileNameNoExtension=${element%.*}
-	mv ./$fileNameNoExtension.hexplt ./tmp_colorMindSort_AYXqmYHefxMYzD
+	# only move to target dir if file does not exist there:
+	if [ ! -e "./tmp_colorMindSort_AYXqmYHefxMYzD/$element" ]
+	then
+		mv ./$element ./tmp_colorMindSort_AYXqmYHefxMYzD/
+	fi
+	if [ ! -e "./tmp_colorMindSort_AYXqmYHefxMYzD/$fileNameNoExtension.png" ]
+	then
+		mv ./$fileNameNoExtension.png ./tmp_colorMindSort_AYXqmYHefxMYzD
+	fi
 done
 
-rm IMGlistSimilarComparisonsAboveThreshold.txt
-
-echo "DONE. Have moved $NumberOfFilesInArray palettes and coressponding PNG palette renders above similarity threshhold $deletePalettesAboveSimilarityThreshhold into temp dir tmp_colorMindSort_AYXqmYHefxMYzD. Examine them and if you wish delete them. Also, you may wish to manually run imgsGetSimilar.sh, because the file it created, IMGlistByMostSimilar.txt, would be outdated with those files gone."
+echo "DONE. Have moved $NumberOfFilesInArray palettes and coressponding PNG palette renders below similarity threshhold $deletePalettesBelowDifferenceThreshold into temp dir tmp_colorMindSort_AYXqmYHefxMYzD. Examine them, and if you wish to, delete them. (If you delete them, you may also want to delete paletteDifferencesBelowThreshold.txt, as that would be outdated after the delete. Also, you may wish to manually run allPalettesCompareCIECAM02.sh again, because the file it created, paletteDifferenceRankings.txt, would be outdated with those files gone."
