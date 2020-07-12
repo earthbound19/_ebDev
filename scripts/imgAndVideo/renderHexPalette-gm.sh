@@ -83,18 +83,20 @@ fi
 # $4 is across. If $4 is not specified, do some math. Otherwise use $4:
 if [ ! $4 ]
 then
-	# Get number of lines (colors). Square root of that x2 will be the number of columns in the rendered palette:
-	# Works around potential incorrect line count; re: https://stackoverflow.com/a/28038682/1397555 :
-# echo attempting awk command\:
-# echo "awk 'END{print NR}' $hexColorSrcFullPath"
-	# numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
+	# Get number of lines (colors). The following awk command works around potential incorrect line count; re: https://stackoverflow.com/a/28038682/1397555 :
 	numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
-			# echo number of colors found in $paletteFile is $numColors.
-	sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
-			# echo sqrtOfColorCount is $sqrtOfColorCount \(first check\)
-	tilesAcross=$(( $sqrtOfColorCount * 2 ))
-else
-	tilesAcross=$4
+	# If number of colors is above N (12?), try to render a ~2:1 aspect palette (columns will be the square root of the number of colors, x2). If it is N or below, render only one row, with as many columns as there are colors.
+	N=12
+	if [[ $numColors -le $N ]]
+	then
+		printf "\nAt $numColors, number of colors in palette is $N or less; will render only one row of that many colors."
+		tilesAcross=$numColors
+	else
+		printf "\nAt $numColors, number of colors in palette is greater than $N; will calculate rows and columns to try to render a ~2:1 aspect palette."
+		sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
+		tilesAcross=$(( $sqrtOfColorCount * 2 ))
+	fi
+	printf "\ntilesAcross is $tilesAcross.\n"
 fi
 # echo tilesAcross is $tilesAcross\.
 
