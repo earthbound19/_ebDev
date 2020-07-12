@@ -2,7 +2,7 @@
 # Installs all the Python modules I commonly use.
 
 # USAGE
-#  ./installUsedPythonModules.sh
+#  installUsedPythonModules.sh
 
 
 # CODE

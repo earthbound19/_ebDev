@@ -4,7 +4,7 @@
 
 # USAGE
 # Pass this script one parameter, being the file type to generate a subfolder of numbered hardlinks to; e.g.:
-#  ./genRHS.sh png
+#  genRHS.sh png
 # OPTIONAL: pass anything as a second parameter, and this script will randomly shuffle the list of files (of the given extension) before generating numbered hardlinks.
 
 

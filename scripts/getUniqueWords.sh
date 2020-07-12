@@ -3,7 +3,7 @@
 
 # USAGE
 # Pass this script the name of a text file which you want to filter unique words from, e.g.:
-#  ./getUniqueWords.sh gibberwords.txt
+#  getUniqueWords.sh gibberwords.txt
 
 
 # CODE

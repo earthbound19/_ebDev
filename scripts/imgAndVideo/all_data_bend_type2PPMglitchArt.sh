@@ -5,7 +5,7 @@
 # USAGE: invoke this script with these parameters:
 # $1 file type to operate on (e.g. .dat, bug give the parameter as just dat)
 # Example:
-#  ./all_data_bend_type2PPMglitchArt.sh txt
+#  all_data_bend_type2PPMglitchArt.sh txt
 
 # TO DO
 # Check if target file exists and do not overwrite if it does.

@@ -3,7 +3,7 @@
 
 # USAGE
 # Call this script with one parameter $1, being a file type in the directory from which you run this script--a file type for which all thing whom what this yes you wish to convert to Adobe digital negatives format (.dng), e.g.:
-#  ./all_imgType2dng.sh CR2
+#  all_imgType2dng.sh CR2
 
 
 # CODE

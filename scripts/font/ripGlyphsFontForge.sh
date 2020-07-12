@@ -9,12 +9,12 @@
 # $1 the input font file name
 # $2 the output format for ripped glyphs
 # For example:
-#  ./ripGlyphsFontForge.sh inFontFile.ttf eps
+#  ripGlyphsFontForge.sh inFontFile.ttf eps
 # NOTES
 # A way to get fontforge must in your %PATH% is to run fontforge-console.bat from the install directory of fontforge. Then, to get into the directory you want to work in:
 # cd "/path/to/working/directory"
 # -- and then type e.g.:
-#   /path/to/ripGlyphsFontForge.sh inFontFile.tff eps
+#  path/to/ripGlyphsFontForge.sh inFontFile.tff eps
 # --Where inFontFile.ttf is the font file name to extract glyphs from, and eps is the output format for ripped glyphs.
 # ALSO NOTE that ripGlyphs.pe and the font file must both be in your %PATH% and/or working directory. Maybe. I just copy the files I want to work on into the fontforge directory temporarily, then copy out the results and clean up.
 

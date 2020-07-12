@@ -3,7 +3,7 @@
 
 # USAGE
 # Pass one parameter, being another path, e.g.:
-#  ./deleteDuplicateFileNamesAtOtherFolder.sh /c/whydothosefilesexist/there
+#  deleteDuplicateFileNamesAtOtherFolder.sh /c/whydothosefilesexist/there
 
 
 # CODE

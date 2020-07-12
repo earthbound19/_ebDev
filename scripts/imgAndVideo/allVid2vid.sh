@@ -3,7 +3,7 @@
 
 # USAGE
 # Invoke this script with two paramaters, the first being the source format and the second being the target, e.g.:
-#  ./allVid2vid.sh mov mp4
+#  allVid2vid.sh mov mp4
 # ALSO, see the "ADDITIONAL PARAMTERS" comment section.
 
 # DEPENDENCIES

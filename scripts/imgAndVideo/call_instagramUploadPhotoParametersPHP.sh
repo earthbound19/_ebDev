@@ -14,7 +14,7 @@
 # $2 image file name to upload thereto, which image must be in your current PATH
 # $3 caption for photo (surrounded by double quotes)
 # -- e.g.:
-#  ./call_instagramUploadPhotoParametersPHP.sh earthbound.io ./_EXPORTED_M_variantWork_00099_FFsideToside_v02_PZ-8280x.jpg
+#  call_instagramUploadPhotoParametersPHP.sh earthbound.io ./_EXPORTED_M_variantWork_00099_FFsideToside_v02_PZ-8280x.jpg
 # NOTES
 # This script provides the password parameter to UploadPhotoParameters.php via a text file (which text file you should keep secure in your home path, and out of any repository!), ~/instagramPassword.txt -- ALSO NOTE that the /examples subdir of the Instagram-API repository must be in your PATH, as this script searches for one file UploadPhotoParameters.php in your path, and cds into that directory, AND LASTLY NOTE (or is this still true--? check and document here) that owing to something butchering captions here, the caption parameter will be blanked out in this script until that is fixed.
 

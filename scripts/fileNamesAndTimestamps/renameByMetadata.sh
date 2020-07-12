@@ -8,7 +8,7 @@
 
 # USAGE
 # Invoke from a directory with media files you wish to so rename, e.g.:
-#  ./renameByMetadata.sh
+#  renameByMetadata.sh
 
 # KNOWN ISSUES
 # THIS MAY NOT PERFECTLY segregate by creation date metadata type; it potentially renames many files twice (first by creation date metadata, then dateTimeOriginal metadata). ALSO, for files from some sources mixed with others (something doing with dateTimeOriginal metadata in one jpg source and not another?) it may loop endlessly . . .
