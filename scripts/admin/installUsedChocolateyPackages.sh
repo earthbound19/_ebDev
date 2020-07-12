@@ -10,7 +10,7 @@ echo "EXCEPT THAT I'm not getting chocolatey to install anything on Windows 7 :(
 exit
 
 # Modify the array of packages per your wants. Then, run this script:
-#  ./installUsedChocolateyPackages.sh
+#  installUsedChocolateyPackages.sh
 
 # CODE
 chocolateyPackages=" \

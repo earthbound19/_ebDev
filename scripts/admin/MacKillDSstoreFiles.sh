@@ -2,7 +2,7 @@
 # Wipes all the silly .DS_Store metadata files from the MacOS drive. It can take forever. SEE ALSO macDevSetup.sh to set a preference to not write .DS_Store metadata files on network drives.
 
 # USAGE
-#  ./MacKillDSstoreFiles.sh
+#  MacKillDSstoreFiles.sh
 
 
 # CODE

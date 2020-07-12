@@ -6,7 +6,7 @@
 # - $1 the width of the grid to create (default 19
 # - $2 the height (default 9). It will produce a random $1x$2 collage of images from the ./selected directory. Except it won't. At this writing.
 # Example command:
-#  ./ copyNrandomFilesToTemp.sh 8 4
+#   copyNrandomFilesToTemp.sh 8 4
 
 # DEPENDENCIES
 # allRandomFileNames.sh, autoMontageIM.sh

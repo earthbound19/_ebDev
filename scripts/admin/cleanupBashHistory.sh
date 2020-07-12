@@ -3,7 +3,7 @@
 
 # USAGE
 # Invoke without any parameters:
-#  ./cleanupBashHistory.sh
+#  cleanupBashHistory.sh
 # NOTE: Expects a file ~/.bash_history to contain bash history.
 
 # re: https://stackoverflow.com/a/7449399/1397555

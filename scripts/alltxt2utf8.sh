@@ -2,7 +2,7 @@
 # Converts every .txt file in the current directory and all subdirectories to unix line endings and utf8 encoding, IF they are not encoded in us-ascii. Overwrites the original files. I have no idea why I needed or coded this script. Prompts to be sure you want to when you run the script.
 
 # USAGE
-#  ./alltxt2utf8.sh
+#  alltxt2utf8.sh
 
 
 # CODE

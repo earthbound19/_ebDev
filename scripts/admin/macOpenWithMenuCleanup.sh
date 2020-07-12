@@ -2,7 +2,7 @@
 # Cleans up the MacOS "Open with" menu.
 
 # USAGE
-#  ./macOpenWithMenuCleanup.sh
+#  macOpenWithMenuCleanup.sh
 
 
 # CODE

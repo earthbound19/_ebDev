@@ -2,7 +2,7 @@
 # Installs all the brew packages I commonly use.
 
 # USAGE
-#  ./installUsedBrewPackages.sh
+#  installUsedBrewPackages.sh
 # NOTES
 # To get a list of all homebrew installed packages to back up here, run:
 # brew list -1 > installedBrewPackages.txt

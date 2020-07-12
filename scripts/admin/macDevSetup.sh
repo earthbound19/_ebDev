@@ -3,7 +3,7 @@
 
 # USAGE
 # Examine every line and uncomment what you want, and comment out what you don't want. If you don't know what every line does, don't use this script. To use it, just run it:
-#  ./macDevSetup.sh
+#  macDevSetup.sh
 # -- then follow the prompt to really aktully do things if you want (requires a password it tells you).
 
 

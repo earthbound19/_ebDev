@@ -3,7 +3,7 @@
 
 # USAGE
 # From a path in which you wish to blank all files to 0 bytes, invoke the script:
-#  ./blankAllFiles.sh
+#  blankAllFiles.sh
 
 
 # CODE

@@ -2,7 +2,7 @@
 # Force rebuilds the MacOS Spotlight index.
 
 # USAGE
-#  ./rebuildMacSpotlightIndex.sh
+#  rebuildMacSpotlightIndex.sh
 
 # CODE
 # re mdutil help (when run without any switch) :

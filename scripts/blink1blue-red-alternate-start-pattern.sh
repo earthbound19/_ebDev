@@ -2,7 +2,7 @@
 # SAVES a boot pattern to a blink1 (USB-powered LED) device via blink1-tool (Mac).
 
 # USAGE
-#  ./blink1blue-red-alternate-start-pattern.sh
+#  blink1blue-red-alternate-start-pattern.sh
 
 
 # CODE

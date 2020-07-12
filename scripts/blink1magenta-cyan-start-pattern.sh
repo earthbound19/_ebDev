@@ -5,7 +5,7 @@
 # https://github.com/todbot/blink1-tool/blob/master/scripts/blink1-patt-tst.sh
 
 # USAGE
-#  ./blink1magenta-cyan-start-pattern.sh
+#  blink1magenta-cyan-start-pattern.sh
 
 
 # CODE
