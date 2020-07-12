@@ -1,16 +1,16 @@
 # DESCRIPTION
-# Renames folders with random character strings of length n (per paramater passed to script or default 4), preserving file extension.
+# Renames all folders in the current directory (but not subfolders; non-recursive) with random characters to length $1.
 
 # USAGE
-# From a directory in which you wish to rename all sub-directories (only one level down--not recursive) to have 34 random characters (per optional parameter), invoke this script thusly:
+# Invoke with one parameter:
+# - $1 OPTIONAL. how many random characters to have in the random strings which folders will be renamed to. If not provided, a default number is used.
+# Example that will will rename all folders (non-recursive) with 34 random characters:
 #  allRandomFolderNames.sh 34
-# --where you can change that number to specify how many random characters you want in the new file name. If you don't specify any number, it defaults to 4.
 
 
 # CODE
 # GLOBAL VAR SET; if numeric parameter $1 is passed to script, set $getNrandChars to that; otherwise default it to 4:
-if [ "$1" ]; then echo parameter passed to script\; will set getNrandChars to passed value of $1.; getNrandChars="$1"; else getNrandChars=4; echo no parameter passed to script\; using default value of \4 for getNrandChars.; fi
-		# echo val of 1 is $1.
+if [ "$1" ]; then getNrandChars="$1"; echo parameter passed to script\; will set getNrandChars to passed value of $getNrandChars.; else getNrandChars=6; echo no parameter passed to script\; using default value of $getNrandChars for getNrandChars.; fi
 
 find ./* -type d > allDirs.txt
 mapfile -t array < allDirs.txt

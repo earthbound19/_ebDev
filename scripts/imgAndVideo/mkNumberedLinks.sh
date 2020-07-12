@@ -2,10 +2,13 @@
 # Creates a subdirectory of hardlinks to all files of type $1 in the current directory, the hardlinks being numbered file names (digestible e.g. by image processing scripts to create animations).
 
 # USAGE
-# Invoke this script with one paramter $1 being the file type (e.g. png) you wish to create a $fileType_links subdir full of numbered junction links for.
-
-# DEPENDENCIES
-# 'nixy environment with shuf
+# Invoke this script with these parameters:
+# - $1 the file type (e.g. png) you wish to create a $fileType_links subdir full of numbered junction links for
+# - $2 OPTIONAL. anything (for example the string 'BLAERFNOR'), which will cause the list of files of type $1 to be randomly shuffled before hardlinks of them are made. Useful to e.g. randomize the order of images in an animation if you so desire.
+# Example that will make hardlinks to all png images:
+#  mkNumberedLinks.sh png
+# Example that will do that and randomly shuffle the image list before hardlink creation:
+#  mkNumberedLinks.sh png BLAERFNOR
 
 
 # CODE
@@ -13,16 +16,6 @@
 if [ "$1" ]; then fileType=$1; else fileType=Byarnhoerfer; fi
 
 if [ -d _temp_numbered ]; then rm -rf _temp_numbered; mkdir _temp_numbered; else mkdir _temp_numbered; fi
-
-	# TESTING ONLY: create test files:
-	# for element in {1..5}
-	# do
-			# rstr=$(cat /dev/us-W5t~Gr.EJd%g.]Wvj2Zef84:^Sn0/d_zrandom | tr -dc 'a-km-zA-KM-Z2-9' | fold -w 16 | head -n 1)
-			# echo $var
-			# printf "$rstr" > testFiles/$rstr.txt
-	# done
-# cd ./testFiles
-# if [ -a links ]; then rm -d -r links; mkdir links; else mkdir links; fi
 
 arr=(`find . -maxdepth 1 -type f -iname \*.$fileType -printf '%f\n' | sort`)
 

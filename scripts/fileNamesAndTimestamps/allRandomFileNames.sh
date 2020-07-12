@@ -2,17 +2,17 @@
 # Renames files with random character strings of length n (per paramater passed to script or default 4), preserving file extension.
 
 # USAGE
-# WARNING: This will randomly rename *all files in a tree* (including subfolders) and move the renamed files to the root folder this script is invoked from. It will prompt you for a known (given) password to continue before doing so.
-# Put this script in your $PATH, and run it with these parameters:
-# - $1 the length of random characters to rename the file with. If you don't specify any number for the first parameter, it uses a default.
-# - $2 OPTIONAL. A file extension (without any . in it) to restrict random renames to. It will not rename any other file types. If this is not provided, it will rename _all_ file types in the current path.
+# WARNING: This will randomly rename all files in the current directory (non-recursive; it will not rename files in subfolders). It will keep the same file extensions (a file with a .png or .hexplt or any extension will still have that; it will just have a randomly different base file name).
+# Invoke with these parameters:
+# - $1 OPTIONAL. How many random characters to have in each file name (length of file name). If not provided, a default is used.
+# - $2 OPTIONAL. Extension of files to randomly rename. Only files with this extension will be renamed. If not provided, files of all extensions in the current directory will be randomly renamed.
 # WARNING: very bad things might happen (e.g. permanent data loss!) if you do not pass parameters as instructed here under USAGE. The script errors out for at least some scenarios to prevent that though.
 # Example command to rename all files with the extension .hexplt to 20-character random strings:
 #  allRandomFileNames.sh 20 hexplt
 
 
 # CODE
-# GLOBAL VAR SETS:
+# GLOBAL VARS SET:
 # if positional parameter 1 is passed to script, check if it is not numeric and throw an error if it is. If it is numeric, use it. If no parameter $1 is passed at all, use a default value and continue.
 if [ "$1" ]
 then
