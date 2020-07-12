@@ -11,7 +11,8 @@
 # color_growth_cgps.sh
 #  It will invoke color_growth.py repeatedly with each
 #  .cgp preset as the parameter to --LOAD_PRESET.
-# - NOTE: This is designed to run in multiple simultaneous
+# NOTES
+# - This is designed to run in multiple simultaneous
 #  batch jobs. When rendering a preset, it cretes a file
 #  named after the preset but with the .rendering extension,
 #  (it does not ever delete them; you have to). Another,
@@ -20,10 +21,7 @@
 #  finds one. This is useful for computers with many
 #  cores where you can even run multiple of this same
 #  task on one core if it's not loading the CPU too much.
-#  This may not be as elegant as if color_growth.py optionally
-#  handled that itself based on partial file name, hm.
-#  :/ TO DO? that in color_growth.py itself.
-# - ALSO NOTE that you may customize parameters by tweaking
+# - You may customize parameters by tweaking
 #  and uncommenting one of the extraParameters lines,
 #  just below (or adding your own).
 
