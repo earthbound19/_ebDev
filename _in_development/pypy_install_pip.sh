@@ -5,7 +5,7 @@
 
 ./pypy3 -m ensurepip
 ./pypy3 -m pip install --upgrade pip
-# ./pypy3 -m pip install whatever_package_name
-# ./pypy3 -m pip install whatever_package_name
-# ./pypy3 -m pip install whatever_package_name
+#  pypy3 -m pip install whatever_package_name
+#  pypy3 -m pip install whatever_package_name
+#  pypy3 -m pip install whatever_package_name
 # etc. . . .
