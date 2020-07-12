@@ -1,19 +1,28 @@
 # DESCRIPTION
-# Reads n random bytes from file y, where n is paramater $2 (number of bytes) to be passed to script, and y is paramater $1 (a file name) to be passed to script. Why? Um. Nothing practical probably. Actually, it can be hacked to randomly destroy bits on a device (drive) for whatever purposes you would want to do that for which are not malicious (I actually have such purposes--simulate hard drive corruption in a virtual machine). Something I did to thaw out after a hard work day. Writes the result to an output file randomBytes.bin
+# Copies $2 random contiguous bytes from file $1 and writes them to file $3. Could be useful for data bending / glitch art.
 
 # USAGE
-# readNrandomBytes.sh ./in.flam3 15
-# This script assumes two parameters, being $1 a file name to read and $2 how many random bytes to read from file $1 from a random position in the file.
-# ALSO: THIS SCRIPT MAY BE VERY SLUGGISH with files more than several thousand kilobytes in size.
-# To quickly make a random source file to test this with:
+# Invoke with these parameters:
+# - $1 input file name
+# - $2 how many contiguous bytes to read from random location in $1
+# - $3 file name to write them to
+# Example that reads 15 contiguous bytes from a random location in in.flam3, and writes them to flam3outFragments.bin:
+#  readNrandomBytes.sh in.flam3 15 flam3outFragments.bin
+# NOTES:
+# - THIS SCRIPT MAY BE VERY SLUGGISH with files more than several thousand kilobytes in size.
+# - To quickly make a random source file to test this with:
 # dd count=200 bs=1 obs=1 if=/dev/urandom of=random2.bin
 
-NOTE:
+# TO DO
+# - Write a script that calls this many times for a random selection of files, and assembles the results into glitch art.
 
-howManyBytesToRead=$2
-	echo howManyBytesToRead val is\:
-	echo $howManyBytesToRead
-inputFileByteSize=`stat --printf="%s" $1`
+
+# CODE
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (input file name). Exit."; exit 1; else inputFile=$1; fi
+if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many random bytes to read). Exit."; exit 1; else howManyBytesToRead=$2; fi
+if [ ! "$3" ]; then printf "\nNo parameter \$3 (output file name). Exit."; exit 1; else outputFile=$3; fi
+
+inputFileByteSize=`stat --printf="%s" $inputFile`
 			# Because we want the "size" of the file to only be itself minus how many bytes to read (to avoid reading anywhere from the end of the file backward to $howManyBytesToRead but getting the same output, which would be a statistical anomoly . . . which only obsessed coders or cryptographers care about) :
 inputFileByteSize=$(($inputFileByteSize - $howManyBytesToRead))
 	echo inputFileByteSize val is\:
@@ -22,16 +31,14 @@ skipToByte=`seq 0 $inputFileByteSize | sort -R | head -n 1`
 	echo skipToByte val is\:
 	echo $skipToByte
 
-dd count=$howManyBytesToRead bs=1 obs=1 if=$1 of=randomBytes.bin skip=$skipToByte
+dd count=$howManyBytesToRead bs=1 obs=1 if=$inputFile of=$outputFile skip=$skipToByte
 	# DANGEROUS HACK to make the above line randomly corrupt bytes on a drive:
 	# dd count=$howManyBytesToRead bs=1 obs=1 if=/dev/urandom of=/dev/hda0 skip=$skipToByte
 
 
-# NOTES
-# deprecated script from a silly similarly named script readRandomNbytes.sh :p :
-# Read n bytes from file name parameter $1 (parameter $2 specificies how many bytes). EXCEPT this doesn't do that, yet. Right now, it generates a random number in the range of how many bytes long the input file is.
-
-# __ln=( $( ls -Lon "$1" ) )
+# DEVELOPER NOTES
+# deprecated approach:
+# __ln=( $( ls -Lon "$inputFile" ) )
 # __size=${__ln[3]}
 	# echo "Size is: $__size bytes"
 # echo file size in bytes is $__size. getting random number in that range:
