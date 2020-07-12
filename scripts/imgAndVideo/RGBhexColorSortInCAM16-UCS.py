@@ -16,6 +16,7 @@
 # Example invocation with the optional third parameter, an arbitrary color to start comparisons with (here, magenta):
 #  Python RGBhexColorSortInCAM16-UCS.py inputColors.hexplt foo '#ff00ff'
 # NOTES
+# - It seems the library this uses for CAM16-UCS is slower than the library used in the other mentioned script (for CIECAM02).
 # - This expects perfect data. If there's a blank line anywhere in the
 # input file, or any other unexpected data, it may stop with an unhelpful error.
 # - This will also delete duplicate colors in the list.
