@@ -29,7 +29,7 @@
 # CODE
 # extraParameters='--WIDTH 850 --HEIGHT 180 --SAVE_PRESET False --SAVE_EVERY_N 9'
 # extraParameters='--WIDTH 1920 --HEIGHT 1080 --SAVE_PRESET False --SAVE_EVERY_N 1400'
-extraParameters='--SAVE_EVERY_N 1226'
+# extraParameters='--SAVE_EVERY_N 1226'
 # extraParameters='--SAVE_PRESET False'
 
 pathToScript=`whereis color_growth.py | sed 's/color_growth: \(.*\)/\1/g'`
