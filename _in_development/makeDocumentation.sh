@@ -7,18 +7,23 @@
 # It searches all code/script files in this directory and subdirectories for documentation comments, and collates all such comments into one large file (referenceing the source file for each comment), with the domment delimiters stripped. Results are in _ebDevDocumentation.txt
 # NOTE: that file is expected to be large and freuntly changing, so is is not stored in the repository. Periodic updates of it may be posted to s.earthbound.io/_ebDevDoc.
 
+
 # CODE
+# TO DO
+# Also include .bat, .ps, and maybe other script files.
 currentDir=`pwd`
 currentDirBasename=`basename $currentDir`
-# create array of all source code / script file names of given types in this directory and subdirectories; -printf "%P\n" removes the ./ from the front; re: https://unix.stackexchange.com/a/215236/110338 -- ALSO NOTE: if I use any printf command, it only lists findings for that associated -o option; so printf must be used for every -o; ALSO, the gsord and sed pipes sort scripts by time stamp, newest first:
+# create array of all source code / script file names of given types in this directory and subdirectories; -printf "%P\n" removes the ./ from the front; re: https://unix.stackexchange.com/a/215236/110338 -- ALSO NOTE: if I use any printf command, it only lists findings for that associated -o option; so printf must be used for every -o; ALSO, the sort and sed pipes sort scripts by time stamp, newest first:
 sourceCodeFilesArray=(` find . -type f -name '*.sh' -printf "%P\n" -o -name '*.py' -printf "%P\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 
 # BEGIN check all files for CODE comment, and warn and exit on first one that doesn't:
+printf "\nChecking if any script files lack comments that follow documentation convention . . ."
 errorFiles=()
 foundErrorFile=0
 printf "" > log_SrKw5ECDBXvyQ4M7zAeb8kVC_files_without_CODE_delimiter.txt
 for fileNameWithPath in ${sourceCodeFilesArray[@]}
 do
+	printf "\nChecking $fileNameWithPath . . ."
 	# re: https://stackoverflow.com/a/35900771/1397555
 	# prints 0 (from $?) if the word CODE is in the file; 1 if not:
 	# grep -q CODE test.txt
@@ -42,14 +47,15 @@ else
 	rm log_SrKw5ECDBXvyQ4M7zAeb8kVC_files_without_CODE_delimiter.txt
 fi
 # END check all files for CODE comment
-echo "WILL CONTINUE coding when I hae all good files to work with . . ."
-exit
+
+# Recreate documentation header before appending everything else:
+printf "The code in all of the files in this folder was either written by me or taken from public sources where there is clearly only a desire to help others and no copyright restrictions. I deed all of the works authored by me, in this folder and subfolders, to the Public Domain. Other works have their respective licenses.\n\n2015-09-04 - 2020-07-12 -RAH\n\nDOCUMENTATION COMMENTS EXTRACTED FROM SCRIPTS:" > README.md
 
 for fileNameWithPath in ${sourceCodeFilesArray[@]}
 do
+	printf "\nCollating from file $fileNameWithPath . . ."
 	printf "## $fileNameWithPath\n\n" > tmp_making_documentation_CVxfP4qT_scriptTitleSection.txt
-	# Find line number of CODE comment:
-	scriptFile="imgAndVideo/color_growth.py"
+	# find line number of CODE comment:
 	lineNumber=`awk -v search="^#[[:blank:]]*CODE$" '$0~search{print NR; exit}' $fileNameWithPath`
 	# use that line number minus one to print everything up to it to a temp file:
 	lineNumber=$(($lineNumber - 1))
@@ -60,4 +66,10 @@ do
 	sed -i 's/^[# ].//g' tmp_making_documentation_CVxfP4qT.txt
 	# strip """ docstring delimiters (Python) from start of lines:
 	sed -i 's/^"""//g' tmp_making_documentation_CVxfP4qT.txt
+	cat tmp_making_documentation_CVxfP4qT_scriptTitleSection.txt tmp_making_documentation_CVxfP4qT.txt >> README.md
+	printf "\n\n" >> README.md
 done
+
+rm tmp_making_documentation_CVxfP4qT_scriptTitleSection.txt tmp_making_documentation_CVxfP4qT.txt
+
+printf "\nDONE collating documentation from scripts. Results are in README.md."
