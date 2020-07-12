@@ -7,7 +7,7 @@
 # USAGE
 # - suppose you have two different versions of a Filter Forge user preset file (e.g. Library_14934.xml) from different machines (from the "My Presets" subfolder in the Filter Forge user data folder). If you cut and pasted all of the <element> fields of one into the other (combined all those fields), you would end up with new unique elements but a lot of duplicated elements. This script assists in eliminating the duplicate elements. Do this: 
 # - cut and paste the <presets> XML elements from one file into the other (right after all of the <element> fields of the other; combining them; we'll say we've cut and pasted them into a file named Library_14934.xml). Then run this script like this:
-# ./sort_uniq_FFXML_user_filters.sh Library_14934.xml > deduped_elements.xml
+#  sort_uniq_FFXML_user_filters.sh Library_14934.xml > deduped_elements.xml
 # - then cut and paste deduped_elements.xml over the elements in Library_14934.xml (replacing all of the <element> fields, not appending to them).
 # - copy the merged and deduplicated user presets file over the original in the "/My Presets" user folder of your Filter Forge install
 # - at this writing, Filter Forge sadly doesn't detect stale preset image caches, and goes right on using the same images even if presets were reordered/deleted/inserted outside the program, meaning that you'll get wrong thumbnails. As a workaround, delete the thumbnail data file named after the filter you deduplicate. You'll find it inin the /System/Thumbnails subfolder of the user folder for your Filter Forge install.
@@ -52,7 +52,7 @@ rm ./tmp_rSnzR26vhdi8Uy.txt
 #       <stringField>stringValue</stringField>
 #     </rec>
 #   </table>
-# </xml>
+#  xml>
 
 # Update value of an element
 # xml ed -u "/xml/table/rec[@id=1]/numField" -v 0 xml/tab-obj.xml
@@ -77,7 +77,7 @@ rm ./tmp_rSnzR26vhdi8Uy.txt
 #       <stringField>stringValue</stringField>
 #     </rec>
 #   </table>
-# </xml>
+#  xml>
 
 # Recover malformed XML document
 # xml fo -R xml/malformed.xml 2>/dev/null
@@ -86,7 +86,7 @@ rm ./tmp_rSnzR26vhdi8Uy.txt
 # <test_output>
 #    <test_name>foo</testname>
 #    <subtest>...</subtest>
-# </test_output>
+#  test_output>
 
 # Let's take a look at XSLT produced by the following 'xml sel' command:
 # 
@@ -98,7 +98,7 @@ rm ./tmp_rSnzR26vhdi8Uy.txt
 # <xsl:param name="inputFile">-</xsl:param>
 # <xsl:template match="/">
 #   <xsl:call-template name="t1"/>
-# </xsl:template>
+#  xsl:template>
 # <xsl:template name="t1">
 #   <xsl:for-each select="/xml/table/rec">
 #     <xsl:sort order="descending" data-type="number" 
@@ -106,5 +106,5 @@ rm ./tmp_rSnzR26vhdi8Uy.txt
 #     <xsl:value-of select="concat(@id,'|',numField,'|',stringField)"/>
 #     <xsl:value-of select="'&#10;'"/>
 #   </xsl:for-each>
-# </xsl:template>
-# </xsl:stylesheet>
+#  xsl:template>
+#  xsl:stylesheet>

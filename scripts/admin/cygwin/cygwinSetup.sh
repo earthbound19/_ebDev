@@ -8,13 +8,13 @@
 # this script. Comment out the line for the cygwin installer version you don't
 # want to use.
 # To run it, open the cygwin prompt, cd to this path, then run:
-# ./cygwinSetup.sh
+#  cygwinSetup.sh
 
 
 # CODE
 installParams="-q -P perl -P gcc-g++ -P make -P diffutils -P libmpfr-devel -P libgmp-devel -P libmpc-devel -P bc -P lynx -P chere"
 
-# ./Cygwin_setup-x86.exe $installParams
+#  Cygwin_setup-x86.exe $installParams
 ./Cygwin_setup-x86_64.exe $installParams
 
 # re: https://stackoverflow.com/a/12010346/1397555

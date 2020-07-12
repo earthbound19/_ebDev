@@ -3,10 +3,9 @@
 # (oldest first), then runs cat against each. Meow.
 
 # USAGE
-# Invoke with one parameter, being a filetpe (or anything else
-# find can use), without any . before the extension (for example
-# just txt) to pass repeatedly to cat (sorted by creation date
-# descending), for example:
+# Invoke with one parameter, being a filetype (or anything else you can use), without any . before the extension (for example just txt) to pass repeatedly to cat (sorted by creation date
+# descending).
+# Example:
 #  catByDate.sh txt
 # To pipe the output to a new file, invoke thusly:
 #  catByDate.sh hexplt > all_palettes.hexplt

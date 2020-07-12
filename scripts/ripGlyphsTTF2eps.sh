@@ -17,10 +17,10 @@
 # ttf2eps [-all] {-glyph num | -name name | -unicode hex | -uni hex} truetypefile
 #
 # Examples:
-# ./ttf2eps -unicode 0021 arial.ttf
+#  ttf2eps -unicode 0021 arial.ttf
 # --may produce e.g. glyph4.eps (an exclamation mark)! :)
 #
-# ./ttf2eps.exe -all Aetherfox.TTF
+#  ttf2eps.exe -all Aetherfox.TTF
 # -- will extract all glyphs from the font to .eps files named after each glyph.
 #
 # To build ttf2eps via gcc, but as of a newer version of the c file it has other dependencies I haven't wrangled into build shape:

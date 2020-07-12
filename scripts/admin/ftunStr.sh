@@ -5,9 +5,9 @@
 # USAGE
 # Invoke this script with one parameter surrounded either in double
 # or singl quotes: e.g.
-# ./ftunStr.sh "Mountain@Landscape over] Downtown'' Provo UT"
+#  ftunStr.sh "Mountain@Landscape over] Downtown'' Provo UT"
 #  OR
-# ./ftunStr.sh 'Mountain@Landscape over]"" Downtown Provo UT'
+#  ftunStr.sh 'Mountain@Landscape over]"" Downtown Provo UT'
 # To make use of the echoed result in another script by
 #  storing it in a variable, surround the call with backticks
 #  and assign it to a variable:

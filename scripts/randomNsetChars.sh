@@ -4,10 +4,10 @@
 
 # USAGE: Run this script with one parameter, being the number of characters desired,
 # and pipe the output to a text file, like this:
-# ./randomBlockCharsString.sh 800 > block_chars_art.txt
+#  randomBlockCharsString.sh 800 > block_chars_art.txt
 # The script by default prints hard newlines after 72 characters per line. To override that
 # e.g. with 60 characters, provide that as a second parameter:
-# ./randomBlockCharsString.sh 800 60 > block_chars_art.txt
+#  randomBlockCharsString.sh 800 60 > block_chars_art.txt
 # NOTE that you may alter the declaration of CHARSET to include any characters which
 # the toolset may handle (possibly Unicode), including repeating characters in CHARSET
 # to make it more likely that they will appear, for different pattern types/effects.

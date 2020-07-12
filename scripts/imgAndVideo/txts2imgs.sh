@@ -3,7 +3,7 @@
 
 # USAGE
 # With this script in your PATH, invoke it with no parameters:
-# ./texts2imgs.sh
+#  texts2imgs.sh
 
 # CODE
 array=(`find . -maxdepth 1 -type f -iname \*.txt -printf '%f\n'`)

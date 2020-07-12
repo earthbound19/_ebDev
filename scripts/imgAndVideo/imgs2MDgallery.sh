@@ -3,7 +3,7 @@
 
 # USAGE
 # Invoke this script without any parameters:
-# ./imgs2MDgallery.sh
+#  imgs2MDgallery.sh
 # (Omit the ./ if the directory which contains this script is in your PATH environment variable.)
 
 

@@ -13,7 +13,7 @@
 # other utility that reads ppms files.
 
 # USAGE:
-# ./data_bend_2PPMglitchArt00padded.sh dataSource.file
+#  data_bend_2PPMglitchArt00padded.sh dataSource.file
 # See also all_data_bend_type2PPMglitchArt.sh, which will call this script
 # against every file of a given time in a path.
 

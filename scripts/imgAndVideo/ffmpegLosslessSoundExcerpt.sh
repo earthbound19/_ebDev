@@ -3,7 +3,7 @@
 
 # USAGE
 # Invoke this script with two parameters, being $1 the file to excerpt from, $2 the seconds to start at (resulution 00:00:00.0 available) and $3 how long of a sound clip to losslessly extract (same time resolution available) from that position. If only seconds, leading zeros (00: etc) can be omitted. Example that would copy 30 seconds of sound starting at 12 seconds:
-# ./ffmpegLosslessSoundExcerpt.sh inputFile.m4a 12 30
+#  ffmpegLosslessSoundExcerpt.sh inputFile.m4a 12 30
 # NOTE: to excerpt everything after the start point, put a stupidly high number as the "how long" (third) parameter. This is a stupid kludge but it works.
 
 # REFERENCE: ffmpeg parameters: -map 0:a : operate only on input audio stream, -ss : seconds to start at, -t: duration to copy, -acodec copy: copy contents without recompression of any kind (LOSSLESS).

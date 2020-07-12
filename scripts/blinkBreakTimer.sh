@@ -17,16 +17,17 @@
 # homebrew, homebrew brightness package (Mac)
 
 # USAGE
-# Execute this script (`./macPomodoroBreakTimer.sh`) and let it
-# run in the background as you work.
-# NOTE: if you do not have a blink device, uncomment the lines with the "sleep" commands.
-# ALSO NOTE that you may alter the values under the "CHANGE THESE VALUES" comment.
-# ALSO NOTE that depending on the way timer intervals divide (if the color change interval
+# Execute this script:
+#  macPomodoroBreakTimer.sh
+# -- and let it run in the background as you work.
+# NOTES
+# - if you do not have a blink device, uncomment the lines with the "sleep" commands.
+# - you may alter the values under the "CHANGE THESE VALUES" comment.
+# - depending on the way timer intervals divide (if the color change interval
 # doesn't divide the break interval evenly), work and break periods may be a bit shorter
 # than what you tell this script.
 # WARNING
-# If you terminate this script in an inverval of screen darkness, you will be left in darkness.
-# DARKNESS, Batman. DARKNESS.
+# If you terminate this script in an inverval of screen darkness, you will be left in darkness. DARKNESS, Batman. DARKNESS.
 
 # DEVELOPER NOTES
 # `2> /dev/null` suppresses error print.

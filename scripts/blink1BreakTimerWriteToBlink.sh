@@ -6,7 +6,7 @@
 # (when it is not connected to a computer).
 
 # USAGE: with blink1-tool in your PATH (https://blink1.thingm.com/blink1-tool/), run this script:
-# ./ blink1BreakTimerWriteToBlink.sh
+#   blink1BreakTimerWriteToBlink.sh
 
 # NOTES: Even though the math here "should" produce accurate minute/second intervals, in
 # practice it doesn't. ALSO, the hard-coded math results in 1 faster flash before all the slower flash.

@@ -30,7 +30,7 @@
 # "<StrokeEvent>\r\n" is replaced with
 # "Wait: 21.082s EvType: Command CommandID: ExportLayer Idx: -1 Channels: NO Path: \"path/to/my1.png\"\r\n<StrokeEvent>\r\n".
 # NOTE: I modified that and found it works, including if you specify
-# ./this_dir or / as the folder. See yprf.ascript, but the command is:
+#  this_dir or / as the folder. See yprf.ascript, but the command is:
 # Wait: 21.082s EvType: Command CommandID: ExportLayer Idx: -1 Channels: NO Path: "./frames_anim/artRagePainting.png"
 # -- and that person's logic would not export the final frame. In my
 # opinion the ExportLayer command should be _after_ the closing tag of

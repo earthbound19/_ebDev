@@ -16,7 +16,7 @@
 # Check: is it proper or does it work to use the -IPTC:ObjectName in this script? Should that be -MWG:Description?
 # - Document workings and use; ack. or fix clunky weaknesses in design.
 # ? - Implement keyword heirarchies re: http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/MWG.html
-# */ DONE BUT MOVE TO COMMENT NEAR RELEVANT CODE: Implement self-hosted polr url shortening for looong titles/self-hosted title search URLS. e.g. like http://polr.me/w9g or http://polr.me/11q3 ; dev code that works or doesn't depending on authentication; the following are for polr_cli_polrAcct.py : C:\Python27\Lib\site-packages\polr_cli\polr_cli.py --shorten http://earthbound\.io/q -- NOTES:
+#   DONE BUT MOVE TO COMMENT NEAR RELEVANT CODE: Implement self-hosted polr url shortening for looong titles/self-hosted title search URLS. e.g. like http://polr.me/w9g or http://polr.me/11q3 ; dev code that works or doesn't depending on authentication; the following are for polr_cli_polrAcct.py : C:\Python27\Lib\site-packages\polr_cli\polr_cli.py --shorten http://earthbound\.io/q -- NOTES:
 				#	Command that looks up target of shortened link, but relies on faulty dependency:
 				# 	Python polr_cli.py --lookup w9g
 				# 	Command that does NOT work at this writing at my self-hosted Polr install:

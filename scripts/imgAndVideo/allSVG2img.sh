@@ -7,7 +7,7 @@
 # $2 the target file format e.g. png or jpg -- defaults to jpg if not provided.
 # $3 optional--see parameter $4 description in SVG2img.sh.
 # e.g.:
-# ./allSVG2img.sh 4200 png 000066
+#  allSVG2img.sh 4200 png 000066
 # NOTE: to render svgs in subdirectories as well, remove "-maxdepth 1" from the array build code line.
 
 

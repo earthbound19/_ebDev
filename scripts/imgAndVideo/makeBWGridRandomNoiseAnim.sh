@@ -12,7 +12,7 @@
 # - $4 How many such images to show per second in the output animation (which will be at 29.97 frames per second, with the input interpreted at $4 frames per second).
 # - then wait (maybe a long time).
 # NOTE: at this writing, if not always, you must manually specify the target video size hard-coded at the end fo this script (in the ffmpeg parameters).
-# ./src/[timestamp]__1MB_img_seq_representation.mp4
+#  src/[timestamp]__1MB_img_seq_representation.mp4
 
 
 # CODE
