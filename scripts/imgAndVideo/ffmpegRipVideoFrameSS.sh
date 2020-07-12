@@ -6,7 +6,7 @@
 # $1 an input video file name to grab a frame from, and
 # $2 what percent time into the video duration to grab a frame from, expressed in decimal (and allowing high decimal precision e.g. .214 -- meaningfulness of that precision (if it is actually useful at all) may depend on the video length).
 # Example:
-#  ./ffmpegRipVideoFrameSS.sh inputVideo.mp4 .86
+#  ffmpegRipVideoFrameSS.sh inputVideo.mp4 .86
 
 # KNOWN ISSUES
 # Copies the whole input video to a temp file; inefficient.

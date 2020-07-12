@@ -6,7 +6,7 @@
 
 # USAGE
 # See "DEPENDENCIES" first. Then run:
-#  ./ffmpegCrossfadeIMGsToAnimFromFileList.sh
+#  ffmpegCrossfadeIMGsToAnimFromFileList.sh
 
 # RECIPE
 # For a recipe that uses this script, see ffmpegCrossfadeIMGsToAnimFromFileList.sh in my _ebArt repository (in /recipes):

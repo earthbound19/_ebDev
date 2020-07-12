@@ -2,7 +2,7 @@
 # Makes glitch art from any data source by creating a ppm header approximating a defined image size (at this writing square) into which that data would fit; takes that image header and slaps raw copied hex value pairs (converted to decimal) into an RGB value array which composes the remainder of the PPM format file. The result may be converted to any other image format, apparently only by IrfanView (GraphicsMagick and NConvert choke on ppm files with hex values; IrfanView doesn't). SEE ALTERNATE script data_bend_2PPMglitchArt00padded.sh for a better data representation option.
 
 # USAGE
-#  ./data_bend_2PPMglitchArt.sh dataSource.file
+#  data_bend_2PPMglitchArt.sh dataSource.file
 
 # DEPENDENCIES
 # a 'nix environment including the od utility, and optionally IrfanView and img2imgNN.sh

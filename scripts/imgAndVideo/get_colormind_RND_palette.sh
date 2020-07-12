@@ -5,7 +5,7 @@
 # curl and sed from a 'nixy environment (MSYS2 on Windows may be best) to run this bash script, and the colormind API documented at: http://colormind.io/api-access/ and https://github.com/dmi3kno/colormind
 
 # USAGE
-#  ./get_colormind_RND_palette.sh
+#  get_colormind_RND_palette.sh
 # results in a new file e.g. colormind_dot_io__0C4F4F_D8CBAA_FD7A07_FC2515_720B17.hexplt, with one hex color code per line of those respective color codes in the file name itself.
 # To retrieve and render so many palettes, see USAGE in fetch_and_render_Ncolormind_palettes.sh.
 

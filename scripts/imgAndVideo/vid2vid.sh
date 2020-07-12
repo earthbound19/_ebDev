@@ -6,7 +6,7 @@
 
 # USAGE
 # Invoke this script with two paramaters, the first being the source format and the second being the target. , e.g.:
-#  ./vid2vid.sh mov mp4
+#  vid2vid.sh mov mp4
 # ALSO SEE the "ADDITIONAL PARAMETERS" comment section
 
 

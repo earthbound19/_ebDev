@@ -2,7 +2,7 @@
 # Makes a markdown gallery of remote images from a title query to the Wordpress JSON REST API.
 
 # USAGE
-#  ./WPmedia2markdownGallery.sh $1 "An image title name"
+#  WPmedia2markdownGallery.sh $1 "An image title name"
 
 # DEPENDENCIES
 # Unix-y environment, jq CLI json parser, an image in a wordpress media database (NOTE: hard-coded--TO DO--? make the WP-json URL a parameter?) bearing the same title (in metadata) which you pass this script via $1.

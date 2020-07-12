@@ -3,12 +3,12 @@
 
 # USAGE
 # To render all palettes in the current directory, invoke the script without any argument:
-#  ./renderAllHexPalettes-gm.sh
+#  renderAllHexPalettes-gm.sh
 # To recurse into all subdirectories and render all palettes in them, pass any parameter for $1:
-#  ./renderAllHexPalettes-gm.sh YORP
+#  renderAllHexPalettes-gm.sh YORP
 # To pass additional parameters, examine the positional parameters in renderHexPalette-gm.sh and position them the same here, but don't use $1 for that script here, because $1 is provided by this script as $element in a loop repeatedly calling renderHexPalette-gm.sh.
 # To NOT recurse into subdirectories but also use additional parameters, pass the keyword NULL for $1, e.g.:
-#  ./renderAllHexPalettes-gm.sh NULL 250 NULL 5
+#  renderAllHexPalettes-gm.sh NULL 250 NULL 5
 
 
 # CODE

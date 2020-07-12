@@ -16,11 +16,11 @@
 # -- see the comments in imgs2imgsNN for details.
 # EXAMPLE COMMANDS
 # Generate 3 files of randomly generated colors in a 4x2 grid:
-#  ./colorsGridFromRNDorList.sh 4 2 1
+#  colorsGridFromRNDorList.sh 4 2 1
 # Generate one hundred and seventy 16x9 pixel files of colors picked randomly from the color hex code list file rainbowHexColorsByMyEye.txt:
-#  ./colorsGridFromRNDorList.sh 16 9 170 rainbowHexColorsByMyEye.txt
+#  colorsGridFromRNDorList.sh 16 9 170 rainbowHexColorsByMyEye.txt
 # The same as the previous command, but reading colors from the list sequentially:
-#  ./colorsGridFromRNDorList.sh 16 9 170 rainbowHexColorsByMyEye.txt foo
+#  colorsGridFromRNDorList.sh 16 9 170 rainbowHexColorsByMyEye.txt foo
 
 
 # CODE

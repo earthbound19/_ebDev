@@ -3,9 +3,9 @@
 
 # USAGE
 # Invoke this script with $1 parameter, being a file name to rip layers out of and place in a /$1_layers subdir; e.g.:
-#  ./extractIMGlayersGM.sh inFile.psd
+#  extractIMGlayersGM.sh inFile.psd
 # OR, probably:
-#  ./extractIMGlayersGM.sh inFile.tif
+#  extractIMGlayersGM.sh inFile.tif
 # -- or perhaps any other supported layered file format.
 
 # NOTES

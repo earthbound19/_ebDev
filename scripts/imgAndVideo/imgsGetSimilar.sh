@@ -6,7 +6,7 @@
 
 # USAGE
 # Invoke this script with one parameter, being the file format in the current dir. to operate on, e.g.:
-#  ./imgsGetSimilar.sh png
+#  imgsGetSimilar.sh png
 # OPTIONAL: omit variable 1 to compare ALL files in current dir; will throw errors if some files are not images or valid images.
 # NOTES
 # - the comparison algorithm never compares the same image pair more than once.

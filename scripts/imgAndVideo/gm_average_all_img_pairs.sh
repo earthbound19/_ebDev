@@ -6,7 +6,7 @@
 
 # USAGE
 # Invoke without any parameters:
-#  ./gm_average_all_img_pairs.sh
+#  gm_average_all_img_pairs.sh
 
 
 # CODE

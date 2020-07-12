@@ -10,7 +10,7 @@
 
 # USAGE
 # call this script from the terminal to thusly destroy so many images e.g.:
-#  ./imgs_of_numbers.sh png "SET A"
+#  imgs_of_numbers.sh png "SET A"
 # To have global use of it, copy this script to somewhere in your $PATH, or make such a path.
 
 # CODE

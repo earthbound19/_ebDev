@@ -20,7 +20,7 @@
 # NOTES (AND THE MATH) TO REPRESENT 1 MB in a BW noise anim:
 # Use a 144x80 pixel image of black and white noise (so, 11520 squares), blown up with hard edges preserved to 1280x720. Use a series of these. Use 729 of them. = 8,398,080 squares. ~= 8,388,608, which is the number of 1s and 0s in 1 Megabyte (in the power of 2 definition; an alternate definition is by powers of 10, re: http://searchstorage.techtarget.com/definition/megabyte and https://en.wikipedia.org/wiki/Megabyte ). 1 megabyte = 1024 kilobytes, 1 kilobyte = 1024 bytes. 1024 kilobytes * 1024 bytes * 8 bits per byte = 8,388,608 bits.
 # PUTTING THAT TOGETHER, call this script thus:
-#  ./makeBWGridRandomNoiseAnim.sh 144 80 729 7 
+#  makeBWGridRandomNoiseAnim.sh 144 80 729 7 
 # TO DO
 # - Take parameters to this script to alter the following globals.
 # - Alter the scale=1280:960 vars accordingly--or wouldn't I just use e.g. 1280:-1 to maintain aspect with 1280 x pixels?

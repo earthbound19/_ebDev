@@ -11,7 +11,7 @@
 # $3 Duration of crossfade between them
 # $4 OPTIONAL. Padding, in seconds (time for images to be shown without crossfade), at start and end of video. If not specified, defaults to 4.36.
 # EXAMPLE: the following creates a video of a 7-second crossfade from one image to another, with 4.36 seconds padding before and after:
-#  ./ffmpegCrossfadeIMGsToAnim.sh inputImageOne.png inputImageTwo.png 7 4.36
+#  ffmpegCrossfadeIMGsToAnim.sh inputImageOne.png inputImageTwo.png 7 4.36
 # NOTES
 # If this script is called thus from another script:
 #  source ./ffmpegCrossfadeIMGsToAnim.sh <parameters>

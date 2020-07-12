@@ -6,7 +6,7 @@
 # $1 imageFile to perform a Google Reverse Image search for.
 # $2 How many matches or near matches of that file to download.
 # Example that searches for imageFile.png and downloads the 6 top matches:
-#  ./gorisDownloadNmatches.sh imageFile.png 6
+#  gorisDownloadNmatches.sh imageFile.png 6
 
 # NOTES
 # Because the CLI tool this wraps downloads all matches to the current directory--which could clutter up your workspace fast--this script organizes search result downloads per the echo information at the end of this script.
