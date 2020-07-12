@@ -1,7 +1,14 @@
 # DESCRIPTION
-# Creates a markdown image gallery of randomly generated color palettes. Not platform-nuetral (uses irfanview)
+# Creates a markdown image gallery of randomly generated color palettes. Not platform-nuetral (uses irfanview).
 
-# TO DO: make a directory named after the date and a random string and cd into it, then:
+# USAGE
+#  genRandomColorsGallery.sh
+
+
+# CODE
+# TO DO
+# parameterize number of images to make.
+# - make a directory named after the date and a random string and cd into it before all this other code.
 NrandomHexColorSchemes.sh 6
 allhexplt2ppm.sh
 imgs2imgsnn.sh ppm png 540

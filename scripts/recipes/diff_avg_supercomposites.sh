@@ -2,9 +2,12 @@
 # SEE diff_avg_supercomposites_nested_loop.sh. NOTE: This script repeatedly supercomposites random pairs from array A and B. A very similar script, diff_avg_supercomposites_nested_loop.sh, takes a random pair from array A and super-composites it against every image in array B.
 
 # USAGE
-# Invoke with one parameter, being how many supercomposites you want to generate by random selection from two image arrays:
-# diff_avg_supercomposites.sh 150
+# Invoke with one parameter, being how many supercomposites you want to generate by random selection from two image arrays, e.g. to make 150 of them, run:
+#  diff_avg_supercomposites.sh 150
 
+
+# CODE
+# TO DO: use the script that creates an array of image files.
 if [ -z "$1" ]; then how_many=312; echo "No paramater \$1 (how many images to make). Defaulting to $how_many."; else how_many=$1; echo "Set how_many to parameter \$1, $how_many"; fi
 
 idiff_all_img_pairs.sh

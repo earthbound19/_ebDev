@@ -1,18 +1,14 @@
 # DESCRIPTION
-# Invokes ffmpegAnim.sh against every subfolder in the current folder,
-# with hard-coded values including N second still of last frame at 
-# end (see ffmpegAnim.sh invocation line). Assumes all subfolders in 
-# the current folder contain animation frames (and you may get some 
-# wonky animations if you have other images in subfolders). Not 
-# recursive; will only work one folder level down from current folder,
-# will not work on subfolders of those. Also, renames _out.mp4 
-# result animations after containing folder of animation frames, and 
-# moves the resulting renamed .mp4 file one directory up. Moreoer, it
- # checks for the final renamed .mp4 file before invoking 
-# ffmpegAnim.sh (before rendering), and if the target file already 
-# exists it skips that render (so, you may interrupt and resume 
-# renders from this script).
+# Invokes ffmpegAnim.sh against every subfolder in the current folder, with custom hard-coded values and for a specific purpose. See NOTES under USAGE.
 
+# USAGE
+#  ffmpegAnimsDirs.sh
+# NOTES
+# This calls ffmpegAnim.sh with hard-coded values including N second still of last frame at 
+# end (see ffmpegAnim.sh invocation line). Assumes all subfolders in the current folder contain animation frames with a naming scheme as expected by ffmpegAnim.sh. Not recursive; will only work one folder level down from current folder, will not work on subfolders of those. Also, renames _out.mp4 result animations after containing folder of animation frames, and moves the resulting renamed .mp4 file one directory up. Moreoer, it checks for the final renamed .mp4 file before invoking ffmpegAnim.sh (before rendering), and if the target file already exists it skips that render (to avoid duplicating work, and also so you may interrupt and resume renders from this script).
+
+
+# CODE
 # sorts by newest first:
 directories=(`find . -maxdepth 1 -type d -printf '%f\n' | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 # the :1 in the following slices the array to omit

@@ -1,8 +1,15 @@
 # DESCRIPTION
 # Creates a markdown image gallery of randomly generated color palettes using "gray math" (where the sum of colors by additive color mixing will make a shade of white). Not platform-nuetral (uses irfanview).
 
-# Alas, the following (until I figure out how to do otherwise) must use a hard-coded full path for your platform--edit as you must! :
-python "c:\_ebdev\scripts\imgAndVideo\NrandomHexColorSchemesGrayMath.py"
+# USAGE
+#  genRandomColorsGrayMathGallery.sh
+
+
+# CODE
+# TO DO
+# parameterize number of images to make.
+pythonScriptPath=`whereis NrandomHexColorSchemesGrayMath.py | sed 's/.* \(.*\/NrandomHexColorSchemesGrayMath.py\).*/\1/g'`
+python \"$pythonScriptPath\"
 # TO DO: make a directory named after the date and a random string and cd into it, then:
 allhexplt2ppm.sh
 imgs2imgsnn.sh ppm png 540

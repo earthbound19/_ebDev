@@ -1,8 +1,11 @@
 # DESCRIPTION
-# see next_most_similar_image_anim.sh in this repo.
+# See next_most_similar_image_anim.sh in this repo.
 
+# USAGE
 # Examine comments in the scripts this recipe uses (which are at https://github.com/earthbound19/_ebDev) to get an idea what goes on here. Run the following commands and scripts as listed, adapting for your situation. At this writing, ffmpegCrossfadeIMGsToAnimFromFileList.sh has comments which may be more complete than this recipe listing of scripts.
 
+
+# CODE
 	# All images you operate on must be pngs for this to work:
 	# To render pngs from all svgs in the current directory, run:
 	# allSVG2img.sh 1080 png

@@ -1,3 +1,10 @@
-# this script will launch whatever program you give it as parameter 1, returning to the shell (not waiting on the program) and without the program terminating when you exit the shell. re: http://apple.stackexchange.com/a/133148/219513
+# DESCRIPTION
+# Launches whatever program you pass as parameter $1, and returns to the shell (and does not wait on the program), and the program does not terminate when you exit the shell.
 
+# USAGE
+# Invoke with one parameter, which is the file name of a program or script (presumed to be in your PATH) to so execute. For example, to launch web_post_color_growth.sh in a process independent of the calling shell, invoke:
+#  subshellLaunch.sh web_post_color_growth.sh
+
+# CODE
+# re: http://apple.stackexchange.com/a/133148/219513
 ($1 &)
