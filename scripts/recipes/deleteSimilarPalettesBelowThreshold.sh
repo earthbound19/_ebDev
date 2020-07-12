@@ -22,8 +22,8 @@ do
 	if [ $count != 0 ]
 	then
 		printf "\nAt least one .hexplt file found here; proceeding . . .\n"
-# TWO OPTIONS here: allRGBhexColorSortInCAM16-UCS.sh or allRGBhexColorSortIn2CIECAM02.sh; I went with the former because it sorts dark/bright better, which is an emphasis I prefer for my purposes here:
-		allRGBhexColorSortInCAM16-UCS.sh
+# TWO OPTIONS here: allRGBhexColorSortInCAM16-UCS.sh or allRGBhexColorSortIn2CIECAM02.sh; I've gone back and forth on which to use; CAM16 I had at one point thought sorted tint/shade better; now I'm not sure; it seemed to me at one point that CIECAM02 sorted hue better. I haven't re-examined that theory. allRGBhexColorSortIn2CIECAM02.sh does calculations much faster it seems:
+		allRGBhexColorSortIn2CIECAM02.sh
 		rm *.png
 		renderAllHexPalettes-gm.sh NULL 250 NULL
 		allPalettesCompareCIECAM02.sh
