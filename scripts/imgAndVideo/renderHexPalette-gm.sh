@@ -7,13 +7,12 @@
 # A file ~/palettesRootDir.txt (in your home folder) which contains one line, being a unixy path to the folder where you keep hex palette (.hexplt) files.
 
 # USAGE
-# NOTE: this script seems not to work on cygwin/windows, but it does work on Mac and probably nix' variants.
 # Invoke this script with the following parameters:
-# $1 hex color palette flat file list (input file).
-# $2 OPTIONAL. Edge length of each square tile to be composited into final image. If not provided a default is used.
-# $3 OPTIONAL. If not provided, or provided as string 'NULL' (don't use the single quote marks), the order of elements in the palette will be preserved. If provided and anything other than NULL (for example 2 or foo or 1 or 3), the script will randomly shuffle the hex color files before compositing them to one image. I have gone back and forth on requiring this in the history of this script :/
-# $4 OPTIONAL. Number of tiles accross of tiles-assembled image (columns).
-# $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).
+# - $1 hex color palette flat file list (input file).
+# - $2 OPTIONAL. Edge length of each square tile to be composited into final image. If not provided a default is used.
+# - $3 OPTIONAL. If not provided, or provided as string 'NULL' (don't use the single quote marks), the order of elements in the palette will be preserved. If provided and anything other than NULL (for example 2 or foo or 1 or 3), the script will randomly shuffle the hex color files before compositing them to one image. I have gone back and forth on requiring this in the history of this script :/
+# - $4 OPTIONAL. Number of tiles accross of tiles-assembled image (columns).
+# - $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).
 # EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, the palette image being 5 columns wide and 6 rows down, with squares in the palette rendered in random order:
 #  renderHexPalette-gm.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
 # ANOTHER EXAMPLE COMMAND; create a palette image from tigerDogRabbit_many_shades.hexplt, with each tile 300 pixels wide, no shuffling, the script deciding how many accross and down to make the tiles:
@@ -23,11 +22,11 @@
 
 
 # TO DO
-# UM. WOULDN'T THIS BE A TON FASTER creating a ppm and then upscaling it by nearest neighbor method?! Redo script (or make variant method script) for that?! -- trying that in hexplt2ppm.sh.
-# Adapt this to do double-wide half-down ratios by multiples of two, e.g. 4:2, 8:4, 16:8 etc. (not just 2:1).
-# Allow handling of a hex color on any line with or without # in front of it.
-# Allow comments in .hexplt files (decide on a parse demarker for them and ignore all whitespace before that demarker, and also ignore the demarker itself and everything after it on the line).
-# Math to determine tile size dynamically for a target total image resolution?
+# - UM. WOULDN'T THIS BE A TON FASTER creating a ppm and then upscaling it by nearest neighbor method?! Redo script (or make variant method script) for that?! -- trying that in hexplt2ppm.sh.
+# - Adapt this to do double-wide half-down ratios by multiples of two, e.g. 4:2, 8:4, 16:8 etc. (not just 2:1).
+# - Allow handling of a hex color on any line with or without # in front of it.
+# - Allow comments in .hexplt files (decide on a parse demarker for them and ignore all whitespace before that demarker, and also ignore the demarker itself and everything after it on the line).
+# - Math to determine tile size dynamically for a target total image resolution?
 
 
 # CODE
@@ -89,16 +88,17 @@ then
 	N=12
 	if [[ $numColors -le $N ]]
 	then
-		printf "\nAt $numColors, number of colors in palette is $N or less; will render only one row of that many colors."
+		# printf "\nAt $numColors, number of colors in palette is $N or less; will render only one row of that many colors."
 		tilesAcross=$numColors
 	else
-		printf "\nAt $numColors, number of colors in palette is greater than $N; will calculate rows and columns to try to render a ~2:1 aspect palette."
+		# printf "\nAt $numColors, number of colors in palette is greater than $N; will calculate rows and columns to try to render a ~2:1 aspect palette."
 		sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
 		tilesAcross=$(( $sqrtOfColorCount * 2 ))
 	fi
 	printf "\ntilesAcross is $tilesAcross.\n"
+else
+	tilesAcross=$4
 fi
-# echo tilesAcross is $tilesAcross\.
 
 # $5 is down. If $5 is not specified, do some math. Otherwise use $5.
 if [ ! $5 ]
