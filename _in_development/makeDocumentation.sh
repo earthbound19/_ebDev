@@ -10,11 +10,14 @@
 
 # CODE
 # TO DO
-# Also include .bat, .ps, and maybe other script files.
+# - have header stub in dir. up from this (/ or repo root), use that header, write all this to README.md in repo root? That will be teh many teh large file changes for git :( so:
+#  - host external and link to?
+# - add double-spaces after headers (forces markdown to place newlines after them)
+# - include .bat, .ps, and maybe other script files.
 currentDir=`pwd`
 currentDirBasename=`basename $currentDir`
 # create array of all source code / script file names of given types in this directory and subdirectories; -printf "%P\n" removes the ./ from the front; re: https://unix.stackexchange.com/a/215236/110338 -- ALSO NOTE: if I use any printf command, it only lists findings for that associated -o option; so printf must be used for every -o; ALSO, the sort and sed pipes sort scripts by time stamp, newest first:
-sourceCodeFilesArray=(` find . -type f -name '*.sh' -printf "%P\n" -o -name '*.py' -printf "%P\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+sourceCodeFilesArray=(`find . -type f -name '*.sh' -printf "%P\n" -o -name '*.py' -printf "%P\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 
 # BEGIN check all files for CODE comment, and warn and exit on first one that doesn't:
 printf "\nChecking if any script files lack comments that follow documentation convention . . ."
