@@ -22,7 +22,7 @@ do
 	count=`ls -1 *.hexplt 2>/dev/null | wc -l`
 	if [ $count != 0 ] && [ ! -e similar_palettes_deleted.txt ]
 	then
-		printf "\nAt least one .hexplt file found here; proceeding . . .\n"
+		printf "\nAt least one .hexplt file found here OR log file similar_palettes_deleted.txt not found; proceeding . . .\n"
 # TWO OPTIONS here: allRGBhexColorSortInCAM16-UCS.sh or allRGBhexColorSortIn2CIECAM02.sh; I've gone back and forth on which to use; CAM16 I had at one point thought sorted tint/shade better; now I'm not sure; it seemed to me at one point that CIECAM02 sorted hue better. I haven't re-examined that theory. allRGBhexColorSortIn2CIECAM02.sh does calculations much faster it seems:
 		allRGBhexColorSortIn2CIECAM02.sh
 			# OPTIONAL count of lines in each hexplt (check if their data ended up ok after that sort) :
