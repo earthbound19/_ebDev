@@ -1,9 +1,9 @@
 # DESCRIPTION
-# Helps eliminate palettes (.hexplt files) in a collection which are perceptually similar (technically and logically: not very different below a threshold). Does this with a custom loop in this script, using other scripts also. See details under NOTES.
+# I know, the name of this script file is very long. This script helps eliminate palettes (.hexplt files) in all subfolders of the current folder (but not palettes in the folder itself) which are perceptually similar (technically and logically: not very different below a threshold). Does this with a custom loop in this script, using other scripts also. To understand all how this works, you must examine the DESCRIPTION and USAGE etc. comments of all the scripts which this script invokes.
 
 # USAGE
 # Hack the global value right after the CODE comment per your want. Then invoke the script:
-#  deleteSimilarPalettesBelowThreshold.sh
+#  intraPaletteSortByNextMostSimilarAndDeleteSimilarPalettes.sh
 # NOTES
 # - When this script completes work of removing similar palettes from a directory, it places a log file named similar_palettes_deleted.txt in that directory. Before working in any directory, it checks for that file, and if it exists, the script skips working in that directory. This allows breaking and resuming run of this script.
 # - To remove palettes for which you manually delete a rendered PNG (because you don't want the palette), see listUnmatchedExtensions.sh or pruneByUnmatchedExtension.sh.
