@@ -1,38 +1,21 @@
 # DESCRIPTION
-This repository was previously entitled _devtools.
 
-A collection of scripts (most of them developed by me) which I use for development of many kinds--at this writing, mostly visual art development on Windows. It heavily relies on various 'nix/cygwin utilities, which at this writing you can obtain via a URL provided later in this document.
+A collection of scripts etc., the vast majority developed by me (`earthbound19`/RAH), which I use mostly for creative coding, (and/or generative / new media art), mostly on Windows.
 
-# LICENSE
-Everything in this repository which I have created, I dedicate to the Public Domain, unless comments in or near any code state otherwise.
 
-I believe that everything not created by me in this archive is at least freely available and open source. If you are the copyright owner of anything in this archive and wish for it to be removed, please contact me and I will do so.
+# USAGE etc.
 
-[http://earthbound.io/contact](http://earthbound.io/contact "http://earthbound.io/contact")
+Technical information on this repository, including installation and usage details for it and all of the scripts in it, are available in a collated superdocument at my website in various formats:
 
-09/02/2015 07:29:00 PM -RAH
+[Markdown](https://earthbound.io/data/doc/_ebDev/_ebDev_Documentation.md) - [HTML](https://earthbound.io/data/doc/_ebDev/_ebDev_Documentation.html) - [PDF](https://earthbound.io/data/doc/_ebDev/_ebDev_Documentation.pdf) - [Open Document Text](https://earthbound.io/data/doc/_ebDev/_ebDev_Documentation.odt) - [Word](https://earthbound.io/data/doc/_ebDev/_ebDev_Documentation.docx)
 
-# INSTALLATION AND USAGE
 
-Horrible kludge note: for these scripts to work on Windows you may need to rename Cygwin's find.exe to gfind.exe (I _think_ it works the same way as gfind from brew GNU coreutils on Mac?)
+## LICENSE
+Everything in this repository which I have created I dedicate to the Public Domain, unless comments in or near any code state otherwise.
 
-## _ebSuperBin dependencies
-- From a cygwin (or adapt for another 'nixy environment on Windows, or for similar utilities on a Mac) run the following command:
-    <!-- DEPRECATED but of potential future use (e.g. to grab the most current release): -->
-    <!-- apt-cyg install p7zip -->
-    <!-- wget http://earthbound.io/dist/_ebSuperBin.7z -->
-    <!-- p7zip -d ./_ebSuperBin.7z -->
-- `git clone https://github.com/earthbound19/_ebSuperBin.git` --which will give you an ./_ebSuperBin folder.
-    <!-- ALSO DEPRECATED but of potential future use: -->
-    <!-- OR instead of wget use curl: -->
-    <!-- apt-cyg install curl -->
-    <!-- curl http://earthbound.io/dist/_ebSuperBin.7z -->
-- Windows: clone and make use of _setBinBaths.bat from https://github.com/earthbound19/_ebPathMan, which will permanently modify your path to include all relevant paths in this archive.
-Windows and/or 'nixy environments: OR examine and use getDevEnv.sh per the comments therein.
+I believe that everything not created by me in this archive is at least freely available and open source. If you have copyright control of anything in this archive and wish for it to be removed, please contact me and I will do so: [http://earthbound.io/contact](http://earthbound.io/contact "http://earthbound.io/contact")
 
-NOTE that the tools and scripts in this repository are subject to high flux, because I edit and develop them as I use them, and/or because I freely add or remove utilities from this archive.
 
-## ARCHIVE HISTORY
-- 03/13/2016 04:20:39 PM Dramatically expanded/reorganized to include a lot more that I'm using, and have developed and/or moved. -RAH
-- 09/02/2015 08:42:48 PM This was initially a project of only font development scripts. I upgraded it to be a repository of executables and scripts I use (and wrote). -RAH
-- Late 2017 after scrapping this as a repo on account it was way too fat, discovered git lfs and resurrected repo, with lfs integration.
+## NOTE
+
+This repository was previously titled `\_devtools`.
