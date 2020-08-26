@@ -1,4 +1,19 @@
-duration=5
+# DESCRIPTION
+# Makes a video of a random color accompanied by a random sound pitch. Because you might want to drive someone insane, or because what is life and what is art and why are you doing this and what is life and what is art and why are you doing this.
+
+# USAGE
+# Run with one optional parameter, which is a decimal duration in seconds which will be the duration of the generated video, e.g.:
+#    RNDcolorAndPitchVid.sh 0.68
+# If you pass no parameter, it defaults to a hard-coded value.
+
+
+# CODE
+if [ "$1" ]
+then
+	duration=$1
+else
+	duration=5
+fi
 
 # Generate input video animation of random still color:
 hexColor=`cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6`
@@ -7,7 +22,7 @@ ffmpeg -y -f lavfi -i color=$hexColor:s=1280x720:d=$duration -codec:v utvideo rg
 frequency=`echo "scale=2; ($RANDOM * 571.94 / 32767) + 87.31" | bc`
 ffmpeg -y -f lavfi -i "sine=frequency=$frequency:duration=$duration" "$frequency"Hz_"$duration"s.wav
 
-# DEPRECATE? ; handle in another script? : mux the two into one .mp4, then dispose of the input files:
+# Mux the two into one .mp4, then dispose of the input files:
 ffmpeg -i rgb_0x"$hexColor"_"$duration"s.avi -i "$frequency"Hz_"$duration"s.wav -crf 38 rgb_0x"$hexColor"_and_"$frequency"Hz_"$duration"s.mp4
 rm rgb_0x"$hexColor"_"$duration"s.avi "$frequency"Hz_"$duration"s.wav
 

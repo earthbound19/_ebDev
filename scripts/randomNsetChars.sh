@@ -1,26 +1,17 @@
-# DESCRIPTION: returns approximately N ($1) characters randomly chosen from hackable
-# string CHARSET. If parameter 1 not provided, a default number is used. DEPRECATED; use
-# randomNsetChars.py instead: it is far faster, can write to files, and produces unique subsets.
-
-# USAGE: Run this script with one parameter, being the number of characters desired,
-# and pipe the output to a text file, like this:
-# ./randomBlockCharsString.sh 800 > block_chars_art.txt
-# The script by default prints hard newlines after 72 characters per line. To override that
-# e.g. with 60 characters, provide that as a second parameter:
-# ./randomBlockCharsString.sh 800 60 > block_chars_art.txt
-# NOTE that you may alter the declaration of CHARSET to include any characters which
-# the toolset may handle (possibly Unicode), including repeating characters in CHARSET
-# to make it more likely that they will appear, for different pattern types/effects.
-# ALSO NOTE that the script by default alters the CHARSET string to be a random subset
-# of itself (and thereby randomly change the character of output). To use use the full
-# set without alteration, find and comment out the OPTIONAL code block.
-# ALSO, see DEPENDENCIES:
+# DESCRIPTION
+# Returns approximately N ($1) characters randomly chosen from hackable string CHARSET. If parameter 1 not provided, a default number is used. DEPRECATED; use randomNsetChars.py instead: it is far faster, can write to files, and produces unique subsets.
 
 # DEPENDENCIES
-# A 'nixy environment with seq, shuf, and printf, printf and your file system able to handle
-# the block characters or whatever else you might hack into CHARSET.
+# A 'Nixy environment with seq, shuf, and printf, printf and your file system able to handle the block characters or whatever else you might hack into CHARSET.
 
-# LICENSE: I wrote and deed this to the Public Domain 05/04/2016 12:22:51 PM -RAH
+# USAGE
+# Run this script with one parameter, which is the number of characters desired, and pipe the output to a text file, like this:
+#    randomBlockCharsString.sh 800 > block_chars_art.txt
+# The script by default prints hard newlines after 72 characters per line. To override that e.g. with 60 characters, provide that as a second parameter:
+#    randomBlockCharsString.sh 800 60 > block_chars_art.txt
+# NOTES
+# - You may alter the declaration of CHARSET to include any characters which the toolset may handle (possibly Unicode), including repeating characters in CHARSET to make it more likely that they will appear, for different pattern types/effects.
+# - The script by default alters the CHARSET string to be a random subset of itself (and thereby randomly change the character of output). To use use the full set without alteration, find and comment out the OPTIONAL code block.
 
 
 # CODE
@@ -28,11 +19,11 @@
 if [ "$1" ]; then N_CHARS_TO_GENERATE=$1; else N_CHARS_TO_GENERATE=1024; fi
 if [ "$2" ]; then HARD_NEWLINE_AT_CHARACTER=$2; else HARD_NEWLINE_AT_CHARACTER=72; fi
 
-# COULD USE: BOX DRAWING unicode block set, re: https://en.wikipedia.org/wiki/Box_Drawing_(Unicode_block)
+# COULD USE: BOX DRAWING Unicode block set, re: https://en.wikipedia.org/wiki/Box_Drawing_(Unicode_block)
 # ─━│┃┄┅┆┇┈┉┊┋┌┍┎┏┐┑┒┓└┕┖┗┘┙┚┛├┝┞┟┠┡┢┣┤┥┦┧┨┩┪┫┬┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏═║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬╭╮╯╰╱╲╳╴╵╶╷╸╹╺╻╼╽╾╿
 # A SUBSET OF THAT WHICH I MAY LIKE: ┈┉┊┋┌└├┤┬┴┼╌╍╎╭╮╯╰╱╲╳╴╵╶╷
 #
-# OR: GEOMETRIC SHAPES unicode block:
+# OR: GEOMETRIC SHAPES Unicode block:
 # ■□▢▣▤▥▦▧▨▩▪▫▬▭▮▯▰▱▲△▴▵▶▷▸▹►▻▼▽▾▿◀◁◂◃◄◅◆◇◈◉◊○◌◍◎●◐◑◒◓◔◕◖◗◘◙◚◛◜◝◞◟◠◡◢◣◤◥◦◧◨◩◪◫◬◭◮◯◰◱◲◳◴◵◶◷◸◹◺◻◼◽◾◿
 # A SUBSET OF THAT WHICH I MAY LIKE: ▲△◆◇○◌◍◎●◜◝◞◟◠◡◢◣◤◥◸◹◺◿◻◼
 #
@@ -85,12 +76,9 @@ do
   printf "\n"
 done
 
-# DEV HISTORY:
-# - 05/04/2016 12:37:50 PM -RAH Created after seeing these interesting characters in an .nfo;
-# coincidentally, just such blocky "noise" suited for what I had wanted at that moment to make!
-# - 10/04/good buddy/2016 12:15 PM on lunch at work -RAH updated to find the path of this dir,
-# store it in THIS_SCRIPTS_PATH, and invoke it locally to actually make use of blockstring.txt
-# - 2019-12-13 09:31 PM Friday completely refactored to use a hard-coded, in-script character
-# string which can be hacked for any purpose (to use different characters). Also included
-# possible other character references (ha ha) in comment, and an optional code block that alters
-# the character set to a random subset of itself (code block commited as used; can be commented out).
+
+# DEV HISTORY
+# - 2016-05-04 Created after seeing these interesting characters in an .nfo; coincidentally, just such blocky "noise" suited for what I had wanted at that moment to make!
+# - 2016-10-04 Good buddy on lunch at work updated to find the path of this dir,
+# store it in THIS_SCRIPTS_PATH, and run it locally to actually make use of blockstring.txt
+# - 2019-12-13 Completely refactored to use a hard-coded, in-script character string which can be hacked for any purpose (to use different characters). Also included possible other character references (ha ha) in comment, and an optional code block that alters the character set to a random subset of itself (code block committed as used; can be commented out).

@@ -1,20 +1,35 @@
-# USAGE
-# Invoke this script with one parameter:
-# $1 The file list name, for which every file name in the list will have numbered copies made in a subdir. This is preparation for other scripts which must operate on numbered files.
-
-# WARNING: this script perhaps dangerously assumes all file names provided in the list have the same extension. Also, it clobbers any files that already exist when it copies (overwrites without prompt).
+# DESCRIPTION
+# From a list of image filenames suitable for ffmpeg (which file names must be in the current folder), creates numbered copies of those files in a subdirectory, from which an animation may be made, e.g. via ffmpegAnimFromFileList.sh. SEE ALSO mkNumberedLinksFromFileList.sh if you prefer to make junctions (links) instead of file copies (junctions may be faster to create).
 
 # DEPENDENCIES
-# IMGlistByMostSimilar.txt as prepared by imgsGetSimilar.sh and/or re_sort_imgsMostSimilar.sh
+# `IMGlistByMostSimilar.txt`, as prepared by `imgsGetSimilar.sh` and/or `re_sort_imgsMostSimilar.sh`.
+
+# WARNINGS
+# - This script perhaps dangerously assumes all file names provided in the list have the same extension.
+# - It also clobbers any files that already exist when it copies (overwrites without prompt).
+# KNOWN ISSUE
+# - On copy of the list, it overwrites the last image with the second-to-last.
 
 # USAGE
-# TO DO
-# - detail usage
-# - BUG FIX: on copy it is overwriting the last image with the second-to-last. ?
-# - Document how to use this script :)
+# FIRST, prepare a list of images, for example named `IMGlistByMostSimilar.txt`, as prepared by `imgsGetSimilar.sh` and/or `re_sort_imgsMostSimilar.sh`. Or manually prepare your own list with any other file name. The list must have the following layout or format:
+#    file '263.jpg'
+#    file '363.jpg'
+#    file '064.jpg'
+#    file '145.jpg'
+# This format is suitable for ffmpeg.
+# Run with one OPTIONAL parameter, which is the file name of any such list you have prepared.
+# Example run with a file list parameter:
+#    mkNumberedLinksFromFileList.sh customImageListForAnimation.txt
+# If such a file name is not provided as the first parameter, a file list must be present in the same directory you run this script from, and the file list must be named `IMGlistByMostSimilar.txt`.
+# To run the script without the optional first parameter, you would run:
+#    mkNumberedLinksFromFileList.sh
+# The script will scan the list and make numbered file copies in a subdirectory named `_temp_numbered`. This is preparation for other scripts which must operate on numbered files.
 
 
 # CODE
+# TO DO
+# - Fix listed KNOWN ISSUE.
+
 # IF NO list file provided, assume it is IMGlistByMostSimilar.txt:
 if [ -z "$1" ]
 then
@@ -26,13 +41,13 @@ fi
 # If the _temp_numbered directory already exists, TOAST IT without warning, then recreate it; otherwise create it:
 if [ -d _temp_numbered ]; then rm -rf _temp_numbered; mkdir _temp_numbered; else mkdir _temp_numbered; fi
 
-tempStr=`ghead -n 1 $fileList`
+tempStr=`head -n 1 $fileList`
 # NOTE that this script assumes a closing apostraphe or single quote in the input file! :
 # No, the fileExt=${filename##*.} doesn't work here as there's a trailing ' to trim:
-fileNameExt=`echo $tempStr | gsed "s/.*\.\([^\.]\{1,5\}\)'.*/\1/g"`
+fileNameExt=`echo $tempStr | sed "s/.*\.\([^\.]\{1,5\}\)'.*/\1/g"`
 
 # NOTE this script assumes a list formatted for concatenation by ffmpeg, and makes a temp copy of the list removing that syntax:
-gsed "s/file '\(.*\)'/\1/g" $fileList > tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
+sed "s/file '\(.*\)'/\1/g" $fileList > tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
 dos2unix tmp_kHDcaVmKUgsZp9cvU2QezUsZ3EYHAWbqkr.txt
 
 # Because some platforms pad wc output with spaces:

@@ -1,18 +1,18 @@
 # DESCRIPTION
-# Creates .jpg (by default) files from an .svg file passed as parameter $1.
+# Creates a .jpg (by default) file from an .svg file passed as parameter $1.
 
 # USAGE
-# invoke this script with these parameters:
-# $1 REQUIRED. The svg file name to create an image from e.g. in.svg
-# $2 Longest side in pixels for rendered output image. Default 4280 if not given.
-# $3 Target file format e.g. png or jpg -- default jpg if not given.
-# $4 A hex color code (format ffffff, no pound/hex symbol) which will be used to render the svg background (if it has a transparent background). If it does not match the regex [a-f0-9]{6} (you can pass anything as this parameter), a hard-coded hex color will be used. See the BACKGROUND COLOR OPTIONS comment to hack that. IF OMMITTED, the background will be transparent.
-
-# TO DO
-# Add an rnd bg color option?
+# Run with these parameters:
+# - $1 The svg file name to create an image from e.g. in.svg
+# - $2 OPTIONAL. Longest side in pixels for rendered output image. Default 4280 if not given.
+# - $3 OPTIONAL. Target file format e.g. png or jpg -- default jpg if not given.
+# - $4 A hex color code (format ffffff, no pound/hex symbol) which will be used to render the svg background (if it has a transparent background). If it does not match the regex [a-f0-9]{6} (you can pass anything as this parameter), a hard-coded hex color will be used. See the BACKGROUND COLOR OPTIONS comment to hack that. IF OMITTED, the background will be transparent.
 
 
 # CODE
+# TO DO
+# - Add an rnd bg color option?
+# - Or rnd background choice from a hexplt file?
 
 # ==== START SET GLOBALS
 # If parameter $1 not present, notify user and exit. Otherwise use it and continue.

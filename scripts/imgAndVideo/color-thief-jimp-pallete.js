@@ -2,7 +2,7 @@
 // Intended for CLI use. Extracts dominant color and a palette of an arbitrary number of colors from an image, printing to stdout.
 
 // USAGE
-// Invoke this script with two parameters:
+// Run with two parameters:
 // process.argv[2] <./path_to_image_to_process.png>
 // process.argv[3] <number of colors to extract for palette>.
 

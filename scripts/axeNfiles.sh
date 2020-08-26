@@ -3,11 +3,13 @@
 
 # USAGE
 # with this script in your PATH:
-# axeNfiles.sh fileExtension numberOfFilesToAxePerFolder _folderPrefixName_
-# NOTE the comments which say "works on cygwin" vs. "works on Mac", and uncomment the line needed for your platform.
+#    axeNfiles.sh fileExtension numberOfFilesToAxePerFolder _folderPrefixName_
+# Observe the comments which say "works on Cygwin" vs. "works on Mac", and uncomment the line needed for your platform.
 
 
 # CODE
+# TO DO
+# Make this work cross-platform.
 
 # ====
 # BEGIN SET GLOBALS
@@ -22,7 +24,7 @@ fi
 
 if [ -z "$2" ]
 then
-	echo No axe by N files paramater \$2 passed to script\; setting to default 8\.
+	echo No axe by N files parameter \$2 passed to script\; setting to default 8\.
 	numberToAxeOn=8
 else
 	numberToAxeOn=$2; echo numberToAxeOn set to parameter \$2\, $2\.
@@ -37,7 +39,7 @@ else
 fi
 
 # Count number of files so we can figure out how many 0 columns to pad numbers with via printf:
-numberOfFiles=$(gfind . -maxdepth 1 -iname "*.$fileExt" | wc -l | tr -d ' ')
+numberOfFiles=$(find . -maxdepth 1 -iname "*.$fileExt" | wc -l | tr -d ' ')
 		echo Found $numberOfFiles files of type $fileExt.
 padToDigits=${#numberOfFiles}
 		echo Will pad numbers in folder names to $padToDigits digits.
@@ -46,7 +48,7 @@ padToDigits=${#numberOfFiles}
 
 # MAIN LOGIC
 # Adapted from and thanks to a genius breath yon; https://stackoverflow.com/a/29118145 -- for axing files in subdirs into subdirs by count, check another answer there:
-n=$((`gfind . -maxdepth 1 -iname "*.$fileExt" | wc -l`/$numberToAxeOn+1))
+n=$((`find . -maxdepth 1 -iname "*.$fileExt" | wc -l`/$numberToAxeOn+1))
 # Variables used in the coming control block to break up lines of a text file (created by and useful for other scripts) into partitioned copies of it in created subfolders:
 linesCPmultiplier=1
 linesCPStartAtMultiple=1
@@ -63,10 +65,10 @@ do
 	if [ $i == $n ]; then helpLastFolderName=$folderName; fi    # Store last folder name in variable for later help text.
 	if ! [ -d $folderName ]; then mkdir $folderName; fi
 	# WORKS ON CYGWIN:	
-	gfind . -maxdepth 1 -iname "*.$fileExt" | sort -n | head -n $numberToAxeOn | tr -d '\15\32' | xargs -i mv "{}" $folderName
+	find . -maxdepth 1 -iname "*.$fileExt" | sort -n | head -n $numberToAxeOn | tr -d '\15\32' | xargs -i mv "{}" $folderName
 		# Only do anything with IMGlistByMostSimilar.txt if it exists:
 	if [ -f ./IMGlistByMostSimilar.txt ]
-	# re: https://unix.stackexchange.com/a/47423/110338
+	# re: https://Unix.stackexchange.com/a/47423/110338
 	then
 		tail -n+$linesCPStartAtMultiple IMGlistByMostSimilar.txt | head -n$numberToAxeOn > $folderName/IMGlistByMostSimilar.txt
 		linesCPStartAtMultiple=$(( ($linesCPmultiplier * $numberToAxeOn) + 1))

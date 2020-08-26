@@ -1,25 +1,26 @@
 # DESCRIPTION
-# Converts any camera raw format image file into a .tif file via dcraw.
+# Converts (almost?) any camera raw format image file into a .tif file via dcraw. See NOTES for a command to quickly extract any embedded thumbnails.
 
 # DEPENDENCIES
-# dcraw
+#    dcraw
 
 # USAGE
-# Invoke this script with one parameter, being a raw image filename in your PATH. e.g.:
-# ./thisScript.sh rawImageFileName.cr2
-# NOTE: to quickly rip the embedded jpegs (if there be any) out of all images, don't
-# even use this script, just do:
-# dcraw -e *.CR2
+# Run this script with one parameter, which is a raw image filename in your PATH. e.g.:
+#    dcraw2tif.sh rawImageFileName.cr2
+# NOTES
+# To quickly rip the embedded jpegs (if there be any) out of all images, don't
+# even use this script, run:
+#    dcraw -e *.CR2
 # An interesting thing is to see raw sensor values in white scale:
-# dcraw -D -T *.CR2
+#    dcraw -D -T *.CR2
 
 
 # CODE
-# I feel stupid that this far more efficient and elegant method of extracting file base names and extensions has eluded me for years, re: https://www.cyberciti.biz/faq/unix-linux-extract-filename-and-extension-in-bash/ -- this will speed up at least a few scripts.
+# I feel stupid that this far more efficient and elegant method of extracting file base names and extensions has eluded me for years, re: https://www.cyberciti.biz/faq/Unix-linux-extract-filename-and-extension-in-bash/ -- this will speed up at least a few scripts.
 fileName="${1%.*}"
 # fileExt=`echo "${1##*.}"`
 
-# - SCRATCHED -D switch; it makes the image very white. ? AND -W makes it very black. Together, they make it gray. (I assume that with good paramters they can adjust the white and black points.)
+# - SCRATCHED -D switch; it makes the image very white. ? AND -W makes it very black. Together, they make it gray. (I assume that with good parameters they can adjust the white and black points.)
 if [ ! -e $fileName.tif ]
 then
   echo Target file "$fileName".tif does not exist. Will render.

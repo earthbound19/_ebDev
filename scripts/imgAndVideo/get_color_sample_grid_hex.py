@@ -1,26 +1,21 @@
 # DESCRIPTION
-# Extract colors from an image (parameter 1), over a
-# regular grid of pixel samples taken from the center of a virtual
-# cell division (columns and rows) structure, and print them as RGB
-# values in hexadecimal format.
-
-# USAGE
-# Invoke the script with the source image to sample as parameter 1,
-# number of columns to divide the image into for sampling as paramter 2,
-# and number of rows to divide the image into for sampling as parameter 3.
-# For example, if the source image is named darks-v2.png, and you want it to
-# sample from the center each cell in a grid 16 across (16 columns) and 12 down
-# (12 rows), run:
-# python full/path_to_this_script/darks-v2 16 12
-# To pipe the results to a text file, add a > redirect operator and text
-# file to the end of that command, like this:
-# > darks-v2.hexplt
-
-# NOTE: may fail if only one row or column in source image.
+# Extract colors from an image (parameter 1), over a regular grid of pixel samples taken from the center of a virtual cell division (columns and rows) structure, and print them as RGB values in hexadecimal format.
 
 # DEPENDENCIES
 # python libraries imported at start of script, however you get those installed :|
 # pip install colorgram.py
+
+# USAGE
+# Run this script through a Python interpreter, with these parameters:
+# - sys.argv[1] source image to sample
+# - sys.argv[2] number of columns to divide the image into for samples
+# - sys.argv[3] number of rows to divide the image into for samples
+# For example, if the source image is named darks-v2.png, and you want to sample from the center of each cell in a grid 16 across (16 columns) and 12 down (12 rows), run:
+#    python full/path_to_this_script/darks-v2 16 12
+# To pipe the results to a text file, add a > redirect operator and text file to the end of that command, like this:
+#    python full/path_to_this_script/darks-v2 16 12 > darks-v2.hexplt
+# NOTE
+# It may fail if you use only 1 column or row, and for that you can use a freeware color picker on many platforms anyway.
 
 
 # CODE
@@ -40,7 +35,7 @@ with Image.open(source_image) as image:
 	im_arr = im_arr.reshape((image.size[1], image.size[0], 3))
 	# That's height (image.size[1]), width (image.size[0])
 
-img_width = len(im_arr[0]) - 1		# - 1 because will be used in zero-based index iteration
+img_width = len(im_arr[0]) - 1		# - minus 1 because will be used in zero-based index iteration
 img_height = len(im_arr) - 1		#	^
 column_pix_width = int(img_width / columns) - 1
 row_pix_height = int(img_height / rows) - 1

@@ -5,22 +5,23 @@
 # GraphicsMagick and Krita, both in your $PATH.
 
 # USAGE
-# Invoke this script with two parameters, being $1 the extension of all files in your current directory to operate on, and $2 (optional) the desired final layered format.
-# ./thisScript.sh tif ora
-
+# Run this script with these parameters:
+# - $1 The extension of all files in your current directory to operate on
+# - $2 OPTIONAL. The desired final layered file format, e.g. tif or psd
+# Example run command:
+#    allIMGtypeToLayeredIMG.sh tif ora
 # NOTES
-# FOR BEST RESULTS start with .tif images that store alpha information. Otherwise, IF YOUR SOURCE images are in a format (even with alpha information) other than .tif, graphicsmagick may replace alpha values in each layer with black, which you'll want to eliminate with an unmultiply filter (in photoshop and/or filter forge).
-# Script first converts to a layered .tif, then the target format. I discourage archiving images in layered .tif format, because Krita and Photoshop (at least) read them differently; Krita understands them, but Photoshop only reads one layer!
-
-# TO DO
-# Set defaulf ora format for destination file.
+# - For best results, start with .tif images that store alpha information. Otherwise, IF YOUR SOURCE images are in a format (even with alpha information) other than .tif, GraphicsMagick may replace alpha values in each layer with black, which you'll want to eliminate with an unmultiply filter (in Photoshop and/or filter forge).
+# - This script first converts to a layered .tif, then the target format. I discourage archiving images in layered .tif format, because Krita and Photoshop (at least) read them differently; Krita understands them, but Photoshop only reads one layer!
 
 
 # CODE
+# TO DO
+# Set defaulf ora format for destination file.
 # Template command:
 # gm convert 1.png 2.png 3.png 4.png out.tif
 
-gfind *.$1 > all_$1.txt
+find *.$1 > all_$1.txt
 dos2unix all_$1.txt
 
 while read element

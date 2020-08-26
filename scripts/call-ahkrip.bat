@@ -1,22 +1,28 @@
-REM DESCRIPTION: rips all .ahk files in the directory from which this script is called--rips them to .exe files using ahkrip.bat (which) in turn uses ahk2exe.exe).
+:: DESCRIPTION
+:: Runs ahkrip.bat (SEE) for all .ahk files in the directory from which this script is called.
 
-REM USAGE: Execute this batch. ahkrip.bat must be in the same directory as this.
+:: DEPENDENCIES
+:: You must have ahkrip.bat in the same directory as this (or possibly just in your PATH).
 
-REM TO DO? : consolidate ahkrip.bat into this.
+:: USAGE
+:: From a directory with one or more .ahk (AutoHotkey) scripts ready to be compiled to executables, run this script:
+::    call-ahkrip.bat
+:: See USAGE in ahkrip.bat for expected results.
 
+
+:: CODE
 ECHO OFF
-
-REM COPY _temp\*.txt ..\
-REM (Those had been some text files used in development.)
+:: COPY _temp\*.txt ..\
+:: (Those had been some text files used in development.)
 
 SET CURRDIR=%CD%
 SET CURRDRIVE=%cd:~0,2%
 
-REM REBUILD TARGETS
+:: REBUILD TARGETS
 ECHO OFF
 FOR %%A IN (%CURRDIR%\*.ahk) DO (
 ahkrip.bat %%~nA
 %CURRDRIVE%
 CD %CURRDIR%
-REM MOVE /Y %CURRDIR%\%%~nA.exe ..\
+:: MOVE /Y %CURRDIR%\%%~nA.exe ..\
 )

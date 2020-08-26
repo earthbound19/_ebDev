@@ -1,7 +1,13 @@
 # DESCRIPTION
-# Invokes svgo_optimize.sh repeatedly. See comments in that script.
+# Runs svgo_optimize.sh for every .svg file in the current directory. See comments in that script.
 
-array=(`gfind . -maxdepth 1 -type f -iname \*.svg -printf '%f\n'`)
+# USAGE
+# Run without any parameter:
+#    svgo_optimize_all.sh
+
+
+# CODE
+array=(`find . -maxdepth 1 -type f -iname \*.svg -printf '%f\n'`)
 for element in ${array[@]}
 do
 	svgo_optimize.sh "$element"

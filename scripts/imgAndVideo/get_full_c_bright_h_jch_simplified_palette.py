@@ -1,13 +1,13 @@
 # DESCRIPTION
-# See comments of get_CIECAM02_simplified_gamut.py . This is that but without modifying j and c -- full brightness and chroma hues.
+# See comments of `get_CIECAM02_simplified_gamut.py`. This is that but without modifying j and c; this has full brightness and chroma hues.
 
 # USAGE
-# Invoke this script without any parameter:
-# python /path/to/this/script/get_full_c_bright_h_jch_simplified_palette.py
-# it creates output files named:
-# str(h_step) + "_full_c_bright_h_jch_simplified.gamut"
-# str(h_step) + "_full_c_bright_h_jch_simplified_to_RGB.hexplt"
-# -- where `str(h_step)` is an interger determined by the value of the h_step variable.
+# Run this script through a Python interpreter, without any parameter:
+#    python /path/to/this/script/get_full_c_bright_h_jch_simplified_palette.py
+# It creates output files named:
+#    <h_step>_full_c_bright_h_jch_simplified.gamut
+#    <h_step>_full_c_bright_h_jch_simplified_to_RGB.hexplt
+# Where `h_step` is an integer determined by the value of the h_step variable.
 
 
 # CODE

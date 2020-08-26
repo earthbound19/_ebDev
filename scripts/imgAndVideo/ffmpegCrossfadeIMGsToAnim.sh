@@ -5,27 +5,25 @@
 # ffmpeg, a nixy' environment
 
 # USAGE
-# invoke this script with three parameters:
-# $1 File name of input image one
-# $2 File name of input image two
-# $3 Duration of crossfade between them
-# $4 OPTIONAL. Padding, in seconds (time for images to be shown without crossfade), at start and end of video. If not specified, defaults to 4.36.
-# EXAMPLE: the following creates a video of a 7-second crossfade from one image to another, with 4.36 seconds padding before and after:
-# ./thisScript.sh inputImageOne.png inputImageTwo.png 7 4.36
-
+# run this script with three parameters:
+# - $1 File name of input image one
+# - $2 File name of input image two
+# - $3 Duration of crossfade between them
+# - $4 OPTIONAL. Padding, in seconds (time for images to be shown without crossfade), at start and end of video. If not specified, defaults to 4.36.
+# Example that creates a video of a 7-second crossfade from one image to another, with 4.36 seconds padding before and after:
+#    ffmpegCrossfadeIMGsToAnim.sh inputImageOne.png inputImageTwo.png 7 4.36
 # NOTES
-# If this script is called thus from another script:
-# source ./thisScript.sh
-# -- the variable this script sets named $targetRenderFile will persist in the shell after this script terminates (for a calling script to make use of). The script ffmpegCrossfadeIMGsToAnimFromFileList.sh does this.
-
-# TO DO:
-# - Do not use `exit`. Instead, elegantly skip main logic if no paramaters passed, because `exit` will terminate this script *and* a calling script if the calling script invokes this via `source ./thisScript`.
-# - Test with many image pairs, and if necessary fix complex filter timings math (in ffmpeg command). It seems that the crossfade starts and ends later than it should.
-# - Add fps param?
-# - Option to adapt this to automatically detect the duration of two pre-existing input clips and crossfade almost the whole length of the shorter over the longer?
+# If this script is called this way from another script via the source command, like this:
+#    source ./ffmpegCrossfadeIMGsToAnim.sh <parameters>
+# -- then the variable which this script sets, named $targetRenderFile will persist in the shell after this script terminates, for a calling script to make use of. The script `ffmpegCrossfadeIMGsToAnimFromFileList.sh` does this.
 
 
 # CODE
+	# TO DO:
+	# - Do not use `exit`. Instead, elegantly skip main logic if no parameters passed, because `exit` will terminate this script *and* a calling script if the calling script runs this via `source ffmpegCrossfadeIMGsToAnim.sh`.
+	# - Test with many image pairs, and if necessary fix complex filter timings math (in ffmpeg command). It seems that the crossfade starts and ends later than it should.
+	# - Add fps param?
+	# - Option to adapt this to automatically detect the duration of two pre-existing input clips and crossfade almost the whole length of the shorter over the longer?
 # GLOBAL HARD-CODED OPTIONS--tweak these per your want:
 vidExt=avi
 # vidExt=mp4
@@ -39,13 +37,13 @@ codecParam="-vcodec rawvideo"
 
 # ====
 # SET GLOBALS START
-if [ -z "$1" ]; then echo No paramater \$1 \(start input image\)\. Will exit.; exit; else imgOne=$1; echo SET imgOne to $1; fi
-if [ -z "$2" ]; then echo No paramater \$2 \(end input image\)\. Will exit.; exit; else imgTwo=$2; echo SET imgOne to $2; fi
+if [ -z "$1" ]; then echo No parameter \$1 \(start input image\)\. Will exit.; exit; else imgOne=$1; echo SET imgOne to $1; fi
+if [ -z "$2" ]; then echo No parameter \$2 \(end input image\)\. Will exit.; exit; else imgTwo=$2; echo SET imgOne to $2; fi
 
 # Initializing from $4 before initializing $3 (if $4 passed; otherwise set default), because 3 needs 4.
 if [ -z "$4" ]
 then
-	echo No paramater \$4 \(still image padding before and after crossfade\). Will default to 4.36.
+	echo No parameter \$4 \(still image padding before and after crossfade\). Will default to 4.36.
 	clipPaddingSeconds=4.36
 else
 	clipPaddingSeconds=$4
@@ -54,7 +52,7 @@ fi
 
 if [ -z "$3" ]
 then
-	echo No paramater \$3 \(crossfade length\). Will default to 7.; xFadeLen=7
+	echo No parameter \$3 \(crossfade length\). Will default to 7.; xFadeLen=7
 else
 	xFadeLen=$3
 	echo SET xFadeLen to $3.

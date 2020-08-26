@@ -1,35 +1,31 @@
 # DESCRIPTION
-# Converts all files of type $1 in a tree to type $2, via pandoc (a wrapper for pandoc). Copies respective timestamps from file types $1 to $2 (via cygin/'nix/mac touch command), so that each newly created (converted) document has the same time stamp.
-
-# NOTES
-# This script can alternately use binarez_touch on Windows to update file creation dates to match the source. See the OPTIONS comment in the source code below.
+# Converts all files of type $1 in a directory tree to type $2, via pandoc (via pandoc2doc.sh). See documentation in comments of that script.
 
 # USAGE
-# pandoc2doc.sh source_docs_extension dest_docs_extension
+# Run with these parameters:
+# - $1 source format of files to convert
+# - $2 target format of files to convert
+# Example that will convert all files of type .md (markdown) to .html (static web page) :
+#    pandoc2doc.sh md docx
 
-if [ "$1" ]; then src_format=$1; echo "Source format \$1 $1 passed to script; using that."; else echo "NO source format \$1 passed to script. Exiting."; exit; fi
-if [ "$2" ]; then dest_format=$2; echo "Source format \$2 $2 passed to script; using that."; else echo "NO destination format \$2 passed to script. Exiting."; exit; fi
+
+# CODE
+if [ ! "$1" ]; then echo "No source format \$1 passed to script. Exit."; exit 1; else src_format=$1; fi
+if [ ! "$2" ]; then echo "No destination format \$2 passed to script. Exit."; exit 1; else dest_format=$2; fi
 
 # recurse through all directories under this path, and in each directory, convert all $1 (source) format files to $2 (destination format), then copy the timestamp of each source file to its file name match corresponding .txt file.
-directories=(`gfind . -type d -iname \*`)
+directories=(`find . -type d -iname \*`)
 for directory in ${directories[@]}
 do
 	pushd .
 	cd $directory
-	src_docs=(`gfind . -maxdepth 1 -type f -iname \*.$src_format -printf '%f\n'`)
+	src_docs=(`find . -maxdepth 1 -type f -iname \*.$src_format -printf '%f\n'`)
 	for src_doc in ${src_docs[@]}
 	do
 		file_name_no_ext=${src_doc%.*}
 		dest_file="$file_name_no_ext".$dest_format
-# WIP hoping to format documents via templates:		
-#		if [ -e ./template."$dest_format" ]; then echo FOUND template."$dest_format" FILE in this path.; fi
-		pandoc -t $dest_format -o $dest_file $src_doc
-			# OPTIONAL: to clear out start of line gobbledygook resulting from src_doc -> txt conversion, uncomment this next line:
-			# gsed -i 's/^[\{\}0-9 ;]\{1,\}//g' $dest_file
-		# update the new docs' creation and modification file time stamps (windows) or just modification time stamp ('nix):
-		# OPTIONS: on windows if you have binarez_touch, comment out the first line here, and uncomment the second. For 'nix platforms, do visa-versa:
-		touch --reference="$src_doc" $dest_file
-		binarez_touch -cmx "-r""$src_doc" $dest_file
+		# deprecated in favor of calling pandoc2doc (functionality of this moved into that script) : "pandoc -t $dest_format -o $dest_file $src_doc"
+		pandoc2doc.sh $src_doc $dest_file
 	done
 	popd
 done

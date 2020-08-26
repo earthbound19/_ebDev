@@ -1,36 +1,26 @@
 # DESCRIPTION
 # This script should not exist. I hope I never need to use it again.
-# Scenario: you have a lot of preset files of type $1 (say, .cgp)
-# from which you have rendered target files $2 (say, .png). However,
-# because you are silly and didn't ensure the rendered files have
-# names that give you any clue what preset or source they were
-# rendered from, you have no way of knowing which presets you want
-# to dispose of also.
-# This script attempts to solve that problem through guesswork.
+# Scenario: you have a lot of preset files of type $1 (say, .cgp) from which you have rendered target files $2 (say, .png). However, because you are silly and didn't ensure the rendered files have names that give you any clue what preset or source they were rendered from, you have no way of knowing which presets you want to dispose of also. This script attempts to solve that problem through guesswork.
 # It assumes:
-# 1. The batch that rendered the presets listed them in default
-# gfind sort order
-# 3. The default gfind sort order of the rendered files matches
-# the gsort order of the sources. If so, all $2 can be renamed
-# to match all $1.
-# WARNING: ONLY RUN THIS BATCH ON COPIES of the files. Why?
-# because it renames all $2 to match all $1 on that assumption,
-# which could be wrong.
+# - The batch that rendered the presets listed them in default find sort order
+# - The default find sort order of the rendered files matches the sort order of the sources. If so, all $2 can be renamed to match all $1.
+
+# WARNING
+# ONLY RUN THIS BATCH ON COPIES of the files, then verify the renames are correct. Why? because it renames all $2 to match all $1 on that assumption, which could be wrong.
 
 # USAGE
-# Run script with two parameters, being $1 the format of the
-#  source files and $2 the format of the target/rendered/mystery
-#  companion files which need to be renamed to match all $1.
-#  Don't include the . in the format; just the extension, e.g.
-#  cgp for $1 or png for $2,
-# renamePairedFileTypeToMatch.sh sourceExtension targetExtensionMysteryFiles
-# OR:
-# renamePairedFileTypeToMatch.sh cpg png
+# Run with these parameters:
+# - $1 the file extension of the source files 
+# - $2 the format of the target/rendered/mystery companion files which need to be renamed to match all $1. Don't include the . in the format; just the extension
+# An example command that where the source files are .cgp format and the targets are .png:
+#    renamePairedFileTypeToMatch.sh cpg png
+# To express that in variables that read more like a sentence, but this would not be a practical command, because you would never have extensions with those names:
+#    renamePairedFileTypeToMatch.sh sourceExtension targetExtensionMysteryFiles
 
 
 # CODE
-if ! [ "$1" ]; then echo "No paramater \$1 passed to script. Exit."; exit; else sourceFormat=$1; fi
-if ! [ "$2" ]; then echo "No paramater \$2 passed to script. Exit."; exit; else destFormat=$2; fi
+if ! [ "$1" ]; then echo "No parameter \$1 passed to script. Exit."; exit; else sourceFormat=$1; fi
+if ! [ "$2" ]; then echo "No parameter \$2 passed to script. Exit."; exit; else destFormat=$2; fi
 
 echo ""
 read -p "WARNING: This script renames all files of type $2 after the presumed matching file name of type $1. See comments in script for details. If this is not what you want to do, press ENTER or RETURN, or CTRL+C or CTRL+Z. If this _is_ what you want to\n do, type SNARFBLOR and then press ENTER or RETURN: " CHORFL
@@ -42,13 +32,13 @@ then
 	exit
 else
 	echo continuing . .
-		# This can work for building an array from find (I rename it gfind) :
-		# readarray -d '' filesArray1 < <(gfind . -name "*.$1" -print0)
+		# This can work for building an array from find (I rename it find) :
+		# readarray -d '' filesArray1 < <(find . -name "*.$1" -print0)
 		# -- from here: https://stackoverflow.com/a/54561526/1397555
 	# -- but so can this; subscriptable; adds stuff that sorts by file date (which I want here):
-	filesArrayOne=(`gfind . -name "*.$1" -print0 -printf "%T@ %Tc %p\n" | gsort -n | gsed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+	filesArrayOne=(`find . -name "*.$1" -print0 -printf "%T@ %Tc %p\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 
-	filesArrayTwo=(`gfind . -name "*.$2" -print0 -printf "%T@ %Tc %p\n" | gsort -n | gsed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+	filesArrayTwo=(`find . -name "*.$2" -print0 -printf "%T@ %Tc %p\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
 	# demonstrates that subscripting works with these arrays:
 	# echo "${filesArrayOne[4]}"
 	# echo "${filesArrayTwo[4]}"

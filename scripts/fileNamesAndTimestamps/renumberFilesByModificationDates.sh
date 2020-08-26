@@ -1,14 +1,19 @@
 # DESCRIPTION
-# renumberFiles.sh but forcing reverse sort by file modification date (one use case is this script helping make anims of modifications to files over time)
+# Renames files to numbers by reverse sort of file modification date (one use case is this script helping make anims of modifications to files over time).
+
+# USAGE
+# Run without any parameter:
+#    renumberFilesByModificationDates.sh
+
 
 # CODE
 echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
 
-filesCount=`gfind . -maxdepth 1 -iname \*.$1 | sort | wc -l | tr -d ' '`
+filesCount=`find . -maxdepth 1 -iname \*.$1 | sort | wc -l | tr -d ' '`
 digitsToPadTo=${#filesCount}
 
 # Create array to use to loop over files. Sort by modified date stamp re genius breath yon: https://superuser.com/a/294164
-# filesArray=`gfind . -maxdepth 1 -iname "*.$1" | sort -zk 1n | gsed -z 's/^[^ ]* //' | tr '\0' '\n'`
+# filesArray=`find . -maxdepth 1 -iname "*.$1" | sort -zk 1n | sed -z 's/^[^ ]* //' | tr '\0' '\n'`
 # NOPE, that dunna work, but this does:
 filesArray=`ls --sort=time --reverse *$1 | tr '\0' '\n'`
 

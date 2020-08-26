@@ -1,14 +1,15 @@
 # DESCRIPTION
-# Converts all files of type $1 in a directory to type $2.
+# Converts all FontForge-compatible files in the current directory of type $1 to type $2.
+
+# DEPENDENCIES
+# FontForge installed and in your PATH.
 
 # USAGE
-# Open a cmd terminal using fontforge-console.bat
-# (which comes with the fontforge win distribution), then
-# type the name of this batch file, the type you want to
-# convert from (withuot a . for the extension), the type you
-# want to convert to (also without a .), then ENTER.
-# EXAMPLE command that converts all .sfd files to .otf:
-# FontForgeFont2Font.sh sfd otf
+# Run with these parameters:
+# - $1 Source type to convert from.
+# - $2 Target type to convert from.
+# Example that converts all .sfd files to .otf:
+#    FontForgeFont2Font.sh sfd otf
 
 
 # CODE
@@ -28,8 +29,8 @@ else
 	echo source format passed to script\: $2;
 fi
 
-# get full path to fontforge:
-fullPathToFFscript=`whereis FontForgeConvert.pe | gsed 's/.*: \(.*\)/\1/g' | tr -d '\15\32'`
+# get full path to FontForge:
+fullPathToFFscript=`whereis FontForgeConvert.pe | sed 's/.*: \(.*\)/\1/g' | tr -d '\15\32'`
 # conver to windows path format if Windows:
 if [ $OS == "Windows_NT" ]
 then
@@ -38,10 +39,10 @@ fi
 
 currDir=`pwd`
 IFS=""
-gfind . -maxdepth 1 -type f -iname \*.$sourceFormat -printf '%f\n' > all_"$sourceFormat"s.txt
+find . -maxdepth 1 -type f -iname \*.$sourceFormat -printf '%f\n' > all_"$sourceFormat"s.txt
 while IFS= read -r element || [ -n "$element" ]
 do
-	# If we're running Windows, assume cygwin and convert to windows path.
+	# If we're running Windows, assume Cygwin and convert to windows path.
 	# otherwise leave path as-is:
 	if [ $OS == "Windows_NT" ]
 	then
@@ -60,7 +61,7 @@ do
 	# double-quote marks and/or spaces in paths going on? :
 	# AMENDED: no, I can only get it to work if I create and execute a temp
 	# script! :
-	echo "fontforge -script \"$fullPathToFFscript\" \"$fullPathToSourceFile\" .$destFormat" > gs42BeyT_tmpScript.sh
+	echo "FontForge -script \"$fullPathToFFscript\" \"$fullPathToSourceFile\" .$destFormat" > gs42BeyT_tmpScript.sh
 	chmod +x ./gs42BeyT_tmpScript.sh
 	source ./gs42BeyT_tmpScript.sh
 done < all_"$sourceFormat"s.txt
@@ -68,9 +69,6 @@ rm all_"$sourceFormat"s.txt ./gs42BeyT_tmpScript.sh
 
 
 # DEV HISTORY:
-# - revamped to use simpler script. 08/29/2014 12:49:24 PM -RAH
-# - rewrote as bash script, parameterizing source and dest format.
-#   2020-04-30 -RAH
-# 2020-04-30 10:23 PM pulled my hair out with problems of spaces in file
-#  name and arrays, made "array" with text file and iterated over lines of
-#  it instead. -RAH
+# 2020-08-29 Revamped to use simpler script. 
+# 2020-04-30 Rewrote as bash script, parameterizing source and dest format.
+# 2020-04-30 Pulled my hair out with problems of spaces in file name and arrays, made "array" with text file and iterated over lines of it instead.

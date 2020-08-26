@@ -1,25 +1,13 @@
 # DESCRIPTION
-# Takes a list of RGB colors expressed in hex (one per line) and sorts them 
-# using an advanced color appearance model for human color vision: CIECAM02, sorting into
-# lists of darks and lights (nearest to black and nearest to white), via the colorspacious library.
-# Adapted from RGBhexColorSortInCIECAM02.py.
-# A test array for this: #E33200 #FF8B94 #54F1F1 #499989 #AAEFCB #8E4C5C #F7B754 #8AC2B0 #DE9D38 #FA9394 #ADDCCA #2DD1AA #E5E4E9 #02547D #78BF82 #745D5F #414141 #958F95 #FDE182 #7699C7 #FF5933 #D9BB93 #F1E5E9 #EA5287 #E3DB9A #95B6BA #59746E #333388 #008D94 #2EC1B1 #FF534E #367793 #00A693
+# Takes a list of RGB colors expressed in hex (one per line) and sorts them using an advanced color appearance model for human color vision: CIECAM02, sorting into lists of darks and lights (nearest to black and nearest to white), via the colorspacious library. Adapted from RGBhexColorSortInCIECAM02.py.
 
-# NOTES: this script expects perfect data. If there's a blank line anywhere in the
-# input file, or any other unexpected data, it may stop with an unhelpful error.
-# ALSO, this script will eliminate duplicates in the input list.
-#
 # USAGE
-# With this script and a .hexplt file both in your immediate path, and
-# Python in your PATH, call this script with one parameter, being a hex palette list:
-# Python RGBhexColorSortToDarksAndLightsIn2CIECAM02.py inputColors.hexplt
-# --
-# It will print the results to new files named darks.hexplt and lights.hexplt
-# you may sort those results by next nearest color via e.g. RGBhexColorSortInCIECAM02.py.
-
-# LICENSE
-# This is my original code and I release it to the Public Domain. -RAH 2019-12-03 03:17 AM
-
+# From a directory with a .hexplt file, run this script through a Python interpreter:
+#    python /path/to_this_script/RGBhexColorSortToDarksAndLightsIn2CIECAM02.py inputColors.hexplt
+# It will print the results to new files named darks.hexplt and lights.hexplt you may sort those results by next nearest color via e.g. RGBhexColorSortInCIECAM02.py.
+# NOTES
+# - This script expects perfect data. If there's a blank line anywhere in the input file, or any other unexpected data, it may stop with an unhelpful error.
+# - This script will eliminate duplicates in the input list.
 
 
 # CODE
@@ -53,21 +41,17 @@ colors_list = list(unique_everseen(colors_list))
 # SORT HEX RGB color list to next nearest per color,
 # by converting to CIECAM02, then sorting on some dimensions in that space.
 
-# get a list of lists of all possible color two-combinations, with an deltaE (distance
-# measurement between the colors) as a value in the lists; doing this
-# with manual nested for loops because itertools returns tuples and other reasons that
-# may not be valid:
+# get a list of lists of all possible color two-combinations, with an deltaE (distance measurement between the colors) as a value in the lists:
 pair_deltaEs_darks = []
 pair_deltaEs_lights = []
 
 white_comp, DISCARD = hex_to_CIECAM02_JCh('FFFFFF')
 black_comp, DISCARD = hex_to_CIECAM02_JCh('000000')
 
-if len(sys.argv) > 1:	# if a second parameter was passed to script, do these things:
-    print('Input file is ', inputFile)
-    print('Getting deltaE for all colors vs. black and white . . .')
+print('Input file is ', inputFile)
+print('Getting deltaE for all colors vs. black and white . . .')
+
 for i in range(len(colors_list)):
-    # print(colors_list[i], colors_list[j])
     CIECAM02_comp, SPACE = hex_to_CIECAM02_JCh(colors_list[i])
     distance_white_comp = deltaE(CIECAM02_comp, white_comp, input_space = SPACE)
     distance_black_comp = deltaE(CIECAM02_comp, black_comp, input_space = SPACE)

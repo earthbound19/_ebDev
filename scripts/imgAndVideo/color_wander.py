@@ -1,16 +1,18 @@
 # DESCRIPTION
-# Renders a PNG image like a single colored bacteria which walks randomluy over a surface and randomly mutates (and paints) color as it goes. This is a snapshot of colorGrowth.py which I've decided deserves its own variant script named this. Output file names are random. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
-
-# USAGE
-# Run this script without any paramaters, and it will use a default set of parameters:
-# python thisScript.py
-# To see available parameters, run this script with the -h switch:
-# python thisScript.py -h
+# Renders a PNG image like a single colored bacteria which walks randomly over a surface and randomly mutates (and paints) color as it goes. This is a snapshot of colorGrowth.py which I've decided deserves its own variant script named this. Output file names are random. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
 # DEPENDENCIES
 # python 3 with the various modules installed that you see in the import statements here near the start of this script.
 
-# TO DO:
+# USAGE
+# Run this script through a Python interpreter without any parameters, and it will use a default set of parameters:
+#    python /path/to/this/script/color_wander.py
+# To see available parameters, run this script with the -h switch:
+#    python /path/to/this/script/color_wander.py -h
+
+
+# CODE
+# TO DO
 # - Throw an error and exit script when conflicting CLI options are passed (a parameter that overrides another).
 # - Option to use a parameter preset (which would be literally just an input file of desired parameters?). Is this a standardized nixy' CLI thing to do?
 # - Initialize colorMutationBase by random selection from a .hexplt color scheme
@@ -19,8 +21,6 @@
 # - Have more than one bacterium alive at a time (and have all their colors evolve on creating new bacterium).
 # - Major new feature? : Initialize arr[] from an image, pick a random coordinate from the image, and use the color at that coordinate both as the origin coordinate and the color at that coordinate as colorMutationBase. Could also be used to continue terminated runs with the same or different parameters.
 
-
-# CODE
 import datetime, random, argparse, ast, os.path
 import numpy as np
 from PIL import Image

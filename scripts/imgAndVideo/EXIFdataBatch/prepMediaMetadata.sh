@@ -1,26 +1,18 @@
 # DESCRIPTION
-# Prepares image metadata text file for insertion into images
-#  via exiftool (I forget the command or batch that does that;
-#  TO DO: implement that.)
+# Prepares image metadata text file for insertion into images via `ExifTool`.
 
 # USAGE
-# - Create a ~/metaDataTemplatesPath.txt file, which contains
-# the path to your metadata template files as seen by whatever
-# unixy tool you use to run this script (e.g. MSYS2 or cygwin)
-# - Uncomment the line with the metadata template you want to use,
-# comment out the others. Additional usage details: CORRECT.
-# SEE DESCRIPTION. Run this from a unixy prompt in a directory
-# with images in the directory tree for which you wish to create
-# custom metadata ~_MD_ADDS.txt files which another script will
-# use to set image metadata tags. NOTE: for videos, copy the
-# generated title into the description field of the final metadata
-# source file.
-
-# DEV NOTE: if you make only temporary changes to this for ripping art,
-# revert the changes so there aren't a lot of extraneous repository
-# commits of unnecessary changes.
+# - First, create a `~/metaDataTemplatesPath.txt` file, which contains the path to your metadata template files as seen by whatever Unixy tool you use to run this script (e.g. MSYS2 or Cygwin)
+# - Uncomment the line with the metadata template you want to use, comment out the others. Additional usage details: pending.
+# - Run this from a Unixy prompt in a directory with images in the directory tree for which you wish to create custom metadata `~_MD_ADDS.txt` files which another script will use to set image metadata tags. 
+# NOTES
+# - For videos, copy the generated title into the description field of the final metadata source file.
+# - If you make only temporary changes to this for ripping art, revert the changes so there aren't a lot of extraneous git repository commits of unnecessary changes.
 
 
+# CODE
+# TO DO
+# - further document as promised in USAGE.
 # Q. Should those be _FINAL_ and _EXPORTED_, not _FINAL and _EXPORTED ? :
 # _MTPL=_FINAL
 _MTPL=_EXPORTED_
@@ -56,7 +48,7 @@ metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 		# exit
 # END IN DEVELOPMENT SECTION
 
-list=(`gfind . -maxdepth 1 \( \
+list=(`find . -maxdepth 1 \( \
 -iname \*$_MTPL*.mp4 \
 -o -iname \*"$_MTPL"var*.mp4 \
 -o -iname \*$_MTPL*.tif \
@@ -119,16 +111,16 @@ do
 			# Write file name to text file and alter for human readability via text search-replacements:
 			echo $imageFileNameNoExt > temp.txt
 				# TO DO: other text replacements besides the following?
-				gsed -i 's/_[fF][iI][nN][aA][lL]//g' temp.txt
-				gsed -i 's/_[fF][iI][nN][aA][lL][vV][aA][rR]/Variation of/g' temp.txt
-				gsed -i 's/FFlib/Filter Forge library/g' temp.txt
-				gsed -i 's/FF\([0-9]\{1,\}..\)/Filter Forge library \1/g' temp.txt
-				gsed -i 's/pre\([0-9]\{1,\}\)/preset \1/g' temp.txt
+				sed -i 's/_[fF][iI][nN][aA][lL]//g' temp.txt
+				sed -i 's/_[fF][iI][nN][aA][lL][vV][aA][rR]/Variation of/g' temp.txt
+				sed -i 's/FFlib/Filter Forge library/g' temp.txt
+				sed -i 's/FF\([0-9]\{1,\}..\)/Filter Forge library \1/g' temp.txt
+				sed -i 's/pre\([0-9]\{1,\}\)/preset \1/g' temp.txt
 				# Delete any leading whitespace from name field:
 				tr '_' ' ' < temp.txt > temp2.txt
-				gsed -i 's/^\s\{1,\}//g' temp2.txt
+				sed -i 's/^\s\{1,\}//g' temp2.txt
 					# ALSO WORKS on that last line: ~   [[:space:]]    instead of    \s
-				gsed -i 's/^[vV][aA][rR] /Variation of /g' temp2.txt
+				sed -i 's/^[vV][aA][rR] /Variation of /g' temp2.txt
 					# Thanks to: http://stackoverflow.com/a/10771857 :
 			imagePreparedTitle=$( < temp2.txt)
 				# Alas, there is no MWG mapping of ObjectName/Title; this is an IPTC only thing; which is another reason the final distribution image will be renamed to the image title:

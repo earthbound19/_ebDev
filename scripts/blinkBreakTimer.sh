@@ -1,37 +1,32 @@
 # DESCRIPTION
-# Work/break pomodoro timer.
-# Variables L, M, X, and Y in description are customizable.
-# For L minutes (customizable), echoes a prompt to work. If you have a blink1 device, changes
-# the device to a random color every M seconds during that work period.
-# (Also with N millisecond color gradation change.) (SUGGESTION:
-# don't change the blink color at all, or change it infrequently, during the work period.
-# The blinking can distract.)
-# Then for X minutes echoes a prompt to take a break. If you have a blink device,
-# randomly changes the blink color every Y seconds (customizable) during break period Y.
-# (Also with Z millisecond customizable color gradation change.)
-# Also, dims the computer screen to black and back quickly three times at that break prompt.
-# Repeats this cycle indefinitely.
-# ANOTHER SUGGESTION: Every N break periods (4? 5?), take a long break.
+# Work/break Pomodoro timer. Variables in this description are customizable via hacking the script:
+# - For L minutes (customizable), echoes a prompt to work. If you have a blink1 device, changes the device to a random color every M seconds during that work period. (Also with N millisecond color gradation change.)
+# - If you have a blink device, randomly changes the blink color every Y seconds (customizable) during break period Y. 
+# - With Z millisecond customizable color gradation change.
+# - Dims the computer screen to black and back quickly three times at that break prompt.
+# - Repeats this cycle indefinitely.
 
 # DEPENDENCIES
 # homebrew, homebrew brightness package (Mac)
 
-# USAGE
-# Execute this script (`./macPomodoroBreakTimer.sh`) and let it
-# run in the background as you work.
-# NOTE: if you do not have a blink device, uncomment the lines with the "sleep" commands.
-# ALSO NOTE that you may alter the values under the "CHANGE THESE VALUES" comment.
-# ALSO NOTE that depending on the way timer intervals divide (if the color change interval
-# doesn't divide the break interval evenly), work and break periods may be a bit shorter
-# than what you tell this script.
-
 # WARNING
-# If you terminate this script in an inverval of screen darkness, you will be left in darkness.
-# DARKNESS, Batman. DARKNESS.
+# If you terminate this script in an interval of screen darkness, you will be left in darkness. DARKNESS, Batman. DARKNESS.
 
-# DEVELOPER NOTES
+# USAGE
+# Execute this script without any parameter:
+#    macPomodoroBreakTimer.sh
+# -- and let it run in the background as you work.
+# NOTES
+# - I suggest you don't change the blink color at all, or change it infrequently, during the work period. The blinking can distract. Then for X minutes echoes a prompt to take a break.
+# - Every N break periods (4? 5?), take a long break.
+# - If you do not have a blink device, uncomment the lines with the "sleep" commands.
+# - You may alter the values under the "CHANGE THESE VALUES" comment.
+# - Depending on the way timer intervals divide (if the color change interval doesn't divide the break interval evenly), work and break periods may be a bit shorter than what you tell this script.
+
+
+# CODE
+# DEVELOPER NOTE
 # `2> /dev/null` suppresses error print.
-
 
 # USER VARIABLES
 # CHANGE THESE VALUES to your liking:
@@ -96,12 +91,12 @@ done
 # do
 #	This could be done more efficiently by pregenerating so much randomness
 #	and cutting sections off it, as in other scripts, but;
-#	(re: https://unix.stackexchange.com/a/140751) :
+#	(re: https://Unix.stackexchange.com/a/140751) :
 	# rndR=`shuf -i 0-255 -n 1`
 	# rndG=`shuf -i 0-255 -n 1`
 	# rndB=`shuf -i 0-255 -n 1`
 #	echo "writing $rndR,$rndG,$rndB"
-	# blink1-tool -m 400 -t 600 --rgb $rndR,$rndG,$rndB --setpattline $i
+	# blink1-tool -m 400 -t 600 --RGB $rndR,$rndG,$rndB --setpattline $i
 # done
 
 # save that pattern to the blink as a bootup (USB only--no computer) pattern:
@@ -117,10 +112,10 @@ done
 # blink1-tool <cmd> [options]
 # where <cmd> is one of:
 # --list                      List connected blink(1) devices 
-# --rgb=<red>,<green>,<blue>  Fade to RGB value
-# --rgb=[#]RRGGBB             Fade to RGB value, as hex color code
+# --RGB=<red>,<green>,<blue>  Fade to RGB value
+# --RGB=[#]RRGGBB             Fade to RGB value, as hex color code
 # --hsb=<hue>,<sat>,<bri>     Fade to HSB value
-# --blink <numtimes>          Blink on/off (use --rgb to blink a color)
+# --blink <numtimes>          Blink on/off (use --RGB to blink a color)
 # --flash <numtimes>          Flash on/off (same as blink)
 # --on | --white              Turn blink(1) full-on white 
 # --off                       Turn blink(1) off 
@@ -131,7 +126,7 @@ done
 # --magenta                   Turn blink(1) magenta (red + blue) 
 # --yellow                    Turn blink(1) yellow (red + green) 
 # --rgbread                   Read last RGB color sent (post gamma-correction)
-# --setpattline <pos>         Write pattern RGB val at pos (--rgb/hsb to set)
+# --setpattline <pos>         Write pattern RGB val at pos (--RGB/hsb to set)
 # --getpattline <pos>         Read pattern RGB value at pos
 # --savepattern               Save RAM color pattern to flash (mk2)
 # --clearpattern              Erase color pattern completely 
@@ -144,7 +139,7 @@ done
 # --servertickle <1/0>[,1/0,start,end] Turn on/off servertickle (w/on/off, uses -t msec)
 # --chase, --chase=<num,start,stop> Multi-LED chase effect. <num>=0 runs forever
 # --random, --random=<num>    Flash a number of random colors, num=1 if omitted 
-# --glimmer, --glimmer=<num>  Glimmer a color with --rgb (num times)
+# --glimmer, --glimmer=<num>  Glimmer a color with --RGB (num times)
 # Nerd functions: 
 # --fwversion                 Display blink(1) firmware version 
 # --version                   Display blink1-tool version info 
@@ -154,26 +149,26 @@ done
 # -d dNums --id all|deviceIds Use these blink(1) ids (from --list) 
 # -g -nogamma                 Disable autogamma correction
 # -m ms,   --millis=millis    Set millisecs for color fading (default 300)
-# -q, --quiet                 Mutes all stdout output (supercedes --verbose)
+# -q, --quiet                 Mutes all stdout output (supersedes --verbose)
 # -t ms,   --delay=millis     Set millisecs between events (default 500)
 # -l <led>, --led=<led>       Which LED to use, 0=all/1=top/2=bottom (mk2+)
 # --ledn 1,3,5,7              Specify a list of LEDs to light
 # -v, --verbose               verbose debugging msgs
 # 
 # Examples: 
-# blink1-tool -m 100 --rgb=255,0,255    # Fade to #FF00FF in 0.1 seconds 
+# blink1-tool -m 100 --RGB=255,0,255    # Fade to #FF00FF in 0.1 seconds 
 # blink1-tool -t 2000 --random=100      # Every 2 seconds new random color
 # blink1-tool --led 2 --random=100      # Random colors on both LEDs 
-# blink1-tool --rgb 0xff,0x00,0x00 --blink 3  # blink red 3 times
-# blink1-tool --rgb '#FF9900'           # Make blink1 pumpkin orange
-# blink1-tool --rgb FF9900 --led 2      # Make blink1 orange on lower LED
+# blink1-tool --RGB 0xff,0x00,0x00 --blink 3  # blink red 3 times
+# blink1-tool --RGB '#FF9900'           # Make blink1 pumpkin orange
+# blink1-tool --RGB FF9900 --led 2      # Make blink1 orange on lower LED
 # blink1-tool --chase=5,3,18            # Chase pattern 5 times, on leds 3-18
 # 
 # Pattern Examples: 
 # # Play purple-green flash 10 times (pattern runs in blink1-tool so blocks)
 # blink1-tool --playpattern '10,#ff00ff,0.1,0,#00ff00,0.1,0'
 # # Change the 2nd color pattern line to #112233 with a 0.5 sec fade
-# blink1-tool -m 500 --rgb 112233 --setpattline 1 
+# blink1-tool -m 500 --RGB 112233 --setpattline 1 
 # # Erase all lines of the color pattern and save to flash 
 # blink1-tool --clearpattern ; blink1-tool --savepattern 
 # 
@@ -190,6 +185,6 @@ done
 # 
 # Notes: 
 # - To blink a color with specific timing, specify 'blink' command last:
-#  blink1-tool -t 200 -m 100 --rgb ff00ff --blink 5 
+#        blink1-tool -t 200 -m 100 --RGB ff00ff --blink 5 
 # - If using several blink(1)s, use '-d all' or '-d 0,2' to select 1st,3rd: 
-#  blink1-tool -d all -t 50 -m 50 -rgb 00ff00 --blink 10 
+#        blink1-tool -d all -t 50 -m 50 -RGB 00ff00 --blink 10 

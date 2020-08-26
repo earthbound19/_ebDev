@@ -1,30 +1,21 @@
 # DESCRIPTION
-# Resizes an image of type T (via parameter $1) in a path, by
-# nearest-neighbor method, to target format F ($2), at size A x B ($3 x $4).
-# (Nearest neighbor method will keep hard edges, or look "pixelated.")
-# Uses GraphicsMagick, unless the file is ppm format, and in that case it
-# uses IrfanView.
-
-# USAGE
-# NOTE that as this auto-switches to IrfanView as needed, it supercedes
-# the now deleted irfanView2imgNN.sh and allIrfanView2imgNN.sh scripts.
-# To use:
-# Invoke this script with the following parameters
-# $1 source file.
-# $2 destination format
-# $3 scale by nearest neighbor method to pixels X
-# $4 Optional. Force this Y-dimension, regardless of aspect. Scales by
-#  nearest neighbor method to pixels Y. ONLY USED for ppms. Ignored for
-#  all other types (aspect kept). SEE COMMENTS in i_view32.exe code
-#  lines area for options to maintain aspect and/or rotate image (wanted
-#  for my purposes at times).
-# Example command:
-# img2imgNN.sh input.ppm png 640
-# OR, to force a given x by y dimension for a ppm:
-# img2imgNN.sh input.ppm png 640 480
+# Resizes an image of type T (via parameter $1) in a path, by nearest-neighbor method, to target format F ($2), at size A x B ($3 x $4). (Nearest neighbor method will keep hard edges, or look "pixelated.") Uses GraphicsMagick, unless the file is ppm format, and in that case it uses IrfanView.
 
 # DEPENDENCIES
 # GraphicsMagick and/or IrfanView, both in your $PATH.
+
+# USAGE
+# NOTE that as this auto-switches to IrfanView as needed, it supersedes the now deleted irfanView2imgNN.sh and allIrfanView2imgNN.sh scripts.
+# Run this script with the following parameters
+# - $1 source file.
+# - $2 destination format
+# - $3 scale by nearest neighbor method to pixels X
+# - $4 Optional. Force this Y-dimension, regardless of aspect. Scales by nearest neighbor method to pixels Y. ONLY USED for ppms. Ignored for all other types (aspect kept). SEE COMMENTS in i_view32.exe code lines area for options to maintain aspect and/or rotate image (wanted for my purposes at times).
+# Example command:
+#    img2imgNN.sh input.ppm png 640
+# OR, to force a given x by y dimension for a ppm:
+#    img2imgNN.sh input.ppm png 640 480
+
 
 # CODE
 imgFileNoExt=${1%.*}
@@ -47,7 +38,7 @@ if [ ! -f $targetFileName ]; then
 		# i_view32.exe "$1 /resize_long=$3 /aspectratio $extraIrfanViewParam1 $extraIrfanViewParam2 /convert=$targetFileName"
 	# otherwise use graphicsmagic:
 	else
-		echo converting image via graphicsmagick . . .
+		echo converting image via GraphicsMagick . . .
 		# If params $3 or $4 were not passed to the script, the command will simply be empty where they are (on the following line of code), and it should still work:
 		gm convert $1 -scale $3 $targetFileName
 	fi

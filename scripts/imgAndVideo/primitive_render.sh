@@ -1,26 +1,25 @@
 # DESCRIPTION
-# Renders any image source as a composition of flat primitive shapes, via a Go package named "primitive" (this is a wrapper for primitive). Output file names are the same as input only possibly in a different image format, but add _primitive_count_<count>_mode_<mode>__<8RandomChars> to the file name (extrapolate the meaning--it doesn't literally use angle brackets in the output file name). It adds random strings to the end so you can run it twice on the same input and get a different result (it is different every time!) and keep the original and the new alongside each other. Also, it overrides the (at this writing) default behavior of reducing the image by getting and passing the largest dimenion to the -s switch.
-
-# USAGE
-# ./thisScript.sh input_image.png 100 5 png
-# where:
-# - input_image.png (as an example) is an input image file name. Required.
-# - 100 (as an example) is how many primitive shapes will be in the render. Default 100 if omitted.
-# - 4 is the mode number (see below reference), which may be 0 to 8. Default 5 (rotated rectangle) if omitted.
-# - png is an output image format. Valid options are png, jpg, svg, gif (see reference comments at end of script or see primitive CLI reference). Default png if omitted.
-# OR, just use the go package directly, as the basic usage is, well, basic:
-# primitive -i input.png -o output.png -n 100 -m 4
-
-# NOTE that input images must be png or jpg format images.
+# Renders any image source as a composition of flat primitive shapes, via a Go package named "primitive" (this is a wrapper for primitive). Output file names are the same as input only possibly in a different image format, but add `_primitive_count_<count>_mode_<mode>__<8RandomChars>` to the file name (extrapolate the meaning--it doesn't literally use angle brackets in the output file name). It adds random strings to the end of the file name, so that you can run it twice on the same input and get a different result (it is different every time!) and keep the original and the new alongside each other. Also, it overrides the (at this writing) default behavior of reducing the image by getting and passing the largest dimension to the -s switch.
 
 # DEPENDENCIES
-# Go, and said Go package; install it with:
-# go get -u github.com/fogleman/primitive
+# Go, and the Go package named "primitive;" install it with:
+#    go get -u github.com/fogleman/primitive
 # --and the Go bin or wherever it installs said package in your $PATH.
 
+# USAGE
+# Run with these parameters:
+# - $1 input image file name. Must be jpg or png format.
+# - $2 OPTIONAL. How many primitive shapes will be in the render. Default 100 if omitted.
+# - $3 OPTIONAL. Render mode, which is a number from 0 to 8. Default 5 (rotated rectangle) if omitted.
+# - $4 OPTIONAL. Image output file format (extension without the period '.'). Defaults to png if omitted. Valid options are png, jpg, svg, gif. Output for png, jpg and gif will be raster, and gif will be an animation showing the accumulation of shapes until it is complete. An svg image will be a vector. For PNG and SVG outputs, you can also include %d, %03d, etc. in the filename. In this case, each frame will be saved separately.
+# Example that will use input_image.png and make 100 rectangles, and render to a .png image:
+#    primitive_render.sh input_image.png 100 5 png
+# NOTES
+# You can also just use the go package directly, as the basic usage is, well, basic:
+#    primitive -i input.png -o output.png -n 100 -m 4
+# To directly use the go package, you can use the -o flag multiple times. This way you can save both a PNG and an SVG, for example.
 # SEE ALSO
-# https://gist.github.com/Everlag/8344fa7c9234900ba2cb851581c62599
-# re https://github.com/fogleman/primitive/issues/28 -- and see other things there
+# https://gist.github.com/Everlag/8344fa7c9234900ba2cb851581c62599 re https://github.com/fogleman/primitive/issues/28 -- and see other things there
 
 
 # CODE
@@ -32,8 +31,8 @@ if [ -z "$4" ]; then output_format=png; else output_format=$4; fi
 # override default shrinking of images by default in this script :) by getting largest dimension and passing it later via -s:
 identStr=`gm identify $filename`
 		# echo $identStr
-xPix=`echo $identStr | gsed 's/.* \([0-9]\{1,\}\)x[0-9]\{1,\}.*/\1/g' | tr -d '\15\32'`
-yPix=`echo $identStr | gsed 's/.* [0-9]\{1,\}x\([0-9]\{1,\}\).*/\1/g' | tr -d '\15\32'`
+xPix=`echo $identStr | sed 's/.* \([0-9]\{1,\}\)x[0-9]\{1,\}.*/\1/g' | tr -d '\15\32'`
+yPix=`echo $identStr | sed 's/.* [0-9]\{1,\}x\([0-9]\{1,\}\).*/\1/g' | tr -d '\15\32'`
 largestDimension=`echo $(( $xPix > $yPix ? $xPix : $yPix ))`
 
 fileNameNoExt=${filename%.*}
@@ -44,7 +43,8 @@ primitive -i $filename -o "$fileNameNoExt"_primitive_count_"$count"_mode_"$mode"
 # REFERENCE
 # From the CLI program's own help output and from README.md at github: https://github.com/fogleman/primitive
 
-# Usage: primitive [OPTIONS] -i input -o output -n count
+# USAGE of the tool this script calls, which is named "primitive:"
+# primitive [OPTIONS] -i input -o output -n count
   # -a int
         # alpha value (default 128)
   # -bg string
@@ -70,14 +70,3 @@ primitive -i $filename -o "$fileNameNoExt"_primitive_count_"$count"_mode_"$mode"
   # -v    verbose
   # -vv
         # very verbose
-
-# Output Formats
-# Depending on the output filename extension provided, you can produce different types of output.
-
-# PNG: raster output
-# JPG: raster output
-# SVG: vector output
-# GIF: animated output showing shapes being added - requires ImageMagick (specifically the convert command)
-# For PNG and SVG outputs, you can also include %d, %03d, etc. in the filename. In this case, each frame will be saved separately.
-
-# You can use the -o flag multiple times. This way you can save both a PNG and an SVG, for example.

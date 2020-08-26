@@ -1,14 +1,17 @@
 # DESCRIPTION
-# Creates a markdown top-down image gallery from all image files in the current path (at this writing only png, jpg, gif, and tif are suppored). Gallery file is README.md. WARNING: this will overwrite any other such file without warning!
+# Creates a markdown top-down image gallery from all image files in the current path (at this writing only png, jpg, gif, and tif are supported). Gallery file is README.md.
+
+# WARNING
+# This script will overwrite any README.md gallery that already exists in the directory you run it from, without warning!
 
 # USAGE
-# Invoke this script without any parameters:
-# ./imgs2MDgallery.sh
+# Run this script without any parameters:
+#    imgs2MDgallery.sh
 # (Omit the ./ if the directory which contains this script is in your PATH environment variable.)
 
 
 # CODE
-gfind *.png *.jpg *.gif *.tif *.tiff > all_imgs.txt
+find *.png *.jpg *.gif *.tif *.tiff > all_imgs.txt
 
 printf "# Images Markdown Gallery\n\nClick any image or title header to go to the source image.\n\n" > README.md
 

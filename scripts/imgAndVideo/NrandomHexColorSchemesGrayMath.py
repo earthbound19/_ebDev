@@ -1,14 +1,16 @@
 # DESCRIPTION
-# Run this script with the --help parameter or examine "description" in parser = argparse.. code in this script.
+# Generates a random hex color scheme of file format .hexplt, which is a plain text file with one hex color per line. The generated colors are constructed according to a color theory given in Itten\'s "ELEMENTS OF COLOR," which states that color combinations tend to be more pleasing to the human eye if, when the colors are mixed (by substractive color mixing), they make gray. This script makes colors that are mixed by additive light (RGB), but the principle is the same and the results have generally verified the theory.
 
 # USAGE
-# Run this script with the --help parameter or examine the parser = argparse.. code in this script.
+# Run this script through a Python interpreter, with the `--help` parameter or examine the `parser = argparse` code in this script:
+#    python path/to_this/script/NrandomHexColorSchemesGrayMath.py --help
+# -- and examine the help print. Or examine the `help=` strings in the source code.
 
 
 # CODE
 import datetime, random, os.path, argparse
 
-parser = argparse.ArgumentParser(description='Generates a random hex color scheme of file format .hexplt, which is a plain text file with one hex color per line. The generated colors are constrained after a color theory given in Itten\'s "ELEMENTS OF COLOR," which states that color combinations tend to be more pleasing to the human eye if, when the colors are mixed (by substractive color mixing), they make gray. This script makes colors that are mixed by additive light (RGB), but the principle is the same and the results have generally verified the theory.')
+parser = argparse.ArgumentParser(description='Generates a random hex color scheme of file format .hexplt, which is a plain text file with one hex color per line. The generated colors are constructed according to a color theory given in Itten\'s "ELEMENTS OF COLOR," which states that color combinations tend to be more pleasing to the human eye if, when the colors are mixed (by substractive color mixing), they make gray. This script makes colors that are mixed by additive light (RGB), but the principle is the same and the results have generally verified the theory.')
 parser.add_argument('-n', '--numschemes', type=int, default=36, help='How many color schemes to generate. Default 36.')
 parser.add_argument('-g', '--grayhigh', type=int, default=222, help='Gray high threshold. No RGB-256 value will be higher than this number. Default 222. Range 0-255.')
 parser.add_argument('-l', '--graylow', type=int, default=60, help='Gray low threshold. No RGB-256 value will be lower than this number. Default 60. Range 0-255. When the sum of any generated RGB values is less than this number, this script will stop generating colors.')

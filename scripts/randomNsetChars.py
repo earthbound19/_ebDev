@@ -1,27 +1,28 @@
 # DESCRIPTION
 # Prints N variants of constructed random character sets (hard-coded but hackable: block
-# characters), at X characters accross and Y lines down each. Prints to either terminal or
+# characters), at X characters across and Y lines down each. Prints to either terminal or
 # files; hack the global variable SAVE_TO_RND_FILENAMES to alter that; hack the other globals
 # also for whatever other purposes you might have.
 # SEE ALSO randomNSetChars.pde.
 
-# DEPENDENCIES:
-# Python 3.8 (or maybe any 3.x version) with random and time modules installed. Moroever,
-# python may need to be compiled with UCS2 or UCS4 support (larger text code pages support).
+# DEPENDENCIES
+# Python 3.8 (or maybe any 3.x version) with random and time modules installed. Moreover, python may need to be compiled with UCS2 or UCS4 support (larger text code pages support).
 
 # USAGE
-# - With this script in your path, invoke it with Python:
-# python randomNsetChars.py
-# - NOTE that the hard-coded defaults create 1,000 rnd character set variations saved to
-# text files in the directory you run this script from. So be prepared, ha, for a lot of noise.
-# - Also, hack the global variables (under the GLOBALS comment) for your purposes if you wish.
+# Run from a python interpreter:
+#    python /path/to_this_script/randomNsetChars.py
+# To pipe what is printed to a file, run for example:
+#    python /path/to_this_script/randomNsetChars.py > 1000000_randomNsetCharsVariants.txt
+# NOTES
+# - Hard-coded defaults print 1,000,000 rnd character set variations. So be prepared for a lot of noise.
+# - Hack the global variables (under the GLOBALS comment) for your purposes if you wish.
 
 
 # CODE
 import random
 from time import sleep
 
-# GLOBALS:
+# GLOBALS
 # Seeds rando number generator via current time:
 random.seed(None, 2)
 # OR you can seed with a specific number, e.g.:

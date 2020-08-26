@@ -3,17 +3,14 @@
 # img2imgNN.sh ppm png 640 480
 
 # USAGE
-# Invoke this script with the following parameters:
-#  $1 hex color palette flat file list (input file).
-#  $2 OPTIONAL. Number of tiles across of tiles-assembled image (columns). If not provided, automatically calculated as approximate square root of total number of colors in source .hexplt file.
-#  $3 OPTIONAL. IF $2 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $3. Number of tiles down of tiles-assembled image (rows).
-#  EXAMPLE COMMANDS:
-# With this script in your PATH:
-#  hexplt2ppm.sh RAHfavoriteColorsHex.hexplt 5 40
-#  --creates a tiny ppm palette image from the hex color list RAHfavoriteColorsHex.hexplt,
-#  which is 5 tiles across and 40 tiles down.
-#  hexplt2ppm.sh RAHfavoriteColorsHex.hexplt
-#  -- creates a tiny ppm image of that palette file, with columns and rows calculated by the script.
+# Run this script with the following parameters:
+# - $1 hex color palette flat file list (input file).
+# - $2 OPTIONAL. Number of tiles across of tiles-assembled image (columns). If not provided, automatically calculated as approximate square root of total number of colors in source .hexplt file.
+# - $3 OPTIONAL. IF $2 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $3. Number of tiles down of tiles-assembled image (rows).
+# For example, to create a tiny ppm palette 5 tiles across and 40 tiles down from colors in the list `RAHfavoriteColorsHex.hexplt`, run:
+#    hexplt2ppm.sh RAHfavoriteColorsHex.hexplt 5 40
+# To create a tiny ppm image with columns and rows calculated by the script from that same palette, run:
+#    hexplt2ppm.sh RAHfavoriteColorsHex.hexplt
 
 
 # CODE
@@ -36,15 +33,15 @@ else	# Search for specified palette file in palettesRootDir (if that dir exists;
 				echo searching in path $palettesRootDir --
 				echo for file $paletteFile . . .
 						# FAIL:
-						# hexColorSrcFullPath=`gfind "$palettesRootDir" -iname *$paletteFile`
-		hexColorSrcFullPath=`gfind $palettesRootDir -iname "$paletteFile"`
+						# hexColorSrcFullPath=`find "$palettesRootDir" -iname *$paletteFile`
+		hexColorSrcFullPath=`find $palettesRootDir -iname "$paletteFile"`
 		echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 		if [ "$hexColorSrcFullPath" == "" ]
 			then
-				echo No file of name $paletteFile found in the path this script was invoked from OR in path \"$palettesRootDir\" \! ABORTING script.
+				echo No file of name $paletteFile found in the path this script was run from OR in path \"$palettesRootDir\" \! ABORTING script.
 				exit
 			else
-				echo File name $paletteFile found in the path this script was invoke from OR in path \"$palettesRootDir\" \! PROCEEDING. IN ALL CAPS.
+				echo File name $paletteFile found in the path this script was run from OR in path \"$palettesRootDir\" \! PROCEEDING. IN ALL CAPS.
 		fi
 	else
 		echo !--------------------------------------------------------!
@@ -61,13 +58,13 @@ fi
 # Do whitespace / extraneous lines cleanup of .hexplt source file (saving result to temp file which we will operate from) :
 			# commands iterated through in development:
 			# replaces whitespace with ____:
-			# gsed -e "s/\s/____/g" ColorSchemeHexBurntSandstone.hexplt
+			# sed -e "s/\s/____/g" ColorSchemeHexBurntSandstone.hexplt
 			# isolates six-character hex:
-			# gsed -e "s/#\([0-9a-fA-F]\{6\}\)/\1/g" ColorSchemeHexBurntSandstone.hexplt
+			# sed -e "s/#\([0-9a-fA-F]\{6\}\)/\1/g" ColorSchemeHexBurntSandstone.hexplt
 			# combines stripping leading whitespace and isolating sextuple hex strings:
-			# gsed -e "s/^\s\{1,\}//g" -e "s/#\([0-9a-fA-F]\{6\}\).*/\1/g" ColorSchemeHexBurntSandstone.hexplt
+			# sed -e "s/^\s\{1,\}//g" -e "s/#\([0-9a-fA-F]\{6\}\).*/\1/g" ColorSchemeHexBurntSandstone.hexplt
 # I don't know *how* this combination of flags works; it was a shot in the dark (!), but it works; hints from https://stackoverflow.com/a/1665574/1397555 ; ALSO, the \L converts all preceding characters which are uppercase to lowercase :
-gsed -n -e "s/^\s\{1,\}//g" -n -e "s/#\([0-9a-fA-F]\{6\}\).*/\L\1/p" $hexColorSrcFullPath > tmp_djEAM2XJ9w.hexplt
+sed -n -e "s/^\s\{1,\}//g" -n -e "s/#\([0-9a-fA-F]\{6\}\).*/\L\1/p" $hexColorSrcFullPath > tmp_djEAM2XJ9w.hexplt
 # Reassign name of that temp file to hexColorSrcFullPath to work from:
 hexColorSrcFullPath=tmp_djEAM2XJ9w.hexplt
 
@@ -130,14 +127,14 @@ else
 
 	# each hex color is a triplet of hex pairs (corresponding to 0-255 RGB values) ; concatenate temp hexplt file to uninterrupted hex pairs (no newlines) to parse as one long string into the ppm body:
 	# with | tr -d '\15\32' to delete windows newlines from the resultant array
-	#  and this is the seventeen-thousandth time this doom has caused issues withuot this:
+	#  and this is the seventeen-thousandth time this doom has caused issues without this:
 	ppmBodyValues=`tr -d '\n' < $hexColorSrcFullPath | tr -d '\15\32'`
 			rm $hexColorSrcFullPath
 	# Split that superstring with spaces every two hex chars:
-	ppmBodyValues=`echo $ppmBodyValues | gsed 's/../& /g' | tr -d '\15\32'`
+	ppmBodyValues=`echo $ppmBodyValues | sed 's/../& /g' | tr -d '\15\32'`
 	# TO DO for hexplt2ppm.sh: convert that to decimal; first work it up into a string formatted for echo in base-16, e.g.:
 	# ppmBodyValues=`echo $((16#"$thisHexString")) $((16#"$thatHexString"))`
-	ppmBodyValues=`echo $ppmBodyValues | gsed 's/[a-zA-Z0-9]\{2\}/$((16#&))/g' | tr -d '\15\32'`
+	ppmBodyValues=`echo $ppmBodyValues | sed 's/[a-zA-Z0-9]\{2\}/$((16#&))/g' | tr -d '\15\32'`
 	# If I echo that\, it prints it literally instead of interpretively. Ach! Workaround: make a temp shell script that echoes it interpretively (and assign the result to a variable) :
 	printf "echo $ppmBodyValues" > tmp_hsmwzuF64fEWmcZ2.sh
 	chmod +x tmp_hsmwzuF64fEWmcZ2.sh
@@ -146,24 +143,24 @@ else
 	echo $ppmBodyValues > ppmBody.txt
 			# DEV NOTES
 			# including "simulate ? (optionals) with \{0,1\}", re: https://stackoverflow.com/a/6157705/1397555
-			# ex. command: echo "a aa a aa aaa a " | gsed "s/ \{0,1\}\(a\)/\1\n/g"
+			# ex. command: echo "a aa a aa aaa a " | sed "s/ \{0,1\}\(a\)/\1\n/g"
 			# (The space needs to be optional because the start of a line isn't going to have a space in our case.)
 			# further worked up to break all three-groups of the letter a separated by spaces:
-			# echo "aaaaaaa aaaaa a aa aaaa a a a a aaa aa aaaaaaaaaaaaaaaaa" | gsed "s/\( \{0,1\}a\{1,\}\)\{3\}/&\n/g"
+			# echo "aaaaaaa aaaaa a aa aaaa a a a a aaa aa aaaaaaaaaaaaaaaaa" | sed "s/\( \{0,1\}a\{1,\}\)\{3\}/&\n/g"
 			# further worked up to capture digits, not "a"s:
-			# echo "8 11 254 4 100 2 36 1 100" | gsed "s/\( \{0,1\}[0-9]\{1,\}\)\{3\}/&\n/g"
+			# echo "8 11 254 4 100 2 36 1 100" | sed "s/\( \{0,1\}[0-9]\{1,\}\)\{3\}/&\n/g"
 	# Because each pixel is three values, each tile (tilesAcross) will be * 3 numeric values:
 	splitAtCount=$(( $tilesAcross * 3 ))
-	echo $ppmBodyValues | gsed "s/\( \{0,1\}[0-9]\{1,\}\)\{$splitAtCount\}/&\n/g" > ppmBody.txt
+	echo $ppmBodyValues | sed "s/\( \{0,1\}[0-9]\{1,\}\)\{$splitAtCount\}/&\n/g" > ppmBody.txt
 	# Strip resultant leading spaces off that, in place (in file):
-	gsed -i 's/^ \(.*\)/\1/g' ppmBody.txt
+	sed -i 's/^ \(.*\)/\1/g' ppmBody.txt
 # CONTINUE CODING HERE; NOTE copied from above:
 	echo Padding any empty columns on last row of .ppm file with middle gray pixels . . .
 	# Fill in any empty columns on the last line with gray:
 	# - Count number of value triplets on last line, and subtract that tilesAcross; if the result is nonzero, add that many to the row.
 	#  - Isolate last line of ppmBody.txt to count those values; re http://www.theunixschool.com/2012/05/7-different-ways-to-print-last-line-of.html :
 	#  - pipe the last line of ppmBody to grep and search for number pattern, then pipe to word count (wc), and store all that in the variable lastLineValuesCount:
-	# Because AGAIN windows line endings created by one ported gnu utility are conflicting with unix line endings created by another ported gnu utility:
+	# Because AGAIN windows line endings created by one ported gnu utility are conflicting with Unix line endings created by another ported gnu utility:
 	dos2unix ppmBody.txt
 	lastLineString=`tail -1 ppmBody.txt`
 	lastLineValuesCount=`echo $lastLineString | grep -o '[0-9]\{1,\}' | wc -l | tr -d ' '`
@@ -182,7 +179,7 @@ else
 	done
 	lastLineValuesPadString="$lastLineString $lastLineValuesPadString"
 	# remove last line from ppmBody.txt, then append the replacement line to it:
-	gsed -i '$ d' ppmBody.txt
+	sed -i '$ d' ppmBody.txt
 	echo $lastLineValuesPadString >> ppmBody.txt
 	# concatenate the header and body to create the final ppm file:
 	cat PPMheader.txt ppmBody.txt > $renderTargetFile

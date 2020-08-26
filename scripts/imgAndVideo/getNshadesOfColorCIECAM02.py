@@ -1,32 +1,32 @@
 # DESCRIPTION
-# Gets -n shades of any -c color (default white if not passed) via the CIECAM02 color space, which models human perception of color (and brightnes and other aspects of light) better than any other model at this writing.
-
-# USAGE
-# run script with --help parameter for instructions, or read the description sections in the argsparse setup below. Basic default usage for e.g. 16 shades of gray:
-# getNshadesOfColorCIECAM02.py -n 16 > 18shadesOf<color>CIECAM02.hexplt
-# NOTES:
-# - it may produce more or less colors than specified. Welcome to inexact float math.
-# - it may produce some unexpected colors. I recommend you use an editor that live previews
-# hex colors (like Atom with the highlight-colors package).
-# NOTE that the script adds the original color to the array at the start or end depending on
-# whether you use -r | --DARK_TO_BRIGHT or not IF you also don't use -b | --BRIGHTNESS_OVERRIDE.
+# Gets -n shades of any -c color (default white if not passed) via the CIECAM02 color space, which models human perception of color (and brightness and other aspects of light) better than any other model at this writing. Writes results to a new .hexplt file named after color.
 
 # DEPENDENCIES
 # Python and the various import libraries declared at the start of CODE.
 
-# DEV NOTES
-# SEE COMMENTS IN get_CIECAM02_simplified_gamut.py, BUT:
-# J (brightness or lightness) range is 0 to 100, h (hue) is 0 to 360, C (chroma) can be 0 to any number (I don't believe that there _is_ a max from whatever correlary/inputs produces the max), maybe max 160. For hard-coded colors, start with max 182 (this seemed a thing with L in HCL).
+# USAGE
+# Run this script through a Python interpeter with the --help parameter for instructions, or read the description sections in the argsparse setup below. Basic default usage for e.g. 16 shades of gray (as it defaults to shades of white if no --COLOR is specified) :
+#    python /path/to_this_script/getNshadesOfColorCIECAM02.py -n 16 > 18shadesOf_color_CIECAM02.hexplt
+# NOTES
+# - It may produce more or less colors than specified. Welcome to inexact float math.
+# - It may produce some unexpected colors. I recommend you use an editor that live previews hex colors (like Atom with the highlight-colors package).
+# - It writes results to a file named after the color, e.g. `fff585_15shades.hexplt`.
+# - It adds the original color to the array at the start or end depending on whether you use `-r` | `--DARK_TO_BRIGHT` or not IF you also don't use `-b` | `--BRIGHTNESS_OVERRIDE`.
 
 
 # CODE
+# DEV NOTES
+# SEE COMMENTS IN get_CIECAM02_simplified_gamut.py, BUT:
+# J (brightness or lightness) range is 0 to 100, h (hue) is 0 to 360, C (chroma) can be 0 to any number (I don't believe that there _is_ a max from whatever corollary/inputs produces the max), maybe max 160. For hard-coded colors, start with max 182 (this seemed a thing with L in HCL).
+# ALSO, I tried the same thing with a different color library, in a now deleted script getNshadesOfColorCAM16-colour-science.py, but I was getting very wonky color results, so I forsook it and deleted the script.
+
 import sys
 import numpy as np
 from colorspacious import cspace_converter, cspace_convert, deltaE
 import argparse
 
 # configure arguments / help
-PARSER = argparse.ArgumentParser(description='Gets -n shades of any -c color (default color is white if not passed) via the CIECAM02 color space, which models human perception of color (and brightnes and other aspects of light) better than any other model at this writing.')
+PARSER = argparse.ArgumentParser(description='Gets -n shades of any -c color (default color is white if not passed) via the CIECAM02 color space, which models human perception of color (and brightness and other aspects of light) better than any other model at this writing.')
 PARSER.add_argument('-c', '--COLOR', help='String. Color to get shades of, in RGB HEX format e.g. \"-c \'FF00FF\'\" (without the double quote marks, but _with_ the single quote marks) for magenta.', type=str)
 PARSER.add_argument('-n', '--NUMBER_OF_SHADES', help='Number. How many shades of color to generate from brightest original color point to black., e.g. "-n 15" (without the quote marks) for 15 shades.', type=int, required=True)
 PARSER.add_argument('-b', '--BRIGHTNESS_OVERRIDE', help='Optional number from 0 to 100. If provided, overrides innate brightness (according to CIECAM02 / JCh modeling of J or brightness) of -c color, resulting in colors stepping down from this override brightness. 100 is full bright (will appear white or near-white), 50 is medium bright, 0 is dark (will appear black or near-black). If not provided, generated shades will step (default down) from colors\' inherent brightness to black or near black. To step up to white, see -r option. Note that yellows may get lost as orange below about J = 80, but violets get lost as magenta above that, depending on the value of C also.', type=int)

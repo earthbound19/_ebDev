@@ -1,15 +1,15 @@
 # DESCRIPTION
 # Creates a list of colors expressed as RGB hexadecimal values, from a simplified CIECAM02 color space. Names the output file partly after the number of elements in the list. Variant of script that uses one ciecam02 python library; this uses colorspacious, which at this writing I seem not to understand (or maybe it had errors) and it sometimes produces very out of place colors.
 
-# USAGE
-# python get_CIECAM02_simplified_gamut.py
-# Produces a file named <n>_from_CIECAM02_simplified_as_RGB.hexplt.
-# NOTES:
-# - To change the number of output colors, hack the assignments in the script to the variables
-# J_step, C_step and h_step.
-
 # DEPENDENCIES
-# python, with these packages: numpy, colorspacious, colormap, more_itertools
+# python, with these packages: numpy, colorspacious, colormap, more_itertools.
+
+# USAGE
+# Run this script through a Python interpreter, without any parameters:
+#    python /path/to_this_script/get_CIECAM02_simplified_gamut.py
+# Produces a file named <n>_from_CIECAM02_simplified_as_RGB.hexplt.
+# NOTE
+# To change the number of output colors, hack the scripts' variable assignments to `J_step`, `C_step` and `h_step`.
 
 
 # CODE
@@ -26,16 +26,15 @@
 
 # ciecam02 doc:
 # CIECAM02 produces multiple correlates, like H, J, z, Q, t, C, M, s. Some of them represent similar concepts, such as C means chroma and M colorfulness s saturation correlate the same thing in different density. We need only 3 major property of these arguments to completely represent a color, and we can get other properties or reverse algorithms..
-# Color type jch is a float list like [J, C, h], where 0.0 < J < 100.0, 0.0 < h < 360.0, and 0.0 < C. the max value of C does not limit, and may produce exceeds when transform to rgb. The effective value of max C varies. Probably for red color h 0.0, and brightness j 50.0, C reach the valid maximum, values about 160.0.
-# IN OTHER WORDS: J (brightness) range is 0 to 100, h (hue) is 0 to 360, C (chroma) can be 0 to any number (I don't beleive that there _is_ a max from whatever correlary/inputs produces the max), maybe max 160. I'll start with max 182 (this seemed a thing with L in HCL).
+# Color type jch is a float list like [J, C, h], where 0.0 < J < 100.0, 0.0 < h < 360.0, and 0.0 < C. the max value of C does not limit, and may produce exceeds when transform to RGB. The effective value of max C varies. Probably for red color h 0.0, and brightness j 50.0, C reach the valid maximum, values about 160.0.
+# IN OTHER WORDS: J (brightness) range is 0 to 100, h (hue) is 0 to 360, C (chroma) can be 0 to any number (I don't beleive that there _is_ a max from whatever corollary/inputs produces the max), maybe max 160. I'll start with max 182 (this seemed a thing with L in HCL).
 
 # NOTE my eyes said, assuming those values, for HCL, do these step values: L_step 18, C_domain 24, H_step 7
 # (later self: WHAT? 7 colors?! How about 12 * how many perceived steps in between all?)
 
 
 import numpy as np
-# DEPRECATED:
-# from ciecam02 import jch2rgb
+# DEPRECATED: from ciecam02 import jch2rgb
 from colorspacious import cspace_convert
 from colormap import rgb2hex	# which also needs easydev (pip install easydev)
 import more_itertools

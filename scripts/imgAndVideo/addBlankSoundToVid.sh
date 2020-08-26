@@ -5,11 +5,11 @@
 # This replaces the original video without warning, with the new copy that has a silent sound track added.
 
 # DEPENDENCIES
-# a 'nixy environment, ffmpeg
+#    ffmpeg
 
 # USAGE
-# Pass this script one parameter, being a video file, e.g.:
-# ./thisScript.sh inputVideoFile.mp4
+# Pass this script one parameter, which is a video file, e.g.:
+#    addBlankSoundToVid.sh inputVideoFile.mp4
 
 
 # CODE

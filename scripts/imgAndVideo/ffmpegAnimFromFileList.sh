@@ -1,22 +1,25 @@
 # DESCRIPTION
 # Creates an mp4 video (AVC) from a flat text file list of input image file names (one image file name per line in list). Creates the animation at _out.mp4.
 
-# WARNING: AUTOMATICALLY overwrites _out.mp4 if it already exists.
+# WARNING
+# This script overwrites _out.mp4 if it already exists.
 
 # USAGE
-# From the directory with the image animation source images, invoke this script with these parameters:
-# $1 input "frame rate" (how to interpret the speed of input images in fps)
-# $2 desired output framerate
-# $3 desired constant quality (crf)
-# $4 the flat text file list of image file names to string into an animation _out.mp4.
+# From the directory with the image animation source images, run this script with these parameters:
+# - $1 input "frame rate" (how to interpret the speed of input images in fps)
+# - $2 desired output framerate
+# - $3 desired constant quality (crf)
+# - $4 the flat text file list of image file names to string into an animation _out.mp4.
 # Optional: $5 rescale target resolution expressed as nnnnXnnnn. Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution.
-# NOTE that the expected list format is:
-# file 0001.png
-# file 0002.png
-# file 0003.png
+# NOTE that the expected list format is, per ffmpeg:
+#    file 0001.png
+#    file 0002.png
+#    file 0003.png
 # etc.
-# ALSO: - You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32). - You may prefer to instead build a file list by way of mkNumberedLinksFromFileList.sh for use with ffmpegAnim.sh, because file concatenation with ffmpeg, it seems, can be buggy and drop frames.
+# ALSO, you can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32). - You may prefer to instead build a file list by way of mkNumberedLinksFromFileList.sh for use with ffmpegAnim.sh, because file concatenation with ffmpeg, it seems, can be buggy and drop frames.
 
+
+# CODE
 # TO DO
 # ? make it name the output file after the ../.. parent folder name?
 # Adapt the script from which this is derived to handle parameter $4 here (and then scrap this script)?

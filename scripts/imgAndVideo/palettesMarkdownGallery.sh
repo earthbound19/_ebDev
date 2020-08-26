@@ -1,25 +1,24 @@
 # DESCRIPTION
-# Creates a markdown image listing of all palette files (rendered from .hexplt source files) in the current path. Gallery file is README.md. WARNING: this will overwrite any other such file! DOUBLE WARNING: it will delete any (presumably erroneous) README.md if there are no .pngs in the directory you run this in!
+# Creates a markdown image listing (README.md) of all .png format palette files (rendered from .hexplt source files) in the current path.
+
+# WARNINGS
+# - This will overwrite a palette README.md file that already exists.
+# - It will also delete a README.md if there are no .pngs in the directory you run this in.
 
 # USAGE
-# Invoke this script without any parameters:
-# palettesMarkdownGallery.sh
-
-# NOTES
+# Run this script without any parameters:
+#    palettesMarkdownGallery.sh
+# NOTE
 # On Mac (at least) this script throws an error about test, and yet it still works as intended (the test causes a zero or nonzero return code).
-
-# TO DO
-# Remove search for many image types?
 
 
 # CODE
-
 # checking error code on find command thanks to a genius breath yon: https://serverfault.com/a/768042/121188
-! test -z $(gfind . -maxdepth 1 -iname \*.png)
+! test -z $(find . -maxdepth 1 -iname \*.png)
 error_code=`echo $?`
 # echo error_code is $error_code
 
-# If no png files were found (if gfind threw an error), destroy any README.md gallery file and exit the script:
+# If no png files were found (if find threw an error), destroy any README.md gallery file and exit the script:
 if (( error_code == "1" ))
 then
 	echo "--NO png files were found. DESTROYING README.md and will then exit script!";
@@ -31,7 +30,7 @@ fi
 # Otherwise, proceed with gallery creation:
 printf "# Palettes\n\nClick any image to go to the source image; the text line above the image to go to the source .hexplt file.\n\n" > README.md
 
-array=(`gfind . -maxdepth 1 -type f -iname \*.png -printf '%f\n' | tr -d '\15\32' | gsort -n`)
+array=(`find . -maxdepth 1 -type f -iname \*.png -printf '%f\n' | tr -d '\15\32' | sort -n`)
 
 for element in ${array[@]}
 do

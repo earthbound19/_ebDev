@@ -1,9 +1,19 @@
-# DESCRIPTION: returns one random hex string of length 6 characters or per paramaters you pass to the script.
+# DESCRIPTION
+# Prints $1 randomly generated hex strings of length $2 (default values used if no parameters provided).
 
-# USAGE: pass this script two paramaters:
-# $1 How many hex strings you want it to generate
-# $2 The length of each hex string
+# USAGE
+# Run with these parameters:
+# - $1 OPTIONAL. How many hex strings you want to print.
+# - $2 OPTIONAL. The length of each hex string.
+# For example, to print 14 hex strings, each 42 characters long, use:
+#    randomHexString.sh 14 42
+# To use default settings, omit any or all parameters, e.g.
+#    randomHexString.sh 8
+# Or:
+#    randomHexString.sh
 
+
+# CODE
 if [[ $1 == "" ]]; then howMany=1; else howMany=$1; fi
 if [[ $2 == "" ]]; then length=6; else length=$2; fi
 for (( i=1; i<=$howMany; i++ ))
