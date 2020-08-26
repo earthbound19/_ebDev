@@ -1,6 +1,0 @@
-https://github.com/mavnn/mintty-colors-solarized
-https://github.com/geekjuice/flat-ui-mintty/blob/master/flat-minttyrc
-https://github.com/rhlee/mintty-gnome-colors/blob/master/.minttyrc
-https://gist.github.com/pasela/3412915
-
-unexplored: https://github.com/oumu/mintty-color-schemes
