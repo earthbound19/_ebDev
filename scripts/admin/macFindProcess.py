@@ -1,16 +1,17 @@
 # DESCRIPTION
-# Identifies the process associated with a window on Macs. RE: https://superuser.com/a/1171739
+# Identifies the process associated with a window on MacOS. RE: https://superuser.com/a/1171739
 
 # USAGE
-# python thisScript.py
-# -- then follow on-screen prompts
+# Run this script through a Python interpereter withuot any parameter:
+#    python path/to/this/script/macFindProcess.py
+# -- then follow on-screen prompts.
 
 # DEPENDENCIES
-# pyenv (suggested)
-# Python 2, via these commands:
-# pyenv install 2.7.15
-# pyenv active 2.7.15
-# pip install pyobjc-framework-Quartz
+# pyenv (suggested) and Python 2 (or will this work with Python 3?), via these commands:
+#    pyenv install 2.7.15
+#    pyenv active 2.7.15
+# quartz, via this command:
+#    pip install pyobjc-framework-Quartz
 
 
 # CODE

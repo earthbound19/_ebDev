@@ -1,11 +1,12 @@
 # DESCRIPTION
-# Returns one password of length 44 characters or per paramaters you pass to the script.
+# Returns one password of length 44 characters or per parameters you pass to the script.
 
 # USAGE
-# pass this script two paramaters:
-# $1 how many strings you want it to return
-# $2 the length of each string. Example:
-# thisScript.sh 5 44
+# pass this script two parameters:
+# - $1 how many strings you want it to return
+# - $2 the length of each string.
+# Example:
+#    complexPassword.sh 5 44
 # -- will return 5 passwords of length 44 characters each.
 
 # SEE ALSO: http://passwordmaker.sourceforge.net/downloads/cli.html
@@ -20,7 +21,7 @@ export LC_CTYPE=C
 for (( i=1; i<=$howMany; i++ ))
 do
 	cat /dev/urandom | tr -dc 'a-z0-9A-Z{}[]~!@#$%^&*()_+-' | head -c $length
-# Possibly more efficient option that sacrifices many unusual characters from entropy pool; re https://unix.stackexchange.com/a/476125/110338 :
+# Possibly more efficient option that sacrifices many unusual characters from entropy pool; re https://Unix.stackexchange.com/a/476125/110338 :
 	# base64 < /dev/urandom | head -c $length
 		# For newline between printed strings:
 		echo

@@ -1,10 +1,14 @@
 # DESCRIPTION
-# Generates random hex color schemes of file format .hexplt (randomly named), which are plain text files with one hex color per line.
+# Generates random hex color schemes of file format `.hexplt` (randomly named), which are plain text files with one hex color per line.
 
 # USAGE
-# Invoke this script with 1 or 2 parameters, both optional:
-# $1 How many such color schemes to generate. If not provided, one will be made.
-# $2 The number of colors to have in the generated color scheme. If omitted, the script will randomly pick a number between 2 and 7.
+# Run with these parameters:
+# - $1 How many such color schemes to generate. If not provided, one will be made.
+# - $2 The number of colors to have in the generated color scheme. If omitted, the script will randomly pick a number between 2 and 7.
+# Example that will generate 10 random palette files with 6 colors each:
+#    NrandomHexColorSchemes.sh 10 6
+# Example that will generate 12 random palette files, and the script will randomly decide how many colors in each:
+#    NrandomHexColorSchemes.sh 12
 
 
 # CODE
@@ -12,12 +16,12 @@ rndFileNameLen=8
 colorsInThisScheme=7
 
 if [ -z "$1" ]; then howManySchemesToCreate=1; else howManySchemesToCreate=$1; fi
-# If no paramater $2 passed, set a string that later is used to instruct to randomly pick a number between 1 and 7:
+# If no parameter $2 passed, set a string that later is used to instruct to randomly pick a number between 1 and 7:
 if [ -z "$2" ]; then pickNcolorsPerScheme="r"; else pickNcolorsPerScheme=$2; colorsInThisScheme=$pickNcolorsPerScheme; fi
 
 # Pregenerate random hex chars to be used in palettes:
 allRndHexChars=$(( $howManySchemesToCreate * $colorsInThisScheme * 6 ))	# some waste here, because if pickNcolorsPerScheme == r, a number of colors in a range will be selected for each generated scheme, and the number of hex characters generated against allRndHexChars won't all be used.
-# TO DO: add the following line to every script that uses tr such as the following, because Mac terminal throws an error without it, re: https://unix.stackexchange.com/a/141434/110338
+# TO DO: add the following line to every script that uses tr such as the following, because Mac terminal throws an error without it, re: https://Unix.stackexchange.com/a/141434/110338
 export LC_CTYPE=C
 rndHexStrings=`cat /dev/urandom | tr -cd 'a-f0-9' | head -c $allRndHexChars`
 # Counter variables incremented by N in loops to partition where to grab random characters from a string:
@@ -55,6 +59,6 @@ do
 done
 
 # DEVELOPMENT LOG
-# 2018-04-24 how have I used this if the paramaters weren't correctly detected? Fixed that and tightened/improved logic, reversed paramater $1 and $2 positions.
+# 2018-04-24 how have I used this if the parameters weren't correctly detected? Fixed that and tightened/improved logic, reversed parameter $1 and $2 positions.
 # 2017-05-23 altered to just output generated hex color scheme list file to current path (and not fuss about folders before even invoking or after invoking script). Redifined output file format as .hexplt and updated script to output to that.
 # 2016-10-22 merged more efficient functionality of duplicate work rndHexColorsGen.sh with better file naming functionality of this.

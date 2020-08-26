@@ -1,3 +1,13 @@
+% DESCRIPTION
+% Force removes all the Windows Store apps that are _components_ (and should not be components) of Windows 8+.
+
+% USAGE
+% Run from an elevated powershell terminal, from a directory that has this script in it:
+%    interactiveWinAppStoreUninstall.ps
+% You may need to set powershell execution policy first to allow execution of this.
+
+
+% CODE
 Get-AppxProvisionedPackage -Online | Out-GridView -PassThru | Remove-AppxProvisionedPackage -Online
 
 % remove the user's apps:

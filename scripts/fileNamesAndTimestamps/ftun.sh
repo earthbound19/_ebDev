@@ -1,37 +1,34 @@
 # DESCRIPTION
-# Replaces terminal-unfriendly characters in all files of type $1
-# in the current directory. If $1 is not provided, does this to
-# ALL files in the current directory.
-# Why ftun.sh? FTUN stands for "Fix Terminal Unfriendly [folder
-# and file] Names." Terminal-unfriendly charactrers in file names
-# are any character that may make a script choke if you attempt
-# to pass a file name (or folder name) containing them to a script.
-# Characters I consider unfriendly (but which may not all actually
-# cause problems) are (with maybe more problematic ones first) :
-# '@=`~!#$%^&()+[{]};. ,-
-# In my opinion it is also undesirable to have a . character
-# in the middle of a file name.
+# Replaces terminal-unfriendly characters in all files of a given type (parameter 1) in the current directory, via rename.pl. If $1 is not provided, does this to ALL files in the current directory. Why ftun.sh? FTUN stands for "Fix Terminal Unfriendly [folder and file] Names." Terminal-unfriendly characters in file names are any character that may make a script choke if you attempt to pass a file name (or folder name) containing them to a script. See NOTES under USAGE.
 
 # DEPENDENCIES
-# Perl, and rename.pl from http://plasmasturm.org/code/rename/rename
-# in your PATH, and a 'nixy environment.
+# Perl, and `rename.pl` (from http://plasmasturm.org/code/rename/rename) in your PATH, and a Unix or emulated Unix environment.
 
 # USAGE
-#  The following assumes this script is in you PATH.
-#   From a terminal, in a folder with terminal-processing-unfriendly
-#   names, execute this script, optionally with one parameter, being
-#   the extension of every file you wish to rename. For example,
-#   for all png images, run:
-# ftun.sh png
-#  To operate on ALL files (regardless of extension), run this
-#   script withuot any parameter:
-# ftun.sh
-#  To operate on all files of a given type in all subpaths (and it
-#   operates on folders, too!), pass anything as a second parameter:
-# ftun.sh png foo
+# From a terminal, in a folder with terminal-unfriendly file or folder names, execute with these parameters:
+# - $1 OPTIONAL. File extension without . in it, for example png. Causes script to rename all file names with that extension. To rename all files of every type (`.txt`, `.png`, `.hexplt`, `.ttf`, or whatever -- everything found), pass the keyword 'ALL'.
+# - $2 OPTIONAL. Anything (for example the word 'SNORFBLARN'). Causes script to rename all files of type $1 in all subdirectories also.
+# Example that would rename all files with the .png extension to terminal-friendly names:
+#    ftun.sh png
+# Example that would rename all files (regardless of extension):
+#    ftun.sh ALL
+# Example that would operate on all png files in the current directory and all subdirectories:
+#    ftun.sh png SNORFBLARN
+# Example that would operate on all files of every type found in the current directory and all subdirectories:
+#    ftun.sh png ALL SNORFBLARN
+# NOTES
+# - Characters I consider unfriendly (but which may not all actually cause problems) are (with maybe more problematic ones first) : ``@=\`~!#$%^&()+[{]}; ,-``
+# - Also, in my opinion it is undesirable to have a . character in the middle of a file name (a file extension with two or more dots in it).
 
 
-if [ "$1" ]
+# CODE
+# DEV NOTES:
+# How to figure out which characters need escaping for a script of a given type: type them into your text editor, and save the file with the intended batch script extension. The characters not recognized as part of a string show in a non-string-highlight color, e.g. :
+# \`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \.
+
+# Example command that WORKS as far as demonstrating replacing characters:
+# echo A\`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \.B | tr \`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \. _
+if [ "$1" ] && [ "$1" != "ALL" ]
 then
 	extension=\*\.$1
 else
@@ -61,42 +58,33 @@ echo "script."
 
 read -p "TYPE HERE: " USERINPUT
 
-if [ $USERINPUT == $PASS_STRING ]
+if [ $USERINPUT != $PASS_STRING ]
 then
-	echo "User input equals pass string; proceeding."
-	pathToRenamePerl=`which rename.pl`
-		# Option that removes dashes also:
-		# perl $pathToRenamePerl -e 's/[^\w.]+/_/g' $extension
-	perl $pathToRenamePerl -e 's/[^\w.-]+/_/g' $extension
-	# if $2 was passed to script, do the same thing recursively in all directories:
-	if [ "$2" ]
-	then
-		directories=(`gfind . -type d`)
-		# remove the first element in that array by reassigning to itself without that:
-		directories=(${directories[@]:1})
-
-		for element in ${directories[@]}
-		do
-			pushd .
-			cd $element
-			perl $pathToRenamePerl -e 's/[^\w.-]+/_/g' $extension
-			popd
-		done
-	fi
-else
-	echo "User input does not equal $PASS_STRING."
-	echo "script will exit without doing anything."
+	echo "User input does not equal $PASS_STRING. Script will exit without doing anything."
+	exit 1
 fi
 
+echo "User input equals pass string. Will proceed."
+pathToRenamePerl=$(getFullPathToFile.sh rename.pl)
 
+# TO DO: make this work with all these characters:
+# '@=`~!#$%^&()+[{]};. ,-
+Perl $pathToRenamePerl -e 's/[^\w.-]+/_/g' $extension
 
-# DEV NOTES:
-# How to figure out which characters need escaping for a script of
-# a given type: type them into your text editor, and save the file
-# with the intended batch script extension. The characters not
-# recognized as part of a string show in a non-string-highlight color,
-# e.g. :
-# \`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \.
+# If $2 was passed to script, recurse through subdirectories and also rename all files of type $extension:
+if [ "$2" ]
+then
+	directories=(`find . -type d`)
+	# remove the first element in that array by reassigning to itself without that:
+	directories=(${directories[@]:1})
 
-# Example command that WORKS as far as demonstrating replacing characters:
-# echo A\`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \.B | tr \`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \. _
+	for element in ${directories[@]}
+	do
+		pushd .
+		cd $element
+# TO DO: make this work with all these characters:
+# '@=`~!#$%^&()+[{]}; ,-
+		Perl $pathToRenamePerl -e 's/[^\w.-]+/_/g' $extension
+		popd
+	done
+fi

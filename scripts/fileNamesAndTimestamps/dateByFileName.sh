@@ -1,17 +1,19 @@
 # DESCRIPTION
-# looks for files named after the pattern .*YYYY.[.]MM.[.]DD.[.]HH.[.]MM.[.]SS and updates their modified date stamps to match. Works on all files from the directory tree from which it is run. Doesn't bother stopping to prompt for stamp updates; use at your own risk. WARNING: it expects file names without spaces.
+# Looks for files named after the pattern .*YYYY.[.]MM.[.]DD.[.]HH.[.]MM.[.]SS and updates their modified date stamps to match. Works on all files from the directory tree from which it is run (recursive). Useful for correcting that information if you have for example restored from backups or copied accross drives (which can cause the file timestamps to be made anew, depending on the file system and/or tool), and if you want to examine files by sort of the date they were _actually_ created or modified, not just copied or restored.
+
+# WARNING
+# This script does not prompt to confirm date stamp updates, it just runs them without asking. Use at your own risk.
 
 # USAGE
-# Invoke this script from a directory tree which you want to so correct the file modified date stamps in.
+# Run without any parameter, from a directory tree which you want to so correct the file modified date stamps in:
+#    dateByFileName.sh
+# NOTE
+# This script expects terminal-friendly file names. See ftun.sh.
 
-# LICENSE
-# I wrote this from scratch and I release it to the Public Domain. 12/23/2015 11:36:51 PM -RAH
 
+# CODE
 # TO DO
-# Optional filtering of only specific file types (extensions)? Add parsing/updating of hours/minutes/seconds?
-
-
-# SCRIPT BEGIN.
+# Optional filtering of only specific file types (extensions)? Add parse/update of hours/minutes/seconds?
 echo Creating batch script to update time stamps of all files in this path by parsing any date stamps in file names . . .
 # List all files with a matching date pattern of 'yyyy-mm-dd to a file:
 		# Rescued again by a genius breath at stackoverflow; to avoid referencing so many capture groups; re: http://stackoverflow.com/a/10993346/1397555
@@ -19,14 +21,14 @@ echo Creating batch script to update time stamps of all files in this path by pa
 		# touch -c -t 201405140809 "./_patreon_cropOfFinal_07-18-2014__11-18-21_AM_FINAL_v04_29-703x12-377_300dpi.tif"
 		# touch -c -t 201405140809.16 "./_patreon_cropOfFinal_07-18-2014__11-18-21_AM_FINAL_v04_29-703x12-377_300dpi.tif"
 		# nested backreference command that works:
-		# echo hello | gsed 's/\(.*\(ll\).*\)/\1 \2/g'
-gfind -type f | gsed -n 's/\(.*\([0-9]\{4\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\).*\)/touch -c -t  \2 \3 \4 \5 \6.\7 "\1"/p' > _UPDtimeStamp.sh
+		# echo hello | sed 's/\(.*\(ll\).*\)/\1 \2/g'
+find . -type f | sed -n 's/\(.*\([0-9]\{4\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\)[^0-9]\{1,2\}\([0-9]\{1,2\}\).*\)/touch -c -t  \2 \3 \4 \5 \6.\7 "\1"/p' > _UPDtimeStamp.sh
 # NOTE: that double-space after the -t flag is intentional (so that there remains a space after later number string processing.
 
 # replace all single-digit space-padded numbers with one zero pad:
-gsed -i 's/ \([0-9][^0-9]\)/ 0\1/g' _UPDtimeStamp.sh
+sed -i 's/ \([0-9][^0-9]\)/ 0\1/g' _UPDtimeStamp.sh
 # remove spaces between numbers:
-gsed -i 's/ \([0-9]\{2\}\)/\1/g' _UPDtimeStamp.sh
+sed -i 's/ \([0-9]\{2\}\)/\1/g' _UPDtimeStamp.sh
 
 # Execute the file time stamp modification batch, then rename it to a date and time stamped .txt file:
 echo Executing ./_UPDtimeStamp.sh . . .

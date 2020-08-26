@@ -1,12 +1,12 @@
 # DESCRIPTION
-# Lossy transcodes all video files in the current directory (doesn't scan subdirectories) into mp4s compatible with Sony Vegas 12.
-
-# USAGE
-# Invoke this with one paramater, being the extension of videos you wish to encode to Sony Vegas compatible video.
-# Vcompat = compatible with Sony (V)egas video editing software. 2016-04-26 9:46 PM -RAH
+# Lossy transcodes all video files in the current directory (doesn't scan subdirectories) into mp4s compatible with Sony Vegas 12. ('Vcompat' means Vegas compatible, or compatible with Sony (V)egas video editing software.)
 
 # DEPENDENCIES
-# find (gnu find), ffmpeg, a 'nixy environment.
+#    ffmpeg
+
+# USAGE
+# Run this with one parameter, which is the extension of videos you wish to encode to Sony Vegas compatible video, e.g.:
+#    allVidsType2VcompatMP4.sh avi
 
 
 # CODE
@@ -20,7 +20,7 @@ additionalParams_one="-preset slow -tune animation"
 # Makes a video matte by scaling down a bit and placing on a dark dark violet background:
 # additionalParams_three="-vf scale=-1:1054:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=1a171e"
 
-arr=(`gfind . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
+arr=(`find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
 for filename in ${arr[@]}
 do
 	fileNameNoExt=${filename%.*}

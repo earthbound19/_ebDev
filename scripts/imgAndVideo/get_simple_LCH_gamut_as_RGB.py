@@ -1,17 +1,22 @@
 # DESCRIPTION
 # Creates a list of colors expressed as RGB hexadecimal values, from a simplified LCH (a.k.a. HCL) gamut. Capture the list with the > operator via terminal (see USAGE). Can be hacked to do this with several gamuts which the supporting "spectra" python library can use. To change the step over various components in the gamut, hack the A_domain, B_domain and C_domain variables in this script.
 
-# USAGE
-# python get_simple_gamut.py > HSL_simplified_gamut.hexplt
-
 # DEPENDENCIES
 # Python 3, spectra
 
-# Something I read and my own sample simplified gamut of lab vs. hcl convinced me to use HCL. BUT:
-# NOT TO DO: use https://github.com/colour-science/colour which has _a lot_ of functionality (including Colour Difference calculation), a ton of commits, and at this writing the newest commit only 4 days ago -- or any of the packages _it_ lists? -- don't use because it doesn't support HCL. https://github.com/colour-science/colour#see-also
+# USAGE
+# Run through a python interpreter without any parameter:
+#    python /path/to_this_script/get_simple_gamut.py
+# To pipe the result to a file, do this:
+#    python /path/to_this_script/get_simple_gamut.py > HSL_simplified_gamut.hexplt
 
 
 # CODE
+# DEVELOPER NOTE:
+# Something I read and my own sample simplified gamut of lab vs. hcl convinced me to use HCL. BUT:
+# NOT TO DO?
+# - Use https://github.com/colour-science/colour which has _a lot_ of functionality (including Colour Difference calculation), a ton of commits, and at this writing the newest commit only 4 days ago -- or any of the packages _it_ lists? -- don't use because it doesn't support HCL?
+# - See also https://github.com/colour-science/colour#see-also
 import spectra
 
 # FAILED to do what I want implemented with color print; from the spectra tutorial page; but handy reference for creating gradients (scales) :
@@ -34,7 +39,7 @@ import spectra
 
 # Lab min and max values? : L: 0 to 100; a: -110 to 110; b: -110 to 110? re: http://davidjohnstone.net/pages/lch-lab-colour-gradient-picker
 
-# LCH (Luminance, Chroma, Hue) (also known as HCL) min and max values? : L 0 to 100, C 0 to 182 (not 100?!), H 0 to 360? (Documentation doesn't say!) re: http://www.multipole.org/discourse-server/viewtopic.php?t=24834 -- with those max ranges I get hex ff00ff, whereas with what many web sites led me to believe the ranges should be (with C max 100) I get ff95ff.
+# LCH (Luminescense, Chroma, Hue) (also known as HCL) min and max values? : L 0 to 100, C 0 to 182 (not 100?!), H 0 to 360? (Documentation doesn't say!) re: http://www.multipole.org/discourse-server/viewtopic.php?t=24834 -- with those max ranges I get hex ff00ff, whereas with what many web sites led me to believe the ranges should be (with C max 100) I get ff95ff.
 # NOTE my eyes say, assuming those values, do these step values: L_step 18, C_domain 24, H_step 7
 
 A_min = 0

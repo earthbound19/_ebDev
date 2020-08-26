@@ -1,16 +1,19 @@
 Windows Registry Editor Version 5.00
+; DESCRIPTION
+; Uninstalls right-click menu options on folders and files to open an MSYS2 terminal in that location.
 
-;; THIS SECTION removes right-click on folder background options.
+; USAGE
+; Right-click this file and click "Merge," or double-click it, then click "Yes" and "Ok."
+
+
+; CODE
+; THIS SECTION removes right-click on folder background options.
 [-HKEY_CLASSES_ROOT\Directory\Background\shell\mingw32]
-
 [-HKEY_CLASSES_ROOT\Directory\Background\shell\mingw64]
-
 [-HKEY_CLASSES_ROOT\Directory\Background\shell\msys2]
 
-;; THIS SECTION removes right-click on folder options.
+; THIS SECTION removes right-click on folder options.
 [-HKEY_CLASSES_ROOT\Directory\shell\mingw32]
-
 [-HKEY_CLASSES_ROOT\Directory\shell\mingw64]
-
 [-HKEY_CLASSES_ROOT\Directory\shell\msys2]
 

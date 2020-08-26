@@ -1,13 +1,22 @@
 # DESCRIPTION
-# Invokes toOldestWindowsDateTime.sh for all image formats (hard coded) in the current directory.
+# Runs `toOldestWindowsDateTime.sh` for all files in the current directory, and optionally all subdirectories.
 
 # USAGE
-# allToOldestWindowsDateTime.sh
+# To run `toOldestWindowsDateTime.sh` for all files in the current directory (and not subdirectories), run this script without any parameter:
+#    allToOldestWindowsDateTime.sh
+# To run `toOldestWindowsDateTime.sh` for all files in the current directory and all subdirectories, run with any parameter, for example the word 'WABYEG':
+#    allToOldestWindowsDateTime.sh WABYEG
 
-list=(`gfind . -maxdepth 1 \( -iname \*.jpg -o -iname \*.png -o -iname \*.cr2 -o -iname \*.tif -o -iname \*.mov \) -printf '%f\n' | sort`)
+# CODE
+# If no parameter one, maxdepthParameter will be left at default, which causes find to search only the current directory:
+maxdepthParameter='-maxdepth 1'
+# If parameter one is passed to script, that changes to nothing, and find's default recursive search will be used (as no maxdepth switch will be passed) :
+if [ "$1" ]; then maxdepthParameter=''; fi
 
-for element in ${list[@]}
+allFiles=($(find . $maxdepthParameter -type f -printf "%P\n"))
+
+for file in ${allFiles[@]}
 do
-	echo "INVOKING toOldestWindowsDateTime.sh for file \"$element\" . . ."
-	toOldestWindowsDateTime.sh $element
+	echo "Running toOldestWindowsDateTime.sh for file \"$file\" . . ."
+	toOldestWindowsDateTime.sh $file
 done

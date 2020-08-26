@@ -1,21 +1,36 @@
 # DESCRIPTION
-# Given a filename, appends one random string of length 20 characters or per paramaters you pass to the script.
+# Prepends a random alphanumeric string (but with similar characters excluded) of length $1 to all files in the current directory. As this is a destructive or potentially havoc-inducing action, the script prompts to be sure you want to do this and does not unless you type a given password.
 
 # USAGE
-# Pass this script one parameter $1, being the length of the random string (default 20; number of possible strings breaks past the nonillians) to prepend to every file name in the current folder.
+# Run with these parameters:
+# - $1 OPTIONAL. How many random characters should be prepended to every file name. If not provided, defaults to a hard-coded value.
+# Example that will use the default number of random characters:
+#    prependRandomStringToAllFilenames.sh
+# Example that will prepend random strings 6 characters long to all files in the current directory:
+#    prependRandomStringToAllFilenames.sh 6
 
 
 # CODE
-if [ -z "$1" ]; then echo No paramater one \(length of random string to prepend\)\. Defaulting to 20\.; rndStringlength=20; else rndStringlength=$1; fi
+if [ -z "$1" ]; then echo No parameter one \(length of random string to prepend\)\. Defaulting to 20\.; rndStringlength=20; else rndStringlength=$1; fi
 
-ls > meerp_gvucavE6ahYEWmEJq267.txt
-while read n
+echo ""
+echo "WARNING: this script will prefix random strings of length $rndStringlength to ALL files in the current directory. If this is _not_ what you want to do, press CTRL (or CMD)+C, or CTRL+Z, or anything besides PEDGNIMK, and press ENTER or RETURN. If this _is_ what you want to do, type PEDGNIMK and then ENTER or RETURN."
+read -p "TYPE HERE: " SILLYWORD
+
+if ! [ "$SILLYWORD" == "PEDGNIMK" ]
+then
+	echo ""
+	echo Typing mismatch\; exit.
+	exit
+else
+	echo continuing . .
+fi
+
+allFiles=$(find . -maxdepth 1 -type f -printf "%P\n")
+for fileName in ${allFiles[@]}
 do
 			# No l, L, ,i, I, O, 1, 0, as those can get confused:
 	randString=`cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c $rndStringlength`
-	echo executing command mv $n $randString\_$n . . .
-	mv $n "$randString"_"$n"
-done < meerp_gvucavE6ahYEWmEJq267.txt
-
-# Funny, we have to use a wildcard here because by the time this script ends, the temp .txt file is renamed with a prepended random string:
-rm *meerp_gvucavE6ahYEWmEJq267.txt
+	echo renaming file $fileName . . .
+	mv $fileName "$randString"_"$fileName"
+done

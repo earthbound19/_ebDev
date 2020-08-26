@@ -1,36 +1,33 @@
 # DESCRIPTION
-# Takes a list of hex color codes, one per line, and renders a palette image composed of those colors via GraphicsMagick.
+# Takes a list of hex color codes, one per line, and renders a PNG image composed of tiles of those colors (a palette image), via GraphicsMagick.
 
 # DEPENDENCIES
-# GraphicsMagick e.g. for:
-# gm convert
-# A file ~/palettesRootDir.txt (in your home folder) which contains one line, being a unixy path to the folder where you keep hex palette (.hexplt) files.
+# - GraphicsMagick
+# - A file `~/palettesRootDir.txt` (in your home folder) which contains one line, which is a Unix-style path to the folder where you keep hex palette (`.hexplt`) files.
 
 # USAGE
-# NOTE: this script seems not to work on cygwin/windows, but it does work on Mac and probably nix' variants.
-# Invoke this script with the following parameters:
-# $1 hex color palette flat file list (input file).
-# $2 edge length of each square tile to be composited into final image.
-# $3 MUST HAVE VALUE 0 or nonzero (anything other than 0). If nonzero, the script will randomly shuffle the hex color files before compositing them to one image. PREVIOUSLY WAS $5, PREVIOUSLY WAS OPTIONAL; NOW REQUIRED. OVERWRITES different previous parameter position (from a prior version of this script).
-# $4 OPTIONAL. number of tiles accross of tiles-assembled image (columns). PREVIOUSLY WAS $3.
-# $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows). PREVIOUSLY WAS $4.
+# Run this script with the following parameters:
+# - $1 hex color palette flat file list (input file).
+# - $2 OPTIONAL. Edge length of each square tile to be composited into final image. If not provided a default is used.
+# - $3 OPTIONAL. If not provided, or provided as string 'NULL' (don't use the single quote marks), the order of elements in the palette will be preserved. If provided and anything other than NULL (for example 2 or foo or 1 or 3), the script will randomly shuffle the hex color files before compositing them to one image. I have gone back and forth on requiring this in the history of this script :/
+# - $4 OPTIONAL. Number of tiles across of tiles-assembled image (columns).
+# - $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).
 # EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, the palette image being 5 columns wide and 6 rows down, with squares in the palette rendered in random order:
-# renderHexPalette-gm.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
-
-# KNOWN ISSUES
-# Sometimes Cygwin awk throws errors as invoked by this script. Not sure why. I run it twice and one time awk throws an error, another it doesn't.
-
-# TO DO
-# Adapt this to use new script findHEXPLT.sh to retrieve .hexplt file path.
-# UM. WOULDN'T THIS BE A TON FASTER creating a ppm and then upscaling it by nearest neighbor method?! Redo script (or make variant method script) for that?! -- trying that in hexplt2ppm.sh.
-# Adapt this to do double-wide half-down ratios by multiples of two, e.g. 4:2, 8:4, 16:8 etc. (not just 2:1).
-# Allow handling of a hex color on any line with or without # in front of it.
-# Allow comments in .hexplt files (decide on a parse demarker for them and ignore all whitespace before that demarker, and also ignore the demarker itself and everything after it on the line).
-# Math to determine tile size dynamically for a target total image resolution?
+#    renderHexPalette-gm.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
+# ANOTHER EXAMPLE COMMAND; create a palette image from tigerDogRabbit_many_shades.hexplt, with each tile 300 pixels wide, no shuffling, the script deciding how many across and down to make the tiles:
+#    renderHexPalette-gm.sh tigerDogRabbit_many_shades.hexplt 300 tigerDogRabbit_many_shades.hexplt
+# ANOTHER EXAMPLE COMMAND; use the same palette and let the script use all defaults:
+#    renderHexPalette-gm.sh tigerDogRabbit_many_shades.hexplt
 
 
 # CODE
-# =============
+# TO DO
+# - UM. WOULDN'T THIS BE A TON FASTER creating a ppm and then upscaling it by nearest neighbor method?! Redo script (or make variant method script) for that?! -- trying that in hexplt2ppm.sh.
+# - Adapt this to do double-wide half-down ratios by multiples of two, e.g. 4:2, 8:4, 16:8 etc. (not just 2:1).
+# - Allow handling of a hex color on any line with or without # in front of it.
+# - Allow comments in .hexplt files (decide on a parse marker for them and ignore all whitespace before that marker, and also ignore the marker itself and everything after it on the line).
+# - Math to determine tile size dynamically for a target total image resolution?
+
 # BEGIN SETUP GLOBAL VARIABLES
 paletteFile=$1
 
@@ -46,15 +43,15 @@ else	# Search for specified palette file in palettesRootDir (if that dir exists;
 				echo searching in path $palettesRootDir --
 				echo for file $paletteFile . . .
 						# FAIL:
-						# hexColorSrcFullPath=`gfind "$palettesRootDir" -iname *$paletteFile`
-		hexColorSrcFullPath=`gfind $palettesRootDir -iname "$paletteFile"`
+						# hexColorSrcFullPath=`find "$palettesRootDir" -iname *$paletteFile`
+		hexColorSrcFullPath=`find $palettesRootDir -iname "$paletteFile"`
 		echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 		if [ "$hexColorSrcFullPath" == "" ]
 			then
-				echo No file of name $paletteFile found in the path this script was invoked from OR in path \"$palettesRootDir\" \! ABORTING script.
+				echo No file of name $paletteFile found in the path this script was run from OR in path \"$palettesRootDir\" \! ABORTING script.
 				exit
 			else
-				echo File name $paletteFile found in the path this script was invoke from OR in path \"$palettesRootDir\" \! PROCEEDING. IN ALL CAPS.
+				echo File name $paletteFile found in the path this script was run from OR in path \"$palettesRootDir\" \! PROCEEDING. IN ALL CAPS.
 		fi
 	else
 		echo !--------------------------------------------------------!
@@ -68,35 +65,37 @@ else	# Search for specified palette file in palettesRootDir (if that dir exists;
 	fi
 fi
 
+if [ "$2" ]; then tileEdgeLen=$2; else tileEdgeLen=250; fi
 
-tileEdgeLen=$2
-# Whether to shuffle colors:
-if [[ $3 == 0 ]]
+# Set default no shuffle, and only alter if $3 is not equal to 'NULL':
+shuffleValues=0
+if [ "$3" ] && [ "$3" != "NULL" ]
 then
-	shuffleValues=0
-	echo Value of paramater \$3 is zero\; will not shuffle read values.
-else
 	shuffleValues=1
-	echo echo Value of paramater \$3 is NONZERO\; WILL SHUFFLE read values.
+	echo echo Value of parameter \$3 is NONZERO\; WILL SHUFFLE read values.
 fi
+
 # WHETHER NUM tiles across (and down) is specified; if so, use as specified, if not so, do some math to figure for a 2:1 aspect;
 # $4 is across. If $4 is not specified, do some math. Otherwise use $4:
 if [ ! $4 ]
 then
-	# Get number of lines (colors). Square root of that x2 will be the number of columns in the rendered palette:
-	# Works around potential incorrect line count; re: https://stackoverflow.com/a/28038682/1397555 :
-# echo attempting awk command\:
-# echo "awk 'END{print NR}' $hexColorSrcFullPath"
-	# numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
+	# Get number of lines (colors). The following awk command works around potential incorrect line count; re: https://stackoverflow.com/a/28038682/1397555 :
 	numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
-			# echo number of colors found in $paletteFile is $numColors.
-	sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
-			# echo sqrtOfColorCount is $sqrtOfColorCount \(first check\)
-	tilesAcross=$(( $sqrtOfColorCount * 2 ))
+	# If number of colors is above N (12?), try to render a ~2:1 aspect palette (columns will be the square root of the number of colors, x2). If it is N or below, render only one row, with as many columns as there are colors.
+	N=12
+	if [[ $numColors -le $N ]]
+	then
+		# printf "\nAt $numColors, number of colors in palette is $N or less; will render only one row of that many colors."
+		tilesAcross=$numColors
+	else
+		# printf "\nAt $numColors, number of colors in palette is greater than $N; will calculate rows and columns to try to render a ~2:1 aspect palette."
+		sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
+		tilesAcross=$(( $sqrtOfColorCount * 2 ))
+	fi
+	printf "\ntilesAcross is $tilesAcross.\n"
 else
 	tilesAcross=$4
 fi
-# echo tilesAcross is $tilesAcross\.
 
 # $5 is down. If $5 is not specified, do some math. Otherwise use $5.
 if [ ! $5 ]
@@ -121,7 +120,17 @@ then
 else
 	tilesDown=$5
 fi
-# echo tilesDown is $tilesDown\.
+
+# COMMENT out these test echoes and exit statement in production:
+# echo "values:"
+# echo "paletteFile $paletteFile"
+# echo "tileEdgeLen $tileEdgeLen"
+# echo "shuffleValues $shuffleValues"
+# echo "numColors $numColors"
+# echo "sqrtOfColorCount $sqrtOfColorCount"
+# echo "tilesAcross $tilesAcross"
+# echo "tilesDown $tilesDown"
+# exit
 # END SETUP GLOBAL VARIABLES
 # =============
 
@@ -153,12 +162,12 @@ else
 	mkdir ./_hexPaletteIMGgenTMP_2bbVyVxD
 fi
 
-# this here complexity solves a problem of not reading a last line if it doesn't end with a new line; dunno how but magic says ok re http://stackoverflow.com/a/31398490 ;
+# this here complexity solves a problem of not reading a last line if it doesn't end with a new line; dunno how but magic says OK re http://stackoverflow.com/a/31398490 ;
 # make directory of color tiles from palette:
 while IFS= read -r line || [ -n "$line" ]
 do
-	# IF A SCRIPT THAT I DEVELOPED WORKED ONCE UPON A TIME BUT DOESN'T ANYMORE, it is because gsed on windows is inserting $#@! windows newlines into stdin/out! &@*(@!! FIXED with tr -d '\15\32':
-	hexNoHash=`echo $line | gsed 's/\#//g' | tr -d '\15\32'`
+	# IF A SCRIPT THAT I DEVELOPED WORKED ONCE UPON A TIME BUT DOESN'T ANYMORE, it is because sed on windows is inserting $#@! windows newlines into stdin/out! &@*(@!! FIXED with tr -d '\15\32':
+	hexNoHash=`echo $line | sed 's/\#//g' | tr -d '\15\32'`
 	gm convert -size "$tileEdgeLen"x"$tileEdgeLen" xc:\#$hexNoHash _hexPaletteIMGgenTMP_2bbVyVxD/$hexNoHash.png
 done < $hexColorSrcFullPath
 
@@ -171,7 +180,7 @@ done < $hexColorSrcFullPath
 echo "gm montage -tile $tilesAcross"x"$tilesDown -background gray -geometry $tileEdgeLen"x"$tileEdgeLen+0+0 \\" > mkGridHead.txt
 
   # convert hex color scheme text list file to parameter list for ~magick; AGAIN WITH THE NEED to unbork windows newlines (via tr):
-gsed 's/.*#\(.*\)$/_hexPaletteIMGgenTMP_2bbVyVxD\/\1.png \\/' $hexColorSrcFullPath | tr -d '\15\32' > ./mkGridSRCimgs.txt
+sed 's/.*#\(.*\)$/_hexPaletteIMGgenTMP_2bbVyVxD\/\1.png \\/' $hexColorSrcFullPath | tr -d '\15\32' > ./mkGridSRCimgs.txt
 # IF $shuffleValues is nonzero, randomly sort that list:
 	if [ $shuffleValues -ne 0 ]; then shuf ./mkGridSRCimgs.txt > ./tmp_3A7u2ZymRgdss4rsXuxs.txt; rm ./mkGridSRCimgs.txt; mv ./tmp_3A7u2ZymRgdss4rsXuxs.txt ./mkGridSRCimgs.txt; fi
 echo $renderTarget > mkGridTail.txt
@@ -190,9 +199,13 @@ mv _hexPaletteIMGgenTMP_2bbVyVxD $paletteFile.colors
 	# AND, if it annoys you, also delete:
 	rm -rf $paletteFile.colors
 
+# The next four code lines are optional but I leave them uncommented, as they can dramatically reduce file size:
+echo ""
+echo OPTIMIZING rendered png . . .
+pngquant --skip-if-larger --ext=.png --force --quality 100 --speed 1 --nofs --strip --verbose $renderTarget
+optipng -o7 $renderTarget
+
+echo ""
 echo DONE--created color palette image is $renderTarget
 
 # TO DO? : make the following statement optionally true (via parameter), and echo it: "You will also find color swatch images from the palette in the folder $paletteFile.colors."
-
-# OPTIONAL on cygwin: open palette image:
-# cygstart $1.png

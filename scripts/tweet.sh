@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
-#
+# DESCRIPTION
+
+# SOURCE
 # Taken from (original at) : from https://github.com/ryuichiueda/TomoTool
+
 # ===============================================================
+# LICENSE
 # The MIT License
 #
 # Copyright (C) 2013-2015 Ryuichi Ueda
@@ -32,6 +36,11 @@
 #
 # If you want to see detailed logs, set an environment variable "DEBUG" to 1 or something.
 
+# USAGE
+# Correct. I don't know yet.
+
+
+# CODE
 work_dir="$(pwd)"
 tools_dir="$(cd "$(dirname "$0")" && pwd)"
 

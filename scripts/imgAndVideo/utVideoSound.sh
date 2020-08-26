@@ -2,17 +2,18 @@
 # Compresses the video and audio from any video container (that ffmpeg will handle) with lossless codecs (utvideo and flac) into a new file of the same container format (e.g. .avi, .mp4). The new video will be named <input_video_losslessCompress>.<inputVideoExtension>.
 
 # USAGE
-# ./thisScript.sh inputVideo.avi
-# OR
-# ./thisScript.sh inputVideo.mp4
+# Run with one parameter, which is the input video file name:
+#    utVideoSound.sh inputVideo.avi
+# Or for example:
+#    utVideoSound.sh inputVideo.mp4
 # etc.
 
+
+# CODE
 # TO DO
 # - Copy metadata from old file to new via exiftool
 # - Optionally overwrite old file with new (destroy original)
 
-
-# CODE
 # Extract base file name and extension into variables.
 fileName="${1%.*}"
 fileExt="${1##*.}"

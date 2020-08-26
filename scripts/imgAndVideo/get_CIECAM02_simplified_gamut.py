@@ -1,18 +1,22 @@
 # DESCRIPTION
-# Creates a list of colors expressed as components OR RGB hexadecimal values, from a simplified CIECAM02 color space. Capture the list with the > operator via terminal (see USAGE).
-
-# USAGE
-# python get_CIECAM02_simplified_gamut.py > CIECAM02_simplified_gamut.gamut
-# NOTE that you may get out-of-gamut warnings (out of range) if you convert to RGB with this--you may ignore them in terms of the script running (you will still get valid output).
-# NOTE that you may alternate comments after the OUTPUT OPTIONS comment for either JCH (simplified CIECAM02 gamut) or RGB HEX output.
+# Creates a list of colors expressed as RGB hexadecimal values, from a simplified CIECAM02 color space. Optionally (with a tweak described under USAGE) prints CIECAM02 JCH components instead.
 
 # DEPENDENCIES
 # python, with these packages: numpy, ciecam02, colormap, more_itertools
 
-# TO DO? parameterize J, C and h steps.
+# USAGE
+# Run through a Python interpreter, without any parameters:
+#    python /path/to/this_script/get_CIECAM02_simplified_gamut.py
+# To pipe the results to a new file, do this:
+#    python /path/to/this_script/get_CIECAM02_simplified_gamut.py > CIECAM02_simplified_gamut.gamut
+# But you will probably get out-of-gamut warnings (out of range) if you convert to RGB with this--you may ignore them in terms of the script running (you will still get valid output). To suppress error prints by piping them to /dev/null in a Unix environment, but still get the valid hex color code printout, run it this way:
+#    python /path/to/this_script/get_CIECAM02_simplified_gamut.py > oot.txt 2>/dev/null
+# You may alternate comments after the OUTPUT OPTIONS comment for either JCH (simplified CIECAM02 gamut) or RGB HEX output.
 
 
 # CODE
+# TO DO
+# - Parameterize J, C and h steps?
 
 # PROGRAMMER NOTES
 # This page -- https://colorspacious.readthedocs.io/en/latest/tutorial.html -- describes a gamut in HCL (actually Jcl there) which is "state of the art:" CIECAM02. Supported as such by chronology in this article: https://en.wikipedia.org/wiki/Color_appearance_model#CIECAM02 Excellent article about it describing well different attributes of color and colorfulness: https://en.wikipedia.org/wiki/CIECAM02
@@ -24,8 +28,8 @@
 
 # cicam02 doc:
 # CIECAM02 produces multiple correlates, like H, J, z, Q, t, C, M, s. Some of them represent similar concepts, such as C means chroma and M colorfulness s saturation correlate the same thing in different density. We need only 3 major property of these arguments to completely represent a color, and we can get other properties or reverse algorithms..
-# Color type jch is a float list like [j, c, h], where 0.0 < j < 100.0, 0.0 < h < 360.0, and 0.0 < c. the max value of c does not limit, and may produce exceeds when transform to rgb. The effective value of max c varies. Probably for red color h 0.0, and brightness j 50.0, c reach the valid maximum, values about 160.0.
-# IN OTHER WORDS: j (brightness) range is 0 to 100, h (hue) is 0 to 360, c (chroma) can be 0 to any number (I don't beleive that there _is_ a max from whatever correlary/inputs produces the max), maybe max 160. I'll start with max 182 (this seemed a thing with L in HCL).
+# Color type jch is a float list like [j, c, h], where 0.0 < j < 100.0, 0.0 < h < 360.0, and 0.0 < c. the max value of c does not limit, and may produce exceeds when transform to RGB. The effective value of max c varies. Probably for red color h 0.0, and brightness j 50.0, c reach the valid maximum, values about 160.0.
+# IN OTHER WORDS: j (brightness) range is 0 to 100, h (hue) is 0 to 360, c (chroma) can be 0 to any number (I don't beleive that there _is_ a max from whatever corollary/inputs produces the max), maybe max 160. I'll start with max 182 (this seemed a thing with L in HCL).
 # colorspacious doc: "The three axes in this space are conventionally called 'J' (for lightness), 'C' (for chroma), and 'h' (for hue)."
 
 # NOTE my eyes said, assuming those values, for HCL, do these step values: L_step 18, C_domain 24, H_step 7

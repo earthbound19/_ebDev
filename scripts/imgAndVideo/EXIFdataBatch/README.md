@@ -17,12 +17,12 @@ mediaTagAndDist.sh does the actual metadata insertion.
 
 You will want to alter the text files in /metaDataTemplates for your own purposes.
 
-NOTE: at this writing, mediaTagAndDist.sh also uses a self-hosted URL shortening service which only I have API key access to--if you are not me :) you will either need to create your own such service (by installing POLR at your own web server) and tweak the script to use your own install of POLR, or you will need to comment out the relevant lines of code. Actually, you can probably just delete the template URL in pre-populated metadata (after the prepMediaMetadata.sh run) so that the script has no such POLR url shortener stub metadata to work with. MOREOVER NOTE that the url shortener invoked creates short URLs for intended queires in a self-installed search engine, Sphider--so that you will also need your own Sphider install to make use of this script feature.
+NOTE: at this writing, mediaTagAndDist.sh also uses a self-hosted URL shortening service which only I have API key access to--if you are not me :) you will either need to create your own such service (by installing POLR at your own web server) and tweak the script to use your own install of POLR, or you will need to comment out the relevant lines of code. Actually, you can probably just delete the template URL in pre-populated metadata (after the prepMediaMetadata.sh run) so that the script has no such POLR url shortener stub metadata to work with. MOREOVER NOTE that the url shortener run creates short URLs for intended queires in a self-installed search engine, Sphider--so that you will also need your own Sphider install to make use of this script feature.
 
 # TO DO
 / Update / integrate this documentation. oldversions\_callCreateImageTags.bat may have comments/output worth copying; also from this file.
 - Get drag-and-drop working.
-- Get invocation from another directory (via console), with this toolset in your %PATH%, working. First guess of cause: full paths not getting input correctly when invoked from another folder.
+- Get run from another directory (via console), with this toolset in your %PATH%, working. First guess of cause: full paths not getting input correctly when run from another folder.
 
 ## Other stuff that needs updating
 

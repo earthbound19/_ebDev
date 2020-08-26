@@ -1,16 +1,24 @@
-# DESCRIPTION: invokes the potrace utility to convert all black and white .bmp images (in the directory in which this script is invoked) to convert them to .svg vector images.
+# DESCRIPTION
+# Runs the potrace utility to convert all black and white .bmp images (in the directory in which this script is run) to convert them to .svg vector images.
 
-# DEPENDENCIES: potrace.
+# DEPENDENCIES
+# potrace.
 
-# USAGE: ensure that this script and potrace are both in your $PATH, and open a terminal in the directory of .bmp images. Invoke this script by name from the terminal. WARNING: depending on whether the relevant code line is commented out, this will delete the original .bmp images! NOTES: It will not trace a bmp image if the target svg file already exists. To retrace, delete the target svg file, and invoke this script again. Also, the script considers white a background color and black the line/trace area color.
+# USAGE
+# Run without any parameter:
+#    BMPs2SVGs.sh
+# NOTES
+# - The script considers white the background color and black the line/trace area color.
+# - It will not trace a bmp image if the target svg file already exists.
+# - To retrace, delete the target svg file, and run this script again.
 
 
 # CODE
-imgs=$(gfind . -iname \*.bmp)
+imgs=$(find . -maxdepth 1 -iname \*.bmp)
 for element in "${imgs[@]}"
 do
-	imgFileNoExt=`echo $element | gsed 's/\(.*\)\..\{1,4\}/\1/g'`
-	if ! [ -a $imgFileNoExt.svg ]
+	imgFileNoExt=`echo $element | sed 's/\(.*\)\..\{1,4\}/\1/g'`
+	if [ ! -a $imgFileNoExt.svg ]
 	then
 	echo tracing $element . . .
 	# original command:
@@ -23,10 +31,6 @@ do
 		potrace -s -t 12 -a 0.88 -r 150 -O 0.86 -C \#000000 --fillcolor \#ffffff $element
 		# potrace -s -t 4 -a 0.84 -r 150 -O 0.347 -C \#000000 --fillcolor \#ffffff $element
 	fi
-# ! --------
-# OPTIONAL--COMMENT OUT IF YOU DON'T WANT THE ORIGINAL IMAGE DELETED! :
-# rm $element
-# ! --------
 done
 
 echo Traced all bmp files. Done.

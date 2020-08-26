@@ -1,46 +1,47 @@
 Windows Registry Editor Version 5.00
+; DESCRIPTION
+; Installs right-click menu options on folders and files to open an MSYS2 terminal in that location.
 
-;; THIS SECTION is for right-click on a folder background.
+; USAGE
+; Right-click this file and click "Merge," or double-click it, then click "Yes" and "Ok."
+
+
+; CODE
+; THIS SECTION is for right-click on a folder background.
 [HKEY_CLASSES_ROOT\Directory\Background\shell\mingw32]
 @="MinGW &32 Bash Here"
 "Icon"="\"C:\\msys64\\mingw32.exe\""
-
 [HKEY_CLASSES_ROOT\Directory\Background\shell\mingw32\command]
 @="C:\\msys64\\msys2_shell.cmd -mingw32 -where \"%v\""
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\mingw64]
 @="MinGW 64 Ba&sh Here"
 "Icon"="\"C:\\msys64\\mingw64.exe\""
-
 [HKEY_CLASSES_ROOT\Directory\Background\shell\mingw64\command]
 @="C:\\msys64\\msys2_shell.cmd -mingw64 -where \"%v\""
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\msys2]
 @="MSYS2 Bash Here"
 "Icon"="\"C:\\msys64\\msys2.ico\""
-
 [HKEY_CLASSES_ROOT\Directory\Background\shell\msys2\command]
 @="C:\\msys64\\msys2_shell.cmd -msys -where \"%v\""
 
 
-;; THIS SECTION is for right-click on a folder.
+; THIS SECTION is for right-click on a folder.
 [HKEY_CLASSES_ROOT\Directory\shell\mingw32]
 @="MinGW &32 Bash Here"
 "Icon"="\"C:\\msys64\\mingw32.exe\""
-
 [HKEY_CLASSES_ROOT\Directory\shell\mingw32\command]
 @="C:\\msys64\\msys2_shell.cmd -mingw32 -where \"%v\""
 
 [HKEY_CLASSES_ROOT\Directory\shell\mingw64]
 @="MinGW 64 Ba&sh Here"
 "Icon"="\"C:\\msys64\\mingw64.exe\""
-
 [HKEY_CLASSES_ROOT\Directory\shell\mingw64\command]
 @="C:\\msys64\\msys2_shell.cmd -mingw64 -where \"%v\""
 
 [HKEY_CLASSES_ROOT\Directory\shell\msys2]
 @="MSYS2 Bash Here"
 "Icon"="\"C:\\msys64\\msys2.ico\""
-
 [HKEY_CLASSES_ROOT\Directory\shell\msys2\command]
-@="C:\\msys64\\msys2_shell.cmd -msys -where \"%v\""
+@="C:\\msys64\\msys2_shell.cmd -msys -where \"%v\""

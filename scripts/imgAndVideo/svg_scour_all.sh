@@ -1,15 +1,17 @@
 # DESCRIPTION
-# Optimizes all svg files in the current directory (writing result to
-# <originalFileName>_scoured.svg) via python scour script.
+# Optimizes all svg files in the current directory, and writes results to <originalFileName>_scoured.svg, via the Python scour script.
 
 # DEPENDENCIES
-# Python with scour installed and in your PATH: pip install scour
+# Python with scour installed and in your PATH via this command:
+#    pip install scour
 
 # USAGE
 # From a path with svg files you wish to optimize and clean up, run this script:
-# svg_scour_all.sh
+#    svg_scour_all.sh
 
-array=(`gfind . -maxdepth 1 -type f -iname \*.svg -printf '%f\n'`)
+
+# CODE
+array=(`find . -maxdepth 1 -type f -iname \*.svg -printf '%f\n'`)
 for element in ${array[@]}
 do
   fileNameNoExt=${element%.*}

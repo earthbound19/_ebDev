@@ -1,38 +1,25 @@
 # DESCRIPTION
-# blink1 USB LED programming script to create work/break timer: slower speed random light changes
-# for work period, faster speed random color changes for break period. 
-# Stripped down version of blink1BreakTimer.sh which instead writes instructions to a blink device
-# (flashes the device memory) so that it will play the pattern when connected to USB power
-# (when it is not connected to a computer).
+# blink1 USB LED programming script to create work/break timer: slower speed random light changes for work period, faster speed random color changes for break period. 
+# Stripped down version of blink1BreakTimer.sh which instead writes instructions to a blink device (flashes the device memory) so that it will play the pattern when connected to USB power (when it is not connected to a computer).
 
-# USAGE: with blink1-tool in your PATH (https://blink1.thingm.com/blink1-tool/), run this script:
-# ./ blink1BreakTimerWriteToBlink.sh
+# USAGE
+# With blink1-tool in your PATH (https://blink1.thingm.com/blink1-tool/), run this script:
+#    blink1BreakTimerWriteToBlink.sh
+# NOTES
+# - Even though the math here "should" produce accurate minute/second intervals, in practice it doesn't.
+# - The hard-coded math results in 1 faster flash before all the slower flash.
 
-# NOTES: Even though the math here "should" produce accurate minute/second intervals, in
-# practice it doesn't. ALSO, the hard-coded math results in 1 faster flash before all the slower flash.
 
+# CODE
 # TO DO: option get color palettes and use them from some external source (a palette serving API
 # which maybe I want to develop).
 
 # DEVELOPER NOTES
-# For a long time this script had a minute defined as 60000 ms (which is accurate), but
-# I wondered why it didn't seem to time the lights that way. The answer is that I am controlling
-# two lights, and it waits for the delay of one light to finish before it controls the other
-# light. It therefore took twice as long with work minutes and break minutes.
+# For a long time this script had a minute defined as 60000 ms (which is accurate), but I wondered why it didn't seem to time the lights that way. The answer is that I am controlling two lights, and it waits for the delay of one light to finish before it controls the other light. It therefore took twice as long with work minutes and break minutes.
 # The solution is to define a minute as half a minute.
-# ALSO, for a very long time I never noticed that write commands to the blink wrap around to 1
-# if you tell it to write to a line higher than 255; OR IN OTHER WORDS, on an mk3 model,
-# you are limited to 255 pattern lines (if you go out of bounds it simply wraps around; it also
-# seems to write the value to line 32 and on and other places). Which this scripts' original
-# design didn't consider, and I wondered why it didn't seem to play back for the time periods
-# I programmed. That there are 256 lines available is not clearly, prominently
-# documented ANYWHERE, and I had to figure this out by trial and error.
-#
+# ALSO, for a very long time I never noticed that write commands to the blink wrap around to 1 if you tell it to write to a line higher than 255; OR IN OTHER WORDS, on an mk3 model, you are limited to 255 pattern lines (if you go out of bounds it simply wraps around; it also seems to write the value to line 32 and on and other places). Which this scripts' original design didn't consider, and I wondered why it didn't seem to play back for the time periods I programmed. That there are 256 lines available is not clearly, prominently documented ANYWHERE, and I had to figure this out by trial and error.
 # TO READ BACK THE WRITTEN PATTERN to a text file, use this command:
-# echo > wut.txt && for p in {0..255}; do blink1-tool --getpattline $p >> wut.txt; done
-
-
-# CODE
+#    echo > wut.txt && for p in {0..255}; do blink1-tool --getpattline $p >> wut.txt; done
 # NOTE: the sum of workMinutesInMSdivisor + breakBlinkColorChangeMS may not exceed 255--
 # or you will not get the result you expect!
 workBlinkNtimes=12
@@ -56,8 +43,8 @@ do
  rndG=`shuf -i 0-255 -n 1`
  rndB=`shuf -i 0-255 -n 1`
  # echo i $i iPlusOne $iPlusOne
- blink1-tool -m $workBlinkColorChangeMS --rgb $rndR,$rndG,$rndB -l 1 --setpattline $i
- blink1-tool -m $workBlinkColorChangeMS --rgb $rndR,$rndG,$rndB -l 2 --setpattline $iPlusOne
+ blink1-tool -m $workBlinkColorChangeMS --RGB $rndR,$rndG,$rndB -l 1 --setpattline $i
+ blink1-tool -m $workBlinkColorChangeMS --RGB $rndR,$rndG,$rndB -l 2 --setpattline $iPlusOne
 done
 
 for j in $(seq $((workBlinkNtimes +1)) 2 $breakBlinkNtimes)
@@ -67,8 +54,8 @@ do
   rndG=`shuf -i 0-255 -n 1`
   rndB=`shuf -i 0-255 -n 1`
   # echo j $j jPlusOne $jPlusOne
-  blink1-tool -m $breakBlinkColorChangeMS --rgb $rndR,$rndG,$rndB -l 1 --setpattline $j
-  blink1-tool -m $breakBlinkColorChangeMS --rgb $rndR,$rndG,$rndB -l 2 --setpattline $jPlusOne
+  blink1-tool -m $breakBlinkColorChangeMS --RGB $rndR,$rndG,$rndB -l 1 --setpattline $j
+  blink1-tool -m $breakBlinkColorChangeMS --RGB $rndR,$rndG,$rndB -l 2 --setpattline $jPlusOne
 done
 
 blink1-tool --savepattern

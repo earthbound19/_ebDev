@@ -1,24 +1,16 @@
-# DESCRIPTION: Faster but more patterned variant of randomNSetChars.sh. returns N ($1)
-# characters randomly chosen from hackable string CHARSET. If parameter 1 not provided,
-# a default number is used. Appends to a file rndCharsSuperCollection.txt, because otherwise
-# the terminal (it seems at least on Mac) doesn't wrap and display everything.
-# Core function taken from: https://stackoverflow.com/a/26326956/1397555
-
-# USAGE: Run this script with one parameter, being the number of times you want to generate
-# a randomly shuffled group of characters from CHARSET (which you may alter in the code below).
-# CHARSET may be altered to include any characters which the toolset may handle 
-# (possibly Unicode). You may repeat characters in CHARSET to make it more likely that
-# they will appear, for different pattern types/effects.
-# ALSO NOTE that the script by default alters the CHARSET string to be a random subset
-# of itself (and thereby randomly change the character of output). To use use the full
-# set without alteration, find and comment out the OPTIONAL code block.
-# ALSO, see DEPENDENCIES:
+# DESCRIPTION
+# Faster but more patterned variant of randomNSetChars.sh. returns N ($1) characters randomly chosen from hackable string CHARSET. If parameter 1 not provided, a default number is used. Appends to a file rndCharsSuperCollection.txt, because otherwise the terminal (it seems at least on Mac) doesn't wrap and display everything. Core function taken from: https://stackoverflow.com/a/26326956/1397555
 
 # DEPENDENCIES
-# A 'nixy environment with seq, shuf, and printf, printf and your file system able to handle
-# the block characters or whatever else you might hack into CHARSET.
+# A 'Nixy environment with seq, shuf, and printf, printf and your file system able to handle the block characters or whatever else you might hack into CHARSET.
 
-# LICENSE: I wrote and deed this to the Public Domain 05/04/2016 12:22:51 PM -RAH
+# USAGE
+# Run with one parameter, which is the number of times you want to generate a randomly shuffled group of characters from CHARSET (which you may alter in the code). For example, to generate 12 groups of characters, run:
+#    randomNsetCharsAlt.sh 12
+# NOTES
+# - CHARSET may be altered in the source code to be any characters which the toolset may handle (possibly Unicode).
+# - You may repeat characters in CHARSET to make it more likely that they will appear, for different pattern types/effects.
+# - The script by default alters the CHARSET string to be a random subset of itself (and thereby randomly change the character of output). To use use the full set without alteration, find and comment out the OPTIONAL code block.
 
 
 # CODE

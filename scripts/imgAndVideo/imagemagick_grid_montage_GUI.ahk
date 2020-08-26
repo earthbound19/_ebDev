@@ -1,24 +1,29 @@
-; imagemagick_grid_montage_GUI found at and adapted from:  http://www.autohotkey.com/board/topic/39534-imagemagick-montage-interface-create-image-tile-sets/
-; 06/05/2015 07:41:45 PM -RAH
- ;
- ; WARNING: As good practice, only ever operate on copies of your images with this script (if something goes wrong, you have your originals still).
- ; A basic graphical interface for ImageMagick's montage tool.
- ; Montage turns a set of images into 1 big tiled image, or animated images into one big image (depending on limits in either case).
- ; You could also use this as an image converter.
- ; This is just a very tiny bit of what the actual command-line app can do, but this is the most important stuff in montage. In my opinion.
- 
- ; USAGE: Install AutoHotkey, and double-click this script. Follow the prompts/dialogs. NOTE: ImageMagick's montage.exe must be in your %PATH% for this to work.
+; DESCRIPTION
+; Creates a montage from images selected from a graphical user interface.
+; Found at and adapted by RAH 2015-06-05 07:41:45 PM from: http://www.autohotkey.com/board/topic/39534-ImageMagick-montage-interface-create-image-tile-sets/
+; _-Created by: tidbit
+; _-Enjoy~~!!
 
- ; TIPS/TRICKS:
- ; Leave width or height, or both, at 0 to make a perfect fit on 1 image, accordingly.
- ; Use wild cards in the Names box to search multple extensions.
- ; Click the blue text at the top to go to the ImageMagick website.
- ; It doesn't matter if you type or don't type the leading period in the FileType field.
- ; Allow a while for the image to complete. It may take a while depending on: your PC, how many images, overall image size, file type, image sizes.
- ; The number to the left of the Names box is the number of lines use (images). There is a blank line at bottom by default. That line desnt effect anything. You may leave or delete.
- 
-;_-Created by: tidbit
-;_-Enjoy~~!!
+; DEPENDENCIES
+; ImageMagick's montage.exe must be in your %PATH% for this to work.
+
+; WARNING
+; As good practice, only ever operate on copies of your images with this script (if something goes wrong, you have your originals still).
+
+; USAGE
+; Install AutoHotkey, and double-click this script. Follow the prompts/dialogs. 
+; Turns a set of images into 1 big tiled image, or animated images into one big image (depending on limits in either case).
+; You could also use this as an image converter.
+; NOTES
+; - Leave width or height, or both, at 0 to make a perfect fit on 1 image, accordingly.
+; - Use wild cards in the Names box to search multiple extensions.
+; - Click the blue text at the top to go to the ImageMagick website.
+; It doesn't matter if you type or don't type the leading period in the FileType field.
+; - Allow a while for the image to complete. It may take a while depending on: your PC, how many images, overall image size, file type, image sizes.
+; - The number to the left of the Names box is the number of lines use (images). There is a blank line at bottom by default. That line doesn't affect anything. You may leave it or delete it.
+
+
+; CODE
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
@@ -26,13 +31,13 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
 
 allowed=BMP,GIF,ICO,JPG,JPEG,PNG,SVG,TGA,TIFF
-; bgColor=444444	; nuetral gray
+; bgColor=444444	; neutral gray
 bgColor=FFFFFF
 help=
 (
 -> The Wild Card  character ( * ) is supported in the "File type" field.
 -> You may use Wildcards in the Names box as well.
--> Please only insert 1 File type (image filetype) in the "File type" field.
+-> Please only insert 1 File type (image file type) in the "File type" field.
 -> Enclose file names in quotes (" ") if they have a space in them.
 -> bmp, gif, ico, jpg, jpeg, png, svg, tga, tiff. Are all supported.
 )
@@ -154,7 +159,7 @@ return
 ;_-=================-_;
 ;_-==RENDER IMAGE===_;
 ;_-=================-_;
-; Render a montage image, using imagemagick's montoge executable, according to user specs from the save dialog or a parameter passed to the script (auto-naming the rendered file after the name of a folder that was dragged and dropped on to this script).
+; Render a montage image, using ImageMagick's montoge executable, according to user specs from the save dialog or a parameter passed to the script (auto-naming the rendered file after the name of a folder that was dragged and dropped on to this script).
 executeRender:
 ;command = montage.exe -background #%bgcolor% -tile %xt%x%yt% -geometry TSX:%tsx% TSY:%tsy% IMG:%imgs% SAVE:%save%, %seldir%
 
@@ -241,7 +246,7 @@ GuiControl, ,num, %count%
 return
 
 url:
-run, http://www.imagemagick.org/script/index.php
+run, http://www.ImageMagick.org/script/index.php
 return 
 
 GuiClose:
@@ -261,7 +266,7 @@ Return
 ;
 ;
 CmnDlg_Color(ByRef pColor, hGui=0){
-        ;covert from rgb
+        ;covert from RGB
         clr := ((pColor & 0xFF) << 16) + (pColor & 0xFF00) + ((pColor >> 16) & 0xFF)
 
         VarSetCapacity(sChooseColor, 0x24, 0)
@@ -284,7 +289,7 @@ CmnDlg_Color(ByRef pColor, hGui=0){
         oldFormat := A_FormatInteger
         SetFormat, Integer, hex  ; Show RGB Color extracted below in hex format.
 
-        ;convert to rgb
+        ;convert to RGB
         pColor := (clr & 0xff00) + ((clr & 0xff0000) >> 16) + ((clr & 0xff) << 16)
         StringTrimLeft, pColor, pColor, 2
         Loop, % 6-StrLen(pColor)

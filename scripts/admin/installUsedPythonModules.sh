@@ -1,9 +1,18 @@
+# DESCRIPTION
+# Installs all the Python modules I commonly use.
+
+# USAGE
+# Run without any parameter:
+#    installUsedPythonModules.sh
+
+
+# CODE
 python -m pip install --upgrade pip
 
 pythonModules=" \
 more_itertools \
 colorspacious \
-colour \
+colour-science \
 spectra \
 numpy \
 ciecam02 \
@@ -11,7 +20,9 @@ colormap \
 colorgram \
 Quartz \
 Foundation \
-Pillow"
+Pillow \
+easydev \
+scour"
 
 # possible future-use modules:
 # matplotlib \

@@ -1,5 +1,14 @@
-REM NOTE: run this as an Administrator.
-REM re: https://support.microsoft.com/en-us/kb/2700567 and http://answers.microsoft.com/en-us/windows/forum/all/windows-update-hangs-on-checking-for-updates/b762abf5-655c-4a60-aabc-9f59785bd8d9 and http://answers.microsoft.com/en-us/windows/forum/windows_other-update/windows-update-application-hang-on-windows-7/787e6deb-69df-49d7-b7f8-eae1990dd1c2 and http://answers.microsoft.com/en-us/windows/forum/all/windows-update-on-windows-7-hangs-on-checking-for/93d85732-e066-452c-82cd-e34515fa6b7d and http://answers.microsoft.com/en-us/windows/forum/all/windows-update-hangs-on-checking-for-updates/b762abf5-655c-4a60-aabc-9f59785bd8d9 (did I already list that? :) and http://answers.microsoft.com/en-us/windows/forum/all/windows-update-on-windows-7-hangs-on-checking-for/93d85732-e066-452c-82cd-e34515fa6b7d (or that? :) 
+:: DESCRIPTION
+:: Attempts to repair causes of Windows Update hanging / never finding / installing needed updates.
+
+:: USAGE
+:: Run from a command prompt with administrative privileges, without any parameters:
+::    fixWindowsUpdateHang.bat
+
+
+:: CODE
+:: NOTE: run this as an Administrator.
+:: re: https://support.microsoft.com/en-us/kb/2700567 and http://answers.microsoft.com/en-us/windows/forum/all/windows-update-hangs-on-checking-for-updates/b762abf5-655c-4a60-aabc-9f59785bd8d9 and http://answers.microsoft.com/en-us/windows/forum/windows_other-update/windows-update-application-hang-on-windows-7/787e6deb-69df-49d7-b7f8-eae1990dd1c2 and http://answers.microsoft.com/en-us/windows/forum/all/windows-update-on-windows-7-hangs-on-checking-for/93d85732-e066-452c-82cd-e34515fa6b7d and http://answers.microsoft.com/en-us/windows/forum/all/windows-update-hangs-on-checking-for-updates/b762abf5-655c-4a60-aabc-9f59785bd8d9 (did I already list that? :) and http://answers.microsoft.com/en-us/windows/forum/all/windows-update-on-windows-7-hangs-on-checking-for/93d85732-e066-452c-82cd-e34515fa6b7d (or that? :) 
 NET STOP wuauserv
 NET STOP bits
 NET STOP cryptsvc
@@ -51,5 +60,5 @@ regsvr32.exe wuwebv.dll
 netsh reset winsock
 net start bits
 net start cryptsvc
-REM net start wuauserv
+:: net start wuauserv
 ECHO DONE. If Updates still fail, install the newest windows update agent, reboot, manually stop the Windows Installer service, and try updating again. Maybe try uninstalling KB2533552 if that fails (and try again).

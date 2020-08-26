@@ -1,35 +1,24 @@
 # DESCRIPTION
-# Creates a .ppm (plain text file bitmap format) image of a random number
-# of color columns, each column repeating one color a random number of times,
-# to effectively make a vertical stripe of a random width. Colors used can be
-# random or configurable via input file parameter (of a list of hex color
-# values). Generates Z such images. All random ranges, dimensions,
-# and colors to use configurable; see USAGE for script parameters and example.
+# Creates a `.ppm` (plain text file bitmap format) image of a random number of color columns, each column repeating one color a random number of times, to effectively make a vertical stripe of a random width. Colors used can be random or configurable via input file parameter (of a list of hex color values). Generates Z such images. All random ranges, dimensions, and colors to use configurable; see USAGE for script parameters and example.
 
 # USAGE
-# NOTE: the number of and purpose of positional parameters has altered through
-#  this script's development history. If you developed a script that uses
-#  this script, re-examine the parameters help above and adapt as
-#  needed. (It used to have a parameter to randomly vary min. number of columns,
-#  which is redundant. You can vary that . . . by varying the min number to
-#  begin with.)
-# PASS THIS SCRIPT the following parameters:
-# $1 The minimum number vertical color stripes to make (before* image upscale).
-# $2 The maximum number "
-# $3 How many such images to make
-# $4 Optional. The name of a file list of hex color values to randomly pick
-#  from, findeable in any of the directories or sub-directories of a path given
-#  in ~/palettesRootDir.txt (the script uses another script, findHEXPLT.sh,
-#  to search subfolders in the path listed in that file). If not provided,
-#  every stripe is a pseudo-randomly generated color (the color created from
-#  entropy at run time). FOR HELP creating that file, see
-#  createPalettesRootDirTXT.sh in the _ebArt repository.
-# EXAMPLE:
-# randomVerticalColorStripes.sh 3 80 5 30 sparkleHeartHexColors.txt
-# ALSO, see imgs2imgsNN.sh for resizing results to arbitrary size.
+# Run with the following parameters:
+# - $1 The minimum number vertical color stripes to make (before* image upscale).
+# - $2 The maximum number "
+# - $3 How many such images to make
+# - $4 OPTIONAL. The name of a file list of hex color values to randomly pick from, findable in any of the directories or sub-directories of a path given in ~/palettesRootDir.txt (the script uses another script, findPalette.sh, to search subfolders in the path listed in that file). If not provided, every stripe is a pseudo-randomly generated color (the color created from entropy at run time). FOR HELP creating that file, see createPalettesRootDirTXT.sh in the _ebArt repository.
+# Example that will produce minimum 3 vertical stripes, maximum 80, and 5 such images, from the palette sparkleHeartHexColors.hexplt:
+#    randomVerticalColorStripes.sh 3 80 5 sparkleHeartHexColors.hexplt
+# NOTES
+# - See imgs2imgsNN.sh to resize results to an arbitrary size by nearest neighbor method (preserves hard edges).
+# - The number of and purpose of positional parameters has altered through this script's development history. If you developed a script that uses this script, and it isn't working, you may want to re-examine the parameters help above and adapt as needed. (It used to have a parameter to randomly vary min. number of columns, which is redundant. You can vary that . . . by varying the min number to begin with.)
 
 
 # CODE
+if ! [ "$1" ]; then printf "\nNo parameter \$1. Exit."; exit; fi
+if ! [ "$2" ]; then printf "\nNo parameter \$2. Exit."; exit; fi
+if ! [ "$3" ]; then printf "\nNo parameter \$3. Exit."; exit; fi
+
 # In case of interrupted run, clean up first:
 if [ -e temp.txt ]; then rm temp.txt; fi
 if [ -e *.temp ]; then rm *.temp; fi
@@ -39,21 +28,18 @@ minColorColumnRepeat=$1
 maxColorColumnRepeat=$2
 padDigitsTo=${#maxColorColumnRepeat}
 howManyImages=$3
-# set hexColorSrcFullPath environment variable via the following script:
-source findHEXPLT.sh $4
-# The logic of this variable check is: if not no value for this var, do
-#  something (in other words, if there is this var with a value, do something) ;
-#  UNFORTUNATELY, it seems this type of check only works with environment
-#  parameter variables [by this do I mean e.g. $1, $2, $3 etc.?], not assigned
-#  [script or named?] variables that have no value, WHICH MEANS that the
-#  following must be hard-coded for the parameter; CHECK THE WHOLE SCRIPT for it:
-if [ "$4" ]
+# set hexColorSrcFullPath variable from printout of script call:
+hexColorSrcFullPath=$(findPalette.sh $4)
+
+if [ "$hexColorSrcFullPath" != "" ]
 	then
 	echo IMPORTING COLOR LIST from file name\:
 	echo $hexColorSrcFullPath
 	mapfile -t hexColorsArray < $hexColorSrcFullPath
 	sizeOf_hexColorsArray=${#hexColorsArray[@]}
 	sizeOf_hexColorsArray=$(( $sizeOf_hexColorsArray - 1))		# Else we get an out of range error for the zero-based index of arrays.
+else
+	printf "\nERROR: \$hexColorSrcFullPath has an empty value. Test calls to findPalette.sh $4 and examine that script for help. Exit."; exit 1
 fi
 	# IN DEVELOPMENT:
 	# ? Pregenerate a long string which is so many random hex colors smushed together (without any delimiters), to pull hex colors from in chuncks of six characters for greater efficiency; re: http://stackoverflow.com/a/1405641
@@ -86,7 +72,7 @@ do
 							# Pick a random color from a hex color list if such a list is specified (converting to RGB along the way); otherwise pick completely random RGB values.
 							pick=`shuf -i 0-"$sizeOf_hexColorsArray" -n 1`
 							hex="${hexColorsArray[$pick]}"
-							# Strip the (text format required) # symbol off that. Via yet another genius breath yon: http://unix.stackexchange.com/a/104887
+							# Strip the (text format required) # symbol off that. Via yet another genius breath yon: http://Unix.stackexchange.com/a/104887
 							hex=`echo ${hex//#/}`
 							echo hex is $hex
 									# Pick a number of times to repeat that chosen hex color, then write it that number of times to the temp file that will make up the eventual .ppm file: 

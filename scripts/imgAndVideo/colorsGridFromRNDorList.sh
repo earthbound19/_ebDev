@@ -2,31 +2,36 @@
 # Creates a .ppm (plain text file bitmap format) image which is W x H pixels of random colors OR colors from a list. Generates Z such images. See USAGE for script parameters and examples.
 
 # USAGE
-# BECAUSE I KEEP FORGETTING, $4, $5 and $6 are actually different things.
-# Pass this script the following parameters; the last being optional:
-# $1 How many pixels wide wide you want a random image grid to be
-# $2 How many pixels tall ~
-# $3 How many such random images you want to create
-# $4 Hex color list file name to pick colors from randomly (if omitted, colors are generated randomly). May or may not result in all colors from source list showing up in final image--it depends on psuedo-random "chance."
-# $5 any value (e.g. "foo") pick colors from list (in $4) sequentially.
-# $6 any value (e.g. "florghulment") pick colors from list (in $4) sequentially *after sorting it randomly*.
+# BECAUSE I KEEP FORGETTING: $4, $5 and $6 are actually different things.
+# Pass this script the following parameters:
+# - $1 How many pixels wide you want the random image grid to be
+# - $2 How many pixels tall ~
+# - $3 How many such random images you want to create
+# - $4 Hex color list file name to pick colors from randomly (if omitted, colors are generated randomly). May or may not result in all colors from source list showing up in final image--it depends on pseudo-random "chance."
+# - $5 any value (e.g. "foo") pick colors from list (in $4) sequentially.
+# - $6 any value (e.g. "florghulment") pick colors from list (in $4) sequentially *after sorting it randomly*.
 # NOTE that if you provide a source list of colors ($4), but numbers too small in parameters $1 and $2, it will not use all colors from the list (as it will generate tiles against only part of the list).
 # AFTER RUNNING this script you may wish to run e.g.:
-# imgs2imgsNN.sh ppm png 4280 4280
-# -- see the comments in imgs2imgsNN for details.
-
+#    imgs2imgsNN.sh ppm png 4280 4280
+# -- see the comments in `imgs2imgsNN.sh` for details.
 # EXAMPLE COMMANDS
 # Generate 3 files of randomly generated colors in a 4x2 grid:
-# thisScript.sh 4 2 1
-# Generate one hundred and seventy 16x9 pixel files of colors picked randomly from the color hex code list file rainbowHexColorsByMyEye.txt:
-# thisScript.sh 16 9 170 rainbowHexColorsByMyEye.txt
+#    colorsGridFromRNDorList.sh 4 2 1
+# Generate one hundred and seventy 16x9 pixel files of colors picked randomly from the color hex code list file `rainbowHexColorsByMyEye.txt`:
+#    colorsGridFromRNDorList.sh 16 9 170 rainbowHexColorsByMyEye.txt
 # The same as the previous command, but reading colors from the list sequentially:
-# thisScript.sh 16 9 170 rainbowHexColorsByMyEye.txt foo
+#    colorsGridFromRNDorList.sh 16 9 170 rainbowHexColorsByMyEye.txt foo
 
-# TO DO: get this using the root hex colors list dir location that summat other script then there used.
-# TO DO: as much of this script as possible in-memory instead of on disk, to speed it up dramatically.
-# TO DO make the cols / rows paramater input sequence consistent between this and makeBWGridRandomNoise.sh, if they aren't (check).
-# TO DO: set default values if no $1 $2 and $3 variables passed to script. Make this take string/switch parameters using em wah dut that testing that.
+
+# CODE
+# TO DO
+# - figure out whether it can use .hexplt lists and if not adapt it to (I no longer use .txt palettes)
+# - get this using the root hex colors list dir location that summat other script then there used.
+# - as much of this script as possible in-memory instead of on disk, to speed it up dramatically.
+# - make the cols / rows parameter input sequence consistent between this and makeBWGridRandomNoise.sh, if they aren't (check).
+# - set named global values from all parameters and use the named globals to eliminate parameter confusion in coding.
+# - set default values if no $1 $2 and $3 variables passed to script.
+# - could $5 and $6 just be $5 / not $5?
 
 numCols=$1
 numRows=$2
@@ -35,7 +40,7 @@ howManyImages=$3
 # if $6 was passed to script (if $6 not null), "randomly" shuffle the elements of the source file into a temp file, and generate the array from that. If no $6, just copy the file (without shuffling it) into a temp file, create the array from the temp file, and destroy the temp file.
 if [ "$6" ]
 then
-	gshuf $4 > tmp_feoijwefjojeoo.txt
+	shuf $4 > tmp_feoijwefjojeoo.txt
 else
 	cp $4 tmp_feoijwefjojeoo.txt
 fi
@@ -80,7 +85,7 @@ do
 												# colorListIterate=0
 											# fi
 						else
-							pick=`gshuf -i 0-"$sizeOf_hexColorsArray" -n 1`
+							pick=`shuf -i 0-"$sizeOf_hexColorsArray" -n 1`
 						fi
 				hex=${hexColorsArray[$pick]}
 				# If $hex is an invalid hex color (0, because I assigned from out of range of the array, or in other words we used all the colors in the list), default to gray #404040, re stdout error when this was a bug: "line 69: printf: 0x: invalid hex number" :
@@ -96,7 +101,7 @@ do
 				printf "%d\n %d\n %d\n" 0x${hex:1:2} 0x${hex:3:2} 0x${hex:5:2} >> temp.txt
 			done
 		else
-			gshuf -i 1-255 -n $numbersNeedsPerRow > temp.txt
+			shuf -i 1-255 -n $numbersNeedsPerRow > temp.txt
 		fi
 		tr '\n' ' ' < temp.txt > $rowCount.temp
 		# adds a newline after that last line:

@@ -1,6 +1,16 @@
-# re: https://stackoverflow.com/a/7449399/1397555
-# SEE ALSO (to do--? implement?) : https://jorge.fbarr.net/2011/03/24/making-your-bash-history-more-efficient/
+# DESCRIPTION
+# Deduplicates listings in bash history.
 
+# USAGE
+# Run without any parameters:
+#    cleanupBashHistory.sh
+# NOTES
+# - This script expects a file `~/.bash_history` to exist and contain bash history.
+# - re: https://stackoverflow.com/a/7449399/1397555
+# - SEE ALSO (to do--? implement?) : https://jorge.fbarr.net/2011/03/24/making-your-bash-history-more-efficient/
+
+
+# CODE
 # remove duplicates while preserving input order
 function dedup {
    awk '! x[$0]++' $@
@@ -10,7 +20,7 @@ function dedup {
 function remove_histignore {
    if [ -n "$HISTIGNORE" ]; then
       # replace : with |, then * with .*
-      local IGNORE_PAT=`echo "$HISTIGNORE" | gsed s/\:/\|/g | gsed s/\*/\.\*/g`
+      local IGNORE_PAT=`echo "$HISTIGNORE" | sed s/\:/\|/g | sed s/\*/\.\*/g`
       # negated grep removes matches
       grep -vx "$IGNORE_PAT" $@
    else
@@ -33,7 +43,11 @@ function history_cleanup {
    fi
 }
 
-# actually invoke that function which invokes other functions :)
+# Run that function which runs other functions :) and it seems like this doesn't work as hoped unless I call that repeatedly? Why?
+history_cleanup
+history_cleanup
+history_cleanup
+history_cleanup
 history_cleanup
 
 echo \.bash_history cleanup done.

@@ -1,3 +1,11 @@
+# DESCRIPTION
+# Copy of chocolately install script from chocolatey.org.
+
+# USAGE
+# Refer to documentation at GitHub and/or chocolotey.org, and/or the file installChocolatey_instructions.txt in this repository.
+
+
+# CODE
 # =====================================================================
 # Copyright 2017 - 2020 Chocolatey Software, Inc, and the
 # original authors/contributors from ChocolateyGallery
@@ -51,11 +59,7 @@ $tempDir = Join-Path $chocTempDir "chocInstall"
 if (![System.IO.Directory]::Exists($tempDir)) {[void][System.IO.Directory]::CreateDirectory($tempDir)}
 $file = Join-Path $tempDir "chocolatey.zip"
 
-# PowerShell v2/3 caches the output stream. Then it throws errors due
-# to the FileStream not being what is expected. Fixes "The OS handle's
-# position is not what FileStream expected. Do not use a handle
-# simultaneously in one FileStream and in Win32 code or another
-# FileStream."
+# PowerShell v2/3 caches the output stream. Then it throws errors due to the FileStream not being what is expected. Fixes "The OS handle's position is not what FileStream expected. Do not use a handle simultaneously in one FileStream and in Win32 code or another FileStream."
 function Fix-PowerShellOutputRedirectionBug {
   $poshMajorVerion = $PSVersionTable.PSVersion.Major
 

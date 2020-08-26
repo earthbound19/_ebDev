@@ -1,41 +1,29 @@
 #!/usr/bin/env perl
-use strict;
-use warnings;
-
-# DECRIPTION
+# DESCRIPTION
 # Advanced file renamer.
 
 # SOURCE
 # http://plasmasturm.org/code/rename/rename via http://plasmasturm.org/code/rename/
 
-# USAGE
-#  Two ways to get the path to this script, assuming it is in your PATH, are:
-# which rename.pl
-# whereis rename.pl
-#  AS THIS WILL NOT convert or or remove these characters, which I personally
-#  also do not want in files:
-#  ~@#%^+[]{},.
-#  -- to make it remove those also from all files AND folder in the
-#  current directory, run:
-# perl /path/to/this/script/rename.pl -e 's/[^\w.-]+//g' *
-#  OR for example to remove those characters from png files, run:
-# perl /path/to/this/script/rename.pl -e 's/[^\w.-]+//g' *.png
-#  OR to replace them with underscores, run:
-# perl /path/to/this/script/rename.pl -e 's/[^\w.-]+/_/g' *.png
-#  To convert many terminal-unfriendly file names (but not everything)
-#  in that list!) in all files in the current directory to _:
-# perl /path/to/this/script/rename.pl -z *
-#  To preview what would be renamed without actually doing it, use -n:
-# perl /path/to/this/script/rename.pl -n -z *
-#  To see other options:
-# perl /path/to/this/script/rename.pl --help
+# SEE ALSO
+# ftun.sh, preferred, which uses this but with my particular preferences.
 
-# OTHER NOTES
-# All that characters that Windows allows in file names but IMO should not:
-# ~`!@#$%^&()=+[]{};' -,
+# MORE GENERAL USAGE
+# To get the path to this script, assuming it is in your PATH, try both of these commands and hope that one works:
+#    which rename.pl
+#    whereis rename.pl
+# Then run this script this way:
+#    /path/to_this/script/rename.pl [options]
+# MORE SPECIFIC USAGE
+# To preview what would be renamed without actually doing it, use -n:
+#    perl /path/to/this/script/rename.pl -n -z *
+# To see other options and more detailed help, run:
+#    perl /path/to/this/script/rename.pl --help
 
 
 # CODE
+use strict;
+use warnings;
 use Getopt::Long 2.24, qw( :config bundling no_ignore_case no_auto_abbrev );
 
 my ( $N, $EXT, @EXT, @USE, $DECODE, $ENCODE );
@@ -412,7 +400,7 @@ Create hard links from the new names to the existing ones, instead of renaming t
 
 =item B<-M>, B<--use>
 
-Like perl's own C<-M> switch. Loads the named modules at the beginning of the rename, and can pass import options separated by commata after an equals sign, i.e. C<Module=foo,bar> will pass the C<foo> and C<bar> import options to C<Module>.
+Like Perl's own C<-M> switch. Loads the named modules at the beginning of the rename, and can pass import options separated by commata after an equals sign, i.e. C<Module=foo,bar> will pass the C<foo> and C<bar> import options to C<Module>.
 
 You may load multiple modules by using this option multiple times.
 
@@ -620,7 +608,7 @@ See L<Image::EXIF>.
 
 =head1 SEE ALSO
 
-mv(1), perl(1), find(1), grep(1), sort(1)
+mv(1), Perl(1), find(1), grep(1), sort(1)
 
 =head1 BUGS
 

@@ -4,8 +4,7 @@
 #    To pick up changes, restart all Cygwin processes.  For a description
 #    see https://cygwin.com/cygwin-ug-net/using.html#mount-table
 
-# THE FOLLOWING ARE BAD EVIL DEFAULTS that came with Cygwin which leads
-# to files being inaccessible to anything other than (if even?!) Cygwin:
+# THE FOLLOWING ARE BAD EVIL DEFAULTS that came with Cygwin which leads to files being inaccessible to anything other than (if even?!) Cygwin:
 # none /cygdrive cygdrive binary,posix=0,user 0 0
 
 # THIS IS WHAT YOU ACTUALLY WANT (noacl) :

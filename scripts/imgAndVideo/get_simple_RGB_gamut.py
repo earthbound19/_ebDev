@@ -1,6 +1,12 @@
 # DESCRIPTION
-# See get_simple_gamut.py. This is adapted for RGB, and the output is horrible and garish, as is RGB math.
+# See scripts with 'get', 'gamut', and '.py' in their file names. This is adapted for RGB, and the output is horrible and garish, as is RGB math.
 
+# USAGE
+# Run through a Python interpreter without any parameters:
+#    python path/to/this_script/get_simple_RGB_gamut.py
+
+
+# CODE
 import spectra
 A_min = 0
 A_max = 1
@@ -22,5 +28,5 @@ C_range = [x/(C_max * C_domain) for x in range(C_min, (C_max * C_domain + 1))]
 for i in A_range:
 	for j in B_range:
 		for k in C_range:
-			this_color = spectra.rgb(i, j, k)
+			this_color = spectra.RGB(i, j, k)
 			print(this_color.hexcode)

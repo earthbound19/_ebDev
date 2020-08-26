@@ -1,3 +1,11 @@
+; DESCRIPTION
+; Converts an image file to an .ico file for use in compiling .ahk scripts to an .exe with an embedded application icon. I (RAH) did not code this; I don't recall either where I horked it from.
+
+; USAGE
+; I don't know, I never documented it. I think ripAHK uses this. Note to self: document usage here if you use this again.
+
+
+; CODE
 #NoEnv
 SetBatchLines,-1
 Ptr := A_PtrSize ? "Ptr" : "UInt"

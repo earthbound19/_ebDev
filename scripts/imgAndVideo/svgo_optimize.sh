@@ -1,20 +1,23 @@
 # DESCRIPTION
-# Optimizes an svg input file (writing the result to <originalFileName>_opt.svg) including color code conversion suited for random recoloring via BWsvgRandomColorFill.sh.
+# Optimizes an svg input file (writing the result to `<original_file_base_name>_opt.svg`) including color code conversion suited for random recoloring via `BWsvgRandomColorFill.sh`.
 
 # DEPENDENCIES
-# A nodejs install with the svgo (svgomg) package installed.
+# A `nodejs` install with the `svgo` (svgomg) package installed.
 
 # USAGE
-# First examine and if you wish to copy the file .svgo.yml in this distribution over the .svgo.yml file that comes with svgo. Among other things it preserves path IDs and long hex color form.
-# Invoke this script with one parameter $1 (required), being the name of the svg file for which you want an ~_opt.svg file produced in the same directory; e.g.:
-# thisScript.sh inputFile.svg
-# NOTE that the CLIopts variables, if you uncomment them, override the .svgo.yml config file.
-# ALSO NOTE that this may misbehave when invoked via cygwin. I've at times found that if I copy and paste the printed command to a cmd prompt, it works ok . . . except the result displays wonky in Internet Explorer and inkscape. :(
+# First examine and if you wish to copy the file `.svgo.yml` in this distribution over the `.svgo.yml` file that comes with `svgo`. Among other things it preserves path IDs and long hex color form.
+# Run this script with one parameter $1 (required), being the name of the svg file for which you want an ~_opt.svg file produced in the same directory; e.g.:
+#    svgo_optimize.sh inputFile.svg
+# NOTES
+# - The CLIopts variables in the source code, if you uncomment them, override the `.svgo.yml` config file.
+# - This may misbehave when run via `Cygwin`. I've at times found that if I copy and paste the printed command to a cmd prompt, it works OK . . . except the result displays wonky in Internet Explorer and inkscape.
 
+
+# CODE
 fileNameNoExt=${1%.*}
 
+# Other CLI options:
 # CLIopts="--enable=convertColors --enable=collapseGroups --disable=convertPathData"
-
 SVGOcommand="svgo -i $1 --pretty $CLIopts -o "$fileNameNoExt"_opt.svg"
 echo Running command\:
 echo $SVGOcommand

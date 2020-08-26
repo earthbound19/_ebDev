@@ -1,3 +1,9 @@
-#script must be executed with super user / admin priveleges e.g. `sudo ./thisScript.sh` -- or something? Not getting it to work calling this script right now, but the copied and pasted command works:
+# DESCRIPTION
+# Wipes Xcode derived data directory (Mac), which may be necessary if 
 
+# USAGE
+# Run without any parameters:
+#    wipeXCodeDerivedData.sh
+
+# CODE
 rm -rf ~/Library/Developer/Xcode/DerivedData/*

@@ -1,32 +1,36 @@
 # DESCRIPTION
 # Tags images with easily customizable metadata; Customizable via a simple editable text file template. Must run prepMediaMetaData.sh and/or other scripts before.
 
-# USAGE
-# NOTE that a run of prepMediaMetaData.sh must precede this script, or this script will not work. ALSO: correct. (MEAGER) NOTES: This expects all images it works upon to be .tif images, and won't work with anything else. Maybe I'll change it to also do non-standard tags in .png files, and do other source formats also.
-# NOTE: fer mystic unknown you may not have permission to run the generated .bat file from cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it.
-
 # DEPENDENCIES
-# A self-hosted intstall of polr URL shortener and the API key for it saved to ~/PolrAPIkey.txt, wget, exiftool, cygwin (this is tied to windows at the moment) . . ?
+# A self-hosted install of polr URL shortener and the API key for it saved to ~/PolrAPIkey.txt, wget, exiftool, Cygwin (this is tied to windows at the moment) . . ?
 
+# USAGE
+# Run prepMediaMetaData.sh before this script.
+# This script is NOT DOCUMENTED, sorry. Will document!
+# NOTES
+# - This expects all images it works upon to be .tif images, and won't work with anything else.
+# - For mystical unknown reasons you may not have permission to run the generated .bat file from Cygwin/bash. If so, delete, then re-create the file from within windows. WUT? But it fixes it. (Better yet: use MSYS2 instead of Cygwin.)
+
+
+# CODE
 # TO DO; * = done, / = in progress:
-# FIND OUT: can the problem of gsed not searching paths for the urlencode.gsed file be fixed without a kludge absolute path hard-coded? If not, store that path in a text file in ~./
-# Don't do any copying and metadata then copy again operations if the target file in _dist already exists (it's recreating them but shouldn't--maybe this is a bug, as I already coded for that.)
-# Figure out why this updates metadata ok to __tagAndDistPrepImage.jpg with e.g. 9000x6000 px jpgs, but chokes on copying them to _dist; fix that. WAIT: I think the real problem was I couldn't rename a file to a duplicate target file name. Catch errors when that happens? Verify this is what happens (the "WAIT" hypothesis).
+# - FIND OUT: can the problem of sed not searching paths for the urlencode.sed file be fixed without a kludge absolute path hard-coded? If not, store that path in a text file in ~./
+# - Don't do any copying and metadata then copy again operations if the target file in _dist already exists (it's recreating them but shouldn't--maybe this is a bug, as I already coded for that.)
+# - Figure out why this updates metadata OK to __tagAndDistPrepImage.jpg with e.g. 9000x6000 px jpgs, but chokes on copying them to _dist; fix that. WAIT: I think the real problem was I couldn't rename a file to a duplicate target file name. Catch errors when that happens? Verify this is what happens (the "WAIT" hypothesis).
 # ? Don't update metadata template with a shortened URL (and retrieve a short URL) if one already exists.
-# Check: is it proper or does it work to use the -IPTC:ObjectName in this script? Should that be -MWG:Description?
+# - Check: is it proper or does it work to use the -IPTC:ObjectName in this script? Should that be -MWG:Description?
 # - Document workings and use; ack. or fix clunky weaknesses in design.
 # ? - Implement keyword heirarchies re: http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/MWG.html
-# */ DONE BUT MOVE TO COMMENT NEAR RELEVANT CODE: Implement self-hosted polr url shortening for looong titles/self-hosted title search URLS. e.g. like http://polr.me/w9g or http://polr.me/11q3 ; dev code that works or doesn't depending on authentication; the following are for polr_cli_polrAcct.py : C:\Python27\Lib\site-packages\polr_cli\polr_cli.py --shorten http://earthbound\.io/q -- NOTES:
+# - DONE BUT MOVE TO COMMENT NEAR RELEVANT CODE: Implement self-hosted polr url shortening for looong titles/self-hosted title search URLS. e.g. like http://polr.me/w9g or http://polr.me/11q3 ; dev code that works or doesn't depending on authentication; the following are for polr_cli_polrAcct.py : C:\Python27\Lib\site-packages\polr_cli\polr_cli.py --shorten http://earthbound\.io/q -- NOTES:
 				#	Command that looks up target of shortened link, but relies on faulty dependency:
 				# 	Python polr_cli.py --lookup w9g
 				# 	Command that does NOT work at this writing at my self-hosted Polr install:
 				# 	Python polr_cli_s_eb.py --lookup 0
+# - Change it to also do non-standard tags in .png files, and do other source formats also?
+
 	# 	API call URL that DOES work at my self-hosted Polr install--and saves the result URL to a plain-text URL! (except that that key is now retired ;) :
 	# 	wget -O shortened_URL.txt "http://s.earthbound.io/api/v2/action/shorten?key=3108e9a45e9f6edcf9eeaa1ca9712d&url=https://google.com&is_secret=false&response_type=plain_text"
 #	NOTE that when logged in, it won't show the new link unless you reload the page.
-
-
-# CODE
 # GLOBAL API key for Polr URL shortener; stored in a private file outside repository ;) and here imported therefrom (will only work per local install of _ebdev)
 PolrAPIkey=$( < ~/PolrAPIkey.txt)
 		# echo PolrAPIkey value is\: $PolrAPIkey
@@ -44,48 +48,48 @@ echo "This script will erase all metadata from applicable image files in the ent
 # END SCRIPT WARNING =======================================
 
 
-gfind . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
+find . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
 mapfile -t images_MD_ADDS_list < images_MD_ADDS_list.txt
 for element in "${images_MD_ADDS_list[@]}"
 do
 	# Retrieve image title from ~MD_ADDS.txt for use in adding search engine query for original image source--adding that to the description tag:
-	imageTitle=`gsed -n 's/^-IPTC:ObjectName="\(.*\)"$/\1/p' $element`
+	imageTitle=`sed -n 's/^-IPTC:ObjectName="\(.*\)"$/\1/p' $element`
 	# Strip out characters (from imageTitle) which may choke the Sphider search engine which I use; adapted from ftun.sh; dunno why, but that backtick \` had to be triple-escaped \\\ and also a backslash double-escaped, and even that only worked if everything is surrounded by single-quote marks ':
 	imageTitleForURLencode=`echo $imageTitle | tr -d '\=\@\\\`~\!#$%^\&\(\)+[{<]}>\*\;\|\/\\\,'`
 	# re: https://gimi.name/snippets/urlencode-and-urldecode-for-bash-scripting-using-sed/ :
 			# OR? : https://gist.github.com/cdown/1163649 :
 	oy="http://earthbound.io/q/search.php?search=1&query=$imageTitleForURLencode"
-	oy=`echo "$oy" | gsed -f /cygdrive/c/_ebdev/scripts/urlencode.sed`
+	oy=`echo "$oy" | sed -f /cygdrive/c/_ebdev/scripts/urlencode.sed`
 	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=""$PolrAPIkey""&is_secret=false&response_type=plain_text&url=$oy"
 echo command to run will be\:
 			# DEPRECATED as it stopped working and I'm not figuring out why, when a working alternative is available:
 			# echo wget -O oy.txt $wgetArg
 			echo "curl \"$wgetArg\" > oy.txt"
 	curl "$wgetArg" > oy.txt
-			# Insert that with a search query URL into the description tag; roundabout means via invoking script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:
+			# Insert that with a search query URL into the description tag; roundabout means by running script created with several text processing commands, because I can't figure the proper escape sequences if there even would be any working ones long cherished friend of a forgotten space and possible future time I love you for even reading this:
 	# parse that result and store it in a variable $descriptionAddendum:
-	gsed -i 's/\//\\\//g' oy.txt
+	sed -i 's/\//\\\//g' oy.txt
 	descriptionAddendum=$( < oy.txt)
 			# echo descriptionAddendum value is\:
 			# echo $descriptionAddendum
 			# echo element is\:
 			# echo $element
 	# strip placeholder URL from description and replace it with URL from $descriptionAddendum:
-	# gsed -i 's/\(.*See\) http:\/\/[^ ]* for \(.*\)/ \1 $descriptionAddendum for \2/g' $element
-	gsed -i -e s/"\(.*See\) http:\/\/[^ ]* \(for .*\)"/"\1 $descriptionAddendum \2"/g $element
+	# sed -i 's/\(.*See\) http:\/\/[^ ]* for \(.*\)/ \1 $descriptionAddendum for \2/g' $element
+	sed -i -e s/"\(.*See\) http:\/\/[^ ]* \(for .*\)"/"\1 $descriptionAddendum \2"/g $element
 	rm oy.txt
 	tr '\n' ' ' < $element > ghor.txt
 	exifTagArgs=$( < ghor.txt)
 	rm ghor.txt
 	# Retrieve extension of source final master file name (SFMFN) from ~MD_ADDS; and store it in a variable; thanks re http://stackoverflow.com/a/1665574 :
-	SFMFNextension=`gsed -n 's/.*from master file.*\(\..\{1,4\}\)"/\1/p' $element`
-	# Retrieve and store full ~ file name with extension; the \.\/ part escapes ./ (which ./ this gsed command also strips) :
-				# SFMFNnoExtension=`gsed -n 's/.*from master file: \.\/\(.*\)\..\{1,4\}"/\1/p' $element`
+	SFMFNextension=`sed -n 's/.*from master file.*\(\..\{1,4\}\)"/\1/p' $element`
+	# Retrieve and store full ~ file name with extension; the \.\/ part escapes ./ (which ./ this sed command also strips) :
+				# SFMFNnoExtension=`sed -n 's/.*from master file: \.\/\(.*\)\..\{1,4\}"/\1/p' $element`
 	# SFMFNpath will preserve any subdirectory paths and duplicate them to the target ./_dist path:
-	SFMFNpath=`gsed -n 's/.*from master file: \.\/\(.*\/\).*\"/\1/p' $element`
+	SFMFNpath=`sed -n 's/.*from master file: \.\/\(.*\/\).*\"/\1/p' $element`
 # e.g. result val of SFMFNpath: subdir/
 # OR if no subdir, it is blank.
-	SFMFNwithExtension=`gsed -n 's/.*from master file: \.\/\(.*\..\{1,4\}\)"/\1/p' $element`
+	SFMFNwithExtension=`sed -n 's/.*from master file: \.\/\(.*\..\{1,4\}\)"/\1/p' $element`
 					# echo ~~~~
 						# echo SFMFNwithExtension is $SFMFNwithExtension
 						# echo SFMFNnoExtension is $SFMFNnoExtension
@@ -97,18 +101,18 @@ echo command to run will be\:
 		# echo is tif.
 # TO DO: double-check: I *think* the -m flag, in ignoring minor warnings, allows writing strings into metadata longer than specs allow:
 				echo writing commmand for tif file to exiftool_temp_update_metadata.bat\:
-				echo exiftool -CommonIFD0= -adobe:all= -xmp:all= -photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension
-		echo exiftool -CommonIFD0= -adobe:all= -xmp:all= -photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension > exiftool_temp_update_metadata.bat
+				echo exiftool -CommonIFD0= -adobe:all= -xmp:all= -Photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension
+		echo exiftool -CommonIFD0= -adobe:all= -xmp:all= -Photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension > exiftool_temp_update_metadata.bat
 		# In two commands because for wait what?
 		# echo exiftool $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension >> exiftool_temp_update_metadata.bat
 				# e.g.:   exiftool -CommonIFD0= testimg.tif    NECESSARY FOR removing tags from tiffs! RE: http://www.sno.phy.queensu.ca/~phil/exiftool/faq.html#Q7
 				# ALSO RE: http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,5111.msg24655.html#msg24655
-				# -adobe:all= -xmp:all= -photoshop:all= -tagsfromfile @ -iptc:all -overwrite_original
+				# -adobe:all= -xmp:all= -Photoshop:all= -tagsfromfile @ -iptc:all -overwrite_original
 	else
 		# echo is not tif.
 				echo writing commmand for non-tif file to exiftool_temp_update_metadata.bat\:
-				echo exiftool -adobe:all= -xmp:all= -photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension
-		echo exiftool -adobe:all= -xmp:all= -photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension > exiftool_temp_update_metadata.bat
+				echo exiftool -adobe:all= -xmp:all= -Photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension
+		echo exiftool -adobe:all= -xmp:all= -Photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension > exiftool_temp_update_metadata.bat
 	fi
 		# Use any/which? :
 		# -@ ARGFILE ?
@@ -122,7 +126,7 @@ echo command to run will be\:
 	# echo -=-=
 	# Copy to new ~tagAndDistPrep image before running metadata update batch against it (so that the batch will even do any work) ; NOTE that if $SFMFNpath is empty, the dest path to copy to will simply be ./ ; this doom of using two sets of double quotes for the dest path was at last prophecied 06/20/2016 11:18:51 PM -RAH; BUT WAIT, THERE'S MORE!--and rediscovered thanks to a missing double quote mark typographical error 07/01/2016 10:18:40 PM -RAH:
 	cp -f "./$SFMFNwithExtension" "./$SFMFNpath""__tagAndDistPrepImage""$SFMFNextension"
-	# Because (it seems) cygwin can create a batch file the system doesn't have permission to run? AND no permissions are given to open that copied file:
+	# Because (it seems) Cygwin can create a batch file the system doesn't have permission to run? AND no permissions are given to open that copied file:
 	chmod 777 exiftool_temp_update_metadata.bat "./$SFMFNpath""__tagAndDistPrepImage""$SFMFNextension"
 	cygstart -w exiftool_temp_update_metadata.bat
 	echo Ran exiftool_temp_update_metadata.bat . . .
