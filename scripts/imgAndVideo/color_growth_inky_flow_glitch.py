@@ -1,18 +1,19 @@
 # DESCRIPTION
 # This is saved as a new script from a development version of colorGrowth.py which has unintended functionality, which is that colors, soon after they have already been filled, still spawn new coordinates and fill them with mutated color for a while. With the -a 1 switch passed to the script and saved animation frames strung together into a video render (e.g. via ffmpegAnim.sh), this appears like ink flowing after it has been poured. This is however much more computationally expensive to simulate, so I saved this development glitch script separate (not intended to be in the final). Renders a PNG image like colored, evolved bacteria (they produce different colors as they evolve) grown randomly over a surface. Output file names are based on the date and add random characters. Inspired and drastically evolved from colorFibers.py, which was horked and adapted from https://scipython.com/blog/computer-generated-contemporary-art/
 
-# USAGE
-# Run this script without any paramaters, and it will use a default set of parameters:
-# python thisScript.py
-# To see available parameters, run this script with the -h switch:
-# python thisScript.py -h
-
 # DEPENDENCIES
 # python 3 with the various modules installed that you see in the import statements here near the start of this script.
 
-# TO DO? fix bugs extant in that this is a dev version.
+# USAGE
+# Run this script through a Python interpreter without any parameters, and it will use a default set of parameters:
+#    python /path/to/this/script/color_growth_inky_flow_glitch.py
+# To see available parameters, run this script with the -h switch:
+#    python /path/to/this/script/color_growth_inky_flow_glitch.py
+
 
 # CODE
+# TO DO
+# - fix bugs extant in that this is a dev version?
 import datetime, random, argparse, ast, os.path
 import numpy as np
 from PIL import Image
