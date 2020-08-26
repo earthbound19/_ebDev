@@ -1,4 +1,0 @@
-Many sources are not on this list, at this writing.
-
-nconvert:
-http://www.xnview.com/en/nconvert/
