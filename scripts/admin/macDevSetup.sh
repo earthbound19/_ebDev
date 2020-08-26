@@ -1,3 +1,35 @@
+# DESCRIPTION
+# Performs administrative setup per my preferences for MacOS development etc.
+
+# USAGE
+# Examine every line and uncomment what you want, and comment out what you don't want. If you don't know what every line does, don't use this script. Then run this without any parameters:
+#    macDevSetup.sh
+# Then follow the prompt to really AKTULLY do things if you want (requires a password it tells you).
+# NOTES
+# If it's your preference, revert from newer MacOS Zsh shell to bash with this command:
+#
+#    chsh -s /bin/bash
+#
+# To go to Zsh again, run:
+#
+#    chsh -s /bin/zshcd
+
+
+# CODE
+echo ""
+echo "WARNING: WARNING. Um, warning. If you want to run this script, type SNURFBLIM and then press ENTER or RETURN."
+read -p "TYPE HERE: " SILLYWORD
+
+if ! [ "$SILLYWORD" == "SNURFBLIM" ]
+then
+	echo ""
+	echo Typing mismatch\; exit.
+	exit
+else
+	echo continuing . .
+fi
+
+
 # pushd .
 # NOPE: maybe asdf instead:
 # install n node version manager; re: https://github.com/tj/n/issues/169
@@ -8,13 +40,8 @@
 # n latest
 # popd
 
-# NOTE:
-# If it's your preference, revert from newer MacOS Zsh shell to bash with this command:
-# chsh -s /bin/bash
-# To go to Zsh again, run:
-# chsh -s /bin/zshcd
-
 ./install_global_node_modules.sh
+./installUsedBrewPackages.sh
 
 # Enable "Allow from Anywhere" in app gatekeeper on macOS Sierra (seriously, Apple, you are AWOL with your controls--I have to enable even the *option* to install apps from anywhere by entering a super-user terminal command?! Isn't that anti-competitive?), re: http://osxdaily.com/2016/09/27/allow-apps-from-anywhere-macos-gatekeeper/
 # USE WITH CAUTION:
@@ -37,7 +64,7 @@ defaults write com.apple.CrashReporter DialogType none
 # defaults write com.apple.CrashReporter UseUNC 1
 
 
-# OPTIONAL COMMANDS that castrate foistware:
+# OPTIONAL COMMANDS that castrate foistware which I don't use:
 pushd
 cd ~/Applications
 sudo chmod 000 ./Messages.app
@@ -65,28 +92,28 @@ printf '
 # openimageIO:
 export DYLD_LIBRARY_PATH="${OCIO_EXECROOT}/lib:${DYLD_LIBRARY_PATH}"
 
+# Put GNU coreutils from brew in path before other Mac tools of the same name; re https://formulae.brew.sh/formula/coreutils :
+PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH"
+PATH=$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH
+PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+
 ' >> ~/.bash_profile
 
-# DISABLE blasted dysfunctional IPv6.
-# To list the network servics, run: networksetup -listallnetworkservices
-# To re-enable, use -setv6automatic instead of -setv6off
-# networksetup -setv6off "USB 10/100/1000 LAN"
-# networksetup -setv6off Wi-Fi
-
-
+# see: pyenvFrameworkInstallMac.sh
 # tcl-tk for python idle? :
-# printf '
-# 
 # # for python idle in pyenv:
 # export LDFLAGS="-L/usr/local/opt/tcl-tk/lib"
 # export CPPFLAGS="-I/usr/local/opt/tcl-tk/include"
 # export PATH=$PATH:/usr/local/opt/tcl-tk/bin
-# 
-# ' >> ~/.bash_profile
+# Then launch IDLE interactive shell with:
+# pyenv-idle.py
+# -- although just:
+# idle
+# -- may work!
 
 # NOTE: ntfs-3g location: /usr/local/Cellar/ntfs-3g/2017.3.23
 
-# Possible additional commands to setup asdf and pyenv:
+# Possible additional commands to setup asdf:
 # git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.6.0
 # echo -e '\n. $HOME/.asdf/asdf.sh' >> ~/.bash_profile
 # asdf plugin-add nodejs
@@ -104,7 +131,7 @@ export DYLD_LIBRARY_PATH="${OCIO_EXECROOT}/lib:${DYLD_LIBRARY_PATH}"
 
 # REFERENCE FOR OTHER TOOLS
 # date format "Phrase content" for PhraseExpress text expander for mac, for hotkey/sequence to type full date and time:
-#   {#datetime -f yyyy.mm.dd dddd t am/pm}
+#     {#datetime -f yyyy.mm.dd dddd t am/pm}
 
 # command for Atom open-terminal-here package on Mac (requires ttab to be installed) which allows opening any path to terminal by shortcut:
 # ttab && cd "$PWD"
@@ -113,3 +140,9 @@ export DYLD_LIBRARY_PATH="${OCIO_EXECROOT}/lib:${DYLD_LIBRARY_PATH}"
 # see: https://coolestguidesontheplanet.com/add-shell-path-osx/
 # 
 # and / or http://hathaway.cc/post/69201163472/how-to-edit-your-path-environment-variables-on-mac
+
+# DISABLE blasted dysfunctional IPv6.
+# To list the network servics, run: networksetup -listallnetworkservices
+# To re-enable, use -setv6automatic instead of -setv6off
+# networksetup -setv6off "USB 10/100/1000 LAN"
+# networksetup -setv6off Wi-Fi
