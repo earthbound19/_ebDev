@@ -1,61 +1,40 @@
-"""Renders a PNG image like bacteria that mutate color as they spread.
-
-An earlier incarnation of this script by earthbound19 was dramatically sped up by changes
-from one GitHub user "scribblemaniac" (like many orders of magnitude faster--an image
-that used to take 7 minutes to render now takes 5 seconds).
-
-Output file names are based on the date and time and random characters.
-Inspired and drastically evolved from color_fibers.py, which was horked and adapted
-from https://scipython.com/blog/computer-generated-contemporary-art/
-
-# USAGE
-Run this script without any parameters, and it will use a default set of parameters:
-python color_growth.py
-To see available parameters, run this script with the --help switch:
-python color_growth.py --help
+# DESCRIPTION
+# Renders a PNG image like bacteria that mutate color as they spread. TRY IT. The output is awesome.
 
 # DEPENDENCIES
-python 3 with numpy, queue, and pyimage modules installed (and others--see the import
-statements).
+# python 3 with numpy, queue, and pyimage modules installed (and others--see the import statements).
 
+# USAGE
+# Run this script through a Python interpreter without any parameters, and it will use a default set of parameters:
+#    python /path/to_this_script/color_growth.py
+# To see available parameters, run this script with the --help switch:
+#    python /path/to_this_script/ --help
+# NOTES
+# - GitHub user `scribblemaniac` sped up this script (with a submitted pull request) by orders of magnitute vs. an earlier version of the script. An image that took seven minutes to render took 5 seconds after speedup.
+# - Output file names are based on the date and time and random characters. Inspired and drastically evolved from `color_fibers.py`, which was horked and adapted from:
+#
+#    https://scipython.com/blog/computer-generated-contemporary-art
+#
 # KNOWN ISSUES
-See help for --RANDOM_SEED.
-
-# TO DO
-See comments under documentation heading in this module.
-
-"""
-
-# TO DO:
-# - figure out whether I broke RND continuity? It would seem
-# the same presets are no longer producing the same results?
-# - isolate what situation didn't create a new preset / anim folder
-# when I expected it to, and fix that (or document in help).
-# - make naming convention of variables consistent? I think I'm
-# all over the place with this . . . :p
-# - possibly things in the color_growth_v1.py's TO DO list.
-# - determine whether any code in the fast fork (now this script)
-# is leftover from color_growth_v1.py, and delete them?
-# - make it properly use negative or > 8 growth-clip values again?
-# since the color_growth_fast.py fork it isn't.
-
-# VERSION HISTORY
-# v2.7.3:
-# - Added --CUSTOM_COORDS_AND_COLORS option that can init
-# coordinates and associated canvas colors from complex array string
-# evaluated by ast.literal_eval. See help print for it.
-# - Delete ancient commented code about subprocesses / windows
-# argument processing, and also ancient unused associated shlex
-# and subprocess module imports.
-# - Rearranged help items order and update --RECLAIM_ORPHANS to
-# mention --GROWTH_CLIP (not --VISCOSITY, which is an ancient
-# vestigal reference).
-# - Deleted speculated TO DO (faster random sampling) that would
-# alter RND state continuity. Will save faster for maybe C++
-# implementation or a faster Python interpreter.
+# See help for `--RANDOM_SEED`.
 
 
 # CODE
+# TO DO
+# - figure out whether I broke RND continuity? It would seem the same presets are no longer producing the same results?
+# - isolate what situation didn't create a new preset / anim folder when I expected it to, and fix that (or document in help).
+# - make naming convention of variables consistent? I think I'm all over the place with this . . . :p
+# - possibly things in the color_growth_v1.py's TO DO list.
+# - determine whether any code in the fast fork (now this script) is leftover from color_growth_v1.py, and delete them?
+# - make it properly use negative or > 8 growth-clip values again? Since the color_growth_fast.py fork it isn't.
+
+# VERSION HISTORY
+# v2.8.7:
+# Edit speedup credit comment.
+
+# START IMPORTS AND GLOBALS
+ColorGrowthPyVersionString = 'v2.8.7'
+
 import datetime
 import random
 import argparse
@@ -70,10 +49,7 @@ import platform
 import numpy as np
 from PIL import Image
 
-
-# START GLOBALS
-# Defaults which will be overriden if arguments of the same name are provided to the script:
-ColorGrowthPyVersionString = 'v2.7.3'
+# Defaults which will be overridden if arguments of the same name are provided to the script:
 WIDTH = 400
 HEIGHT = 200
 RSHIFT = 8
@@ -255,9 +231,9 @@ are zero-index-based, which means 0 is 1, 1 is 2, 4 is 5, etc.; BUT \
 that\'s not human-friendly, so use the actual values (1 is 1!) \
 and the program will just subtract 1 for the zero-based indexing. 3) \
 Although internally in code, coordinates are represented as (y,x) tuples \
-(or (down,accross), that confuses me and isn\'t standard or expected for \
+(or (down,across), that confuses me and isn\'t standard or expected for \
 humans, so in this parameter coordinate are represented as (x,y) (or \
-(accross,down), and the code swaps them before assignment to real, \
+(across,down), and the code swaps them before assignment to real, \
 internal tuples. You\'re welcome.'
 )
 PARSER.add_argument('--GROWTH_CLIP', type=str, help=
@@ -332,8 +308,7 @@ after --LOAD_PRESET. For example, if a preset contains --RANDOM SEED \
 # if I do that in the PARSER.add_argument function --
 # http://python.6.x6.nabble.com/argparse-tell-if-arg-was-defaulted-td1528162.html -- so what
 # I do is check for None (and then supply a default and add to argsparse if None is found).
-# The check for None isn't literal: it's in the else: clause after an if (value) check
-# (if the if check fails, that means the value is None, and else: is invoked) :
+# The check for None isn't literal: it's in the else clause after an if (value) check (if the if check fails, that means the value is None, and else: is used) :
 print('')
 print('Processing any arguments to script . . .')
 
@@ -715,16 +690,12 @@ for y in range(0, HEIGHT):        # for columns (x) in row)
         unallocd_coords.add((y, x))
         canvas[y].append([-1,-1,-1])
 
-# DEV CODING CHANGES/ADDITIONS start here!
-# If ARGS.CUSTOM_COORDS_AND_COLORS was not passed to script, initialize allocd_coords set by random
-# selection from unallocd_coords (and remove from unallocd_coords):
-# Structure of coords is (y,x), and the following is four corners of canvas 100y * 200x:
-    # code line WAS: RNDcoord = random.sample(unallocd_coords, START_COORDS_N) :
+# If ARGS.CUSTOM_COORDS_AND_COLORS was not passed to script, initialize
+# allocd_coords set by random selection from unallocd_coords (and remove
+# from unallocd_coords); structure of coords is (y,x)
 if not ARGS.CUSTOM_COORDS_AND_COLORS:
     print('no --CUSTOM_COORDS_AND_COLORS argument passed to script, so initializing coordinate locations randomly . . .')
     RNDcoord = random.sample(unallocd_coords, START_COORDS_N)
-    print('value of first of that is', RNDcoord[0])
-    print('type of that is ', type(RNDcoord[0]))
     for coord in RNDcoord:
         coord_queue.append(coord)
         if COLOR_MUTATION_BASE == "random":
@@ -741,25 +712,18 @@ else:
         # indexing, which means 1 for hoomans is 0 for program, so substracting 1
         # from both values:
         coord = (element[0][1], element[0][0])
-        # print('witohut mod:', coord)
+        # print('without mod:', coord)
         coord = (element[0][1]-1, element[0][0]-1)
         # print('with mod:', coord)
         coord_queue.append(coord)
         color_values = np.asarray(element[1])       # np.asarray() gets it into same object type as elsewhere done and expected.
-        print('adding clor to canvas:', color_values)
+        # print('adding color to canvas:', color_values)
         # MINDING the x,y swap AND to modify the hooman 1-based index here, too! :
         canvas[ element[0][1]-1 ][ element[0][0]-1 ] = color_values     # LORF! 
 
 report_stats_every_n = 5000
 report_stats_nth_counter = 0
 
-# VESTIGAL CODE; most versions of this script here altered the
-# pseudorandom sequence of --RANDOM_SEED with the following line
-# of code; this had been commented out around v2.3.6 - v2.5.5
-# (maybe?), which broke with psuedorandom continuity as originally
-# developed in the script. For continuity (and because output seemed
-# randomly better _with_ this code), it is left here:
-rndStr = ('%03x' % random.randrange(16**6))
 # Render target file name generation; differs in different scenarios:
 # If a preset was loaded, base the render target file name on it.
 if ARGS.LOAD_PRESET:
@@ -769,7 +733,19 @@ else:
 # Otherwise, create render target file name based on time painting began.
     now = datetime.datetime.now()
     time_stamp = now.strftime('%Y_%m_%d__%H_%M_%S__')
-    render_target_file_base_name = time_stamp + '_colorGrowthPy'
+    # VESTIGAL CODE; most versions of this script here altered the
+    # pseudorandom sequence of --RANDOM_SEED with the following line
+    # of code (that makes an rndStr); this had been commented out around
+    # v2.3.6 - v2.5.5 (maybe?), which broke with psuedorandom continuity as
+    # originally developed in the script. For continuity (and because output
+    # seemed randomly better _with_ this code), it is left here; ALSO NOTE:
+    # in trying to track down this issue some versions of the script had the
+    # following line of code before the above if ARGS.LOAD_PRESET; but now I
+    # think it _would_ have been here (also git history isn't complete on
+    # versions, I think, so I'm speculating); if you can't duplicate the rnd
+    # state of a render, you may want to try copying it up there.
+    rndStr = ('%03x' % random.randrange(16**6))
+    render_target_file_base_name = time_stamp + '__' + rndStr + '_colorGrowthPy'
 # Check if render target file with same name (but .png) extension exists.
 # This logic is very slightly risky: if render_target_file_base_name does
 # not exist, I will assume that state image file name and anim frames
@@ -862,7 +838,7 @@ while coord_queue:
             coord_queue.pop()
         else:
             coord_queue[index] = coord_queue.pop()
-        
+
         # Mutate color--! and assign it to the color variable (list) in the Coordinate object:
         canvas[y][x] = canvas[y][x] + np.random.randint(-RSHIFT, RSHIFT + 1, size=3) / 2
         # print('Colored coordinate (y, x)', coord)
@@ -881,7 +857,7 @@ while coord_queue:
                 canvas[new_y][new_x] = new_allocd_coords_color
         # Save an animation frame (function only does if SAVE_EVERY_N True):
         save_animation_frame()
-
+        
         # Print progress:
         if report_stats_nth_counter == 0 or report_stats_nth_counter == report_stats_every_n:
             print_progress(newly_painted_coords)
