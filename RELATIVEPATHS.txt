@@ -8,3 +8,6 @@ scripts\imgAndVideo\EXIFdataBatch
 scripts\imgAndVideo\EXIFdataBatch\metaDataTemplates
 scripts\imgAndVideo\virtualDub
 scripts\admin
+scripts\admin\MSYS2
+scripts\admin\cygwin
+scripts\recipes
