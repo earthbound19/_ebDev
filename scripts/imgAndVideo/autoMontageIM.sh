@@ -1,48 +1,30 @@
 # DESCRIPTION
-# Uses imagemagick montage to pack all images of type $1 in the current
-# directory into a montage of approximate size $2. Tiles are padded
-# with a dark gray, and the entire result image is padded with a darker
-# gray. Result file will be named __montage_<name_of_current_directory>.
+# Uses ImageMagick montage to pack all images of type $1 in the current directory into a montage of approximate size $2. Tiles are padded with a dark gray, and the entire result image is padded with a darker gray.
 
 # DEPENDENCIES
-# A nixy' environment and imagemagick / montage + convert.
+# Imagemagick / montage + convert
 
 # USAGE
-# Invoke the script with two parameters, being:
-# $1 an image file type, without any . in the extension, e.g.
-#  png, not .png. All images of this type in the current
-#  directory will be used in the montage.
-# $2 OPTIONAL. How many tiles across the montage should be. If not
-#   provided or provided as AUTO, imagemagick will automatically
-#   decide tiles across and down to be similar to ratio of images.
-# $3 OPTIONAL. Approximate intended width of the final montage image,
-#  in pixels. Tiles in the image will not be enlarged to fill up space (only
-#  shrunk if necessary). For smaller images, if you set an outsized
-#  montage size, this could lead to a lot of gray padding around images
-#  in the montage. IF PROVIDED as keyword FULL, montage image width
-#  is automatically figured to ~accommodate all images in the montage
-#  AT FULL SIZE; meaning: the tile width for each image in the montage
-#  will be set to the original image width of the first found image,
-#  which tiles combined will produce a montage of roughly the size of
-#  all original images combined. IF NOT PROVIDED, montage width will be
-#  approximately the size of the first image found. In that case, montage
-#  width is approximated as: (tile width * tiles across) = montage width.
-# Result file will be named __montage_<name_of_current_directory>.
-# Example invocation that will create a montage from all png files in
-#  the current directory, with number of tiles across auto-decided, and
-#  each tile ~800 px wide:
-# autoMontageIM.sh png AUTO 800
-# An example command that will accomplish the same but set the tiles
-#  across to 9:
-# autoMontageIM.sh png 9 800
-# An example 
+# Run the script with these parameters:
+# - $1 an image file type, without any . in the extension, e.g. png, not .png. All images of this type in the current directory will be used in the montage.
+# - $2 OPTIONAL. How many tiles across the montage should be. If not provided or provided as AUTO, ImageMagick will automatically decide tiles across and down to be similar to ratio of images.
+# - $3 OPTIONAL. Approximate intended width of the final montage image, in pixels. Tiles in the image will not be enlarged to fill up space (only shrunk if necessary). For smaller images, if you set an outsize montage size, this could lead to a lot of gray padding around images in the montage. IF PROVIDED as keyword FULL, montage image width is automatically figured to ~accommodate all images in the montage AT FULL SIZE; meaning: the tile width for each image in the montage will be set to the original image width of the first found image, which tiles combined will produce a montage of roughly the size of all original images combined. IF NOT PROVIDED, montage width will be approximately the size of the first image found. In that case, montage width is approximated as: (tile width * tiles across) = montage width.
+# Result file will be named `__montage_<name_of_current_directory>`.
+# Example that will create a montage from all png files in the current directory, with number of tiles across auto-decided, and each tile ~800 px wide:
+#    autoMontageIM.sh png AUTO 800
+# An example command that will accomplish the same but set the tiles across to 9:
+#    autoMontageIM.sh png 9 800
+# An example that produces the same and with the montage at the full size of all images combined plus padding:
+#    autoMontageIM.sh png 9 800 FULL
 
+
+
+# CODE
 # DEV NOTES
-# All combinations of possible parameter types the script can handle,
-#  for testing:
-#  autoMontageIM.sh png (or any image type) +
-#  [none] OR n OR AUTO +
-#  [none] OR n OR FULL = these possible tests:
+# All combinations of possible parameter types the script can handle, for testing:
+#    autoMontageIM.sh png (or any image type) +
+#    [none] OR n OR AUTO +
+#    [none] OR n OR FULL = these possible tests:
 # autoMontageIM.sh png [none]
 # 	( ^ combos with group 1 only)
 # autoMontageIMG.sh png 4 [none]
@@ -64,11 +46,8 @@
 #
 # Phew!
 
-
-# CODE
-# If user did not pass parameter $1, warn and exit.
-
 # START GLOBALS SETUP
+# If user did not pass parameter $1, warn and exit.
 if ! [ "$1" ]
 then
 	echo No parameter \$1 \(image type\) passed to script. Exit.
@@ -92,10 +71,10 @@ fi
 
     # Get dimensions of first image of type $1 found.
     # -printf '%f\n' chops off the ./ at the start which we don't want:
-firstImage=`gfind . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | head -n 1`
+firstImage=`find . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | head -n 1`
 originalIMGwidth=`gm identify -format "%w" $firstImage`
 originalIMGheight=`gm identify -format "%h" $firstImage`
-numImagesFound=`gfind . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | wc -l`
+numImagesFound=`find . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | wc -l`
 SQRTofNumImagesFound=`echo "scale=0; sqrt($numImagesFound) + 1" | bc`
 
 if [ "$3" ]
