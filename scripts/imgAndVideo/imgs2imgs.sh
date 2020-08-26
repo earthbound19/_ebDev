@@ -1,29 +1,22 @@
-# IN PROGRESS.
+# DESCRIPTION
+# converts all images of type $1 in the current directory to type $2.
 
-# DESCRIPTION: converts all images of one type in a directory tree to another.
+# USAGE
+# For svgs, use `SVG2img.sh` or `allsvg2img.sh`, not this. This will do very crummy upscaling of vector images, _post-resterization_.
+# Run this script with these parameters::
+# - $1 the source file format e.g. bmp or png
+# - $2 the target file format e.g. tif or jpg
+# Example that will convert all png images in the current directory to jpgs:
+#    imgs2imgs.sh png jpg
 
-# WARNING: for svgs, use SVG2img.sh or allsvg2img.sh, not this. This will do very crummy upscaling of vector images, _post-resterization_.
-# USAGE: invoke this script with these parameters:
-# $1 the source file format e.g. bmp or png
-# $2 the target file format e.g. tif or jpg
 
-# DEV NOTE: template command: gm -size 850 test.svg result.tif
-# NOTE that for the -size parameter, it scales the images so that the longest side is that many pixels.
+# CODE
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (source image type to convert) passed to script. Exit."; exit 1; else sourceIMGformat=$1; fi
+if [ ! "$2" ]; then printf "\nNo parameter \$2 (source image type to convert) passed to script. Exit."; exit 1; else destIMGformat=$2; fi
 
-img_format_1=$1
-img_format_2=$2
+fileNamesList=$(find . -maxdepth 1 -type f -name \*.$sourceIMGformat -printf "%f\n")
 
-# OPTIONAL e.g. resize command:
-# additionalParams="-scale 1920 "
-
-array=(`gfind . -maxdepth 1 -type f -iname \*.$img_format_1 -printf '%f\n'`)
-for element in ${array[@]}
+for fileName in ${fileNamesList[@]}
 do
-	fileNameNoExtension=`basename $element .$img_format_1`
-			# REFERENCE for script hacking for custom runs: the [-scale n] switch will resize the image maintaining aspect with the longest side at n pixels.
-	# what parameter was I after here? : -size $1x$1
-	command="gm convert $additionalParams $element $fileNameNoExtension.$img_format_2"
-	echo running command\: $command
-	echo . . .
-	$command
+	img2img.sh $fileName $destIMGformat
 done
