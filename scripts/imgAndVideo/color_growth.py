@@ -300,15 +300,9 @@ after --LOAD_PRESET. For example, if a preset contains --RANDOM SEED \
 
 
 # START ARGUMENT PARSING
-# DEVELOPER NOTE: Throughout the below argument checks, wherever a user does not specify
-# an argument and I use a default (as defaults are defined near the start of working code
-# in this script), add that default switch and switch value pair argsparse, for use by
-# the --SAVE_PRESET feature (which saves everything except for the script path ([0]) to
-# a preset). I take this approach because I can't check if a default value was supplied
-# if I do that in the PARSER.add_argument function --
-# http://python.6.x6.nabble.com/argparse-tell-if-arg-was-defaulted-td1528162.html -- so what
-# I do is check for None (and then supply a default and add to argsparse if None is found).
-# The check for None isn't literal: it's in the else clause after an if (value) check (if the if check fails, that means the value is None, and else: is used) :
+# DEVELOPER NOTE: Throughout the below argument checks, wherever a user does not specify an argument and I use a default (as defaults are defined near the start of working code in this script), add that default switch and switch value pair argsparse, for use by the --SAVE_PRESET feature (which saves everything except for the script path ([0]) to a preset). I take this approach because I can't check if a default value was supplied if I do that in the PARSER.add_argument function --
+# http://python.6.x6.nabble.com/argparse-tell-if-arg-was-defaulted-td1528162.html
+# -- so what I do is check for None (and then supply a default and add to argsparse if None is found). The check for None isn't literal: it's in the else clause after an if (value) check (if the if check fails, that means the value is None, and else: is used) :
 print('')
 print('Processing any arguments to script . . .')
 
@@ -464,29 +458,24 @@ np.random.seed(RANDOM_SEED)
 
     # BEGIN STATE MACHINE "Megergeberg 5,000."
     # DOCUMENTATION.
-    # Possible combinations of these variables to handle; "coords" means START_COORDS_N,
-    # RNDcoords means START_COORDS_RANGE:
+    # Possible combinations of these variables to handle; "coords" means START_COORDS_N, RNDcoords means START_COORDS_RANGE:
     # --
     # ('coords', 'RNDcoords') : use coords, delete any RNDcoords
     # ('coords', 'noRNDcoords') : use coords, no need to delete any RNDcoords. These two:
     # if coords if RNDcoords.
     # ('noCoords', 'RNDcoords') : assign user-provided RNDcoords for use (overwrite defaults).
     # ('noCoords', 'noRNDcoords') : continue with RNDcoords defaults (don't overwrite defaults).
-    # These two: else if RNDcoords else. Also these two: generate coords independent of
-    # (outside) that last if else (by using whatever RNDcoords ends up being (user-provided
+    # These two: else if RNDcoords else. Also these two: generate coords independent of (outside) that last if else (by using whatever RNDcoords ends up being (user-provided
     # or default).
     # --
-    # I COULD just have four different, independent "if" checks explicitly for those four
-    # pairs and work from that, but this is more compact logic (fewer checks).
-# If --START_COORDS_N is provided by the user, use it, unless there is overriding
-# CUSTOM_COORDS_AND_COLORS:
+    # I COULD just have four different, independent "if" checks explicitly for those four pairs and work from that, but this is more compact logic (fewer checks).
+# If --START_COORDS_N is provided by the user, use it, unless there is overriding CUSTOM_COORDS_AND_COLORS:
 if not ARGS.CUSTOM_COORDS_AND_COLORS:
     if ARGS.START_COORDS_N:
         START_COORDS_N = ARGS.START_COORDS_N
         print('Will use the provided --START_COORDS_N, ', START_COORDS_N)
         if ARGS.START_COORDS_RANGE:
-            # .. and delete any --START_COORDS_RANGE and its value from argsparse (as it will
-            # not be used and would best not be stored in the .cgp config file via --SAVE_PRESET:
+            # .. and delete any --START_COORDS_RANGE and its value from argsparse (as it will not be used and would best not be stored in the .cgp config file via --SAVE_PRESET:
             argsDict.pop('START_COORDS_RANGE', None)
             print(
     '** NOTE: ** You provided both [-q | --START_COORDS_N] and --START_COORDS_RANGE, \
@@ -516,9 +505,7 @@ if ARGS.GROWTH_CLIP:        # See comments in ARGS.BG_COLOR handling. Handled th
     GROWTH_CLIP = re.sub(' ', '', GROWTH_CLIP)
     argsDict['GROWTH_CLIP'] = GROWTH_CLIP
     GROWTH_CLIP = ast.literal_eval(GROWTH_CLIP)
-# NOTE: VESTIGAL CODE HERE that will alter pseudorandom determinism if commented vs.
-# not commented out; if render from a preset doesn't produce the same result as it
-# once did, try uncommenting the next line! :
+# NOTE: VESTIGAL CODE HERE that will alter pseudorandom determinism if commented vs. not commented out; if render from a preset doesn't produce the same result as it once did, try uncommenting the next line! :
     # zax_blor = ('%03x' % random.randrange(16**6))
 else:
     temp_str = str(GROWTH_CLIP)
@@ -531,24 +518,19 @@ else:
     argsDict['SAVE_PRESET'] = SAVE_PRESET
 # END ARGUMENT PARSING
 
-# Remove arguments from argsDict whose values are 'None' from that
-# (they cause problems when doing things with the arguments list
-# via CLI, as intended) :
+# Remove arguments from argsDict whose values are 'None' from that (they cause problems when doing things with the arguments list via CLI, as intended) :
 for key in argsDict:
     # if the key value is 'None', don't bother saving it; otherwise save it:
     if argsDict[key] != None:
         keyValStr = '--' + key + ' ' + str(argsDict[key])
         SCRIPT_ARGS_STR += keyValStr + ' '
-# removes whitespace from start and end that would mess
-# up parse code earlier in the script (if I didn't do this
-# there also) :
+# removes whitespace from start and end that would mess up parse code earlier in the script (if I didn't do this there also) :
 SCRIPT_ARGS_STR = SCRIPT_ARGS_STR.strip()
 
 # ADDITIONAL GLOBALS defined here:
 allPixelsN = WIDTH * HEIGHT
 stopRenderAtPixelsN = int(allPixelsN * STOP_AT_PERCENT)
-# If RAMP_UP_SAVE_EVERY_N is True, create list saveFramesAtCoordsPaintedArray
-# with increasing values for when to save N evolved coordinates to animation frames:
+# If RAMP_UP_SAVE_EVERY_N is True, create list saveFramesAtCoordsPaintedArray with increasing values for when to save N evolved coordinates to animation frames:
 saveFramesAtCoordsPaintedArray = []
 if SAVE_EVERY_N != 0 and RAMP_UP_SAVE_EVERY_N == True:
     allPixelsNdividedBy_SAVE_EVERY_N = allPixelsN / SAVE_EVERY_N
@@ -563,8 +545,7 @@ if SAVE_EVERY_N != 0 and RAMP_UP_SAVE_EVERY_N == True:
     saveFramesAtCoordsPaintedArray = list(unique_everseen(saveFramesAtCoordsPaintedArray))
     # Because that resulting list doesn't include the ending number, add it:
     saveFramesAtCoordsPaintedArray.append(stopRenderAtPixelsN)
-# If RAMP_UP_SAVE_EVERY_N is False, create list saveFramesAtCoordsPaintedArray with
-# values at constant intervals for when to save animation frames:
+# If RAMP_UP_SAVE_EVERY_N is False, create list saveFramesAtCoordsPaintedArray with values at constant intervals for when to save animation frames:
 if SAVE_EVERY_N != 0 and RAMP_UP_SAVE_EVERY_N == False:
     saveFramesAtCoordsPaintedArray = [x * SAVE_EVERY_N for x in range(0, int(stopRenderAtPixelsN/SAVE_EVERY_N)+1 )]
     # Because that range doesn't include the end of the range:
@@ -657,8 +638,7 @@ def save_animation_frame():
                 saveFramesAtCoordsPaintedArrayIDX += 1
                 saveNextFrameNumber = saveFramesAtCoordsPaintedArray[saveFramesAtCoordsPaintedArrayIDX]
             set_img_frame_file_name()
-            # Only write frame if it does not already exist
-            # (allows resume of suspended / crashed renders) :
+            # Only write frame if it does not already exist (allows resume of suspended / crashed renders) :
             if os.path.exists(imageFrameFileName) == False:
                 # print("Animation render frame file does not exist; writing frame.")
                 coords_set_to_image(canvas, imageFrameFileName)
@@ -690,9 +670,7 @@ for y in range(0, HEIGHT):        # for columns (x) in row)
         unallocd_coords.add((y, x))
         canvas[y].append([-1,-1,-1])
 
-# If ARGS.CUSTOM_COORDS_AND_COLORS was not passed to script, initialize
-# allocd_coords set by random selection from unallocd_coords (and remove
-# from unallocd_coords); structure of coords is (y,x)
+# If ARGS.CUSTOM_COORDS_AND_COLORS was not passed to script, initialize allocd_coords set by random selection from unallocd_coords (and remove from unallocd_coords); structure of coords is (y,x)
 if not ARGS.CUSTOM_COORDS_AND_COLORS:
     print('no --CUSTOM_COORDS_AND_COLORS argument passed to script, so initializing coordinate locations randomly . . .')
     RNDcoord = random.sample(unallocd_coords, START_COORDS_N)
@@ -708,17 +686,14 @@ else:
     print('\n')
     for element in CUSTOM_COORDS_AND_COLORS:
         # SWAPPING those (on CLI they are x,y; here it wants y,x) ;
-        # ALSO, this program kindly allows hoomans to not bother with zero-based
-        # indexing, which means 1 for hoomans is 0 for program, so substracting 1
-        # from both values:
+        # ALSO, this program kindly allows hoomans to not bother with zero-based indexing, which means 1 for hoomans is 0 for program, so substracting 1 from both values:
         coord = (element[0][1], element[0][0])
         # print('without mod:', coord)
         coord = (element[0][1]-1, element[0][0]-1)
         # print('with mod:', coord)
         coord_queue.append(coord)
         color_values = np.asarray(element[1])       # np.asarray() gets it into same object type as elsewhere done and expected.
-        # print('adding color to canvas:', color_values)
-        # MINDING the x,y swap AND to modify the hooman 1-based index here, too! :
+        # print('adding color to canvas:', color_values) MINDING the x,y swap AND to modify the hooman 1-based index here, too! :
         canvas[ element[0][1]-1 ][ element[0][0]-1 ] = color_values     # LORF! 
 
 report_stats_every_n = 5000
@@ -733,32 +708,14 @@ else:
 # Otherwise, create render target file name based on time painting began.
     now = datetime.datetime.now()
     time_stamp = now.strftime('%Y_%m_%d__%H_%M_%S__')
-    # VESTIGAL CODE; most versions of this script here altered the
-    # pseudorandom sequence of --RANDOM_SEED with the following line
-    # of code (that makes an rndStr); this had been commented out around
-    # v2.3.6 - v2.5.5 (maybe?), which broke with psuedorandom continuity as
-    # originally developed in the script. For continuity (and because output
-    # seemed randomly better _with_ this code), it is left here; ALSO NOTE:
-    # in trying to track down this issue some versions of the script had the
-    # following line of code before the above if ARGS.LOAD_PRESET; but now I
-    # think it _would_ have been here (also git history isn't complete on
-    # versions, I think, so I'm speculating); if you can't duplicate the rnd
-    # state of a render, you may want to try copying it up there.
+    # VESTIGAL CODE; most versions of this script here altered the pseudorandom sequence of --RANDOM_SEED with the following line of code (that makes an rndStr); this had been commented out around v2.3.6 - v2.5.5 (maybe?), which broke with psuedorandom continuity as originally developed in the script. For continuity (and because output seemed randomly better _with_ this code), it is left here;
+    # ALSO NOTE:
+    # in trying to track down this issue some versions of the script had the following line of code before the above if ARGS.LOAD_PRESET; but now I think it _would_ have been here (also git history isn't complete on versions, I think, so I'm speculating); if you can't duplicate the rnd state of a render, you may want to try copying it up there.
     rndStr = ('%03x' % random.randrange(16**6))
     render_target_file_base_name = time_stamp + '__' + rndStr + '_colorGrowthPy'
-# Check if render target file with same name (but .png) extension exists.
-# This logic is very slightly risky: if render_target_file_base_name does
-# not exist, I will assume that state image file name and anim frames
-# folder names also do not exist; if I am wrong, those may get overwritten
-# (by other logic in this script).
+# Check if render target file with same name (but .png) extension exists. This logic is very slightly risky: if render_target_file_base_name does not exist, I will assume that state image file name and anim frames folder names also do not exist; if I am wrong, those may get overwritten (by other logic in this script).
 target_render_file_exists = os.path.exists(render_target_file_base_name + '.png')
-# If it does not exist, set render target file name to that ( + '.png').
-# In that case, the following following "while" block will never
-# execute. BUT if it does exist, the following "while" block _will_
-# execute, and do this: rename the render target file name by appending six
-# rnd hex chars to it plus 'var', e.g. 'var_32ef5f' to file base name,
-# and keep checking and doing that over again until there's no target name
-# conflict:
+# If it does not exist, set render target file name to that ( + '.png'). In that case, the following following "while" block will never execute. BUT if it does exist, the following "while" block _will_ execute, and do this: rename the render target file name by appending six rnd hex chars to it plus 'var', e.g. 'var_32ef5f' to file base name, and keep checking and doing that over again until there's no target name conflict:
 cgp_rename_count = 1
 while target_render_file_exists == True:
     # Returns six random lowercase hex characters:
@@ -781,23 +738,16 @@ print('\nrender_target_file_name: ', render_target_file_name)
 print('anim_frames_folder_name: ', anim_frames_folder_name)
 
 
-# If SAVE_EVERY_N has a value greater than zero, create a subfolder to write frames to;
-# Also, initialize a variable which is how many zeros to pad animation save frame file
-# (numbers) to, based on how many frames will be rendered:
+# If SAVE_EVERY_N has a value greater than zero, create a subfolder to write frames to; Also, initialize a variable which is how many zeros to pad animation save frame file (numbers) to, based on how many frames will be rendered:
 if SAVE_EVERY_N > 0:
     padFileNameNumbersDigitsWidth = len(str(stopRenderAtPixelsN))
     # Only create the anim frames folder if it does not exist:
     if os.path.exists(anim_frames_folder_name) == False:
         os.mkdir(anim_frames_folder_name)
 
-# If bool set saying so, save arguments to this script to a .cgp file with the target
-# render base file name:
+# If bool set saying so, save arguments to this script to a .cgp file with the target render base file name:
 if SAVE_PRESET:
-    # strip the --LOAD_PRESET parameter and value from SCRIPT_ARGS_STR
-    # before writing it to preset file (and save it in a new variable),
-    # as it would be redundant (and, if the parameters are based on
-    # loading another preset and overriding some parameters, it would
-    # moreover be wrong) :
+    # strip the --LOAD_PRESET parameter and value from SCRIPT_ARGS_STR before writing it to preset file (and save it in a new variable), as it would be redundant (and, if the parameters are based on loading another preset and overriding some parameters, it would moreover be wrong) :
     SCRIPT_ARGS_WRITE_STR = re.sub('--LOAD_PRESET [^ ]*', r'', SCRIPT_ARGS_STR)
     file = open(render_target_file_base_name + '.cgp', "w")
     file.write(SCRIPT_ARGS_WRITE_STR + '\n\n')
@@ -811,18 +761,13 @@ if SAVE_PRESET:
 # ----
 # START IMAGE MAPPING
 painted_coordinates = 0
-# With higher VISCOSITY some coordinates can be painted around (by other coordinates on
-# all sides) but coordinate mutation never actually moves into that coordinate. The
-# result is that some coordinates may never be "born." this set and associated code
-# revives orphan coordinates:
+# With higher VISCOSITY some coordinates can be painted around (by other coordinates on all sides) but coordinate mutation never actually moves into that coordinate. The result is that some coordinates may never be "born." this set and associated code revives orphan coordinates:
 potential_orphan_coords_two = set()
-# used to reclaim orphan coordinates every N iterations through the
-# `while allocd_coords` loop:
+# used to reclaim orphan coordinates every N iterations through the `while allocd_coords` loop:
 base_orphan_reclaim_multiplier = 0.015
 orphans_to_reclaim_n = 0
 coords_painted_since_reclaim = 0
-# These next two variables are used to ramp up orphan coordinate reclamation rate
-# as the render proceeds:
+# These next two variables are used to ramp up orphan coordinate reclamation rate as the render proceeds:
 print('Generating image . . . ')
 newly_painted_coords = 0        # This is reset at every call of print_progress()
 
@@ -846,8 +791,7 @@ while coord_queue:
         painted_coordinates += 1
         newly_painted_coords += 1
         coords_painted_since_reclaim += 1
-        # The first returned set is used straightway, the second optionally shuffles
-        # into the first after the first is depleted:
+        # The first returned set is used straightway, the second optionally shuffles into the first after the first is depleted:
         rnd_new_coords_set, potential_orphan_coords_one = get_rnd_unallocd_neighbors(y, x, canvas)
         for new_y, new_x in rnd_new_coords_set:
             coord_queue.append((new_y, new_x))
@@ -865,8 +809,7 @@ while coord_queue:
             report_stats_nth_counter = 0
         report_stats_nth_counter += 1
         
-        # Terminate all coordinate and color mutation at an
-        # arbitary number of mutations:
+        # Terminate all coordinate and color mutation at an arbitary number of mutations:
         if painted_coordinates > stopRenderAtPixelsN:
             print('Painted coordinate termination count', painted_coordinates, 'exceeded. Ending paint algorithm.')
             continue_painting = False
@@ -885,11 +828,7 @@ while coord_queue:
 # END IMAGE MAPPING
 # ----
 
-# Works around problem that this setup can (always does?) save
-# everything _except_ for a last frame with every coordinate painted
-# if painted_coordinates >= stopRenderAtPixelsN and
-# STOP_AT_PERCENT == 1; is there a better-engineered way to fix this
-# problem? But this works:
+# Works around problem that this setup can (always does?) save everything _except_ for a last frame with every coordinate painted if painted_coordinates >= stopRenderAtPixelsN and STOP_AT_PERCENT == 1; is there a better-engineered way to fix this problem? But this works:
 if SAVE_EVERY_N != 0:
     set_img_frame_file_name()
     coords_set_to_image(canvas, imageFrameFileName)
