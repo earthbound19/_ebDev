@@ -1,0 +1,14 @@
+freaky characters to remove from file names:
+=+!%^&~#@$[](){}`
+
+The only characters in that list that need escaping with a backslash (for RegexRenamer) are:
+
+\^
+\[
+\]
+
+
+=+!%&~#@$(){}
+
+Regex for RegexRenamer.exe:
+[`=+!%&~#@$(){}\^\[\]]
