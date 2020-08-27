@@ -1,13 +1,10 @@
-_in_development
 scripts
+scripts\admin
+scripts\admin\cygwin
+scripts\admin\MSYS2
 scripts\fileNamesAndTimestamps
+scripts\filter_forge
 scripts\font
-scripts\iconConverter
 scripts\imgAndVideo
 scripts\imgAndVideo\EXIFdataBatch
-scripts\imgAndVideo\EXIFdataBatch\metaDataTemplates
-scripts\imgAndVideo\virtualDub
-scripts\admin
-scripts\admin\MSYS2
-scripts\admin\cygwin
 scripts\recipes
