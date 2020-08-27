@@ -1,5 +1,5 @@
 # DESCRIPTION
-# converts all images of type $1 in the current directory to type $2.
+# Converts all images of type $1 in the current directory to type $2.
 
 # USAGE
 # For svgs, use `SVG2img.sh` or `allsvg2img.sh`, not this. This will do very crummy upscaling of vector images, _post-resterization_.
