@@ -30,6 +30,16 @@
 
 # BEGIN SETUP GLOBAL VARIABLES
 paletteFile=$1
+# IF RENDER TARGET already exists, abort script with error 2. Otherwise continue.
+renderTarget=${paletteFile%.*}.png
+if [ -f ./$renderTarget ]
+then
+	echo Render target $renderTarget already exists\; SKIPPING render.
+	# exit with error code
+	exit 2
+fi
+# Effectively, else:
+echo Render target $renderTarget does not exist\; WILL ATTEMPT TO RENDER.
 
 # Search current path for $1; if it exists set hexColorSrcFullPath to just $1 (we don't need the full path). If it doesn't exist in the local path, search the path in palettesRootDir.txt and make decisions based on that result:
 if [ -e ./$1 ]
@@ -55,7 +65,7 @@ else	# Search for specified palette file in palettesRootDir (if that dir exists;
 		fi
 	else
 		echo !--------------------------------------------------------!
-		echo file ~/palettesRootDir.txt \(in your root user path\) not found. This file should exist and have one line, being the path of your palette text files e.g.:
+		echo file ~/palettesRootDir.txt \(in your root user path\) not found. This file should exist and have one line, which is the path of your palette text files e.g.:
 		echo
 		echo /cygdrive/c/_ebdev/scripts/imgAndVideo/palettes
 		echo
@@ -133,19 +143,6 @@ fi
 # exit
 # END SETUP GLOBAL VARIABLES
 # =============
-
-
-# IF RENDER TARGET already exists, abort script. Otherwise continue.
-fileNameNoExt=${paletteFile%.*}
-renderTarget=$fileNameNoExt.png
-if [ -f ./$renderTarget ]
-then
-	echo Render target $renderTarget already exists\; SKIPPING render.
-	# FOR DEVELOPMENT: Comment out the next line if you want to render anyway:
-	exit
-else
-	echo Render target $renderTarget does not exist\; WILL RENDER.
-fi
 
 if [ -d ./$paletteFile.colors ]
 then
