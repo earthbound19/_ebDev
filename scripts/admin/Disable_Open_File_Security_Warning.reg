@@ -1,0 +1,23 @@
+Windows Registry Editor Version 5.00
+; DESCRIPTION
+; Disables nags to be certain you want to open files originating from a network source which you trust but which Windows doesn't.
+; Created by: Shawn Brink
+; http://www.sevenforums.com
+; Tutorial: http://www.sevenforums.com/tutorials/182353-open-file-security-warning-enable-disable.html
+
+; USAGE
+; Import this reg file by right-clicking it and clicking "Merge," or by double-clicking on it.
+
+
+; CODE
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments]
+"SaveZoneInformation"=dword:00000001
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Associations]
+"LowRiskFileTypes"=".avi;.bat;.com;.cmd;.exe;.htm;.html;.lnk;.mpg;.mpeg;.mov;.mp3;.msi;.m3u;.rar;.reg;.txt;.vbs;.wav;.zip;.7z;.jpg;.png;"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Attachments]
+"SaveZoneInformation"=-
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Associations]
+"LowRiskFileTypes"=-
