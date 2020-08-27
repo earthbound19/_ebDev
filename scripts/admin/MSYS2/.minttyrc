@@ -1,0 +1,5 @@
+ThemeFile=dracula
+Font=Noto Mono
+FontHeight=15
+MiddleClickAction=void
+RightClickAction=paste
