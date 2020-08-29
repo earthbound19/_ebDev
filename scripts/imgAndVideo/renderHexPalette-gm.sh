@@ -1,13 +1,13 @@
 # DESCRIPTION
-# Takes a list of hex color codes, one per line, and renders a PNG image composed of tiles of those colors (a palette image), via GraphicsMagick.
+# Takes a list of hex color codes, one per line, and renders a PNG image composed of tiles of those colors (a palette image), via GraphicsMagick. This script is inefficient; there are probably much faster ways to make a palette image in the structure/format made by this script (it creates color tile images and then montages them), but at this writing, this script is what I have.
 
 # DEPENDENCIES
 # - GraphicsMagick
-# - A file `~/palettesRootDir.txt` (in your home folder) which contains one line, which is a Unix-style path to the folder where you keep hex palette (`.hexplt`) files.
+# - Optionally a file `~/palettesRootDir.txt` (in your home folder) which contains one line, which is a Unix-style path to the folder where you keep hex palette (`.hexplt`) files. If this file is not found, the script searches for palette files in the current directory.
 
 # USAGE
 # Run this script with the following parameters:
-# - $1 hex color palette flat file list (input file).
+# - $1 A palette file in `.hexplt` format, which is a list of RGB colors expressed as hexadecimal (hex color codes), one color per line. If this file is in the directory you run this script from, it will be used. If the file is not in the current directory, it may be anywhere in a directory tree in a path given in a file `~/palettesRootDir.txt`, and the script will find the palette in that directory tree and render from it.
 # - $2 OPTIONAL. Edge length of each square tile to be composited into final image. If not provided a default is used.
 # - $3 OPTIONAL. If not provided, or provided as string 'NULL' (don't use the single quote marks), the order of elements in the palette will be preserved. If provided and anything other than NULL (for example 2 or foo or 1 or 3), the script will randomly shuffle the hex color files before compositing them to one image. I have gone back and forth on requiring this in the history of this script :/
 # - $4 OPTIONAL. Number of tiles across of tiles-assembled image (columns).
@@ -45,6 +45,7 @@ echo Render target $renderTarget does not exist\; WILL ATTEMPT TO RENDER.
 if [ -e ./$1 ]
 then
 	hexColorSrcFullPath=$1
+	echo File name $paletteFile found in the path this script was run from\! PROCEEDING. IN ALL CAPS.
 else	# Search for specified palette file in palettesRootDir (if that dir exists; if it doesn't, exit with an error) :
 	if [ -e ~/palettesRootDir.txt ]
 	then
@@ -52,16 +53,14 @@ else	# Search for specified palette file in palettesRootDir (if that dir exists;
 				echo palettesRootDir.txt found\;
 				echo searching in path $palettesRootDir --
 				echo for file $paletteFile . . .
-						# FAIL:
-						# hexColorSrcFullPath=`find "$palettesRootDir" -iname *$paletteFile`
-		hexColorSrcFullPath=`find $palettesRootDir -iname "$paletteFile"`
+		hexColorSrcFullPath=$(find $palettesRootDir -iname "$paletteFile")
 		echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 		if [ "$hexColorSrcFullPath" == "" ]
 			then
 				echo No file of name $paletteFile found in the path this script was run from OR in path \"$palettesRootDir\" \! ABORTING script.
 				exit
 			else
-				echo File name $paletteFile found in the path this script was run from OR in path \"$palettesRootDir\" \! PROCEEDING. IN ALL CAPS.
+				echo File name $paletteFile found in the path \"$palettesRootDir\" \! PROCEEDING. IN ALL CAPS.
 		fi
 	else
 		echo !--------------------------------------------------------!
@@ -90,7 +89,7 @@ fi
 if [ ! $4 ]
 then
 	# Get number of lines (colors). The following awk command works around potential incorrect line count; re: https://stackoverflow.com/a/28038682/1397555 :
-	numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
+	numColors=$(awk 'END{print NR}' $hexColorSrcFullPath)
 	# If number of colors is above N (12?), try to render a ~2:1 aspect palette (columns will be the square root of the number of colors, x2). If it is N or below, render only one row, with as many columns as there are colors.
 	N=12
 	if [[ $numColors -le $N ]]
@@ -99,7 +98,7 @@ then
 		tilesAcross=$numColors
 	else
 		# printf "\nAt $numColors, number of colors in palette is greater than $N; will calculate rows and columns to try to render a ~2:1 aspect palette."
-		sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
+		sqrtOfColorCount=$(echo "sqrt ($numColors)" | bc)
 		tilesAcross=$(( $sqrtOfColorCount * 2 ))
 	fi
 	printf "\ntilesAcross is $tilesAcross.\n"
@@ -112,9 +111,9 @@ if [ ! $5 ]
 then
 	# Get number of lines (colors, yes again, if so). Square root of that / 2 will be the number of rows in the rendered palette.
 # TO DO: Update all scripts that count lines with the following form of fix:
-	numColors=`awk 'END{print NR}' $hexColorSrcFullPath`
+	numColors=$(awk 'END{print NR}' $hexColorSrcFullPath)
 			# echo numColors is $numColors\.
-	sqrtOfColorCount=`echo "sqrt ($numColors)" | bc`
+	sqrtOfColorCount=$(echo "sqrt ($numColors)" | bc)
 			# echo sqrtOfColorCount is $sqrtOfColorCount
 	tilesDown=$(( $sqrtOfColorCount / 2 ))
 	# If the value of ($tilesAcross times $tilesDown) is less than $numColors (the total number of colors), we will fail to print all colors in the palette; add rows to the print queue for as long as necessary:
@@ -164,15 +163,13 @@ fi
 while IFS= read -r line || [ -n "$line" ]
 do
 	# IF A SCRIPT THAT I DEVELOPED WORKED ONCE UPON A TIME BUT DOESN'T ANYMORE, it is because sed on windows is inserting $#@! windows newlines into stdin/out! &@*(@!! FIXED with tr -d '\15\32':
-	hexNoHash=`echo $line | sed 's/\#//g' | tr -d '\15\32'`
+	hexNoHash=$(echo $line | sed 's/\#//g' | tr -d '\15\32')
 	gm convert -size "$tileEdgeLen"x"$tileEdgeLen" xc:\#$hexNoHash _hexPaletteIMGgenTMP_2bbVyVxD/$hexNoHash.png
 done < $hexColorSrcFullPath
 
-# make the actual montage image.
-# e.g. gm montage colors/5A6D40.png colors/757F26.png colors/C68C15.png colors/8F322F.png colors/954B29.png out.png
-
 # TO DO? : implement e.g. -tile 8x40 flag depending on desired aspect, etc. (will determine values of $tilesAcross and $tilesDown depending on desired aspect?)
 
+# make the actual montage image. Example command: gm montage colors/5A6D40.png colors/757F26.png colors/C68C15.png colors/8F322F.png colors/954B29.png out.png
 # make temporary script to create a grid montage of the colors:
 echo "gm montage -tile $tilesAcross"x"$tilesDown -background gray -geometry $tileEdgeLen"x"$tileEdgeLen+0+0 \\" > mkGridHead.txt
 
