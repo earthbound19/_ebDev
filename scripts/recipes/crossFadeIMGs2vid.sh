@@ -7,9 +7,9 @@
 # - $2 OPTIONAL. The duration of each video still to be crossfaded in decimal seconds. If not provided, a default will be used. Should be greater than $3:
 # - $3 OPTIONAL. Crossfade duration between each still image video, in decimal seconds. If not provided, a default will be used.
 # Example that will make a crossfade video from all pngs, with default durations:
-#    crossFadeIMGs2vid.sh png
+#    ffmpegCrossFadeAllTypeIMGs2vid.sh png
 # Example that will make each still image video 4.7 seconds, and crossfade for 2.6 seconds between them:
-#    crossFadeIMGs2vid.sh png 4.7 2.6
+#    ffmpegCrossFadeAllTypeIMGs2vid.sh png 4.7 2.6
 # Result file is named after the current directory and source image type, after the pattern `__<directoryName>_<$1>_crossfades.mp4`.
 
 

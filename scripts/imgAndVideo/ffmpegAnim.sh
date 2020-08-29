@@ -36,10 +36,7 @@ then
 	fi
 fi
 
-# Assumes that all input files have the same character count in the file base name; I wonder whether I've gone full circle on going away from and back to the exact form of the following command, but *right now* it's testing OK on Cygwin and Mac; re https://stackoverflow.com/a/40876071 ; ALSO it seems as if gnuWin32 `find`has a bug; the command throws an error.
-# EXCEPT all those notes may only apply to the next line's DEPRECATED (indented, commented) command? :
-	# array=(`find . -maxdepth 1 -type f -iname \*.$4 -printf '%f\n' | tr -d '\15\32'`)
-array=(`find . -maxdepth 1 -type f -name "*.$4" -printf '%f\n'`)
+array=( $(find . -maxdepth 1 -type f -name "*.$4" -printf '%f\n') )
 # last element of array is last found file type $4 :
 lastFoundFileType=${array[-1]}
 lastFoundTypeFileNameNoExt=${lastFoundFileType%.*}
