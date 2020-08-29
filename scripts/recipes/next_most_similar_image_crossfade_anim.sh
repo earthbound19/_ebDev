@@ -2,7 +2,7 @@
 # Uses other scripts to create a video of crossfades through images sorted roughly by next most similar. Can be useful for exploring new abstract art ideas by crossfading similar (or very different!) images, or to explore visual ideas, or just for curiosity.
 
 # USAGE
-# Examine comments in the scripts this recipe uses to get an idea what goes on here. Run the following commands and scripts as listed in the source code, adapting for your situation. Refer to comments in code, but ffmpegCrossfadeIMGsToAnimFromFileList.sh has comments which are more complete.
+# Examine comments in the scripts this recipe uses to get an idea what goes on here. Run the following commands and scripts as listed in the source code, adapting for your situation. Refer to comments in code, but ffmpegCrossfadeIMGsToVideoFromFileList.sh has comments which are more complete.
 
 
 # CODE
