@@ -19,13 +19,13 @@ if ! [ "$5" ]; then rescaleParam='NULL'; else rescaleParam=$5; fi
 if ! [ "$6" ]; then finalStillSeconds=13; else finalStillSeconds=$6; fi
 
 # sorts by newest first:
-directories=(`find . -maxdepth 1 -type d -printf '%f\n' | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+directories=( $(find . -maxdepth 1 -type d -printf '%f\n' | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g') )
 # the :1 in the following slices the array to omit
 # the first element, ., which we don't want;
 # re: https://stackoverflow.com/a/2701872/1397555
 directories=("${directories[@]:1}")
 
-parentDir=`pwd`
+parentDir=$(pwd)
 for element in ${directories[@]}
 do
 	cd $element

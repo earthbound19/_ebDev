@@ -13,8 +13,8 @@ imgsGetSimilar.sh png
 	# After that step, if you want to insert an image to the very start of the process (e.g. to fade in from black and back to black at the end), name that image e.g. 000.png so that the following scripts will sort that first in the process:
 mkNumberedCopiesFromFileList.sh
 cd _temp_numbered
-# NOTE: calls ffmpegCrossfadeIMGsToAnim.sh, for which you may want to adjust hard-coded parameters! :
-ffmpegCrossfadeIMGsToAnimFromFileList.sh
+# NOTE: you may want to adjust parameters in this next script call! :
+ffmpegCrossfadeIMGsToVideoFromFileList.sh
 cd fadeSRCvideos
 # allVidsType2VcompatMP4.sh avi
 	# ALTERNATE to that, but not preferred, as it means no audio, and some stupid TVs present ugly complaints if no audio stream:

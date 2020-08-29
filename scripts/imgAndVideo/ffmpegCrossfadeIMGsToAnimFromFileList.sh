@@ -1,12 +1,12 @@
 # DESCRIPTION
-# Renders a sequence of image crossfades from a list (e.g. by next most similar image), by calling `ffmpegCrossfadeIMGsToAnim.sh` repeatedly.
+# Renders a sequence of image crossfades from a list (e.g. by next most similar image), by calling `ffmpegCrossfadeIMGsToVideo.sh` repeatedly.
 
 # DEPENDENCIES
-# a 'Nixy environment, sed, paste, tail, Perl, and the tools needed by `ffmpegCrossfadeIMGsToAnim.sh`.
+# a 'Nixy environment, sed, paste, tail, Perl, and the tools needed by `ffmpegCrossfadeIMGsToVideo.sh`.
 
 # USAGE
 # See "DEPENDENCIES" first. Then run:
-#    ffmpegCrossfadeIMGsToAnimFromFileList.sh
+#    ffmpegCrossfadeIMGsToVideoFromFileList.sh
 
 # RECIPE
 # For a recipe that uses this script, see `next_most_similar_image_crossfade_anim.sh`.
@@ -67,7 +67,7 @@ tail -n +2 $tmpSrcFile > tmp_Ud5EMH7y7fKDn7.txt
 # split every odd-numbered line into listA:
 sed -n 'n;p;' tmp_Ud5EMH7y7fKDn7.txt > listA.txt
 # add the missing first line back to listA:
-firstLineOfList=`head -n 1 $tmpSrcFile`
+firstLineOfList=$(head -n 1 $tmpSrcFile)
 sed -i "1s/^/$firstLineOfList\n/" listA.txt		# Re a genius breath: https://superuser.com/a/246841/130772
 # -- then work up those to versions of the list to a pair list; e.x. command to join list A C E with list B D E as pairs separated by a bar | :
 paste -d '|' listA.txt listB.txt > filePairsFromOddNumberedLines.txt
@@ -76,7 +76,7 @@ paste -d '|' listA.txt listB.txt > filePairsFromOddNumberedLines.txt
 sed -n 'n;p;' tmp_Ud5EMH7y7fKDn7.txt > listB.txt
 tail -n +2 tmp_Ud5EMH7y7fKDn7.txt > tmp_CdJeVagRZ8n8MS.txt
 sed -n 'n;p;' tmp_CdJeVagRZ8n8MS.txt > listA.txt
-firstLineOfList=`head -n 1 tmp_Ud5EMH7y7fKDn7.txt`
+firstLineOfList=$(head -n 1 tmp_Ud5EMH7y7fKDn7.txt)
 sed -i "1s/^/$firstLineOfList\n/" listA.txt
 paste -d '|' listA.txt listB.txt > filePairsFromEvenNumberedLines.txt
 # NOW WE HAVE (in filePairsFromEvenNumberedLines.txt) a list of pairs for crossfades, starting from odd-numbered lines of $tmpSrcFile.
@@ -87,26 +87,26 @@ sed -i '/^$/d' allCrossfadePairs.txt
 # wipe all trailing newlines from result, re https://stackoverflow.com/a/1654042/1397555 :
 Perl -pi -e 'chomp if eof' allCrossfadePairs.txt
 # The last line of that is always one file (the last file in the list), which is convenient for dovetailing back to the first file (so that the whole animation loops); let's do that by appending the first listed file from $tmpSrcFile to the end of that line (which the previous Perl command prepared for) :
-firstFileName=`head -n 1 $tmpSrcFile`
+firstFileName=$(head -n 1 $tmpSrcFile)
 printf "$firstFileName" >> allCrossfadePairs.txt
 # temp file cleanup:
 rm tmp_cMQ3nW6QVY5hFn.txt tmp_TAQZSDa6cn4EXn.txt tmp_Ud5EMH7y7fKDn7.txt listA.txt listB.txt filePairsFromOddNumberedLines.txt tmp_CdJeVagRZ8n8MS.txt filePairsFromEvenNumberedLines.txt
 
-# TO DO: bug fix: the following works inconsistently--it doesn't always create all anims. If I echo the ffmpegCrossfadeIMGsToAnim.sh commands to a script file and call the script, it works. I suspect fould play with newlines. Maybe on Windows I must use  | tr -d '\15\32'  -- and maybe that breaks it on Unix / Mac? :
+# TO DO: bug fix: the following works inconsistently--it doesn't always create all anims. If I echo the ffmpegCrossfadeIMGsToVideo.sh commands to a script file and call the script, it works. I suspect fould play with newlines. Maybe on Windows I must use  | tr -d '\15\32'  -- and maybe that breaks it on Unix / Mac? :
 printf "" > fadeSRCvideosList.txt
 printf "" > srsly.sh
-# parse pairs out of that resulting list and pass them to ffmpegCrossfadeIMGsToAnim.sh:
+# parse pairs out of that resulting list and pass them to ffmpegCrossfadeIMGsToVideo.sh:
 while IFS= read -r element || [ -n "$element" ]
 do
 # TO DO? : build arrays here and then iterate through the arrays (instead of this awful following KLUDGE)?
-	imgOne=`echo $element | sed 's/\(.*\)|.*/\1/g' | tr -d '\15\32'`
+	imgOne=$(echo $element | sed 's/\(.*\)|.*/\1/g' | tr -d '\15\32')
 			# echo imgOne is\: $imgOne
-	imgTwo=`echo $element | sed 's/.*|\(.*\)/\1/g' | tr -d '\15\32'`
+	imgTwo=$(echo $element | sed 's/.*|\(.*\)/\1/g' | tr -d '\15\32')
 			# echo imgTwo is\: $imgTwo
 # KLUDGE
 # I DON'T KNOW why bash on Mac won't run every loop of the following commands from this loop, but it won't--it never completes all of them (it completes a random assortment of them--usually only the first). But with the following ugly kludge of writing all the commands to a script, then running the script, it works:
 	# The following script is run with `source` so that we make use of a variable named $targetRenderFile which that script sets, which persists in the shell after return:
-	echo "source ffmpegCrossfadeIMGsToAnim.sh $imgOne $imgTwo $crossFadeDuration $padding" >> srsly.sh
+	echo "source ffmpegCrossfadeIMGsToVideo.sh $imgOne $imgTwo $crossFadeDuration $padding" >> srsly.sh
 	# Add the filename stored in the $targetRenderFile variable to a list of all rendered crossfade videos:
 	echo "echo \$targetRenderFile >> fadeSRCvideosList.txt" >> srsly.sh
 done < allCrossfadePairs.txt
@@ -114,7 +114,7 @@ chmod +x ./srsly.sh
 source ./srsly.sh
 rm ./srsly.sh
 
-# Sort crossfade source videos (generated by ffmpegCrossfadeIMGsToAnim.sh) into their own folder. NOTE that this relies on the file fadeSRCvideosList.txt created by ffmpegCrossfadeIMGsToAnim.sh.
+# Sort crossfade source videos (generated by ffmpegCrossfadeIMGsToVideo.sh) into their own folder. NOTE that this relies on the file fadeSRCvideosList.txt created by ffmpegCrossfadeIMGsToVideo.sh.
 # If it doesn't already exist, create directory to sort input static image (looped) video files:
 if [ ! -d fadeSRCvideos ]; then mkdir fadeSRCvideos; fi
 # Copy files into that folder whether they exist there already or not:

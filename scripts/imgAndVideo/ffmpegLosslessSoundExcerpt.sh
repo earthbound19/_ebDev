@@ -18,9 +18,9 @@
 # - Update all scripts that extract to variables fileNameNoExt etc. to use this far more elegant method found at: https://www.cyberciti.biz/faq/Unix-linux-extract-filename-and-extension-in-bash/
 
 # REFERENCE: ffmpeg parameters: -map 0:a : operate only on input audio stream, -ss : seconds to start at, -t: duration to copy, -acodec copy: copy contents without recompression of any kind (LOSSLESS).
-fileExt=`echo "${1##*.}"`
+fileExt=$(echo "${1##*.}")
 		# echo fileExt val is $fileExt
-fileNameNoExt=`echo "${1%.*}"`
+fileNameNoExt=$(echo "${1%.*}")
 		# echo fileNameNoExt val is $fileNameNoExt
 
 ffmpeg -y -i "$1" -ss $2 -t $3 -map 0:a -acodec copy "$fileNameNoExt"_soundLosslessExtract_ss"$2"_t"$3"."$fileExt"

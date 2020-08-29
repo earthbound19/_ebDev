@@ -11,16 +11,15 @@
 # - $3 Duration of crossfade between them
 # - $4 OPTIONAL. Padding, in seconds (time for images to be shown without crossfade), at start and end of video. If not specified, defaults to 4.36.
 # Example that creates a video of a 7-second crossfade from one image to another, with 4.36 seconds padding before and after:
-#    ffmpegCrossfadeIMGsToAnim.sh inputImageOne.png inputImageTwo.png 7 4.36
+#    ffmpegCrossfadeIMGsToVideo.sh inputImageOne.png inputImageTwo.png 7 4.36
 # NOTES
 # If this script is called this way from another script via the source command, like this:
-#    source ./ffmpegCrossfadeIMGsToAnim.sh <parameters>
-# -- then the variable which this script sets, named $targetRenderFile will persist in the shell after this script terminates, for a calling script to make use of. The script `ffmpegCrossfadeIMGsToAnimFromFileList.sh` does this.
-
+#    source ./ffmpegCrossfadeIMGsToVideo.sh <parameters>
+# -- then the variable which this script sets, named $targetRenderFile will persist in the shell after this script terminates, for a calling script to make use of. The script `ffmpegCrossfadeIMGsToVideoFromFileList.sh` does this.
 
 # CODE
 	# TO DO:
-	# - Do not use `exit`. Instead, elegantly skip main logic if no parameters passed, because `exit` will terminate this script *and* a calling script if the calling script runs this via `source ffmpegCrossfadeIMGsToAnim.sh`.
+	# - Do not use `exit`. Instead, elegantly skip main logic if no parameters passed, because `exit` will terminate this script *and* a calling script if the calling script runs this via `source ffmpegCrossfadeIMGsToVideo.sh`.
 	# - Test with many image pairs, and if necessary fix complex filter timings math (in ffmpeg command). It seems that the crossfade starts and ends later than it should.
 	# - Add fps param?
 	# - Option to adapt this to automatically detect the duration of two pre-existing input clips and crossfade almost the whole length of the shorter over the longer?
@@ -56,7 +55,7 @@ then
 else
 	xFadeLen=$3
 	echo SET xFadeLen to $3.
-	srcClipLengths=`echo "scale=2; $xFadeLen + $clipPaddingSeconds" | bc`
+	srcClipLengths=$(echo "scale=2; $xFadeLen + $clipPaddingSeconds" | bc)
 fi
 
 fadeSRConeFileName="${imgOne%.*}"
@@ -98,7 +97,7 @@ else
 			# - In practice you can probably usually eliminate the end= from both clip1fadeOut and clip2cut.
 			# - In the filter subcomplex section, st (e.g. st=0) means start, d (e.g. d=4) means duration.
 			# - You will probably always want to set d= to the duration of the first clip MINUS clip1cut's end=<n>. So if the duration of source 1 is 5 seconds, and clip1cut's end=1, that's 5-1=4, so d=4.
-	clip1CutAt=`echo "scale=2; $srcClipLengths - $xFadeLen" | bc`
+	clip1CutAt=$(echo "scale=2; $srcClipLengths - $xFadeLen" | bc)
 			echo RENDERING target crossfade file $targetRenderFile . . .
 	ffmpeg -i "$fadeSRConeFileName"."$vidExt" -i "$fadeSRCtwoFileName"."$vidExt" -an \
 	-filter_complex "\

@@ -26,11 +26,11 @@ eval "$(ffprobe -v error -of flat=s=_ -show_entries format=duration tmp_bbE9pWyX
 # NOTE: THE *0.9 means 90 percent, which is what bc will multiply the total seconds of the video by, which will give us a time (in seconds) ninety percent into the video, from which a later ffmpeg command will grab a frame from:
 	echo *$2 >> tmp_eHmZQ2YtWKr8ZV7YpU3MUn3nrMV2tPT8Ge.txt
 	dos2unix tmp_eHmZQ2YtWKr8ZV7YpU3MUn3nrMV2tPT8Ge.txt
-	format_duration=`tr -d '\n' < tmp_eHmZQ2YtWKr8ZV7YpU3MUn3nrMV2tPT8Ge.txt`
+	format_duration=$(tr -d '\n' < tmp_eHmZQ2YtWKr8ZV7YpU3MUn3nrMV2tPT8Ge.txt)
 	rm tmp_eHmZQ2YtWKr8ZV7YpU3MUn3nrMV2tPT8Ge.txt
 	# WORKING bc command example from another script:
 	# echo "scale=5; $xPix / $yPix" | bc
-selectSecond=`echo "scale=0; $format_duration" | bc`
+selectSecond=$(echo "scale=0; $format_duration" | bc)
 
 # re: https://stackoverflow.com/a/1198191/1397555
 ffmpeg -ss $selectSecond -i tmp_bbE9pWyXSVshTm.mp4 -crf 1 -frames:v 1 oot.jpg
