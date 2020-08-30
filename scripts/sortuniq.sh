@@ -10,7 +10,11 @@
 
 
 # CODE
-sort $1 | uniq > _tmp_HWPqYyXjv7pGCN.txt
+	# DEPRECATED prior command:
+	# sort $1 | uniq > _tmp_HWPqYyXjv7pGCN.txt
+# MORE EFFICIENT new command:
+sort $1 -u > _tmp_HWPqYyXjv7pGCN.txt
+
 mv -f _tmp_HWPqYyXjv7pGCN.txt $1
 
 echo ""
