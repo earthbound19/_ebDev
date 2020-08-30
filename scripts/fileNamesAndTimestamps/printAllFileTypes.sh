@@ -21,7 +21,15 @@
 subDirSearchParam='-maxdepth 1'
 if [ "$1" ]; then subDirSearchParam=''; fi
 
-# Always the genius breaths are helping; modified from these:
-# - https://stackoverflow.com/questions/4210042/how-to-exclude-a-directory-in-find-command?rq=1#comment38334264_4210072
-# - https://stackoverflow.com/a/4998326/1397555
-find . $subDirSearchParam -type f -not -path "./.git*" | sed 's|.*\.||' | sort -u
+	# orig. command; re:
+	# Always the genius breaths are helping; modified from these:
+	# - https://stackoverflow.com/questions/4210042/how-to-exclude-a-directory-in-find-command?rq=1#comment38334264_4210072
+	# - https://stackoverflow.com/a/4998326/1397555
+	# find . $subDirSearchParam -type f -not -path "./.git*" | sed 's|.*\.||' | sort -u
+
+# new commands of my own devising:
+files=( $(find . $subDirSearchParam -type f -not -path "./.git*" -printf "%P\n" | sed 's|[^\.]*.||' | sort -u) )
+for file in ${files[@]}
+do
+	echo $file
+done
