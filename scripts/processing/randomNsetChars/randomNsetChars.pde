@@ -23,6 +23,7 @@ String versionNumber = "1.9.1";
 // - tweet image with current char set text?
 // - save SVG?
 // - svg numbering and save anim mode, for anims?
+// - optionally use the bit blocks font
 
 
 int delayBetweenRenders;
