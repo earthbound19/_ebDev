@@ -183,6 +183,27 @@ Piping with the `|` operator is very common in scripting operations that I do. A
 
 I also use the redireciton operators `<` and `>`. Here's [a link to documentation on the redirect operators](https://www.gnu.org/software/bash/manual/html_node/Redirections.html).
 
+#### Error Level
+
+Bash has a built-in variable, `$?`, which is assigned the error level (or exit code) of the previous command. By convention when there was no error with a command, error level is set to `0`.
+
+So, for example, to check whether an executable was run successfully (and thereby infer that it is in the PATH and probably works as expected), you can call any executable and then check the error level variable:
+
+    ffmpeg --help
+	if [ "$?" == "0" ]; then echo "No error (error level 0) after run of ffmpeg. Assumed to be in PATH and working."; fi
+
+#### stdout and or stderr redirection
+
+If I want to check that a command succeeds, but I don't want to print the output of the command, I'll redirect both `stdout` and `stderr` to `/dev/null`:
+
+    ffmpeg --help &>/dev/null
+
+Over here is a tutorial on [stderr/stdout redirection](https://www.cyberciti.biz/faq/redirecting-stderr-to-stdout/).
+
+Or to redirect both stderr and stdout to a file:
+
+	some command &>log.txt
+
 #### Find the full path to a script in your PATH
 
 See `getFullPathToFile.sh` to work around the problem of `which` and `whereis` being unhelpful finding paths to things on different platforms.
