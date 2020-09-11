@@ -3,12 +3,14 @@
 
 # USAGE
 # Run with or without these optional parameters:
-# - $1 OPTIONAL. Any extra arguments as usable by color_growth.py, surrounded by single or double quote marks. These will override any arguments that use the same switch or switches which are in the .cgp file(s).
+# - $1 OPTIONAL. Any extra arguments as usable by color_growth.py, surrounded by single or double quote marks. These will override any arguments that use the same switch or switches which are in the .cgp file(s). To use $2 but not this (or to use the built-in defaults for this), pass an empty string ('') for this.
 # - $2 OPTIONAL. Anything, for example the string 'PLIBPLUP', which will cause the script to skip the cooldown period after every render.
 # An example that uses parameter $1:
 #    color_growth_cgps.sh '--WIDTH 850 --HEIGHT 180 --SAVE_PRESET False --SAVE_EVERY_N 7150 --RAMP_UP_SAVE_EVERY_N True'
 # An example that uses parameters $1 and $2:
 #    color_growth_cgps.sh '--WIDTH 850 --HEIGHT 180 --SAVE_PRESET False --SAVE_EVERY_N 7150 --RAMP_UP_SAVE_EVERY_N True' PLIBPLUP
+# An example that uses parameter $2 but leaves it to use the defaults for $1:
+#    color_growth_cgps.sh '' PLIBPLUP
 
 
 # NOTES
