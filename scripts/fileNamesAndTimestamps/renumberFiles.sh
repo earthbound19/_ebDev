@@ -7,33 +7,30 @@
 # NOTE: this will choke on file names with console-unfriendly characters e.g. spaces, parenthesis and probably others.
 
 # CODE
-# TO DO
-# - give this script a warning y/n prompt.
-# - make the option to move all renamed files in the path to the root folder this is run from a parameter option?
-echo Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (file extension (type) to renumber) passed to script. Exit."; exit 1; else fileTypeToRenumber=$1; fi
 
-# Get count of files we want, and from that digits to pad to.
-# The necessity of deleting leading blank space is because of Mac. Re: https://stackoverflow.com/a/30927885 : GYAH! This doom was had 2018-04-19 Thursday 07:33 PM:
-filesCount=`find . -maxdepth 1 -iname \*.$1 | sort | wc -l | tr -d ' '`
-digitsToPadTo=${#filesCount}
+echo "Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem"
 
 # Create array to use to loop over files.
 # previous version of command; doesn't sort by file date:
-# filesArray=`find . -maxdepth 1 -iname "*.$1" | sort`
+# filesArray=`find . -maxdepth 1 -iname "*.$fileTypeToRenumber" | sort`
 # new command; sorts by file date (oldest first); re: https://superuser.com/a/546900/130772
-filesArray=`find . -maxdepth 1 -iname "*.$1" -printf "%T@ %Tc %p\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`
+filesArray=($(find . -maxdepth 1 -iname "*.$fileTypeToRenumber" -printf "%T@ %Tc %p\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'))
+# Get digits to pad to from length of array.
+digitsToPadTo=${#filesArray[@]}; digitsToPadTo=${#digitsToPadTo}
 
 counter=0
 for filename in ${filesArray[@]}
 do
 	counter=$((counter + 1))
-	countString=`printf "%0""$digitsToPadTo""d\n" $counter`
+	countString=$(printf "%0""$digitsToPadTo""d\n" $counter)
 			# echo old file name is\: $filename
-			# echo new file name is\: $countString.$1
-	mv $filename $countString.$1
+			# echo new file name is\: $countString.$fileTypeToRenumber
+	mv $filename $countString.$fileTypeToRenumber
 done
 
 # DEVELOPMENT HISTORY
+# 2020-09-11 simplify script logic, require parameter 1 and print error if absent, true array creation, better command substitution
 # 2020/05/22 update array sort to sort by found file date
 # 2018/04/19 Take `mapfile` out (fails on Mac) and create array in-memory. Wrangle how to get digitsToPadTo value meanwhile. (Do it before.)
 # 2016/07/17 I wish it hadn't taken me a silly half hour (more?) to write this. It used to be it would take much longer, so there's that. -RAH
