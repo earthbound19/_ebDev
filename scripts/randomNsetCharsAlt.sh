@@ -38,10 +38,10 @@ STR_LEN=$((${#CHARSET} - 1))
 
 # OPTIONAL: uncomment this next code block if you want to redefine CHARSET as a randomly
 # selected subset of itself:
-NEW_CHARSET_LEN=`shuf -i 3-$STR_LEN -n 1`
+NEW_CHARSET_LEN=$(shuf -i 3-$STR_LEN -n 1)
 for ELEMENT in $(seq $NEW_CHARSET_LEN)
 do
-  TMP_NUMBER=`shuf -i 0-$STR_LEN -n 1`
+  TMP_NUMBER=$(shuf -i 0-$STR_LEN -n 1)
   TMP_CHAR="${CHARSET:$TMP_NUMBER:1}"
   TMP_CHARSET="$TMP_CHARSET$TMP_CHAR"
 done
@@ -51,7 +51,7 @@ STR_LEN=$((${#CHARSET} - 1))
 # CORE FUNCTIONALITY:
 for ELEMENT in $(seq $N_CHARS_TO_GENERATE)
 do
-  NUMBER=`shuf -i 0-$STR_LEN -n 1`
+  NUMBER=$(shuf -i 0-$STR_LEN -n 1)
   scramble $CHARSET
-  printf "$scramble_ret" >> rndCharsSuperCollection.txt
+  printf $scramble_ret >> rndCharsSuperCollection.txt
 done
