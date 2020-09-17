@@ -16,7 +16,8 @@
 
 # CODE
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (file name of fountain format source file to convert) passed to script. Exit."; exit 1; else fountainSourceFileName=$1; fi
-
+# check for and throw an error if $fountainSourceFileName does not exist:
+if [ ! -f $fountainSourceFileName ]; then echo "PROBLEM: source file $fountainSourceFileName not found. Exit."; exit 1; fi
 
 # sets a variable $targetFountainFileName via the script called with `source`, which variable we will use; also creates an unventilated version of the source file which we will use:
 source fountain2fountain.sh $fountainSourceFileName
