@@ -3,8 +3,7 @@
 # a `.png` format image preview of it, named `<fileNameNoExt>_preview.png`
 
 # DEPENDENCIES
-# - `GraphicsMagick`
-# - `gs` (ghostscript).
+# - GraphicsMagick (`gm`)
 # - A Unix or emulated Unix envrionment
 # - An input pdf
 
@@ -14,10 +13,9 @@
 
 
 # CODE
-fileNameNoExt=${1%.*}
-
+renderTargetFileName="${1%.*}"_preview.png
 # command adapted from: http://duncanlock.net/blog/2013/11/18/how-to-create-thumbnails-for-pdfs-with-ImageMagick-on-linux/
-gm convert -set option:size '%[fx:min(w,h)]x%[fx:min(w,h)]' -gravity center $1[1] "$fileNameNoExt"_preview.png
+gm convert -set option:size '%[fx:min(w,h)]x%[fx:min(w,h)]' -gravity center $1[2] "$renderTargetFileName"
 # crop to square over the same image adapted from: https://www.ImageMagick.org/discourse-server/viewtopic.php?t=28283#p125413
-DD=`identify -format "%[fx:min(w,h)]" "$fileNameNoExt"_preview.png`
-convert "$fileNameNoExt"_preview.png -gravity center -crop ${DD}x${DD}+0+0 +repage "$fileNameNoExt"_preview.png
+W=$(gm identify -format "%w" $renderTargetFileName)
+gm convert $renderTargetFileName -gravity center -crop ${W}x${W}+0+0 +repage $renderTargetFileName
