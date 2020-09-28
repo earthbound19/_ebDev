@@ -23,7 +23,7 @@ FOR %%A IN (
            ) DO (
 	:: uninstall option:
 	:: choco uninstall %%A -y --force --force-dependencies
-	choco install %%A -y
+	choco --force install %%A -y
 )
 
 REM POTENTIAL PACKAGES list:
