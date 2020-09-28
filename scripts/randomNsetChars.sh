@@ -37,6 +37,8 @@ if [ "$2" ]; then HARD_NEWLINE_AT_CHARACTER=$2; else HARD_NEWLINE_AT_CHARACTER=7
 #
 # OR: BLOCK ELEMENTS; re: https://en.wikipedia.org/wiki/Block_Elements
 # original more detailed set that I simplified from: ▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟
+#
+# OR: what is this? Are there other things like it in any code page? ¦ (spotted first by me at: https://en.wikipedia.org/wiki/Alexandrine) Or this? : ‖
 
 CHARSET="▀▁▃▅▇█▋▌▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟"
 STR_LEN=$((${#CHARSET} - 1))
