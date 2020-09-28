@@ -14,10 +14,10 @@
 mediaList=$(printAllVideoFileNames.sh)
 
 # OPTIONAL EXTRA PARAMETERS
-# Because ffmpeg can't handle pcm for mp4 right now, and that would be a silly waste of space for distribution anyway (compress it to aac) -- and it throws an error instructing me to add -strict -2 to that if I use aac; BUT the following is an option commented out in distribution because encoding to aac isn't lossless! -crf 15 is quite high quality encoding:
-# extraParams="-acodec aac -crf 15 -strict -2"
+# Because ffmpeg can't handle pcm for mp4 right now, and that would be a silly waste of space for distribution anyway (compress it to aac) -- and it throws an error instructing me to add -strict -2 to that if I use aac; BUT the following is an option commented out in distribution because encoding to aac isn't lossless! -crf 15 is very high quality encoding (practically though not actually lossless?) :
+extraParams="-acodec aac -crf 15"
 # OR just straight copy the sound (default archived code option) even if it's a Canon DSLR .MOV pcm space hog sound channel:
-extraParams="-acodec copy"
+# extraParams="-c:a copy"
 
 for fileName in ${mediaList[@]}
 do
@@ -31,7 +31,7 @@ do
 		fi
 	echo "Converting $fileName to mp4 container as $fileNameNoExt.mp4 . . ."
 	renderTarget=$fileNameNoExt.mp4
-	ffmpeg -y -i $fileName $extraParams -vcodec copy $renderTarget
+	ffmpeg -y -i $fileName $extraParams -c:v copy $renderTarget
 	touch -r $fileName $renderTarget
 	ExifTool -overwrite_original "-FileModifyDate>FileCreateDate" $renderTarget
 done
