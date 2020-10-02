@@ -1,12 +1,14 @@
 # DESCRIPTION
-# Lossy transcodes all video files in the current directory (doesn't scan subdirectories) into mp4s compatible with Sony Vegas 12. ('Vcompat' means Vegas compatible, or compatible with Sony (V)egas video editing software.)
+# Lossy transcodes all video files in the current directory (and optionally all subdirectories) into mp4s compatible with Sony Vegas 12 (and higher, and maybe lower versions also). The "Vcompat" in this script name means "Vegas compatible," or compatible with Sony (V)egas video editing software.
 
 # DEPENDENCIES
 #    ffmpeg
 
 # USAGE
-# Run this with one parameter, which is the extension of videos you wish to encode to Sony Vegas compatible video, e.g.:
-#    allVidsType2VcompatMP4.sh avi
+# To convert all files in the current directory, but not subdirectories, run without any paramter:
+#    allVidsType2VcompatMP4.sh
+# To convert all files in the current directory and all subdirectories, run with any parameter (for example the word 'BROGNALF':
+#    allVidsType2VcompatMP4.sh BROGNALF
 
 
 # CODE
@@ -20,8 +22,9 @@ additionalParams_one="-preset slow -tune animation"
 # Makes a video matte by scaling down a bit and placing on a dark dark violet background:
 # additionalParams_three="-vf scale=-1:1054:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=1a171e"
 
-arr=(`find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
-for filename in ${arr[@]}
+
+allVideoFilesArr=$(printAllVideoFileNames.sh $1)
+for filename in ${allVideoFilesArr[@]}
 do
 	fileNameNoExt=${filename%.*}
 	targetFile="$fileNameNoExt".mp4
