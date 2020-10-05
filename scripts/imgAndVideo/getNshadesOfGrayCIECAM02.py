@@ -3,9 +3,9 @@
 
 # USAGE
 # Run this script through a Python interpeter with one parameter, which is the number of shades of gray you want to print in hex-encoded RGB values. For example, this will print 16 shades of gray:
-#    python /path/to_this_script/getCIECAM02ShadesOfGray.py 16
+#    python /path/to_this_script/getNshadesOfGrayCIECAM02.py 16
 # To write the printout to a file, use the > operator, like this:
-#    python /path/to_this_script/getCIECAM02ShadesOfGray.py 16 > 18shadesOfGrayCIECAM02.hexplt
+#    python /path/to_this_script/getNshadesOfGrayCIECAM02.py 16 > 18shadesOfGrayCIECAM02.hexplt
 # NOTE
 # Because of inexact float math, this script may produce more or less colors than requested.
 
