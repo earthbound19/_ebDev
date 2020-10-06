@@ -21,8 +21,15 @@ error_code=`echo $?`
 # If no png files were found (if find threw an error), destroy any README.md gallery file and exit the script:
 if (( error_code == "1" ))
 then
-	echo "--NO png files were found. DESTROYING README.md and will then exit script!";
-	rm README.md; exit
+	echo "--no png files were found. Destroying any README.md and will then exit script!";
+	if [ -e README.md ]
+	then
+		echo "--> README.md found. Will delete."
+		rm README.md
+	else
+		echo "--> No README.md found."
+	fi
+	exit
 else
 	echo "--png files were found. Will create README.md gallery."
 fi
@@ -30,12 +37,13 @@ fi
 # Otherwise, proceed with gallery creation:
 printf "# Palettes\n\nClick any image to go to the source image; the text line above the image to go to the source .hexplt file.\n\n" > README.md
 
-array=(`find . -maxdepth 1 -type f -iname \*.png -printf '%f\n' | tr -d '\15\32' | sort -n`)
+array=($(find . -maxdepth 1 -type f -iname \*.png -printf '%f\n' | tr -d '\15\32' | sort -n))
 
 for element in ${array[@]}
 do
 	hexpltName=${element%.*}
-	printf "### [$hexpltName]($hexpltName.hexplt)\n\n" >> README.md
+	# NOTE the escaped backticks: they are to create preformatted text formatting around the palette name, in cases where underscore pairs in palette names are erroneously interpreted as italic markdown by some renderers:
+	printf "### [\`$hexpltName\`]($hexpltName.hexplt)\n\n" >> README.md
 	printf "[ ![$element]($element) ]($element)\n\n" >> README.md
 done
 
