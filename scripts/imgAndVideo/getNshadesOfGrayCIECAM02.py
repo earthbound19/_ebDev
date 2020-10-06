@@ -7,7 +7,7 @@
 # To write the printout to a file, use the > operator, like this:
 #    python /path/to_this_script/getNshadesOfGrayCIECAM02.py 16 > 18shadesOfGrayCIECAM02.hexplt
 # NOTE
-# Because of inexact float math, this script may produce more or less colors than requested.
+# Previously, because of inexact float math, this script was capable of producing more or less colors than requested. Thanks to a numpy linspace function, that is no longer the case. Moreover, results are more exact to what is desired (start with absolute white and end with absolute black, where previously it often produced very slight off-white or black, or didn't even end with black).
 
 
 # CODE
@@ -21,13 +21,15 @@ import ast
 j_min = 0
 j_max = 100
 steps = ast.literal_eval(sys.argv[1])	# EXPECTS numeric parameter as only parameter to script!
-j_step = int(100 / steps)
 c = 0
 h = 0
 
 graysJCH = []
 graysRGB = []
-for j in range(j_max, j_min, -j_step):
+# Thanks to help here: https://stackoverflow.com/a/7267806/1397555
+descending_j_values = np.linspace(j_max, j_min, num=steps)
+for j in descending_j_values:
+    # print(j)
 	# build jch array:
 	jch = np.array([ [j, c, h] ])
 	jch_as_str = str(jch[0])
