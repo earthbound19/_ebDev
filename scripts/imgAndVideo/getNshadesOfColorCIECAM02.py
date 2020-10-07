@@ -8,10 +8,10 @@
 # Run this script through a Python interpeter with the --help parameter for instructions, or read the description sections in the argsparse setup below. Basic default usage for e.g. 16 shades of gray (as it defaults to shades of white if no --COLOR is specified) :
 #    python /path/to_this_script/getNshadesOfColorCIECAM02.py -n 16 > 18shadesOf_color_CIECAM02.hexplt
 # NOTES
-# - It may produce more or less colors than specified. Welcome to inexact float math.
-# - It may produce some unexpected colors. I recommend you use an editor that live previews hex colors (like Atom with the highlight-colors package).
+# NOTE
+# - Previously, because of inexact float math, this script was capable of producing more or less colors than requested. Thanks to a numpy linspace function, that is no longer the case. Moreover, results are more exact to what is desired (start with absolute white and end with absolute black, where previously it often produced very slight off-white or black, or didn't even end with black).
+# - It may produce some unexpected colors. I recommend you use an editor that live previews hex colors (like Atom with the highlight-colors package). You may be able to avoid unexpected colors by overriding start brightness of color (see -b parameter).
 # - It writes results to a file named after the color, e.g. `fff585_15shades.hexplt`.
-# - It adds the original color to the array at the start or end depending on whether you use `-r` | `--DARK_TO_BRIGHT` or not IF you also don't use `-b` | `--BRIGHTNESS_OVERRIDE`.
 
 
 # CODE
@@ -56,30 +56,24 @@ RGB = tuple(int(COLOR_HEX_RGB_GLOBAL[i:i+2], 16) for i in (0, 2, 4))
 JCh_result = cspace_convert(RGB, "sRGB255", "JCh")
 # JCH_result[0] is J, JCH_result[1] is C, [JCH_result2] is h
 
-J_min = 0
-# set J_max depending on param.:
+J_min = 0.0000000000000001      # Practically zero and avoids divide by zero warning
+J_max = int(JCh_result[0])		# J	-- loses float precision there :(
+# alter J_max if param. says so:
 if ARGS.BRIGHTNESS_OVERRIDE:
 	J_max = ARGS.BRIGHTNESS_OVERRIDE
-else:
-	J_max = int(JCh_result[0])		# J	-- loses float precision there :(
-# NOTE that as this is a negative number (default) and will be used for range() step, step will be negative! :
 
-J_step = int(J_max / GLOBAL_NUMBER_OF_SHADES) * -1
-
-if ARGS.DARK_TO_BRIGHT:		# if told to reverse gradient (dark -> white)
+if ARGS.DARK_TO_BRIGHT:		# if told to reverse gradient (dark -> white), swap min,max:
 	tmp = J_min; J_min = J_max; J_max = tmp
-	J_step = J_step * -1
-# print("J_min", J_min, " J_max", J_max, " J_step", J_step)
+
 C = JCh_result[1]				# C
 h = JCh_result[2]				# h
 
 JCh2RGB = cspace_converter("JCh", "sRGB255")		# returns a function
 
 colorsRGB = []
-# if regular light to dark sort and no brightness override, start building array with original color:
-if not ARGS.DARK_TO_BRIGHT and not ARGS.BRIGHTNESS_OVERRIDE and not ARGS.BRIGHTNESS_OVERRIDE:
-	colorsRGB.append("#" + COLOR_HEX_RGB_GLOBAL)
-for J in range(J_max, J_min, J_step):
+# Thanks to help here: https://stackoverflow.com/a/7267806/1397555
+descending_j_values = np.linspace(J_max, J_min, num=GLOBAL_NUMBER_OF_SHADES)
+for J in descending_j_values:
 	# build JCh array:
 	JCh = np.array([ [J, C, h] ])
 	JCh_as_str = str(JCh[0])
@@ -93,9 +87,6 @@ for J in range(J_max, J_min, J_step):
 	hex_string = hex_string.upper()
 	colorsRGB.append(hex_string)
 	colorsRGB.append(hex_string)
-# if reverse (dark to light) sort and no brightness override, append original color to end of sort:
-if ARGS.DARK_TO_BRIGHT and not ARGS.BRIGHTNESS_OVERRIDE:
-	colorsRGB.append("#" + COLOR_HEX_RGB_GLOBAL)
 
 # Deduplicate list but maintain order; re: https://stackoverflow.com/a/17016257/1397555
 from more_itertools import unique_everseen
