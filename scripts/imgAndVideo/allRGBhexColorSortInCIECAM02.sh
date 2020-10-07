@@ -10,9 +10,9 @@
 # CODE
 # TO DO
 # Parameterize arbitrary sort color; default to black-black-black-magenta if not provided.
-scriptLocation=`whereis RGBhexColorSortInCIECAM02.py | sed 's/.* \(.*\/RGBhexColorSortInCIECAM02.py\).*/\1/g'`
+scriptLocation=$(getFullPathToFile.sh RGBhexColorSortInCIECAM02.py)
 
-array=(`find . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n'`)
+array=($(find . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n'))
 # or to find every file,`find .` . .
 for element in ${array[@]}
 do
