@@ -1,103 +1,73 @@
 # DESCRIPTION
-# Converts a fountain format plain text file screenplay into a formatted PDF via a CLI tool (two options, uncomment the option you want). Optionally joins semantic linefeeds (AKA ventilated prose or sense lines).
+# Converts a fountain format plain text file screenplay into a formatted PDF via a CLI tool (two options; the default one can be overriden with a second parameter). To join semantic linefeeds in a fountain file before converting it with this script, see fountain2fountain.sh. To use both fountain2fountain.sh and this script, see fountain2fountain2pdf.sh.
 
 # DEPENDENCIES
 # Wrap or Afterwriting CLI (depending on which you choose and which code line you uncomment for either, respectively), and various GNU core utilities.
 
-# WARNING
-# While this script backs the original fountain file, modifies a copy of it, and then restores from backup, if this script is interrupted or anything else goes wrong, your original fountain file may become damaged or lost. Therefore, back up any file you run this against before you run this.
-
 # USAGE
 # Run with these parameters:
-# - $1 fountain file name to convert
-# - $2 OPTIONAL. Anything, such as the word 'foo', which if present, causes the script to join semantic linefeeds in action or dialogue (to a temp file) before PDF conversion.
-# Example with only $1, a fountain file:
+# - $1 fountain file name to convert.
+# - $2 OPTIONAL. Anything, for example the word 'FLOREFLEFL.'. If omitted, the script will attempt to use the CourierMegaRS fonts in rendering PDFs (and will try to retrieve them via HTTP if they are not present). If included, wraps' default font (I think Courier Prime) is used.
+# - $3 OPTIONAL. Anything, for example the word 'FLOREFLEF.' If ommited, the default pdf renderer (wrap) is used. If provided, the afterwriting renderer is used. $2 is overriden in this case (I have not figured out how to get afterwriting's janky custom font flags/config files working!)
+# Example that uses the default renderer.
 #    fountain2pdf.sh fountain-source-file.fountain
-# Example with $1 and $2:
-#    fountain2pdf.sh fountain-source-file.fountain foo
+# Example that uses aftewriting:
+#    fountain2pdf.sh fountain-source-file.fountain FLOREFLEF
 # NOTES
-# - This script expects everything after the title page of the screenplay (the actual screenplay body text) to start with a line that starts and ends with "> FADE IN:" (but without the quote marks), and you may expect this script to not work if that is not the case.
-# - Also, the optional last line of this script opens the output pdf.
-# - There are different pdf renderer options this script can use, but only one of them is hard-coded. If you want to use others, find the PDF RENDER OPTIONS comments and uncomment the render command you want to use (and comment out the render command you don't want to use).
-# - One of the render options expects custom fonts (which I made) to be one directory above the directory you call this script from, and at this writing those fonts (if you even know where to get them; they were made by me: google "courier mega rs" have not been vetted by any typography professional or expert.
-
+# - The wrap CLI option expects custom fonts (which I made) to be in the current directory. If the script doesn't find those (or a signal one of them), it will attempt to download and extract a .7z archive of them. If that fails, it won't specify any custom fonts for rendering (which will cause the default to be used).
+# - The optional last line of this script opens the output pdf.
 
 
 # CODE
-if [ ! -e $1 ]; then echo proposed input file $1 not found. Terminating script.; fi
+# TO DO: more elegant font locating? I don't want to assume they're one directory up.
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (source fountain file name) passed to script. Exit."; exit 1; else sourceFountainFileName=$1; fi
+if [ ! -e $sourceFountainFileName ]; then printf "\n~\nPROBLEM: proposed input file $sourceFountainFileName not found. Terminating script.\n"; exit 1; fi
 
-fileNameNoExt=${1%.*}
+font_option='courier_megaRS'
+if [ "$2" ]; then font_option='renderers_default'; fi
+renderer_option='wrap'
+if [ "$3" ]; then renderer_option='afterwriting'; fi
 
-# if optional parameter 2 provided, join semantic linefeeds into a temp doc and swap it for
-# the original before PDF print:
-if [ "$2" ]
-then
-	# Kludgy and arbitrarily inflexible (instead of pattern matching any title page elements
-	# and temporarily cutting them out), but:
-	# - to avoid the sed command mangling title page info, cut everything before and after
-	# the initial > FADE IN: (which is now an exact match requirement--MUST be present in the
-	# fountain script!--) into two separate files, work on the second, then rejoin them:
-	#  - get line number (of match) to split on:
-	tail_from=`awk '/> FADE IN:/{print NR;exit}' $1`
-	let head_to=tail_from-1
-	head -n $head_to $1 > tmp_head_wYSNpHgq.fountain
-	tail -n +$tail_from $1 > tmp_tail_wYSNpHgq.fountain
-	#  - delete lines that start with markdown image syntax (used to double for eBook output via fountain2ePub (using pandoc), but they'll interfere here:
-		# deletes the line:
-		# sed -i '/\!\[.*/d' tmp_tail_wYSNpHgq.fountain
-	# deletes the line and the line after it (I think?--it leaves one space instead of two) :
-	sed -i ':begin;$!N;/\!\[.*/d;tbegin;P;D' tmp_tail_wYSNpHgq.fountain
-	#  - join semantic linefeeds into that tail file, in-place:
-	# Adapted from: https://backreference.org/2009/12/23/how-to-match-newlines-in-sed/
-	# sed ':begin;$!N;s/FOO\nBAR/FOOBAR/;tbegin;P;D'   # if a line ends in FOO and the next
-	# starts with BAR, join them
-	#   - Also don't match [ .@~] characters at start of line (don't join if those fountain syntax
-	# marks are present:
-	sed -i ':begin;$!N;s/\(^[^ .\(~@\n].*[a-z].*\)\n\(^[^ .\(~@\n].*[a-z].*\)/\1 \2/;tbegin;P;D' tmp_tail_wYSNpHgq.fountain
-	# - back original fountain file up:
-	mv ./$1 ./$1.fountain-bak.txt
-	# - overwrite original with semantic linefeed-joined version (backed up original will be
-	# restored later) :
-	cat tmp_head_wYSNpHgq.fountain tmp_tail_wYSNpHgq.fountain > $1
-	rm ./tmp_head_wYSNpHgq.fountain ./tmp_tail_wYSNpHgq.fountain
-fi
-
-# LOCAL FONTS for wrap render setup:
-# conditional copy of fonts if they exist in parent dir:
-if [ -e ../CourierMegaRS-SemiCondensed.ttf ]; then cp ../CourierMegaRS-SemiCondensed.ttf .; fi
-if [ -e ../CourierMegaRS-SemiCondensedBold.ttf ]; then cp ../CourierMegaRS-SemiCondensedBold.ttf .; fi
-if [ -e ../CourierMegaRS-SemiCondensedBoldItalic.ttf ]; then cp ../CourierMegaRS-SemiCondensedBoldItalic.ttf .; fi
-if [ -e ../CourierMegaRS-SemiCondensedItalic.ttf ]; then cp ../CourierMegaRS-SemiCondensedItalic.ttf .; fi
-# TO DO: get this param. working:
-# if those copies work (we assume from one check), set an opt to use them:
-# if [ -e ./CourierMegaRS-SemiCondensed.ttf ]; then FONT_ARG="\"--font \"CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf\""; fi
+fileNameNoExt=${sourceFountainFileName%.*}
 
 # Eleven billionth time windows silly line endings mucked with a script; this fixes it:
 if [ "$OS" == "Windows_NT" ]
 then
-	unix2dos $1
+	unix2dos $sourceFountainFileName
 else
-	dos2unix $1
+	dos2unix $sourceFountainFileName
 fi
-# ====
-# START PDF RENDER OPTIONS:
-# UNCOMMENT THIS: "wrap" CLI option, uses specific fonts--
-# wrap pdf $1 --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf"
-# _OR_ UNCOMMENT THIS: "afterwriting" CLI option--
-afterwriting --source $1 --overwrite --pdf
-# I gave my best effort and the following method of loading fonts is *stupid* arcane (*_two_ json files?!_*) and doesn't seem to work:
-# --config courierMegaConfig.json --fonts CourierMega.json
-# END PDF RENDER OPTIONS
-# ====
 
-# CLEAN UP the set up local fonts for wrap render; this will throw a non-fatal error if those files don't exist;
-rm CourierMegaRS-SemiCondensed.ttf CourierMegaRS-SemiCondensedBold.ttf CourierMegaRS-SemiCondensedBoldItalic.ttf CourierMegaRS-SemiCondensedItalic.ttf
-
-# If we joined semantic linefeeds, restore backed-up fountain file over original:
-if [ "$2" ]
+if [ "$renderer_option" == 'wrap' ]
 then
-	mv ./$1.fountain-bak.txt ./$1
+# WRAP RENDER OPTION:
+	echo will attempt to use wrap render option.
+	if [ -e CourierMegaRS-SemiCondensed.ttf ] && [ "$font_option" != 'renderers_default' ]
+	then
+		printf "\nSignal font file CourierMegaRS-SemiCondensed.ttf found; will attempt to use . . ."
+	else
+		printf "\nSignal font file CourierMegaRS-SemiCondensed.ttf not found; will attempt to retrieve . . ."
+		wget https://earthbound.io/data/dist/CourierMegaRSfonts.7z
+		7z x -y CourierMegaRSfonts.7z
+		rm ./CourierMegaRSfonts.7z
+	fi
+	# ~
+	if [ -e CourierMegaRS-SemiCondensed.ttf ] && [ "$font_option" != 'renderers_default' ]
+	then
+# NOTE: WITHOUT &>/dev/null redirection, the following command caused wonky output from wrap to print to the terminal for MSYS2, and PDF write failed; the redirection to null fixed it (and caused a PDF to write okay) :
+		echo WILL USE CUSTOM FONT IN RENDER . . .
+		wrap pdf $sourceFountainFileName --font "CourierMegaRS-SemiCondensed.ttf, CourierMegaRS-SemiCondensedBold.ttf, CourierMegaRS-SemiCondensedItalic.ttf, CourierMegaRS-SemiCondensedBoldItalic.ttf" &>/dev/null
+	else
+		printf "\nAttempt to retrieve font files apparently failed (signal font file CourierMegaRS-SemiCondensed.ttf still not found); OR instructed via parameter to use default font; will use default font . . ."
+		wrap pdf $sourceFountainFileName &>/dev/null
+	fi
+else
+# AFTERWRITING CLI OPTION:
+	echo will attempt to use afterwriting render option.
+	afterwriting --source $sourceFountainFileName --overwrite --pdf
+	# I gave my best effort and the following method of loading fonts is *stupid* arcane (*_two_ json files?!_*) and doesn't seem to work:
+	# --config courierMegaConfig.json --fonts CourierMega.json
 fi
 
 # Optionally open result PDF; change `open` to `cygstart` for Cygwin:
-# open ./$fileNameNoExt.pdf
+#open ./$fileNameNoExt.pdf
