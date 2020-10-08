@@ -6,6 +6,7 @@
 # Run with one parameter, which is the input fountain file:
 #    fountain2fountain.sh input-file.fountain
 # NOTES
+# - This script expects everything after the title page of the screenplay (the actual screenplay body text) to start with a line that starts and ends with "> FADE IN:" (but without the quote marks), and you may expect this script to not work if that is not the case.
 # - This script sets a variable named targetFountainFileName, which is a string variable for the target file name. If you call this script from another script, via `source`, like this:
 #        source fountain2fountain.sh input-file.fountain
 # -- then the set variable will be available to the calling script after this script terminates, as `source` does magicky things to cause that. You can then use that variable in the calling script to do other things with that file name.
@@ -19,7 +20,6 @@
 
 # CODE
 if [ ! -e $1 ]; then echo proposed input file $1 not found. Terminating script.; fi
-
 fileNameNoExt=${1%.*}
 # Kludgy and arbitrarily inflexible (instead of pattern matching any title page elements
 # and temporarily cutting them out), but:
