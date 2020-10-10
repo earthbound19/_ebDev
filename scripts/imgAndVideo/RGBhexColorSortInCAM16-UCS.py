@@ -51,6 +51,9 @@ if len(sys.argv) > 2:
         overwriteOriginalList = True
 if len(sys.argv) > 3:
     arbitraryFirstCompareColor = sys.argv[3]
+    # add a # to start of that parameter if it is six characters but missing that:
+    if (len(arbitraryFirstCompareColor) == 6) and (arbitraryFirstCompareColor[0] != '#'):
+        arbitraryFirstCompareColor = '#' + arbitraryFirstCompareColor
 # END GLOBALS and positional parameters check
 
 # split input file into list on newlines:
@@ -171,8 +174,8 @@ for IDX, color in enumerate(sorted_colors):
     fixedTehColorFormat = '#' + color
     sorted_colors[IDX] = fixedTehColorFormat
 
-# If we inserted an arbitrary color at start of list (to make first comprarison from), but it wasn't in the original list, remove it from the new sorted colors list; otherwise leave it there:
-if countOfArbitraryFirstColorInOriginalList == 0 and arbitraryFirstCompareColor != False:
+# If we inserted an arbitrary color at start of list (to make first comprarison from), but it wasn't in the original list, remove it from the new sorted colors list; otherwise leave it there; also with double-checking it is there else not do this:
+if countOfArbitraryFirstColorInOriginalList == 0 and arbitraryFirstCompareColor != False and (arbitraryFirstCompareColor in sorted_colors):
     sorted_colors.remove(arbitraryFirstCompareColor)
 
 # Again, conditional print if we're overwriting original list, and if we are overwriting original list, this is where in code we do that:
