@@ -17,7 +17,7 @@ spectra \
 numpy \
 ciecam02 \
 colormap \
-colorgram \
+colorgram.py \
 Quartz \
 Foundation \
 Pillow \
