@@ -12,7 +12,8 @@
 # CODE
 # Command line options and use of program found here: http://cpicture.thecloudsite.net/blog/content/public/upload/convert-Raw-to-TIFF.ps1.txt 08/20/2015 06:06:35 PM -RAH
 # NOTE if you add the -e switch it will embed the original raw (/CR2 etc) file in the dng.
-AdobeDNGConverter.exe -c -fl -cr5.4 $1
+echo "I recommend against using DNG files because they have mixed support among software vendors and manufacturers . . ."
+AdobeDNGConverter.exe -c -fl -cr7.1 -e $1
 
 
 # DEVELOPER NOTES
