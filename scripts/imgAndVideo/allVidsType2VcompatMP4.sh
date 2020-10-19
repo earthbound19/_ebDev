@@ -27,7 +27,7 @@ allVideoFilesArr=$(printAllVideoFileNames.sh $1)
 for filename in ${allVideoFilesArr[@]}
 do
 	fileNameNoExt=${filename%.*}
-	targetFile="$fileNameNoExt".mp4
+	targetFile="$fileNameNoExt"_vCompat.mp4
 	# CHECK if target render already exists. If it does, skip render and notify user. Otherwise render.
 	if [ -e $targetFile ]
 	then
