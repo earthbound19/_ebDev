@@ -2,9 +2,9 @@
 # Takes a list of RGB colors expressed in hex (one per line) and sorts them using an advanced color appearance model for human color vision: CIECAM02, sorting into lists of darks and lights (nearest to black and nearest to white), via the colorspacious library. Adapted from RGBhexColorSortInCIECAM02.py.
 
 # USAGE
-# From a directory with a .hexplt file, run this script through a Python interpreter:
+# From a directory with a .hexplt file, run this script through a Python interpreter, with a .hexplt list as the first (and only) parameter to the script; for example:
 #    python /path/to_this_script/RGBhexColorSortToDarksAndLightsIn2CIECAM02.py inputColors.hexplt
-# It will print the results to new files named darks.hexplt and lights.hexplt you may sort those results by next nearest color via e.g. RGBhexColorSortInCIECAM02.py.
+# It will print the results to new files named darks.hexplt and lights.hexplt. You may sort those results by next nearest color via e.g. RGBhexColorSortInCIECAM02.py.
 # NOTES
 # - This script expects perfect data. If there's a blank line anywhere in the input file, or any other unexpected data, it may stop with an unhelpful error.
 # - This script will eliminate duplicates in the input list.
@@ -57,11 +57,11 @@ for i in range(len(colors_list)):
     distance_black_comp = deltaE(CIECAM02_comp, black_comp, input_space = SPACE)
     if distance_white_comp < distance_black_comp:       # lower delta means _closer_
         pair_deltaEs_lights.append(colors_list[i])
+        # print('is less than! distance_white_comp', distance_white_comp, 'distance_black_comp', distance_black_comp)
     else:
         pair_deltaEs_darks.append(colors_list[i])
-    if distance_white_comp == distance_black_comp:      # if the distances are equal, default to lights list:
-        pair_deltaEs_lights.append(colors_list[i])
-
+        # print('is greater than! distance_white_comp', distance_white_comp, 'distance_black_comp', distance_black_comp)
+    # There used to be a case for equal here, adding to the lights list, but it would never execute; if the case handling darks fails, it will add to the lights. So this case was deleted.
 
 # dump to lists and report dump
 print('Writing to darks list . . .')
