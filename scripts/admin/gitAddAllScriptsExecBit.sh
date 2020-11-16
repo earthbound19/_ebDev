@@ -10,7 +10,7 @@
 
 # CODE
 # create array of all source code / script file names of given types in this directory and subdirectories; -printf "%P\n" removes the ./ from the front; re: https://Unix.stackexchange.com/a/215236/110338 -- ALSO NOTE: if I use any printf command, it only lists findings for that associated -o option; so printf must be used for every -o:
-scriptsArray=(`find . -type f -name '*.sh' -printf "%P\n" -o -name '*.py' -printf "%P\n"`)
+scriptsArray=($(find . -type f -name '*.sh' -printf "%P\n" -o -name '*.py' -printf "%P\n"))
 
 for element in ${scriptsArray[@]}
 do

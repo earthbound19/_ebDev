@@ -5,11 +5,13 @@
 # Run via python and pass one parameter, which is an ArtRage script file, e.g.:
 #    python /path/to_this_script/artRage2imgs.py inputArtRageScriptFile.arscript
 # NOTES
+# - Happy discovery! ARTRAGE WILL AUTO-NUMBER (INCREMENTALLY!) IMAGES if it encounters a file name conflict! Resultantly, this script is complete without having to manually code incremented numbers! EXCEPT that the first frame (file) must be manually renamed to 0000 (or whatever)!
 # - There must be a folder named anim_frames in the path in which this script runs.
 # - To create images smaller than the original painting, when you play back the script untick the option to use original size (and then set the smaller size, e.g. 50% or screen size (if you use screen size, be careful to keep the W/H aspect ratio correct).
 
 
 # CODE
+#
 # TO DO
 # - Better describe script in comments
 # - Parameterize input script file name
@@ -51,5 +53,3 @@ o = open('artRage_render.arscript', mode='w', encoding='utf-16-le')
 o.write(artScriptString)
 o.close()
 f.close()
-
-# Happy discovery! ARTRAGE WILL AUTO-NUMBER (INCREMENTALLY!) IMAGES if it encountered a file name conflict! Resultantly, this script is complete without having to manually code incremented numbers! EXCEPT that the first frame (file) must be manually renamed to 0000 (or whatever)!
