@@ -8,13 +8,15 @@
 #    composer require mgp25/instagram-php
 
 # USAGE
+# NOTE
+# At this writing, this script has been untested and not used for some time, and it may be broken after some blind tweaks were made to it for better array creation / command substitution. I know, fixing something I don't know is broken, and not testing it. :| ALSO, at this writing it is coded for Windows only (it runs .bat scripts, despite some untested code toward making it windows/Unix alternatly compatible).
 # Run with the following parameters:
 # - $1 instagram username (e.g. earthbound.io)
 # - $2 image file name to upload thereto, which image must be in your current PATH
 # - $3 caption for photo (surrounded by double quotes)
 # Example run command:
 #    call_instagramUploadPhotoParametersPHP.sh earthbound.io ./_EXPORTED_M_variantWork_00099_FFsideToside_v02_PZ-8280x.jpg
-# NOTES
+# OTHER NOTES
 # - This script provides the password parameter to UploadPhotoParameters.php via a text file (which text file you should keep secure in your home path, and out of any repository!), which is `~/instagramPassword.txt`.
 # - The `/examples` subdir of the Instagram-API repository must be in your PATH, as this script searches for one file UploadPhotoParameters.php in your path, and cds into that directory
 # - Because something may butcher the caption (last I tested), the caption parameter will be blanked out in this script until that is fixed.
@@ -30,13 +32,20 @@
 # composer require mgp25/instagram-php
 # --from the root of this cloned repo.
 
-currentDir=`pwd`
-currentDir=`cygpath -w "$currentDir"`
-FullIMGpath="$currentDir"\\"$2"
-		# echo $FullIMGpath
+currentDir=$(pwd)
+currentDir=$(cygpath -w "$currentDir")
+# If we're running Windows, build a Windows-style path (backslashes); otherwise leave path as-is:
+if [ $OS == "Windows_NT" ]
+then
+	# escaping \:
+	FullIMGpath="$currentDir"\\"$2"
+	FullIMGpath=$(cygpath -w $FullIMGpath)
+else
+	FullIMGpath="$currentDir"/"$2"
+fi
 
-tmp=`which UploadPhotoParameters.php`
-instagramAPIrepoPath=`dirname "$tmp"`
+tmp=$(getFullPathToFile.sh UploadPhotoParameters.php)
+instagramAPIrepoPath=$(dirname "$tmp")
 if [ $? == "0" ]
 then
 	foundAPIpath=1

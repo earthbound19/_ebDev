@@ -177,7 +177,7 @@ void setRNDanimFramesSaveDirName() {
     int rnd_choice = (int) random(0, rnd_string_components.length());
     rndString+= rnd_string_components.charAt(rnd_choice);
   }
-  animFramesSaveDir = "_anim_run_" + "_" + rndString + "/";
+  animFramesSaveDir = "_anim_run__" + rndString + "/";
 }
 
 // END CUSTOM FUNCTIONS

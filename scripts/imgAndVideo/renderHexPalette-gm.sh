@@ -171,7 +171,7 @@ done < $hexColorSrcFullPath
 
 # make the actual montage image. Example command: gm montage colors/5A6D40.png colors/757F26.png colors/C68C15.png colors/8F322F.png colors/954B29.png out.png
 # make temporary script to create a grid montage of the colors:
-echo "gm montage -tile $tilesAcross"x"$tilesDown -background gray -geometry $tileEdgeLen"x"$tileEdgeLen+0+0 \\" > mkGridHead.txt
+echo "gm montage -tile $tilesAcross"x"$tilesDown -background '#919191' -geometry $tileEdgeLen"x"$tileEdgeLen+0+0 \\" > mkGridHead.txt
 
   # convert hex color scheme text list file to parameter list for ~magick; AGAIN WITH THE NEED to unbork windows newlines (via tr):
 sed 's/.*#\(.*\)$/_hexPaletteIMGgenTMP_2bbVyVxD\/\1.png \\/' $hexColorSrcFullPath | tr -d '\15\32' > ./mkGridSRCimgs.txt
@@ -194,10 +194,10 @@ mv _hexPaletteIMGgenTMP_2bbVyVxD $paletteFile.colors
 	rm -rf $paletteFile.colors
 
 # The next four code lines are optional but I leave them uncommented, as they can dramatically reduce file size:
-echo ""
-echo OPTIMIZING rendered png . . .
-pngquant --skip-if-larger --ext=.png --force --quality 100 --speed 1 --nofs --strip --verbose $renderTarget
-optipng -o7 $renderTarget
+# echo ""
+# echo OPTIMIZING rendered png . . .
+# pngquant --skip-if-larger --ext=.png --force --quality 100 --speed 1 --nofs --strip --verbose $renderTarget
+# optipng -o7 $renderTarget
 
 echo ""
 echo DONE--created color palette image is $renderTarget

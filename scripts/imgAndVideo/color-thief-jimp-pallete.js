@@ -6,16 +6,12 @@
 // process.argv[2] <./path_to_image_to_process.png>
 // process.argv[3] <number of colors to extract for palette>.
 
-// TO EXAMINE; other means proffered yon: http://stackoverflow.com/questions/26889358/generate-color-palette-from-image-with-imagemagick
-// -- a working test command adapted from yon:
-// magick convert ./tsfVt.jpg -format %c -colorspace LAB -colors 9 histogram:info:- | sort > wut.txt
 
 // TO DO
-// cross-compile this to an exe targeting any platform? roll all dependencies into one repo I control?
-
-console.log(wut);
-
-exit;
+// - EXAMINE other means proffered yon: http://stackoverflow.com/questions/26889358/generate-color-palette-from-image-with-imagemagick
+// -- a working test command adapted from yon:
+//    magick convert ./tsfVt.jpg -format %c -colorspace LAB -colors 9 histogram:info:- | sort > wut.txt
+// - cross-compile this to an exe targeting any platform? roll all dependencies into one repo I control?
 var ColorThief = require('color-thief-jimp.js');
 
 var Jimp = require('jimp');
