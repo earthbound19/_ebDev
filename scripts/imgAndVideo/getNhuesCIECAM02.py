@@ -7,8 +7,7 @@
 # To write the colors to a .hexplt file for permanent palette storage (recommended), use the > operator:
 #    python /path/to/this/script/printNhuesCIECAM02.py -n 18 > 18_max_chroma_hues_from_CIECAM02.hexplt
 # NOTES
-# - Because this script eliminates duplicate colors that it creates, and duplicate colors are likely depending on circumstance (because colors are created outside the RGB color space, and then clamped to it), it may produce wildly more or less colors than asked for. Therefore, to get the actual number of colors desired you may have to experiment with larger or smaller number parameters until it produces the number of colors desired.
-# - It will not produce more than 198 colors with hard-coded parameters.
+# - If you have this script create many colors, it may produce fewer colors because it eliminates duplicate colors. Because colors are created outside the RGB color space, and then clamped to it, duplicate colors are more likely from more values outside the RGB range clamped to it when you create hundreds of colors or more. This behavior seems to alter when you alter J and C.
 # - You probably want to tweak the J, C etc. variables with hard-coded alternatives for your run of the script for different color type scenarios.
 
 
@@ -39,8 +38,8 @@ def clamp(val, minval, maxval):
     return int(val)
 
 # SEE DEVELOPER NOTES at start of script re these values:
-J = 74.5                  # HARD-CODED default: 89. Good mid-range power value?: 50
-C = 29.5                  # " 162. Good mid-high range chroma value?: 120
+J = 89                  # HARD-CODED default: 89. Good mid-range power value?: 50? 74.5?
+C = 162                  # " 162. Good mid-high range chroma value?: 120
 h_min = 0               # " 0, and you probably don't want to change that
 h_max = 360             # " 360 "
     # DEPRECATED METHOD of getting a divisor/incrementor used to get a series of h values:
@@ -60,17 +59,17 @@ colorsRGB = []
     # DEPRECATED METHOD:
     # for h in range(h_min, h_max, h_step):
 for h in h_values:
-	print("h is ", h)
-#	JCh = np.array([ [J, C, h] ])
-#	RGB = JCh2RGB(JCh)
+#	print("h is ", h)
+	JCh = np.array([ [J, C, h] ])
+	RGB = JCh2RGB(JCh)
 	# clamp values to RGB ranges:
-#	R = clamp(RGB[0][0], 0, 255); G = clamp(RGB[0][1], 0, 255); B = clamp(RGB[0][2], 0, 255)
+	R = clamp(RGB[0][0], 0, 255); G = clamp(RGB[0][1], 0, 255); B = clamp(RGB[0][2], 0, 255)
 	# converts to two-digit (if needed) padded hex string: "{0:0{1}x}".format(255,2)
-#	R = "#" + "{0:0{1}x}".format(R,2); G = "{0:0{1}x}".format(G,2); B = "{0:0{1}x}".format(B,2);
-#	hex_string = R + G + B
-#	hex_string = hex_string.upper()
-#	colorsRGB.append(hex_string)
-sys.exit()
+	R = "#" + "{0:0{1}x}".format(R,2); G = "{0:0{1}x}".format(G,2); B = "{0:0{1}x}".format(B,2);
+	hex_string = R + G + B
+	hex_string = hex_string.upper()
+	colorsRGB.append(hex_string)
+
 # Deduplicate list but maintain order; re: https://stackoverflow.com/a/17016257/1397555
 from more_itertools import unique_everseen
 colorsRGB = list(unique_everseen(colorsRGB))
