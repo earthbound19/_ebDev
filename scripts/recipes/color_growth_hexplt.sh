@@ -7,21 +7,21 @@
 # - $2 the `--WIDTH` (as expected by `color_growth.py`) of intended render(s).
 # - $3 the `--HEIGHT` (as expected by `color_growth.py`) of intended render(s).
 # - $4 OPTIONAL. Either A) the keyword RND_BASIC_POS or B) a pair of x,y values (a component of that expected by the `color_growth.py` --CUSTOM_COORDS_AND_COLORS switch), surrounded by single quote marks, for example '1799,1799'. (Note that while the `--CUSTOM_COORDS_AND_COLORS` switch expects parenthesis around those values (among other things), it may break it to do that here. Don't use parenthesis here). If not provided, the x,y values are highly randomized (read on). If you need to use $5 but don't want to "use" $4 (leave it at default), pass the keyword NULL as $4.
-# - $5 OPTIONAL. Any additional arguments that can be accepted by `color_growth.py`, surrounded by single (or double?) quote marks, for example '--WIDTH 3600 --HEIGHT 3600 --RSHIFT 8 --BG_COLOR [255,0,255] --BORDER_BLEND True --TILEABLE True --SAVE_EVERY_N 0'. If not provided no additional parameters are used (the variable that controls them is not even set; it is effectively empty as far as the script is concerned). If provided, you may be able to use `--WIDTH` and `--HEIGHT` parameters in it if they wouldn't cause errors vs. $2 and $3. (I suppose only if in $5 they are larger than $2 and $3?) If you want to use $6 but not $5, pass the keyword NULL as $5.
+# - $5 OPTIONAL. Any additional arguments that can be accepted by `color_growth.py`, surrounded by double quote marks, for example '--WIDTH 3600 --HEIGHT 3600 --RSHIFT 8 --BG_COLOR [255,0,255] --BORDER_BLEND True --TILEABLE True --SAVE_EVERY_N 0'. If $5 is not provided, no additional parameters are used, or in other words the variable that controls them is not even set; it is effectively empty as far as the script is concerned). If $5 is provided, you may be able to use `--WIDTH` and `--HEIGHT` parameters in it if they wouldn't cause errors vs. $2 and $3. (I suppose only if in $5 they are larger than $2 and $3?) If you want to use $6 but not $5, pass the keyword NULL as $5. NOTE that any use of the --GROWTH_CLIP flag must surround the tuple (the parenthesis) with a single quote mark (while the entirety of $5 itself must be surrounded by double quotes). For example: "--RSHIFT 3 --GROWTH_CLIP '(2,6)' --SAVE_PRESET False"
 # - $6 OPTIONAL. Pass any value for this, and the script will skip the 300 second pause (cool-down period) after every render. Only do this if your renders are lightweight or your CPU stays relatively cooled very well.
 # For every color in the .hexplt file ($1), the script will make a `color_growth.py` render.
-# Example run with only a palette, and width 1920 x 1080:
+# EXAMPLE RUN with only a palette, and width 1920 x 1080:
 #    color_growth_hexplt.sh RAHfavoriteColorsHex.hexplt 1920 1080
 # See comments in `hexplt2rgbplt.sh` for expected PATH for any `.hexplt` file ($1).
 # If $4 is passed as `RND_BASIC_POS`, for every `color_growth.py` call (render), the script will randomly choose from any of these six origin coordinates: a hard-coded upper-left, upper-right, lower-left, lower-right, center, or a random coordinate (it will do the math to determine any of them). If $4 is passed as a string matching the Python tuple format (but surrounded by single quote marks), e.g. '(100,50)' (where the first number is an X (across) coordinate, and the second number is a Y (down) coordinate), the script will use that as the coordinate component of the `--CUSTOM_COORDS_AND_COLORS` on every run it does of `color_growth.py`. If $4 is not provided, or is passed as the keyword NULL, the script will choose a random coordinate from the whole image range (anywhere within WIDTH and HEIGHT) each render.
-# Example run with the same parameters but also using the `RND_BASIC_POS` keyword for $4:
+# EXAMPLE RUN with the same parameters but also using the `RND_BASIC_POS` keyword for $4:
 #    color_growth_hexplt.sh collectedColors1.hexplt 1920 1080 RND_BASIC_POS
-# Example run that would cause the script to use a specific origin coordinate for every render (not `RND_BASIC_POS`):
+# EXAMPLE RUN that would cause the script to use a specific origin coordinate for every render (not `RND_BASIC_POS`):
 #    color_growth_hexplt.sh collectedColors1.hexplt 1920 1080 '(2027,400)'
-# Example run that would cause the script to choose a random coordinate from the whole canvas range each render:
+# EXAMPLE RUN that would cause the script to choose a random coordinate from the whole canvas range each render:
 #    color_growth_hexplt.sh collectedColors1.hexplt 1920 1080 NULL
-# Example run that passes custom parameters (with different values than previous examples for the other parameters):
-#    color_growth_hexplt.sh collectedColors1.hexplt 9600 2400 '(4800,1280)' '--RSHIFT 3 --GROWTH_CLIP (2,6) --SAVE_PRESET False'
+# EXAMPLE RUN that passes custom parameters (with different values than previous examples for the other parameters) -- NOTE that for parameter $5, the tuple passed with --GROWTH_CLIP must be surrounded by single quote marks, but the entire parameter $5 must be in double quote marks to distinguish it syntactically vs. the single quote marks:
+#    color_growth_hexplt.sh collectedColors1.hexplt 9600 2400 '(4800,1280)' "--RSHIFT 3 --GROWTH_CLIP '(2,6)' --SAVE_PRESET False"
 # NOTES
 # - Just before every render that is started by calling `color_growth.py`, this script creates a .rendering file named after the RGB decimal values for the given render, e.g. `RGB_COLORS__168-230-207.rendering`. When you're done with a batch, you may delete all the .rendering files (they are intended to be temporary). The intent of these .rendering files is for concurrent runs of this script to check for them, and not duplicate work on a render if it finds one. How that works is that the script checks for a .rendering stub before it would otherwise make a render with that color, and skips the render if it finds an existing (match) .rendering file. You can do multiple simultaneous batch renders (exploiting multiple processors/threads) this way too. To interrupt and resume a batch, keep the .rendering files. If a render was interrupted, you may resume it by deleting the associated .rendering file, then run this script.
 # - Even though `color_growth.py` internally zero-indexes coordinates (1 is 0), pass WIDTH and HEIGHT ($2 and $3) as the actual human-indexed (counting starts from 1, or natural numbers) values, because `color_growth.py` does the zero-indexing adjustment internally.
@@ -45,11 +45,11 @@ if [ "$5" ] && [ "$5" != "NULL" ]; then additionalParams=$5; printf "\n\nParamet
 # If the following is false (no $6 passed to script), no SKIP_COOLDOWN variable will be set, and the script will only skip cooldown if that is set:
 if [ "$6" ]; then SKIP_COOLDOWN='True'; printf "\n\nParameter \$6 passed to script; a variable was set to skip cooldown period between renders."; fi
 
-pathToScript=`whereis color_growth.py | sed 's/color_growth: \(.*\)/\1/g'`
+pathToScript=$(getFullPathToFile.sh color_growth.py)
 # END PARAMETER PARSING AND GLOBALS SETUP.
 
 hexplt2rgbplt.sh $sourcePaletteHexplt
-paletteFileNoExt=`echo "${1%.*}"`
+paletteFileNoExt=$(echo "${1%.*}")
 convertedPaletteFile=$paletteFileNoExt.rgbplt
 
 # I tried iterating over a created array from the palette file, and different commands expecting different IFS delimiters (I know not which) scewed it up. So, just iterate over lines in a file:
@@ -57,7 +57,7 @@ while read -r element
 do
 	# Only render if there is no .rendering stub file named after the
 	# RGB (decimal) values being used for this proposed render:
-	renderLogFile=`echo "RGB_COLORS__""$element"".rendering" | sed 's/ /-/g'`
+	renderLogFile=$(echo "RGB_COLORS__""$element"".rendering" | sed 's/ /-/g')
 	if ! [ -e $renderLogFile ]
 	then
 		# create render stub file so that other or subsequent runs of this script
@@ -67,7 +67,7 @@ do
 		echo "Render log file $renderLogFile was not found;"
 		echo "Rendering . . ."
 		# randomize parameters in ranges:
-		rndSeedValForParam=`shuf -i 0-4294967296 -n 1`
+		rndSeedValForParam=$(shuf -i 0-4294967296 -n 1)
 				# DEPRECATED; because sometimes the inverse of a color is ugly with it;
 				# In cases where you know it won't be, you may want to uncomment this
 				# indented block; then also be sure to set $invertRGBvalForParam in -b:
@@ -79,12 +79,12 @@ do
 				#	invertRGBvalForParam="$invertRGBvalForParam $invert"
 				# done
 				# invertRGBvalForParam=`echo $invertRGBvalForParam | tr ' ' ','`
-		rgbValForParam=`echo $element | tr ' ' ','`
-		rshiftParam=`shuf -i 1-8 -n 1`
+		rgbValForParam=$(echo $element | tr ' ' ',')
+		rshiftParam=$(shuf -i 1-8 -n 1)
 
 		# get an RND clip range (will be overriden by anything in $additionalParams, as that is passed last in the color_growth.py parameter set):
-		lowGrowthClipParam=`shuf -i 1-8 -n 1`
-		highGrowthClipParamAddend=`shuf -i 2-8 -n 1`
+		lowGrowthClipParam=$(shuf -i 1-8 -n 1)
+		highGrowthClipParamAddend=$(shuf -i 2-8 -n 1)
 		highGrowthClipParam=$(($lowGrowthClipParam + $highGrowthClipParamAddend))
 		# reduce the upper value to max if it's beyond max:
 		if [ $highGrowthClipParam -gt 8 ]; then echo highGrowthClipParam value $highGrowthClipParam greater than max allowed \(8\)\; reducing to 8\.; highGrowthClipParam=8; fi
@@ -95,7 +95,7 @@ do
 		if [ "$coordinateSuperParameter" == "RND_BASIC_POS" ]
 		then
 			# Pick a random number. If outside range of numbered cases below, pick x,y coordinates in center of canvas (default case). If inside range, pick coordinates from among more fundamental geometric positions among those cases:
-			picked_number=`shuf -i 1-10 | head -n 1`
+			picked_number=$(shuf -i 1-10 | head -n 1)
 			case $picked_number in
 				1) coord_tuple="1,1" ;;				# upper left as x,y
 				2) coord_tuple="$WIDTH,1" ;;			# upper right
@@ -103,14 +103,14 @@ do
 				4) coord_tuple="$WIDTH,$WIDTH" ;;		# lower right
 				5)
 					# $ get rnd coordinates for anywhere on canvas:
-					first_number=`shuf -i 1-$WIDTH | head -n 1`
-					second_number=`shuf -i 1-$HEIGHT | head -n 1`
+					first_number=$(shuf -i 1-$WIDTH | head -n 1)
+					second_number=$(shuf -i 1-$HEIGHT | head -n 1)
 					coord_tuple="$first_number,$second_number"
 					;;
 				*)
 					# DEFAULT case: get center coords via bc terminal calculator:
-					coord_tuple_element_one=`echo "$WIDTH / 2" | bc`
-					coord_tuple_element_two=`echo "$HEIGHT / 2" | bc`
+					coord_tuple_element_one=$(echo "$WIDTH / 2" | bc)
+					coord_tuple_element_two=$(echo "$HEIGHT / 2" | bc)
 					coord_tuple="$coord_tuple_element_one,$coord_tuple_element_two"
 					;;
 			esac
@@ -120,13 +120,13 @@ do
 		# BUT if coordinateSuperParameter was not set, or was passed as NULL, pick a random coord.
 		if ! [ "$coordinateSuperParameter" ] || [ "$coordinateSuperParameter" == "NULL" ]
 		then
-			first_number=`shuf -i 1-$WIDTH | head -n 1`
-			second_number=`shuf -i 1-$HEIGHT | head -n 1`
+			first_number=$(shuf -i 1-$WIDTH | head -n 1)
+			second_number=$(shuf -i 1-$HEIGHT | head -n 1)
 			coord_tuple="$first_number,$second_number"
 		fi
 		# ==== END ALTER coordinateArg; depending: ====
 		# random string component to add to temp shell script name, so multiple insances of this can run simultaneously without clobbering one another's temp scripts:
-		rndString=`cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6`
+		rndString=$(cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6)
 		tmp_script_file_name=RUN_this__gQThHuC5RTeeRn__"$rndString".sh
 		echo "Calling color_growth.py via temp script $tmp_script_file_name . . ."
 		# Works around problems escaping characters by writing the whole command
