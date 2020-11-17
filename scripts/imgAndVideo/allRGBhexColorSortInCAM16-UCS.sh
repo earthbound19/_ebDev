@@ -11,9 +11,9 @@
 # CODE
 # TO DO
 # Parameterize arbitrary sort color; default to black-black-black-magenta if not provided.
-scriptLocation=`whereis RGBhexColorSortInCAM16-UCS.py | sed 's/.* \(.*\/RGBhexColorSortInCAM16-UCS.py\).*/\1/g'`
+scriptLocation=$(getFullPathToFile.sh RGBhexColorSortInCAM16-UCS.py)
 
-array=(`find . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n'`)
+array=($(find . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n'))
 # or to find every file,`find .` . .
 for element in ${array[@]}
 do

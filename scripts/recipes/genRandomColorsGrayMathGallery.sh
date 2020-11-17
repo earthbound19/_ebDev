@@ -8,12 +8,14 @@
 # CODE
 # TO DO
 # parameterize number of images to make.
-pythonScriptPath=`whereis NrandomHexColorSchemesGrayMath.py | sed 's/.* \(.*\/NrandomHexColorSchemesGrayMath.py\).*/\1/g'`
-python \"$pythonScriptPath\"
+# pythonScriptPath=$(getFullPathToFile.sh NrandomHexColorSchemesGrayMath.py)
+
+# python $pythonScriptPath
+
 # TO DO: make a directory named after the date and a random string and cd into it, then:
-allhexplt2ppm.sh
-imgs2imgsnn.sh ppm png 540
-rm *.ppm
+# allhexplt2ppm.sh
+# imgs2imgsNN.sh ppm png 540 270
+# rm *.ppm
 
 echo ~~~~
 read -r -p "To delete .hexplt files which resulted in color palette images you don't like, look through all the resultant .png images in this directory and delete the ones you don't like, then enter Y to continue. Otherwise enter N to stop." response

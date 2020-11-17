@@ -1,13 +1,13 @@
 # DESCRIPTION
-# runs paletteCompareCIECAM02.py repeatedly, for every .hexplt (list of RGB colors in hex hex format) pair in the current directory, printing the results to paletteDifferenceRankings.txt.
+# runs paletteCompareCIECAM02.py repeatedly, for every .hexplt (list of RGB colors in hex format) pair in the current directory, printing the results to paletteDifferenceRankings.txt.
 
 # USAGE
-#    allPaletteCompareCIECAM02.sh
+#    allPalettesCompareCIECAM02.sh
 
 
 # CODE
-hexpltFileNames=(`find . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n'`)
-comparePyScriptFullPath=`whereis paletteCompareCIECAM02.py | sed 's/.* \(.*\/paletteCompareCIECAM02.py\).*/\1/g'`
+hexpltFileNames=($(find . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n'))
+comparePyScriptFullPath=$(getFullPathToFile.sh paletteCompareCIECAM02.py)
 
 # blank/create new palette comparisons ranking file:
 printf "" > paletteDifferenceRankings.txt
@@ -22,7 +22,7 @@ do
 	for j in ${allHexplts_innerLoop[@]}
 	do
 		echo "Comparing $i and $j . . ."
-		deltaE=`python $comparePyScriptFullPath $i $j`
+		deltaE=$(python $comparePyScriptFullPath $i $j)
 		# OY! :
 		comparisonLogString="$deltaE""|""$i""|""$j"
 		printf "$comparisonLogString\n" >> paletteDifferenceRankings.txt

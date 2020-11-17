@@ -13,11 +13,10 @@
 # DEPENDENCIES
 # GraphicsMagick, and a 'nix environment with the bc command-line calculator.
 
-# TO DO
-# Algebra if image is outside allowed aspect range to determine padding necessary to bring it into acceptable range; AND/OR to do that anyway along with padding image with a color scheme printout derived from it.
-
 
 # CODE
+# TO DO
+# Algebra if image is outside allowed aspect range to determine padding necessary to bring it into acceptable range; AND/OR to do that anyway along with padding image with a color scheme printout derived from it.
 		echo -~-~-~-~-~-~-
 		echo getting aspect ratio for file by running command\; if something is wrong with the image information about that may appear after the command\:
 		echo gm identify $1
