@@ -5,10 +5,12 @@
 # Python and the various import libraries declared at the start of CODE.
 
 # USAGE
-# Run this script through a Python interpeter with the --help parameter for instructions, or read the description sections in the argsparse setup below. Basic default usage for e.g. 16 shades of gray (as it defaults to shades of white if no --COLOR is specified) :
-#    python /path/to_this_script/getNshadesOfColorCIECAM02.py -n 16 > 18shadesOf_color_CIECAM02.hexplt
+# Run this script through a Python interpeter with the --help parameter for instructions, or read the description sections in the argsparse setup below.
+# EXAMPLE RUN that produces 16 shades of gray (as it defaults to shades of white if no --COLOR is specified), which the script will write to the file named FFFFFF_12shades.hexplt:
+#    python /path/to_this_script/getNshadesOfColorCIECAM02.py -n 12
+# EXAMPLE RUN that produces sixteen shades of magenta, which the script will write to a file named FF00FF_18shades.hexplt:
+#    python /path/to_this_script/getNshadesOfColorCIECAM02.py -n 16 --COLOR FF00FF
 # NOTES
-# NOTE
 # - Previously, because of inexact float math, this script was capable of producing more or less colors than requested. Thanks to a numpy linspace function, that is no longer the case. Moreover, results are more exact to what is desired (start with absolute white and end with absolute black, where previously it often produced very slight off-white or black, or didn't even end with black).
 # - It may produce some unexpected colors. I recommend you use an editor that live previews hex colors (like Atom with the highlight-colors package). You may be able to avoid unexpected colors by overriding start brightness of color (see -b parameter).
 # - It writes results to a file named after the color, e.g. `fff585_15shades.hexplt`.
@@ -22,7 +24,7 @@
 
 import sys
 import numpy as np
-from colorspacious import cspace_converter, cspace_convert, deltaE
+from colorspacious import cspace_converter, cspace_convert
 import argparse
 
 # configure arguments / help
@@ -44,8 +46,8 @@ GLOBAL_NUMBER_OF_SHADES = ARGS.NUMBER_OF_SHADES
 
 # Global clamp function keeps values in boundaries and also converts to int
 def clamp(val, minval, maxval):
-    if val < minval: return minval
-    if val > maxval: return maxval
+    if val < minval: return int(minval)
+    if val > maxval: return int(maxval)
     return int(val)
 
 # delete any / all # from string if they are provided in arg. (more than one would be bad source):
@@ -57,7 +59,7 @@ JCh_result = cspace_convert(RGB, "sRGB255", "JCh")
 # JCH_result[0] is J, JCH_result[1] is C, [JCH_result2] is h
 
 J_min = 0.0000000000000001      # Practically zero and avoids divide by zero warning
-J_max = int(JCh_result[0])		# J	-- loses float precision there :(
+J_max = JCh_result[0]
 # alter J_max if param. says so:
 if ARGS.BRIGHTNESS_OVERRIDE:
 	J_max = ARGS.BRIGHTNESS_OVERRIDE
@@ -76,7 +78,6 @@ descending_j_values = np.linspace(J_max, J_min, num=GLOBAL_NUMBER_OF_SHADES)
 for J in descending_j_values:
 	# build JCh array:
 	JCh = np.array([ [J, C, h] ])
-	JCh_as_str = str(JCh[0])
 	# build RGB hex array:
 	RGB = JCh2RGB(JCh)
 	# clamp values to RGB ranges:
