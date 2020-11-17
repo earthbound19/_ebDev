@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Prints -n full chroma hues from the CIECAM02 color model, by division returns from 0 to 360 in -n steps. Colors are printed as RGB colors in hex format.
+# Prints high brightness hues from the CIECAM02 color model in N (parameter -n) steps from 0 to 360 degrees of hue. Colors are printed as RGB colors in hex format.
 
 # USAGE
 # Run this script through a Python interpreter, and pass the script a numeric value for the switch '-n', which is the number of full chroma hues you wish to print. For example, to print 18 hues, run:
@@ -7,8 +7,7 @@
 # To write the colors to a .hexplt file for permanent palette storage (recommended), use the > operator:
 #    python /path/to/this/script/printNhuesCIECAM02.py -n 18 > 18_max_chroma_hues_from_CIECAM02.hexplt
 # NOTES
-# - Because this script eliminates duplicate colors that it creates, and duplicate colors are likely depending on circumstance (because colors are created outside the RGB color space, and then clamped to it), it may produce wildly more or less colors than asked for.
-# - It will not produce more than 198 colors with hard-coded parameters.
+# - If you have this script create many colors, it may produce fewer colors because it eliminates duplicate colors. Because colors are created outside the RGB color space, and then clamped to it, duplicate colors are more likely from more values outside the RGB range clamped to it when you create hundreds of colors or more. This behavior seems to alter when you alter J and C.
 # - You probably want to tweak the J, C etc. variables with hard-coded alternatives for your run of the script for different color type scenarios.
 
 
@@ -30,20 +29,24 @@ PARSER.add_argument('-c', '--COLOR', help='String. Color to get shades of, in RG
 PARSER.add_argument('-n', '--NUMBER_OF_HUES', help='Number. How many hues to return by dividing the 0 to 360 degree hue range by that number and returning a hue from each interval dividend, uh, index, thingie.', type=int, required=True)
 ARGS = PARSER.parse_args()
 
-GLOBAL_NUMBER_OF_HUES = ARGS.NUMBER_OF_HUES
+GLOBAL_NUMBER_OF_HUES = ARGS.NUMBER_OF_HUES + 1     # +1 because we'll get that many values but remove the last one. Removing the last one because it will be identical or very nearly identical to the first (hue wrapped around to start).
 
 # Global clamp function keeps values in boundaries and also converts to int
 def clamp(val, minval, maxval):
-    if val < minval: return minval
-    if val > maxval: return maxval
+    if val < minval: return int(minval)
+    if val > maxval: return int(maxval)
     return int(val)
 
 # SEE DEVELOPER NOTES at start of script re these values:
-J = 89                  # HARD-CODED default: 89
-C = 162                 # " 162
+J = 89                  # HARD-CODED default: 89. Good mid-range power value?: 50? 74.5?
+C = 162                  # " 162. Good mid-high range chroma value?: 120
 h_min = 0               # " 0, and you probably don't want to change that
 h_max = 360             # " 360 "
-h_step = int(h_max / GLOBAL_NUMBER_OF_HUES)
+    # DEPRECATED METHOD of getting a divisor/incrementor used to get a series of h values:
+    # h_step = int(h_max / GLOBAL_NUMBER_OF_HUES)
+h_values = np.linspace(h_min, h_max, num=GLOBAL_NUMBER_OF_HUES)
+# remove last element of array because it will be hue wrapped around to end; virtually if not actually identical to first element the way this script will use it:
+h_values = h_values[:-1]
 
 # "If you are doing a large number of conversions between the same pair of spaces, then calling this function once and then using the returned function repeatedly will be slightly more efficient than calling cspace_convert() repeatedly." :
 JCh2RGB = colorspacious.cspace_converter("JCh", "sRGB255")		# returns a function
@@ -53,8 +56,10 @@ JCh2RGB = colorspacious.cspace_converter("JCh", "sRGB255")		# returns a function
 # print(florf)
 
 colorsRGB = []
-for h in range(h_min, h_max, h_step):
-	# print("h is ", h)
+    # DEPRECATED METHOD:
+    # for h in range(h_min, h_max, h_step):
+for h in h_values:
+#	print("h is ", h)
 	JCh = np.array([ [J, C, h] ])
 	RGB = JCh2RGB(JCh)
 	# clamp values to RGB ranges:
