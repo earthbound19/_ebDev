@@ -218,7 +218,7 @@ squared). Will not be used if [-q | START_COORDS_N] is provided.'
 PARSER.add_argument('--CUSTOM_COORDS_AND_COLORS', type=str, help=
 'Custom coordinate locations and colors list to initialized coordinate \
 mutation queue with. In complex nested lists of tuples _and lists_ \
-formt (I know, it\'s crazy), surrounded by single or double quote marks, \
+format (I know, it\'s crazy), surrounded by single or double quote marks, \
 OR passed without any space characters in the parameter, like: \
 \'[[(coordinate),[color]], [(coordinate),[color]], [(coordinate),[color]]]\', \
 or more accurately like: \

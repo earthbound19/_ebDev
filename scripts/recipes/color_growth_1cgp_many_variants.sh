@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Produces varieties of a color growth. Calls color_growth.py N times (per $1) for preset $2, randomly varying the seed with each run, resulting in a so many renders that all have the same setting but a different seed.
+# Produces varieties of a color growth. Calls color_growth.py N times (per $1) for preset $2, randomly varying the seed with each run, resulting in so many renders that all have the same setting but a different seed.
 
 # USAGE
 # From a directory with a .cgp preset for color_growth.py, run with these parameters:
@@ -10,10 +10,10 @@
 
 
 # CODE
-pathToScript=`whereis color_growth.py | sed 's/color_growth: \(.*\)/\1/g'`
+pathToScript=$(getFullPathToFile.sh color_growth.py)
 
-for i in `seq 1 $1`
+for i in $(seq 1 $1)
 do
-	rndSeedValForParam=`shuf -i 0-4294967296 -n 1`
+	rndSeedValForParam=$(shuf -i 0-4294967296 -n 1)
 	python $pathToScript --LOAD_PRESET $2 --RANDOM_SEED $rndSeedValForParam
 done

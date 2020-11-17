@@ -9,7 +9,7 @@
 # - $1 The source .hexplt file
 # - $2 OPTIONAL. The number of shades to create. If not present, a default is used.
 # Example that will produce 7 shades from every color in inputPalette.hexplt:
-#    getNshadesOfColors.sh inputPalette.hexplt 7
+#    getNshadesOfColorsCIECAM02.sh inputPalette.hexplt 7
 # NOTE
 # To hack other parameters modify the command=".." assignment in the script directly, for example to `-b 100`, referring to the Python script.
 
@@ -18,7 +18,7 @@
 if [ "$1" ]; then
   INFILE=$1
 else
-  echo "no parameter 1 (input file) passed. Exiting."
+  echo "no parameter 1 (input file) passed. Exit."
   exit 1
 fi
 
@@ -32,8 +32,7 @@ fi
   # DEPRECATED OS check:
   # if [ "$OS" == "Windows_NT" ]
   # then
-whereScriptIs=`whereis getNshadesOfColorCIECAM02.py`
-whereScriptIs=`echo $whereScriptIs | sed 's/getNshadesOfColorCIECAM02: //'`
+whereScriptIs=$(getFullPathToFile.sh getNshadesOfColorCIECAM02.py)
   # fi
 
 arr=$(<$INFILE)
