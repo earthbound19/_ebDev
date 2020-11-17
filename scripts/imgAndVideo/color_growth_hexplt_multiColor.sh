@@ -168,7 +168,7 @@ sed -i 's/\(.*\),$/\1/' $cgpFileName
 # append closing ] to command in file, to finish creating it:
 printf ']' >> $cgpFileName
 
-Because a double-space in the paramater in the preset file throws it without any helpful error, avoid that by reducing all double-spaces to single:
+# Because a double-space in the paramater in the preset file throws it without any helpful error (unless or until that bug is fixed in color_growth.pt), avoid that by reducing all double-spaces to single:
 sed -i 's/  / /g' $cgpFileName
 
 # RUN color_growth.py with that newly constructed preset:
