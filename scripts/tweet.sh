@@ -4,6 +4,21 @@
 # SOURCE
 # Taken from (original at) : from https://github.com/ryuichiueda/TomoTool
 
+# LICENSE
+# The MIT License. See copy of it beneath the CODE comment in source code.
+
+# See also:
+#   https://dev.twitter.com/oauth/overview/authentication-by-api-family
+#   https://dev.twitter.com/oauth/overview
+#   https://dev.twitter.com/oauth/overview/creating-signatures
+#
+# If you want to see detailed logs, set an environment variable "DEBUG" to 1 or something.
+
+# USAGE
+# Correct. I don't know yet.
+
+
+# CODE
 # ===============================================================
 # LICENSE
 # The MIT License
@@ -36,11 +51,6 @@
 #
 # If you want to see detailed logs, set an environment variable "DEBUG" to 1 or something.
 
-# USAGE
-# Correct. I don't know yet.
-
-
-# CODE
 work_dir="$(pwd)"
 tools_dir="$(cd "$(dirname "$0")" && pwd)"
 
