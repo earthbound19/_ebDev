@@ -13,22 +13,25 @@
 # DEV NOTES
 # If ever trouble that the following would mitigate? : https://stackoverflow.com/a/29400082/1397555
 
-# identify file layers and write them to a temp text file:
-magick identify $1 > tmp_MeK3vSg5HjdntjPkq6K.txt
-# Count the number of lines in that:
-numLayers=`wc -l < tmp_MeK3vSg5HjdntjPkq6K.txt | tr -d ' '`
-rm tmp_MeK3vSg5HjdntjPkq6K.txt
-# layer [0] as given in that file we read represents all layers in a layered file flattened, so we actually want numLayers - 1:
-numLayers=$(( numLayers - 1 ))
-echo numLayers is $numLayers
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (source file name to extract image layers from) passed to script. Exit."; exit 1; else sourceFileName=$1; fi
 
-imgFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
+imgFileNoExt=${sourceFileName%.*}
+# If it does not already exist, do image processing work (identify layers, create subdir named after image to extract layers ("scenes") to, and extract images to it) ; if it does already exist, warn and exit.
+if [ ! -d "$imgFileNoExt"_scenes ]
+then
+	# get number of file layers:
+	numLayers=$(magick identify $1 | wc -l)
+	# layer [0] as given in that file we read represents all layers in a layered file flattened, so we actually want numLayers - 1:
+	numLayers=$(( numLayers - 1 ))
+	echo identified $numLayers layers in file $1.
 
-# create subdir named after image to extract layers ("scenes") to:
-if [ ! -d "$imgFileNoExt"_scenes ]; then mkdir "$imgFileNoExt"_scenes; fi
+	mkdir "$imgFileNoExt"_scenes
 
-for i in `seq 1 $numLayers`
-do
-	echo attempting to extract layer $i . . .
-	magick $1[$i] "$imgFileNoExt"_scenes/"$imgFileNoExt"_layer"$i".png
-done
+	for i in `seq 1 $numLayers`
+	do
+		echo attempting to extract layer $i . . .
+		magick $1[$i] "$imgFileNoExt"_scenes/"$imgFileNoExt"_layer"$i".png
+	done
+else
+	echo "Subdirectory ""$imgFileNoExt""_scenes already exists; will not clobber. To re-extract the image layers, delete that subdirectory and re-run this script with the same source file name parameter."
+fi
