@@ -26,9 +26,9 @@ then
 
 	mkdir "$imgFileNoExt"_scenes
 
-# If ever trouble that the following would mitigate? : https://stackoverflow.com/a/29400082/1397555
 	for i in $(seq 1 $numLayers)
 	do
+		# The doom of layers being of wrong size solved here by a genius breath yonder; re: https://stackoverflow.com/a/29400082/1397555
 		echo attempting to extract layer $i . . .
 		magick convert \
 		$1[0] \
