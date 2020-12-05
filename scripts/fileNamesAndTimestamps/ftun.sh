@@ -66,15 +66,16 @@ fi
 
 echo "User input equals pass string. Will proceed."
 pathToRenamePerl=$(getFullPathToFile.sh rename.pl)
-
-# TO DO: make this work with all these characters:
+# echo $pathToRenamePerl
+# exit
+# TO DO: make this work with all these characters, if it doesn't:
 # '@=`~!#$%^&()+[{]};. ,-
-Perl $pathToRenamePerl -e 's/[^\w.-]+/_/g' $extension
+perl $pathToRenamePerl -g -e 's/[^\w.-]+/_/g' \"$extension\"
 
 # If $2 was passed to script, recurse through subdirectories and also rename all files of type $extension:
 if [ "$2" ]
 then
-	directories=(`find . -type d`)
+	directories=$(find . -type d)
 	# remove the first element in that array by reassigning to itself without that:
 	directories=(${directories[@]:1})
 
@@ -82,9 +83,9 @@ then
 	do
 		pushd .
 		cd $element
-# TO DO: make this work with all these characters:
+# TO DO: make this work with all these characters, if it doesn't:
 # '@=`~!#$%^&()+[{]}; ,-
-		Perl $pathToRenamePerl -e 's/[^\w.-]+/_/g' $extension
+		perl $pathToRenamePerl -g -e 's/[^\w.-]+/_/g' \"$extension\"
 		popd
 	done
 fi
