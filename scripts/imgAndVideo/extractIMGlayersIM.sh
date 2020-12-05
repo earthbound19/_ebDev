@@ -11,7 +11,6 @@
 
 # CODE
 # DEV NOTES
-# If ever trouble that the following would mitigate? : https://stackoverflow.com/a/29400082/1397555
 
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source file name to extract image layers from) passed to script. Exit."; exit 1; else sourceFileName=$1; fi
 
@@ -27,10 +26,23 @@ then
 
 	mkdir "$imgFileNoExt"_scenes
 
-	for i in `seq 1 $numLayers`
+# If ever trouble that the following would mitigate? : https://stackoverflow.com/a/29400082/1397555
+	for i in $(seq 1 $numLayers)
 	do
 		echo attempting to extract layer $i . . .
-		magick $1[$i] "$imgFileNoExt"_scenes/"$imgFileNoExt"_layer"$i".png
+		magick convert \
+		$1[0] \
+		$1[$i] \
+		\(                    \
+		 -clone 0           \
+		 -alpha transparent \
+		\)                    \
+		-swap 0           \
+		+delete           \
+		-coalesce         \
+		-compose src-over \
+		-composite        \
+		"$imgFileNoExt"_scenes/"$imgFileNoExt"_layer"$i".png
 	done
 else
 	echo "Subdirectory ""$imgFileNoExt""_scenes already exists; will not clobber. To re-extract the image layers, delete that subdirectory and re-run this script with the same source file name parameter."

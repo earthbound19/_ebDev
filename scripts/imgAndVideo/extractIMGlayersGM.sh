@@ -15,6 +15,7 @@
 
 # CODE
 # TO DO
+# - Update re changes to extractIMGlayersIM.sh
 # - Examine? : http://undertheweathersoftware.com/how-to-extract-layers-from-a-Photoshop-file-with-ImageMagick-and-python/
 # OR? : https://github.com/psd-tools/psd-tools re: http://stackoverflow.com/questions/6598848/extract-layers-from-psd-with-ImageMagick-preserving-layout --and -help info (-verbose switch)
 #
