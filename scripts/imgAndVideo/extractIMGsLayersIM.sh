@@ -5,6 +5,7 @@
 # Run with these parameters:
 # - $1 file type, or extension (without a dot in it, for example psd) to search for in the current directory. Every file of that type found will be used in a call of `extractIMGlayersIM.sh` with that file name as the parameter to that script. See that script's documentation for details
 # - $2 OPTIONAL. May be anything, for example the word FLOREFLEFL. If present, all subdirectories will be searched for files of type $1. If not present, only the current directory will be searched.
+# - $3 OPTIONAL. Value to pass to extractIMGlayersIM.sh as parameter $2 to that script (see documentation in that script). Note that this is $3 in this script, but is passed to that script as the second parameter, $2.
 # Example command that will call `extractIMGlayersIM.sh` once with every psd (Photoshop format) file in the current directory:
 #    extractIMGsLayersIM.sh psd
 # Example command that will do the same but for all psd files in the current directory and subdirectories also:
@@ -19,10 +20,10 @@ if [ "$2" ]; then subDirSearchParam=''; fi
 files=( $(find . $subDirSearchParam -type f -name "*.$sourceFormat" -printf "%P\n") )
 for file in ${files[@]}
 do
-	extractIMGlayersIM.sh $file
+	extractIMGlayersIM.sh $file "$3"
 done
 
-printf "DONE running extractIMGlayersIM.sh for all files of type $sourceFormat\nin the current directory"
+printf "\n~\nDONE running extractIMGlayersIM.sh for all files of type $sourceFormat\nin the current directory"
 if [ "$subDirSearchParam" == '' ]
 then
 	printf ", and also subdirectories.\n"
