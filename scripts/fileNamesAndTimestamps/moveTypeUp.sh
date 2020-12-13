@@ -17,6 +17,21 @@ if [ ! "$1" ]; then printf "\nNo parameter \$1 (type of file to search for in su
 subDirSearchParam='-maxdepth 2'
 if [ "$2" ]; then subDirSearchParam=''; fi
 
+currentDir=$(pwd)
+
+echo ""
+echo "WARNING: this script is about to move all files with extension $searchFileType, from all subfolders, up into the folder $currentDir. If this is not what you want, press CTRL+C or ENTER. If this _is_ what you want, type GLOR and then press ENTER or RETURN."
+read -p "TYPE HERE: " SILLYWORD
+
+if ! [ "$SILLYWORD" == "GLOR" ]
+then
+	echo ""
+	echo Typing mismatch\; exit.
+	exit
+else
+	echo continuing . .
+fi
+
 # If this operates on a super duper long list of files, and I store that all in an array, it will probably throw an error about something being too long, unless I print the results to a file and scan it line by line. So use a file:
 find . $subDirSearchParam -iname \*.$searchFileType -printf "%P\n" > filesOfTypeList_tmp_ut9NaYAH.txt
 while read fileNameWithPath
