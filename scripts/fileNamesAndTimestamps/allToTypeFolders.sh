@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Runs toTypeFolder.sh for every file of every type in the current directory, and optionally also for all subdirectories.
+# Runs moveToTypeFolder.sh for every file of every type in the current directory, and optionally also for all subdirectories.
 
 # USAGE
 # Run with or without an optional parameter:

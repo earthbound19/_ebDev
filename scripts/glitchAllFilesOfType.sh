@@ -11,7 +11,7 @@
 
 
 # CODE
-array=(`find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
+array=$(find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n')
 
 if [ ! -d _glitched ]; then mkdir _glitched; fi
 
@@ -22,7 +22,7 @@ do
 	# Corrupt the file $2 times.
 	cd ./_glitched
 			corrupt_file_copy=0
-	for x in $( seq $2 )
+	for x in $(seq $2)
 		do
 				corrupt_file_copy=$((corrupt_file_copy + 1))
 				echo generating corrupt file copy number $corrupt_file_copy for $element . . .
