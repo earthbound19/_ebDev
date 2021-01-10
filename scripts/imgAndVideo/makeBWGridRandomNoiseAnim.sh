@@ -63,9 +63,8 @@ $numCols $numRows
 						# DEPRECATED, because ffmpeg can do nearest-neighbor resize from a ppm internally; e.g. ffmpeg -y -f image2 -i %03d.pbm -vf scale=1280:720:flags=neighbor .. :
 						# nconvert -ratio -rtype quick -resize 1000 1000 -out png -o "$numCols"x"$numRows"__"$timestamp".png "$numCols"x"$numRows"__"$timestamp".pbm
 done
-
 mkNumberedLinks.sh pbm
-cd numberedLinks
+cd _temp_numbered
 
 numDigits=$(ls *.pbm | head -n 1)
 numDigits=$(basename $numDigits .pbm)
@@ -76,8 +75,8 @@ targetVideoFileName="$timestamp"__bw_square_noise_upsaled.mp4
 ffmpeg -y -framerate $inputFPS -f image2 -i %0"$numDigits"d.pbm -vf scale=1280:960:flags=neighbor -crf 17 -c:a aac -strict experimental -tune fastdecode -pix_fmt yuv420p -b:a 192k -ar 48000 -r 29.97 $targetVideoFileName
 
 mv $targetVideoFileName ..
-rm *.pbm
+# rm *.pbm
 cd ..
-rmdir numberedLinks
+# rmdir _temp_numbered
 
 echo Done. Final file is $targetVideoFileName.
