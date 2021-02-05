@@ -10,6 +10,7 @@
 
 // CODE
 String version = "1.0.0";
+// This git commit: parameter set 2 (a variant of the work).
 
 import dawesometoolkit.*;
 
@@ -31,14 +32,11 @@ class wrappingColorIDX {
 DawesomeToolkit dawesome;
 ArrayList<PVector> layout;
 ArrayList<wrappingColorIDX> bgPointColors;
-int backgroundDotSize = 20;
-int foregroundDotSize = 15;
+int backgroundDotSize = 40;
+//int foregroundDotSize = 15;
 int vogelPointsDistance = 13;
 color[] backgroundDotRNDcolors = {
-  // tweaked with less pungent and more pastel orange and green, from _ebPalettes 16_max_chroma_med_light_hues_regular_hue_interval_perceptual.hexplt:
-  #f800fc, #ff0596, #ea0000, #fb5537, #ff9710, #ffc900, #feff06, #a0d901,
-  #85e670, #0ccab3, #01edfd, #00a6fe, #0041ff, #9937ff, #c830ff
-  // omitted because it is used for the foreground dot color: #5c38ff
+  #01EDFD, #00FFFF, #00CCCC, #0CCAB3, #00A693, #009B7D, #008B8B, #008080, #006D6F, #004C54, #007BA7, #0D98BA, #00B7EB, #00A6FE, #3AA8C1, #43B3AE, #3AB09E, #20B2AA, #40E0D0, #7DF9FF, #B2FFFF, #E0FFFF, #C0E8D5, #A8C3BC, #88D8C0, #7FFFD4, #87D3F8, #40826D, #2E8B57, #00A86B
 };
 int backgroundDotRNDcolorsArrayMaxIDX = backgroundDotRNDcolors.length;
 
@@ -93,10 +91,10 @@ void draw(){
   }
 
   // fixed color, slightly smaller, fixed position dots in front of those:
-  fill(#5c38ff);  // medium blue-violet
-  for (PVector p : layout) {
-   ellipse(p.x, p.y, foregroundDotSize, foregroundDotSize);
-  }
-  // saveFrame("/##########.png");
+  //fill(#5c38ff);  // medium blue-violet
+  //for (PVector p : layout) {
+  // ellipse(p.x, p.y, foregroundDotSize, foregroundDotSize);
+  //}
+  //saveFrame("/##########.png");
   delay(48);
 }
