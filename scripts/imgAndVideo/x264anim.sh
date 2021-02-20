@@ -38,7 +38,7 @@ then
 fi
 
 
-array=(`find . -maxdepth 1 -type f -iname \*.$4 -printf '%f\n' | tr -d '\15\32'`)
+array=( $(find . -maxdepth 1 -type f -iname \*.$4 -printf '%f\n' | tr -d '\15\32') )
 # last element of array is last found file type $4 :
 lastFoundFileType=${array[-1]}
 lastFoundTypeFileNameNoExt=${lastFoundFileType%.*}

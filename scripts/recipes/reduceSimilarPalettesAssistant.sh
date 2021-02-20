@@ -26,7 +26,7 @@ do
 # TWO OPTIONS here: allRGBhexColorSortInCAM16-UCS.sh or allRGBhexColorSortIn2CIECAM02.sh; I've gone back and forth on which to use; CAM16 I had at one point thought sorted tint/shade better; now I'm not sure; it seemed to me at one point that CIECAM02 sorted hue better. I haven't re-examined that theory. allRGBhexColorSortIn2CIECAM02.sh does calculations much faster it seems:
 		allRGBhexColorSortIn2CIECAM02.sh
 			# OPTIONAL count of lines in each hexplt (check if their data ended up OK after that sort) :
-			# allHEXPLTs=(`find . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n'`)
+			# allHEXPLTs=( $(find . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n') )
 			# for hexplt in ${allHEXPLTs[@]}
 			# do
 				# count=`cat $hexplt | wc -l`

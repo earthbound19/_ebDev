@@ -45,7 +45,7 @@ fontParameter="-font '$fullPathToFontFile'";
 echo "fontParameter is $fontParameter"
 fi
 
-fileNamesArray=(`find . -maxdepth 1 -type f -iname \*.txt -printf '%f\n'`)
+fileNamesArray=( $(find . -maxdepth 1 -type f -iname \*.txt -printf '%f\n') )
 for fileName in ${fileNamesArray[@]}
 do
 	# make image for each poem, if it doesn't already exist:

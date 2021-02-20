@@ -11,7 +11,7 @@ fileExt=$1
 
 if ! [ "$1" ]; then printf "\nNo parameter 1 (video file type). Exit."; exit; fi
 
-allVideosArray=(`find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
+allVideosArray=( $(find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n') )
 
 for filename in ${allVideosArray[@]}
 do

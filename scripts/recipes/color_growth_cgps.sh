@@ -26,7 +26,7 @@ bypassCooldownPeriod="False"
 if [ "$2" ]; then bypassCooldownPeriod="True"; fi
 
 pathToScript=$(getFullPathToFile.sh color_growth.py)
-presetsArray=(`find . -maxdepth 1 -type f -name "*.cgp" -printf '%f\n'`)
+presetsArray=( $(find . -maxdepth 1 -type f -name "*.cgp" -printf '%f\n') )
 
 for element in ${presetsArray[@]}
 do

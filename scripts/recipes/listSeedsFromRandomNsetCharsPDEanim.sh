@@ -9,7 +9,7 @@
 
 
 # CODE
-array=(`find . -iname '*.txt' -print0 -printf "%T@ %Tc %p\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'`)
+array=( $(find . -iname '*.txt' -print0 -printf "%T@ %Tc %p\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g') )
 
 printf "" > seeds.txt
 for element in ${array[@]}
