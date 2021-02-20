@@ -1,6 +1,6 @@
 Open($argv[1])
-SelectEverything()
-#SelectWorthOutputting()
+#SelectEverything()
+SelectWorthOutputting()
 foreach
   Export($argv[2])
 endloop
