@@ -11,9 +11,9 @@
 
 
 # CODE
-array=(`find . -maxdepth 1 -type f -iname \*.svg -printf '%f\n'`)
+array=( $(find . -maxdepth 1 -type f -iname \*.svg -printf '%f\n') )
 for element in ${array[@]}
 do
   fileNameNoExt=${element%.*}
-  scour -i "$element" -o "$fileNameNoExt"_scoured.svg --enable-id-stripping --enable-comment-stripping --shorten-ids
+  scour -i "$element" -o "$fileNameNoExt"_scoured.svg --enable-id-stripping --enable-comment-stripping --shorten-ids --strip-xml-prolog --enable-viewboxing
 done
