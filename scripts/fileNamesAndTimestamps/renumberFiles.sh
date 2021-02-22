@@ -15,7 +15,7 @@ echo "Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem"
 # previous version of command; doesn't sort by file date:
 # filesArray=`find . -maxdepth 1 -iname "*.$fileTypeToRenumber" | sort`
 # new command; sorts by file date (oldest first); re: https://superuser.com/a/546900/130772
-filesArray=($(find . -maxdepth 1 -iname "*.$fileTypeToRenumber" -printf "%T@ %Tc %p\n" | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g'))
+filesArray=( $(find . -maxdepth 1 -iname "*.$fileTypeToRenumber" -printf "%T@ %Tc %p\n" | sort -n | sed 's/.* \.\///g') )
 # Get digits to pad to from length of array.
 digitsToPadTo=${#filesArray[@]}; digitsToPadTo=${#digitsToPadTo}
 
@@ -30,6 +30,7 @@ do
 done
 
 # DEVELOPMENT HISTORY
+# 2021-02-21 change sed parsing command that isn't working in whatever changed situation broke it.
 # 2020-09-11 simplify script logic, require parameter 1 and print error if absent, true array creation, better command substitution
 # 2020/05/22 update array sort to sort by found file date
 # 2018/04/19 Take `mapfile` out (fails on Mac) and create array in-memory. Wrangle how to get digitsToPadTo value meanwhile. (Do it before.)
