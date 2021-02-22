@@ -30,7 +30,7 @@ allFiles=$(find . -maxdepth 1 -type f -printf "%P\n")
 for fileName in ${allFiles[@]}
 do
 			# No l, L, ,i, I, O, 1, 0, as those can get confused:
-	randString=`cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c $rndStringlength`
+	randString=$(cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c $rndStringlength)
 	echo renaming file $fileName . . .
 	mv $fileName "$randString"_"$fileName"
 done

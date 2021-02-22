@@ -26,5 +26,5 @@ generate-md --lagenerate-md --layout $layoutString --input ./$1 --output ./_publ
 # cp *.gif ./_publish_MD_tmp_qJt5d4bKCm
 
 # OPTIONAL; launch result index.html file in default html viewer (Cygwin--for Mac, change `cygstart` to `open`) ; NOTE that if the next two lines are uncommented it may break the file move code lines at the end of MD_ADDS2md.sh:
-# srcFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
+# srcFileNoExt=$(echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g')
 # cygstart ./_publish_MD_tmp_qJt5d4bKCm/$srcFileNoExt.html

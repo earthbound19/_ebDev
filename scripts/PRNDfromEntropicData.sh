@@ -61,7 +61,7 @@ fi
 if [ -z "$1" ]
 	then
 		echo No split block size passed to script. Picking one at random \(for super-concatenated superBlock.dat to be made\) . . .
-		blockSplitSize=`shuf -i 242-512 -n 1`
+		blockSplitSize=$(shuf -i 242-512 -n 1)
 		echo chose block size $blockSplitSize.
 	else
 	blockSplitSize=$1
@@ -84,7 +84,7 @@ cmd /c 'rehash -none -adler32 -crc16 -crc16c -crc16x -crc32 -elf32 -fcs16 -fnv32
 dos2unix rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt
 # strip down that output to only hex prints and newlines:
 sed -i -e 's/.*: \(.*\).*/\1/g' -e 's/<.*>//g' rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt
-timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
+timestamp=$(date +"%Y_%m_%d__%H_%M_%S__%N")
 tr -d '\n' < rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt > __trueRandomData_"$timestamp"_HEXsrcTable.txt
 rm rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt
 # Huh? There is no -p flag. Did I mean -ps? TO DO: check:
@@ -97,7 +97,7 @@ echo ----
 # nah -- and __trueRandomData_"$timestamp"_HEXsrcTable.txt have
 echo DONE. __trueRandomData_"$timestamp".dat has been moved to ../_final_TRND_archive
 
-timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
+timestamp=$(date +"%Y_%m_%d__%H_%M_%S__%N")
 cat * > ../_superblock_SOURCE_notPRND__$timestamp.dat
 rm *.*
 mv ../_superblock_SOURCE_notPRND__$timestamp.dat ./

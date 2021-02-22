@@ -21,12 +21,12 @@ if [ ! "$1" ]; then printf "\nNo parameter \$1 (input file name). Exit."; exit 1
 if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many random bytes to read). Exit."; exit 1; else howManyBytesToRead=$2; fi
 if [ ! "$3" ]; then printf "\nNo parameter \$3 (output file name). Exit."; exit 1; else outputFile=$3; fi
 
-inputFileByteSize=`stat --printf="%s" $inputFile`
+inputFileByteSize=$(stat --printf="%s" $inputFile)
 			# Because we want the "size" of the file to only be itself minus how many bytes to read (to avoid reading anywhere from the end of the file backward to $howManyBytesToRead but getting the same output, which would be a statistical anomoly . . . which only obsessed coders or cryptographers care about) :
 inputFileByteSize=$(($inputFileByteSize - $howManyBytesToRead))
 	echo inputFileByteSize val is\:
 	echo $inputFileByteSize
-skipToByte=`seq 0 $inputFileByteSize | sort -R | head -n 1`
+skipToByte=$(seq 0 $inputFileByteSize | sort -R | head -n 1)
 	echo skipToByte val is\:
 	echo $skipToByte
 
