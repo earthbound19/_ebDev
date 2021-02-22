@@ -30,7 +30,7 @@ presetsArray=( $(find . -maxdepth 1 -type f -name "*.cgp" -printf '%f\n') )
 
 for element in ${presetsArray[@]}
 do
-	cgpFileNoExt=`echo "${element%.*}"`
+	cgpFileNoExt=$(echo "${element%.*}")
 	renderLogFileFile=$cgpFileNoExt.rendering
 	if ! [ -e $renderLogFileFile ]
 	then

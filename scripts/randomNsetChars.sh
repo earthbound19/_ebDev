@@ -48,10 +48,10 @@ STR_LEN=$((${#CHARSET} - 1))
 
 # OPTIONAL: uncomment this next code block if you want to redefine CHARSET as a randomly
 # selected subset of itself:
-NEW_CHARSET_LEN=`shuf -i 2-$STR_LEN -n 1`
+NEW_CHARSET_LEN=$(shuf -i 2-$STR_LEN -n 1)
 for ELEMENT in $(seq $NEW_CHARSET_LEN)
 do
-  TMP_NUMBER=`shuf -i 0-$STR_LEN -n 1`
+  TMP_NUMBER=$(shuf -i 0-$STR_LEN -n 1)
   TMP_CHAR="${CHARSET:$TMP_NUMBER:1}"
   TMP_CHARSET="$TMP_CHARSET$TMP_CHAR"
 done
@@ -69,7 +69,7 @@ for NEWLINE in $(seq $HARD_NEWLINES)
 do
   for ELEMENT in $(seq $HARD_NEWLINE_AT_CHARACTER)
   do
-    NUMBER=`shuf -i 0-$STR_LEN -n 1`
+    NUMBER=$(shuf -i 0-$STR_LEN -n 1)
     # echo $NEWLINE $ELEMENT
     # for a curious slow terminal effect, pause between character renders:
     # sleep 0.2

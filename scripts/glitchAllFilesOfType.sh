@@ -11,7 +11,7 @@
 
 
 # CODE
-array=$(find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n')
+array=( $(find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n') )
 
 if [ ! -d _glitched ]; then mkdir _glitched; fi
 

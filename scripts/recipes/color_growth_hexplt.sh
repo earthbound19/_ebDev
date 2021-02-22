@@ -78,7 +78,7 @@ do
 				# 	invert=$((255 - $value))
 				#	invertRGBvalForParam="$invertRGBvalForParam $invert"
 				# done
-				# invertRGBvalForParam=`echo $invertRGBvalForParam | tr ' ' ','`
+				# invertRGBvalForParam=$(echo $invertRGBvalForParam | tr ' ' ',')
 		rgbValForParam=$(echo $element | tr ' ' ',')
 		rshiftParam=$(shuf -i 1-8 -n 1)
 
@@ -131,7 +131,7 @@ do
 		echo "Calling color_growth.py via temp script $tmp_script_file_name . . ."
 		# Works around problems escaping characters by writing the whole command
 		# to a script (which still needs " ( and ) escaped though?!) :
-# TO DO: make a tmp. cgp file and load it with --LOAD_PRESET from a temp script instead (as in call_get_img_RND_CCC_for_color_growth-py.sh). For reasons. start of code to use: rndStringForTempPreset=`cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6` -- and a timestamp string and the RGB vals?
+# TO DO: make a tmp. cgp file and load it with --LOAD_PRESET from a temp script instead (as in call_get_img_RND_CCC_for_color_growth-py.sh). For reasons. start of code to use: rndStringForTempPreset=$(cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6) -- and a timestamp string and the RGB vals?
 # TO DO: hunt down and fix cause of this error also: Traceback (most recent call last): File "C:/_ebdev/scripts/imgAndVideo/color_growth.py", line 732, in <module> canvas[ element[0][1]-1 ][ element[0][0]-1 ] = color_values     # LORF! IndexError: list index out of range
 		echo "python $pathToScript --WIDTH $WIDTH --HEIGHT $HEIGHT --RSHIFT $rshiftParam -b [$rgbValForParam] --CUSTOM_COORDS_AND_COLORS '[[($coord_tuple),[$rgbValForParam]]]' --RECLAIM_ORPHANS True --BORDER_BLEND True --TILEABLE False --STOP_AT_PERCENT 1 -a 0 --RANDOM_SEED $rndSeedValForParam -q 1 --GROWTH_CLIP \($lowGrowthClipParam,$highGrowthClipParam\) --SAVE_PRESET True $additionalParams" > $tmp_script_file_name
 		./$tmp_script_file_name

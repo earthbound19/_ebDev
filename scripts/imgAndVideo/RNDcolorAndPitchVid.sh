@@ -16,10 +16,10 @@ else
 fi
 
 # Generate input video animation of random still color:
-hexColor=`cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6`
+hexColor=$(cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6)
 ffmpeg -y -f lavfi -i color=$hexColor:s=1280x720:d=$duration -codec:v utvideo rgb_0x"$hexColor"_"$duration"s.avi
 # Generate input tone: To get random number (for tone) in range F2 87.31 - E5 659.25, make random number 0-n be E5 minus F2 (or 659.25 - 87.31 = 571.94), plus 87.31:
-frequency=`echo "scale=2; ($RANDOM * 571.94 / 32767) + 87.31" | bc`
+frequency=$(echo "scale=2; ($RANDOM * 571.94 / 32767) + 87.31" | bc)
 ffmpeg -y -f lavfi -i "sine=frequency=$frequency:duration=$duration" "$frequency"Hz_"$duration"s.wav
 
 # Mux the two into one .mp4, then dispose of the input files:

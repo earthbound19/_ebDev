@@ -53,7 +53,7 @@ do
 	mkDir $rndSTR
 done
 
-nSubDirs=`echo "scale=0; $howManyBaseDirectories / 2" | bc`
+nSubDirs=$(echo "scale=0; $howManyBaseDirectories / 2" | bc)
 # get random selection of directories and make random subdirectories in them, $subfolderDepth times:
 for i in $(seq 1 $subfolderDepth)
 do

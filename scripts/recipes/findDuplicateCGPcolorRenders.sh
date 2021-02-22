@@ -21,7 +21,7 @@ printf "" > findDuplicateCGPcolorRenders_sh__log.txt
 while read element
 do
 	# NOTE this inserts escape \ characters before the [ and ] else the grep search intended won't work as intended, AND (this is insanity!) those \ won't even be created unless I triple-escape them, \\\\ :
-	searchString=`echo $element | sed 's/\([0-9]\{1,\}\) \([0-9]\{1,\}\) \([0-9]\{1,\}\).*/\\\\[\1,\2,\3\\\\]/g'`
+	searchString=$(echo $element | sed 's/\([0-9]\{1,\}\) \([0-9]\{1,\}\) \([0-9]\{1,\}\).*/\\\\[\1,\2,\3\\\\]/g')
 	echo "Searching through files for grep match $searchString . . ."
 	# echo "$element -> $searchString"
 	for searchFile in ${presetsAndSHsArray[@]}

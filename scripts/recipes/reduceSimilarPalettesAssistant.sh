@@ -12,14 +12,14 @@
 # CODE
 deletePalettesBelowDifferenceThreshold=0.14
 
-currentDir=`pwd`
+currentDir=$(pwd)
 allSubdirectoriesArray=(`listAllSubdirs.sh`)
 for directory in ${allSubdirectoriesArray[@]}
 do
 	printf "\nChanging to directory: $directory . . ."
 	cd $directory
 	# Only do things if there are .hexplt files (and assumed related files) to work on; re: https://stackoverflow.com/a/3856879/1397555
-	count=`ls -1 *.hexplt 2>/dev/null | wc -l`
+	count=$(ls -1 *.hexplt 2>/dev/null | wc -l)
 	if [ $count != 0 ] && [ ! -e similar_palettes_deleted.txt ]
 	then
 		printf "\nAt least one .hexplt file found here OR log file similar_palettes_deleted.txt not found; proceeding . . .\n"
@@ -29,7 +29,7 @@ do
 			# allHEXPLTs=( $(find . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n') )
 			# for hexplt in ${allHEXPLTs[@]}
 			# do
-				# count=`cat $hexplt | wc -l`
+				# count=$(cat $hexplt | wc -l)
 				# echo file $hexplt is with line count $count
 			# done
 		rm *.png

@@ -42,7 +42,7 @@ renumberFiles.sh png
 ffmpegAnim.sh 11 30 13 png NULL 6
 # rename the result _out.mp4 after this directory;
 # re a genius breath: parentname="$(basename "$(dirname "$filepath")")" -- forgot to link to source of that finding!
-thisPath=`pwd`
+thisPath=$(pwd)
 parentDirectoryName="$(basename "$(dirname "$thisPath")")"
 mv ./_out.mp4 ../__"$parentDirectoryName".mp4
 popd
