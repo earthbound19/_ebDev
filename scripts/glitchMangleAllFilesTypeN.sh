@@ -14,13 +14,20 @@
 # CODE
 # if [ ! -d ./out ]; then mkdir out; fi
 
-array=(`find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n'`)
+files=( $(find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n') )
 
-for element in ${array[@]}
+if [ ! -e out ]; then mkdir out; else echo "POTENTIAL PROBLEM: subdirectory '/out' already exists. Rename or delete the '/out' subdirectory, then run the script again."; exit 2; fi
+for file in ${files[@]}
 do
-	# randomCharsString=`cat /dev/urandom | tr -cd 'a-km-np-zA-KM-NP-Z2-9' | head -c $numRandomCharsToGet`
-	bm.exe $element -x jpg -u $2 -r 6 -t 1 -s 100 -v -a -m +-
-	mv ./out ./"$element"_corrupted
-	mkdir out
-	echo element is $element
+	bm.exe $file -x jpg -u $2 -r 6 -t 1 -s 100 -v -a -m +-
+	subdir_files=( $(find ./out -maxdepth 1 -type f -iname \*.$1 -printf '%f\n') )
+	for subdir_file in ${subdir_files[@]}
+	do
+		echo generating rnd file name for moved file . . .
+		randomCharsString=$(cat /dev/urandom | tr -cd 'a-km-np-zA-KM-NP-Z2-9' | head -c 9)
+		if [ ! -e "$file"_corrupted ]; then mkdir "$file"_corrupted; fi
+		echo moving to ./out/$subdir_file to ./"$file"_corrupted/"$randomCharsString"_"$file" . . .
+		mv ./out/$subdir_file ./"$file"_corrupted/"$randomCharsString"_"$file"
+	done
 done
+rm -rf ./out
