@@ -35,23 +35,20 @@ else
 	echo SET img_format to DEFAULT $img_format
 fi
 
-# there was a vestigal param3 here -- renaming it extraParameters:
-extraParameters=
-
 array=( $(find . -maxdepth 1 -type f -iname \*.eps -printf '%f\n') )
 for element in ${array[@]}
 do
 	epsFilenameNoExtension=${element%.*}
 	if [ -a $epsFilenameNoExtension.$img_format ]
 	then
-		# echo render candidate is $epsFilenameNoExtension.$img_format
+		echo render candidate is $epsFilenameNoExtension.$img_format
 		echo target already exists\; will not render.
 		echo . . .
 	else
 		# Have I already tried e.g. -size 1000x1000 as described here? :  
 		echo rendering $element . . .
 		# -density parameter upscaling fix found here: https://stackoverflow.com/a/7584726
-		echo COMMAND\: gm convert -density 300 $extraParameters $element $epsFilenameNoExtension.$img_format
-		gm convert -density 300 $extraParameters -resize $img_size $element $epsFilenameNoExtension.$img_format
+		echo COMMAND\: gm convert -density 300 $param3 $element $epsFilenameNoExtension.$img_format
+		gm convert -density 300 $param3 -resize $img_size $element $epsFilenameNoExtension.$img_format
 	fi
 done
