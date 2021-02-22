@@ -42,23 +42,15 @@ lastFoundFileType=${array[-1]}
 lastFoundTypeFileNameNoExt=${lastFoundFileType%.*}
 digitsPadCount=${#lastFoundTypeFileNameNoExt}
 
-# IN DEVELOPMENT: automatic centering of image in black matte borders (padding):
-# steps:
-# - get matte WxH intended
-# - get src images to anim WxH
-# - div. matte W / 2 for center X pixmark
-# - div. src image W / 2 for offset from matte center X pixmark
-# - subtr. offset from center X pixmark for X pixmark to place src images at.
-# - Follow same process on Y to get Y offset pixmark and place src images there.
-# - formulate ur parameter to pass to ffmpeg from that; in form:
-# padParams=-vf "pad=width=1920:height=1080:x=0:y=0:color=black"
 # ex commands to fetch and parse src pix dimensions is in getDoesIMGinstagram.sh.
-# an example command wut does some math as would be needed per this algo: echo "scale=5; 3298 / 1296" | bc
-# OR JUST?! :
-# additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2"
-# ASSUMING 1920x1420 input image, crop to center; NOTE that it necessarily escapes double-quote marks with \:
-# additionalParams=-filter:v "crop=1920:1080"
+# also could do bc math e.g: echo "scale=5; 3298 / 1296" | bc
+# constructing an additionalParams arg via piping and read?! :
 # echo "-filter:v \"crop=1920:1080\"" > tmp_blaheryeag_nbD9X44rCJev.txt && additionalParams=$(<tmp_blaheryeag_nbD9X44rCJev.txt) && rm tmp_blaheryeag_nbD9X44rCJev.txt
+
+# OPTIONAL additionalParams; uncomment / tweak any; NOTE that some necessarily escape double-quote marks with \:
+# additionalParams='-vf "pad=width=1422:height=800:x=712:y=400:color=#362e2c"'
+# additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2"
+# additionalParams=-filter:v "crop=1920:1080"
 
 # Because something funky and evil in DOS and/or Unix emulation chokes on some forms of $additionalParams inline, but not if printed to and executed from a script;
 # FOR LOSSLESS BUT COMPRESSED AVI, end the command instead with: -codec:v utvideo _out.avi :
