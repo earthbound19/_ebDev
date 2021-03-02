@@ -50,13 +50,13 @@ import numpy as np
 from PIL import Image
 
 # Defaults which will be overridden if arguments of the same name are provided to the script:
-WIDTH = 400
-HEIGHT = 200
+WIDTH = 600
+HEIGHT = 300
 RSHIFT = 8
 STOP_AT_PERCENT = 1
 SAVE_EVERY_N = 0
 RAMP_UP_SAVE_EVERY_N = False
-START_COORDS_RANGE = (1,13)
+START_COORDS_RANGE = (1,3)
 GROWTH_CLIP = (0,5)
 SAVE_PRESET = True
 animationFrameCounter = 0
@@ -67,8 +67,8 @@ padFileNameNumbersDigitsWidth = 0
 # SOME BACKGROUND COLOR options;
 # any of these (uncomment only one) are made into a list later by ast.literal_eval(BG_COLOR) :
 # BG_COLOR = "[157,140,157]"        # Medium purplish gray
-# BG_COLOR = "[252,251,201]"        # Buttery light yellow
-BG_COLOR = "[255,63,52]"        # Scarlet-scarlet-orange
+BG_COLOR = "[252,251,201]"        # Buttery light yellow
+# BG_COLOR = "[255,63,52]"        # Scarlet-scarlet-orange
 RECLAIM_ORPHANS = True
 BORDER_BLEND = True
 TILEABLE = False
