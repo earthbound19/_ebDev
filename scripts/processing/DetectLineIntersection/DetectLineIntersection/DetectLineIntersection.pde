@@ -11,7 +11,7 @@ PVector a2 = new PVector(10,10);
 PVector b1 = new PVector(100,300);
 PVector b2 = new PVector(500,100);
 
-// LINE/LINE
+// function returns true if lines of 1a-a2 and b1-b2 intersect; false otherwise
 boolean checkIfLinesIntersect(PVector a1, PVector a2, PVector b1, PVector b2) {
   // calculate the distance to intersection point:
   float uA = ((b2.x-b1.x)*(a1.y-b1.y) - (b2.y-b1.y)*(a1.x-b1.x)) / ((b2.y-b1.y)*(a2.x-a1.x) - (b2.x-b1.x)*(a2.y-a1.y));
