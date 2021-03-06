@@ -39,13 +39,14 @@ void setup() {
 void draw() {
   background(255);
   // set line's end to mouse coordinates:
-  a1.x = mouseX;
-  a1.y = mouseY;
-  // check for collision
-  // if hit, change color of line:
+  a1.x = mouseX; a1.y = mouseY;
+  // check for collision; if hit, change color of line:
   boolean hit = checkIfLinesIntersect(a1, a2, b1, b2);
-  if (hit) stroke(255,150,0, 150);
-  else stroke(0,150,255, 150);
+  if (hit == true) {
+    stroke(255,150,0, 150);
+  } else {
+    stroke(0,150,255, 150);
+  }
   line(b1.x,b1.y, b2.x,b2.y);
   // draw user-controlled line
   stroke(0, 150);
