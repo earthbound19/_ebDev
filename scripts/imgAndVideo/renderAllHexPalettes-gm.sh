@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Runs renderHexPalette-gm.sh for every .hexplt file in the path (non-recursive) from which this script is run. Result: all hex palette files in the current path are rendered. Also optionally recurses into subdirectories. Also has cooldown (no work) periods after every N renders.
+# Runs renderHexPalette.sh for every .hexplt file in the path (non-recursive) from which this script is run. Result: all hex palette files in the current path are rendered. Also optionally recurses into subdirectories. Also has cooldown (no work) periods after every N renders.
 
 # USAGE
 # Run with these parameters:
