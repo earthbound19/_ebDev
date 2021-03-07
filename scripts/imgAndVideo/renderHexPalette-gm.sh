@@ -1,8 +1,8 @@
 # DESCRIPTION
-# Takes a list of hex color codes, one per line, and renders a PNG image composed of tiles of those colors (a palette image), via GraphicsMagick. This script is inefficient; there are probably much faster ways to make a palette image in the structure/format made by this script (it creates color tile images and then montages them), but at this writing, this script is what I have.
+# Takes a list of hex color codes, one per line, and renders a PNG image composed of tiles of those colors (a palette image), via ImageMagick. This script is inefficient; there are probably much faster ways to make a palette image in the structure/format made by this script (it creates color tile images and then montages them), but at this writing, this script is what I have.
 
 # DEPENDENCIES
-# - GraphicsMagick
+# - ImageMagick
 # - Optionally a file `~/palettesRootDir.txt` (in your home folder) which contains one line, which is a Unix-style path to the folder where you keep hex palette (`.hexplt`) files. If this file is not found, the script searches for palette files in the current directory.
 
 # USAGE
@@ -73,7 +73,6 @@ else	# Search for specified palette file in palettesRootDir (if that dir exists;
 		exit
 	fi
 fi
-
 if [ "$2" ]; then tileEdgeLen=$2; else tileEdgeLen=250; fi
 
 # Set default no shuffle, and only alter if $3 is not equal to 'NULL':
@@ -164,14 +163,15 @@ while IFS= read -r line || [ -n "$line" ]
 do
 	# IF A SCRIPT THAT I DEVELOPED WORKED ONCE UPON A TIME BUT DOESN'T ANYMORE, it is because sed on windows is inserting $#@! windows newlines into stdin/out! &@*(@!! FIXED with tr -d '\15\32':
 	hexNoHash=$(echo $line | sed 's/\#//g' | tr -d '\15\32')
-	gm convert -size "$tileEdgeLen"x"$tileEdgeLen" xc:\#$hexNoHash _hexPaletteIMGgenTMP_2bbVyVxD/$hexNoHash.png
+	echo "running command: magick convert -size "$tileEdgeLen"x"$tileEdgeLen" xc:\#$hexNoHash _hexPaletteIMGgenTMP_2bbVyVxD/$hexNoHash.png"
+	magick convert -size "$tileEdgeLen"x"$tileEdgeLen" xc:\#$hexNoHash _hexPaletteIMGgenTMP_2bbVyVxD/$hexNoHash.png
 done < $hexColorSrcFullPath
 
 # TO DO? : implement e.g. -tile 8x40 flag depending on desired aspect, etc. (will determine values of $tilesAcross and $tilesDown depending on desired aspect?)
 
-# make the actual montage image. Example command: gm montage colors/5A6D40.png colors/757F26.png colors/C68C15.png colors/8F322F.png colors/954B29.png out.png
+# make the actual montage image. Example command: magick montage colors/5A6D40.png colors/757F26.png colors/C68C15.png colors/8F322F.png colors/954B29.png out.png
 # make temporary script to create a grid montage of the colors:
-echo "gm montage -tile $tilesAcross"x"$tilesDown -background '#919191' -geometry $tileEdgeLen"x"$tileEdgeLen+0+0 \\" > mkGridHead.txt
+echo "magick montage -tile $tilesAcross"x"$tilesDown -background '#919191' -geometry $tileEdgeLen"x"$tileEdgeLen+0+0 \\" > mkGridHead.txt
 
   # convert hex color scheme text list file to parameter list for ~magick; AGAIN WITH THE NEED to unbork windows newlines (via tr):
 sed 's/.*#\(.*\)$/_hexPaletteIMGgenTMP_2bbVyVxD\/\1.png \\/' $hexColorSrcFullPath | tr -d '\15\32' > ./mkGridSRCimgs.txt
