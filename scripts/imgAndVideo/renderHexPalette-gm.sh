@@ -13,11 +13,11 @@
 # - $4 OPTIONAL. Number of tiles across of tiles-assembled image (columns).
 # - $5 OPTIONAL. IF $4 IS PROVIDED, you probably want to provide this also, as the script does math you may not want if you don't provide $5. Number of tiles down of tiles-assembled image (rows).
 # EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, the palette image being 5 columns wide and 6 rows down, with squares in the palette rendered in random order:
-#    renderHexPalette-gm.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
+#    renderHexPalette.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
 # ANOTHER EXAMPLE COMMAND; create a palette image from tigerDogRabbit_many_shades.hexplt, with each tile 300 pixels wide, no shuffling, the script deciding how many across and down to make the tiles:
-#    renderHexPalette-gm.sh tigerDogRabbit_many_shades.hexplt 300 tigerDogRabbit_many_shades.hexplt
+#    renderHexPalette.sh tigerDogRabbit_many_shades.hexplt 300 tigerDogRabbit_many_shades.hexplt
 # ANOTHER EXAMPLE COMMAND; use the same palette and let the script use all defaults:
-#    renderHexPalette-gm.sh tigerDogRabbit_many_shades.hexplt
+#    renderHexPalette.sh tigerDogRabbit_many_shades.hexplt
 
 
 # CODE
