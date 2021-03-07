@@ -33,7 +33,7 @@ if [ ! -f $targetFileName ]; then
 			# ROTATE 90 DEGREES OPTION; uncomment next line (used with other options) :
 		# extraIrfanViewParam1="/rotate_r"
 			# FORCE ARBITRARY DIMENSIONS (aspect) by passing /resize_long=$3 AND /resize_short=$4
-		i_view32.exe "$1 /resize_long=$3 /resize_short=$4 $extraIrfanViewParam1 /convert=$targetFileName"
+		i_view64.exe "$1 /resize_long=$3 /resize_short=$4 $extraIrfanViewParam1 /convert=$targetFileName"
 			# MAINTAIN ASPECT OPTION:
 		# i_view32.exe "$1 /resize_long=$3 /aspectratio $extraIrfanViewParam1 $extraIrfanViewParam2 /convert=$targetFileName"
 	# otherwise use graphicsmagic:
