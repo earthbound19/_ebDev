@@ -17,7 +17,7 @@ echo "Will obtain, compare and possibly delete similar palettes from $numberOfPa
 for i in $(seq 1 $numberOfPalettesToGet); do get_colormind_RND_palette.sh; sleep 1; done
 
 allRGBhexColorSortIn2CIECAM02.sh
-renderAllHexPalettes-gm.sh NULL 250 NULL
+renderAllHexPalettes.sh NULL 250 NULL
 allPalettesCompareCIECAM02.sh
 listPaletteDifferencesBelowThreshold.sh $deletePalettesBelowDifferenceThreshold
 # PENDING DEVELOPMENT:
