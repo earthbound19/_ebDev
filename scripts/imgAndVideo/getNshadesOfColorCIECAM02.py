@@ -64,8 +64,8 @@ J_max = JCh_result[0]
 if ARGS.BRIGHTNESS_OVERRIDE:
 	J_max = ARGS.BRIGHTNESS_OVERRIDE
 
-if ARGS.DARK_TO_BRIGHT:		# if told to reverse gradient (dark -> white), swap min,max:
-	tmp = J_min; J_min = J_max; J_max = tmp
+# It turns out that the way I've coded this, the math works out how I want if I reverse things here. If DARK_TO_BRIGHT has been set, it will be used to reverse the order of colors later. Meanwhile, here:
+tmp = J_min; J_min = J_max; J_max = tmp
 
 C = JCh_result[1]				# C
 h = JCh_result[2]				# h
@@ -74,7 +74,8 @@ JCh2RGB = cspace_converter("JCh", "sRGB255")		# returns a function
 
 colorsRGB = []
 # Thanks to help here: https://stackoverflow.com/a/7267806/1397555
-descending_j_values = np.linspace(J_max, J_min, num=GLOBAL_NUMBER_OF_SHADES)
+AKTUL_MATH_NUMBER_OF_SHADES = GLOBAL_NUMBER_OF_SHADES + 1       # This is because the way the math is done here, the first shade will be black, and my intend is to have shades exluding black and white (which are the perfect shade and tint of every color). The math doesn't work out here to include white.
+descending_j_values = np.linspace(J_max, J_min, num=AKTUL_MATH_NUMBER_OF_SHADES)
 for J in descending_j_values:
 	# build JCh array:
 	JCh = np.array([ [J, C, h] ])
@@ -92,6 +93,9 @@ for J in descending_j_values:
 # Deduplicate list but maintain order; re: https://stackoverflow.com/a/17016257/1397555
 from more_itertools import unique_everseen
 colorsRGB = list(unique_everseen(colorsRGB))
+colorsRGB.pop(0)     # removes the first color, which is black. White isn't in the list via the math; see an earlier comment.
+if not ARGS.DARK_TO_BRIGHT:		# if told to reverse gradient (dark -> white), reverse that list; but (re earlier comment), as the math works best dark to light, that's actually how it's done internally anyway, so only reverse it here (light to dark) if _not_ told it is dark to light:
+    colorsRGB.reverse()
 
 outFileName = COLOR_HEX_RGB_GLOBAL + "_" + str(len(colorsRGB)) + "shades.hexplt"
 
