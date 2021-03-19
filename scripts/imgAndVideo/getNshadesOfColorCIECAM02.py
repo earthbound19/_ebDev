@@ -88,7 +88,6 @@ for J in descending_j_values:
 	hex_string = R + G + B
 	hex_string = hex_string.upper()
 	colorsRGB.append(hex_string)
-	colorsRGB.append(hex_string)
 
 # Deduplicate list but maintain order; re: https://stackoverflow.com/a/17016257/1397555
 from more_itertools import unique_everseen
