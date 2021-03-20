@@ -6,7 +6,7 @@
 # - $1 file type to sort (every one of) into a subfolder named after the base of the file, for example 'hexplt'.
 # - $2 OPTIONAL. Any string (for example 'EKTHELPOI'), which will cause the script to operate also on subfolders which contain type $1.
 # Example that will sort all files with the extension .hexplt into new subfolders named after the files:
-#    moveToTypeFolder.sh hexplt
+#    moveTypeToBasenamedFolder.sh hexplt
 # Example that will sort all files with the extension .hexplt in the current folder and all subfolders into a new directory named /hexplt:
 #    moveTypeToBasenamedFolder.sh hexplt EKTHELPOI
 
@@ -17,16 +17,13 @@ if [ ! "$1" ]; then printf "\nNo parameter \$1 (type of file to sort into subdir
 subDirSearchParam='-maxdepth 1'
 if [ "$2" ]; then subDirSearchParam=''; fi
 
-
-
-
 # If this operates on a super duper long list of files, and I store that all in an array, it will probably throw an error about something being too long, unless I print the results to a file and scan it line by line. So use a file:
 find . $subDirSearchParam -iname \*.$fileType -printf "%P\n" > filesOfTypeList_tmp_fZagq34GD
 while read file
 do
 	fileNameNoExt=${file%.*}
 	fileExt=${file##*.}
-	echo subfolderName is $subfolderName
+	subfolderName="$fileNameNoExt"_"$fileExt"
 	if [ ! -e $subfolderName ] && [ ! -e $subfolderName/$file ]
 	then
 		mkdir $subfolderName
