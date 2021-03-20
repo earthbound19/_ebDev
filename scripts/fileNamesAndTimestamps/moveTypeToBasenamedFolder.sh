@@ -5,10 +5,9 @@
 # Run with these parameters:
 # - $1 file type to sort (every one of) into a subfolder named after the base of the file, for example 'hexplt'.
 # - $2 OPTIONAL. Any string (for example 'EKTHELPOI'), which will cause the script to operate also on subfolders which contain type $1.
-# - $3 OPTIONAL. Any string (for example 'FLERFLBERFL', which will bypass the prompt to type a password 
 # Example that will sort all files with the extension .hexplt into new subfolders named after the files:
 #    moveToTypeFolder.sh hexplt
-# Example that will sort all file with the extension .hexplt in the current folder and all subfolders into a new directory named /hexplt:
+# Example that will sort all files with the extension .hexplt in the current folder and all subfolders into a new directory named /hexplt:
 #    moveTypeToBasenamedFolder.sh hexplt EKTHELPOI
 
 
@@ -27,7 +26,6 @@ while read file
 do
 	fileNameNoExt=${file%.*}
 	fileExt=${file##*.}
-	subfolderName="$fileNameNoExt"_"$fileExt"
 	echo subfolderName is $subfolderName
 	if [ ! -e $subfolderName ] && [ ! -e $subfolderName/$file ]
 	then
