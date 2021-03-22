@@ -33,6 +33,7 @@ PARSER.add_argument('-c', '--COLOR', help='String. Color to get shades of, in RG
 PARSER.add_argument('-n', '--NUMBER_OF_SHADES', help='Number. How many shades of color to generate from brightest original color point to black., e.g. "-n 15" (without the quote marks) for 15 shades.', type=int, required=True)
 PARSER.add_argument('-b', '--BRIGHTNESS_OVERRIDE', help='Optional number from 0 to 100. If provided, overrides innate brightness (according to CIECAM02 / JCh modeling of J or brightness) of -c color, resulting in colors stepping down from this override brightness. 100 is full bright (will appear white or near-white), 50 is medium bright, 0 is dark (will appear black or near-black). If not provided, generated shades will step (default down) from colors\' inherent brightness to black or near black. To step up to white, see -r option. Note that yellows may get lost as orange below about J = 80, but violets get lost as magenta above that, depending on the value of C also.', type=int)
 PARSER.add_argument('-r', '--DARK_TO_BRIGHT', help='Optional switch (no value needed). If present, shades will be generated from dark to light (instead of default bright to dark).', action='store_true')
+PARSER.add_argument('-d', '--DECIMATE', help='Optional number switch. If present, every dth element of the result list will be removed, then d will be reduced by 1 and elements removed again, repeating until d=1. Useful if you for example want to get darker shades (via a higher -n, which will get shades nearer to black), yet have fewer shades. Example result list that gives original list element numbers decimated to fewer if the list starts with 13 elements and d=3: [1, 4, 7, 10, 13]', type=int)
 ARGS = PARSER.parse_args()
 
 # init globals / from parsed arguments
@@ -93,6 +94,12 @@ for J in descending_j_values:
 from more_itertools import unique_everseen
 colorsRGB = list(unique_everseen(colorsRGB))
 colorsRGB.pop(0)     # removes the first color, which is black. White isn't in the list via the math; see an earlier comment.
+# Remove every k element decreasing recursive if numeric decimate switch to do so present:
+if ARGS.DECIMATE:
+	k = ARGS.DECIMATE
+	while k > 1:
+		del colorsRGB[k-1::k]
+		k -= 1
 if not ARGS.DARK_TO_BRIGHT:		# if told to reverse gradient (dark -> white), reverse that list; but (re earlier comment), as the math works best dark to light, that's actually how it's done internally anyway, so only reverse it here (light to dark) if _not_ told it is dark to light:
     colorsRGB.reverse()
 
