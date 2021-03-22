@@ -11,7 +11,7 @@
 # Example that will produce 7 shades from every color in inputPalette.hexplt:
 #    getNshadesOfColorsCIECAM02.sh inputPalette.hexplt 7
 # NOTE
-# To hack other parameters modify the command=".." assignment in the script directly, for example to `-b 100`, referring to the Python script.
+# To hack other parameters modify the command=".." assignment in the script directly, for example to `-b 100`, referring to the Python script. You may for example want to examine and use the -d switch for the called python script.
 
 
 # CODE
@@ -38,7 +38,7 @@ whereScriptIs=$(getFullPathToFile.sh getNshadesOfColorCIECAM02.py)
 arr=$(<$INFILE)
 for element in ${arr[@]}
 do
-  command="python $whereScriptIs -c $element -n $N -b 100"
+  command="python $whereScriptIs -c $element -n $N"
   $command
   # echo \'$element\'
 done
