@@ -2,6 +2,7 @@
 /setPathsLog.txt
 .DS_Store
 node_modules
+package-lock.json
 *__pycache__*
 /processing/by_me/digit_glyph_combos/data/lastDisplayedVariant.txt
 _ebDev_DOCUMENTATION.md
