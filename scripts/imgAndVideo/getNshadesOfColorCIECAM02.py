@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Gets -n shades of any -c color (default white if not passed) via the CIECAM02 color space, which models human perception of color (and brightness and other aspects of light) better than any other model at this writing. Writes results to a new .hexplt file named after color.
+# I NOW RECOMMEND `get_color_gradient_culori.js` over this script, because CIECAM02 does some hue shifting on darkening which the Oklab color space does not. This script gets -n shades of any -c color (default white if not passed) via the CIECAM02 color space, which models human perception of color (and brightness and other aspects of light) better than any other model at this writing. Writes results to a new .hexplt file named after color.
 
 # DEPENDENCIES
 # Python and the various import libraries declared at the start of CODE.
@@ -11,6 +11,7 @@
 # EXAMPLE RUN that produces sixteen shades of magenta, which the script will write to a file named FF00FF_18shades.hexplt:
 #    python /path/to_this_script/getNshadesOfColorCIECAM02.py -n 16 --COLOR FF00FF
 # NOTES
+# - I now recommend `get_color_gradient_culori.js` over this.
 # - Previously, because of inexact float math, this script was capable of producing more or less colors than requested. Thanks to a numpy linspace function, that is no longer the case. Moreover, results are more exact to what is desired (start with absolute white and end with absolute black, where previously it often produced very slight off-white or black, or didn't even end with black).
 # - It may produce some unexpected colors. I recommend you use an editor that live previews hex colors (like Atom with the highlight-colors package). You may be able to avoid unexpected colors by overriding start brightness of color (see -b parameter).
 # - It writes results to a file named after the color, e.g. `fff585_15shades.hexplt`.
