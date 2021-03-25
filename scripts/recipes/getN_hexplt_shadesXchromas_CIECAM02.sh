@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Via a combination of scripts (which in turn call scripts), gets M shades times N chromacities (color saturation intensities) of every color in a palette. Essentially, obtains and lists a gamut of tints, shades and saturated and unsaturated colors for a palette. Results will be in palette files named after each color.
+# NOTE THAT `get_color_gradient_culori.js` is recommended over this script for color gradients. This script, via a combination of scripts (which in turn call scripts), gets M shades times N chromacities (color saturation intensities) of every color in a palette. Essentially, obtains and lists a gamut of tints, shades and saturated and unsaturated colors for a palette. Results will be in palette files named after each color.
 
 # USAGE
 # Run with these parameters:
@@ -8,6 +8,9 @@
 # - $3 how many chromacities to get for every resultant shade.
 # Example that will get 7 shades and 6 chromacities for every resultant shade, for every color in 16_max_chroma_med_light_hues.hexplt:
 #    getNshadesXchromacities_from_hexplt.sh 16_max_chroma_med_light_hues.hexplt 7 6
+# NOTE
+# Again, `get_color_gradient_culori.js` is recommended over this script for color gradients.
+
 
 # CODE
 # DELETE this line and the next if your script doesn't need them; otherwise adapt per your needs:
