@@ -13,14 +13,13 @@
 
 
 # CODE
-# DELETE this line and the next if your script doesn't need them; otherwise adapt per your needs:
-if [ ! "$1" ]; then printf "\nNo parameter \$1 (source .hexplt file name) passed to script. Exit."; exit 1; else sourceHexpltFile=$1; fi
-if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many shades to get for each color in palette) passed to script. Exit."; exit 1; else nShades=$2; fi
-if [ ! "$3" ]; then printf "\nNo parameter \$3 (how many chroma to get per shade) passed to script. Exit."; exit 1; else nChroma=$3; fi
-
 # check for any pre-existing subfolders in this folder, and if there are any, exit with an error:
 subfoldersCheckArray=( $(listAllSubdirs.sh FLORFELNAUT) )
 if [ "${#subfoldersCheckArray[@]}" != "0" ]; then echo; echo "PROBLEM: subfolders exist in this folder. This script needs to operate in a folder which has no subfolders in it. Remove or move the subfolder out of this folder. Will exit script."; exit 1; fi
+
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (source .hexplt file name) passed to script. Exit."; exit 1; else sourceHexpltFile=$1; fi
+if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many shades to get for each color in palette) passed to script. Exit."; exit 1; else nShades=$2; fi
+if [ ! "$3" ]; then printf "\nNo parameter \$3 (how many chroma to get per shade) passed to script. Exit."; exit 1; else nChroma=$3; fi
 
 getNshadesOfColorsCIECAM02.sh $sourceHexpltFile $nShades
 # temporarily rename source hexplt so it won't be sorted into any subfolder:
