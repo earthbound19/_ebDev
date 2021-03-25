@@ -22,7 +22,7 @@
 fullPathToCuloriScript=$(getFullPathToFile.sh get_color_gradient_culori.js)
 if [ "$fullPathToCuloriScript" == "" ]; then printf "\n~\nERROR: dependency script get_color_gradient_culori.js not found in your \$PATH. Will exit."; exit 1; fi
 
-if [ ! "$1" ]; then printf "\nNo parameter \$1 (source .hexplt file name) passed to script. Exit."; exit 1; else sourceHexpltFile=$1; fi
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (source .hexplt file name) passed to script. Exit."; exit 1; else sourceHexpltFile=$1; fi; if [ ! -e $sourceHexpltFile ]; then printf "\n~\nERROR: file $sourceHexpltFile not found. Will exit."; exit 1; fi
 if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many tints and shades to get for each color in palette) passed to script. Exit."; exit 1; else nShades=$2; nShades2moar=$(($nShades + 2)); fi		# +2 because this script removes the start and end of gradients (-f and -l switches to get_color_gradient_culori.js)
 if [ ! "$3" ]; then printf "\nNo parameter \$3 (how many chroma to get per tint and shade) passed to script. Exit."; exit 1; else nChroma=$3; nChroma2moar=$(($nChroma + 2));fi
 # END MAIN SETUP AND CHECKS
