@@ -9,6 +9,7 @@
 # - $1 source file name of palette in .hexplt format (a list of RGB color hex codes)
 # - $2 how many tints and shades to obtain for each color
 # - $3 how many chromacities to get (toward gray) for every one of those resultant tints and shades
+# - $4 anything, such as the word FLOOFARF, which will cause the palette renders stage of the script to be skipped.
 # Example that will get 3 tints, 3 shades, and 4 chromacities for every tint and shade, for every color in 16_max_chroma_med_light_hues.hexplt:
 #    getN_hexplt_shadesXchromas_Oklab.sh 16_max_chroma_med_light_hues.hexplt 3 4
 # NOTE
@@ -59,8 +60,11 @@ do
 	done
 done
 
-renderColumns=$(($nChroma + 1))
-renderRows=$((($nShades * 2) + 1))
-renderAllHexPalettes.sh YORP 260 NULL $renderColumns $renderRows
+if [ ! "$4" ]
+then
+	renderColumns=$(($nChroma + 1))
+	renderRows=$((($nShades * 2) + 1))
+	renderAllHexPalettes.sh YORP 260 NULL $renderColumns $renderRows
+fi
 
 printf "\n~\nDONE generating and rendering palettes from source file $sourceHexpltFile."
