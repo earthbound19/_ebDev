@@ -81,7 +81,7 @@ if (options.startColorRemove) {
   var i; for (i = 0; i < options.startColorRemove; i++) { samples.pop(); }
 }
 if (options.endColorRemove) {
-  var j; for (j = 0; j < options.endColorRemove; j++) { samples.shift(); }
+  var j; for (j = 0; j < options.endColorRemove; j++) { samples.pop(); }
 }
 // reverse order of colors if switch so commands:
 if (options.reverse) { samples.reverse(); }
