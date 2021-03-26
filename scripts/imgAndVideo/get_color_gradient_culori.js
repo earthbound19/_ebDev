@@ -30,7 +30,7 @@ program
 program.parse();
 const options = program.opts();
 // if n < 3, abort with error as there's no point.
-if (options.number < 3) { console.log("ERROR: -n < 2; no point in running script. Pass a number greater than 2. Will exit."); process.exit(1); }
+if (options.number < 2) { console.log("ERROR: -n < 2; no point in running script. Pass a number greater than 2. Will exit."); process.exit(1); }
 // if --startColorRemove switch provided but won't work, throw error and exit:
 if (
     (options.startColorRemove && isNaN(parseFloat(options.startColorRemove)))
@@ -78,10 +78,10 @@ samples = culori.samples(number).map(my_interpolator).map(culori.formatHex);
 
 // remove start and/or end colors if switches so command:
 if (options.startColorRemove) {
-  var i; for (i = 0; i < options.startColorRemove; i++) { samples.shift(); }
+  var i; for (i = 0; i < options.startColorRemove; i++) { samples.pop(); }
 }
 if (options.endColorRemove) {
-  var j; for (j = 0; j < options.endColorRemove; j++) { samples.pop(); }
+  var j; for (j = 0; j < options.endColorRemove; j++) { samples.shift(); }
 }
 // reverse order of colors if switch so commands:
 if (options.reverse) { samples.reverse(); }
