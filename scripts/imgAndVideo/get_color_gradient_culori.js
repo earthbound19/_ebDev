@@ -78,7 +78,7 @@ samples = culori.samples(number).map(my_interpolator).map(culori.formatHex);
 
 // remove start and/or end colors if switches so command:
 if (options.startColorRemove) {
-  var i; for (i = 0; i < options.startColorRemove; i++) { samples.pop(); }
+  var i; for (i = 0; i < options.startColorRemove; i++) { samples.shift(); }
 }
 if (options.endColorRemove) {
   var j; for (j = 0; j < options.endColorRemove; j++) { samples.pop(); }
