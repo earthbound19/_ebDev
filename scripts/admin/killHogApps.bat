@@ -101,3 +101,4 @@ process -k upd.exe
 process -k keybase.exe
 process -k jusched.exe
 process -k cnext.exe
+process -k discord.exe
