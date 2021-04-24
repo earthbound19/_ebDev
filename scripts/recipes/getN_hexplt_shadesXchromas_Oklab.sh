@@ -70,13 +70,17 @@ do
 	for chromaSource in ${chromaSourceColorsArray[@]}
 	do
 		chromaSourceNoHashSign=$(echo ${chromaSource:1})
-		node $fullPathToCuloriScript -s $chromaSourceNoHashSign -e $chromaSourceNoHashSign -n $nChroma -c 0 $extraParameters >> $destFileName
+		# UNCOMMENT ONLY ONE of the following options; if you use the first, you must -1 in the later calc. renderColumns=$nChroma to renderColumns=$(($nChroma - 1)) :
+		# OPTION THAT REMOVES LAST GRAY:
+		node $fullPathToCuloriScript -s $chromaSourceNoHashSign -e $chromaSourceNoHashSign -n $nChroma -c 0 -l 1 $extraParameters >> $destFileName
+		# OPTION THAT KEEPS LAST GRAY:
+		# node $fullPathToCuloriScript -s $chromaSourceNoHashSign -e $chromaSourceNoHashSign -n $nChroma -c 0 $extraParameters >> $destFileName
 	done
 done
 
 if [ ! "$7" ]
 then
-	renderColumns=$nChroma
+	renderColumns=$(($nChroma - 1))
 	renderRows=$(( ($nShades * 2) + 1 - $nColorsRemoved))
 	renderAllHexPalettes.sh YORP 260 NULL $renderColumns $renderRows
 fi
