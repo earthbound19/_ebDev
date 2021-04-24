@@ -12,6 +12,7 @@
 # Thanks to: http://stackoverflow.com/a/4909968 and http://stackoverflow.com/a/4040324
 
 # TO DO
+# - rename this to just archiveMetaData.sh, as it could work with exiftool on other platforms.
 # - integrate functionality from the .bat file this calls into this script
 # - don't clobber existing metadata files
 # - verify archive and delete metadata files (to save file space/clutter)

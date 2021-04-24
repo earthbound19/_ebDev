@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Incremental file number naming by label utility. Finds the highest numbered file having both the phrase _FINAL_ and a five-padded number (nnnnn) in the file name, and renames file names which have _FINAL_ in them but no five-padded numbers; *adding* incremented five-padded numbers to those file names (to number all such _FINAL_ files by incremented numbers). Handy for incrementally numbering e.g. a lot of new original abstract art work master image file names; or numbering e.g. abstract works.
+# Incremental file number naming by label utility. Finds the highest numbered file having both the phrase _FINAL_ and a five-padded number (nnnnn) in the file name, and renames file names which have _FINAL_ in them but no five-padded numbers; *adding* incremented five-padded numbers to those file names (to number all such _FINAL_ files by incremented numbers). Handy for incrementally numbering e.g. a lot of new original abstract art work master image file names in a directory tree (operates also on subdirectories), or numbering e.g. abstract works.
 
 # USAGE
 # Not currently documented. Will document.
