@@ -30,8 +30,8 @@ print ('Searching for color_growth.py in PATH . . .')
 # This fails to find the path on windows unless you have .sh scripts associated with MSYS2 or whatever you're using for Unix-like emulation; a workaround could be changing the next call by reading the return of platform.system() (after importing platform) and then directly calling the MSYS2 termianl app and passing that script, assuming that MSYS2 terminal app is in your PATH:
 proc=subprocess.Popen('getFullPathToFile.sh color_growth.py', shell=True, stdout = subprocess.PIPE, )
 pathToColorGrowthPy = proc.communicate()[0]
-# That's in some byte encoding or summat I can't use; but this this function automagically clears it up:
-pathToColorGrowthPy = pathToColorGrowthPy.decode()
+# That's in some byte encoding or summat I can't use; but this function automagically clears it up; re: https://stackoverflow.com/a/606205/1397555
+pathToColorGrowthPy = pathToColorGrowthPy.decode('utf-8')
 # that has a newline before it which throws everything if I try to run it right after 'python' in a terminal; strip that newline:
 pathToColorGrowthPy = re.sub('\n', '', pathToColorGrowthPy)
 
