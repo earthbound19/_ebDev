@@ -14,6 +14,8 @@
 
 # CODE
 # TO DO; * = done, / = in progress:
+# - break URL shortcode generation/retrieval into separate script.
+# - figure out why with (for example) trying to get metadata into work 00001 vB its creating a batch that tries to update a __tagAndDistPrepImage.$extension file which doesn't exist. Should this copy to that file, and does it fail to?
 # - FIND OUT: can the problem of sed not searching paths for the urlencode.sed file be fixed without a kludge absolute path hard-coded? If not, store that path in a text file in ~./
 # - Don't do any copying and metadata then copy again operations if the target file in _dist already exists (it's recreating them but shouldn't--maybe this is a bug, as I already coded for that.)
 # - Figure out why this updates metadata OK to __tagAndDistPrepImage.jpg with e.g. 9000x6000 px jpgs, but chokes on copying them to _dist; fix that. WAIT: I think the real problem was I couldn't rename a file to a duplicate target file name. Catch errors when that happens? Verify this is what happens (the "WAIT" hypothesis).
@@ -52,14 +54,16 @@ find . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
 mapfile -t images_MD_ADDS_list < images_MD_ADDS_list.txt
 for element in "${images_MD_ADDS_list[@]}"
 do
+echo element is $element
 	# Retrieve image title from ~MD_ADDS.txt for use in adding search engine query for original image source--adding that to the description tag:
-	imageTitle=`sed -n 's/^-IPTC:ObjectName="\(.*\)"$/\1/p' $element`
+	imageTitle=$(sed -n 's/^-IPTC:ObjectName="\(.*\)"$/\1/p' $element)
 	# Strip out characters (from imageTitle) which may choke the Sphider search engine which I use; adapted from ftun.sh; dunno why, but that backtick \` had to be triple-escaped \\\ and also a backslash double-escaped, and even that only worked if everything is surrounded by single-quote marks ':
-	imageTitleForURLencode=`echo $imageTitle | tr -d '\=\@\\\`~\!#$%^\&\(\)+[{<]}>\*\;\|\/\\\,'`
+	imageTitleForURLencode=$(echo $imageTitle | tr -d '\=\@\\\`~\!#$%^\&\(\)+[{<]}>\*\;\|\/\\\,')
 	# re: https://gimi.name/snippets/urlencode-and-urldecode-for-bash-scripting-using-sed/ :
 			# OR? : https://gist.github.com/cdown/1163649 :
 	oy="http://earthbound.io/q/search.php?search=1&query=$imageTitleForURLencode"
-	oy=`echo "$oy" | sed -f /cygdrive/c/_ebdev/scripts/urlencode.sed`
+	fullPathToURLencodeSED=$(getFullPathToFile.sh urlencode.sed)
+	oy=$(echo "$oy" | sed -f $fullPathToURLencodeSED)
 	wgetArg="http://s.earthbound.io/api/v2/action/shorten?key=""$PolrAPIkey""&is_secret=false&response_type=plain_text&url=$oy"
 echo command to run will be\:
 			# DEPRECATED as it stopped working and I'm not figuring out why, when a working alternative is available:
@@ -82,14 +86,14 @@ echo command to run will be\:
 	exifTagArgs=$( < ghor.txt)
 	rm ghor.txt
 	# Retrieve extension of source final master file name (SFMFN) from ~MD_ADDS; and store it in a variable; thanks re http://stackoverflow.com/a/1665574 :
-	SFMFNextension=`sed -n 's/.*from master file.*\(\..\{1,4\}\)"/\1/p' $element`
+	SFMFNextension=$(sed -n 's/.*from master file.*\(\..\{1,4\}\)"/\1/p' $element)
 	# Retrieve and store full ~ file name with extension; the \.\/ part escapes ./ (which ./ this sed command also strips) :
 				# SFMFNnoExtension=`sed -n 's/.*from master file: \.\/\(.*\)\..\{1,4\}"/\1/p' $element`
 	# SFMFNpath will preserve any subdirectory paths and duplicate them to the target ./_dist path:
-	SFMFNpath=`sed -n 's/.*from master file: \.\/\(.*\/\).*\"/\1/p' $element`
+	SFMFNpath=$(sed -n 's/.*from master file: \.\/\(.*\/\).*\"/\1/p' $element)
 # e.g. result val of SFMFNpath: subdir/
 # OR if no subdir, it is blank.
-	SFMFNwithExtension=`sed -n 's/.*from master file: \.\/\(.*\..\{1,4\}\)"/\1/p' $element`
+	SFMFNwithExtension=$(sed -n 's/.*from master file: \.\/\(.*\..\{1,4\}\)"/\1/p' $element)
 					# echo ~~~~
 						# echo SFMFNwithExtension is $SFMFNwithExtension
 						# echo SFMFNnoExtension is $SFMFNnoExtension
@@ -128,7 +132,7 @@ echo command to run will be\:
 	cp -f "./$SFMFNwithExtension" "./$SFMFNpath""__tagAndDistPrepImage""$SFMFNextension"
 	# Because (it seems) Cygwin can create a batch file the system doesn't have permission to run? AND no permissions are given to open that copied file:
 	chmod 777 exiftool_temp_update_metadata.bat "./$SFMFNpath""__tagAndDistPrepImage""$SFMFNextension"
-	cygstart -w exiftool_temp_update_metadata.bat
+	start exiftool_temp_update_metadata.bat
 	echo Ran exiftool_temp_update_metadata.bat . . .
 # printf "" > exiftool_temp_update_metadata.bat
 	# Move the new, properly metadata tagged file to a permanent distribution location; but only if the dist. file doesn't exist:
@@ -143,7 +147,7 @@ echo command to run will be\:
 	echo -~-~
 done
 
-rm -f exiftool_temp_update_metadata.bat imagesMetadataPrepList.txt images_MD_ADDS_list.txt
+# rm -f exiftool_temp_update_metadata.bat images_MD_ADDS_list.txt
 
 echo Metadata modified for each image\, and each final distribution image copied to \.\/_dist in the same path\.
 
