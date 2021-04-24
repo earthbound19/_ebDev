@@ -2,7 +2,7 @@
 # Prints information about a Python module, such as functions. re: https://stackoverflow.com/a/31005891
 
 # USAGE
-# Run through the Python interpreter, without any parameters to the script:
+# Run through the Python interpreter, with this script as the first parameter (to python) and the script to analyze as the second parameter:
 #    python /path_to/this_script/analyse_module.py module_script.py
 
 
