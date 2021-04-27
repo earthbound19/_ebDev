@@ -15,6 +15,7 @@
 # Example run:
 #    ffmpegAnim.sh 29.97 29.97 13 png
 # NOTES
+# - Search for the pixelFormat parameter and modify it or don't.
 # - Search for the additionalParams options and uncomment or modify them (or don't) as you wish.
 # - You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).
 
@@ -52,16 +53,19 @@ digitsPadCount=${#lastFoundTypeFileNameNoExt}
 # additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2"
 # additionalParams=-filter:v "crop=1920:1080"
 
+# yuv420p is apparently required by instagram and probably facebook and others:
+pixelFormat="-pix_fmt yuv420p"
+
 # Because something funky and evil in DOS and/or Unix emulation chokes on some forms of $additionalParams inline, but not if printed to and executed from a script;
 # FOR LOSSLESS BUT COMPRESSED AVI, end the command instead with: -codec:v utvideo _out.avi :
-echo "ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $additionalParams $rescaleParams -r $2 _out.mp4" > tmp_enc_script_P4b3ApXC.sh
+echo "ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $additionalParams $rescaleParams -r $2 $pixelFormat _out.mp4" > tmp_enc_script_P4b3ApXC.sh
 ./tmp_enc_script_P4b3ApXC.sh
 rm ./tmp_enc_script_P4b3ApXC.sh
 
 # If $6 is passed to the script, create a looped still video ($6 seconds long) from the last frame and append it to the video:
 if [ "$6" ]
 then
-	ffmpeg -y -loop 1 -i $lastFoundFileType -vf fps=$2 -t $6 -crf $3 _append.mp4
+	ffmpeg -y -loop 1 -i $lastFoundFileType -vf fps=$2 -t $6 -crf $3 $pixelFormat _append.mp4
 	printf "" > tmp_ft2N854f.txt
 	echo _out.mp4 >> tmp_ft2N854f.txt
 	echo _append.mp4 >> tmp_ft2N854f.txt
