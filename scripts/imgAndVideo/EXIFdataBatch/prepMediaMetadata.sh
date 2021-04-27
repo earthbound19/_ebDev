@@ -20,13 +20,13 @@ _MTPL=_EXPORTED_
 # NOTE: cygpath use else err next:
 metaDataTemplatePath=$(<~/metaDataTemplatesPath.txt)
 	# Pick and uncomment one:
-	metaDataTemplateFile=customImageMetadataTemplate.txt
+	# metaDataTemplateFile=customImageMetadataTemplate.txt
 	# metaDataTemplateFile=electricSheep_CC_by_sa_template.txt
 	# metaDataTemplateFile=fractalFlame_template.txt
 	# metaDataTemplateFile=DrawnColorVectorArtMetadataTemplate.txt
 	# metaDataTemplateFile=vectorRandomColorAnimTemplate.txt
 	# metaDataTemplateFile=TFTMdraftMetadataTemplate.txt
-	# metaDataTemplateFile=narrativeVideoMetadataTemplate.txt
+	metaDataTemplateFile=narrativeVideoMetadataTemplate.txt
 	# metaDataTemplateFile=nextMostSimilarIMGanimTemplate.txt
 metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 
@@ -48,7 +48,7 @@ metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 		# exit
 # END IN DEVELOPMENT SECTION
 
-list=(`find . -maxdepth 1 \( \
+list=( $(find $(pwd) -maxdepth 1 \( \
 -iname \*$_MTPL*.mp4 \
 -o -iname \*"$_MTPL"var*.mp4 \
 -o -iname \*$_MTPL*.tif \
@@ -85,62 +85,63 @@ list=(`find . -maxdepth 1 \( \
 -o -iname \*"$_MTPL"VAR*.svg \
 -o -iname \*$_MTPL*.pdf \
 -o -iname \*"$_MTPL"VAR*.pdf \
- \) -printf '%f\n' | sort`)
+ \) | sort) )
 
 echo starting metadata prep . . .
 
-currdir=`pwd`
+currdir=$(pwd)
 for element in "${list[@]}"
 do
-		# echo Preparing image metadata from template and image file name $element . . .
-					# DEPRECATED, because much as I hate it, putting like-named files into a new subfolder will cause path length errors in windows:
-					# imagePath=`expr match "$element" '\(.*\)\/.*'`
-					# if [ -a $imagePath/_metadataAdditions ]
-		imagePath=`expr match "$element" '\(.*\)\/.*'`
-		imageFileNameNoExt=`expr match "$element" '.*\/\(.*\)\..*'`
-		metaDataAdditionsTextFile=$imagePath/$imageFileNameNoExt\_MD_ADDS.txt
-				# NOTE: the following check previously didn't behave as wanted, because I erroneously checked for $imagePath/$metaDataAdditionsTextFile:
-		if [ -a $metaDataAdditionsTextFile ]
-		then
-			# DO NOT OVERWRITE THE EXISTING FILE
-			echo =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
-			echo Would-be newly created metadata additions text file already exists \($metaDataAdditionsTextFile\). Will not overwrite.
-		else
-			# CREATE AND DO STUFF with the new file
-			echo CREATING METADATA PREP FILE $currdir\/$metaDataAdditionsTextFile\ . . .
-			# Write file name to text file and alter for human readability via text search-replacements:
+echo is $element
+	# echo Preparing image metadata from template and image file name $element . . .
+				# DEPRECATED, because much as I hate it, putting like-named files into a new subfolder will cause path length errors in windows:
+				# imagePath=`expr match "$element" '\(.*\)\/.*'`
+				# if [ -a $imagePath/_metadataAdditions ]
+	imagePath=$(expr match "$element" '\(.*\)\/.*')
+	imageFileNameNoExt=`expr match "$element" '.*\/\(.*\)\..*'`
+	metaDataAdditionsTextFile=$imagePath/"$imageFileNameNoExt"_MD_ADDS.txt
+			# NOTE: the following check previously didn't behave as wanted, because I erroneously checked for $imagePath/$metaDataAdditionsTextFile:
+	if [ -a $metaDataAdditionsTextFile ]
+	then
+		# DO NOT OVERWRITE THE EXISTING FILE
+		echo =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
+		echo Would-be newly created metadata additions text file already exists \($metaDataAdditionsTextFile\). Will not overwrite.
+	else
+		# CREATE AND DO STUFF with the new file
+			echo CREATING METADATA PREP FILE $metaDataAdditionsTextFile . . .
+		# Write file name to text file and alter for human readability via text search-replacements:
 			echo $imageFileNameNoExt > temp.txt
-				# TO DO: other text replacements besides the following?
+			# TO DO: other text replacements besides the following?
 				sed -i 's/_[fF][iI][nN][aA][lL]//g' temp.txt
 				sed -i 's/_[fF][iI][nN][aA][lL][vV][aA][rR]/Variation of/g' temp.txt
 				sed -i 's/FFlib/Filter Forge library/g' temp.txt
 				sed -i 's/FF\([0-9]\{1,\}..\)/Filter Forge library \1/g' temp.txt
 				sed -i 's/pre\([0-9]\{1,\}\)/preset \1/g' temp.txt
-				# Delete any leading whitespace from name field:
+			# Delete any leading whitespace from name field:
 				tr '_' ' ' < temp.txt > temp2.txt
 				sed -i 's/^\s\{1,\}//g' temp2.txt
-					# ALSO WORKS on that last line: ~   [[:space:]]    instead of    \s
+				# ALSO WORKS on that last line: ~   [[:space:]]    instead of    \s
 				sed -i 's/^[vV][aA][rR] /Variation of /g' temp2.txt
-					# Thanks to: http://stackoverflow.com/a/10771857 :
+				# Thanks to: http://stackoverflow.com/a/10771857 :
 			imagePreparedTitle=$( < temp2.txt)
-				# Alas, there is no MWG mapping of ObjectName/Title; this is an IPTC only thing; which is another reason the final distribution image will be renamed to the image title:
+			# Alas, there is no MWG mapping of ObjectName/Title; this is an IPTC only thing; which is another reason the final distribution image will be renamed to the image title:
 			echo \-IPTC:ObjectName\=\"$imagePreparedTitle\" > temp.txt
-			# Create stub metadata file using (modified) filename for title and metadata template:
+		# Create stub metadata file using (modified) filename for title and metadata template:
 			cat temp.txt $metaDataTemplate > $metaDataAdditionsTextFile
 			rm temp.txt temp2.txt
-			# So the tag to be added doesn't get munged onto the same line as the last tag:
+		# So the tag to be added doesn't get munged onto the same line as the last tag:
 			printf "\n" >> $metaDataAdditionsTextFile
 # TO DO? Add this snarf? : https://iptc.org/standards/newscodes/groups/
 			echo \-EXIF:ImageHistory\=\"Exported or copied from master file\: $element\" >> $metaDataAdditionsTextFile
-			# Open the metadata prep file and corresponding image file in the default programs, to make any necessary metadata prep. changes:
+		# Open the metadata prep file and corresponding image file in the default programs, to make any necessary metadata prep. changes:
 			echo =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
 			read -n 1 -p "After you press any key, the metadata text file $metaDataAdditionsTextFile and corresponding image \"$element\" will open. There will be a short pause before it opens. Edit and save the opened prep text file, then close it and the image. Another prompt (if any) will appear here."
-			cygstart $element
-				# Because delays loading the text file into an editor (COMPUTER SCIENCE?!) can cause image viewer focus problems; force-focus the image for 2 seconds, by way of a pause:
+			start $element
+			# Because delays loading the text file into an editor (COMPUTER SCIENCE?!) can cause image viewer focus problems; force-focus the image for 2 seconds, by way of a pause:
 			sleep 2
-			cygstart $metaDataAdditionsTextFile
+			start $metaDataAdditionsTextFile
 			echo =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
-		fi
+	fi
 done
 
 
