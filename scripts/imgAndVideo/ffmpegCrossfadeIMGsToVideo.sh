@@ -13,7 +13,9 @@
 # Example that creates a video of a 7-second crossfade from one image to another, with 4.36 seconds padding before and after:
 #    ffmpegCrossfadeIMGsToVideo.sh inputImageOne.png inputImageTwo.png 7 4.36
 # NOTES
-# If this script is called this way from another script via the source command, like this (assuming this script is in your PATH) :
+# - You may wish to hack global variables right after the CODE comment per your wants.
+# - This script will not overwrite pre-existing render targets. You may therefore interrupt and re-run it to stop and continue interrupted render series.
+# - If this script is called this way from another script via the source command, like this (assuming this script is in your PATH) :
 #    source ffmpegCrossfadeIMGsToVideo.sh <parameters>
 # -- then the variable which this script sets, named $targetRenderFile will persist in the shell after this script terminates, for a calling script to make use of. The script `ffmpegCrossfadeIMGsToVideoFromFileList.sh` does this.
 
