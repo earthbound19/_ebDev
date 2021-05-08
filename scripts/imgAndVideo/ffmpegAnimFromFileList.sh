@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates an mp4 video (AVC) from a flat text file list of input image file names (one image file name per line in list). Creates the animation at _out.mp4.
+# Creates an mp4 video (AVC) from a flat text file list of input image (or video!) file names (one image file name per line in list). Creates the animation at _out.mp4.
 
 # WARNING
 # This script overwrites _out.mp4 if it already exists.
@@ -11,12 +11,14 @@
 # - $3 desired constant quality (crf)
 # - $4 the flat text file list of image file names to string into an animation _out.mp4.
 # Optional: $5 rescale target resolution expressed as nnnnXnnnn. Source images will be rescaled by nearest-neighbor (keep hard edges) option to this target resolution.
-# NOTE that the expected list format is, per ffmpeg:
+# NOTES:
+# - The expected list format is, per ffmpeg:
 #    file 0001.png
 #    file 0002.png
 #    file 0003.png
-# etc.
-# ALSO, you can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32). - You may prefer to instead build a file list by way of mkNumberedLinksFromFileList.sh for use with ffmpegAnim.sh, because file concatenation with ffmpeg, it seems, can be buggy and drop frames.
+# -- etc.
+# - You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32). - You may prefer to instead build a file list by way of mkNumberedLinksFromFileList.sh for use with ffmpegAnim.sh, because file concatenation with ffmpeg, it seems, can be buggy and drop frames.
+# - If your source files are still images, uncomment the framerateParam line of code. If your source files are videos, comment that line out.
 
 
 # CODE
@@ -31,9 +33,11 @@ then
 		# echo $rescaleParams
 fi
 
+# framerateParam="-framerate $1"
+
 # re https://stackoverflow.com/questions/25073292/how-do-i-render-a-video-from-a-list-of-time-stamped-images --it works--! :
 # TWO OPTIONS on the following two lines; first is x264, second is lossless compressed UTvideo codec avi; comment out what you don't want:
-ffmpeg -y -framerate $1 -f concat -i $4 -vf fps=$2 -crf $3 _out.mp4
+ffmpeg -y $framerateParam -f concat -i $4 -vf fps=$2 -crf $3 _out.mp4
 # ffmpeg -y -f concat -framerate $1 -i $4 -vf fps=$2 -crf $3 -codec:v utvideo _out.avi
 
 # | ffmpeg -y -framerate $1 -f image2pipe $rescaleParams -r $2 -crf $3 _out.mp4
