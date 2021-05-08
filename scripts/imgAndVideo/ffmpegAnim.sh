@@ -57,7 +57,7 @@ pixelFormat="-pix_fmt yuv420p"
 
 # Because something funky and evil in DOS and/or Unix emulation chokes on some forms of $additionalParams inline, but not if printed to and executed from a script;
 # FOR LOSSLESS BUT COMPRESSED AVI, end the command instead with: -codec:v utvideo _out.avi :
-echo "ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $additionalParams $rescaleParams -r $2 $pixelFormat _out.mp4" > tmp_enc_script_P4b3ApXC.sh
+echo "ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $additionalParams $rescaleParams -r $2 $pixelFormat -crf $3 _out.mp4" > tmp_enc_script_P4b3ApXC.sh
 ./tmp_enc_script_P4b3ApXC.sh
 rm ./tmp_enc_script_P4b3ApXC.sh
 
