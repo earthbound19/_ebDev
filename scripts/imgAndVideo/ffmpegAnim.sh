@@ -48,9 +48,8 @@ digitsPadCount=${#lastFoundTypeFileNameNoExt}
 # constructing an additionalParams arg via piping and read?! :
 # echo "-filter:v \"crop=1920:1080\"" > tmp_blaheryeag_nbD9X44rCJev.txt && additionalParams=$(<tmp_blaheryeag_nbD9X44rCJev.txt) && rm tmp_blaheryeag_nbD9X44rCJev.txt
 
-# OPTIONAL additionalParams; uncomment / tweak any; NOTE that some necessarily escape double-quote marks with \:
-# additionalParams='-vf "pad=width=1422:height=800:x=712:y=400:color=#362e2c"'
-# additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2"
+# OPTIONAL additionalParams; uncomment / tweak any; NOTE that some necessarily escape double-quote marks with \:	a previously used color: #362e2c
+# additionalParams='-vf "scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:color=#f2e0c9"'
 # additionalParams=-filter:v "crop=1920:1080"
 
 # yuv420p is apparently required by instagram and probably facebook and others:
