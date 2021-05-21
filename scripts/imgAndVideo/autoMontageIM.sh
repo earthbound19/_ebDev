@@ -71,11 +71,11 @@ fi
 
     # Get dimensions of first image of type $1 found.
     # -printf '%f\n' chops off the ./ at the start which we don't want:
-firstImage=`find . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | head -n 1`
-originalIMGwidth=`gm identify -format "%w" $firstImage`
-originalIMGheight=`gm identify -format "%h" $firstImage`
-numImagesFound=`find . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | wc -l`
-SQRTofNumImagesFound=`echo "scale=0; sqrt($numImagesFound) + 1" | bc`
+firstImage=$(find . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | head -n 1)
+originalIMGwidth=$(gm identify -format "%w" $firstImage)
+originalIMGheight=$(gm identify -format "%h" $firstImage)
+numImagesFound=$(find . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | wc -l)
+SQRTofNumImagesFound=$(echo "scale=0; sqrt($numImagesFound) + 1" | bc)
 
 if [ "$3" ]
 then
@@ -89,20 +89,20 @@ then
 	else
 		echo ""
 		echo "Will create montage approximately $3 pixels wide."
-		tileWidth=`echo "scale=0; $3 / $SQRTofNumImagesFound" | bc`
+		tileWidth=$(echo "scale=0; $3 / $SQRTofNumImagesFound" | bc)
 	fi
 else
 	echo ""
 	echo "No parameter \$3 (montage width in pixels) passed to script;"
 	echo " montage will be roughly the same width of first image found."
-	tileWidth=`echo "scale=0; $originalIMGwidth / $SQRTofNumImagesFound" | bc`
+	tileWidth=$(echo "scale=0; $originalIMGwidth / $SQRTofNumImagesFound" | bc)
 fi
 # END GLOBALS SETUP
 
-heightToWidthAspect=`echo "scale=5; $originalIMGwidth / $originalIMGheight" | bc`
-tileHeight=`echo "scale=0; $tileWidth / $heightToWidthAspect" | bc`
-widthPadding=`echo "scale=0; $tileWidth - ($tileWidth * 95.5 / 100)" | bc`
-heightPadding=`echo "scale=0; $tileHeight - ($tileHeight * 95.5 / 100)" | bc`
+heightToWidthAspect=$(echo "scale=5; $originalIMGwidth / $originalIMGheight" | bc)
+tileHeight=$(echo "scale=0; $tileWidth / $heightToWidthAspect" | bc)
+widthPadding=$(echo "scale=0; $tileWidth - ($tileWidth * 95.5 / 100)" | bc)
+heightPadding=$(echo "scale=0; $tileHeight - ($tileHeight * 95.5 / 100)" | bc)
 # Dev. testing only:
 # echo "tilesAcross $tilesAcross tilesAcrossParam $tilesAcrossParam numImagesFound=$numImagesFound SQRTofNumImagesFound=$SQRTofNumImagesFound tileWidth=$tileWidth firstImage=$firstImage originalIMGwidth=$originalIMGwidth originalIMGheight=$originalIMGheight heightToWidthAspect=$heightToWidthAspect tileHeight=$tileHeight widthPadding=$widthPadding heightPadding=$heightPadding"
 
@@ -113,15 +113,15 @@ echo "magick montage -background '#767575' $tilesAcrossParam -geometry '$geometr
 ./tmp_command_MbVTjRGUYXUJ.sh
 rm tmp_command_MbVTjRGUYXUJ.sh
 # Get dimensions of result and calculate desired (larger) pad size for result:
-originalIMGwidth=`gm identify -format "%w" ___oooot_n4yR24PG.png`
-originalIMGheight=`gm identify -format "%h" ___oooot_n4yR24PG.png`
-paddedImageW=`echo "$originalIMGwidth + ($widthPadding * 2.25)" | scale=0 bc`
-paddedImageH=`echo "$originalIMGheight + ($widthPadding * 2.25)" | scale=0 bc`
+originalIMGwidth=$(gm identify -format "%w" ___oooot_n4yR24PG.png)
+originalIMGheight=$(gm identify -format "%h" ___oooot_n4yR24PG.png)
+paddedImageW=$(echo "$originalIMGwidth + ($widthPadding * 2.25)" | scale=0 bc)
+paddedImageH=$(echo "$originalIMGheight + ($widthPadding * 2.25)" | scale=0 bc)
 echo Will pad final montage from $originalIMGwidth to $paddedImageW and $originalIMGheight to $paddedImageH . . .
 # Pad temp image file to final result file;
 # Construct final file name first:
-thisPath=`pwd`
-thisFolderName=`basename $thisPath`
+thisPath=$(pwd)
+thisFolderName=$(basename $thisPath)
 gm convert ___oooot_n4yR24PG.png -gravity center -background '#454444' -extent "$paddedImageW"x"$paddedImageH" _montage__"$thisFolderName".png
 # Remove temp image file:
 rm ___oooot_n4yR24PG.png
