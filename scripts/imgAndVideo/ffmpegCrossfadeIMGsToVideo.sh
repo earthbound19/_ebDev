@@ -36,6 +36,9 @@ codecParam="-vcodec rawvideo"
 	# looks horrible at video start for animations! :
 # codecParam="-codec:v libvpx-vp9 -lossless 1 -r 30"
 
+# yuv420p is apparently required by instagram and probably facebook and others:
+pixelFormat="-pix_fmt yuv420p"
+
 # ====
 # SET GLOBALS START
 if [ -z "$1" ]; then echo No parameter \$1 \(start input image\)\. Will exit.; exit; else imgOne=$1; echo SET imgOne to $1; fi
@@ -77,15 +80,15 @@ else
 	if [ ! -e "$fadeSRConeFileName"."$vidExt" ]
 	then
 				echo target render image for still image video fade source "$fadeSRConeFileName"."$vidExt" doesn\'t exist\; RENDERING\; render command is\:
-				echo ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $codecParam "$fadeSRConeFileName"."$vidExt"
-		ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $codecParam "$fadeSRConeFileName"."$vidExt"
+				echo ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $pixelFormat $codecParam "$fadeSRConeFileName"."$vidExt"
+		ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $pixelFormat $codecParam "$fadeSRConeFileName"."$vidExt"
 	fi
 	# This also avoids repeat work:
 	if [ ! -e "$fadeSRCtwoFileName"."$vidExt" ]
 	then
 				echo target render image for still image video fade source "$fadeSRCtwoFileName"."$vidExt" doesn\'t exist\; RENDERING\; render command is\:
-				echo ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $codecParam "$fadeSRCtwoFileName"."$vidExt"
-		ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $codecParam "$fadeSRCtwoFileName"."$vidExt"
+				echo ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $pixelFormat $codecParam "$fadeSRCtwoFileName"."$vidExt"
+		ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $pixelFormat $codecParam "$fadeSRCtwoFileName"."$vidExt"
 	fi
 	# CREATE the video crossfade from those two static image (looped) video files we just made.
 	# The following complex filter taken and adapted from https://superuser.com/a/1001040/130772
@@ -116,7 +119,7 @@ else
 		[fadeoutfifo][fadeinfifo]overlay[crossfade]; \
 		[clip1cut][crossfade][clip2cut]concat=n=3[output] \
 		" \
-	-map "[output]" $codecParam $targetRenderFile
+	-map "[output]" $pixelFormat $codecParam $targetRenderFile
 
 	# Cygwin option: auto-launch the completed cross-faded video:
 	# cygstart $targetRenderFile
