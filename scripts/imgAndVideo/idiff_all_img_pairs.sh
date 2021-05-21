@@ -13,6 +13,7 @@
 
 # CODE
 # TO DO:
+# - Check that I'm not getting duplicate source image file names in the inner loop (need J+1 maybe?), and fix that if I am.
 # - Resize larger image to fit in smaller before idiff operation (instead of recommendation of use gm_downsize_img_copies_to_smallest.sh beforehand, which loses a lot of resolution for many images if there is only one small image, where with this approach we could instead get higher resolution results.
 # - DON'T TRY saving to jpgs via this tool, because this tool isn't built to. Jpegs from this are 8-bit and of inferior quality versus the 24-bit tifs. It might be nice to pipe the image output to another openimageio tool to save a high-quality 24-bit image.
 # Get array of many images named imgs_arr via dependency script:
