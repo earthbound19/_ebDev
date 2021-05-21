@@ -7,7 +7,7 @@
 # - $2 the number of glitched images per image you wish to make.
 # - $3 what percent of each file to corrupt (1 to 100)
 # Example command that will create 10 glitched versions of all jpg images in the current directory, corrupting 30 percent of their data:
-#    glitchAllFilesOfType.sh jpg 10 30
+#    glitchAllFilesOfTypeNtimes.sh jpg 10 30
 
 
 # CODE
