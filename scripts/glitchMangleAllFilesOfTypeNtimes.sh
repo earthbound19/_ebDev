@@ -8,7 +8,7 @@
 # - $1 a file type to scan for and make corrupt copies of
 # - $2 how many corrupt copies to make
 # Example that loads input.jpg and creating 12 corrupt copies of it:
-#    glitchMangleAllFilesTypeN.sh input.jpg 12
+#    glitchMangleAllFilesOfTypeNtimes.sh input.jpg 12
 
 
 # CODE
