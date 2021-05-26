@@ -42,7 +42,7 @@ do
 		# and first file number, and passing that to ffmpeg re:
 		# https://en.wikibooks.org/wiki/FFMPEG_An_Intermediate_Guide/image_sequence
 		renumberFiles.sh svg
-		allSVG2img.sh 1920 png
+		allSVG2img.sh 1080 png
 		ffmpegAnim.sh 30 30 9 png
 		mv ./_out.mp4 ../../anim_segment_"$zeroPaddedNumber".mp4
 		cd ..
@@ -53,7 +53,7 @@ do
 done
 
 # concatenate resulting .mp4 files:
-concatVidFiles.sh mp4
+concatVideos.sh mp4
 # rename the concatenated file after the parent directory:
 current_dir=$(pwd)
 parent_dir=$(basename $current_dir)

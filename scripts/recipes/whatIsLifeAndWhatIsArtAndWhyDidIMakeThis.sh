@@ -27,7 +27,7 @@ do
 	RNDcolorAndPitchVid.sh $float
 done
 
-concatVidFiles.sh mp4
+concatVideos.sh mp4
 timestamp=$(date +"%Y_%m_%d__%H_%M_%S__%N")
 renameTarget="$timestamp"__WILAWIAAWDTVE.mp4
 mv _mp4sConcatenated.mp4 ../$renameTarget
