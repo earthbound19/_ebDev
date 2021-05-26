@@ -17,7 +17,7 @@
 # TO DO: am I doing the same thing as here? And share it there if I am but doing it better: https://www.davidebarranca.com/2018/05/automated-check-for-corrupted-image-files-with-python-and-ImageMagick/
 if [ ! -d _irrecoverable ]; then mkdir _irrecoverable; fi
 
-array=`find . -maxdepth 1 -type f -name "*.$1" -printf '%f\n' | sort`
+array=($(find . -maxdepth 1 -type f -name "*.$1" -printf '%f\n' | sort))
 
 for filename in ${array[@]}
 do
