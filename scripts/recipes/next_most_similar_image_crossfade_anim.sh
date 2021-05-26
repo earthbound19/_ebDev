@@ -19,7 +19,7 @@ cd fadeSRCvideos
 # allVidsType2VcompatMP4.sh avi
 	# ALTERNATE to that, but not preferred, as it means no audio, and some stupid TVs present ugly complaints if no audio stream:
 	# allVid2vid.sh avi mp4
-concatVidFiles.sh mp4
+concatVideos.sh mp4
 addBlankSoundToVid.sh _mp4sConcatenated.avi
 
 # Result will be in ..?

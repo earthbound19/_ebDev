@@ -46,6 +46,6 @@ sleep 40
 done
 
 # OPTIONAL: concatenates all the resulting videos into _mp4sConcatenated.mp4:
-# concatVidFiles.sh mp4
+# concatVideos.sh mp4
 
 printf "\nDone."
