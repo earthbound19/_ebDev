@@ -64,7 +64,7 @@ do
 	node $fullPathToCuloriScript -s $colorNoHashSign -e $colorNoHashSign -n $(($nShades + 1)) -b 0 -f 1 $shadesRemoveSwitch $extraParameters >> $destFileName
 	# META! :
 	# Read that result file into an array:
-	chromaSourceColorsArray=$(<$destFileName)
+	chromaSourceColorsArray=($(<$destFileName))
 	# Empty the result file because we're going to write the same colors (with additional colors) back to it:
 	printf "" > $destFileName
 	for chromaSource in ${chromaSourceColorsArray[@]}

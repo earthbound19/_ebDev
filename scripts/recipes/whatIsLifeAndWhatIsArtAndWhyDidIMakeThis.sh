@@ -16,7 +16,7 @@ if ! [ "$1" ]; then howMany=42; else howMany=$1; fi
 if ! [ "$2" ]; then minimumDuration=0.14; else minimumDuration=$2; fi
 if ! [ "$3" ]; then maximumDuration=1.21; else maximumDuration=$3; fi
 
-floatsArray=$(/c/_ebSuperBin/randomFloatsInRange.exe $minimumDuration $maximumDuration $howMany)
+floatsArray=($(/c/_ebSuperBin/randomFloatsInRange.exe $minimumDuration $maximumDuration $howMany))
 
 if [ -d tmp_42_WILAWIAAWDTVE ]; then rm -rf tmp_42_WILAWIAAWDTVE; fi
 mkdir tmp_42_WILAWIAAWDTVE

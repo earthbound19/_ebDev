@@ -48,7 +48,7 @@ then
 	esac
 fi
 
-srcFileTypesArray=$(find . -maxdepth 1 -iname \*.$fileExt -printf "%P\n")
+srcFileTypesArray=($(find . -maxdepth 1 -iname \*.$fileExt -printf "%P\n"))
 
 printf "\nWill search for pairs for files of type $fileExt . . .\n"
 for file in ${srcFileTypesArray[@]}
