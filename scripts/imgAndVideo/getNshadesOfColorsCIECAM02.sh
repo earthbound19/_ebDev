@@ -36,7 +36,7 @@ fi
 whereScriptIs=$(getFullPathToFile.sh getNshadesOfColorCIECAM02.py)
   # fi
 
-arr=$(<$INFILE)
+arr=($(<$INFILE))
 for element in ${arr[@]}
 do
   command="python $whereScriptIs -c $element -n $N"
