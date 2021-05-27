@@ -31,7 +31,7 @@ fi
 
 whereScriptIs=$(getFullPathToFile.sh getNchromasOfColorCIECAM02.py)
 
-arr=$(<$INFILE)
+arr=($(<$INFILE))
 for element in ${arr[@]}
 do
   # an optional possible switch to pass (I avoid using it and just use the C detected from the color -c :
