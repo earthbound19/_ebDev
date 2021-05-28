@@ -26,6 +26,8 @@
 
 DIR /b /s *_originalMetaData* > XMPsToArchive.txt
 7za a -up1q1r2x1y1z1w1 -spf -ir@XMPsToArchive.txt all_originalMetaData.7z
+REM RMDIR /S /Q _originalMetaData
+echo DONE. Archive is in all_originalMetaData.7z. Check it against the _originalMetaData subdirectory, and if they match, you may delete that directory, as it is archived.
 
 :: TO DO: code option to nuke all those _originalMetaData folders after they're archived to .7z files.
 
