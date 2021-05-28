@@ -16,10 +16,10 @@ cd _temp_numbered
 # NOTE: you may want to adjust parameters in this next script call! :
 ffmpegCrossfadeIMGsToVideoFromFileList.sh
 cd fadeSRCvideos
-# allVidsType2VcompatMP4.sh avi
-	# ALTERNATE to that, but not preferred, as it means no audio, and some stupid TVs present ugly complaints if no audio stream:
-	# allVid2vid.sh avi mp4
-concatVideos.sh mp4
-addBlankSoundToVid.sh _mp4sConcatenated.avi
+source concatVideos.sh avi fadeSRCvideosList.txt
+convertedFileName=${concatenatedVideoFileName%.*}.mp4
+ffmpeg -i $concatenatedVideoFileName -crf 13 $convertedFileName
+addBlankSoundToVid.sh $convertedFileName
+mv $convertedFileName ../../
 
-# Result will be in ..?
+echo "DONE. Result is file $convertedFileName. There may be a lot of intermediate files in the fadeSRCvideos subdirectory, which you may want to partly or totally clean up."
