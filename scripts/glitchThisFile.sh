@@ -61,7 +61,7 @@ __size=${__ln[3]}
 		# Re: reply by "lewis" here: http://echochamber.me/viewtopic.php?t=6377
 		# Also: http://stackoverflow.com/a/7290825/1397555
 
-# ALTERNATE OPTIONS HERE; comment out the one you don't want:
+# ALTERNATE OPTIONS HERE; uncomment only one:
 # corruptionPasses=$(($__size / 147500 * $percentToCorrupt))
 # corruptionPasses=$(($__size / 100000 * $percentToCorrupt))
 # corruptionPasses=$(($__size / 75000 * $percentToCorrupt))

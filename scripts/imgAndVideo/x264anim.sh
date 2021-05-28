@@ -44,9 +44,9 @@ lastFoundFileType=${array[-1]}
 lastFoundTypeFileNameNoExt=${lastFoundFileType%.*}
 digitsPadCount=${#lastFoundTypeFileNameNoExt}
 
-# additionalParams='-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2'
+# additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2"
 # ASSUMING 1920x1420 input image, crop to center; NOTE that it necessarily escapes double-quote marks with \:
-# additionalParams=-filter:v "crop=1920:1080"
+# additionalParams="-filter:v crop=1920:1080"
 echo "-filter:v \"crop=1920:1080\"" > tmp_blaheryeag_nbD9X44rCJev.txt && additionalParams=$(<tmp_blaheryeag_nbD9X44rCJev.txt) && rm tmp_blaheryeag_nbD9X44rCJev.txt
 
 echo executing ffmpeg command ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $additionalParams $rescaleParams -r $2 -codec:v utvideo _out.avi . . .
