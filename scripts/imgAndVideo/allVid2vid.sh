@@ -39,7 +39,9 @@ fi
 # Scale video to given pixels X, maintain aspect ratio, no padding:
 # additionalParams="-vf scale=-1:640:force_original_aspect_ratio=1"
 # Scale video down to half size; trying the \" escapes for double quote marks because it works from the terminal with those around the "scale" param:
-# additionalParams="-vf \"scale=iw/2:-1\""
+# additionalParams="-vf scale=iw/2:-1"
+# yuv420p is apparently required by instagram and probably facebook and others:
+pixelFormat="-pix_fmt yuv420p"
 
 for element in "${IMGconvertList[@]}"
 do
@@ -51,6 +53,6 @@ do
 		echo . . .
 	else
 		echo converting $element . . .
-		ffmpeg -i "$IMGfilenameNoExt"."$srcIMGformat" $additionalParams -crf 13 "$IMGfilenameNoExt"_converted."$destIMGformat"
+		ffmpeg -i "$IMGfilenameNoExt"."$srcIMGformat" $additionalParams -crf 13 $pixelFormat "$IMGfilenameNoExt"_converted."$destIMGformat"
 	fi
 done

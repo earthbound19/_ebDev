@@ -49,8 +49,8 @@ digitsPadCount=${#lastFoundTypeFileNameNoExt}
 # echo "-filter:v \"crop=1920:1080\"" > tmp_blaheryeag_nbD9X44rCJev.txt && additionalParams=$(<tmp_blaheryeag_nbD9X44rCJev.txt) && rm tmp_blaheryeag_nbD9X44rCJev.txt
 
 # OPTIONAL additionalParams; uncomment / tweak any; NOTE that some necessarily escape double-quote marks with \:	a previously used color: #362e2c
-# additionalParams='-vf "scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:color=#f2e0c9"'
-# additionalParams=-filter:v "crop=1920:1080"
+# additionalParams="-vf scale=990:-1:force_original_aspect_ratio=1,pad=1080:1080:(ow-iw)/2:(oh-ih)/2:color=#130a14"
+# additionalParams="-filter:v crop=1920:1080"
 
 # yuv420p is apparently required by instagram and probably facebook and others:
 pixelFormat="-pix_fmt yuv420p"
