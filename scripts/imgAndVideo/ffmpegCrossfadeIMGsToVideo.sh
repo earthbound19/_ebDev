@@ -35,9 +35,9 @@ codecParam="-vcodec rawvideo"
 # codecParam="-codec:v qtrle -r 30"
 	# looks horrible at video start for animations! :
 # codecParam="-codec:v libvpx-vp9 -lossless 1 -r 30"
-
 # yuv420p is apparently required by instagram and probably facebook and others:
 pixelFormat="-pix_fmt yuv420p"
+# additionalParams="-vf scale=990:-1:force_original_aspect_ratio=1,pad=1080:1080:(ow-iw)/2:(oh-ih)/2:color=#130a14"
 
 # ====
 # SET GLOBALS START
@@ -80,15 +80,15 @@ else
 	if [ ! -e "$fadeSRConeFileName"."$vidExt" ]
 	then
 				echo target render image for still image video fade source "$fadeSRConeFileName"."$vidExt" doesn\'t exist\; RENDERING\; render command is\:
-				echo ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $pixelFormat $codecParam "$fadeSRConeFileName"."$vidExt"
-		ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $pixelFormat $codecParam "$fadeSRConeFileName"."$vidExt"
+				echo ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $pixelFormat $codecParam $additionalParams "$fadeSRConeFileName"."$vidExt"
+		ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $pixelFormat $codecParam $additionalParams "$fadeSRConeFileName"."$vidExt"
 	fi
 	# This also avoids repeat work:
 	if [ ! -e "$fadeSRCtwoFileName"."$vidExt" ]
 	then
 				echo target render image for still image video fade source "$fadeSRCtwoFileName"."$vidExt" doesn\'t exist\; RENDERING\; render command is\:
-				echo ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $pixelFormat $codecParam "$fadeSRCtwoFileName"."$vidExt"
-		ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $pixelFormat $codecParam "$fadeSRCtwoFileName"."$vidExt"
+				echo ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $pixelFormat $codecParam $additionalParams "$fadeSRCtwoFileName"."$vidExt"
+		ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $pixelFormat $codecParam $additionalParams "$fadeSRCtwoFileName"."$vidExt"
 	fi
 	# CREATE the video crossfade from those two static image (looped) video files we just made.
 	# The following complex filter taken and adapted from https://superuser.com/a/1001040/130772
