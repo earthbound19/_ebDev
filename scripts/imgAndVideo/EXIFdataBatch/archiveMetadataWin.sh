@@ -1,5 +1,8 @@
 # DESCRIPTION
-# For all images of many types in the current directory, creates metadata archive files in a _originalMetaData subfolder. Metadata archives are named after the original image.
+# For all images of many types in the current directory, creates metadata archive files in an _originalMetaData subfolder. Metadata archives are named after the original image.
+
+# DEPENDENCIES
+# `exiftool`, `printAllIMGfileNames.sh`. Intended archive of metadata to a .7z file will at this writing fail if you're not running Windows (`imgMetaDataTo7z.bat`).
 
 # USAGE
 # Hack the script this calls (if you need to, to get a different formats list), then run this without any parameter:
@@ -22,16 +25,21 @@
 allIMGsArray=($(printAllIMGfileNames.sh))
 # \*.ptg (ArtRage) and *.kra (Krita) no recognized metadata :( I'd be surprised if .ora (any program) and .rif/.riff (any program though most likely Corel Painter) have readable metadata.
 
+currentDir=$(pwd)
 for element in ${allIMGsArray[@]}
 {
-	# echo ELEMENT:
-	# echo "$element"
+	# echo $element
 	# From exiftool help:
 	# -u          (-unknown)           Extract unknown tags
 	# -U          (-unknown2)          Extract unknown binary tags too
 	# -z          (-zip)               Read/write compressed information
-	imagePath=`expr match "$element" '\(.*\/\).*'`
-	exiftool -u -U -o $imagePath/_originalMetaData/%f.xmp "$element"
+	pathNoFileName=$(dirname $element)
+	if [ $pathNoFileName == '.' ]
+	then
+		pathNoFileName=''
+	fi
+	fullPathToFilename=$currentDir/$pathNoFileName$element
+	exiftool -u -U -o $currentDir/_originalMetaData/%f.xmp "$fullPathToFilename"
 }
 
 # CALL DOS batch \(I know, the inconsistency of it all!\) which creates/updates an all_originalMetaData.7z (in this path), with everything in all _originalMetaData folders in this path \(meaning, including all _originalMetaData folders in all subfolders in this path\). See comments in the following run DOS batch for details:
@@ -44,5 +52,6 @@ imgMetaDataTo7z.bat
 # Determine whether this will overwrite existing .xmp sidecars; if it does, have it *not* do that, but instead list sidecars that already exist \(list them to a text file\), and notify the user about that and the file.
 
 # ==REVISION HISTORY==
+# v?? bug fixed. Don't remember details. But history is kept in git commits (and maybe has been for a while).
 # v1.0 01/05/2016 01:17:42 AM -- seriously . . . good night. Got working in tandem with companion script, getShorterImageName.ahk/.exe [01/31/2016 06:59:37 PM that's now renamed to getCorrectedImageName.ahk/exe]. Added feature that it's smart enough to properly create and write to _originalMetaData subfolders for respective image directories. This batch had been in development long prior; this is the first feature complete/functioning version, I think.
 # v1.09 01/10/2016 01:00:47 AM . . . yerp :\) Good morning again. Created accompanying batch imgMDto7z.bat and run it from this here script. Good night.
