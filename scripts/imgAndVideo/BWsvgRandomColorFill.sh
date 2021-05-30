@@ -24,7 +24,7 @@
 
 # PARAMETER CHECKING:
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source SVG file name) passed to script. Exit."; exit 1; else svgFileName=$1; fi
-if [ ! "$2" ]; then printf "\nNo parameter \$2 (source SVG file name) passed to script. Exit."; exit 2; else generateThisMany=$2; fi
+if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many variations to make) passed to script. Exit."; exit 2; else generateThisMany=$2; fi
 if [ "$3" ]
 then
 	paletteFile=$3
@@ -103,7 +103,7 @@ fi
 
 sizeOf_rndHexColors=${#rndHexColors[@]}
 sizeOf_rndHexColors=$(($sizeOf_rndHexColors - 1))		# Else we get an out of range error for the zero-based index of arrays.
-		echo val of sizeOf_rndHexColors is $sizeOf_rndHexColors
+		# echo val of sizeOf_rndHexColors is $sizeOf_rndHexColors
 		# Dev test to assure no picks are out of range (with the first seq command in this script changed to 3):
 		# for i in $( seq 50 )
 		# do
@@ -117,7 +117,7 @@ do
 	timestamp=$(date +"%Y%m%d_%H%M%S_%N")
 	newFile="$timestamp"rndColorFill__$svgFileName
 	cp $svgFileName $newFile
-	numFFFFFFstringsInFile=$(grep -c "[fF][fF][fF][fF][fF][fF]" $newFile)		# The repeated [fF] is to allow for six f characters lowercase OR uppercase in a row, because svgs vary in representing hex digits in upper or lower case letters.
+	numFFFFFFstringsInFile=$(grep -c "[fF][fF][fF]" $newFile)		# The repeated [fF] is to allow for six f characters lowercase OR uppercase in a row, because svgs vary in representing hex digits in upper or lower case letters.
 	for j in $(seq $numFFFFFFstringsInFile)
 	do
 		pick=$(shuf -i 0-"$sizeOf_rndHexColors" -n 1)
