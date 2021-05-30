@@ -22,98 +22,117 @@
 # ? - implement an optional buffer memory of the last three colors used, and if the current picked color is among them, pick another color until it is not among them.
 # ? - replace all this functionality with a script that works with a nodejs svg library, if possible? It could be run from a CLI on any local nodejs (node) install.
 
-svgFileName=$1
-generateThisMany=$2
-paletteFile=$3
+# PARAMETER CHECKING:
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (source SVG file name) passed to script. Exit."; exit 1; else svgFileName=$1; fi
+if [ ! "$2" ]; then printf "\nNo parameter \$2 (source SVG file name) passed to script. Exit."; exit 2; else generateThisMany=$2; fi
+if [ "$3" ]
+then
+	paletteFile=$3
+fi 
 
+# PALETTE FILE SEARCH if applicable:
+if [ -e $paletteFile ]
+then
+	echo Source pallete file $paletteFile found in the current directory. Will use that.
+	rndHexColors=($(<$paletteFile))
+else
+	paletteFileNotFound='true'
+fi
 
-# If no $3 parameter passed to script, create an array of 18 random hex RGB color values. Otherwise, create the array from the list in the filename specified in $3.
-if [ -z "$3" ]
+if [ "$paletteFileNotFound" == 'true' ]
+then
+	echo "Specified palette file name not found in current path. Will search for palettesRootDir.txt and search those pathes for palette . . ."
+	# Search for specified palette file in palettesRootDir (if that dir exists; if it doesn't, exit with an error) :
+	if [ -e ~/palettesRootDir.txt ]
 	then
-		echo no parameter \$3 passed to script\; generating random hex colors array . . .
-		for i in $( seq 9 );
-		do
-# TO DO: make this work faster with one pre-generated string in memory that you bite six bytes off in increments.
-		randomHexString=`cat /dev/urandom | tr -cd 'a-f0-9' | head -c 6`
-				echo Random color \#"$randomHexString" . . .
-		rndHexColors[$i]=$randomHexString
-		done
-# TO DO: make this save the generated hex color scheme to a plain text file.
-	else
-		# Search for specified palette file in palettesRootDir (if that dir exists; if it doesn't, exit with an error) :
-		if [ -e ~/palettesRootDir.txt ]
+		palettesRootDir=$(< ~/palettesRootDir.txt)
+				echo palettesRootDir.txt found\;
+				echo searching in path $palettesRootDir
+				echo -- for file $paletteFile . . .
+		hexColorSrcFullPath=$(find $palettesRootDir -iname "$paletteFile")
+		echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+		if [ "$hexColorSrcFullPath" == "" ]
 		then
-			palettesRootDir=$(< ~/palettesRootDir.txt)
-					echo palettesRootDir.txt found\;
-					echo searching in path $palettesRootDir --
-					echo for file $paletteFile . . .
-			hexColorSrcFullPath=`find $palettesRootDir -iname "$paletteFile"`
-			echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
-			if [ "$hexColorSrcFullPath" == "" ]
-				then
-					echo File of name $paletteFile NOT FOUND in the path this script was run from OR in path \"$palettesRootDir\" \! ABORTING script.
-					exit
-				else
-					echo File name $paletteFile FOUND in the path this script was run from OR in path \"$palettesRootDir\" \!
-					echo File is at\:
-					echo $hexColorSrcFullPath
-					echo PROCEEDING. IN ALL CAPS.
-			fi
+			echo File of name $paletteFile NOT FOUND in the path this script was run from OR in path \"$palettesRootDir\" \! ABORTING script.
+			exit 3
 		else
-			echo !--------------------------------------------------------!
-			echo file ~/palettesRootDir.txt \(in your root user path\) not found. This file should exist and have one line, being the path of your palette text files e.g.:
-			echo
-			echo /cygdrive/c/_ebdev/scripts/imgAndVideo/palettes
-			echo
-			echo ABORTING script.
-			echo !--------------------------------------------------------!
-			exit
+			echo File name $paletteFile FOUND in the path this script was run from OR in path \"$palettesRootDir\" \!
+			echo File is at\:
+			echo $hexColorSrcFullPath
+			echo PROCEEDING. IN ALL CAPS.
+			rndHexColors=($(<$hexColorSrcFullPath))
+		fi
+	else
+		echo !--------------------------------------------------------!
+		echo "file ~/palettesRootDir.txt \(in your root user path\) not found. If you wish to use your intended palette from a directory within a global path containing palettes, this file should exist and have one line, being the root directory that contains palettes (which may be in subfolders of that directory), e.g.:"
+		echo
+		echo /c/Users/YourUserName/Documents/_ebPalettes/palettes
+		echo
+		echo see the _ebPalettes repo with its createPalettesRootDirTXT.sh script.
+		echo ABORTING script.
+		echo !--------------------------------------------------------!
+		exit
 	fi
-		echo Generating hex colors array from file $paletteFile . . .
-		sed 's/#//g' $hexColorSrcFullPath > srcHexColorsNoHash.txt
-		mapfile -t rndHexColors < srcHexColorsNoHash.txt
-				for element in ${rndHexColors[@]}
-				do
-					echo Color $element . . .
-				done
-		rm srcHexColorsNoHash.txt
+fi
+
+# remove # from start of every element of hex array:
+counter=0
+replArr=()
+# build new array then copy it to old one, because my attempt to modify by index failed:
+for element in ${rndHexColors[@]}
+do
+	newSTR="${element/\#/}"
+	replArr+=($newSTR)
+done
+rndHexColors=("${replArr[@]}")
+
+# If no $paletteFile set (no parameter $3 passed to script), create an array of 18 random hex RGB color values. Otherwise, create the array from the list in the filename specified in $3.
+if [ -z "$paletteFile" ]
+then
+	echo no parameter \$3 passed to script\; generating random hex colors array . . .
+	rndHexColors=()
+	for i in $(seq 9);
+	do
+		# TO DO: make this work faster with one pre-generated string in memory that you bite six bytes off in increments?
+		randomHexString=$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 6)
+			echo Generated random RGB hex color "$randomHexString" . . .
+		rndHexColors+=($randomHexString)
+	done
+# TO DO: make this save the generated hex color scheme to a plain text file (just generate an RND name and rename it to that instead of the following delete) :
 fi
 
 sizeOf_rndHexColors=${#rndHexColors[@]}
-sizeOf_rndHexColors=$(( $sizeOf_rndHexColors - 1))		# Else we get an out of range error for the zero-based index of arrays.
-		# echo val of sizeOf_rndHexColors is $sizeOf_rndHexColors
+sizeOf_rndHexColors=$(($sizeOf_rndHexColors - 1))		# Else we get an out of range error for the zero-based index of arrays.
+		echo val of sizeOf_rndHexColors is $sizeOf_rndHexColors
 		# Dev test to assure no picks are out of range (with the first seq command in this script changed to 3):
 		# for i in $( seq 50 )
 		# do
-			# pick=`shuf -i 0-"$sizeOf_rndHexColors" -n 1`
+			# pick=$(shuf -i 0-"$sizeOf_rndHexColors" -n 1)
 			# echo sizeOf_rndHexColors val \(\*zero-based\*\) is $sizeOf_rndHexColors
 			# echo rnd pick is $pick
 		# done
-for i in $( seq $generateThisMany )
+for i in $(seq $generateThisMany)
 do
 	echo Generating variant $i of $generateThisMany . . .
-	timestamp=`date +"%Y%m%d_%H%M%S_%N"`
+	timestamp=$(date +"%Y%m%d_%H%M%S_%N")
 	newFile="$timestamp"rndColorFill__$svgFileName
 	cp $svgFileName $newFile
-	numFFFFFFstringsInFile=`grep -c "[fF][fF][fF][fF][fF][fF]" $newFile`		# The repeated [fF] is to allow for six f characters lowercase OR uppercase in a row, because svgs vary in representing hex digits in upper or lower case letters.
-	for j in $( seq $numFFFFFFstringsInFile )
+	numFFFFFFstringsInFile=$(grep -c "[fF][fF][fF][fF][fF][fF]" $newFile)		# The repeated [fF] is to allow for six f characters lowercase OR uppercase in a row, because svgs vary in representing hex digits in upper or lower case letters.
+	for j in $(seq $numFFFFFFstringsInFile)
 	do
-		pick=`shuf -i 0-"$sizeOf_rndHexColors" -n 1`
+		pick=$(shuf -i 0-"$sizeOf_rndHexColors" -n 1)
 		randomHexString="${rndHexColors[$pick]}"
 				# echo pick is $pick
-				echo Randomly picked hex color \#"$randomHexString" for fill . . .
-			# ULTIMATE CLUGE WORKAROUND for problem mixing ' and " in a sed command; NOTE that the $ is escaped--in some insane way that for some reason the shell insists! :
+				echo Randomly picked hex color "$randomHexString" for fill . . .
+			# HORRIBLE KLUDGE for problem mixing ' and " in a sed command; NOTE that the $ is escaped--in some insane way that for some reason the shell insists! :
 			# NOTE: I was at first using $j instead of 1 to delimit which instance should be replaced, but D'OH! : that Nth instance changes (for the next replace by count operation) after any inline replace!
 			# Changing Nth instance of string re: http://stackoverflow.com/a/13818063/1397555
 					# test command that worked [by replacing 5th instance of the string?] :
-					# sed ':a;N;$!ba;s/FFFFFF/3f2aff/5' test.svg
+					# sed -i ':a;N;$!ba;s/ffffff/3f2aff/5' test.svg
 			# -- expanding on that pattern, the following command changes the first instance of [fF]\{6\} in the file (I think?) :
-		sedCommand=`echo sed -i \'":a;N;\\$!ba;s/[fF]\{6\}/$randomHexString/1"\' $newFile`
-				# echo $sedCommand
+		sedCommand=`echo sed -i \'":a;N;\\$!ba;s/[fF]\{3,\}/$randomHexString/1"\' $newFile`
 		echo $sedCommand > tempCommand.sh
-				chmod 777 ./tempCommand.sh
 		./tempCommand.sh
 	done
 	rm ./tempCommand.sh
-	chmod 777 $newFile
 done
