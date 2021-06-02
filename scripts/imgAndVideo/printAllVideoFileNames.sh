@@ -10,6 +10,8 @@
 #    for element in ${allIMGfileNamesArray[@]}; do <something with $element>; done
 # By default, the script only prints files in the current directory, but if you pass any parameter to the script (for example the word 'BROGNALF'), it will also (find and) print image file names from subdirectories:
 #    printAllVideoFileNames.sh BROGNALF
+# NOTE
+# Because some tools are silly and create files with uppercase extensions, this script searches for both lowercase and uppercase extensions of every file type in its list.
 
 
 # CODE
@@ -18,61 +20,74 @@ maxdepthParameter='-maxdepth 1'
 # If parameter one is passed to script, that changes to nothing, and find's default recursive search will be used (as no maxdepth switch will be passed) :
 if [ "$1" ]; then maxdepthParameter=''; fi
 
-find . $maxdepthParameter \( \
--iname \*.3g2 \
--o -iname \*.3gp \
--o -iname \*.3gp2 \
--o -iname \*.3gpp \
--o -iname \*.amv \
--o -iname \*.asf \
--o -iname \*.avi \
--o -iname \*.bik \
--o -iname \*.divx \
--o -iname \*.dpg \
--o -iname \*.dv \
--o -iname \*.dvr-ms \
--o -iname \*.evo \
--o -iname \*.f4v \
--o -iname \*.flv \
--o -iname \*.hdmov \
--o -iname \*.k3g \
--o -iname \*.m1v \
--o -iname \*.m2t \
--o -iname \*.m2ts \
--o -iname \*.m2v \
--o -iname \*.m4b \
--o -iname \*.m4p \
--o -iname \*.m4v \
--o -iname \*.mk3d \
--o -iname \*.mkv \
--o -iname \*.mov \
--o -iname \*.mp2v \
--o -iname \*.mp4 \
--o -iname \*.mp4v \
--o -iname \*.mpe \
--o -iname \*.mpeg \
--o -iname \*.mpg \
--o -iname \*.mpv2 \
--o -iname \*.mpv4﻿﻿ \
--o -iname \*.mqv \
--o -iname \*.mts \
--o -iname \*.mxf \
--o -iname \*.nsv \
--o -iname \*.ogm \
--o -iname \*.ogv \
--o -iname \*.qt \
--o -iname \*.ram \
--o -iname \*.rm \
--o -iname \*.rmvb \
--o -iname \*.skm \
--o -iname \*.swf \
--o -iname \*.tp \
--o -iname \*.tpr \
--o -iname \*.trp \
--o -iname \*.ts \
--o -iname \*.vob \
--o -iname \*.webm \
--o -iname \*.wm \
--o -iname \*.wmv \
--o -iname \*.xvid \
- \) -printf "%P\n"
+# array of file types in lowercase; will programmatically build `find` command that searches for these *and* uppercase versions (because some devices and programs are silly and write uppercase extensions) :
+filetypes=(
+3g2
+3gp
+3gp2
+3gpp
+amv
+asf
+avi
+bik
+divx
+dpg
+dv
+dvr-ms
+evo
+f4v
+flv
+hdmov
+k3g
+m1v
+m2t
+m2ts
+m2v
+m4b
+m4p
+m4v
+mk3d
+mkv
+mov
+mp2v
+mp4
+mp4v
+mpe
+mpeg
+mpg
+mpv2
+mpv4﻿﻿
+mqv
+mts
+mxf
+nsv
+ogm
+ogv
+qt
+ram
+rm
+rmvb
+skm
+swf
+tp
+tpr
+trp
+ts
+vob
+webm
+wm
+wmv
+xvid
+)
+
+# build string listing lowercase and also uppercase extensions list section for `find` command:
+fileTypesWithAlsoUppercase=
+for type in ${filetypes[@]}
+do
+	typesParam+="-o -iname \*.$type -o -iname \*.${type^^} "
+done
+
+# I'm only getting this to work in a temp script that I create, write the command to, executed and then delete. By itself with whatever escaping I find, or in a variable expanded to a command, it breaks; CHORFL is just to meet a requirement of starting the list withuot -o:
+echo "find ./ $maxdepthParameter -type f \( -iname \*.CHORFL $typesParam \) -printf \"%P\n\"" > tmpScript_bNTGndH63.sh
+./tmpScript_bNTGndH63.sh
+rm ./tmpScript_bNTGndH63.sh
