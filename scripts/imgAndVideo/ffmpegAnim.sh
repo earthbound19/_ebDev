@@ -22,7 +22,6 @@
 
 # CODE
 # TO DO
-# - Optional: padding re https://superuser.com/a/690211
 # - Make it name the output file after the ../.. parent folder name?
 
 if [ "$5" ]
@@ -49,7 +48,7 @@ digitsPadCount=${#lastFoundTypeFileNameNoExt}
 # echo "-filter:v \"crop=1920:1080\"" > tmp_blaheryeag_nbD9X44rCJev.txt && additionalParams=$(<tmp_blaheryeag_nbD9X44rCJev.txt) && rm tmp_blaheryeag_nbD9X44rCJev.txt
 
 # OPTIONAL additionalParams; uncomment / tweak any; NOTE that some necessarily escape double-quote marks with \:	a previously used color: #362e2c
-# additionalParams="-vf scale=990:-1:force_original_aspect_ratio=1,pad=1080:1080:(ow-iw)/2:(oh-ih)/2:color=#130a14"
+additionalParams="-vf scale=990:-1:force_original_aspect_ratio=1,pad=1080:1080:\(ow-iw\)/2:\(oh-ih\)/2:color=#130a14"
 # additionalParams="-filter:v crop=1920:1080"
 
 # yuv420p is apparently required by instagram and probably facebook and others:

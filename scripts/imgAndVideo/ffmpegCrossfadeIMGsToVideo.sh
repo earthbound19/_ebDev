@@ -37,7 +37,7 @@ codecParam="-vcodec rawvideo"
 # codecParam="-codec:v libvpx-vp9 -lossless 1 -r 30"
 # yuv420p is apparently required by instagram and probably facebook and others:
 pixelFormat="-pix_fmt yuv420p"
-# additionalParams="-vf scale=990:-1:force_original_aspect_ratio=1,pad=1080:1080:(ow-iw)/2:(oh-ih)/2:color=#130a14"
+# additionalParams="-vf scale=990:-1:force_original_aspect_ratio=1,pad=1080:1080:\(ow-iw\)/2:\(oh-ih\)/2:color=#130a14"
 
 # ====
 # SET GLOBALS START

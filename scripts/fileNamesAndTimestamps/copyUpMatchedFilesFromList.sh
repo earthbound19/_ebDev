@@ -15,6 +15,8 @@
 # - Run the following command (assuming this script is in your PATH) to copy associated render configuration etc. files up from the subfolders:
 #    copyUpMatchedFilesFromList.sh favorites.txt
 # - Sort all those copied files into another folder for further work
+# YOU MAY ALSO get such a list by piping output of listUnmatchedExtensions.sh to a file, like this:
+#    listUnmatchedExtensions.sh png svg > noMatchingSVGs.sh
 
 # KEYWORDS
 # pair, matched, copy, up, file list

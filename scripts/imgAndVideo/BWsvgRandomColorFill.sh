@@ -117,7 +117,8 @@ do
 	timestamp=$(date +"%Y%m%d_%H%M%S_%N")
 	newFile="$timestamp"rndColorFill__$svgFileName
 	cp $svgFileName $newFile
-	numFFFFFFstringsInFile=$(grep -c "[fF][fF][fF]" $newFile)		# The repeated [fF] is to allow for six f characters lowercase OR uppercase in a row, because svgs vary in representing hex digits in upper or lower case letters.
+# TO DO: figure out what's wrong in my SVGs and/or this script that if I change the following to match "#fff (instead of #fff) it sometimes fails to count+replace:
+	numFFFFFFstringsInFile=$(grep -c '\#[fF][fF][fF]' $newFile)		# The repeated [fF] is to allow for six f characters lowercase OR uppercase in a row, because svgs vary in representing hex digits in upper or lower case letters.
 	for j in $(seq $numFFFFFFstringsInFile)
 	do
 		pick=$(shuf -i 0-"$sizeOf_rndHexColors" -n 1)
