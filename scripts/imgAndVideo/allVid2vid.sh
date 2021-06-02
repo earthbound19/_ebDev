@@ -35,7 +35,7 @@ fi
 # ADDITIONAL PARAMETERS--uncomment whatever you may wish here:
 # Option which I haven't gotten to work yet (it works if I paste it into the command in the loop, but not as stored in the variable additonalParams) :
 # Pad video to a given size, with the video in the center:
-# additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:(ow-iw)/2:(oh-ih)/2"
+# additionalParams="-vf scale=-1:1080:force_original_aspect_ratio=1,pad=1920:1080:\(ow-iw\)/2:\(oh-ih\)/2"
 # Scale video to given pixels X, maintain aspect ratio, no padding:
 # additionalParams="-vf scale=-1:640:force_original_aspect_ratio=1"
 # Scale video down to half size; trying the \" escapes for double quote marks because it works from the terminal with those around the "scale" param:
