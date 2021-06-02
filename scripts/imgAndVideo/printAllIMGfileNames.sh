@@ -10,6 +10,8 @@
 #    for element in ${allIMGfileNamesArray[@]}; do <something with $element>; done
 # By default, the script only prints files in the current directory, but if you pass any parameter to the script (for example the word 'BROGNALF'), it will also (find and) print image file names from subdirectories:
 #    printAllIMGfileNames.sh BROGNALF
+# NOTE
+# Because some tools are silly and create files with uppercase extensions, this script searches for both lowercase and uppercase extensions of every file type in its list.
 
 
 # CODE
@@ -18,24 +20,37 @@ maxdepthParameter='-maxdepth 1'
 # If parameter one is passed to script, that changes to nothing, and find's default recursive search will be used (as no maxdepth switch will be passed) :
 if [ "$1" ]; then maxdepthParameter=''; fi
 
-find . $maxdepthParameter \( \
--iname \*.tif \
--o -iname \*.tiff \
--o -iname \*.png \
--o -iname \*.tga \
--o -iname \*.psd \
--o -iname \*.psb \
--o -iname \*.ora \
--o -iname \*.rif \
--o -iname \*.riff \
--o -iname \*.jpg \
--o -iname \*.jpeg \
--o -iname \*.gif \
--o -iname \*.bmp \
--o -iname \*.cr2 \
--o -iname \*.raw \
--o -iname \*.dng \
--o -iname \*.crw \
--o -iname \*.kra \
--o -iname \*.ptg \
- \) -printf "%P\n"
+# array of file types in lowercase; will programmatically build `find` command that searches for these *and* uppercase versions (because some devices and programs are silly and write uppercase extensions) :
+filetypes=(
+tif
+tiff
+png
+tga
+psd
+psb
+ora
+rif
+riff
+jpg
+jpeg
+gif
+bmp
+cr2
+raw
+dng
+crw
+kra
+ptg
+)
+
+# build string listing lowercase and also uppercase extensions list section for `find` command:
+fileTypesWithAlsoUppercase=
+for type in ${filetypes[@]}
+do
+	typesParam+="-o -iname \*.$type -o -iname \*.${type^^} "
+done
+
+# I'm only getting this to work in a temp script that I create, write the command to, executed and then delete. By itself with whatever escaping I find, or in a variable expanded to a command, it breaks; CHORFL is just to meet a requirement of starting the list withuot -o:
+echo "find ./ $maxdepthParameter -type f \( -iname \*.CHORFL $typesParam \) -printf \"%P\n\"" > tmpScript_bxJZuSvKq.sh
+./tmpScript_bxJZuSvKq.sh
+rm ./tmpScript_bxJZuSvKq.sh
