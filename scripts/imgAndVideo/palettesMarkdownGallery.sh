@@ -13,13 +13,11 @@
 
 
 # CODE
-# checking error code on find command thanks to a genius breath yon: https://serverfault.com/a/768042/121188
-! test -z $(find . -maxdepth 1 -iname \*.png)
-error_code=`echo $?`
-# echo error_code is $error_code
+array=($(find . -maxdepth 1 -type f -iname \*.png -printf '%f\n' | tr -d '\15\32' | sort -n))
+array_length=${#array[@]}
 
 # If no png files were found (if find threw an error), destroy any README.md gallery file and exit the script:
-if (( error_code == "1" ))
+if (( array_length == "0" ))
 then
 	echo "--no png files were found. Destroying any README.md and will then exit script!";
 	if [ -e README.md ]
@@ -33,11 +31,9 @@ then
 else
 	echo "--png files were found. Will create README.md gallery."
 fi
-
+exit
 # Otherwise, proceed with gallery creation:
 printf "# Palettes\n\nClick any image to go to the source image; the text line above the image to go to the source .hexplt file.\n\n" > README.md
-
-array=($(find . -maxdepth 1 -type f -iname \*.png -printf '%f\n' | tr -d '\15\32' | sort -n))
 
 for element in ${array[@]}
 do
