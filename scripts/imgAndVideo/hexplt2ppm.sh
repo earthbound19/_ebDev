@@ -1,6 +1,6 @@
 # DESCRIPTION
 # Makes a teensy ppm palette image (one pixel per color) from a hex palette .hexplt source file. Result is usable as a basis for a scaled up palette image via e.g.:
-# img2imgNN.sh ppm png 640 480
+#    img2imgNN.sh ppm png 640 480
 
 # USAGE
 # Run this script with the following parameters:
