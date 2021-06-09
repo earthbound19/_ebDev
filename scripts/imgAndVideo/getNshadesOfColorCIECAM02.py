@@ -1,5 +1,5 @@
 # DESCRIPTION
-# I NOW RECOMMEND `get_color_gradient_culori.js` over this script, because CIECAM02 does some hue shifting on darkening which the Oklab color space does not. This script gets -n shades of any -c color (default white if not passed) via the CIECAM02 color space, which models human perception of color (and brightness and other aspects of light) better than any other model at this writing. Writes results to a new .hexplt file named after color.
+# Gets -n shades of any -c color (default white if not passed) via the CIECAM02 color space. Writes results to a new .hexplt file named after color. SEE ALSO `get_color_gradient_culori.js`. That and this might both do hue shifting (you may not get perceptual hue constancy) in shades (~culori possibly less). For example you might say that shades of yellow look orange. But with shades of gray, this produces results that seem to align more with my idea of neutral gray (between black and white, as seen from optical blending experiments).
 
 # DEPENDENCIES
 # Python and the various import libraries declared at the start of CODE.
@@ -94,7 +94,7 @@ for J in descending_j_values:
 # Deduplicate list but maintain order; re: https://stackoverflow.com/a/17016257/1397555
 from more_itertools import unique_everseen
 colorsRGB = list(unique_everseen(colorsRGB))
-colorsRGB.pop(0)     # removes the first color, which is black. White isn't in the list via the math; see an earlier comment.
+# colorsRGB.pop(0)     # removes the first color, which is black. White isn't in the list via the math; see an earlier comment.
 # Remove every k element decreasing recursive if numeric decimate switch to do so present:
 if ARGS.DECIMATE:
 	k = ARGS.DECIMATE
