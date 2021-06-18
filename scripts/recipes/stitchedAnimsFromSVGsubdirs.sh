@@ -8,6 +8,8 @@
 # USAGE
 # After you obtain so many images in subdirectories via small_and_simple_things.pde, run this script without any parameters:
 #    stitchedAnimsFromSVGsubdirs.sh
+# NOTE
+# See outdented "OPTIONAL" comment for a line of code you may uncomment that will leave all copied svgs (rendered frames) after a certain count out of the render (for example to only render less than a minute's worth of frames).
 
 
 # CODE
@@ -42,9 +44,11 @@ do
 		# and first file number, and passing that to ffmpeg re:
 		# https://en.wikibooks.org/wiki/FFMPEG_An_Intermediate_Guide/image_sequence
 		renumberFiles.sh svg
-		allSVG2img.sh 1080 png
+# OPTIONAL: delete all svg files after count N with this script call:
+# rmnn.sh svg 600 NULL BLUBARG
+		allSVG2img.sh 720 png
 		ffmpegAnim.sh 30 30 9 png
-		mv ./_out.mp4 ../../anim_segment_"$zeroPaddedNumber".mp4
+		mv ./_out.mp4 ../../_segment_"$zeroPaddedNumber"_"$element".mp4
 		cd ..
 		rm -rf tmp_rip
 		popd
