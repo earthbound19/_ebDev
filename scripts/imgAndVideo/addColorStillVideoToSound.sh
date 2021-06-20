@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates a still color video the duration of a source sound, in an mp4 media container, copying the sound losslesly into the video container. Useful for sharing music on silly platforms that only share video but not sound.
+# Creates a still color video the duration of a source sound, in an mp4 media container, copying the sound losslesly into the video container. Useful for sharing music on silly platforms that only share video but not sound. To combine a still image and video, see stillIMGAndSoundToVid.sh
 
 #DEPENDENCIES
 # randomString.sh, graphicsmagick (convert), ffmpeg
