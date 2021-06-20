@@ -125,6 +125,7 @@ else
 	echo $tilesAcross $tilesDown >> PPMheader.txt
 	echo "255" >> PPMheader.txt
 
+	# TO DO: this simpler conversion method for sRGB hex code to decimal: https://stackoverflow.com/a/7254022/1397555
 	# each hex color is a triplet of hex pairs (corresponding to 0-255 RGB values) ; concatenate temp hexplt file to uninterrupted hex pairs (no newlines) to parse as one long string into the ppm body:
 	# with | tr -d '\15\32' to delete windows newlines from the resultant array
 	#  and this is the seventeen-thousandth time this doom has caused issues without this:
@@ -132,7 +133,6 @@ else
 			rm $hexColorSrcFullPath
 	# Split that superstring with spaces every two hex chars:
 	ppmBodyValues=`echo $ppmBodyValues | sed 's/../& /g' | tr -d '\15\32'`
-	# TO DO for hexplt2ppm.sh: convert that to decimal; first work it up into a string formatted for echo in base-16, e.g.:
 	# ppmBodyValues=`echo $((16#"$thisHexString")) $((16#"$thatHexString"))`
 	ppmBodyValues=`echo $ppmBodyValues | sed 's/[a-zA-Z0-9]\{2\}/$((16#&))/g' | tr -d '\15\32'`
 	# If I echo that\, it prints it literally instead of interpretively. Ach! Workaround: make a temp shell script that echoes it interpretively (and assign the result to a variable) :
