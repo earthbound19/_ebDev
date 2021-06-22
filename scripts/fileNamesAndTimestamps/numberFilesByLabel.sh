@@ -13,6 +13,7 @@
 # - determine whether any sed flag will make e.g. _[fF][iI][nN][aA][lL] unnecessary as a search pattern (case-insenstitive search). My first searches for this said no . . .
 # - In this script, make the following variables actually do anything :) which will mean case-insensitive regexes in sed maybe, or which whuh i dunno? :
 # - improve the following description in the line of code starting with 'echo WARNING\:'.
+# - determine whether I need to do anything from this note which was in a straggling file named "teh_scrap_of_now.txt" : is final numbered removed from numbersFrom!. ?
 labelOne=_FINAL_
 labelTwo=_work_
 
