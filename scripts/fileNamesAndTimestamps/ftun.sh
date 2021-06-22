@@ -15,7 +15,7 @@
 # Example that would operate on all png files in the current directory and all subdirectories:
 #    ftun.sh png SNORFBLARN
 # Example that would operate on all files of every type found in the current directory and all subdirectories:
-#    ftun.sh png ALL SNORFBLARN
+#    ftun.sh ALL SNORFBLARN
 # NOTES
 # - Characters I consider unfriendly (but which may not all actually cause problems) are (with maybe more problematic ones first) : ``@=\`~!#$%^&()+[{]}; ,-``
 # - Also, in my opinion it is undesirable to have a . character in the middle of a file name (a file extension with two or more dots in it).
@@ -75,7 +75,7 @@ perl $pathToRenamePerl -g -e 's/[^\w.-]+/_/g' \"$extension\"
 # If $2 was passed to script, recurse through subdirectories and also rename all files of type $extension:
 if [ "$2" ]
 then
-	directories=$(find . -type d)
+	directories=( $(find . -type d) )
 	# remove the first element in that array by reassigning to itself without that:
 	directories=(${directories[@]:1})
 
