@@ -343,6 +343,12 @@ This might be called "array slicing," I don't know. `:2` will list everything bu
 
 I have not had occasion, using bash, to remove or insert specific elements into an array at specific indices. Python does that more easily.
 
+#### Reverse a bash array
+
+This may be kludgy but it reads the most elegantly in my opinion, from [here](https://unix.stackexchange.com/a/497850/110338) -- and more importantly, in my environment at least, it works:
+
+    reversedArray=($(echo "${allIMGsArray[@]} " | tac -s ' '))
+
 #### Combine bash arrays into one new array
 
 Adapted from TheGeekStuff; if there are duplicates between the arrays they will appear more than once in the new array:
