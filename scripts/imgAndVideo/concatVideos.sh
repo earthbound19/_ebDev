@@ -12,7 +12,7 @@
 #    file 'file2.avi'
 #    file 'anotherVideoFileName.avi'
 #    file 'etcetera.avi'
-# If $2 is used, $1 is ignored (and can technically be anything in that case, like the word NULL). It may be desirable to use $2 if you want a custom ordering for the concatenation of the files. If you only use $1, whatever order results from `ls $1` is the concatenation order.
+# If $2 is used, $1 is ignored (and can technically be anything in that case, like the word NULL). It may be desirable to use $2 if you want a custom ordering for the concatenation of the files. If you only use $1, whatever order results from the file list wildcard portion of the printf command in code (see) is the concatenation order.
 # Example with only parameter $1:
 #    concatVideos.sh avi
 # Example without any parameter, which would concatenate all mp4 files:
@@ -30,12 +30,12 @@ if [ "$2" ]; then srcFileList=$2; fi
 
 if [ ! "$srcFileList" ]
 then
-	srcFileList=all"$vidExt".txt
-	ls *.$vidExt > $srcFileList
-	sed -i "s/^\(.*\)/file '\1'/g" $srcFileList
+	srcFileList="all"_"$vidExt"".txt"
+	printf "file '%s'\n" *.$vidExt > $srcFileList
 fi
-rndString=$(randomString.sh 1 8)
-concatenatedVideoFileName=_"$vidExt"sConcatenated_"$rndString".$vidExt
+
+rndString=$(randomString.sh 1 14)
+concatenatedVideoFileName=_"$vidExt"sConcatenated_"$rndString"\.$vidExt
 ffmpeg -f concat -i $srcFileList -c copy $concatenatedVideoFileName
 
 echo DONE. See result file $concatenatedVideoFileName and move or copy it where you will.
