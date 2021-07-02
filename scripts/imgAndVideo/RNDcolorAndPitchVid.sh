@@ -22,11 +22,12 @@ fi
 hexColor=$(cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6)
 ffmpeg -y -f lavfi -i color=$hexColor:s=1280x720:d=$duration -codec:v utvideo rgb_0x"$hexColor"_"$duration"s.avi
 # Generate input tone in random frequency range N to M (ex. C1 32.70 to C6 1046.50) :
-frequency=$(echo "scale=2; ($RANDOM * 32.70 / 32767) + 1046.50" | bc)
+frequency_one=$(echo "scale=2; ($RANDOM * 32.70 / 32767) + 523.25" | bc)
+frequency_two=$(echo "scale=2; ($RANDOM * 32.70 / 32767) + 523.25" | bc)
 # PREVIOUS ffmpeg command:
 # ffmpeg -y -f lavfi -i "sine=frequency=$frequency:duration=$duration" "$frequency"Hz_"$duration"s.wav
 # NEW	sox command:
-sox −n "$frequency"Hz_"$duration"s.wav synth $duration triangle $frequency gain -13
+sox −n "$frequency"Hz_"$duration"s.wav synth $duration triangle "$frequency_one"-"$frequency_two" gain -13
 
 # Mux the two into one .mp4, then dispose of the input files:
 ffmpeg -i rgb_0x"$hexColor"_"$duration"s.avi -i "$frequency"Hz_"$duration"s.wav -crf 38 rgb_0x"$hexColor"_and_"$frequency"Hz_"$duration"s.mp4
