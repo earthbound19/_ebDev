@@ -1,6 +1,9 @@
 # DESCRIPTION
 # Makes a video of a random color accompanied by a random sound pitch. Because you might want to drive someone insane, or because what is life and what is art and why are you doing this and what is life and what is art and why are you doing this.
 
+# DEPENDENCIES
+# sox CLI sound utility
+
 # USAGE
 # Run with one optional parameter, which is a decimal duration in seconds which will be the duration of the generated video, e.g.:
 #    RNDcolorAndPitchVid.sh 0.68
@@ -18,9 +21,12 @@ fi
 # Generate input video animation of random still color:
 hexColor=$(cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6)
 ffmpeg -y -f lavfi -i color=$hexColor:s=1280x720:d=$duration -codec:v utvideo rgb_0x"$hexColor"_"$duration"s.avi
-# Generate input tone: To get random number (for tone) in range F2 87.31 - E5 659.25, make random number 0-n be E5 minus F2 (or 659.25 - 87.31 = 571.94), plus 87.31:
-frequency=$(echo "scale=2; ($RANDOM * 571.94 / 32767) + 87.31" | bc)
-ffmpeg -y -f lavfi -i "sine=frequency=$frequency:duration=$duration" "$frequency"Hz_"$duration"s.wav
+# Generate input tone in random frequency range N to M (ex. C1 32.70 to C6 1046.50) :
+frequency=$(echo "scale=2; ($RANDOM * 32.70 / 32767) + 1046.50" | bc)
+# PREVIOUS ffmpeg command:
+# ffmpeg -y -f lavfi -i "sine=frequency=$frequency:duration=$duration" "$frequency"Hz_"$duration"s.wav
+# NEW	sox command:
+sox −n "$frequency"Hz_"$duration"s.wav synth $duration triangle $frequency gain -13
 
 # Mux the two into one .mp4, then dispose of the input files:
 ffmpeg -i rgb_0x"$hexColor"_"$duration"s.avi -i "$frequency"Hz_"$duration"s.wav -crf 38 rgb_0x"$hexColor"_and_"$frequency"Hz_"$duration"s.mp4
@@ -62,6 +68,7 @@ rm rgb_0x"$hexColor"_"$duration"s.avi "$frequency"Hz_"$duration"s.wav
 # A0	27.50 	1254.55
  # A#0/Bb0  	29.14 	1184.13
 # B0	30.87 	1117.67
+# -> general broad human range begin, according to one source
 # C1	32.70 	1054.94
  # C#1/Db1  	34.65 	995.73
 # D1	36.71 	939.85
@@ -81,6 +88,7 @@ rm rgb_0x"$hexColor"_"$duration"s.avi "$frequency"Hz_"$duration"s.wav
 # E2	82.41 	418.65
 # F2	87.31 	395.16
  # F#2/Gb2  	92.50 	372.98
+# -> general broad human range begin, according to another source
 # G2	98.00 	352.04
  # G#2/Ab2  	103.83 	332.29
 # A2	110.00 	313.64
@@ -123,6 +131,7 @@ rm rgb_0x"$hexColor"_"$duration"s.avi "$frequency"Hz_"$duration"s.wav
  # A#5/Bb5  	932.33 	37.00
 # B5	987.77 	34.93
 # C6	1046.50 	32.97
+# <- general broad human vocal range end
  # C#6/Db6  	1108.73 	31.12
 # D6	1174.66 	29.37
  # D#6/Eb6  	1244.51 	27.72
