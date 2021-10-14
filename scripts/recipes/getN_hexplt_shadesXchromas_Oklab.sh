@@ -4,6 +4,9 @@
 # - Every color in that resulting tint <-> shades palette is taken, and a perceptually uniform gradient of N ($3) grays made from each to near desaturated (no chroma, or gray) for that color
 # In other words, this script obtains and lists a gamut of tints, shades and saturated and unsaturated colors for every color in a palette. Results will be in palette files named after each color in the source palette. Also, this calls a script to render the result palettes in a layout that shows the tint, shade and chroma gradients' relationships.
 
+# DEPENDENCIES:
+# getFullPathToFile.sh, get_color_gradient_culori.sh
+
 # USAGE
 # Run with these parameters:
 # - $1 source file name of palette in .hexplt format (a list of RGB color hex codes)
@@ -85,4 +88,4 @@ then
 	renderAllHexPalettes.sh YORP 260 NULL $renderColumns $renderRows
 fi
 
-printf "\n~\nDONE generating and rendering palettes from source file $sourceHexpltFile."
+printf "\n~\nDONE generating and (if told to) rendering palettes from source file $sourceHexpltFile."
