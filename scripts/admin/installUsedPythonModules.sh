@@ -10,11 +10,12 @@
 python -m pip install --upgrade pip
 
 pythonModules=" \
+numpy \
+scipy \
 more_itertools \
 colorspacious \
 colour-science \
 spectra \
-numpy \
 ciecam02 \
 colormap \
 colorgram.py \
