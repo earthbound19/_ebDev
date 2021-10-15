@@ -157,3 +157,5 @@ do
 	echo SC CONFIG $element start= demand
 	SC CONFIG $element start= demand
 done
+
+echo DONE. See also disable_per_user_services.reg.
