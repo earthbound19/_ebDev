@@ -31,7 +31,7 @@ then
 else
 	echo "--png files were found. Will create README.md gallery."
 fi
-exit
+
 # Otherwise, proceed with gallery creation:
 printf "# Palettes\n\nClick any image to go to the source image; the text line above the image to go to the source .hexplt file.\n\n" > README.md
 
