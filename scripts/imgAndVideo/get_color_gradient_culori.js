@@ -2,7 +2,7 @@
 // Prints interpolated colors from -s (--start) to -e (--end) at -n (--number) even intervals, using the Oklab color space, via the culori npm (JavaScript / Nodejs) package. At this writing, Oklab does perceptual color modeling and changes better than any other color space I am aware of (including CIECAM02). Re: https://bottosson.github.io/posts/oklab/ -- https://raphlinus.github.io/color/2021/01/18/oklab-critique.html#update-2021-01-29
 
 // DEPENDENCIES
-// nodejs, with `culori` and `command` packages installed in the same directory as this script (via `npm install <package_name>`.
+// nodejs, with `culori@0.20.1` (anything past that version breaks this and will require a rewrite of this script!) and `command` packages installed. They can be installed as local modules (in the same directory as this script) or global (-g), via `npm install <package_name>`.
 
 // USAGE
 // See help printout from this command:

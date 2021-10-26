@@ -1,5 +1,5 @@
 # DESCRIPTION
-# SEE `diff_avg_supercomposites_nested_loop.sh`. NOTE: This script repeatedly supercomposites random pairs from array A and B. A very similar script, `diff_avg_supercomposites_nested_loop.sh`, takes a random pair from array A and super-composites it against every image in array B.
+# Repeatedly supercomposites random pairs from array A and B. SEE ALSO `diff_avg_supercomposites_nested_loop.sh`, which takes a random pair from array A and super-composites it against every image in array B.
 
 # USAGE
 # Run with one parameter, which is how many supercomposites you want to generate by random selection from two image arrays, e.g. to make 150 of them, run:

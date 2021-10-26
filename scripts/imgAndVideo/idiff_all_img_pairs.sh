@@ -13,7 +13,6 @@
 
 # CODE
 # TO DO:
-# - Check that I'm not getting duplicate source image file names in the inner loop (need J+1 maybe?), and fix that if I am.
 # - Resize larger image to fit in smaller before idiff operation (instead of recommendation of use gm_downsize_img_copies_to_smallest.sh beforehand, which loses a lot of resolution for many images if there is only one small image, where with this approach we could instead get higher resolution results.
 # - DON'T TRY saving to jpgs via this tool, because this tool isn't built to. Jpegs from this are 8-bit and of inferior quality versus the 24-bit tifs. It might be nice to pipe the image output to another openimageio tool to save a high-quality 24-bit image.
 # Get array of many images named imgs_arr via dependency script:
@@ -46,36 +45,7 @@ do
 	inner_loop_start=$(($inner_loop_start + 1))
 done
 
-# All the same things again, but with the lists reversed first, because if you operate on the same pair of file names in different parameter order, you get different results;
-# Reverse the array (into a copy of it) ; re https://Unix.stackexchange.com/a/412870 :
-min=0
-max=$(( ${#allIMGsArray[@]} ))
-while [[ min -lt max ]]
-do
-    # Swap current first and last elements
-    x="${allIMGsArray[$min]}"
-    reversedArray[$min]="${allIMGsArray[$max]}"
-    reversedArray[$max]="$x"
-    # Move closer
-    (( min++, max-- ))
-done
-# use the reverse array:
-inner_loop_start=1
-for outer in ${reversedArray[@]}
-do
-	for((j = inner_loop_start; j<array_size; j++))
-	do
-		inner=${reversedArray[j]}
-		inner_no_ext=${inner%.*}
-		outer_no_ext=${outer%.*}
-		outfileNoExt="image_pairs_diffs/""$outer_no_ext"__"$inner_no_ext"__diff
-		outfile="$outfileNoExt".tif
-		if [ ! -e "$outfileNoExt"* ]
-		then
-			idiff -fail 1 -warn 1 -abs -o $outfile $outer $inner
-		else
-			echo ~- Target file or similarly named already exists \($outfile\). Skipped render.
-		fi
-	done
-	inner_loop_start=$(($inner_loop_start + 1))
-done
+# All the same things again, but in reverse list order, because if you operate on the same pair of file names in different parameter order, you get different results;
+# Reverse the array (into a copy of it) ; re the (at this writing) downvoted quick and dirty (kludgy?) solution here: https://unix.stackexchange.com/a/497850/110338 -- also because this hurts my brain less then proper for loop reverse logic on the same data; this next command creates a copy of the array, reversed:
+# reversedArray=($(echo "${allIMGsArray[@]} " | tac -s ' '))
+# EXCEPT DON'T, because it appears I was mistaken to think you get different results with differencing (haha) in reverse. Maybe you would if it was a subtraction, not difference, operation.

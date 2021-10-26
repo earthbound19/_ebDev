@@ -13,7 +13,8 @@
 
 # CODE
 # TO DO
-# Optional filtering of only specific file types (extensions)? Add parse/update of hours/minutes/seconds?
+# - Optional filtering of only specific file types (extensions)? Add parse/update of hours/minutes/seconds?
+# - Instead use exiftool "-alldates<filename" <filename or path>? re question 5 at this writing: https://exiftool.org/faq.html
 echo Creating batch script to update time stamps of all files in this path by parsing any date stamps in file names . . .
 # List all files with a matching date pattern of 'yyyy-mm-dd to a file:
 		# Rescued again by a genius breath at stackoverflow; to avoid referencing so many capture groups; re: http://stackoverflow.com/a/10993346/1397555
