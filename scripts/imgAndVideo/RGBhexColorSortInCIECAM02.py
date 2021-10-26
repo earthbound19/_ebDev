@@ -11,7 +11,7 @@
 # Run this script through a Python interpreter, with these positional parameters:
 # - sys.argv[1] A list of RGB colors as hexadecimal numbers, in .hexplt format (a simple text list, one color per line).
 # - sys.argv[2] OPTIONAL. May be anything, and if present, the script will overwrite the original hex palette list with the sorted colors. To use positional parameter 3 (the next one) but not overwrite the original hex palette list, pass this as the string 'NULL' (with or without quote marks).
-# - sys.argv[3] OPTIONAL. Any hex color code string in the format #211421 (RGB color expressed in hex format), which the script will use as the first color to compare other colors to, even if it's not in the list. The list will therefore be sorted by next nearest color starting with this arbitrary color. If the color happens to be in the original list file (first argument), it will remain in the final list. If the color is not in the original list, it will not appear in the final sorted list.
+# - sys.argv[3] OPTIONAL. Any hex color code string in the format '#fa24cf' (RGB color expressed in hex format, surrounded by single quote marks), which the script will use as the first color to compare other colors to. The list will be sorted by next nearest color starting with this arbitrary color. If the color happens to be in the original list file (first argument), it will remain in the final list. If the color is not in the original list, it will not appear in the final sorted list.
 # Example run with only a hexplt file given:
 #    python /path/to_this_script/RGBhexColorSortInCIECAM02.py PrismacolorMarkers.hexplt
 # The result will be printed to stdout, so that you may for example redirect the output to a new .hexplt file, e.g.:
