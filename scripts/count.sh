@@ -22,7 +22,7 @@ if [ "$2" ]; then searchSubDirs=True; fi
 # MAIN FUNCTIONALITY
 if [ "$searchSubDirs" == "False" ]
 then
-	ls *.$fileTypeToCount | wc -l
+	find . -maxdepth 1 -type f -iname \*.$fileTypeToCount | wc -l
 else
-	find . -type f -iname \*.$fileTypeToCount -printf '%f\n' | wc -l
+	find . -type f -iname \*.$fileTypeToCount | wc -l
 fi
