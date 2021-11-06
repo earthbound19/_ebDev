@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Prints count of file type $1 in current directory, and optionally in all subdirectories.
+# Prints count of file type $1 in current directory (CASE-SENSITIVE search), and optionally in all subdirectories.
 
 # USAGE
 # Run with these parameters:
@@ -9,6 +9,8 @@
 #    count.sh png
 # Example that prints the count of all .hexplt files in the current directory and all subdirectories:
 #    count.sh hexplt FLAERGHBLOR
+# NOTE
+# Search is CASE-SENSITIVE: if you give it cr2 it will only find lowercase cr2 extensions. Conversely if you give it CR2 it will only find uppercase. If you want case-insenstive search, hack the script to use the -iname switch with find (instead of -name).
 
 
 # CODE
@@ -22,7 +24,7 @@ if [ "$2" ]; then searchSubDirs=True; fi
 # MAIN FUNCTIONALITY
 if [ "$searchSubDirs" == "False" ]
 then
-	find . -maxdepth 1 -type f -iname \*.$fileTypeToCount | wc -l
+	find . -maxdepth 1 -type f -name \*.$fileTypeToCount | wc -l
 else
-	find . -type f -iname \*.$fileTypeToCount | wc -l
+	find . -type f -name \*.$fileTypeToCount | wc -l
 fi
