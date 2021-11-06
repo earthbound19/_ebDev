@@ -7,9 +7,9 @@
 # - $2 OPTIONAL. Any string (for example 'EKTHELPOI'), which will cause the script to search subfolders also for files of type $1.
 # - $3 OPTIONAL. Any string (for example 'EKTHELPOI ON THE FLORF', which will bypass the prompt to type a password 
 # Example that will sort all files with the extension .png into a new subfolder named png/ :
-#    moveToTypeFolder.sh png
+#    toTypeFolder.sh png
 # Example that will sort all file with the extension .hexplt in the current folder and all subfolders into a new directory named /hexplt:
-#    moveToTypeFolder.sh hexplt EKTHELPOI
+#    toTypeFolder.sh hexplt EKTHELPOI
 
 
 # CODE
