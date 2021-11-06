@@ -11,10 +11,11 @@
 # - $3 How many such images to make.
 # - $4 How many such images to show per second in the output animation (which will be at 29.97 frames per second, with the input interpreted at $4 frames per second).
 # - then wait (maybe a long time).
+# - $5 OPTIONAL. Resolution to scale images up to for video (by nearest neighbor method), expressed as "xPixels:yPixels", and surrounded by single or double quote marks, e.g. '1280:1920'. If not provided, defaults to '1920:1080'.
 # Example that will generate images that are 24 columns wide, 16 rows high, and make 1024 such images, and animate them at a source framerate of 5 per second:
 #    makeBWGridRandomNoiseAnim.sh 24 16 1024 5
 # NOTES
-# At this writing, if not always, you must manually specify the target video size hard-coded at the end fo this script (in the ffmpeg parameters).
+# At this writing, if not always, you must manually specify the target video size hard-coded at the end of this script (in the ffmpeg parameters).
 
 
 # CODE
@@ -31,8 +32,7 @@ numCols=$1
 numRows=$2
 howManyImages=$3
 inputFPS=$4
-	# DEPRECATED; was for using nconvert to upscale image; can be done directly with ffmpeg:
-	# multiplierScale=125
+if [  "$5" ]; then scale="$5"; else scale='1920:1080'; fi
 squaresPerImage=$((numCols * numRows))
 
 # Outer loop per howManyImages:
@@ -72,7 +72,7 @@ numDigits=${#numDigits}
 		# echo numDigits val is $numDigits
 timestamp=$(date +"%Y_%m_%d__%H_%M_%S__%N")
 targetVideoFileName="$timestamp"__bw_square_noise_upsaled.mp4
-ffmpeg -y -framerate $inputFPS -f image2 -i %0"$numDigits"d.pbm -vf scale=1280:960:flags=neighbor -crf 17 -c:a aac -strict experimental -tune fastdecode -pix_fmt yuv420p -b:a 192k -ar 48000 -r 29.97 $targetVideoFileName
+ffmpeg -y -framerate $inputFPS -f image2 -i %0"$numDigits"d.pbm -vf scale=$scale:flags=neighbor -crf 17 -c:a aac -strict experimental -tune fastdecode -pix_fmt yuv420p -b:a 192k -ar 48000 -r 29.97 $targetVideoFileName
 
 mv $targetVideoFileName ..
 # rm *.pbm
