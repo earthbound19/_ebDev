@@ -10,10 +10,12 @@
 # USAGE
 # Run with these parameters:
 # - $1 search string
-# - $2 replace string
+# - $2 replace string. If provided as the syntax-phrase combination "-_-SNIP-_-" (with or without quote marks), the search string will be deleted from all found files (replaced with nothing).
 # - $3 the word YOINK
-# Example:
+# Example that will replace the string "dGSUyfhH" with "Murky_Forest" in all files:
 #    esmv.sh dGSUyfhH Murky_Forest YOINK
+# Example that will delete the string SNAIRFU from all found files:
+#    esmv.sh SNAIRFU -_-SNIP-_- YOINK
 # DON'T DO THIS UNLESS:
 # - You're very sure you know what you're doing
 # - You've tested it on disposable files first
@@ -23,6 +25,7 @@
 # CODE
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source string) passed to script. Exit."; exit 1; else srcString=$1; fi
 if [ ! "$2" ]; then printf "\nNo parameter \$2 (destination string) passed to script. Exit."; exit 2; else destString=$2; fi
+	if [ "$destString" == "-_-SNIP-_-" ]; then destString=""; fi
 if [ ! "$3" == "YOINK" ]; then printf "\nParameter 3 incorrect. See USAGE comments in script."; exit 3; fi
 
 foundPaths=($(es $1 | tr -d '\15\32'))		# the tr statement deletes windows-style newlines, which throw win-ported GNU tools out of whack.
