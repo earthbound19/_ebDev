@@ -13,9 +13,9 @@
 # - $2 replace string. If provided as the syntax-phrase combination "-_-SNIP-_-" (with or without quote marks), the search string will be deleted from all found files (replaced with nothing).
 # - $3 the word YOINK
 # Example that will replace the string "dGSUyfhH" with "Murky_Forest" in all files:
-#    esmv.sh dGSUyfhH Murky_Forest YOINK
+#    everythingRename.sh dGSUyfhH Murky_Forest YOINK
 # Example that will delete the string SNAIRFU from all found files:
-#    esmv.sh SNAIRFU -_-SNIP-_- YOINK
+#    everythingRename.sh SNAIRFU -_-SNIP-_- YOINK
 # DON'T DO THIS UNLESS:
 # - You're very sure you know what you're doing
 # - You've tested it on disposable files first
