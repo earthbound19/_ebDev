@@ -1,46 +1,68 @@
 # DESCRIPTION
-# Resizes an image of type T (via parameter $1) in a path, by nearest-neighbor method, to target format F ($2), at size A x B ($3 x $4). (Nearest neighbor method will keep hard edges, or look "pixelated.") Uses GraphicsMagick, unless the file is ppm format, and in that case it uses IrfanView.
+# Resizes an image of type $1, in the current directory, by nearest-neighbor method, to target format $2, with the longest edge scaled up (or down!) to pixels $3. The shortest edge is scaled to maintain aspect, but that can be overriden to change aspect, with $4. Nearest neighbor method will keep hard edges, or look "pixelated." Uses GraphicsMagick, unless the file is ppm or pbm format, in which case it uses IrfanView (which to my knowledge is Windows only).
 
 # DEPENDENCIES
 # GraphicsMagick and/or IrfanView, both in your $PATH.
 
 # USAGE
-# NOTE that as this auto-switches to IrfanView as needed, it supersedes the now deleted irfanView2imgNN.sh and allIrfanView2imgNN.sh scripts.
-# Run this script with the following parameters
-# - $1 source file.
-# - $2 destination format
-# - $3 scale by nearest neighbor method to pixels X
-# - $4 Optional. Force this Y-dimension, regardless of aspect. Scales by nearest neighbor method to pixels Y. ONLY USED for ppms. Ignored for all other types (aspect kept). SEE COMMENTS in i_view32.exe code lines area for options to maintain aspect and/or rotate image (wanted for my purposes at times).
-# Example command:
-#    img2imgNN.sh input.ppm png 640
-# OR, to force a given x by y dimension for a ppm:
+# Run with the following parameters:
+# - $1 source file name
+# - $2 destination image format
+# - $3 scale by nearest neighbor method to this many pixels _in the longest dimension_ (whether that is X or Y). If the source image is the same dimension in X and Y, just use either.
+# - $4 OPTIONAL. Force this dimension _for the shorter side_, regardless of aspect. Scales by nearest neighbor method to this many pixels for the shortest edge, even if that forces a different aspect (including making that side longer). If omitted, the shortest edge is calculated automatically to maintain aspect.
+# Example command that will scale the longest edge of a pbm to 640 px (by nearest neighbor method), and scale the other edge automatically to whatever length will maintain the original aspect, and output to a png image:
+#    img2imgNN.sh input.pbm png 640
+# OR, to force a given longest and shortest dimension for a ppm:
 #    img2imgNN.sh input.ppm png 640 480
 
-
 # CODE
-imgFileNoExt=${1%.*}
-imgFileExt=${1##*.}
-targetFileName=$imgFileNoExt.$2
+# PARAMETER CHECKING
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (source image file name) passed to script. Exit."; exit 1; else srcFileName=$1; fi
+if [ ! "$2" ]; then printf "\nNo parameter \$2 (target image format) passed to script. Exit."; exit 2; else destFormat=$2; fi
+if [ ! "$3" ]; then printf "\nNo parameter \$3 (scale by nearest neighbor method to this many pixels X) passed to script. Exit."; exit 3; else targetLongDim=$3; fi
+
+# MAIN WORK
+imgFileExt=${srcFileName##*.}
+targetFileName=${srcFileName%.*}.$destFormat
 if [ ! -f $targetFileName ]; then
-	# if source file is ppm, use IrfanView or graphicsmagic
-	# (uncomment your preference) to convert.
-	if [ $imgFileExt == ppm ]; then
+	# if source file is ppm or pbm, use IrfanView
+	if [ $imgFileExt == "ppm" ] || [ $imgFileExt == "pbm" ]; then
 		echo converting ppm file via i_view32 . . .
+		# IRFANVIEW PAREMETER SETUP VIA SCRIPT PARAMS
+		# set default empty value for targetShortDim; will be populated if $4 passed:
+		iViewTargetShortDimParam=""
+		# set default i_view64 maintain aspect parameter; will be cleared if $4 passed:
+		iViewAspectParam="/aspectratio"
+		if [ "$4" ]		# $4 is shorter edge length override, if it's passed
+		then
+			iViewTargetShortDimParam="/resize_short=$4"
+			iViewAspectParam=""
+		fi
 		# re: http://www.etcwiki.org/wiki/IrfanView_Command_Line_Options
-		# NOTE that with an MSYS2 terminal (maybe it would happen with Cygwin also),
-		# it simply opened the image in irfanview, unless I provide the escaped double-quote
-		# marks in the below command. ?
-			# ROTATE 90 DEGREES OPTION; uncomment next line (used with other options) :
+		# ROTATE 90 DEGREES OPTION; uncomment next line (used with other options) :
 		# extraIrfanViewParam1="/rotate_r"
-			# FORCE ARBITRARY DIMENSIONS (aspect) by passing /resize_long=$3 AND /resize_short=$4
-		i_view64.exe "$1 /resize_long=$3 /resize_short=$4 $extraIrfanViewParam1 /convert=$targetFileName"
-			# MAINTAIN ASPECT OPTION:
-		# i_view32.exe "$1 /resize_long=$3 /aspectratio $extraIrfanViewParam1 $extraIrfanViewParam2 /convert=$targetFileName"
+		i_view64 "$srcFileName /resize_long=$targetLongDim $iViewTargetShortDimParam $iViewAspectParam $extraIrfanViewParam1 /convert=$targetFileName"
 	# otherwise use graphicsmagic:
 	else
 		echo converting image via GraphicsMagick . . .
-		# If params $3 or $4 were not passed to the script, the command will simply be empty where they are (on the following line of code), and it should still work:
-		gm convert $1 -scale $3 $targetFileName
+		# GRAPHICSMAGIC PAREMETER SETUP VIA SCRIPT PARAMS
+		# Identify whether width or height of src image is longer (or the same!) :
+			# re: http://jeromebelleman.gitlab.io/posts/graphics/gmresize/
+			# re: http://www.graphicsmagick.org/GraphicsMagick.html#details-format
+		srcIMGw=$(gm identify $srcFileName -format "%w")
+		srcIMGh=$(gm identify $srcFileName -format "%h")
+		if [ "$4" ]		# $4 is shorter edge length override, if it's passed
+		then
+			if (($srcIMGw >= $srcIMGh))
+			then
+				gmScaleParam="-sample $targetLongDim"x"$4!"
+			else
+				gmScaleParam="-sample $4"x"$targetLongDim!"
+			fi
+		else
+			gmScaleParam="-sample $targetLongDim"
+		fi
+		gm convert $srcFileName $gmScaleParam $targetFileName
 	fi
 	echo converted to $targetFileName . .
 else
