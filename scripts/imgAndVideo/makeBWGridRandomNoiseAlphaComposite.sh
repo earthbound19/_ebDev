@@ -2,7 +2,7 @@
 # Animate RND block noise as in makeBWGridRandomNoiseAnim.sh, and use it as alpha in a composite animation with a foreground image animated over a background image, where the RND block noise is the animated transparency (or alpha) mask. THIS IS A STUB, in development.
 
 # DEPENDENCIES
-# `ffmpeg`, `graphicsmagick` (as `gm`), `imgs2imgsNN.sh`
+# `ffmpeg`, `graphicsmagick` (as `gm`), `imgs2imgsNN.sh`, `ffmpegAnim.sh`.
 
 # USAGE
 # Run this script with these parameters:
@@ -15,9 +15,10 @@
 # - $6 Resolution to scale images up to for video (by nearest neighbor method), in pixels down.
 # - $7 background image file name. Defaults to `bg.png` if not provided.
 # - $8 foreground image file name. Defaults to `fg.png` if not provided.
-
-# Example that will generate images that are 24 columns wide, 16 rows high, and make 1024 such images, animate them at a source framerate of 5 per second, and blow them up to 1920 x 1080 px, assuming the image files `bg.png` and `fg.png` are in this directory:
-#    makeBWGridRandomNoiseAlphaComposite.sh 24 16 1024 5 1920 1080
+# Example that will generate images that are 5 columns wide, 8 rows high, make 28 such images, animate them at a source framerate of 0.65 per second, and blow them up to 746 x 1080px, assuming the image files `bg.png` and `fg.png` are in this directory:
+#    makeBWGridRandomNoiseAlphaComposite.sh 5 8 28 0.65 746 1080
+# NOTE
+# It seems that for ffmpeg to encode video from the source images, the source images must have an x pixel count (accross) which is an even number, and so must y (number of pixels down). Otherwise, ffmpeg may throw an error on encoding.
 
 
 # CODE
