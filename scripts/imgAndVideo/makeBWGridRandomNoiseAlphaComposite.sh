@@ -10,15 +10,15 @@
 # - $2 The number of desired rows ".
 # - $3 How many such images to make.
 # - $4 How many such images to show per second in the output animation (which will be at 29.97 frames per second, with the input interpreted at $4 frames per second).
-# - then wait (maybe a long time).
 # - $5 Resolution to scale images up to for video (by nearest neighbor method), in pixels across.
 # - $6 Resolution to scale images up to for video (by nearest neighbor method), in pixels down.
 # - $7 background image file name. Defaults to `bg.png` if not provided.
 # - $8 foreground image file name. Defaults to `fg.png` if not provided.
 # Example that will generate images that are 5 columns wide, 8 rows high, make 28 such images, animate them at a source framerate of 0.65 per second, and blow them up to 746 x 1080px, assuming the image files `bg.png` and `fg.png` are in this directory:
 #    makeBWGridRandomNoiseAlphaComposite.sh 5 8 28 0.65 746 1080
-# NOTE
-# It seems that for ffmpeg to encode video from the source images, the source images must have an x pixel count (accross) which is an even number, and so must y (number of pixels down). Otherwise, ffmpeg may throw an error on encoding.
+# NOTES
+# - It seems that for ffmpeg to encode video from the source images, the source images must have an x pixel count (accross) which is an even number, and so must y (number of pixels down). Otherwise, ffmpeg may throw an error on encoding.
+# - If the rnd block char mask is smaller or larger than the source images, it may be that the source images have different dpi than the generated alpha RND blocks (which would be expected to be default 72dpi).
 
 
 # CODE
@@ -65,21 +65,28 @@ $numCols $numRows
 	rm ppmheader.txt grid.pbm
 done
 
-# convert all those pbm image files to blown up pngs by nearest neighbor method:
-imgs2imgsNN.sh pbm png $xTargetPix $yTargetPix
+# convert all those pbm image files to blown up pngs by nearest neighbor method;
+# set first and second param to imgs2imgsNN.sh depending on whether x edge is longer number (as imgs2imgsNN.sh wants longest edge first); set default and override if needed:
+longerEdge=$xTargetPix
+shorterEdge=$yTargetPix
+# switch that if the reverse is true (or if both are equal switch again :shrug:) :
+if (( $xTargetPix <= $yTargetPix))
+then
+	longerEdge=$yTargetPix
+	shorterEdge=$xTargetPix
+fi
+imgs2imgsNN.sh pbm png $longerEdge $shorterEdge
 
 # make an array of those resultant png files:
 alphaFiles=( $(find . -maxdepth 1 -type f -iname \*.png -printf '%f\n') )
 
 # calculate number of digits to pad numbered (animation) files to:
 digitsToPadTo=${#alphaFiles[@]}; digitsToPadTo=${#digitsToPadTo}
-
 # step over array and make composite from each alpha (block noise png) image in array;
 # creating padded (animation frame) number file for each:
 counter=0
 for alphaFile in ${alphaFiles[@]}
 do
-	counter=$((counter+1))
 	countString=$(printf "%0""$digitsToPadTo""d\n" $counter)
 	# composite via compose mask; re:
 	# https://legacy.imagemagick.org/Usage/compose/#mask
@@ -89,8 +96,9 @@ do
 
 	# The actual composite! :
 	gm composite ../fg.png ../bg.png $alphaFile "$countString".png
-	# remove alpha png (pbm source remains) :
+	# remove alpha png (pbm source remains) (NOTE: if you don't remove this, try moving it somewhere else -- it may mess up the ffmpeg render/file count sequence if you don't!) :
 	rm $alphaFile
+	counter=$((counter+1))
 done
 
 # actual video file render! :
@@ -100,6 +108,5 @@ ffmpegAnim.sh $inputFPS 29.97 13 png
 # move render up from this subdirectory:
 mv _out.mp4 ../$targetVideoFileName
 
-cd ..
+#cd ..
 echo Done. Final file is $targetVideoFileName.
-
