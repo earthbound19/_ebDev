@@ -9,7 +9,7 @@
 #    renderAllHexPalettes.sh
 # To recurse into all subdirectories and render all palettes in them, pass any parameter for $1:
 #    renderAllHexPalettes.sh YORP
-# To pass additional parameters, examine the positional parameters in renderHexPalette.sh and position them the same here, but don't use $1 for that script here, because $1 is provided by this script as $element in a loop repeatedly calling renderHexPalette.sh.
+# To pass additional parameters, examine the positional parameters in renderHexPalette.sh and position them the same here, but don't use $1 for that script here, because $1 is provided by this script as $element in a loop repeatedly calling renderHexPalette.sh (while also, confusingly, $1 is something else to THIS script (ANYWORD or NULL for subdirectory search or not).
 # To NOT recurse into subdirectories but also use additional parameters, pass the keyword NULL for $1, e.g.:
 #    renderAllHexPalettes.sh NULL 250 NULL 5
 # NOTES
