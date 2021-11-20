@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Uses ImageMagick montage to pack all images of type $1 in the current directory into a montage of approximate size $2. Tiles are padded with a dark gray, and the entire result image is padded with a darker gray.
+# Uses ImageMagick montage to pack all images of type $1 in the current directory into a montage combining all their resoluition and then some, with options for numbers of tiles across and approximate result pixels across (those options are automated if omitted). Tiles are padded with a dark gray, and the entire result image is padded with a darker gray.
 
 # DEPENDENCIES
 # Imagemagick / montage + convert
@@ -109,7 +109,7 @@ heightPadding=$(echo "scale=0; $tileHeight - ($tileHeight * 95.5 / 100)" | bc)
 # Create the montage to a temp image file.
 # Because I can't seem to find the escape sequence necessary to do this from bash+cmd, print the command to a bash script, then execute the script:
 geometryParam="$tileWidth"x$tileHeight\>+$heightPadding+$heightPadding
-echo "magick montage -background '#767575' $tilesAcrossParam -geometry '$geometryParam' *.$imageType ___oooot_n4yR24PG.png" > tmp_command_MbVTjRGUYXUJ.sh
+echo "magick montage -background '#919191' $tilesAcrossParam -geometry '$geometryParam' *.$imageType ___oooot_n4yR24PG.png" > tmp_command_MbVTjRGUYXUJ.sh
 ./tmp_command_MbVTjRGUYXUJ.sh
 rm tmp_command_MbVTjRGUYXUJ.sh
 # Get dimensions of result and calculate desired (larger) pad size for result:
@@ -122,7 +122,7 @@ echo Will pad final montage from $originalIMGwidth to $paddedImageW and $origina
 # Construct final file name first:
 thisPath=$(pwd)
 thisFolderName=$(basename $thisPath)
-gm convert ___oooot_n4yR24PG.png -gravity center -background '#454444' -extent "$paddedImageW"x"$paddedImageH" _montage__"$thisFolderName".png
+gm convert ___oooot_n4yR24PG.png -gravity center -background '#363636' -extent "$paddedImageW"x"$paddedImageH" _montage__"$thisFolderName".png
 # Remove temp image file:
 rm ___oooot_n4yR24PG.png
 
