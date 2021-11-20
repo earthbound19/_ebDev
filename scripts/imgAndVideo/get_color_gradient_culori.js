@@ -2,7 +2,10 @@
 // Prints interpolated colors from -s (--start) to -e (--end) at -n (--number) even intervals, using the Oklab color space, via the culori npm (JavaScript / Nodejs) package. At this writing, Oklab does perceptual color modeling and changes better than any other color space I am aware of (including CIECAM02). Re: https://bottosson.github.io/posts/oklab/ -- https://raphlinus.github.io/color/2021/01/18/oklab-critique.html#update-2021-01-29
 
 // DEPENDENCIES
-// nodejs, with `culori@0.20.1` (anything past that version breaks this and will require a rewrite of this script!) and `command` packages installed. They can be installed as local modules (in the same directory as this script) or global (-g), via `npm install <package_name>`.
+// nodejs, with `culori@0.20.1`
+// NOTES
+// - Anything past that version breaks this and will require a rewrite of this script!) and `command` packages installed.
+// - You may have to install culori locall (in the same directory as this script) via `npm install <package_name>`, or globally, via `npm install -g <package_name>`.
 
 // USAGE
 // See help printout from this command:
@@ -19,8 +22,8 @@ const { program } = require('commander');
 var remove_start_color = false;
 var remove_end_color = false;
 program
-  .requiredOption('-s, --start [RGB hex color code]', '\n\tStart color for gradient. Expected format is RGB hex, but any other format which the culori.interpolate function can accept may work.\n')
-  .requiredOption('-e, --end [RGB hex color code]', '\n\tEnd color for gradient. Expected format is RGB hex, but any other format which the culori.interpolate function can accept may work.\n')
+  .requiredOption('-s, --start [RGB hex color code]', '\n\tStart color for gradient. Expected format is RGB hex \(without any pound or 0x hex symbols at the start\), but any other format which the culori.interpolate function can accept may work.\n')
+  .requiredOption('-e, --end [RGB hex color code]', '\n\tEnd color for gradient. Expected format is RGB hex \(without any pound or 0x hex symbols at the start\), but any other format which the culori.interpolate function can accept may work.\n')
   .requiredOption('-n, --number [natural number > 2]', '\n\tNumber of colors in gradient.\n')
   .option('-f, --startColorRemove [natural number > 0]', '\n\tRemoves the N (f)irst) colors from gradient before print.\n')
   .option('-l, --endColorRemove [natural number > 0]', '\n\tRemove the N (l)ast) colors from gradient before print.\n')
