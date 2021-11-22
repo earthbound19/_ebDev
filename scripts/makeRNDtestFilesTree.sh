@@ -19,7 +19,7 @@ if [ "$1" ]; then includeTerminalUnfriendlyCharacters="True"; fi
 
 howManyBaseDirectories=7
 subfolderDepth=4
-lengthRangeOfNames='3 9'
+lengthRangeOfNames='7 12'
 # Note that even if you give it 0 for the low range, it will still make at least 1 (limitation of how I'm using 'seq') :
 rangeOfRNDfilesPerFolder='1 2'
 fileTypesToMake='png tif cgp hexplt mp4 avi JPG PNG MP4 MOV'
