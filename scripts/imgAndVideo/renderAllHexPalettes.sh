@@ -13,9 +13,8 @@
 # To NOT recurse into subdirectories but also use additional parameters, pass the keyword NULL for $1, e.g.:
 #    renderAllHexPalettes.sh NULL 250 NULL 5
 # NOTES
-# - The script has cool-down periods where it pauses between renders every N render, because if you run this script against thousands of palettes, it cooks your CPU perhaps more constantly and via harder and more continuous work than a CPU should do.
-# - The script parameters are complex enough that I'm not adding a parameter to override cooldown; if you want to skip cooldown, or change the number of renders between cooldown periods, find and hack the variables that contain the string `coolDown` and/or the `sleep` commands.
 # - Like renderHexPalette.sh, this script checks if the render target exists before it enters the cool-down period. It only enters the cool-down period if the render target does not exist (and therefore heavier computing work would be performed).
+# - The script has an optinoal cool-down period where it pauses between renders every N render, because if you run this script against thousands of palettes, it cooks your CPU perhaps more constantly and via harder and more continuous work than a CPU should do. To enable this option, find the comment block labeled OPTIONAL COOLDOWN PERIOD, and uncomment it.
 
 
 # CODE
@@ -35,8 +34,6 @@ coolDownCounter=0
 coolDownSleepSeconds=27
 for hexpltFileName in ${hexpltFilesArray[@]}
 do
-	coolDownCounter=$((coolDownCounter + 1))
-	printf "\n~\nCheck or render $coolDownCounter of $hexpltFilesArrayLen . . ."
 	# I duplicate no-clobber target file check here (same as in (renderHexPalette.sh); if it already exists, no point loading that script which checks if it exists; that's just an extra operation (slowdown). This also sidesteps the problem of a sleep period in between lighter weight work (only a file existence check), which would be mostly a waste of time:
 	renderTargetFileName=${hexpltFileName%.*}.png
 	if [ -f $renderTargetFileName ]
@@ -44,13 +41,16 @@ do
 		printf "\nRender target $renderTargetFileName already exists (check from renderAllHexPalettes.sh). Will skip render attempt."
 		# (else block isn't run; nothing more is done in this loop in this case.)
 	else
-		# cool down period check, and if it is time, cool down:
-		moduloResult=$(echo "scale=0; $coolDownCounter % $coolDownEveryNrenders" | bc)
-		if [ "$moduloResult" == "0" ]
-		then
-				printf "\nWill sleep script actions for $coolDownSleepSeconds seconds to allow cool-down . . ."
-				sleep $coolDownSleepSeconds
-		fi
+# BEGIN OPTIONAL COOLDOWN PERIOD; uncomment these outdented lines if you want that:
+# coolDownCounter=$((coolDownCounter + 1))
+# cool down period check, and if it is time, cool down:
+# moduloResult=$(echo "scale=0; $coolDownCounter % $coolDownEveryNrenders" | bc)
+# if [ "$moduloResult" == "0" ]
+# then
+#	printf "\nWill sleep script actions for $coolDownSleepSeconds seconds to allow cool-down . . ."
+# sleep $coolDownSleepSeconds
+# fi
+# END OPTIONAL COOLDOWN PERIOD
 		# Progress feedback and command log print:
 		renderCommand="renderHexPalette.sh $hexpltFileName $2 $3 $4 $5 $6"
 		printf "\nRender target $renderTargetFileName does not exist (check from renderAllHexPalettes.sh)\nWill run render command:\n$renderCommand"
