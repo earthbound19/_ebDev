@@ -1,8 +1,9 @@
 # DESCRIPTION
-# Organizes CR2 and MOV format camera exports this way, using other scripts:
-#    - lowercases MOV and CR2 extensions to lowercase
+# Organizes exported media files (e.g. from cameras and devices) this way, using other scripts:
+#    - renames various common camera/device media file extensions to lowercase
 #    - renames files after metadata date
-#    - extracts preview thumbnails
+#    - extracts preview thumbnails from CR2s
+#    - renames all .jpeg file extensions to .jpg
 #    - sorts all these file types into subfolders by type
 
 # DEPENDENCIES
@@ -16,10 +17,14 @@
 # CODE
 toLowercaseExtensions.sh MOV
 toLowercaseExtensions.sh CR2
+toLowercaseExtensions.sh JPG
+toLowercaseExtensions.sh JPEG
+toLowercaseExtensions.sh PNG
+toLowercaseExtensions.sh HEIC
+toLowercaseExtensions.sh MP4
 mkdir tmp_renames_2ydTVzqG
 # Because (at this writing) renameByMetadata.sh doesn't operate selectively on file types, move the types we want to operate on into their own folder (to exclude other types from the operation) :
-mv *.mov ./tmp_renames_2ydTVzqG/
-mv *.cr2 ./tmp_renames_2ydTVzqG/
+mv *.mov *.cr2 *.jpg *.jpeg *.png *.heic *.mp4 ./tmp_renames_2ydTVzqG/
 cd tmp_renames_2ydTVzqG/
 # Do the actual rename:
 renameByMetadata.sh
@@ -32,6 +37,15 @@ dcraw -e *.cr2
 # Thanks to a genius breath yon https://stackoverflow.com/a/45703829 ;
 # rename all .thumb.jpg files to just .jpg:
 for x in *.thumb.jpg; do mv "$x" "${x%.thumb.jpg}.jpg"; done
+# rename all .jpeg to .jpg:
+for x in *.jpeg; do mv "$x" "${x%.jpeg}.jpg"; done
+# OPTIONAL: uncomment if you want to lossleslly recontain all .mov files to .mp4 -- but be warned that this will lose metadata if you destroy the original mov files (metadata is not copied)! :
+# allVideo2mp4Lossless.sh
 toTypeFolder.sh mov
 toTypeFolder.sh cr2
 toTypeFolder.sh jpg
+toTypeFolder.sh png
+toTypeFolder.sh heic
+toTypeFolder.sh mp4
+
+echo "DONE."
