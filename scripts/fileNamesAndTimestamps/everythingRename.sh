@@ -21,6 +21,9 @@
 # - You've tested it on disposable files first
 # - You're also looking at files found from a search string using Everything, to verify renames and to be able to undo any breaks.
 # - You know and can see that there's no funky crap (like terminal-unfriendly characters) in file and folder names you operate on.
+# NOTE
+# Known issue: a wonky character shows up in logs instead of a path backslash. No plan to fix. Just know that's a backslash.
+
 
 # CODE
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source string) passed to script. Exit."; exit 1; else srcString=$1; fi
@@ -33,7 +36,7 @@ foundPaths=($(es $1 | tr -d '\15\32'))		# the tr statement deletes windows-style
 
 # build file name for log, and create the log:
 dateTimeString=$(date +"%Y_%m_%d__%H_%M_%S")
-renameLog=_everythingRename_log_"$dateTimeString".txt
+renameLog=_everythingRename_log_"$srcString"__to__"$destString"__"$dateTimeString".txt
 printf "" > $renameLog
 
 # iterate over found paths and do rename operation on each, logging each rename to log file, and also printing feedback:
