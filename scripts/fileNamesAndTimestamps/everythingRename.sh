@@ -28,9 +28,28 @@ if [ ! "$2" ]; then printf "\nNo parameter \$2 (destination string) passed to sc
 	if [ "$destString" == "-_-SNIP-_-" ]; then destString=""; fi
 if [ ! "$3" == "YOINK" ]; then printf "\nParameter 3 incorrect. See USAGE comments in script."; exit 3; fi
 
+# build array of file names from search output from everything search ("es" is everything search) :
 foundPaths=($(es $1 | tr -d '\15\32'))		# the tr statement deletes windows-style newlines, which throw win-ported GNU tools out of whack.
+
+# build file name for log, and create the log:
+dateTimeString=$(date +"%Y_%m_%d__%H_%M_%S")
+renameLog=_everythingRename_log_"$dateTimeString".txt
+printf "" > $renameLog
+
+# iterate over found paths and do rename operation on each, logging each rename to log file, and also printing feedback:
 for path in ${foundPaths[@]}
 do
 	renameTarget=$(echo $path | sed "s/$srcString/$destString/g")
 	mv $path $renameTarget
+	
+	# capture error level and report rename success or fail, depending:
+	errorLevelCapture=$(echo $?)
+	if [ $errorLevelCapture -eq 0 ]
+	then
+		printf "RENAMED ->\n$path\n  ->\n$renameTarget\n<- (logging . . .)\n "
+		printf "RENAMED ->\n$path\n  ->\n$renameTarget\n<-\n" >> $renameLog
+	else
+		printf " ! ERROR attempting rename ->\n$path\n   ->\n$renameTarget\n<-\n "
+		printf " ! ERROR attempting rename ->\n$path\n   ->\n$renameTarget\n<-\n" >> $renameLog
+	fi
 done
