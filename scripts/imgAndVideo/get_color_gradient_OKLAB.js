@@ -9,7 +9,7 @@
 
 // USAGE
 // See help printout from this command:
-//    node get_color_gradient_culori.js --help
+//    node get_color_gradient_OKLAB.js --help
 // --or see the `program` . . . `.requiredOption` and `.option` section in the source code.
 
 
@@ -19,8 +19,6 @@ culori = require('culori');
 
 // START OPTIONS PARSING AND CHECKING
 const { program } = require('commander');
-var remove_start_color = false;
-var remove_end_color = false;
 program
   .requiredOption('-s, --start [RGB hex color code]', '\n\tStart color for gradient. Expected format is RGB hex \(without any pound or 0x hex symbols at the start\), but any other format which the culori.interpolate function can accept may work.\n')
   .requiredOption('-e, --end [RGB hex color code]', '\n\tEnd color for gradient. Expected format is RGB hex \(without any pound or 0x hex symbols at the start\), but any other format which the culori.interpolate function can accept may work.\n')
@@ -89,7 +87,7 @@ if (options.endColorRemove) {
 // reverse order of colors if switch so commands:
 if (options.reverse) { samples.reverse(); }
 
-// print inerpolated colors, on per line:
+// print interpolated colors, on per line:
 idx = 0;
 while (idx < samples.length) {
   console.log(samples[idx]);
