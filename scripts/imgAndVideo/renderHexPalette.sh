@@ -82,7 +82,7 @@ then
 fi
 
 # get array of colors from file by extracting all matches of a pattern of six hex digits preceded by a #:
-colorsArray=( $(grep -o '#[0-9a-f]\{6\}' $hexColorSrcFullPath | tr -d '#') )		# tr command removes pound symbol, and surrounding () makes it an actual array
+colorsArray=( $(grep -i -o '#[0-9a-f]\{6\}' $hexColorSrcFullPath | tr -d '#') )		# tr command removes pound symbol, and surrounding () makes it an actual array
 # Get number of colors (from array):
 numColors=${#colorsArray[@]}
 
