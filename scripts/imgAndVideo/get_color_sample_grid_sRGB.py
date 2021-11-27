@@ -46,7 +46,8 @@ if len(sys.argv) > 4:
     ZERO_X_OFFSET = True
 # Loads and converts images more efficiently,
 # re: https://stackoverflow.com/a/42036542
-with Image.open(source_image) as image:         
+with Image.open(source_image) as image:
+	image = image.convert("RGB")
 	im_arr = np.frombuffer(image.tobytes(), dtype=np.uint8)
 	im_arr = im_arr.reshape((image.size[1], image.size[0], 3))
 	# That's height (image.size[1]), width (image.size[0])
