@@ -22,6 +22,6 @@ img = Image.open((sys.argv[1]))
 
 pixels = list(img.convert('RGBA').getdata())
 
-for r, g, b, a in pixels: # just ignore the alpha channel
-	norf = rgb2hex(r, g, b)
+for r, g, b, a in pixels:
+	norf = rgb2hex(r, g, b)     # just ignore the alpha channel
 	print(norf)
