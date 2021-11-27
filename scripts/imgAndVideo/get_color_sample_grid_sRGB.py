@@ -2,8 +2,7 @@
 # Extracts color samples from an image (parameter 1), divided into a grid of columns and rows, with each color sample taken from the color of each cell in the grid. Prints the samples as RGB values in hexadecimal format.
 
 # DEPENDENCIES
-# python libraries imported at start of script, however you get those installed :|
-# pip install colorgram.py
+# python PIL and numpy libraries
 
 # USAGE
 # Run this script through a Python interpreter, with these parameters:
@@ -20,7 +19,7 @@
 
 
 # CODE
-import colorgram, sys, ast
+import sys, ast
 from PIL import Image
 import numpy as np
 np.set_printoptions(threshold=np.inf)
@@ -71,5 +70,4 @@ for row in range(rows):
 		RGB_vals = im_arr[Y][X]
 		# convert to hex and print:
 		hex_code = '#%02x%02x%02x' % (RGB_vals[0], RGB_vals[1], RGB_vals[2])
-		hex_code = hex_code.upper()
 		print(hex_code)
