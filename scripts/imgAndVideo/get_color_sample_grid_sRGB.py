@@ -12,9 +12,9 @@
 # - sys.argv[3] number of rows to divide the image into for samples
 # - sys.argv[4] OPTIONAL. May be anything (for example the word 'ROGBALF'). If provided, causes samples of column offset to be at left edge of column (will start at x=0 in the image), instead of center of column.
 # For example, if the source image is named darks-v2.png, and you want to sample from the center of each cell in a grid 16 across (16 columns) and 12 down (12 rows), run:
-#    python full/path_to_this_script/get_color_sample_grid_hex.py darks-v2.png 16 12
+#    python full/path_to_this_script/get_color_sample_grid_sRGB.py darks-v2.png 16 12
 # To pipe the results to a text file, add a > redirect operator and text file to the end of that command, like this:
-#    python full/path_to_this_script/get_color_sample_grid_hex.py darks-v2.png 16 12 > darks-v2.hexplt
+#    python full/path_to_this_script/get_color_sample_grid_sRGB.py darks-v2.png 16 12 > darks-v2.hexplt
 # NOTE
 # It may fail if you use only 1 column or row, and for that you can use a freeware color picker on many platforms anyway.
 
