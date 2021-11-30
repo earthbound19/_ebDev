@@ -15,22 +15,24 @@
 # CODE
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (type of file to sort into subdirectory named after file type) passed to script. Exit."; exit 1; else fileType=$1; fi
 
-if [ ! -e $fileType ]; then mkdir $fileType; fi
+# Previously I've been concerned about encountering a "parameter list too long" or similar error, but I'm not seeing that now, and not concerned with it since I bypass inline expansion by surrounding the search string in double quotes; re: https://unix.stackexchange.com/a/421699/110338
+fileNamesArray=( $(find . $subDirSearchParam -iname "*.$fileType" -printf "%P\n") )
+# check if array is not empty (array length is not zero); only do work if it is not (because if it is empty, no file of type $fileType is in the current directory, so we don't want to make an empty directory that this script won't populate) :
+if [ ${#fileNamesArray[@]} -ne 0 ]
+then
+	if [ ! -e $fileType ]; then mkdir $fileType; fi
 
-subDirSearchParam='-maxdepth 1'
-if [ "$2" ]; then subDirSearchParam=''; fi
+	subDirSearchParam='-maxdepth 1'
+	if [ "$2" ]; then subDirSearchParam=''; fi
 
-# If this operates on a super duper long list of files, and I store that all in an array, it will probably throw an error about something being too long, unless I print the results to a file and scan it line by line. So use a file:
-find . $subDirSearchParam -iname \*.$fileType -printf "%P\n" > filesOfTypeList_tmp_kPRvCkMt
-while read file
-do
-	if [ -e "$fileType/$file" ]
-	then
-		printf "\nTARGET EXISTS already for move $fileType/$file. Skipping."
-	else
-		mv $file "$fileType/"
-		printf "\nMoved file $file to folder '/$fileType'."
-	fi
-done < filesOfTypeList_tmp_kPRvCkMt
-
-rm ./filesOfTypeList_tmp_kPRvCkMt
+	for file in ${fileNamesArray[@]}
+	do
+		if [ -e "$fileType/$file" ]
+		then
+			printf "\nTARGET EXISTS already for command mv $fileType/$file. Skipping."
+		else
+			mv $file "$fileType/"
+			printf "\nMoved file $file to folder '/$fileType'."
+		fi
+	done
+fi
