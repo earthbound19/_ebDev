@@ -9,8 +9,9 @@
 # Run with these parameters:
 # - $1 OPTIONAL. How many random characters to have in each file name (length of file name). If not provided, a default is used.
 # - $2 OPTIONAL. Extension of files to randomly rename. Only files with this extension will be renamed. If not provided, or if provided as keyword 'ALL', files of all extensions in the current directory will be randomly renamed.
+# - $3 OPTIONAL. Anything, or the word 'NULL.' If provided as anything else (for example the word 'SNAULHORF'), search and random rename is done in all subfolders in the current directory as well. If provided as the word NULL, search and random rename is only done in the current directory.
+# - $4 OPTIONAL. Keyword to bypass warnings and do destructive work without warning. ONLY USE THIS in a controlled script after testing on files you can afford to destroy (files that have secure backup somewhere else). If used, it must be the word 'SNEERFBLURN'.
 # Example command to rename all files with the extension .hexplt to 20-character random strings:
-# - $3 OPTIONAL. Keyword to bypass warnings and do destructive work without warning. ONLY USE THIS in a controlled script after testing on files you can afford to destroy (files that have secure backup somewhere else). If used, it must be the word 'SNEERFBLURN'.
 #    allRandomFileNames.sh 20 hexplt
 
 
@@ -33,18 +34,23 @@ else
 		echo "No parameter \$1 passed to script\; using default value of 8 for getNrandChars."
 fi
 
+# depthParameter defaults to only the current directory:
+depthParameter='-maxdepth 1'
+# But if any parameter is passed to this script, it is set to nothing, which will cause "find" to search all subdirectories also:
+if [ "$3" ] && [ "$3" != "NULL" ]; then depthParameter=''; fi
+
 if [ ! "$2" ] || [ "$2" == "ALL" ]
 then
-	fileNamesArray=($(find . -maxdepth 1 -type f -iname \* -printf '%f\n'))
+	fileNamesArray=($(find . $depthParameter -type f -iname "*"))
 	fileTypesToRename="*"
 fi
 if [ "$2" ] && [ "$2" != "ALL" ]
 then
-	fileNamesArray=($(find . -maxdepth 1 -type f -iname \*.$2 -printf '%f\n'))
+	fileNamesArray=($(find . $depthParameter -type f -iname "*.$2"))
 	fileTypesToRename=$2
 fi
 
-if [ ! "$3" ] || [ "$3" != "SNEERFBLURN" ]
+if [ ! "$4" ] || [ "$4" != "SNEERFBLURN" ]
 then
 	echo ""
 	echo "WARNING: This script renames all files of type '*.$fileTypesToRename' with $1"
@@ -61,7 +67,7 @@ then
 	fi
 fi
 
-echo "Keyword "$3" passed to script as parameter 3 OR as password on prompt; continuing . . ."
+echo "Keyword "$4" passed to script as parameter 3 OR as password on prompt; continuing . . ."
 echo "Will rename all files of type "$fileTypesToRename" in the current directory . . ."
 echo "PRESS CONTROL+C OR CTRL+Z to cancel within the next 8 seconds if that is not what you mean to do . . ."
 sleep 8
@@ -89,13 +95,15 @@ do
 		multCounter=$(($multCounter + $getNrandChars))
 		# echo getNrandChars val is $getNrandChars
 		newFileBaseName=${randomCharsString:$multCounter:$getNrandChars}
-		echo "~ Renaming $filename to $newFileBaseName"."$fileExt . . ."
-	mv ./$filename ./$newFileBaseName.$fileExt
+		pathNoFileName="${filename%\/*}"
+		echo "~ Renaming $filename to $pathNoFileName/$newFileBaseName.$fileExt . . ."
+	mv $filename $pathNoFileName/$newFileBaseName.$fileExt
 done
 
 
 # DEVELOPMENT HISTORY
-# 2020-09-10 Added optional paramter $3 password to bypass prompts and force destructive work. Upgraded to better command substitution + true arrays.
+# 2021-12-03 Added optional parameter $3 to do search and rename in all subdirectories, and repositioned previous parameter $3 (prompt bypass) to $4. I searched for uses of this script from other scripts, and it shouldn't break anything.
+# 2020-09-10 Added optional parameter $3 password to bypass prompts and force destructive work. Upgraded to better command substitution + true arrays.
 # 2020-07-09 12:22 Throw errors if non-numeric first parameter and exit. Change default rnd chars retrieved to 8.
 # ????-??-?? Made this keep extensions. this is quick and dirty for flam3 files. 06/12/2016 09:15:44 AM -RAH -- DONE 2016-07-16 6:33 PM -RAH
 # 2016-07-16 Made script much more efficient by prefetching necessary number of random characters into a variable, and fetching iterative groups of chars from said variable (in memory, instead of using a file on disk). -RAH
