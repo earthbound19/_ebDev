@@ -13,12 +13,13 @@
 # Check if $0 (script path) is ./pa.sh. If it is not, it means this script was run from another directory (that it was found in from searching directories in PATH), and not from the users' current terminal directory. And if so, there will be unexpected behavior, so notify and exit. (Enforces calling this script only via the command `./pa.sh` (local), and never from `pa.sh` (PATH search) :
 if ! [ "$0" == "./pa.sh" ]; then echo "Script not called via ./pa.sh command. Call this script only as ./pa.sh. Exiting script."; exit; fi
 
-repo_directories=" \
-_ebPalettes \
-_ebDev \
-_ebPathMan \
-_ebSuperBin \
-autobrood"
+repo_directories=(
+_ebPalettes
+_ebDev
+_ebPathMan
+_ebSuperBin
+autobrood
+)
 
 parent_directory=$(pwd)
 for directory in ${repo_directories[@]}
