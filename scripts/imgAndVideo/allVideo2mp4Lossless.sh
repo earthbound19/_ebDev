@@ -15,7 +15,7 @@ mediaList=$(printAllVideoFileNames.sh)
 
 # OPTIONAL EXTRA PARAMETERS
 # Because ffmpeg can't handle pcm for mp4 right now, and that would be a silly waste of space for distribution anyway (compress it to aac) -- and it throws an error instructing me to add -strict -2 to that if I use aac; BUT the following is an option commented out in distribution because encoding to aac isn't lossless! -crf 15 is very high quality encoding (practically though not actually lossless?) :
-extraParams="-acodec aac -crf 15"
+# extraParams="-acodec aac -crf 15"
 # OR just straight copy the sound (default archived code option) even if it's a Canon DSLR .MOV pcm space hog sound channel:
 # extraParams="-c:a copy"
 
