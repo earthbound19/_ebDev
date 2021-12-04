@@ -15,16 +15,35 @@
 
 
 # CODE
-toLowercaseExtensions.sh MOV
-toLowercaseExtensions.sh CR2
-toLowercaseExtensions.sh JPG
-toLowercaseExtensions.sh JPEG
-toLowercaseExtensions.sh PNG
-toLowercaseExtensions.sh HEIC
-toLowercaseExtensions.sh MP4
+# ADD AN EXTENSION to this list if you need it operated on with this script:
+extensions=(
+MOV
+CR2
+JPG
+JPEG
+PNG
+HEIC
+MP4
+GIF
+)
+
+lowerCaseExtensions=()
+# lowercase the extension on all file types in list;
+# build a lowercase extensions array at the same time:
+for ext in ${extensions[@]}
+do
+	toLowercaseExtensions.sh $ext
+	lowerCasedFileExt=$(echo "$ext" | tr '[:upper:]' '[:lower:]')
+	lowerCaseExtensions+=($lowerCasedFileExt)
+done
+
 mkdir tmp_renames_2ydTVzqG
 # Because (at this writing) renameByMetadata.sh doesn't operate selectively on file types, move the types we want to operate on into their own folder (to exclude other types from the operation) :
-mv *.mov *.cr2 *.jpg *.jpeg *.png *.heic *.mp4 ./tmp_renames_2ydTVzqG/
+for lowerCaseExt in ${lowerCaseExtensions[@]}
+do
+	mv *."$lowerCaseExt" ./tmp_renames_2ydTVzqG/
+done
+
 cd tmp_renames_2ydTVzqG/
 # Do the actual rename:
 renameByMetadata.sh
@@ -41,11 +60,10 @@ for x in *.thumb.jpg; do mv "$x" "${x%.thumb.jpg}.jpg"; done
 for x in *.jpeg; do mv "$x" "${x%.jpeg}.jpg"; done
 # OPTIONAL: uncomment if you want to lossleslly recontain all .mov files to .mp4 -- but be warned that this will lose metadata if you destroy the original mov files (metadata is not copied)! :
 # allVideo2mp4Lossless.sh
-toTypeFolder.sh mov
-toTypeFolder.sh cr2
-toTypeFolder.sh jpg
-toTypeFolder.sh png
-toTypeFolder.sh heic
-toTypeFolder.sh mp4
+
+for lowerCaseExt in ${lowerCaseExtensions[@]}
+do
+	toTypeFolder.sh $lowerCaseExt
+done
 
 echo "DONE."
