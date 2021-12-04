@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Calls get_color_sample_grid_sRGB.py for every image file of type $1 in the current directory. Passes to that python script parameters such that the samples are over a number of columns that fit (image width / $2 = cell width) and rows (imageheight / cell width). (The center of square cells of size determined by image widht divided by parameter $3. Captures the outputs of the python script and writes them to ~.hexplt files named after each source file.
+# Calls get_color_sample_grid_sRGB.py for every image file of type $1 in the current directory. Passes to that python script parameters such that the samples are over a number of columns that fit (image width / $2 = cell width) and rows (image height / cell width). (The center of square cells of size determined by image width divided by parameter $3. Captures the outputs of the python script and writes them to ~.hexplt files named after each source file.
 
 # DEPENDENCIES
 # python, the library used by the called python script, getFullPathToFile.sh
@@ -29,7 +29,7 @@ fullPathToScript=$(getFullPathToFile.sh get_color_sample_grid_sRGB.py)
 
 for fileName in ${fileNamesArray[@]}
 do
-	renderTarget=$(echo ${fileName%.*}).hexplt
+	renderTarget=$(echo ${fileName%.*})_palette.hexplt
 	if [ ! -f $renderTarget ]
 	then
 		# get image width and height into variables:
