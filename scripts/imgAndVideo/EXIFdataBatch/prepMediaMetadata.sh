@@ -49,7 +49,7 @@ metaDataTemplate=$metaDataTemplatePath/$metaDataTemplateFile
 # END IN DEVELOPMENT SECTION
 
 list=( $(find $(pwd) -maxdepth 1 \( \
--iname \*$_MTPL*.mp4 \
+-iname \*"$_MTPL"*.mp4 \
 -o -iname \*"$_MTPL"var*.mp4 \
 -o -iname \*$_MTPL*.tif \
 -o -iname \*"$_MTPL"var*.tif \
