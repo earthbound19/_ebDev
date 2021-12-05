@@ -11,4 +11,4 @@
 @ECHO OFF
 SET dtStamp=%date:~-4%_%date:~4,2%_%date:~7,2%__%time:~0,2%_%time:~3,2%_%time:~6,2%
 
-wia-cmd-scanner /w 215.9 /h 279.4 /dpi 100 /color GRAY /format PNG /output .\SCAN_%dtStamp%.png
+wia-cmd-scanner /w 215.9 /h 279.4 /dpi 100 /color GRAY /format PNG /output ".\SCAN_%dtStamp%.png"
