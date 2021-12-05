@@ -44,7 +44,7 @@ catch(err) {
   console.log("\n\n!========\nERROR: unable to open specified -i --inputFile ", inputFileString, ". Exit.\n!========\n");
 }
 
-const regexp = /#[a-f0-9]{6}/g;
+const regexp = /#[a-fA-F0-9]{6}/g;
 // const str = '#f2aece floarif #002139 bepfj #4a2e3f';
 const searchResults = [...inputFileContent.matchAll(regexp)];
 // resulting structure is: searchResults[arrayIndex][hexStringIWant]
