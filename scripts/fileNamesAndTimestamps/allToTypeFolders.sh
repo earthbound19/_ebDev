@@ -19,5 +19,5 @@ if [ "$1" ]; then extraParam='FLIBFLUB'; fi
 allFileTypes=$(printAllFileTypes.sh $FLIBFLUB)
 for fileType in ${allFileTypes[@]}
 do
-	moveToTypeFolder.sh $fileType
+	toTypeFolder.sh $fileType
 done
