@@ -35,7 +35,7 @@ if [ "$2" ]
 	subDirSearchFlag=''
 fi
 
-fileMatches=( $(find . $subDirSearchFlag -iname "*$fileExt*" -type f -printf "%P\n") )
+fileMatches=( $(find ~+ $subDirSearchFlag -iname "*.$fileExt" -type f) )
 for filename in ${fileMatches[@]}
 do
 	# check if extension is all-lowercase, and if not, rename it to so:
