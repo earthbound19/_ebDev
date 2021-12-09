@@ -126,4 +126,4 @@ gm convert ___oooot_n4yR24PG.png -gravity center -background '#363636' -extent "
 # Remove temp image file:
 rm ___oooot_n4yR24PG.png
 
-echo DONE. Result file is _montage__"$parentDirectoryName".png.
+echo DONE. Result file is _montage__"$thisFolderName".png.
