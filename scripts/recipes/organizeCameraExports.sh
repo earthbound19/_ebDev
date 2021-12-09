@@ -11,7 +11,7 @@
 
 # USAGE
 # From a folder with such files to organize (and no other files!), run without any parameters:
-# - organizeCameraExports.sh
+#    organizeCameraExports.sh
 
 
 # CODE
@@ -46,7 +46,7 @@ done
 
 cd tmp_renames_2ydTVzqG/
 # Do the actual rename:
-renameByMetadata.sh
+renameByMetadata.sh NORTHERP
 # Move those up a folder, move back to that folder, and destroy the temp folder:
 mv * ..
 cd ..
