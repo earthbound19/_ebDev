@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Runs moveToTypeFolder.sh for every file of every type in the current directory, and optionally also for all subdirectories.
+# Runs toTypeFolder.sh for every file of every type in the current directory, and optionally also for all subdirectories.
 
 # USAGE
 # Run with or without an optional parameter:
@@ -12,12 +12,12 @@
 
 # CODE
 # list all directories in path.
-extraParam=''
+optionalParam=''
 # Override that if $1 exists:
-if [ "$1" ]; then extraParam='FLIBFLUB'; fi
+if [ "$1" ]; then optionalParam='FLIBFLUB'; fi
 
-allFileTypes=$(printAllFileTypes.sh $FLIBFLUB)
+allFileTypes=( $(printAllFileTypes.sh $optionalParam) )
 for fileType in ${allFileTypes[@]}
 do
-	toTypeFolder.sh $fileType
+	toTypeFolder.sh $fileType $optionalParam
 done
