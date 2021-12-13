@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Takes a list of RGB colors expressed in hex (one per line) and sorts them using an advanced color appearance model for human color vision: CIECAM02, sorting into lists of darks and lights (nearest to black and nearest to white), via the colorspacious library. Adapted from RGBhexColorSortInCIECAM02.py.
+# Takes a list of RGB colors expressed in hex (one per line) and sorts them using an advanced color appearance model: CIECAM02, sorting into lists of darks and lights (nearest to black and nearest to white), via the colorspacious library. Adapted from RGBhexColorSortInCIECAM02.py.
 
 # USAGE
 # From a directory with a .hexplt file, run this script through a Python interpreter, with a .hexplt list as the first (and only) parameter to the script; for example:

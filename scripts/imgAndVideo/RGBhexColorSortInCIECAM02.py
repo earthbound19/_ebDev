@@ -1,6 +1,6 @@
 # DESCRIPTION
 # Takes a list of RGB colors expressed in hex (one per line) and sorts them 
-# using an advanced color appearance model for human color vision: CIECAM02.
+# using an advanced color appearance model: CIECAM02.
 # If you're sorting very different colors, YOU MAY WISH to use
 # RGBhexColorSortinCAM16-UCS.py instead (see). This uses the colorspacious library; that uses colour-science.
 
@@ -28,7 +28,16 @@
 
 
 # CODE
-# TO DO: Maybe see DEVELOPER NOTES at end of script.
+# DEVELOPER NOTES
+# Try the same function but with different parameters J'a'b' in the colour library? 
+# re: https://colour.readthedocs.io/en/develop/generated/colour.difference.delta_E_CAM16LCD.html
+# re: https://colour.readthedocs.io/en/develop/tutorial.html
+# NOTE that the install package name for that is colour-science, NOT colour (which is valid but
+# something else far more limited!)
+# - Chart of library-available color spaces / models and how to convert between them, re colour library:
+# https://colour.readthedocs.io/en/develop/index.html#automatic-colour-conversion-graph-colour-graph
+# - I only get the colorio library installing on python 3.8.0 on mac. possible use of cam16 color
+
 import sys
 from itertools import combinations
 from colorspacious import cspace_convert, deltaE
@@ -193,20 +202,3 @@ if overwriteOriginalList == True:
 else:
     for element in sorted_colors:
         print(element)
-
-
-
-# DEVELOPER NOTES
-# Try the same function but with different parameters J'a'b' in the colour library? 
-# re: https://colour.readthedocs.io/en/develop/generated/colour.difference.delta_E_CAM16LCD.html
-# re: https://colour.readthedocs.io/en/develop/tutorial.html
-# NOTE that the install package name for that is colour-science, NOT colour (which is valid but
-# something else far more limited!)
-# - See URLs in comments in the below code. They all probably were developed because of this
-# paper: https://www.researchgate.net/publication/227991182_CIE_Color_Appearance_Models_and_Associated_Color_Spaces
-# - Chart of all known color spaces / models and how to convert between them, re colour library:
-# https://colour.readthedocs.io/en/develop/index.html#automatic-colour-conversion-graph-colour-graph
-# - I only get the colorio library installing on python 3.8.0 on mac. possible use of cam16 color
-# - another library that does other things: http://markkness.net/colorpy/ColorPy.html
-# space in it: https://github.com/nschloe/colorio/blob/master/test/test_cam16.py
-# - stinking awesome answer that led to some of this: https://stackoverflow.com/a/49346067/1397555

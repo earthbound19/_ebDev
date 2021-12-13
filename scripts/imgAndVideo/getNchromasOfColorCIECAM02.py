@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Gets -n chromatic intensities (different states of saturation) for any -c color via the CIECAM02 color space, which models human perception of color (and brightness and other aspects of light) better than any other model at this writing. Writes results to a new .hexplt file named after the color.
+# Gets -n chromatic intensities (different states of saturation) for any -c color via the CIECAM02 color space. Writes results to a new .hexplt file named after the color.
 
 # DEPENDENCIES
 # Python and the various import libraries declared at the start of CODE.

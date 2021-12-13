@@ -1,5 +1,5 @@
 // DESCRIPTION
-// Prints sRGB hex color values with altered Lightness, and/or Chroma, and/or Hue of every color from a .hexplt file -i (input), by parameters -l, -c and/or -h (as transforms from OKLAB color space). Tweaks are by float values between 0 and 1 for l (L), 0 to 0.322 for c, and 0 to 360 for h. Values may be negative or positive. Requires an input .hexplt file, which is a list of sRGB colors expressed in hexadecimal. At this writing, Oklab does perceptual color modeling and changes better than any other color space I am aware of (including CIECAM02). Re: https://bottosson.github.io/posts/oklab/ -- https://raphlinus.github.io/color/2021/01/18/oklab-critique.html#update-2021-01-29
+// Prints sRGB hex color values with altered Lightness, and/or Chroma, and/or Hue of every color from a .hexplt file -i (input), by parameters -l, -c and/or -h (as transforms from OKLAB color space). Tweaks are by float values between 0 and 1 for l (L), 0 to 0.322 for c, and 0 to 360 for h. Values may be negative or positive. Requires an input .hexplt file, which is a list of sRGB colors expressed in hexadecimal. Re: https://bottosson.github.io/posts/oklab/ -- https://raphlinus.github.io/color/2021/01/18/oklab-critique.html#update-2021-01-29
 
 // DEPENDENCIES
 // nodejs, with `culori@0.20.1`

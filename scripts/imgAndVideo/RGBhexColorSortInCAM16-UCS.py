@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Variant of RGBhexColorSortInCIECAM02.py which uses the color-science library and CAM16 color model for color sorting (supposedly superior to CIECAM02). In my tests, RGBhexColorSortInCIECAM02.py (which uses the colorspacious library) does better for hue matching independent of brightness; this (which uses colour-science) does better for matching first brightness/saturation, then hue. Both give good results. To my eye colorspacious is better overall (maybe I reckon hue before brightness/saturation).
+# Variant of RGBhexColorSortInCIECAM02.py which uses the color-science library and CAM16 color model for color sorting. In my tests, RGBhexColorSortInCIECAM02.py (which uses the colorspacious library) does better for hue matching independent of brightness; this (which uses colour-science) does better for matching first brightness/saturation, then hue. Both give good results. To my eye colorspacious is better overall (maybe I reckon hue before brightness/saturation).
 
 # DEPENDENCIES
 # Python 3, various python packages (see import list at start of code) which you may install with easy_install or pip; NOTE that the colour import is actually from the colour-science package; you must install colour-science.
@@ -25,7 +25,6 @@
 # - The same input always produces the same output, though if you change the order of colors in the list, the results may change. This is because the script uses the first color in the list to begin its comparisons (but you may override that with parameter 3). You therefore may wish to decide which color you want first in the list for those comparison purposes, or pass an arbitrary color via parameter 3.
 # - Good comparisons with this script may be a matter of here figuring the best illuminant and transform matrix parameters, and hacking that. You can try different chromatic_adaptation_transform values from here:
 # https://colour.readthedocs.io/en/develop/generated/colour.RGB_to_XYZ.html
-# Also, I may not know what I'm doing here -- the illuminants and transform matrix have me scratching my head.
 
 
 # CODE
@@ -188,27 +187,3 @@ if overwriteOriginalList == True:
 else:
     for element in sorted_colors:
         print(element)
-
-
-
-# REFERENCE and dev notes
-# - Also, CAM16 has superceded CIECAM02: https://arxiv.org/abs/1802.06067
-# CAM16 defines via tristimulus values XYZ: lightness J, brightness Q, chroma C, colorfulness M, saturation s, and hue h. re https://observablehq.com/@jrus/cam16
-# - maybe yet better, as it's referenced in a paper -- https://arxiv.org/pdf/1802.06067.pdf --
-# describing the very same implementation as a solution to found problems in CIECAM02;
-# it is implemented in https://github.com/nschloe/colorio
-# DEV NOTE: 
-# "The results showed that J'a'b' gave the second best (CAM16-UCS was the best) performance
-# for small color difference data sets and the best for experimental data corresponding to
-# large color differences." -- https://www.osapublishing.org/DirectPDFAccess/83324CA3-D13F-9C21-A2C857331BED04A3_368272/oe-25-13-15131.pdf?da=1&id=368272&seq=0&mobile=no (from https://www.osapublishing.org/oe/abstract.cfm?uri=oe-25-13-15131) and https://www.osapublishing.org/DirectPDFAccess/72B3A417-CBFB-5C71-084E496F156FBA4E_368272/oe-25-13-15131.pdf?da=1&id=368272&seq=0&mobile=no
-# in J'a'b, "J refers to lightness, a refers to redness-to-greenness, and b refers to blueness-to-yellowness." re https://github.com/connorgr/d3-cam02 (that is a javascript library I think)
-# also re https://colour.readthedocs.io/en/develop/generated/colour.XYZ_to_JzAzBz.html#colour.XYZ_to_JzAzBz
-# "Returns:	JzAzBz colourspace array where Jz is Lightness, Az is redness-greenness and Bz is yellowness-blueness."
-# - to get all convert functions starting with a string:
-# print([name for name in colour.__all__ if name.startswith('XYZ_to')])
-# - to get conversion path from one color space / model to another
-# (but I got errors trying) :
-# colour.describe_conversion_path('sRGB', 'CAM16UCS', width=75)
-# re https://colour.readthedocs.io/en/develop/generated/colour.describe_conversion_path.html#colour.describe_conversion_path
-# JzAzBz is based on CAM16? re: http://files.cie.co.at/x046_2019/x046-OP71.pdf: "A new whiteness formula, named white J’a’b’ (WJ’a’b’) was derived using the datasets introduced in the last section..where J’, a’, b’ are the colour coordinates of the test stimulus in CAM16-UCS within the colour boundary."
-# - yet another library: https://www.tandfonline.com/doi/full/10.1080/15502724.2018.1518717
