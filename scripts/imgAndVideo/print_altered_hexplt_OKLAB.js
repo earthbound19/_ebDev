@@ -7,18 +7,23 @@
 // - Anything past that version breaks this and will require a rewrite of this script!) and `command` packages installed.
 // - You may have to install culori locally (in the same directory as this script) via `npm install <package_name>`, or globally, via `npm install -g <package_name>`.
 
+// KNOWN ISSUES
+// If you push intended conversions out of gamut (of oklab? sRGB?), this script may return the color black where that makes no sense for the conversion. This script clamps values to what I think are gamut limits (from reference I found), and yet this happens. I don't know whether it's a bug in the library, or I don't actually know the gamut limits, or what.
+
 // USAGE
 // See help printout from this command:
 //    node print_altered_hexplt_OKLAB.js --help
 // --or see the `program` . . . `.requiredOption` and `.option` section in the source code.
 // To save the result to a new file, use a redirection operator, e.g.:
 //    node /path/to/script/print_altered_hexplt_OKLAB.js -i 'floral_print_00002.hexplt' -c 0.018 -l 0.068 -h 12 > floral_print_00002_more_lively_more_orange.hexplt
+// NOTES
+// TheEither there's a bug (or bugs) in the library this uses, or I
 
 
 // CODE
 // main dependency:
 culori = require('culori');
-var fs = require("fs")
+var fs = require('fs')
 
 // START OPTIONS PARSING AND CHECKING
 const { program } = require('commander');
