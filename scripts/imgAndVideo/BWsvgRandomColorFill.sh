@@ -60,7 +60,7 @@ then
 			echo File is at\:
 			echo $hexColorSrcFullPath
 			echo PROCEEDING. IN ALL CAPS.
-			rndHexColors=($(<$hexColorSrcFullPath))
+			rndHexColors=( $(grep -i -o '#[0-9a-f]\{6\}' $hexColorSrcFullPath) )
 		fi
 	else
 		echo !--------------------------------------------------------!
