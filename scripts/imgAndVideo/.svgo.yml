@@ -1,4 +1,5 @@
 # Custom svgo configuration replacement by RAH / earthbound.io
+# NOTE: this is deprecated. You will only be able to use this with a previous version of SVGO. To use this file, it must be changed to the newest .js config format and possibly updated to include/exclude updated plugins.
 
 # multipass: true
 # full: true

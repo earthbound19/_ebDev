@@ -5,26 +5,27 @@
 # A `nodejs` install with the `svgo` (svgomg) package installed.
 
 # USAGE
-# First examine and if you wish to copy the file `.svgo.yml` in this distribution over the `.svgo.yml` file that comes with `svgo`. Among other things it preserves path IDs and long hex color form.
-# Run this script with one parameter $1 (required), being the name of the svg file for which you want an ~_opt.svg file produced in the same directory; e.g.:
+# - First examine the file `.svgo.yml` in this distribution, and if you wish to, copy it over the `.svgo.yml` file that comes with `svgo`. Among other things it preserves path IDs and long hex color form. UPDATE: that will need to change; the newest version of SVGO doesn't use yaml config anymore, it uses .js. For now, you're forced to either use the default config or update the yaml to the newest js and figure out how/where to copy that/use that. RE: https://github.com/svg/svgo/releases/tag/v2.0.0
+# - Run this script with one parameter $1 (required), being the name of the svg file for which you want an ~_opt.svg file produced in the same directory; e.g.:
 #    svgo_optimize.sh inputFile.svg
 # NOTES
-# - The CLIopts variables in the source code, if you uncomment them, override the `.svgo.yml` config file.
 # - This may misbehave when run via `Cygwin`. I've at times found that if I copy and paste the printed command to a cmd prompt, it works OK . . . except the result displays wonky in Internet Explorer and inkscape.
 
 
 # CODE
 fileNameNoExt=${1%.*}
-
-# Other CLI options:
+renderTargetFile="$fileNameNoExt"_opt.svg
+# Other CLI options; NOTE 2021-12-18: CLI --enable and --disable items are no longer available in SVGO. You must now follow a more difficult javascript-object-as-strings syntax to configure those, it seems, from something I read; so the following needs update if you use it:
 # CLIopts="--enable=convertColors --enable=collapseGroups --disable=convertPathData"
-SVGOcommand="svgo -i $1 --pretty $CLIopts -o "$fileNameNoExt"_opt.svg"
+SVGOcommand="svgo -i $1 --pretty $CLIopts -o $renderTargetFile"
 echo Running command\:
 echo $SVGOcommand
 echo . . .
 $SVGOcommand
 
-# OPTIONAL and DANGER: will toast original file--comment out if you do not want that! :
+echo "DONE. Result file is $renderTargetFile."
+
+# OPTIONAL and DANGER: will toast original file and replace it with the converted one; comment out if you do not want that! :
 # rm $1 && mv "$fileNameNoExt"_opt.svg $1
 
 
@@ -33,7 +34,7 @@ $SVGOcommand
 # -p precision; want 3 decimal points
 # --pretty
 # ? --multipass
-# --config=CONFIG : Config file or JSON string to extend or replace default
+# --config=CONFIG : Config file to extend or replace default
 
 # SVGO USAGE
 # svgo [OPTIONS] [ARGS]
