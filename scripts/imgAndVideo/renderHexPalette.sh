@@ -188,11 +188,10 @@ rm ./$tempScriptFileName
 # OR:
 rm -rf $tmp_render_dir
 
-# To optionally reduce the file size a lot (maybe?) uncomment these next lines:
-# echo ""
-# echo OPTIMIZING rendered png . . .
-# pngquant --skip-if-larger --ext=.png --force --quality 100 --speed 1 --nofs --strip --verbose $renderTarget
-# optipng -o7 $renderTarget
+# These next three lines will make palette creation take longer, but optimize the palette png. Comment them out if you don't want that delay:
+echo ""
+echo OPTIMIZING rendered png . . .
+optipng -o7 $renderTarget
 
 echo ""
 echo DONE--created color palette image is $renderTarget
