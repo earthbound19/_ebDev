@@ -30,8 +30,7 @@ presetsArray=( $(find . -maxdepth 1 -type f -name "*.cgp" -printf '%f\n') )
 
 for element in ${presetsArray[@]}
 do
-	cgpFileNoExt=$(echo "${element%.*}")
-	renderLogFileFile=$cgpFileNoExt.rendering
+	renderLogFileFile=${element%.*}.rendering
 	if ! [ -e $renderLogFileFile ]
 	then
 		# create render stub file so that other or subsequent runs of this script

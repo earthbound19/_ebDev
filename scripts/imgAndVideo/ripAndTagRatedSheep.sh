@@ -40,7 +40,7 @@ do
 	localFile=`echo $URL | sed 's/.*\/\(.*\)/\1/g'`
 	localFile="$sheep_avis_local_path/$localFile"
 		echo local file name is\: $localFile
-	localFileNoEXT=`echo $localFile | sed 's/.*\/\(.*\)\.avi/\1/g'`
+	localFileNoEXT=${localFile%.*}
 		# echo local file name without extension is\: $localFileNoEXT
 	# Losslessly transcode and embed rating in metadata only if target file does not already exist:
 	i=0

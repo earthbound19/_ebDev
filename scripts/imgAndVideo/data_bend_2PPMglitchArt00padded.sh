@@ -19,8 +19,7 @@
 # - once that's done, reintegrate those options into the original as options.
 # - option to pad with any value you may want from 00-ff (also including in whichever column?), not just 00.
 
-imgFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g' | tr -d '\15\32'`
-ppmDestFileName="$imgFileNoExt""_asPPM.ppm"
+ppmDestFileName=${1%.*}_asPPM.ppm
 
 inputDataFile=$1
 __ln=( $( ls -Lon "$inputDataFile" ) )

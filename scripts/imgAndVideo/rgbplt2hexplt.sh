@@ -11,8 +11,7 @@
 # CODE
 # BEGIN SETUP GLOBAL VARIABLES
 if [ ! "$1" ]; then printf "No .rgbplt file name passed to script. Expected as parameter \$1."; exit 1; else paletteFile=$1; fi
-paletteFileNoExt=$(echo "${1%.*}")
-renderTargetFile=$paletteFileNoExt.hexplt
+renderTargetFile=${paletteFile%.*}.hexplt
 
 # IF RENDER TARGET already exists, abort script. Otherwise continue.
 if [ -f ./$renderTargetFile ]

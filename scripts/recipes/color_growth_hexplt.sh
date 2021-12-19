@@ -49,8 +49,7 @@ pathToScript=$(getFullPathToFile.sh color_growth.py)
 # END PARAMETER PARSING AND GLOBALS SETUP.
 
 hexplt2rgbplt.sh $sourcePaletteHexplt
-paletteFileNoExt=$(echo "${1%.*}")
-convertedPaletteFile=$paletteFileNoExt.rgbplt
+convertedPaletteFile=${sourcePaletteHexplt%.*}.rgbplt
 
 # I tried iterating over a created array from the palette file, and different commands expecting different IFS delimiters (I know not which) scewed it up. So, just iterate over lines in a file:
 while read -r element

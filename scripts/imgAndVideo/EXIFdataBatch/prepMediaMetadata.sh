@@ -13,6 +13,7 @@
 # CODE
 # TO DO
 # - further document as promised in USAGE.
+# - see TO DO later on in comments; maybe do that.
 # Q. Should those be _FINAL_ and _EXPORTED_, not _FINAL and _EXPORTED ? :
 # _MTPL=_FINAL
 _MTPL=_EXPORTED_
@@ -97,6 +98,10 @@ echo is $element
 				# DEPRECATED, because much as I hate it, putting like-named files into a new subfolder will cause path length errors in windows:
 				# imagePath=`expr match "$element" '\(.*\)\/.*'`
 				# if [ -a $imagePath/_metadataAdditions ]
+# TO DO: possibly update the folowing, like so:
+# imagePath="${fileNameWithPath%\/*}"
+# fileNameNoExt=${filename%.*}
+# -- after figuring out again how this script works/documenting that.
 	imagePath=$(expr match "$element" '\(.*\)\/.*')
 	imageFileNameNoExt=`expr match "$element" '.*\/\(.*\)\..*'`
 	metaDataAdditionsTextFile=$imagePath/"$imageFileNameNoExt"_MD_ADDS.txt

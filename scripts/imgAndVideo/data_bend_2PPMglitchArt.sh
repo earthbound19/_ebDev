@@ -27,8 +27,7 @@
 		# f f f f f f f f f
 		# f f f f f f f f f = 3 rows of 9 vals = 27 = orig. data length.
 
-imgFileNoExt=`echo $1 | sed 's/\(.*\)\..\{1,4\}/\1/g'`
-ppmDestFileName="$imgFileNoExt""_asPPM.ppm"
+ppmDestFileName=${1%.*}_asPPM.ppm
 
 inputDataFile=$1
 __ln=( $( ls -Lon "$inputDataFile" ) )

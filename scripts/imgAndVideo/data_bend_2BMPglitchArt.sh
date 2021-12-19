@@ -15,8 +15,7 @@
 # Does a square root calculation (rounded) from the byte size of the data to determine the bmp X and Y dimensions which this creates a header from.
 if [ ! "$1" ]; then echo "No parameter \$1 (source file to bend). Exit."; exit; else sourceFile=$1 fi;
 
-imgFileNoExt=`echo $sourceFile | sed 's/\(.*\)\..\{1,4\}/\1/g'`
-ppmDestFileName="$imgFileNoExt"_asBMP.bmp
+ppmDestFileName=${1%.*}_asBMP.bmp
 
 fileToMakeCorruptedCopyOf=$sourceFile
 __ln=( $( ls -Lon "$fileToMakeCorruptedCopyOf" ) )

@@ -15,7 +15,7 @@
 
 
 # CODE
-fileExt=$(echo "${1##*.}")
-fileNameNoExt=$(echo "${1%.*}")
+fileExt=${1##*.}
+fileNameNoExt=${1%.*}
 
 ffmpeg -y -i "$1" -ss $2 -t $3 -map 0:v -vcodec copy -map 0:a -acodec copy "$fileNameNoExt"_soundLosslessExtract_ss"$2"_t"$3"."$fileExt"

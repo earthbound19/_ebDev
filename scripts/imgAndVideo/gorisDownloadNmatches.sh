@@ -29,12 +29,7 @@ fi
 echo numberToDownload is $numberToDownload
 # END SETUP GLOBALS
 
-# Get the filename from $1, minus the file extension:
-		# To append to the next command between backticks `` if Cygwin mangles variables by using windows linefeeds:  | tr -d '\15\32'
-fileNameNoExt=`rev <<< "$1" | cut -d"." -f2- | rev `
-		# echo filenameNoExt is\: $fileNameNoExt
-
-goris_matches_subdir=$fileNameNoExt
+goris_matches_subdir=${1%.*}
 		# echo goris_matches_subdir is $goris_matches_subdir
 # Create a directory named after the file, only if it doesn't already exist:
 if [ ! -d $goris_matches_subdir ]; then mkdir $goris_matches_subdir; fi

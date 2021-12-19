@@ -15,7 +15,7 @@ find . -maxdepth 1 -iname \*.png > crop_imgs.txt
 i=0
 while read element
 do
-	imgFileNoExt=`echo $element | sed 's/\(.*\)\..\{1,4\}/\1/g'`
+	imgFileNoExt=${element%.*}
 	if [ -a $imgFileNoExt.bmp ]
 	then
 		der=duh

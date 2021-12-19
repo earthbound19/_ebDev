@@ -18,8 +18,7 @@
 # =============
 # BEGIN SETUP GLOBAL VARIABLES
 paletteFile=$1
-paletteFileNoExt=`echo "${1%.*}"`
-renderTargetFile=$paletteFileNoExt.ppm
+renderTargetFile=${1%.*}.ppm
 
 # Search current path for $1; if it exists set hexColorSrcFullPath to just $1 (we don't need the full path). If it doesn't exist in the local path, search the path in palettesRootDir.txt and make decisions based on that result:
 if [ -e ./$1 ]

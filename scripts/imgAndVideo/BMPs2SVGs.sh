@@ -17,7 +17,7 @@
 imgs=$(find . -maxdepth 1 -iname \*.bmp)
 for element in "${imgs[@]}"
 do
-	imgFileNoExt=`echo $element | sed 's/\(.*\)\..\{1,4\}/\1/g'`
+	imgFileNoExt=${element%.*}
 	if [ ! -a $imgFileNoExt.svg ]
 	then
 	echo tracing $element . . .
