@@ -16,7 +16,7 @@
 #    deletePalettesDifferentBelowThreshold.sh 320
 # The script will skip all iterations up to 320 and resume from there.
 # To examine all iterations, run this script without any parameter:
-#    deletePalettesDifferentBelowThreshold.sh 320
+#    deletePalettesDifferentBelowThreshold.sh
 # NOTES
 # - This script detects whether everythingCLI is installed and executes normally, and if so, it enables you to pick favorite palettes and copy them into palette collections, by printing information about how many copies of the palette (ASSUMED: in .hexplt format) are found on your computer. If this script prints information on the count of that palette file found on the computer, you'll know you don't need to copy the palette to another location (a collection), as it has already been copied (there are 2 or more of it).
 # - If this script gets an error on attempt to run everythingCLI, it will print a count for a palette with a question mark, which indicates that the number of them on the computer is unknown.
@@ -32,7 +32,7 @@ then
 fi
 echo value of everythingCLIworking is $everythingCLIworking
 
-printf "\nThis script launches pairs of palette image renders associated with palettes ranked below a dissimilarity threhshold, in a comparison log file, paletteDifferencesBelowThreshold.txt. It uses the 'start' command repeatedly to launch images. The intent is that an image editor with a hotkey to delete an image will make it easier to delete one of a pair of palettes that you like less. Press any key to continue . . ."
+printf "\nThis script launches pairs of palette image renders associated with palettes ranked below a dissimilarity threshold, in a comparison log file, paletteDifferencesBelowThreshold.txt. It uses the 'start' command repeatedly to launch images. The intent is that an image editor with a hotkey to delete an image will make it easier to delete one of a pair of palette images that you like less. Press any key to continue . . ."
 read -rsn1
 
 arrayOfFilesToScan=$(<paletteDifferencesBelowThreshold.txt)
