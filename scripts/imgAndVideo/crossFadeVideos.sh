@@ -18,13 +18,15 @@ if [ ! "$2" ]; then printf "\nNo parameter \$2 (source video two file name) pass
 if [ "$3" ]; then crossFadeLength=$3; else crossFadeLength=4.25; fi
 if [ "$4" ]; then crossFadeStart=$4; else crossFadeStart=0.75; fi
 
+pixelFormat="-pix_fmt yuv420p"
+
 # Construct render target file name variable:
 inputVideoOneFileNameNoExt=${inputVideoOne%.*}
 inputVideoTwoFileNameNoExt=${inputVideoTwo%.*}
 renderTargetFileName="$inputVideoOneFileNameNoExt"_xFade_"$inputVideoTwoFileNameNoExt".mp4
 
 # IF VIDEO HAS AUDIO, make audio crossfade. The following command will print nothing if there is no audio:
-#audioLog=$(ffprobe -i $inputVideoOne -show_streams -select_streams a -loglevel error)
+audioLog=$(ffprobe -i $inputVideoOne -show_streams -select_streams a -loglevel error)
 if [ "$audioLog" != "" ]
 then
 	ffmpeg -y -i $inputVideoOne -r 11500 -i $inputVideoTwo -filter_complex \
@@ -42,6 +44,7 @@ ffmpeg -y -i $inputVideoOne -i $inputVideoTwo -filter_complex \
 "[0:v]fade=t=out:st=0:d=$crossFadeLength:alpha=1,setpts=PTS-STARTPTS[va0];\
 [1:v]fade=t=in:st=0:d=$crossFadeLength:alpha=1,setpts=PTS-STARTPTS[va1];\
 [va0][va1]overlay[over]" \
+$pixelFormat \
 -map [over] _crossFadeVideos_sh_tmp_PgfJnBGc9.mp4
 
 # IF SOURCE VIDEO has audio, mux video and audio crossfade (and render to final render target file name); otherwise don't (and just rename the crossfade video to the final render target file name), because we made no audio crossfade. Alas, sound is shorter [I noted at one point; does that mean sound goes out of sync?] at this writing:

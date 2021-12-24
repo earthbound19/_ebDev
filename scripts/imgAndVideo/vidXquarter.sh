@@ -12,5 +12,7 @@
 # -vf scale=iw/4:-1
 # WHERE 2: will make it half-size, 3 third-size, 4 fourth-size etc.
 
-ffmpeg -y -i $1 -vf scale=iw/4:-1 -crf 17 "$1"_quarter_resolution.mp4
+pixelFormat="-pix_fmt yuv420p"
+
+ffmpeg -y -i $1 -vf scale=iw/4:-1 -crf 17 $pixelFormat "$1"_quarter_resolution.mp4
 

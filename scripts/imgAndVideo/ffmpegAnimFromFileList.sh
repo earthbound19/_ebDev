@@ -34,10 +34,11 @@ then
 fi
 
 # framerateParam="-framerate $1"
+pixelFormat="-pix_fmt yuv420p"
 
 # re https://stackoverflow.com/questions/25073292/how-do-i-render-a-video-from-a-list-of-time-stamped-images --it works--! :
 # TWO OPTIONS on the following two lines; first is x264, second is lossless compressed UTvideo codec avi; comment out what you don't want:
-ffmpeg -y $framerateParam -f concat -i $4 -vf fps=$2 -crf $3 $rescaleParams _out.mp4
+ffmpeg -y $framerateParam -f concat -i $4 -vf fps=$2 -crf $3 $rescaleParams $pixelFormat _out.mp4
 # ffmpeg -y -f concat -framerate $1 -i $4 -vf fps=$2 -crf $3 $rescaleParams -codec:v utvideo _out.avi
 
 # | ffmpeg -y -framerate $1 -f image2pipe $rescaleParams -r $2 -crf $3 _out.mp4

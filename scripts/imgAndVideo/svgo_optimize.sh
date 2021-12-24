@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Optimizes an svg input file (writing the result to `<original_file_base_name>_opt.svg`) including color code conversion suited for random recoloring via `BWsvgRandomColorFill.sh`.
+# Optimizes an svg input file (writing the result to `<original_file_base_name>_opt.svg`) including color code conversion suited for random recoloring via `SVGrandomColorReplace.sh`.
 
 # DEPENDENCIES
 # A `nodejs` install with the `svgo` (svgomg) package installed.

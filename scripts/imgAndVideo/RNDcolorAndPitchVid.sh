@@ -18,6 +18,8 @@ else
 	duration=5
 fi
 
+pixelFormat="-pix_fmt yuv420p"
+
 # Generate input video animation of random still color:
 hexColor=$(cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6)
 ffmpeg -y -f lavfi -i color=$hexColor:s=1280x720:d=$duration -codec:v utvideo rgb_0x"$hexColor"_"$duration"s.avi
@@ -30,7 +32,7 @@ frequency_two=$(echo "scale=2; ($RANDOM * 32.70 / 32767) + 523.25" | bc)
 sox −n "$frequency"Hz_"$duration"s.wav synth $duration triangle "$frequency_one"-"$frequency_two" gain -13
 
 # Mux the two into one .mp4, then dispose of the input files:
-ffmpeg -i rgb_0x"$hexColor"_"$duration"s.avi -i "$frequency"Hz_"$duration"s.wav -crf 38 rgb_0x"$hexColor"_and_"$frequency"Hz_"$duration"s.mp4
+ffmpeg -i rgb_0x"$hexColor"_"$duration"s.avi -i "$frequency"Hz_"$duration"s.wav -crf 38 $pixelFormat rgb_0x"$hexColor"_and_"$frequency"Hz_"$duration"s.mp4
 rm rgb_0x"$hexColor"_"$duration"s.avi "$frequency"Hz_"$duration"s.wav
 
 
