@@ -2,7 +2,7 @@
 # Takes an .svg file and fills all regions of one color (default ffffff, white) with randomly generated colors (not recommended -- random colors can be garish), OR from colors randomly selected from a .hexplt color list (recommended, optional).
 
 # WARNING
-# Changes (overwrites) input svg file without warning. You may wish to only operate on a copy of the svg file, or make many copies and alter them by calling this script from another script, such as `SVGrandomColorReplaceCopies.sh` (which will be created soon).
+# Changes (overwrites) input svg file without warning. You may wish to only operate on a copy of the svg file, or make many copies and alter them by calling this script from another script, such as `SVGrandomColorReplaceCopies.sh`.
 
 # USAGE
 # Run with these parameters:
@@ -17,14 +17,12 @@
 #    SVGrandomColorReplace.sh input.svg earth_pigments_dark.hexplt 000000
 # NOTES
 # - This expects rgb hex color codes in six digits in your SVGs; ex. f800fc -- never abridged hex forms like fff. (To save *three bytes,* programmers confused the world and added a requirement of more complicated parsers.) If your svg is not this way, use potrace to scan the original black bitmap using BMPs2SVGs.sh, or use the SVGOMG service (convert your SVG file online) at: https://jakearchibald.github.io/svgomg/ -- or use SVGO re https://github.com/svg/svgo and https://web-design-weekly.com/2014/10/22/optimizing-svg-web/ -- It converts RGB values to hex by default. BUT NOTE: for our purposes, do not use the "minify colors" option (which can result in abridged hex codes). 
-# - a previous version of this script had this parameter order: $1 source svg file, $2 how many copies of the file to make (this parameter has been removed in the current version, and will be available via `SVGrandomColorReplaceCopies.sh`), $3 palette file to use (or the word RANDOM). This version of the script adds $4 color to replace.
-# - this will be renamed from BWsvgRandomColorFill.sh to SVGrandomColorReplace.sh in a future verson control revision.
+# - a previous version of this script had this parameter order: $1 source svg file, $2 how many copies of the file to make (this parameter has been removed in the current version, and is now available via `SVGrandomColorReplaceCopies.sh`), $3 palette file to use (or the word RANDOM). This version of the script adds $4 color to replace.
+# - this script was renamed from BWsvgRandomColorFill.sh to SVGrandomColorReplace.sh.
 
 
 # CODE
 # TO DO:
-# - rename this script from BWsvgRandomColorFill.sh to SVGrandomColorReplace.sh
-# - replace references and calls to this script (in other scripts) with the updated name.
 # ? - implement an optional buffer memory of the last three colors used, and if the current picked color is among them, pick another color until it is not among them.
 
 # PARAMETER CHECKING:
@@ -45,10 +43,6 @@ then
 	if [ "$replaceThisHexColor" != "" ]
 	then
 		echo "Will attempt to replace color $replaceThisHexColor in copies of $svgFileName."
-	else
-		echo ''
-		echo 'No six-digit RGB hex color code found in parameter $3. Exit.'
-		exit 3
 	fi
 fi
 
