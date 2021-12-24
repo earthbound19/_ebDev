@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates a .ppm (plain text file bitmap format) image which is W x H pixels of random colors OR colors from a list. Generates Z such images. See USAGE for script parameters and examples.
+# Creates a .ppm (plain text file bitmap format) image which is W x H pixels of randomly generated colors OR colors randomly selected from a list. Generates Z such images. See USAGE for script parameters and examples.
 
 # USAGE
 # BECAUSE I KEEP FORGETTING: $4, $5 and $6 are actually different things.
