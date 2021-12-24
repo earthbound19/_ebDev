@@ -35,6 +35,8 @@ inputFPS=$4
 if [  "$5" ]; then scale="$5"; else scale='1920:1080'; fi
 squaresPerImage=$((numCols * numRows))
 
+pixelFormat="-pix_fmt yuv420p"
+
 # Outer loop per howManyImages:
 for a in $( seq $howManyImages )
 do
@@ -72,7 +74,7 @@ numDigits=${#numDigits}
 		# echo numDigits val is $numDigits
 timestamp=$(date +"%Y_%m_%d__%H_%M_%S__%N")
 targetVideoFileName="$timestamp"__bw_square_noise_upsaled.mp4
-ffmpeg -y -framerate $inputFPS -f image2 -i %0"$numDigits"d.pbm -vf scale=$scale:flags=neighbor -crf 17 -c:a aac -strict experimental -tune fastdecode -pix_fmt yuv420p -b:a 192k -ar 48000 -r 29.97 $targetVideoFileName
+ffmpeg -y -framerate $inputFPS -f image2 -i %0"$numDigits"d.pbm -vf scale=$scale:flags=neighbor -crf 17 -c:a aac -strict experimental -tune fastdecode $pixelFormat -b:a 192k -ar 48000 -r 29.97 $targetVideoFileName
 
 mv $targetVideoFileName ..
 # rm *.pbm

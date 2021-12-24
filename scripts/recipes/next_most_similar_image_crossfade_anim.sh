@@ -6,6 +6,7 @@
 
 
 # CODE
+pixelFormat="-pix_fmt yuv420p"
 	# All images you operate on must be pngs for this to work:
 	# To render pngs from all svgs in the current directory, run:
 	# allSVG2img.sh 1080 png
@@ -18,7 +19,7 @@ ffmpegCrossfadeIMGsToVideoFromFileList.sh
 cd fadeSRCvideos
 source concatVideos.sh avi fadeSRCvideosList.txt
 convertedFileName=${concatenatedVideoFileName%.*}.mp4
-ffmpeg -i $concatenatedVideoFileName -crf 13 $convertedFileName
+ffmpeg -i $concatenatedVideoFileName -crf 13 $pixelFormat $convertedFileName
 addBlankSoundToVid.sh $convertedFileName
 mv $convertedFileName ../../
 

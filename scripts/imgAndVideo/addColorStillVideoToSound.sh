@@ -23,11 +23,12 @@ if [ ! "$1" ]; then printf "\nNo parameter \$1 (source audio file name) passed t
 if [ ! "$2" ]; then outputVideoDimensions='1280x720'; else outputVideoDimensions=$2; fi
 if [ ! "$3" ]; then stillImageColor=#180028; else stillImageColor=$3; fi
 
+# -pix_fmt yuv420p is for silly platforms that require that:
+pixelFormat="-pix_fmt yuv420p"
 sourceAudioFileNoExt=${sourceAudioFile%.*}
 rndString=$(randomString.sh 1 14)
 stillIMGtmpFileName="$rndString"_tmp_still_image.png
 targetVideoFileName="$sourceAudioFileNoExt"_blankVideo.mp4
 gm convert -size $outputVideoDimensions xc:$stillImageColor $stillIMGtmpFileName
-# -pix_fmt yuv420p is for silly platforms that require that:
-ffmpeg -y -loop 1 -i $stillIMGtmpFileName -i $sourceAudioFile -c:a copy -shortest -c:v libx264 -tune stillimage -pix_fmt yuv420p $targetVideoFileName
+ffmpeg -y -loop 1 -i $stillIMGtmpFileName -i $sourceAudioFile -c:a copy -shortest -c:v libx264 -tune stillimage $pixelFormat $targetVideoFileName
 rm $stillIMGtmpFileName
