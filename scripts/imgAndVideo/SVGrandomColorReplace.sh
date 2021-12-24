@@ -47,7 +47,7 @@ then
 fi
 
 # PALETTE FILE SEARCH if applicable:
-if [ -e $paletteFile ]
+if [ "$paletteFile" != "" ] && [ -e $paletteFile ]		# check if != "" because GNU/Cygwin returns true for search for an undefined or empty string file?!
 then
 	echo Source pallete file $paletteFile found in the current directory. Will use that.
 	rndHexColors=( $(grep -i -o '#[0-9a-f]\{6\}' $paletteFile) )
@@ -55,7 +55,7 @@ else
 	paletteFileNotFound='true'
 fi
 
-if [ "$paletteFileNotFound" == 'true' ]
+if [ "$paletteFile" != "" ] && [ "$paletteFileNotFound" == 'true' ]
 then
 	echo "Specified palette file name not found in current path. Will search for palettesRootDir.txt and search those pathes for palette . . ."
 	# Search for specified palette file in palettesRootDir (if that dir exists; if it doesn't, exit with an error) :
