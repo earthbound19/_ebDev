@@ -1,53 +1,54 @@
 # DESCRIPTION
-# Takes an .svg file and fills all regions of one color (default ffffff, white) with randomly generated colors (not recommended -- random colors can be garish), N times, OR from colors randomly selected from a .hexplt color list (recommended, optional).
+# Takes an .svg file and fills all regions of one color (default ffffff, white) with randomly generated colors (not recommended -- random colors can be garish), OR from colors randomly selected from a .hexplt color list (recommended, optional).
+
+# WARNING
+# Changes (overwrites) input svg file without warning. You may wish to only operate on a copy of the svg file, or make many copies and alter them by calling this script from another script, such as `SVGrandomColorReplaceCopies.sh` (which will be created soon).
 
 # USAGE
 # Run with these parameters:
-# - $1 an .svg file name
-# - $2 how many random color fill variations of that file to create, and
-# - $3 OPTIONAL. A flat text file list of hexadecimal RGB color codes, one per line, from which to choose random colors for this fill. NOTE: each hex color must be preceded by #. This script makes a copy of the .svg with a name being a time stamp. If $3 is omitted, the script will produce random colors fills. If you want to use $4 but not specify any pallette file (and have it generate random colors), pass the word RANDOM for $3.
-# - $4 OPTIONAL. RGB hex color code in format e.g. f800fc (no starting # symbol) to search and replace with random colors from $3. If omitted, defaults to ffffff.
-# Example that will create 12 randomly colored variations of input.svg:
-#    BWsvgRandomColorFill.sh input.svg 12
-# Example that will create 12 variations of input.svg with colors randomly selected from `RAHfavoriteColorsHex.hexplt`:
-#    BWsvgRandomColorFill.sh input.svg 12 RAHfavoriteColorsHex.hexplt:
+# - $1 the file name of an .svg file in the current directory, which this script will directly modify (overwrite with changes).
+# - $2 OPTIONAL. A flat text file list of hexadecimal RGB color codes, one per line, from which to choose random colors for this fill. NOTE: each hex color must be preceded by #. This script makes a copy of the .svg with a name being a time stamp. If $2 is omitted, the script will produce random colors fills. If you want to use $2 but not specify any pallette file (and have it generate random colors), pass the word RANDOM for $2.
+# - $3 OPTIONAL. RGB hex color code in format f800fc (six hex digits, no starting # symbol) to search and replace with random colors from $2. If omitted, defaults to ffffff.
+# Example that will replace every color fill of ffffff (white) in input.svg with randomly generated sRGB colors:
+#    SVGrandomColorReplace.sh input.svg
+# Example that will replace every color fill of ffffff (white) in input.svg with randomly selected colors from `eb_favorites_v2.hexplt`:
+#    SVGrandomColorReplace.sh input.svg eb_favorites_v2.hexplt
+# Example that will replace every color fill of 000000 (black) in input.svg with randomly selected colors from `earth_pigments_dark.hexplt`:
+#    SVGrandomColorReplace.sh input.svg earth_pigments_dark.hexplt 000000
 # NOTES
 # - This expects rgb hex color codes in six digits in your SVGs; ex. f800fc -- never abridged hex forms like fff. (To save *three bytes,* programmers confused the world and added a requirement of more complicated parsers.) If your svg is not this way, use potrace to scan the original black bitmap using BMPs2SVGs.sh, or use the SVGOMG service (convert your SVG file online) at: https://jakearchibald.github.io/svgomg/ -- or use SVGO re https://github.com/svg/svgo and https://web-design-weekly.com/2014/10/22/optimizing-svg-web/ -- It converts RGB values to hex by default. BUT NOTE: for our purposes, do not use the "minify colors" option (which can result in abridged hex codes). 
+# - a previous version of this script had this parameter order: $1 source svg file, $2 how many copies of the file to make (this parameter has been removed in the current version, and will be available via `SVGrandomColorReplaceCopies.sh`), $3 palette file to use (or the word RANDOM). This version of the script adds $4 color to replace.
+# - this will be renamed from BWsvgRandomColorFill.sh to SVGrandomColorReplace.sh in a future verson control revision.
 
 
 # CODE
-# TO DO
-# - Items listed in comments that read TO DO
-# - make it use an optional global hex color schemes dir tree (search path), otherwise search in path script is run from.
-# - make it name the target file after the color scheme.
+# TO DO:
+# - rename this script from BWsvgRandomColorFill.sh to SVGrandomColorReplace.sh
+# - replace references and calls to this script (in other scripts) with the updated name.
 # ? - implement an optional buffer memory of the last three colors used, and if the current picked color is among them, pick another color until it is not among them.
-# ? - replace all this functionality with a script that works with a nodejs svg library, if possible? It could be run from a CLI on any local nodejs (node) install.
 
 # PARAMETER CHECKING:
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source SVG file name) passed to script. Exit."; exit 1; else svgFileName=$1; fi
-if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many variations to make) passed to script. Exit."; exit 2; else generateThisMany=$2; fi
-if [ "$3" ] && [ "$3" != "RANDOM" ]
+if [ "$2" ] && [ "$2" != "RANDOM" ]
 then
-	paletteFile=$3
+	paletteFile=$2
 fi
-# Set a default that will be overrided in the next check if $4 was passed to script:
+# Set a default that will be overriden in the next check if $4 was passed to script:
 replaceThisHexColor='ffffff'
-if [ "$4" ]
+if [ "$3" ]
 then
-	# check that $4 is in hex color code format; if so use it, if not exit with error.
-	# need to print to  2>/dev/null  ? :
+	# check that $3 is in hex color code format; if so use it, if not exit with error.
 	echo ''
-	echo 'Attempt RGB hex color code from parameter $4 . . .'
-	echo $4
-	replaceThisHexColor=$(echo $4 | grep -i -o "[0-9a-f]\{6\}")
+	echo 'Attempt RGB hex color code from parameter \$3, $3 . . .'
+	replaceThisHexColor=$(echo $3 | grep -i -o "[0-9a-f]\{6\}")
 	# The result of that operation will be that $replaceThisHexColor will be empty if no match was found, and not empty if a match was found. This check uses that fact:
 	if [ "$replaceThisHexColor" != "" ]
 	then
 		echo "Will attempt to replace color $replaceThisHexColor in copies of $svgFileName."
 	else
 		echo ''
-		echo 'No six-digit RGB hex color code found in parameter $4. Exit.'
-		exit 4
+		echo 'No six-digit RGB hex color code found in parameter $3. Exit.'
+		exit 3
 	fi
 fi
 
@@ -107,7 +108,7 @@ do
 done
 rndHexColors=("${replArr[@]}")
 
-# If no $paletteFile set (no parameter $3 passed to script), create an array of 18 random hex RGB color values. Otherwise, create the array from the list in the filename specified in $3.
+# If no $paletteFile set (no parameter $3 passed to script), create an array of 9 random hex RGB color values. Otherwise, create the array from the list in the filename specified in $3.
 if [ -z "$paletteFile" ]
 then
 	echo "no parameter \$3 passed to script, OR passed as RANDOM; generating random hex colors array . . ."
@@ -119,52 +120,31 @@ then
 			echo Generated random RGB hex color "$rndHexColor" . . .
 		rndHexColors+=($rndHexColor)
 	done
-# TO DO: make this save the generated hex color scheme to a plain text file (just generate an RND name and rename it to that instead of the following delete) :
 fi
 
 sizeOf_rndHexColors=${#rndHexColors[@]}
 sizeOf_rndHexColors=$(($sizeOf_rndHexColors - 1))		# Else we get an out of range error for the zero-based index of arrays.
-		# echo val of sizeOf_rndHexColors is $sizeOf_rndHexColors
-		# Dev test to assure no picks are out of range (with the first seq command in this script changed to 3):
-		# for i in $( seq 50 )
-		# do
-			# pick=$(shuf -i 0-"$sizeOf_rndHexColors" -n 1)
-			# echo sizeOf_rndHexColors val \(\*zero-based\*\) is $sizeOf_rndHexColors
-			# echo rnd pick is $pick
-		# done
-for i in $(seq $generateThisMany)
+	# echo val of sizeOf_rndHexColors is $sizeOf_rndHexColors
+	# Dev test to assure no picks are out of range (with the first seq command in this script changed to 3):
+	# for i in $( seq 50 )
+	# do
+		# pick=$(shuf -i 0-"$sizeOf_rndHexColors" -n 1)
+		# echo sizeOf_rndHexColors val \(\*zero-based\*\) is $sizeOf_rndHexColors
+		# echo rnd pick is $pick
+	# done
+
+# NOTE: previously I had attempted to match "#[hexdigits], but we don't want that because SVGs can have fills defined as 'style="fill:[hexdigits]". (Also, maybe they can be defined as '#[hexdigits (starting with single quote mark). Just match six hex digits.
+numColorsToReplaceInFile=$(grep -i -c "$replaceThisHexColor" $svgFileName)
+for j in $(seq $numColorsToReplaceInFile)
 do
-	echo Generating variant $i of $generateThisMany . . .
-	timestamp=$(date +"%Y%m%d_%H%M%S_%N")
-	newFile="$timestamp"rndColorFill__$svgFileName
-	cp $svgFileName $newFile
-	# NOTE: previously I had attempted to match "#[hexdigits], but we don't want to do that because SVGs can have fills defined as 'style="fill:[hexdigits]". (Also, maybe they can be defined as '#[hexdigits (starting with single quote mark). Just match six hex digits.
-# IN PROGRESS: make use of replaceThisHexColor and ~ $(echo $4 | grep -i -o "[0-9a-f]\{6\}")
-	numColorsToReplaceInFile=$(grep -i -c "$replaceThisHexColor" $newFile)
-	for j in $(seq $numColorsToReplaceInFile)
-	do
-		pick=$(shuf -i 0-"$sizeOf_rndHexColors" -n 1)
-		rndHexColor="${rndHexColors[$pick]}"
-				# echo pick is $pick
-				echo Randomly picked hex color "$rndHexColor" for fill . . .
-			# HORRIBLE KLUDGE for problem mixing ' and " in a sed command; NOTE that the $ is escaped--in some insane way that for some reason the shell insists! :
-			# NOTE: I was at first using $j instead of 1 to delimit which instance should be replaced, but D'OH! : that Nth instance changes (for the next replace by count operation) after any inline replace!
-			# Changing Nth instance of string re: http://stackoverflow.com/a/13818063/1397555
-					# test command that worked [by replacing 5th instance of the string?] :
-					# sed -i ':a;N;$!ba;s/ffffff/3f2aff/5' test.svg
-			# -- expanding on that pattern, the following command changes the first instance of [fF]\{6\} in the file (I think?) ;
-			# the i after /1i is for case-insensitive search (will find a or A) :
-echo ''
-echo RUNNING COMMAND\:
-# TO DO: run this -- IT WORKS -- without escaping, as printed this way:
-echo "sed -i ':a;N;\$!ba;s/$replaceThisHexColor/$rndHexColor/1i' $newFile"
-# IN DEVELOPMENT; not working now:
-sedCommand=`echo sed -i ':a;N;\$!ba;s/$replaceThisHexColor/$rndHexColor/1i' $newFile`
-		# PREVIOUS version:
-		# 2021-12-20: I don't know why I used backticks here? They work? Or is that command substitution and it actually just runs the command?! :
-		# sedCommand=`echo sed -i \'":a;N;\\$!ba;s/[fF]\{3,\}/$rndHexColor/1i"\' $newFile`
-		echo $sedCommand > tempCommand.sh
-		./tempCommand.sh
-	done
-	rm ./tempCommand.sh
+	pick=$(shuf -i 0-"$sizeOf_rndHexColors" -n 1)
+	rndHexColor="${rndHexColors[$pick]}"
+		echo Randomly picked hex color "$rndHexColor" for fill . . .
+		# NOTE: I was at first using $j instead of 1 to delimit which instance should be replaced, but D'OH! : that Nth instance changes (for the next replace by count operation) after any inline replace!
+		# Changing Nth instance of string re: http://stackoverflow.com/a/13818063/1397555
+		# test command that worked [by replacing 5th instance of the string?] :
+		# sed -i ':a;N;$!ba;s/ffffff/3f2aff/5' test.svg
+		# -- expanding on that pattern, the following command changes the first instance of [fF]\{6\} in the file (I think?) ;
+		# further adapting for variable use, and the i after /1i is for case-insensitive search (will find a or A) :
+	sed -i ":a;N;\$!ba;s/$replaceThisHexColor/$rndHexColor/1i" $svgFileName
 done
