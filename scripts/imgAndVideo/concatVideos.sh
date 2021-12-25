@@ -1,6 +1,9 @@
 # DESCRIPTION
 # Concatenates all video files (default extension .mp4) in a directory into one output file. Source files must all be encoded with the same codec and settings. In contrast to some other scripts here, it makes the list of videos "on the fly"--it will do so with whatever sort the `ls` command outputs.
 
+# KNOWN ISSUES
+# See "NOTE" echo at end of script (about super long path/file names).
+
 # DEPENDENCIES
 #    ffmpeg, randomString.sh
 
@@ -38,4 +41,4 @@ rndString=$(randomString.sh 1 14)
 concatenatedVideoFileName=_"$vidExt"sConcatenated_"$rndString"\.$vidExt
 ffmpeg -f concat -i $srcFileList -c copy $concatenatedVideoFileName
 
-echo DONE. See result file $concatenatedVideoFileName and move or copy it where you will.
+echo "DONE. See result file $concatenatedVideoFileName and move or copy it where you will. NOTE: If you got an error about not finding all_mp4.txt (or similar), it may be that you're in a folder path and/or you have file names that are far to long, and you need to shorten them and move the folder to the root of a drive and try again."
