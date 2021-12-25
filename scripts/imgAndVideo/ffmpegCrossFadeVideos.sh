@@ -8,7 +8,7 @@
 # - $3 OPTIONAL. The duration of the crossfade to make between them (in seconds, which may include decimals). If not provided, a default is used.
 # - $4 OPTIONAL. Time in the video that the crossfade will begin (in seconds, which may include decimals). If not provided, a default is used.
 # Example that will crossfade input1.mp4 to input2.mp4, with a crossfade of 2.3 seconds, which begins at 7.6 seconds into the video:
-#    crossFadeVideos.sh input1.mp4 input2.mp4 2.3 7.6
+#    ffmpegCrossFadeVideos.sh input1.mp4 input2.mp4 2.3 7.6
 
 
 # CODE
