@@ -29,7 +29,7 @@ renderTargetFileName="$inputVideoOneFileNameNoExt"_xFade_"$inputVideoTwoFileName
 audioLog=$(ffprobe -i $inputVideoOne -show_streams -select_streams a -loglevel error)
 if [ "$audioLog" != "" ]
 then
-	ffmpeg -y -i $inputVideoOne -r 11500 -i $inputVideoTwo -filter_complex \
+	ffmpeg -y -i $inputVideoOne -r 11500 -i $inputVideoTwo -crf 13 -filter_complex \
 	"[0:a]afade=t=out:st=$crossFadeStart:d=$crossFadeLength[a0];\
 	[1:a]afade=t=in:st=$crossFadeStart:d=$crossFadeLength[a1];\
 	[a0][a1]amix[over]" \
@@ -40,7 +40,7 @@ fi
 
 # MAKE VIDEO crossfade.
 # Adapted from: http://superuser.com/a/778967/130772
-ffmpeg -y -i $inputVideoOne -i $inputVideoTwo -filter_complex \
+ffmpeg -y -i $inputVideoOne -i $inputVideoTwo -crf 13 -filter_complex \
 "[0:v]fade=t=out:st=0:d=$crossFadeLength:alpha=1,setpts=PTS-STARTPTS[va0];\
 [1:v]fade=t=in:st=0:d=$crossFadeLength:alpha=1,setpts=PTS-STARTPTS[va1];\
 [va0][va1]overlay[over]" \
