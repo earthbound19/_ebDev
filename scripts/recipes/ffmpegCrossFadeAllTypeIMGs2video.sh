@@ -1,5 +1,8 @@
 # DESCRIPTION
-# Creates a looped video in which all images of type $1 in the current directory are crossfaded one after another, and then the final image crossfades back to the first. Accomplishd by custom logic in this script and runs of `crossFadeVideos.sh` and `concatVideos.sh`. Result video renamed after this directory.
+# Creates a looped video in which all images of type $1 in the current directory are crossfaded one after another, and then the final image crossfades back to the first. Accomplishd by custom logic in this script and runs of `ffmpegCrossFadeVideos.sh` and `concatVideos.sh`. Result video renamed after this directory.
+
+# WARNING
+# Intermediate videos are lossless though compressed (utvideo codec) avis, and they are much larger compared to mp4s. This script does not delete those files, as you may wish to keep any of them for archiving or resource combination purposes. If you don't want those large files, you may want to delete them afterward.
 
 # USAGE
 # Run with these parameters:
@@ -54,35 +57,35 @@ do
 	# construct still video render target file names:
 	fileA_baseName=${filesList[$IDX]%.*}
 	fileB_baseName=${filesList[$IDX_plus_one]%.*}
-	videoStilltempFileA="$fileA_baseName"_still_tmp_KN63j9znQ.mp4
-	videoStilltempFileB="$fileB_baseName"_still_tmp_KN63j9znQ.mp4
+	videoStilltempFileA="$fileA_baseName"_still_tmp_KN63j9znQ.avi
+	videoStilltempFileB="$fileB_baseName"_still_tmp_KN63j9znQ.avi
 	# ARGHUEFIHUFMGURGH...
 	videoStilltempFileA_baseName=${videoStilltempFileA%.*}
 	videoStilltempFileB_baseName=${videoStilltempFileB%.*}
 	crossFadeVideoTargetFileName="$videoStilltempFileA_baseName"_xFade_"$videoStilltempFileB_baseName".mp4
 	# - render video still for A in pair, only if the render target file does not already exist
-	#  - construct target file that would result from crossFadeVideos.sh script call, and skip render attempt if it already exists:
+	#  - construct target file that would result from ffmpegCrossFadeVideos.sh script call, and skip render attempt if it already exists:
 	thisScriptsRenderTargetFileName="xFade_pair_""$pair_count_filename_str""_""$fileA_baseName"_xFade_"$fileB_baseName".mp4
 	# only render still if it doesn't already exist (as video stills can be reused for subsequent crossfades) :
 	if [ ! -e $videoStilltempFileA ]
 	then
-		ffmpeg -y -loop 1 -i ${filesList[$IDX]} -t $stillDuration $videoStilltempFileA
+		ffmpeg -y -loop 1 -i ${filesList[$IDX]} -t $stillDuration -codec:v utvideo $videoStilltempFileA
 	fi
 # ~ for B in pair:
 	if [ ! -e $videoStilltempFileB ]
 	then
-		ffmpeg -y -loop 1 -i ${filesList[$IDX_plus_one]} -t $stillDuration $videoStilltempFileB
+		ffmpeg -y -loop 1 -i ${filesList[$IDX_plus_one]} -t $stillDuration -codec:v utvideo $videoStilltempFileB
 	fi
 			# OPTED NOT TO DO: This will work, but it is extraordinarily much slower than making two still image videos and using the crossfade filter; also, I would need to construct shims between it if I want the stills to not be in crossfade at any point (it is all crossfade) ; re: https://stackoverflow.com/questions/21493797/how-to-fade-two-images-with-ffmpeg/21503774#21503774
 			# ffmpeg -y -loop 1 -i ${filesList[$IDX]} -loop 1 -i ${filesList[$IDX_plus_one]} -filter_complex "[1:v][0:v]blend=all_expr='A*(if(gte(T,3),1,T/3))+B*(1-(if(gte(T,3),1,T/3)))'" -t $crossfadeDuration out.mp4
-	# Make crossfade video from the still video, via crossFadeVideos.sh, only if it doesn't already exist:
+	# Make crossfade video from the still video, via ffmpegCrossFadeVideos.sh, only if it doesn't already exist:
 	if [ ! -e $crossFadeVideoTargetFileName ] | [ ! -e $thisScriptsRenderTargetFileName ]
 	then
 		# Do calculation to have crossfade start at a time such that crossfade will be time-centered (equal time for non-crossfade portion of still image at start and end of video) :
 		xFadeBeginAtTime=$(echo "scale=2; ($stillDuration - $xFadeDuration) / 2" | bc)
 		echo ""
-		crossFadeVideos.sh $videoStilltempFileA $videoStilltempFileB $xFadeDuration $xFadeBeginAtTime
-		# construct file name to match crossFadeVideos.sh script result; reprise of ARGHUEFIHUFMGURGH . . .
+		ffmpegCrossFadeVideos.sh $videoStilltempFileA $videoStilltempFileB $xFadeDuration $xFadeBeginAtTime
+		# construct file name to match ffmpegCrossFadeVideos.sh script result; reprise of ARGHUEFIHUFMGURGH . . .
 		crossFadeVideoTargetFileName="$videoStilltempFileA_baseName"_xFade_"$videoStilltempFileB_baseName".mp4
 		# rename that to what we want for concatenation:
 		mv $crossFadeVideoTargetFileName $thisScriptsRenderTargetFileName
@@ -95,14 +98,8 @@ currentDirNoPath=$(basename $(pwd))
 finalRenderTargetFileName=__"$currentDirNoPath"_"$srcFileType"_crossfades.mp4
 if [ ! -e $finalRenderTargetFileName ]
 then
-	if [ -d __butSrsly ]; then rm -rf __butSrsly; fi
-	if [ ! -d __butSrsly ]; then mkdir __butSrsly; fi
-	mv *_still_tmp_KN63j9znQ.mp4 ./__butSrsly/
 	# concat the videos we want to:
-	concatVideos.sh
-	# move those videos back:
-	mv ./__butSrsly/* .
-	rm -rf __butSrsly
+	concatVideos.sh mp4
 	# -- and rename it to that plus __ at the start:
 	mv _mp4sConcatenated.mp4 $finalRenderTargetFileName
 	printf "\n~\nDONE rendering crossfade videos via crossFadeIMGs.sh. Final file is $finalRenderTargetFileName. You may want to delete all video files with _still_tmp_KN63j9znQ.mp4 in their file name (a lot of still image videos). You may also want to delete intermediate files that start with xFade_pair_<nnnnnn> in their file name.\n\n"
