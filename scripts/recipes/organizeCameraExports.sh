@@ -48,16 +48,16 @@ cd tmp_renames_2ydTVzqG/
 # Do the actual rename:
 renameByMetadata.sh NORTHERP
 # Move those up a folder, move back to that folder, and destroy the temp folder:
-mv * ..
+mv -i * ..
 cd ..
 rm -rf tmp_renames_2ydTVzqG
 # Extract thumbs:
 dcraw -e *.cr2
 # Thanks to a genius breath yon https://stackoverflow.com/a/45703829 ;
 # rename all .thumb.jpg files to just .jpg:
-for x in *.thumb.jpg; do mv "$x" "${x%.thumb.jpg}.jpg"; done
+for x in *.thumb.jpg; do mv -i "$x" "${x%.thumb.jpg}.jpg"; done
 # rename all .jpeg to .jpg:
-for x in *.jpeg; do mv "$x" "${x%.jpeg}.jpg"; done
+for x in *.jpeg; do mv -i "$x" "${x%.jpeg}.jpg"; done
 # OPTIONAL: uncomment if you want to lossleslly recontain all .mov files to .mp4 -- but be warned that this will lose metadata if you destroy the original mov files (metadata is not copied)! :
 # allVideo2mp4Lossless.sh
 
