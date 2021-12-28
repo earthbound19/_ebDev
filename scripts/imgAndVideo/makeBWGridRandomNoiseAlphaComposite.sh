@@ -19,6 +19,7 @@
 # NOTES
 # - It seems that for ffmpeg to encode video from the source images, the source images must have an x pixel count (accross) which is an even number, and so must y (number of pixels down). Otherwise, ffmpeg may throw an error on encoding.
 # - If the rnd block char mask is smaller or larger than the source images, it may be that the source images have different dpi than the generated alpha RND blocks (which would be expected to be default 72dpi).
+# - You can leave space on the right or bottom of block character noise by giving smaller dimensions for the X and Y block noise upscale dimension parameters.
 
 
 # CODE
@@ -79,11 +80,11 @@ imgs2imgsNN.sh pbm png $longerEdge $shorterEdge
 
 # make an array of those resultant png files:
 alphaFiles=( $(find . -maxdepth 1 -type f -iname \*.png -printf '%f\n') )
-
 # calculate number of digits to pad numbered (animation) files to:
 digitsToPadTo=${#alphaFiles[@]}; digitsToPadTo=${#digitsToPadTo}
 # step over array and make composite from each alpha (block noise png) image in array;
 # creating padded (animation frame) number file for each:
+
 counter=0
 for alphaFile in ${alphaFiles[@]}
 do
@@ -95,7 +96,7 @@ do
 	# -- but that isn't working with imagemagick for me. But it does work with graphicsmagick! :
 
 	# The actual composite! :
-	gm composite ../fg.png ../bg.png $alphaFile "$countString".png
+	gm composite ../$fgImageFileName ../$bgImageFileName $alphaFile "$countString".png
 	# remove alpha png (pbm source remains) (NOTE: if you don't remove this, try moving it somewhere else -- it may mess up the ffmpeg render/file count sequence if you don't!) :
 	rm $alphaFile
 	counter=$((counter+1))
