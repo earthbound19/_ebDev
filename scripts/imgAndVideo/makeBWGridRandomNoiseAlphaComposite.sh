@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Animate RND block noise as in makeBWGridRandomNoiseAnim.sh, and use it as alpha in a composite animation with a foreground image animated over a background image, where the RND block noise is the animated transparency (or alpha) mask. THIS IS A STUB, in development.
+# Animate RND block noise as in makeBWGridRandomNoiseAnim.sh, and use it as alpha in a composite animation with a foreground image animated over a background image, where the RND block noise is the animated transparency (or alpha) mask. Uses complete foreground image as first still and background as final still (with RND block noise anim between).
 
 # DEPENDENCIES
 # `ffmpeg`, `graphicsmagick` (as `gm`), `imgs2imgsNN.sh`, `ffmpegAnim.sh`.
@@ -80,12 +80,19 @@ imgs2imgsNN.sh pbm png $longerEdge $shorterEdge
 
 # make an array of those resultant png files:
 alphaFiles=( $(find . -maxdepth 1 -type f -iname \*.png -printf '%f\n') )
-# calculate number of digits to pad numbered (animation) files to:
-digitsToPadTo=${#alphaFiles[@]}; digitsToPadTo=${#digitsToPadTo}
+# calculate number of frames in final anim:
+numFrames=${#alphaFiles[@]}
+# adding two to that, as we'll make a start and end shim also:
+numFrames=$((numFrames + 2))
+# calculate number of digits of that for zero-padding:
+digitsToPadTo=${#numFrames}
+		# make fg first frame and bg last frame shims numbered at start (0) and end of anim:
+		zeroFrameShim=$(printf "%0""$digitsToPadTo""d\n" 0)
+		cp ../$fgImageFileName "$zeroFrameShim".png
 # step over array and make composite from each alpha (block noise png) image in array;
 # creating padded (animation frame) number file for each:
-
-counter=0
+# starting at one because we'll make a shim 0 after this control block; these will start at 1 and first frame will be 0:
+counter=1
 for alphaFile in ${alphaFiles[@]}
 do
 	countString=$(printf "%0""$digitsToPadTo""d\n" $counter)
@@ -101,6 +108,11 @@ do
 	rm $alphaFile
 	counter=$((counter+1))
 done
+		# get count of one after last file:
+		numAlphaFiles=${#alphaFiles[@]}; lastFrameShim=$((numAlphaFiles + 1))
+		# use that count to get zero-padded final frame number:
+		lastFrameShim=$(printf "%0""$digitsToPadTo""d\n" $lastFrameShim)
+		cp ../$bgImageFileName "$lastFrameShim".png
 
 # actual video file render! :
 targetVideoFileName="$renderID"_BWGridRandomNoiseAlphaComposite.mp4
