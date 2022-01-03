@@ -32,7 +32,7 @@ do
 				# count=$(cat $hexplt | wc -l)
 				# echo file $hexplt is with line count $count
 			# done
-		rm *.png
+#		rm *.png
 		renderAllHexPalettes.sh NULL 250 NULL
 		allPalettesCompareCIECAM02.sh
 		listPaletteDifferencesBelowThreshold.sh $deletePalettesBelowDifferenceThreshold
