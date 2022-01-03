@@ -49,7 +49,6 @@ numberOfFiles=${#allFilesType[@]}
 		echo Found $numberOfFiles files of type $fileExt.
 padToDigits=${#numberOfFiles}
 		echo Will pad numbers in folder names to $padToDigits digits.
-exit
 # MAIN LOGIC
 # Figure out how many folders we'll need to create to move $numberToAxeOn into each:
 n=$(($numberOfFiles / $numberToAxeOn+1))
@@ -59,17 +58,19 @@ linesCPStartAtMultiple=1
 # For folder name by number zero-padding digits:
 highestAxeFolderNumberWillBe=$(($n * $numberToAxeOn))
 folderNumberDigitsPadding=${#highestAxeFolderNumberWillBe}
-for i in $(seq 1 $n);
+i=0			# iterator
+for element in ${allFilesType[@]}
 do
 	zeroPaddedNumber=$(printf "%0"$padToDigits"d" $i)
-	toEndFrameMultiple=$(($i * $numberToAxeOn))
+	if [ $(($i % $numberToAxeOn)) == 0 ]
+	then
+		toEndFrameMultiple=$(( $toEndFrameMultiple + $numberToAxeOn))
+	fi
 	paddedToEndFrameMultiple=$(printf "%0"$folderNumberDigitsPadding"d" $toEndFrameMultiple)
 	folderName=$folderPrefix"$paddedToEndFrameMultiple"
 	if [ $i == 1 ]; then helpFirstFolderName=$folderName; fi    # Store first folder name in variable for later help text.
-	if [ $i == $n ]; then helpLastFolderName=$folderName; fi    # Store last folder name in variable for later help text.
 	if ! [ -d $folderName ]; then mkdir $folderName; fi
-# TO DO: get array item by index here and rewrite the next line to move command using that:
-	find . -maxdepth 1 -iname "*.$fileExt" | sort -n | head -n $numberToAxeOn | tr -d '\15\32' | xargs -i mv "{}" $folderName
+	mv $element ./$folderName/
 		# Only do anything with IMGlistByMostSimilar.txt if it exists:
 	if [ -f ./IMGlistByMostSimilar.txt ]
 	# re: https://Unix.stackexchange.com/a/47423/110338
@@ -77,10 +78,10 @@ do
 		tail -n+$linesCPStartAtMultiple IMGlistByMostSimilar.txt | head -n$numberToAxeOn > $folderName/IMGlistByMostSimilar.txt
 		linesCPStartAtMultiple=$(( ($linesCPmultiplier * $numberToAxeOn) + 1))
 		linesCPmultiplier=$(($linesCPmultiplier + 1))
-				# echo werf $linesCPmultiplier
-				# echo worf $linesCPStartAtMultiple
 	fi
+	# increment iterator:
+	i=$((i + 1))
 done
 
 numeralOneToPadToDigits=$(printf "%0"$padToDigits"d" 1)
-echo DONE. All files in this folder of type $fileExt have been axed by count $numberToAxeOn into folders named starting $helpFirstFolderName and ending $helpLastFolderName \(if those are both the same folder name\, they are all in that one folder\)\. If the number of files of type $fileExt evenly divided by $numberToAxeOn\, the highest numbered folder will be empty\, so you know.
+echo "DONE. All files in this folder of type $fileExt have been axed by count $numberToAxeOn into folders named starting $helpFirstFolderName and ending $folderName (if those are both the same folder name, there may not have been any point to running this script with the parameters you did: all files ended up in one subfolder only, because you axed the number of files you had to begin with)."
