@@ -85,7 +85,7 @@ if [ ! "$7" ]
 then
 	renderColumns=$(($nChroma - 1))
 	renderRows=$(( ($nShades * 2) + 1 - $nColorsRemoved))
-	renderAllHexPalettes.sh YORP 260 NULL $renderColumns $renderRows
+	renderAllHexPalettes.sh NULL 260 NULL $renderColumns $renderRows
 fi
 
 printf "\n~\nDONE generating and (if told to) rendering palettes from source file $sourceHexpltFile."

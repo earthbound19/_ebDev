@@ -56,8 +56,8 @@ do
 	rm *.hexplt
 	# rename the tmp .txt to a proper .hexplt file::
 	mv "$fileNameNoExt"_"$nChroma"_chromas.txt "$fileNameNoExt"_"$nChroma"_chromas.hexplt
-	# render the resultant palette, with $nChroma columns and rows per number of hues (.hexplt files we concatenated) :
-	renderAllHexPalettes.sh YORP 260 NULL $nChroma $hexpltFilesCount
+	# render the resultant palettes, with $nChroma columns and rows per number of hues (.hexplt files we concatenated) :
+	renderAllHexPalettes.sh NULL 260 NULL $nChroma $hexpltFilesCount
 	# move everything up one folder (to final destination folder) :
 	mv * ..
 	popd
@@ -66,4 +66,4 @@ do
 done
 
 # render the shades palettes:
-renderAllHexPalettes.sh YORP 260 NULL $nShades 1
+renderAllHexPalettes.sh NULL 260 NULL $nShades 1

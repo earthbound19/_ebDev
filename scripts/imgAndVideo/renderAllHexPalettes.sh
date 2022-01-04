@@ -3,32 +3,31 @@
 
 # USAGE
 # Run with these parameters:
-# - $1 OPTIONAL. Anything, for example the word 'YORP,' which will cause the script to search for palette files only in the current directory. If not provided, script searches subdirectories (recursive search) by default. To use other positional parameters but override the the recursive default (and only search the current directory), pass the word 'NULL' for $1.
+# - $1 OPTIONAL. Anything, for example the word 'YORP,' which will cause the script to search for and render palette files in subdirectories also. If not provided, script only searches and renders files in the current directory (and not subdirectories). To use other positional parameters but not render files in subdirectories, pass the word 'NULL' for $1.
+# - ADDITIONAL OPTIONAL PARAMETERS. To pass additional parameters, examine the positional parameters in renderHexPalette.sh and position them the same here, but don't use $1 for that script here, because $1 is provided by this script as $element in a loop repeatedly calling renderHexPalette.sh (while also, confusingly, $1 is something else to THIS script (ANYWORD or NULL for subdirectory search or not).
 # EXAMPLES
 # To render all palettes in the current directory, run the script without any argument:
 #    renderAllHexPalettes.sh
-# To recurse into all subdirectories and render all palettes in them, pass any parameter for $1:
+# To recurse into all subdirectories and render all palettes in them, pass any parameter other than the word 'NULL' for $1:
 #    renderAllHexPalettes.sh YORP
-# To pass additional parameters, examine the positional parameters in renderHexPalette.sh and position them the same here, but don't use $1 for that script here, because $1 is provided by this script as $element in a loop repeatedly calling renderHexPalette.sh (while also, confusingly, $1 is something else to THIS script (ANYWORD or NULL for subdirectory search or not).
 # To NOT recurse into subdirectories but also use additional parameters, pass the keyword NULL for $1, e.g.:
 #    renderAllHexPalettes.sh NULL 250 NULL 5
 # NOTES
-# - Like renderHexPalette.sh, this script checks if the render target exists before it enters the cool-down period. It only enters the cool-down period if the render target does not exist (and therefore heavier computing work would be performed).
 # - The script has an optinoal cool-down period where it pauses between renders every N render, because if you run this script against thousands of palettes, it cooks your CPU perhaps more constantly and via harder and more continuous work than a CPU should do. To enable this option, find the comment block labeled OPTIONAL COOLDOWN PERIOD, and uncomment it.
 
 
 # CODE
 if [ "$1" ] && [ "$1" != "NULL" ]
 then
-	# no -maxdepth 1 switch; recurse through subdirectories
+	# param 1 passed; don't use maxdepth 1 switch; causes recursive search through subdirectories
 	hexpltFilesArray=( $(find . -type f -iname \*.hexplt -printf "%P\n") )
 else
-	# -maxdepth 1 switch restricts search to current directory
+	# param 1 NOT passed; use -maxdepth 1 switch to restricts search to current directory
 	hexpltFilesArray=( $(find . -maxdepth 1 -type f -iname \*.hexplt -printf "%P\n") )
 fi
+
 # for progress feedback print:
 hexpltFilesArrayLen=${#hexpltFilesArray[@]}
-
 coolDownEveryNrenders=23
 coolDownCounter=0
 coolDownSleepSeconds=27
