@@ -1,8 +1,8 @@
 # DESCRIPTION
-# Calls get_color_sample_grid_sRGB.py for every image file of type $1 in the current directory. Passes to that python script parameters such that the samples are over a number of columns that fit (image width / $2 = cell width) and rows (image height / cell width). (The center of square cells of size determined by image width divided by parameter $3. Captures the outputs of the python script and writes them to ~.hexplt files named after each source file.
+# Calls get_color_sample_grid_sRGB.py for every image file of type $1 in the current directory. Passes to that python script parameters such that the samples are over number of columns $2 (assuming one row). Captures the outputs of the python script and writes them to `.hexplt` files named after each source file.
 
 # DEPENDENCIES
-# python, the library used by the called python script, getFullPathToFile.sh
+# python, the library used by the called python script, and getFullPathToFile.sh
 
 # USAGE
 # Run with these parameters:
@@ -11,8 +11,9 @@
 # - $3 OPTIONAL. Anything, which will cause this script to operate on image type $1 in all subdirectories under the current directory.
 # Example command that will operate on every png file in the current directory, sampling 16 columns for each:
 #    get_color_sample_grids_sRGB.sh png 16
-# NOTE
-# This script will not clobber a pre-existing file that matches (has the same base name as) any source image of type $1. It will print a notice that the target already exists.
+# NOTES
+# - Colors in image for sampling are assumed to be all one one row--multiple rows are not supported.
+# - This script will not clobber a pre-existing file that matches (has the same base name as) any source image of type $1. It will print a notice that the target already exists.
 
 
 # CODE
