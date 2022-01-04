@@ -1,11 +1,11 @@
 # DESCRIPTION
 # Last of a series of scripts designed to eliminate similar .hexplt format palettes. Interactively launches pairs of rendered palettes corresponding to .hexplt files found to be similar (not so different below a rating threshold), as discovered by listPaletteDifferencesBelowThreshold.sh (which must be run first). Logs how many comparisons have been examined and allows resume from Nth comparison (see USAGE).
-# For assistance with managing copies of palettes (in favorites collections), this script optionally uses everythingCLI (if it makes a successful attempt to run an executable of that name in a way that will produce no error), for statistics on how many copies of given images are found on your (Windows) computer. See USAGE for details.
+# For assistance with managing copies of palettes (in favorites collections), this script optionally uses everything CLI (es.exe, if it makes a successful attempt to run an executable of that name in a way that will produce no error), for statistics on how many copies of given images are found on your (Windows) computer. See USAGE for details.
 
 # DEPENDENCIES
 # - run of a previous script and anything it depends on (see USAGE)
 # - A default image editor associated with the image files in the list which this script depends on (paletteDifferencesBelowThreshold.txt)
-# - Optionally, everythingCLI (see DESCRIPTION)
+# - Optionally, everything CLI (es.exe, see DESCRIPTION)
 
 # USAGE
 # Before this script, run listPaletteDifferencesBelowThreshold.sh (which tells you to run another script before it), to generate the list paletteDifferencesBelowThreshold.txt. Then run with or without this parameter, and follow the prompts:
@@ -18,14 +18,14 @@
 # To examine all iterations, run this script without any parameter:
 #    deletePalettesDifferentBelowThreshold.sh
 # NOTES
-# - This script detects whether everythingCLI is installed and executes normally, and if so, it enables you to pick favorite palettes and copy them into palette collections, by printing information about how many copies of the palette (ASSUMED: in .hexplt format) are found on your computer. If this script prints information on the count of that palette file found on the computer, you'll know you don't need to copy the palette to another location (a collection), as it has already been copied (there are 2 or more of it).
-# - If this script gets an error on attempt to run everythingCLI, it will print a count for a palette with a question mark, which indicates that the number of them on the computer is unknown.
+# - This script detects whether everything CLI (es.exe) is installed and executes normally, and if so, it enables you to pick favorite palettes and copy them into palette collections, by printing information about how many copies of the palette (ASSUMED: in .hexplt format) are found on your computer. If this script prints information on the count of that palette file found on the computer, you'll know you don't need to copy the palette to another location (a collection), as it has already been copied (there are 2 or more of it).
+# - If this script gets an error on attempt to run everything CLI, it will print a count for a palette with a question mark, which indicates that the number of them on the computer is unknown.
 
 # CODE
 if [ "$1" ]; then echo "Parameter \$1 passed to script (comparison number to resume from). Will use that"; resumeFromNumber=$1; else resumeFromNumber=0; fi
 
 everythingCLIworking='False'
-everythingCLI ANtUeH52yu9rtxWaBEBAqm5UsJ34Sghjz9vzRujyVN
+es ANtUeH52yu9rtxWaBEBAqm5UsJ34Sghjz9vzRujyVN
 if [ $(echo $?) == "0" ]
 then
 	everythingCLIworking='True'
@@ -63,10 +63,10 @@ do
 			# write to log (so user can look in log to know where to resume if process interrupted) :
 			if [ "$everythingCLIworking" == 'True' ]
 			then
-				count_pngs_A=$(everythingCLI $PNGmatchFor_A | wc -l)
-				count_pngs_B=$(everythingCLI $PNGmatchFor_B | wc -l)
-				count_hexplts_A=$(everythingCLI $HEXPLTmatchFor_A | wc -l)
-				count_hexplts_B=$(everythingCLI $HEXPLTmatchFor_B | wc -l)
+				count_pngs_A=$(es $PNGmatchFor_A | wc -l)
+				count_pngs_B=$(es $PNGmatchFor_B | wc -l)
+				count_hexplts_A=$(es $HEXPLTmatchFor_A | wc -l)
+				count_hexplts_B=$(es $HEXPLTmatchFor_B | wc -l)
 			else
 				count_pngs_A='n?'
 				count_pngs_B='n?'

@@ -6,7 +6,7 @@
 #    reduceSimilarPalettesAssistant.sh
 # NOTES
 # - When this script completes work of removing similar palettes from a directory, it places a log file named similar_palettes_deleted.txt in that directory. Before working in any directory, it checks for that file, and if it exists, the script skips working in that directory. This allows breaking and resuming run of this script.
-# - To remove palettes for which you manually delete a rendered PNG (because you don't want the palette), see listUnmatchedExtensions.sh or pruneByUnmatchedExtension.sh.
+# - Via listUnmatchedExtensions.sh, this script sorts resultant orphaned .hexplt files (for which matching png palettes were deleted) into a folder for review to delete.
 
 
 # CODE
@@ -37,10 +37,12 @@ do
 		allPalettesCompareCIECAM02.sh
 		listPaletteDifferencesBelowThreshold.sh $deletePalettesBelowDifferenceThreshold
 		deletePalettesDifferentBelowThreshold.sh
-		# change back to parent dir; not using pushd . /popd because it does weird unhelpful printing of the same directory over and over which I don't like and which isn't helpful:
-		printf "Similar palettes which were in this directory below difference threshold 0.14 were deleted.\n" > similar_palettes_deleted.txt
+		# move any leftover .hexplt (no matched .png file -- matching png deleted) into a folder for review for deletion, via this script:
+		pruneByUnmatchedExtension.sh hexplt png
+		printf "Similar palettes which were in this directory below difference threshold 0.14 were deleted.\nOrphan .hexplt files which have no matching png were sorted into a folder for review to delete.\n" > similar_palettes_deleted.txt
 	else
 		printf "\nNo hexplt file found in directory OR log file similar_palettes_deleted.txt was found; skipping directory."
 	fi
+	# change back to parent dir; not using pushd . /popd because it does weird unhelpful printing of the same directory over and over which I don't like and which isn't helpful:
 	cd $currentDir
 done

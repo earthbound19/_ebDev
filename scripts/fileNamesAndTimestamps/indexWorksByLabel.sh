@@ -23,7 +23,7 @@ label=$1
 		# DEPRECATED, use if on non-Windows platform:
 		# echo Listing to temp file all files matching pattern \.\*_EXPORTED_.\*_MD_ADDS.txt . . .
 		# find . -regex .*_EXPORTED_.*_MD_ADDS.txt -type f > _tmp_JnhPUNahaRA5BdZdWx_EXPORTED_works_MD_ADDS_files.txt
-# To get the current directory in Windows path form to prefix to the search query for everythingCLI, to avoid matches outside of the current path.
+# To get the current directory in Windows path form to prefix to the search query for everything CLI (es.exe), to avoid matches outside of the current path.
 echo Finding all files in this directory tree that match file name pattern \.\*_EXPORTED_.\*_MD_ADDS.txt\, to index . . .
 		# tr piped commands re: https://github.com/earthbound19/_ebDev/issues/6
 thisDir=`pwd | tr -d '\15\32'`
@@ -32,9 +32,9 @@ echo $thisDir
 		# DEPRECATED; resurrect if necessary for a 'Nixy system case:
 		# Strip any \ char off the end of that (from a root dir it shows, but not in other dirs--we always want it not there) :
 thisDir=`echo $thisDir | sed 's/\(.*\)\\$/\1/g' | tr -d '\15\32'`
-everythingCLI "$thisDir\*_EXPORTED_*_MD_ADDS.txt" > _tmp_4UFKgbkrnpDvZK.txt
+es "$thisDir\*_EXPORTED_*_MD_ADDS.txt" > _tmp_4UFKgbkrnpDvZK.txt
 		# ALTERNATE which will catch matches outside the directory tree from which this script is run:
-		# everythingCLI *_EXPORTED_*_MD_ADDS.txt > _tmp_4UFKgbkrnpDvZK.txt
+		# es *_EXPORTED_*_MD_ADDS.txt > _tmp_4UFKgbkrnpDvZK.txt
 # else the following tools get gummed up by windows newlines:
 dos2unix _tmp_4UFKgbkrnpDvZK.txt
 echo Adapting list of found files for processing . . .

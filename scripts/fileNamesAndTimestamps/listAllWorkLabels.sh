@@ -22,9 +22,9 @@
 thisDir=`pwd | tr -d '\15\32'`
 thisDir=`cygpath -w $thisDir | tr -d '\15\32'`
 thisDir=`echo $thisDir | sed 's/\(.*\)\\$/\1/g' | tr -d '\15\32'`
-everythingCLI "$thisDir\*_EXPORTED_*_MD_ADDS.txt" > _tmp_hXhsyZvaWb6eXp.txt
+es "$thisDir\*_EXPORTED_*_MD_ADDS.txt" > _tmp_hXhsyZvaWb6eXp.txt
 		# ALTERNATE which will catch matches outside the directory tree from which this script is run:
-		# everythingCLI *_EXPORTED_*_MD_ADDS.txt > _tmp_hXhsyZvaWb6eXp.txt
+		# es *_EXPORTED_*_MD_ADDS.txt > _tmp_hXhsyZvaWb6eXp.txt
 # else the following tools get gummed up by windows newlines:
 dos2unix _tmp_hXhsyZvaWb6eXp.txt
 		# echo Adapting list of found files for processing . . .

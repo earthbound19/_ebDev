@@ -7,7 +7,7 @@
 
 # CODE
 # TO DO
-# - deprecate sections of this relying on slow (not database of a monitored file system driven) 'nix search commands, and use everythingCLI instead (as in indexWorksByLabel.sh).
+# - deprecate sections of this relying on slow (not database of a monitored file system driven) 'nix search commands, and use everything CLI (es.exe) instead (as in indexWorksByLabel.sh).
 # - break the deprecated sections out into if blocks that run depending on detected platform (windows or 'Nixy system).
 # - fix bug where file names which mistakenly have _FINAL_ twice in the name don't register (apparently) as a five-padded number. OR: warn this should never be.
 # - determine whether any sed flag will make e.g. _[fF][iI][nN][aA][lL] unnecessary as a search pattern (case-insenstitive search). My first searches for this said no . . .
