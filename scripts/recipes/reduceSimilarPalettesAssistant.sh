@@ -5,6 +5,7 @@
 # Hack the global value right after the CODE comment per your want. Then run the script:
 #    reduceSimilarPalettesAssistant.sh
 # NOTES
+# - Search for a comment that reads UNCOMMENT and examine it and follow its instruction if you wish.
 # - When this script completes work of removing similar palettes from a directory, it places a log file named similar_palettes_deleted.txt in that directory. Before working in any directory, it checks for that file, and if it exists, the script skips working in that directory. This allows breaking and resuming run of this script.
 # - Via listUnmatchedExtensions.sh, this script sorts resultant orphaned .hexplt files (for which matching png palettes were deleted) into a folder for review to delete.
 
@@ -23,8 +24,9 @@ do
 	if [ $count != 0 ] && [ ! -e similar_palettes_deleted.txt ]
 	then
 		printf "\nAt least one .hexplt file found here OR log file similar_palettes_deleted.txt not found; proceeding . . .\n"
-# TWO OPTIONS here: allRGBhexColorSortInCAM16-UCS.sh or allRGBhexColorSortIn2CIECAM02.sh; I've gone back and forth on which to use; CAM16 I had at one point thought sorted tint/shade better; now I'm not sure; it seemed to me at one point that CIECAM02 sorted hue better. I haven't re-examined that theory. allRGBhexColorSortIn2CIECAM02.sh does calculations much faster it seems:
-		allRGBhexColorSortIn2CIECAM02.sh
+# TWO OPTIONS here: allRGBhexColorSortInCAM16-UCS.sh or allRGBhexColorSortInCIECAM02.sh; I've gone back and forth on which to use; CAM16 I had at one point thought sorted tint/shade better; now I'm not sure; it seemed to me at one point that CIECAM02 sorted hue better. I haven't re-examined that theory. allRGBhexColorSortInCIECAM02.sh does calculations much faster it seems:
+# OPTIONAL; in many cases I've already run this over the directory, so it would be redundant and wasted work; UNCOMMENT if you want to use it:
+#		allRGBhexColorSortInCIECAM02.sh
 			# OPTIONAL count of lines in each hexplt (check if their data ended up OK after that sort) :
 			# allHEXPLTs=( $(find . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n') )
 			# for hexplt in ${allHEXPLTs[@]}
