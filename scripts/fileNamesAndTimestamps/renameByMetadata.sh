@@ -5,7 +5,7 @@
 # Run from a directory with media files you wish to so rename, e.g.:
 #    renameByMetadata.sh
 # OR OPTIONALLY run with one parameter, which is the word NORTHERP:
-#    organizeCameraExports.sh NORTHERP
+#    renameByMetadata.sh NORTHERP
 # -- to bypass the password check and rename all files by metadata without warning.
 # KNOWN ISSUES
 # - THIS MAY NOT PERFECTLY split by creation date metadata type; it potentially renames many files twice (first by creation date metadata, then dateTimeOriginal metadata). ALSO, for files from some sources mixed with others (something doing with dateTimeOriginal metadata in one jpg source and not another?) it may loop endlessly . . .
@@ -26,9 +26,7 @@
 # https://sno.phy.queensu.ca/~phil/exiftool/filename.html
 
 # Allow to override prompt for password to continue by parsing $1; assign $1 to SILLYWORD, and if it equals "NORTHERP", a later check will pass and the remainder of the script will execute. Otherwise the check will fail and the script will exit.
-SILLYWORD=''
-if [ "$1" ]; then SILLYWORD=$1; fi
-if [ "$SILLYWORD" != "NORTHERP" ]
+if [ "$1" != "NORTHERP" ]
 then
 	echo ""
 	echo "WARNING: THIS SCRIPT PERMANENTLY RENAMES as many files as it can in the current directory, for many image types and all .mov and .mp4 video files. It renames them after what creation metadata it can find. If this is what you want to do, type NORTHERP and then press <enter> (or <return>)."
