@@ -17,10 +17,13 @@
 
 
 # CODE
+# TO DO: tests re "does it work?" comment
+
 # $(($2 + 1)) because it's only giving e.g. 7 colors if I ask for 8:
 node color-thief-jimp-pallete.js $1 $(($2 + 1)) > $1.ctj-colors-hex.txt
 # re: http://stackoverflow.com/questions/26889358/generate-color-palette-from-image-with-ImageMagick
 # possibly more useful parameter omitted: -colorspace LAB
+# wait what -- this was commited to version control WITH that: does it work?
 gm convert $1 -format %c -colorspace LAB -colors $2 histogram:info:- > $1.mg-colors-hex.txt
 
 # NOTES: hrm. it seems that perhaps on Mac that -n switches here (with -i) make it work, and on Cygwin they make it *not* work.
