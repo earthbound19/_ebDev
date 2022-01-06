@@ -14,7 +14,7 @@
 deletePalettesBelowDifferenceThreshold=0.14
 
 currentDir=$(pwd)
-allSubdirectoriesArray=(`listAllSubdirs.sh`)
+allSubdirectoriesArray=( $(listAllSubdirs.sh) )
 for directory in ${allSubdirectoriesArray[@]}
 do
 	printf "\nChanging to directory: $directory . . ."
@@ -41,7 +41,7 @@ do
 		deletePalettesDifferentBelowThreshold.sh
 		# move any leftover .hexplt (no matched .png file -- matching png deleted) into a folder for review for deletion, via this script:
 		pruneByUnmatchedExtension.sh hexplt png
-		printf "Similar palettes which were in this directory below difference threshold 0.14 were deleted.\nOrphan .hexplt files which have no matching png were sorted into a folder for review to delete.\n" > similar_palettes_deleted.txt
+		printf "Similar palettes which were in this directory below difference threshold 0.14 were deleted.\nOrphan .hexplt files which have no matching png were sorted into a subfolder for review to delete.\n" > similar_palettes_deleted.txt
 	else
 		printf "\nNo hexplt file found in directory OR log file similar_palettes_deleted.txt was found; skipping directory."
 	fi
