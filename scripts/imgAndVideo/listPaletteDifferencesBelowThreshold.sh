@@ -31,7 +31,6 @@ do
 	sed -i -n "/^$filterNumTwo/!p" tmp_p6WtTVackrvH.txt
 	# add $filterNumOne and 0.1 with awk's print command:
 	filterNumOne=`echo $filterNumOne .1 | awk '{print $1 + $2}'`
-	# print lines that do _not_ start with the 0.4 match pattern:
 done
 # END CRAZY but sort of amazing text filtration~
 
