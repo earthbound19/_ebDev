@@ -183,6 +183,8 @@ Piping with the `|` operator is very common in scripting operations that I do. A
 
 I also use the redireciton operators `<` and `>`. Here's [a link to documentation on the redirect operators](https://www.gnu.org/software/bash/manual/html_node/Redirections.html).
 
+Better than the pipe operator in many cases is the here-string operator `<<<` which passes the result of the command on the right to the command on the left. Here is [a link to documentation on that](http://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Here-Strings) (along with everything else Bash.)
+
 #### Error Level
 
 Bash has a built-in variable, `$?`, which is assigned the error level (or exit code) of the previous command. By convention when there was no error with a command, error level is set to `0`.
