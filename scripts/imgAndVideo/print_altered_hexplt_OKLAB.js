@@ -1,5 +1,5 @@
 // DESCRIPTION
-// Prints sRGB hex color values with altered Lightness, and/or Chroma, and/or Hue of every color from a .hexplt file -i (input), by parameters -l, -c and/or -h (as transforms from OKLAB color space). Tweaks are by float values between 0 and 1 for l (L), 0 to 0.322 for c, and 0 to 360 for h. Values may be negative or positive. Requires an input .hexplt file, which is a list of sRGB colors expressed in hexadecimal. Re: https://bottosson.github.io/posts/oklab/ -- https://raphlinus.github.io/color/2021/01/18/oklab-critique.html#update-2021-01-29
+// Prints sRGB hex color values with altered Lightness, and/or Chroma, and/or Hue of every color from a .hexplt file -i (input), by parameters -l, -c and/or -h (as transforms from OKLAB color space). Requires an input .hexplt file, which is a list of sRGB colors expressed in hexadecimal.
 
 // DEPENDENCIES
 // nodejs, with `culori@0.20.1`
@@ -17,7 +17,8 @@
 // To save the result to a new file, use a redirection operator, e.g.:
 //    node /path/to/script/print_altered_hexplt_OKLAB.js -i 'floral_print_00002.hexplt' -c 0.018 -l 0.068 -h 12 > floral_print_00002_more_lively_more_orange.hexplt
 // NOTES
-// TheEither there's a bug (or bugs) in the library this uses, or I
+// - Source references: https://bottosson.github.io/posts/oklab/ -- https://raphlinus.github.io/color/2021/01/18/oklab-critique.html#update-2021-01-29
+// - Either there's a bug (or bugs) in the library this uses, or I [?? I started a comment here but it's truncated.]
 
 
 // CODE
