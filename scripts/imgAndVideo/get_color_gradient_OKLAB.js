@@ -1,11 +1,9 @@
 // DESCRIPTION
-// Prints interpolated colors from -s (--start) to -e (--end) at -n (--number) even intervals, using the Oklab color space, via the culori npm (JavaScript / Nodejs) package. At this writing, Oklab does perceptual color modeling and changes better than any other color space I am aware of (including CIECAM02). Re: https://bottosson.github.io/posts/oklab/ -- https://raphlinus.github.io/color/2021/01/18/oklab-critique.html#update-2021-01-29
+// Prints interpolated colors from -s (--start) to -e (--end) at -n (--number) even intervals, using the Oklab color space, via the culori npm (JavaScript / Nodejs) package. Re: https://bottosson.github.io/posts/oklab/ -- https://raphlinus.github.io/color/2021/01/18/oklab-critique.html#update-2021-01-29
 
 // DEPENDENCIES
-// nodejs, with `culori@0.20.1`
-// NOTES
-// - Anything past that version breaks this and will require a rewrite of this script!) and `command` packages installed.
-// - You may have to install culori locall (in the same directory as this script) via `npm install <package_name>`, or globally, via `npm install -g <package_name>`.
+// - nodejs, with a version of the `culori` module greater than `culori@0.20.1` (I think?), as this uses the CommonJS export of culori at `'culori/require'`.
+// - You may have to install culori locally (in the same directory as this script) via `npm install <package_name>`, or globally, via `npm install -g <package_name>`.
 
 // USAGE
 // See help printout from this command:
@@ -14,8 +12,8 @@
 
 
 // CODE
-// main dependency
-culori = require('culori');
+// main dependency; CommonJS export, re: https://culorijs.org/guides/migration/
+culori = require('culori/require');
 
 // START OPTIONS PARSING AND CHECKING
 const { program } = require('commander');
@@ -36,23 +34,23 @@ if (options.number < 2) { console.log("ERROR: -n < 2; no point in running script
 if (
     (options.startColorRemove && isNaN(parseFloat(options.startColorRemove)))
     || options.startColorRemove < 1
-  ) {console.log("ERROR: value for -f [--startColorRemove] not provided, or out of range. Should be provided and have a value between 1 and -n -1 (number of colors in gradient minus one). Script will exit.N"); process.exit(1);}
+  ) {console.log("ERROR: value for -f [--startColorRemove] not provided, or out of range. Should be provided and have a value between 1 and -n -1 (number of colors in gradient minus one). Script will exit.N"); process.exit(2);}
 // if --endColorRemove switch provided but won't work, throw error and exit:
 if (
     (options.endColorRemove && isNaN(parseFloat(options.endColorRemove)))
     || options.endColorRemove < 1
-  ) {console.log("ERROR: value for -f [--endColorRemove] not provided, or out of range. Should be provided and have a value between 1 and -n -1 (number of colors in gradient minus one). Script will exit.N"); process.exit(1);}
+  ) {console.log("ERROR: value for -f [--endColorRemove] not provided, or out of range. Should be provided and have a value between 1 and -n -1 (number of colors in gradient minus one). Script will exit.N"); process.exit(3);}
 // if --chromaOverrideOnEndColor switch provided but won't work, throw error and exit:
 if (
     (options.chromaOverrideOnEndColor && isNaN(parseFloat(options.chromaOverrideOnEndColor)))
     || options.chromaOverrideOnEndColor < 0   // a user would have to work hard to pass this though.
-  ) {console.log("ERROR: value for -c [--chromaOverrideOnEndColor] not provided, or can't be used as a float, or out of range. Should be provided and have a value between 0 and 0.322≈. Script will exit.N"); process.exit(1);}
+  ) {console.log("ERROR: value for -c [--chromaOverrideOnEndColor] not provided, or can't be used as a float, or out of range. Should be provided and have a value between 0 and 0.322≈. Script will exit.N"); process.exit(4);}
 // if --lightnessOverrideOnEndColor switch provided but won't work, throw error and exit:
 if (
     (options.lightnessOverrideOnEndColor && isNaN(parseFloat(options.lightnessOverrideOnEndColor)))
     || options.lightnessOverrideOnEndColor > 1
     || options.lightnessOverrideOnEndColor < 0
-  ) {console.log("ERROR: value for -b [--lightnessOverrideOnEndColor] not provided, or can't be used as a float, or out of range. Should be provided and have a value between 0 and 0.322≈. Script will exit.N"); process.exit(1);}
+  ) {console.log("ERROR: value for -b [--lightnessOverrideOnEndColor] not provided, or can't be used as a float, or out of range. Should be provided and have a value between 0 and 0.322≈. Script will exit.N"); process.exit(5);}
 // END OPTIONS PARSING AND CHECKING
 
 var start_color = options.start;
@@ -73,7 +71,9 @@ if (options.lightnessOverrideOnEndColor) {
   end_color = end_color_lightness_override;
 }
 
-// create color interpolation array:
+// create color interpolation array;
+// re: https://culorijs.org/api/#interpolate
+// and re: https://culorijs.org/api/#samples
 my_interpolator = culori.interpolate([start_color, end_color], 'oklab');
 samples = culori.samples(number).map(my_interpolator).map(culori.formatHex);
 
@@ -87,7 +87,7 @@ if (options.endColorRemove) {
 // reverse order of colors if switch so commands:
 if (options.reverse) { samples.reverse(); }
 
-// print interpolated colors, on per line:
+// print interpolated colors, one per line:
 idx = 0;
 while (idx < samples.length) {
   console.log(samples[idx]);
@@ -116,5 +116,5 @@ while (idx < samples.length) {
 // console.log(parsed.l);
 // TO DO: NOTE for other possible development? Color Difference and Nearest color(s) at: https://culorijs.org/api/
 
-// - The only way that I could get an interactive Nodejs terminal to include a globally installed package was:
+// At one point, the only way that I could get an interactive Nodejs terminal to include a globally installed package was:
 // culori = require('C:/Users/<username>/AppData/Roaming/npm/node_modules/culori');

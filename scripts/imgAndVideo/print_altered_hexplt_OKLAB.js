@@ -2,9 +2,7 @@
 // Prints sRGB hex color values with altered Lightness, and/or Chroma, and/or Hue of every color from a .hexplt file -i (input), by parameters -l, -c and/or -h (as transforms from OKLAB color space). Requires an input .hexplt file, which is a list of sRGB colors expressed in hexadecimal.
 
 // DEPENDENCIES
-// nodejs, with `culori@0.20.1`
-// NOTES
-// - Anything past that version breaks this and will require a rewrite of this script!) and `command` packages installed.
+// - nodejs, with a version of the `culori` module greater than `culori@0.20.1` (I think?), as this uses the CommonJS export of culori at `'culori/require'`.
 // - You may have to install culori locally (in the same directory as this script) via `npm install <package_name>`, or globally, via `npm install -g <package_name>`.
 
 // KNOWN ISSUES
@@ -22,8 +20,8 @@
 
 
 // CODE
-// main dependency:
-culori = require('culori');
+// main dependency; CommonJS export, re: https://culorijs.org/guides/migration/
+culori = require('culori/require');
 var fs = require('fs')
 
 // START OPTIONS PARSING AND CHECKING
@@ -48,7 +46,13 @@ try {
 }
 catch(err) {
   console.log("\n\n!========\nERROR: unable to open specified -i --inputFile ", inputFileString, ". Exit.\n!========\n");
+  process.exit(1);
 }
+
+// print warning and exit of no modify parameters provided:
+if ( (! options.lightness && ! options.chroma && ! options.hue) ) {
+	console.log("WARNING: no -l --lightness, -c --chroma, or -h --hue option(s) passed to script. Output would be identical to input; no point in running the script without those options. Script will exit.\n!========\n"); process.exit(2);
+	}
 
 const regexp = /#[a-fA-F0-9]{6}/g;
 // const str = '#f2aece floarif #002139 bepfj #4a2e3f';
