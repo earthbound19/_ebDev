@@ -1,5 +1,5 @@
 # DESCRIPTION
-# NOTE THAT `get_color_gradient_culori.js` is recommended over this script for color gradients. This script repeatedly runs getNshadesOfColorCIECAM02.py for every color in a .hexplt file $1, with optional $2 colors (default hard-coded number may be overridden with optional 2nd parameter).
+# NOTE THAT `get_color_gradient_OKLAB.js` is recommended over this script for color gradients. This script repeatedly runs getNshadesOfColorCIECAM02.py for every color in a .hexplt file $1, with optional $2 colors (default hard-coded number may be overridden with optional 2nd parameter).
 
 # DEPENDENCIES
 # Bash, and all the dependencies of the python script this calls.
@@ -11,7 +11,7 @@
 # Example that will produce 7 shades from every color in inputPalette.hexplt:
 #    getNshadesOfColorsCIECAM02.sh inputPalette.hexplt 7
 # NOTES
-# - Again, `get_color_gradient_culori.js` is recommended over this script for color gradients.
+# - Again, `get_color_gradient_OKLAB.js` is recommended over this script for color gradients.
 # - To hack other parameters modify the command=".." assignment in the script directly, for example to `-b 100`, referring to the Python script.
 
 

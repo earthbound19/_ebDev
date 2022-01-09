@@ -1,11 +1,11 @@
 # DESCRIPTION
-# Calls `get_color_gradient_culori.js` repeatedly to construct palettes from files in a source .hexplt file ($1), such that:
+# Calls `get_color_gradient_OKLAB.js` repeatedly to construct palettes from files in a source .hexplt file ($1), such that:
 # - There is a perceptually uniform gradient of M ($2) tints from white to the color, then the color, then M ($2) shades
 # - Every color in that resulting tint <-> shades palette is taken, and a perceptually uniform gradient of N ($3) grays made from each to near desaturated (no chroma, or gray) for that color
 # In other words, this script obtains and lists a gamut of tints, shades and saturated and unsaturated colors for every color in a palette. Results will be in palette files named after each color in the source palette. Also, this calls a script to render the result palettes in a layout that shows the tint, shade and chroma gradients' relationships.
 
 # DEPENDENCIES:
-# getFullPathToFile.sh, get_color_gradient_culori.sh
+# getFullPathToFile.sh, get_color_gradient_OKLAB.js
 
 # USAGE
 # Run with these parameters:
@@ -14,20 +14,20 @@
 # - $3 how many chromacities to get (toward gray) for every one of those resultant tints and shades
 # - $4 OPTIONAL. How many tints to remove from the start of the tints gradient (which begins nearest white).
 # - $5 OPTIONAL. How many shades to remove from the end of the shades gradient (which ends nearest black).
-# - $6 OPTIONAL. Any other arbitrary switches (with their optional values) that you want to pass to `get_color_gradient_culori.js`. If there are spaces in these switches, surround all the switches and their values with single or double quote marks. To not use any arbitrary (additional) switches, but use $7, pass the word NULL for this parameter.
+# - $6 OPTIONAL. Any other arbitrary switches (with their optional values) that you want to pass to `get_color_gradient_OKLAB.js`. If there are spaces in these switches, surround all the switches and their values with single or double quote marks. To not use any arbitrary (additional) switches, but use $7, pass the word NULL for this parameter.
 # - $7 OPTIONAL. Anything, such as the word FLOOFARF, which will cause the palette renders stage of the script to be skipped.
 # Example that will get 3 tints, 3 shades, and 4 chromacities for every tint and shade, for every color in 16_max_chroma_med_light_hues.hexplt:
 #    getN_hexplt_shadesXchromas_Oklab.sh 16_max_chroma_med_light_hues.hexplt 3 4
 # NOTES
 # - The result count of tints and shades is ($2 * 2) + 1, because it is $2 tints + $2 shades + the original color
 # - The result count of chromas is that many + (chromas * those tints and shades), because those tints and shades are included unmodified (you get the original tints and shades plus chroma variants).
-# - See the optional `extraParams` variable to pass additional arguments in calls to `get_color_gradient_culori.js`
+# - See the optional `extraParams` variable to pass additional arguments in calls to `get_color_gradient_OKLAB.js`
 
 # CODE
 # START MAIN SETUP AND CHECKS
 # Via another script, check for existence of dependency script (fullPathToCuloriScript will be path to it if it exists) :
-fullPathToCuloriScript=$(getFullPathToFile.sh get_color_gradient_culori.js)
-if [ "$fullPathToCuloriScript" == "" ]; then printf "\n~\nERROR: dependency script get_color_gradient_culori.js not found in your \$PATH. Will exit."; exit 1; fi
+fullPathToCuloriScript=$(getFullPathToFile.sh get_color_gradient_OKLAB.js)
+if [ "$fullPathToCuloriScript" == "" ]; then printf "\n~\nERROR: dependency script get_color_gradient_OKLAB.js not found in your \$PATH. Will exit."; exit 1; fi
 
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source .hexplt file name) passed to script. Exit."; exit 1; else sourceHexpltFile=$1; fi; if [ ! -e $sourceHexpltFile ]; then printf "\n~\nERROR: file $sourceHexpltFile not found. Will exit."; exit 1; fi
 if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many tints and shades to get for each color in palette) passed to script. Exit."; exit 1; else nShades=$2; fi
