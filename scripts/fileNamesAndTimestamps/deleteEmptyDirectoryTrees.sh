@@ -11,6 +11,9 @@
 
 
 # CODE
+# saved again by a genius breath yonder: https://stackoverflow.com/a/16831721/1397555
+IFS=$'\n'
+
 directories=( $(find . -type d) )
 directories=( ${directories[@]:1} )
 foundEmptyDirectory=FALSE
@@ -24,7 +27,7 @@ do
 		then
 			foundEmptyDirectory=TRUE
 			echo "found empty directory $directory; will delete."
-			rm -rf $directory
+			rm -rf "$directory"
 		fi
 	done
 	
@@ -35,3 +38,5 @@ do
 	# if we don't reset this var here, the loop will contine forever:
 	foundEmptyDirectory=FALSE
 done
+
+unset IFS
