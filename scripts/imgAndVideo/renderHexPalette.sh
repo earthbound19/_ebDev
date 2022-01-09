@@ -8,8 +8,8 @@
 # USAGE
 # Run this script with the following parameters:
 # - $1 A palette file in `.hexplt` format, which is a list of RGB colors expressed as hexadecimal (hex color codes), one color per line. If this file is in the directory you run this script from, it will be used. If the file is not in the current directory, it may be anywhere in a directory tree in a path given in a file `~/palettesRootDir.txt`, and the script will find the palette in that directory tree and render from it.
-# - $2 OPTIONAL. Edge length of each square tile to be composited into final image. If not provided a default is used.
-# - $3 OPTIONAL. If not provided, or provided as string 'NULL' (don't use the single quote marks), the order of elements in the palette will be preserved. If provided and anything other than NULL (for example 2 or foo or 1 or 3), the script will randomly shuffle the hex color files before compositing them to one image. I have gone back and forth on requiring this in the history of this script :/
+# - $2 OPTIONAL. Edge length of each square tile to be composited into final image. If not provided a default is used. To use additional parameters and use the default for this, provide the string 'NULL' for this.
+# - $3 OPTIONAL. If not provided, or provided as string 'NULL', the order of elements in the palette will be preserved. If provided and anything other than NULL (for example 2 or foo or 1 or 3), the script will randomly shuffle the hex color files before compositing them to one image. I have gone back and forth on requiring this in the history of this script :/
 # - $4 OPTIONAL. Number of tiles across of tiles-assembled image (columns).
 # - $5 OPTIONAL. Number of tiles down of tiles-assembled image (rows). At one point I wrote that if $5 was omitted, the script might do wrong math for the number of rows, but I don't see that being the case. If $5 is provided and is too small, the collage will be split vertically into truncated, numbered collages. I don't know why.
 # EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, the palette image being 5 columns wide and 6 rows down, with squares in the palette rendered in random order:
@@ -71,7 +71,7 @@ else	# Search for specified palette file in palettesRootDir (if that dir exists;
 		exit
 	fi
 fi
-if [ "$2" ]; then tileEdgeLen=$2; else tileEdgeLen=250; fi
+if [ "$2" ] && [ "$2" != "NULL" ]; then tileEdgeLen=$2; else tileEdgeLen=250; fi
 
 # Set default no shuffle, and only alter if $3 is not equal to 'NULL':
 shuffleValues=0
