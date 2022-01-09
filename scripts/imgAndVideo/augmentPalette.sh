@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Does linear interpolation in N ($2) steps between each color in a .hexplt palette ($1), in okLab color space (using CHL coordinates). Writes result to <paletteBaseFileName>_augmented_<N>.hexplt.
+# Does linear interpolation in N ($2) steps between each color in a .hexplt palette ($1), in okLab color space (using CHL coordinates). Prints the result to stdout.
 
 # DEPENDENCIES
 # `get_color_gradient_OKLAB.js` (and nodeJS and the packages that script requires), `getFullPathToFile.sh`
@@ -12,8 +12,10 @@
 #    augmentPalette.sh Firebird.hexplt 13
 # The result file for this example would be `Firebird_augmented_13.hexplt`.
 # NOTES
-# This script checks for a local environment variable $fullPathToOKLABAugmentationScript, which is the full path to the dependency script `get_color_gradient_OKLAB.js`. If that environment variable is not set, it will look for the path to the dependency script via `getFullPathToFile.sh`, and set that variable to what `getFullPathToFile.sh` finds. If you call this script via `source`, that newly set variable will still exist in your shell when this script returns. This will save a call to `getFullPathToFile.sh` if you call this script (`augmentPalette.sh`) again, which can save a lot of time, as that path finding script can run very slow. (It saves time because after the first call, the variable is set and so on the second call, it checks and sees it's already set and doesn't look for it again.) So, if you call this script repeatedly from another script, call it with `source` this way, where `<palette_file_name>` and/or `<N>` change with each call:
+# - This script checks for a local environment variable $fullPathToOKLABAugmentationScript, which is the full path to the dependency script `get_color_gradient_OKLAB.js`. If that environment variable is not set, it will look for the path to the dependency script via `getFullPathToFile.sh`, and set that variable to what `getFullPathToFile.sh` finds. If you call this script via `source`, that newly set variable will still exist in your shell when this script returns. This will save a call to `getFullPathToFile.sh` if you call this script (`augmentPalette.sh`) again, which can save a lot of time, as that path finding script can run very slow. (It saves time because after the first call, the variable is set and so on the second call, it checks and sees it's already set and doesn't look for it again.) So, if you call this script repeatedly from another script, call it with `source` this way, where `<palette_file_name>` and/or `<N>` change with each call:
 #    source augmentPalette.sh <palette_file_name> <N>
+# - To write the printed result to a file, redirect it like so:
+#    augmentPalette.sh Firebird.hexplt 13 > Firebird_augmented_13.hexplt
 
 
 # CODE
