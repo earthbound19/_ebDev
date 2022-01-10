@@ -3,7 +3,8 @@
 
 # USAGE
 # Run with these parameters:
-# - $1 OPTIONAL. Anything, for example the word 'BROGNALF', which will cause the script to find and print image file names also in subdirectories (and not only the current directory). If omitted, the script only finds and prints file names from the current directory.
+# - $1 OPTIONAL. Anything, for example the word 'BROGNALF', which will cause the script to find and print image file names also in subdirectories (and not only the current directory). If omitted, the script only finds and prints file names from the current directory. To use parameter $2 (read on) but not this, pass this as the word 'NULL'.
+# - $2 OPTIONAL. Anything, for example the phrase 'RETURN OF BROGNALF' encased in single quote marks, which will cause the script to print full paths (not relative paths).
 # Example command to find and print files from the current directory only:
 #    printAllIMGfileNames.sh
 # Example command to find and print files from the current directory and all subdirectories:
@@ -20,7 +21,7 @@
 # If no parameter one, maxdepthParameter will be left at default, which causes find to search only the current directory:
 maxdepthParameter='-maxdepth 1'
 # If parameter one is passed to script, that changes to nothing, and find's default recursive search will be used (as no maxdepth switch will be passed) :
-if [ "$1" ]; then maxdepthParameter=''; fi
+if [ "$1" ] && [ "$1" != "NULL" ]; then maxdepthParameter=''; fi
 
 # array of file types in lowercase; will programmatically build `find` command that searches for these *and* uppercase versions (because some devices and programs are silly and write uppercase extensions) :
 filetypes=(
@@ -53,7 +54,14 @@ do
 done
 
 # I'm only getting this to work in a temp script that I create, write the command to, executed and then delete. By itself with whatever escaping I find, or in a variable expanded to a command, it breaks; CHORFL is just to meet a requirement of starting the list withuot -o:
-# TO DO? : option to search with ~+ (causes full path to be prints) instead of ./
-echo "find ./ $maxdepthParameter -type f \( -iname \*.CHORFL $typesParam \) -printf \"%P\n\"" > tmpScript_bxJZuSvKq.sh
+# if $2 was passed to the script, use find command that will print full paths (via ~+ and no -printf "%P\n") :
+if [ "$2" ]
+then
+	echo "find ~+ $maxdepthParameter -type f \( -iname \*.CHORFL $typesParam \)" > tmpScript_bxJZuSvKq.sh
+# otherwise use command that prints relative paths:
+else
+	echo "find ./ $maxdepthParameter -type f \( -iname \*.CHORFL $typesParam \) -printf \"%P\n\"" > tmpScript_bxJZuSvKq.sh
+fi
+
 ./tmpScript_bxJZuSvKq.sh
 rm ./tmpScript_bxJZuSvKq.sh
