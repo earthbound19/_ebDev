@@ -33,7 +33,7 @@ read -p "NOTE: at this writing, via the coding of getNshadesOfColorsCIECAM02.sh,
 subdirsOneLevelDeep=( $(listAllSubdirs.sh FLORFELNAUT) )
 for folderName in ${subdirsOneLevelDeep[@]}
 do
-	pushd .
+	pushd . >/dev/null
 	cd $folderName
 	# there will only be one file name, and this stores it in a variable:
 	sourceHexpltFileName=$(ls *.hexplt)
@@ -60,7 +60,7 @@ do
 	renderAllHexPalettes.sh NULL 260 NULL $nChroma $hexpltFilesCount
 	# move everything up one folder (to final destination folder) :
 	mv * ..
-	popd
+	popd >/dev/null
 	# destroy temp subfolder (since we got the files we want back up here in this folder:
 	rm -rf $folderName
 done

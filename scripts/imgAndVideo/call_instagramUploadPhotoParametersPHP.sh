@@ -63,11 +63,7 @@ caption=$3
 if [ -e ~/instagramPassword.txt ] && [ $foundAPIpath == 1 ]
 then
 	pw=$(< ~/instagramPassword.txt)
-			# echo password is $pw
-			# thas right, ima kludge:
-			echo saving current dir . . .
-	pushd .
-			echo moving to another dir . . .
+	pushd . >/dev/null
 	cd $instagramAPIrepoPath
 			echo Will write command to batch and run render:
 			echo php UploadPhotoParameters.php $1 $pw $FullIMGpath \"$caption\"
@@ -76,6 +72,5 @@ then
 	chmod 777 ./tmp_dZv7S9WXXheh298ApQFmtyWnB6ya877vZw.bat
 	tmp_dZv7S9WXXheh298ApQFmtyWnB6ya877vZw.bat
 	rm ./tmp_dZv7S9WXXheh298ApQFmtyWnB6ya877vZw.bat
-			echo returning to saved dir . . .
-	popd
+	popd >/dev/null
 fi

@@ -34,8 +34,9 @@ goris_matches_subdir=${1%.*}
 # Create a directory named after the file, only if it doesn't already exist:
 if [ ! -d $goris_matches_subdir ]; then mkdir $goris_matches_subdir; fi
 # Move into that directory and execute a reverse image search and download for $1 (which will be one directory up) :
-		pushd .
+		pushd . >/dev/null
 cd $goris_matches_subdir
+		echo "Working in directory: $goris_matches_subdir . . ."
 goris search --fromfile "../$1" --number $numberToDownload --download
 
 exit
@@ -48,6 +49,6 @@ mv ../* .
 cd ..
 mv "../$1" .
 
-popd
+		popd >/dev/null
 
 echo DONE. The search image was moved into the a new $gorisDownloadNmatchesThe subdirectory\, with the search results below that in ./$goris_matches_subdir/matches, for easy reference.

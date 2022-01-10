@@ -32,7 +32,7 @@ do
 	# if the render target does *not* exist, do things to create it. Otheriwise do nothing for this loop:
 	if [ ! -e anim_segment_"$zeroPaddedNumber".mp4 ]
 		then
-		pushd .
+		pushd . >/dev/null
 		cd $currdir/$element
 		echo rendering animation in $currdir/$element . . .
 		# remove tmp_rip directory if it exists:
@@ -51,7 +51,7 @@ do
 		mv ./_out.mp4 ../../_segment_"$zeroPaddedNumber"_"$element".mp4
 		cd ..
 		rm -rf tmp_rip
-		popd
+		popd >/dev/null
 	else echo Render target anim_segment_"$zeroPaddedNumber".mp4 already exists\; skipping render..
 	fi
 done

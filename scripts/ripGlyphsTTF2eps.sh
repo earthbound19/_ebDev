@@ -130,7 +130,7 @@ teh_codes=(
 rm -rf tmp_working_dir__VbUM3EynUyPhg7
 mkdir tmp_working_dir__VbUM3EynUyPhg7
 
-pushd .
+pushd . >/dev/null
 cd tmp_working_dir__VbUM3EynUyPhg7
 cp ../$1 .
 
@@ -139,7 +139,7 @@ do
 	ttf2eps -Unicode $element $1
 done
 
-epsArray=(`find . -maxdepth 1 -type f -iname \*.eps -printf '%f\n'`)
+epsArray=( $(find . -maxdepth 1 -type f -iname \*.eps -printf '%f\n') )
 
 # Rename resultant files after font file name.
 fontFileNameNoExt=${1%.*}
@@ -151,7 +151,7 @@ fi
 
 mv *.eps ../"$fontFileNameNoExt"_glyphs
 
-popd
+popd >/dev/null
 rm -rf tmp_working_dir__VbUM3EynUyPhg7
 
 echo "DONE. Ripped glyphs are in directory ""$fontFileNameNoExt""_glyphs. You may wish to run allEPS2ims.sh in that directory to convert them all .e.g. to pngs."

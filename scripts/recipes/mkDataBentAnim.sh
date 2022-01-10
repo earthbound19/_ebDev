@@ -24,7 +24,7 @@
 
 if [ -z "$1" ]; then echo No parameter one \(input files extension e.g. txt\)\. Will exit.; exit; else fileExt=$1; echo SET fileExt to $1; fi
 
-pushd .
+pushd . >/dev/null
 
 all_data_bend_type2PPMglitchArt.sh $fileExt
 mkdir ppm
@@ -45,7 +45,8 @@ ffmpegAnim.sh 11 30 13 png NULL 6
 thisPath=$(pwd)
 parentDirectoryName="$(basename "$(dirname "$thisPath")")"
 mv ./_out.mp4 ../__"$parentDirectoryName".mp4
-popd
+
+popd >/dev/null
 
 
 echo DONE. result is __"$parentDirectoryName".mp4.

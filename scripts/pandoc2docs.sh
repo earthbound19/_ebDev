@@ -17,8 +17,9 @@ if [ ! "$2" ]; then echo "No destination format \$2 passed to script. Exit."; ex
 directories=(`find . -type d -iname \*`)
 for directory in ${directories[@]}
 do
-	pushd .
+	pushd . >/dev/null
 	cd $directory
+	echo "Working in directory: $directory . . ."
 	src_docs=(`find . -maxdepth 1 -type f -iname \*.$src_format -printf '%f\n'`)
 	for src_doc in ${src_docs[@]}
 	do
@@ -27,5 +28,5 @@ do
 		# deprecated in favor of calling pandoc2doc (functionality of this moved into that script) : "pandoc -t $dest_format -o $dest_file $src_doc"
 		pandoc2doc.sh $src_doc $dest_file
 	done
-	popd
+	popd >/dev/null
 done

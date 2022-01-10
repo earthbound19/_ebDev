@@ -81,11 +81,12 @@ then
 
 	for element in ${directories[@]}
 	do
-		pushd .
+		pushd . >/dev/null
 		cd $element
+		echo "Working in directory: $element . . ."
 # TO DO: make this work with all these characters, if it doesn't:
 # '@=`~!#$%^&()+[{]}; ,-
 		perl $pathToRenamePerl -g -e 's/[^\w.-]+/_/g' \"$extension\"
-		popd
+		popd >/dev/null
 	done
 fi
