@@ -14,11 +14,11 @@
 
 # USAGE
 # Execute this script without any parameter:
-#    macPomodoroBreakTimer.sh
+#    blinkBreakTimer.sh
 # -- and let it run in the background as you work.
 # NOTES
 # - I suggest you don't change the blink color at all, or change it infrequently, during the work period. The blinking can distract. Then for X minutes echoes a prompt to take a break.
-# - Every N break periods (4? 5?), take a long break.
+# - Every N break periods (4? 5?), take a break.
 # - If you do not have a blink device, uncomment the lines with the "sleep" commands.
 # - You may alter the values under the "CHANGE THESE VALUES" comment.
 # - Depending on the way timer intervals divide (if the color change interval doesn't divide the break interval evenly), work and break periods may be a bit shorter than what you tell this script.
