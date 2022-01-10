@@ -1,14 +1,17 @@
 # DESCRIPTION
-# Produces list of images in the current directory arranged by most similar to nearest neighbor. To do this it compares all images in a directory. For the first image, it lists which image is most similar to it, then does the same for the second, then third image, and on until the end of the image list. The result is a list of images where every image is adjacent to the two images which are most similar to it. See USAGE for notes on potential uses. It _may_ be that that sort order is not strict; there may be some some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list. I have not re-examined this since coding it and did not document that.
+# Produces list of images in the current directory arranged by next most similar. Compares all images in a directory. For the first image, it lists which image is most similar to it, then does the same for the second, then third image, and on until the end of the image list. The result is a list of images where every image is adjacent to the two images which are most similar to it. See NOTES for potential uses. It may end up that sort order is not strict; there may be some some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list. I have not re-examined this since coding it and did not document that.
 
 
 # DEPENDENCIES
-# GraphicsMagick, image files in a directory to work on, and bash / GNU utilities
+# `printAllIMGfileNames.sh`, GraphicsMagick, image files in a directory to work on, and bash / GNU utilities
 
 # USAGE
-# Run this script with one parameter, which is the file format in the current dir. to operate on, e.g.:
+# Run with these parameters:
+# - $1 OPTIONAL. File format (e.g. 'png') to run comparisons for. To compare ALL files in current directory, omit this parameter. It will throw errors for any files which are not valid images.
+# For example, to compare all png format images in the current directory, run:
 #    imgsGetSimilar.sh png
-# OPTIONAL: omit variable 1 to compare ALL files in current dir; will throw errors if some files are not images or valid images.
+# To compare all (supported) image formats in the current directory, run:
+#    imgsGetSimilar.sh
 # NOTES
 # - The comparison algorithm never compares the same image pair more than once.
 # - See re_sort_imgsMostSimilar.sh to sort the result other ways.
@@ -18,34 +21,19 @@
 
 # CODE
 # TO DO:
-# - efactor to allow continuation of interrupted runs (do not erase temp files; rather append to them.) This means not resizing for comparision any pre-existing files of the pattern __superShrunkRc6d__*, not wiping comparision result temp files, picking up where comparisons left off, and . . . ?
+# - Refactor to allow continuation of interrupted runs (do not erase temp files; rather append to them.) This means not resizing for comparision any pre-existing files of the pattern __superShrunkRc6d__*, not wiping comparision result temp files, picking up where comparisons left off, and . . . ?
 
-# If no $1 parameter, warn and exit.
-if [ -z "$1" ]
+allIMGs=()
+if [ ! "$1" ]
 then
-	echo "No paramter \$1 passed to script; will exit. Re-run script with an image format extension (without any .) as the only parameter to the script; e.g.:"
-	echo "	./imgsGetSimilar.sh png"
-	exit
+	allIMGs=( $(printAllIMGfileNames.sh) )
 else
-	searchRegex=$1
+	allIMGs=( $(find . -maxdepth 1 -type f -iname "*.$1" -printf '%f\n') )
 fi
-# DEPRECATED until it is tested to see whether the presence of text files in list (will result from no $1 passed to script) will mess up process:
-	# change search regex depending on presence or absense of parameter $1:
-	# if [ -z "$1" ]
-	# then
-	# 	searchRegex='*'
-	# else
-	# 	searchRegex="$1"
-	# fi
 
-
-# CODE
 # OPTIONAL wipe of all leftover files from previous run; comment out the next line if you don't want or need that:
 rm -rf __superShrunkRc6d__*
 
-
-# Because on stupid platforms find produces windows line-endings, convert them to Unix after pipe | :
-allIMGs=(`find . -maxdepth 1 -type f -iname \*.$searchRegex -printf '%f\n' | sort`)
 # Create heavily shrunken image copies to run comparison on.
 echo Generating severely shrunken image copies to run comparisons against . . .
 for element in "${allIMGs[@]}"
