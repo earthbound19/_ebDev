@@ -1,8 +1,8 @@
 # DESCRIPTION
-# Lists all files in the current directory, then deletes all copies of those files *that have the same base file name* (meaning no extension), which Everything search engine (voidtools) finds everywhere on the computer. USE WITH EXTREME CAUTION, knucklehead.
+# Lists all files in the current directory, then deletes all copies of those files *that have the same base file name* (meaning no extension), which Everything search engine (voidtools) finds everywhere on the computer. THAT MEANS all of the files found in this folder, too. USE WITH EXTREME CAUTION, knucklehead.
 
 # WARNING
-# Deletes from this script are permanent and immediate, but it prompts to type a confirmation password first.
+# Deletes from this script are permanent and immediate, and all files in the current folder you run this from are part of that deletion. It prompts to type a confirmation password first.
 
 # USAGE
 #    lsEverythingDelete.sh
