@@ -7,15 +7,14 @@
 # USAGE
 # Run this script through a Python interpreter, with these parameters:
 # - sys.argv[1] source image to sample
-# - sys.argv[2] number of columns to divide the image into for samples
-# - sys.argv[3] number of rows to divide the image into for samples
-# - sys.argv[4] OPTIONAL. May be anything (for example the word 'ROGBALF'). If provided, causes samples of column offset to be at left edge of column (will start at x=0 in the image), instead of center of column.
+# - sys.argv[2] number of columns to divide the image into cells for samples
+# - sys.argv[3] number of rows to divide the image into cells for samples
+# - sys.argv[4] OPTIONAL. Override X percent offset to sample from left edge of each cell. For example to offset the sample by twelve percent from the left edge, pass 0.12 here as argument 4. If omitted, defaults to 0.5 (center from left edge of cell). May be a value between 0 (no offset from left edge of cell) and 1 (at right edge of cell) inclusive.
+# - sys.argv[5] OPTIONAL. Override Y percent offset to sample from top edge of each cell. For example to offset the sample by ten percent from the top edge of each cell, pass 0.1 here as argument 5. If omitted, defaults to 0.5 (center from top edge of cell). May be a value between 0 (no offset from top edge of cell) and 1 (at bottom edge of cell) inclusive.
 # For example, if the source image is named darks-v2.png, and you want to sample from the center of each cell in a grid 16 across (16 columns) and 12 down (12 rows), run:
 #    python full/path_to_this_script/get_color_sample_grid_sRGB.py darks-v2.png 16 12
 # To pipe the results to a text file, add a > redirect operator and text file to the end of that command, like this:
 #    python full/path_to_this_script/get_color_sample_grid_sRGB.py darks-v2.png 16 12 > darks-v2.hexplt
-# NOTE
-# It may fail if you use only 1 column or row, and for that you can use a freeware color picker on many platforms anyway.
 
 
 # CODE
@@ -40,10 +39,14 @@ if len(sys.argv) > 3:
 else:
 	print('\nNo parameter 3 (number of rows to sample from) passed to script. Exit.')
 	sys.exit(3)
-# set default value of boolean; override if instructed by script parameter:
-ZERO_X_OFFSET = False
+# set default value; override if instructed by script parameter:
+x_percent_cell_sample_offset = 0.5
 if len(sys.argv) > 4:
-    ZERO_X_OFFSET = True
+    x_percent_cell_sample_offset = ast.literal_eval(sys.argv[4])
+# set another default value; override if instructed by script parameter:
+y_percent_cell_sample_offset = 0.5
+if len(sys.argv) > 5:
+    y_percent_cell_sample_offset = ast.literal_eval(sys.argv[5])
 # Loads and converts images more efficiently,
 # re: https://stackoverflow.com/a/42036542
 with Image.open(source_image) as image:
@@ -56,16 +59,14 @@ img_width = len(im_arr[0])
 img_height = len(im_arr)
 column_pix_width = int(img_width / columns) - 1
 row_pix_height = int(img_height / rows) - 1
-column_pix_width_offset = int(column_pix_width / 2)
-# Override column offset if a value was set via script parameter saying to do so:
-if ZERO_X_OFFSET == True:
-	column_pix_width_offset = 0
-row_pix_height_offset = int(row_pix_height / 2)
+# if x_percent_cell_sample_offset is zero (0), this will result in zero offset, which is okay; 1 * 1 is also okay:
+x_sample_offset = int(column_pix_width * x_percent_cell_sample_offset)
+y_sample_offset = int(row_pix_height * y_percent_cell_sample_offset)
 # find and print all desired samples:
 for row in range(rows):
 	for column in range(columns):
-		Y = ((row_pix_height * row) + row_pix_height_offset)
-		X = ((column_pix_width * column) + column_pix_width_offset)
+		Y = ((row_pix_height * row) + y_sample_offset)
+		X = ((column_pix_width * column) + x_sample_offset)
 		# print('X,Y', X, Y)
 		# extract and assign RGB values:
 		RGB_vals = im_arr[Y][X]
