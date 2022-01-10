@@ -2,7 +2,7 @@
 # Prints a list of all files matching many image etc. file types in the current directory, and optionally all subdirectories. To create an array from the list, see USAGE.
 
 # USAGE
-# Run without these parameters:
+# Run with these parameters:
 # - $1 OPTIONAL. Anything, for example the word 'BROGNALF', which will cause the script to find and print image file names also in subdirectories (and not only the current directory). If omitted, the script only finds and prints file names from the current directory.
 # Example command to find and print files from the current directory only:
 #    printAllIMGfileNames.sh
