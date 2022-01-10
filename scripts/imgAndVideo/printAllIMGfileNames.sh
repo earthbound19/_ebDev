@@ -22,25 +22,26 @@ if [ "$1" ]; then maxdepthParameter=''; fi
 
 # array of file types in lowercase; will programmatically build `find` command that searches for these *and* uppercase versions (because some devices and programs are silly and write uppercase extensions) :
 filetypes=(
-tif
-tiff
-png
-tga
-psd
-psb
-ora
-rif
-riff
-jpg
-jpeg
-gif
 bmp
 cr2
-raw
-dng
 crw
+dng
+gif
+heic
+jpeg
+jpg
 kra
+ora
+png
+psb
+psd
 ptg
+raw
+rif
+riff
+tga
+tif
+tiff
 )
 
 # build string listing lowercase and also uppercase extensions list section for `find` command:
