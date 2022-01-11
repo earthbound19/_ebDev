@@ -9,8 +9,8 @@
 # - $1 source image type to scan (e.g. 'png', typed with or without single or double quote marks). To scan all supported image types, pass the word 'ALL' for this parameter.
 # - $2 number of columns to sample.
 # - $3 OPTIONAL. Number of rows to sample. If omitted or provided as the keyword 'AUTO', it is automatically calculated to get the number of rows such that row heights are the same as column widths.
-# - $4 CONDITIONALLY OPTIONAL. X percent offset to sample from left edge of cells. If omitted or provided as keyword 'DEFAULT', the called Python script uses a default. If you use $5 (read on), you will want to specify this (and not use DEFAULT), or this script will pass $5 as $4 to the Python script.
-# - $5 OPTIONAL. Y percent offset to sample from top edge of cells. If omitted the called Python script uses a default.
+# - $4 CONDITIONALLY OPTIONAL. X percent offset to sample from left edge of cells, expressed as decimal (e.g. fourteen percent would be 0.14). If omitted or provided as keyword 'DEFAULT', the called Python script uses a default. If you use $5 (read on), you will want to specify this (and not use DEFAULT), or this script will pass $5 as $4 to the Python script.
+# - $5 OPTIONAL. Y percent offset to sample from top edge of cells, also expressed as decimal. If omitted the called Python script uses a default.
 # - $6 OPTIONAL. Anything, for example the word WHEALHALM, which will cause this script to sample colors from all images in all subdirectories (under the directory you run this script from) also. Respective resultant palettes will be in the same directory as sampled images, alongside them.
 # --Whew!
 # Example command that will operate on every png file in the current directory, sampling 16 columns for each, with an automatically calculated number of rows to :
@@ -78,10 +78,14 @@ do
 		srcIMGw=$(gm identify $fileName -format "%w")
 		srcIMGh=$(gm identify $fileName -format "%h")
 		colWidth=$(($srcIMGw / $sampleNcols))
-# TO DO: don't auto-calculate rows -- or make that optional?
-		sampleNrows=$(($srcIMGh / $colWidth))
+		# if parameter instructed to, calculate sample rows such that sample cells will be square. Otherwise do nothing, as $sampleNrows was already set to N specified by parameter:
+		if [ "$sampleNrows" == "AUTO" ]
+		then
+			sampleNrows=$(($srcIMGh / $colWidth))
+		fi
 		echo "Attempting to sample from $fileName at $sampleNcols sample columns and $sampleNrows rows . ."
-		python $fullPathToScript $fileName $sampleNcols $sampleNrows > $renderTarget
+		# passing along xPercentOffset yPercentOffset with everything else:
+		python $fullPathToScript $fileName $sampleNcols $sampleNrows $xPercentOffset $yPercentOffset > $renderTarget
 	else
 		echo TARGET EXISTS ALREADY for $renderTarget\; will not clobber. Skip.
 	fi

@@ -5,12 +5,16 @@
 # `printAllIMGfileNames.sh`, `get_color_sample_grids_sRGB.sh`, and their dependencies, irfanView and/or any other default image viewer, and an environment that will open an image to the default image viewer using the `start` command.
 
 # USAGE
-# Run without any parameter:
+# Alter the hard-coded x offset and y offset variables (`xSampleOffset` and `ySampleOffset` at the start of the script (right after the CODE comment) per your want. (See "$4..X percent offset to sample from left edge of cells.." and "$5..Y percent offset.." parameters in `get_color_sample_grids_sRGB.sh` (which in turn map to the Python script that calls).
+# Then, run this script without any parameters:
 #    get_color_sample_grids_sRGB_assistant.sh
 # -- and follow the prompts.
 
 
 # CODE
+xSampleOffset=0.14
+ySampleOffset=0.14
+
 allImageFileNames=( $(printAllIMGfileNames.sh) )
 for imageFileName in ${allImageFileNames[@]}
 do
@@ -30,3 +34,26 @@ do
 	mv $imageFileName ./$sortDir/
 done
 
+directories=( $(find . -type d -printf "%P\n") )
+for directory in ${directories[@]}
+do
+	# Extract columns and rows from directory names! :
+	echo --
+	echo Directory name is $directory.
+	cols=$(sed 's/\([0-9]\{1,\}\).*/\1/g' <<< $directory)
+	echo Number of columns from directory name is $cols.
+	rows=$(sed 's/\([0-9]\{1,\}\).*\([0-9]\{1,\}\)/\2/g' <<< $directory)
+	echo Number of rows from directory name is $rows.
+	# USE THAT INFO to get color samples! :
+	# save currend directory to directory stack but suppress directory print (redirect to /dev/null) :
+	pushd . 1>/dev/null
+	# change to that directory:
+	cd $directory
+	# command that will get color samples for every image in that (this) directory:
+	get_color_sample_grids_sRGB.sh ALL $cols $rows $xSampleOffset $ySampleOffset
+	popd 1>/dev/null
+	# OPTIONAL hard coded render of resultant palettes; comment out if you don't want to do that from this script:
+	renderAllHexPalettes.sh
+done
+
+echo "DONE sampling colors from all images in all subdirectories. See resultant .hexplt format files in subdirectories."
