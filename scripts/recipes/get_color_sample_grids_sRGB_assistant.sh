@@ -16,7 +16,7 @@ for imageFileName in ${allImageFileNames[@]}
 do
 	start $imageFileName
 	echo Image file $imageFileName opened.
-	printf "Close the image, and enter the grid dimensions of it (for color sampling). If there is a problem with the image, type something like 'error error' to sort it into a folder for editing (sample operations won't happen with the error folder). Type in the format 'columns <space> rows', e.g.\n4 3\n"
+	printf "Close the image, and enter the grid dimensions of it (for color sampling). If there is a problem with the image, type something like 'e' to sort it into a folder for editing (sample operations won't happen in any folder that starts with a non-numeral -- such as a letter). Type in the format 'columns <space> rows', e.g.\n4 3\n"
 	read -p "n n: " colsXrowsSTR
 	# read that into array (space is default delimiter) :
 	arr=($(echo $colsXrowsSTR))
