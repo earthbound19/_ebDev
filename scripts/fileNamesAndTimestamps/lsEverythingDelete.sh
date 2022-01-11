@@ -33,7 +33,9 @@ else
 		cd $directory
 		echo --
 		echo working in directory $directory . . .
-		# make arrey of all file names in the current directory
+		# make arrey of all file names in the current directory; IFS trickery to stop spaces in files from mucking with es search; saved by a genius breath yonder -- https://unix.stackexchange.com/a/9500/110338 :
+		OIFS="$IFS"
+		IFS=$'\n'
 		allFileNamesInThisDirectory=( $(find . -maxdepth 1 -type f -printf "%P\n") )
 		# iterate over it, extracting base file name for each and adding them to a new array:
 		allBaseFileNamesInThisDirectory=()
@@ -43,10 +45,9 @@ else
 			allBaseFileNamesInThisDirectory+=($fileNameNoExt)
 		done
 		# remove any duplicate base file names by sorting and uniqifying array:
-		IFS=$'\n'
 		allBaseFileNamesInThisDirectory=($(sort <<<"${allBaseFileNamesInThisDirectory[*]}"))
 		allBaseFileNamesInThisDirectory=($(uniq <<<"${allBaseFileNamesInThisDirectory[*]}"))
-		unset IFS
+
 		# iterate over those base file names, get an array of Everything CLI results searching for each, and then delete all of the file names (will be full paths) that Everything gives as results:
 		for baseFileName in ${allBaseFileNamesInThisDirectory[@]}
 		do
@@ -56,10 +57,11 @@ else
 			# echo "MATCHES for $baseFileName EVERYWHERE that Everything finds them:"
 			for path in ${foundPaths[@]}
 			do
-				# echo $path
 				nixyPath=$(cygpath $path)
+				echo Deleting $nixyPath . . .
 				rm $nixyPath
 			done
 		done
+		IFS="$OIFS"
 	done
 fi
