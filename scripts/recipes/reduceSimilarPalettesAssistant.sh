@@ -12,7 +12,7 @@
 
 
 # CODE
-deletePalettesBelowDifferenceThreshold=0.14
+deletePalettesBelowDifferenceThreshold=0.106
 
 currentDir=$(pwd)
 allSubdirectoriesArray=( $(listAllSubdirs.sh) )
