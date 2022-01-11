@@ -6,7 +6,7 @@
 # - $1 extension of file types in current directory to find files with the same base name (file minus extension).
 # - $2 extension of file types to find that have the same base name as any file $1 plus this extension.
 # - $3 how many directories up to search for files $2 and move them into the current directory.
-# - $4 OPTIONAL. Force overwrite existing files in the current directory, by moving found matches from any directory up to $3 levels up over them.
+# - $4 OPTIONAL. Any word, for example KRIDTALB, which will cause the script to force overwrite existing files in the current directory, by moving found matches from any directory up to $3 levels up over them.
 # EXAMPLE
 # Suppose you've got some files named `rnd_43aB.png` and `rnd43Cd.png` in the current path, which you rendered from source files `rnd_43aB.flame` and `rnd43Cd.flame`, which are two directories up from the current directory, and you want to move those matching `.flame` files into the current directory. To move those matching `.flame` files from up to two parent directories down to the current directory, run this script with these parameters:
 #    getFilePairs4Up.sh png flame 2
