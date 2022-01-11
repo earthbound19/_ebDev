@@ -9,12 +9,18 @@
 #    printAllIMGfileNames.sh
 # Example command to find and print files from the current directory and all subdirectories:
 #    printAllIMGfileNames.sh BROGNALF
-# To use this from another script to create an array from the output, do this:
+# To find and print file names from subdirectories and print full paths:
+#    printAllIMGfileNames.sh BROGNALF 'RETURN OF BROGNALF'
+# To find and print file names only in the current directory, and print full paths:
+#    printAllIMGfileNames.sh NULL 'RETURN OF BROGNALF'
+# USE FROM ANOTHER SCRIPT. To use this from another script to create an array from the output, do this:
 #    allIMGfileNamesArray=( $(printAllIMGfileNames.sh) )
 # -- you may then iterate through it like this:
 #    for element in ${allIMGfileNamesArray[@]}; do <something with $element>; done
-# NOTE
-# Because some tools are silly and create files with uppercase extensions, this script searches for both lowercase and uppercase extensions of every file type in its list.
+# You can also use the positional switches for this script to create an array with particular properties you want; for example to create an array that lists all supported image files in all subdirectories, with full paths, you would run:
+#    allIMGfileNamesArray=( $(printAllIMGfileNames.sh BROGNALF 'RETURN OF BROGNALF') )
+# NOTES
+# - Because some tools are silly and create files with uppercase extensions, this script searches for both lowercase and uppercase extensions of every file type in its list.
 
 
 # CODE

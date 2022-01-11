@@ -9,7 +9,7 @@
 # - sys.argv[1] source image to sample
 # - sys.argv[2] number of columns to divide the image into cells for samples
 # - sys.argv[3] number of rows to divide the image into cells for samples
-# - sys.argv[4] OPTIONAL. Override X percent offset to sample from left edge of each cell. For example to offset the sample by twelve percent from the left edge, pass 0.12 here as argument 4. If omitted, defaults to 0.5 (center from left edge of cell). May be a value between 0 (no offset from left edge of cell) and 1 (at right edge of cell) inclusive.
+# - sys.argv[4] CONDITIONALLY OPTIONAL. Override X percent offset to sample from left edge of each cell. For example to offset the sample by twelve percent from the left edge, pass 0.12 here as argument 4. If omitted, defaults to 0.5 (center from left edge of cell). May be a value between 0 (no offset from left edge of cell) and 1 (at right edge of cell) inclusive. If you pass something for sys.argv[5] (read on), you must logically pass something also for this.
 # - sys.argv[5] OPTIONAL. Override Y percent offset to sample from top edge of each cell. For example to offset the sample by ten percent from the top edge of each cell, pass 0.1 here as argument 5. If omitted, defaults to 0.5 (center from top edge of cell). May be a value between 0 (no offset from top edge of cell) and 1 (at bottom edge of cell) inclusive.
 # For example, if the source image is named darks-v2.png, and you want to sample from the center of each cell in a grid 16 across (16 columns) and 12 down (12 rows), run:
 #    python full/path_to_this_script/get_color_sample_grid_sRGB.py darks-v2.png 16 12
