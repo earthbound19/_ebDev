@@ -10,16 +10,24 @@
 # - $1 A palette file in `.hexplt` format, which is a list of RGB colors expressed as hexadecimal (hex color codes), one color per line. If this file is in the directory you run this script from, it will be used. If the file is not in the current directory, it may be anywhere in a directory tree in a path given in a file `~/palettesRootDir.txt`, and the script will find the palette in that directory tree and render from it.
 # - $2 OPTIONAL. Edge length of each square tile to be composited into final image. If not provided a default is used. To use additional parameters and use the default for this, provide the string 'NULL' for this.
 # - $3 OPTIONAL. If not provided, or provided as string 'NULL', the order of elements in the palette will be preserved. If provided and anything other than NULL (for example 2 or foo or 1 or 3), the script will randomly shuffle the hex color files before compositing them to one image. I have gone back and forth on requiring this in the history of this script :/
-# - $4 OPTIONAL. Number of tiles across of tiles-assembled image (columns).
-# - $5 OPTIONAL. Number of tiles down of tiles-assembled image (rows). At one point I wrote that if $5 was omitted, the script might do wrong math for the number of rows, but I don't see that being the case. If $5 is provided and is too small, the collage will be split vertically into truncated, numbered collages. I don't know why.
-# EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, the palette image being 5 columns wide and 6 rows down, with squares in the palette rendered in random order:
+# - $4 OPTIONAL. Number of tiles across of tiles-assembled image (columns). If omitted, the script will try to come up with a number of columns that will best fit color tiles with minimal wasted gray "no color" remaining tiles. AND/OR, if columns and rows syntax is found in the source hexplt file (see NOTES) and you omit $4, it will use the columns and rows specified in the source hexplt.
+# - $5 OPTIONAL. Number of tiles down of tiles-assembled image (rows). If omitted, the script will do math to make sure the needed number of rows are used to render all tiles with the given number of columns. At one point I wrote that if $5 was omitted, the script might do wrong math for the number of rows, but I don't see that being the case. If $5 is provided and is too small, the collage will be split vertically into truncated, numbered collages. I don't know why. Also, you can't use $5 unless you use $4.
+# EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, the palette is 5 columns wide and 6 rows down, and tiles in the palette are rendered in random order:
 #    renderHexPalette.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
 # ANOTHER EXAMPLE COMMAND; create a palette image from tigerDogRabbit_many_shades.hexplt, with each tile 300 pixels wide, no shuffling, the script deciding how many across and down to make the tiles:
 #    renderHexPalette.sh tigerDogRabbit_many_shades.hexplt 300 tigerDogRabbit_many_shades.hexplt
-# ANOTHER EXAMPLE COMMAND; use the same palette and let the script use all defaults:
+# ANOTHER EXAMPLE COMMAND; use the same palette and let the script use all defaults, including any number of tiles (columns) accross and down specified in the source hexplt:
 #    renderHexPalette.sh tigerDogRabbit_many_shades.hexplt
-# NOTE
-# This script will work with many kinds of other information present in a .hexplt source file other than RGB hex codes. You can probably have any other arbitrary text, anywhere in the file, including on the same line as RGB hex codes, and it will extract and use only the RGB hex code information. However, no kinds of comments (like # or // at the start of lines) are supported.
+# NOTES
+# - This script will work with many kinds of other information present in a .hexplt source file other than RGB hex codes. You can probably have any other arbitrary text, anywhere in the file, including on the same line as RGB hex codes, and it will extract and use only the RGB hex code information. However, no kinds of comments (like # or // at the start of lines) are supported.
+# - Source hexplt files may contain syntax to define the desired number of columns and rows to render them with. The syntax is to write the word "columns" followed by a number on any line of the file, and optionally also the word "rows" followed by a number on any line of the file, like this:
+#    columns 7 rows 8
+# -- or like this:
+#    #D29B7D columns 7, rows 8
+# All that matters is that the word 'columns' appears followed by a number. You can specify columns only, and this script will figure out the needed number of rows. You can also specify rows (in which case the syntax is the keyword 'rows' followed by a number), and the script will use that number of rows, with the same conditions as for the number of tiles (rows) down parameters to this script.
+# - I RECOMMEND that you specify the columns and rows as a comment after the first color in the palette, on the same line. This way, the `allRGBhexColorSort`~ scripts may be able to sort colors in palettes (it may not work if the columns and rows are specified on their own line).
+# - If in a source hexplt file you specify (for example) "rows 4" but don't specify any columns, the script will interpret rows as the number of columns, and it may cut off tiles (not all color tiles will render). You must specify columns in the source hexplt file if you specify rows.
+
 
 # CODE
 # TO DO
@@ -86,45 +94,65 @@ colorsArray=( $(grep -i -o '#[0-9a-f]\{6\}' $hexColorSrcFullPath | tr -d '#') )	
 # Get number of colors (from array):
 numColors=${#colorsArray[@]}
 
-# WHETHER NUM tiles across (and down) is specified; if so, use as specified, if not so, do some math to figure for a 2:1 aspect;
+# WHETHER NUM tiles across (and down) is specified; if so, use as specified, if not so, do some math to figure for a 2:1 aspect; OR look for instruction syntax in source hexplt (read on) ;
 # $4 is across. If $4 is not specified, do some math. Otherwise use $4:
 if [ ! $4 ]
 then
-	# If number of colors is above N (12?), try to render a ~2:1 aspect palette (columns will be the square root of the number of colors, x2). If it is N or below, render only one row, with as many columns as there are colors.
-	N=12
-	if [[ $numColors -le $N ]]
+	# FIRST LOOK FOR SYNTAX IN source hexplt that specifies number of columns, and use it if it's there; set number of render tiles (columns) accross based on any source hexplt file content:
+	columnSyntaxSearchResult=$(grep -E -m 1 'columns' $hexColorSrcFullPath)
+	# $columnSyntaxSearchResult will be blank if that search failed; use that fact:
+	if [ "$columnSyntaxSearchResult" != "" ]
 	then
-		# printf "\nAt $numColors, number of colors in palette is $N or less; will render only one row of that many colors."
-		tilesAcross=$numColors
+		tilesAcross=$(sed 's/.*columns[^0-9]\{0,\}\([0-9]\{1,\}\).*/\1/g' <<< $columnSyntaxSearchResult)
+	# OTHERWISE do math to figure out a hopefully good number of tiles accross:
 	else
-		# printf "\nAt $numColors, number of colors in palette is greater than $N; will calculate rows and columns to try to render a ~2:1 aspect palette."
-		sqrtOfColorCount=$(echo "sqrt ($numColors)" | bc)
-		tilesAcross=$(( $sqrtOfColorCount * 2 ))
+		# If number of colors is above N (12?), try to render a ~2:1 aspect palette (columns will be the square root of the number of colors, x2). If it is N or below, render only one row, with as many columns as there are colors.
+		N=12
+		if [[ $numColors -le $N ]]
+		then
+			# printf "\nAt $numColors, number of colors in palette is $N or less; will render only one row of that many colors."
+			tilesAcross=$numColors
+		else
+			# printf "\nAt $numColors, number of colors in palette is greater than $N; will calculate rows and columns to try to render a ~2:1 aspect palette."
+			sqrtOfColorCount=$(echo "sqrt ($numColors)" | bc)
+			tilesAcross=$(( $sqrtOfColorCount * 2 ))
+		fi
 	fi
-	printf "\ntilesAcross is $tilesAcross.\n"
 else
 	tilesAcross=$4
 fi
+printf "\ntilesAcross is $tilesAcross.\n"
 
+# SAME LOGIC as for $4 (but relying on $4 being calculated/set first:
 # $5 is down. If $5 is not specified, do some math. Otherwise use $5.
 if [ ! $5 ]
 then
-	sqrtOfColorCount=$(echo "sqrt ($numColors)" | bc)
-			# echo sqrtOfColorCount is $sqrtOfColorCount
-	tilesDown=$(( $sqrtOfColorCount / 2 ))
-	# If the value of ($tilesAcross times $tilesDown) is less than $numColors (the total number of colors), we will fail to print all colors in the palette; add rows to the print queue for as long as necessary:
-	tilesToRender=$(( $tilesAcross * $tilesDown ))
-	# echo tilesToRender is $tilesToRender\.
-	while [ $tilesToRender -lt $numColors ]
-	do
-		# echo tilesDown was $tilesDown.
-		tilesDown=$(( $tilesDown + 1 ))
+	# FIRST LOOK FOR SYNTAX IN source hexplt that specifies number of rows, and use it if it's there; set number of render tiles (rows) down based on any source hexplt file content:
+	rowsSyntaxSearchResult=$(grep -E -m 1 'rows' $hexColorSrcFullPath)
+	# $rowsSyntaxSearchResult will be blank if that search failed; use that fact:
+	if [ "$rowsSyntaxSearchResult" != "" ]
+	then
+		tilesAcross=$(sed 's/.*rows[^0-9]\{0,\}\([0-9]\{1,\}\).*/\1/g' <<< $rowsSyntaxSearchResult)
+	# OTHERWISE do math to figure out a hopefully good number of tiles accross:
+	else
+		sqrtOfColorCount=$(echo "sqrt ($numColors)" | bc)
+				# echo sqrtOfColorCount is $sqrtOfColorCount
+		tilesDown=$(( $sqrtOfColorCount / 2 ))
+		# If the value of ($tilesAcross times $tilesDown) is less than $numColors (the total number of colors), we will fail to print all colors in the palette; add rows to the print queue for as long as necessary:
 		tilesToRender=$(( $tilesAcross * $tilesDown ))
-				# TO DO: checking that twice . . . is that a code smell? Rework for more concise/elegant/sensical logic?
-	done
+		# echo tilesToRender is $tilesToRender\.
+		while [ $tilesToRender -lt $numColors ]
+		do
+			# echo tilesDown was $tilesDown.
+			tilesDown=$(( $tilesDown + 1 ))
+			tilesToRender=$(( $tilesAcross * $tilesDown ))
+					# TO DO: checking that twice . . . is that a code smell? Rework for more concise/elegant/sensical logic?
+		done
+	fi
 else
 	tilesDown=$5
 fi
+printf "tilesDown is $tilesDown.\n"
 
 # END SETUP GLOBAL VARIABLES
 # =============
