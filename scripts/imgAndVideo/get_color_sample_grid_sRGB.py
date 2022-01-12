@@ -63,7 +63,10 @@ row_pix_height = int(img_height / rows) - 1
 x_sample_offset = int(column_pix_width * x_percent_cell_sample_offset)
 y_sample_offset = int(row_pix_height * y_percent_cell_sample_offset)
 # find and print all desired samples:
+counter = 0
+# prints colors on grid shaped after sampled columns and rows:
 for row in range(rows):
+	counter += 1
 	for column in range(columns):
 		Y = ((row_pix_height * row) + y_sample_offset)
 		X = ((column_pix_width * column) + x_sample_offset)
@@ -72,4 +75,8 @@ for row in range(rows):
 		RGB_vals = im_arr[Y][X]
 		# convert to hex and print:
 		hex_code = '#%02x%02x%02x' % (RGB_vals[0], RGB_vals[1], RGB_vals[2])
-		print(hex_code)
+		print(hex_code + ' ', end = '')
+	if counter == 1:
+		print(' columns: ' + str(columns), end = '')
+		print(' rows: ' + str(rows), end = '')
+	print('\n', end = '')
