@@ -11,7 +11,8 @@
 # - $3 OPTIONAL. Number of rows to sample. If omitted or provided as the keyword 'AUTO', it is automatically calculated to get the number of rows such that row heights are the same as column widths.
 # - $4 CONDITIONALLY OPTIONAL. X percent offset to sample from left edge of cells, expressed as decimal (e.g. fourteen percent would be 0.14). If omitted or provided as keyword 'DEFAULT', the called Python script uses a default. If you use $5 (read on), you will want to specify this (and not use DEFAULT), or this script will pass $5 as $4 to the Python script.
 # - $5 OPTIONAL. Y percent offset to sample from top edge of cells, also expressed as decimal. If omitted the called Python script uses a default.
-# - $6 OPTIONAL. Anything, for example the word WHEALHALM, which will cause this script to sample colors from all images in all subdirectories (under the directory you run this script from) also. Respective resultant palettes will be in the same directory as sampled images, alongside them.
+# - $6 OPTIONAL. Anything, for example the word WHEALHALM, which will cause this script to sample colors from all images in all subdirectories (under the directory you run this script from) also. Respective resultant palettes will be in the same directory as sampled images, alongside them. If you want to use $7 (read on) but not this, pass NULL for this.
+# - $7 OPTIONAL. I KNOW! Too many options! Any string, which this script will write after the first color in the rendered hexplt file as a comment. If you need to include spaces in this string, surround it with quote marks. Again, if you want to use this ($7) but not $6, pass the word NULL for $6.
 # --Whew!
 # Example command that will operate on every png file in the current directory, sampling 16 columns for each, with an automatically calculated number of rows to :
 #    get_color_sample_grids_sRGB.sh png 16
@@ -29,6 +30,7 @@
 # -- Double whew!
 # NOTES
 # - This script will not clobber any pre-existing created palette file that matches (has the same base name as) any source image of type $1. It will print a notice that the target already exists.
+# - This script has commented code that reformats the default output hexplt files to arrange colors in columns by number of sampled columns. In my opinion this helps with examining palettes sampled from images in a text editor. This commented functionality is redundant however; the python script this calls does that already (I coded the latter after I realized it better belongs there, after I coded the former). Search the later code for comments that say "OPTIONAL" to see that.
 
 # CODE
 # -- START PARAMETER CHECKING AND SETTINGS SETUP THEREFROM
@@ -46,7 +48,12 @@ if [ ! "$5" ] || [ "$5" == "DEFAULT" ]; then :; else yPercentOffset=$5; fi
 
 # By default set `find` switch to search only the current directory; overide to all (not specifed; defaults to all subdirectories) if $6 is provided:
 subDirSearchParam='-maxdepth 1'
-if [ "$6" ]; then subDirSearchParam=''; fi
+if [ "$6" ] && [ "$6" != "NULL" ]; then subDirSearchParam=''; fi
+
+# Default blank comment string (script will not use if empty); may override by passing a comment string as parameter $7:
+hexpltCommentString=""
+if [ "$7" ]; then hexpltCommentString="$7"; fi
+
 # -- END START PARAMETER CHECKING AND SETTINGS SETUP THEREFROM
 
 if [ "$searchFileType" != "ALL" ]
@@ -86,6 +93,22 @@ do
 		echo "Attempting to sample from $fileName at $sampleNcols sample columns and $sampleNrows rows . ."
 		# passing along xPercentOffset yPercentOffset with everything else:
 		python $fullPathToScript $fileName $sampleNcols $sampleNrows $xPercentOffset $yPercentOffset > $renderTarget
+
+		# OPTIONAL HEXPLT REFORMATTING  -- reworked source Python script with just a few bytes to accomplish the same! :facepalm:
+		# Reformat lines to $sampleNcols per line; re: https://docstore.mik.ua/orelly/unix3/upt/ch21_15.htm
+		# backup IFS and set it to "" else the variable assignment from command substitution eliminates intended newlines on print:
+#		OIFS="$IFS"
+#		IFS=$''
+		# tr -d: windows newlines interfere with intended formatting here otherwise! :
+#		reformatted=$(pr -l1 -3 --across --separator=' ' $renderTarget | tr -d '\15\32')
+#		echo $reformatted > $renderTarget
+#		IFS="$OIFS"
+		# COMMENT PARAMETER USE
+		# paste comment at end of first line of file if parameter to script provided for that (if $hexpltCommentString is non-empty) :
+		if [ "$hexpltCommentString" ]
+		then
+			sed -i -e "1s/$/ $hexpltCommentString/" $renderTarget
+		fi
 	else
 		echo TARGET EXISTS ALREADY for $renderTarget\; will not clobber. Skip.
 	fi
