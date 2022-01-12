@@ -132,7 +132,7 @@ then
 	# $rowsSyntaxSearchResult will be blank if that search failed; use that fact:
 	if [ "$rowsSyntaxSearchResult" != "" ]
 	then
-		tilesAcross=$(sed 's/.*rows[^0-9]\{0,\}\([0-9]\{1,\}\).*/\1/g' <<< $rowsSyntaxSearchResult)
+		tilesDown=$(sed 's/.*rows[^0-9]\{0,\}\([0-9]\{1,\}\).*/\1/g' <<< $rowsSyntaxSearchResult)
 	# OTHERWISE do math to figure out a hopefully good number of tiles accross:
 	else
 		sqrtOfColorCount=$(echo "sqrt ($numColors)" | bc)
