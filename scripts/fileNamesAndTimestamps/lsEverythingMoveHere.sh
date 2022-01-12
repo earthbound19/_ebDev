@@ -31,6 +31,7 @@
 # NOTES
 # - If you specify a file name for $1 (and don't pass 'NULL'), but also pass parameter $2, parameter $1 is ignored (the file list is not used). This is because that would lead to duplicate work (it would recurse through subdirectories and repeatedly move all files from the file list, and on all subsequent directory changes it would find and move all those files again).
 # - Any list of file names you provide via $1 must contain file names without paths. Paths may screw things up and lead to attempts to result files you don't expect!
+# - This skips all moves of any files named README.md and README.txt.
 
 
 # CODE
@@ -88,7 +89,7 @@ else
 		do
 			# the -a-d switch restricts results to files only (no folders) ; the tr statement deletes windows-style newlines, which throw win-ported GNU tools out of whack:
 			# just in case we can end up with a blank array item? -- which would cause es to return ALL FILES ON THE COMPUTER -- AND LEAD TO TRYING TO MOVE EVERYTHING HERE:
-			if [ $fileName != "" ]
+			if [ $fileName != "" ] && [ $fileName != "README.md" ] && [ $fileName != "README.txt" ]
 			then
 				everythingFound=( $(es -a-d $fileName | tr -d '\15\32') )
 				for found in ${everythingFound[@]}
