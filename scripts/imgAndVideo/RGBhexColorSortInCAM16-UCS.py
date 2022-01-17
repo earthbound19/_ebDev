@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Variant of RGBhexColorSortInCIECAM02.py which uses the color-science library and CAM16 color model for color sorting. In my tests, RGBhexColorSortInCIECAM02.py (which uses the colorspacious library) does better for hue matching independent of brightness; this (which uses colour-science) does better for matching first brightness/saturation, then hue. Both give good results. To my eye colorspacious is better overall (maybe I reckon hue before brightness/saturation).
+# Variant of RGBhexColorSortInCIECAM02.py which uses the color-science library and CAM16 color model for color sorting. In my tests, RGBhexColorSortInCIECAM02.py (which uses the colorspacious library) does better for hue matching independent of brightness; this (which uses colour-science) does better for matching first brightness/saturation, then hue. Both give good results. To my eye colorspacious is better overall (maybe I reckon hue before brightness/saturation). HOWEVER, rgbHexColorSortInOkLab.js is blazing fast compared to both of them, and may produce better results than both. It's a subjective call.
 
 # DEPENDENCIES
 # Python 3, various python packages (see import list at start of code) which you may install with easy_install or pip; NOTE that the colour import is actually from the colour-science package; you must install colour-science.

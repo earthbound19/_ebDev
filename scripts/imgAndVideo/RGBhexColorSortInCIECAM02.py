@@ -2,7 +2,7 @@
 # Takes a list of RGB colors expressed in hex (one per line) and sorts them 
 # using an advanced color appearance model: CIECAM02.
 # If you're sorting very different colors, YOU MAY WISH to use
-# RGBhexColorSortinCAM16-UCS.py instead (see). This uses the colorspacious library; that uses colour-science.
+# RGBhexColorSortinCAM16-UCS.py instead (see). This uses the colorspacious library; that uses colour-science. HOWEVER, rgbHexColorSortInOkLab.js is blazing fast compared to both of them, and may produce better results than both. It's a subjective call.
 
 # DEPENDENCIES
 # Python (probably Python 3.5), various python packages (see import list at start of code) which you may install with easy_install or pip.
