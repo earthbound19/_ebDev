@@ -163,17 +163,15 @@ while len(sorted_colors) < len(colors_list):
     # then put the color pair in that subsection list in the sorted list, with the search color (the
     # "search_color" variable here in this code) first; the search color may
     # be at either [0][1] or [0][2], so figure out which. Then add color and the
-    # other color: if len(deltaEs_subsection) > 1:
+    # other color:
     if search_color == deltaEs_subsection[0][1]:
         matched_color = deltaEs_subsection[0][2]
         sorted_colors.append(matched_color)
-#        print('added ', matched_color, 'for', search_color)
-        search_color = matched_color
     else:
         matched_color = deltaEs_subsection[0][1]
         sorted_colors.append(matched_color)
-#        print('added ', matched_color, 'for', search_color)
-        search_color = matched_color
+#   print('added ', matched_color, 'for', search_color)
+    search_color = matched_color
     # remove the subsection from pair_deltaEs, to avoid future matches against current search_color
     # after search_color changes in the next loop:
     for element_two in deltaEs_subsection:
