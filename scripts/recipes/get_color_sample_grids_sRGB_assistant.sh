@@ -12,8 +12,8 @@
 
 
 # CODE
-xSampleOffset=0.14
-ySampleOffset=0.14
+xSampleOffset=0.165
+ySampleOffset=0.165
 
 allImageFileNames=( $(printAllIMGfileNames.sh) )
 for imageFileName in ${allImageFileNames[@]}
@@ -40,8 +40,8 @@ do
 	# Extract columns and rows from directory names! :
 	echo --
 	echo Directory name is $directory.
-	cols=$(sed 's/\([0-9]\{1,\}\).*/\1/g' <<< $directory)
-	echo Number of columns from directory name is $cols.
+	columns=$(sed 's/\([0-9]\{1,\}\).*/\1/g' <<< $directory)
+	echo Number of columns from directory name is $columns.
 	rows=$(sed 's/\([0-9]\{1,\}\).*\([0-9]\{1,\}\)/\2/g' <<< $directory)
 	echo Number of rows from directory name is $rows.
 	# USE THAT INFO to get color samples! :
@@ -50,10 +50,10 @@ do
 	# change to that directory:
 	cd $directory
 	# command that will get color samples for every image in that (this) directory:
-	get_color_sample_grids_sRGB.sh ALL $cols $rows $xSampleOffset $ySampleOffset
-	popd 1>/dev/null
+	get_color_sample_grids_sRGB.sh ALL $columns $rows $xSampleOffset $ySampleOffset
 	# OPTIONAL hard coded render of resultant palettes; comment out if you don't want to do that from this script:
 	renderAllHexPalettes.sh
+	popd 1>/dev/null
 done
 
 echo "DONE sampling colors from all images in all subdirectories. See resultant .hexplt format files in subdirectories."
