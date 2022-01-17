@@ -6,7 +6,7 @@
 // process.argv[2] <./path_to_image_to_process.png>
 // process.argv[3] <number of colors to extract for palette>.
 // For example, substituting /path/to/this with the actual path to this script on your system:
-//    node /path/to/this/color-thief-jimp-pallete.js input.png 12
+//    node /path/to/this/color-thief-jimp-palette.js input.png 12
 
 // TO DO
 // - EXAMINE other means proffered yon: http://stackoverflow.com/questions/26889358/generate-color-palette-from-image-with-imagemagick
