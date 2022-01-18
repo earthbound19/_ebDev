@@ -5,9 +5,9 @@
 # Run without any parameter:
 #    printAllVideoFileNames.sh
 # To use this from another script to create an array from the output, do this:
-#    allIMGfileNamesArray=($(printAllIMGfileNames.sh))
+#    allVideoFileNamesArray=($(printAllVideoFileNames.sh))
 # -- you may then iterate through it like this:
-#    for element in ${allIMGfileNamesArray[@]}; do <something with $element>; done
+#    for element in ${allVideoFileNamesArray[@]}; do <something with $element>; done
 # By default, the script only prints files in the current directory, but if you pass any parameter to the script (for example the word 'BROGNALF'), it will also (find and) print image file names from subdirectories:
 #    printAllVideoFileNames.sh BROGNALF
 # NOTE
@@ -88,6 +88,6 @@ do
 done
 
 # I'm only getting this to work in a temp script that I create, write the command to, executed and then delete. By itself with whatever escaping I find, or in a variable expanded to a command, it breaks; CHORFL is just to meet a requirement of starting the list withuot -o:
-echo "find ./ $maxdepthParameter -type f \( -iname \*.CHORFL $typesParam \) -printf \"%P\n\"" > tmpScript_bNTGndH63.sh
-./tmpScript_bNTGndH63.sh
-rm ./tmpScript_bNTGndH63.sh
+echo "find ./ $maxdepthParameter -type f \( -iname \*.CHORFL $typesParam \) -printf \"%P\n\"" > tmpScript_SRNdxAqJt.sh
+./tmpScript_SRNdxAqJt.sh
+rm ./tmpScript_SRNdxAqJt.sh
