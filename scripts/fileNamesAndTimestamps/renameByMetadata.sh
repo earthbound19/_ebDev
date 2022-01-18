@@ -1,5 +1,8 @@
 # DESCRIPTION
-# Renames image files and .mov and .mp4 files after dateTimeOriginal and createDate metadata, respectively. As this is an irreversible process (unless you keep backups), it asks you to enter a password (which it presents to you) to continue.
+# Renames many image, sound and video files (of many supported types, and in the current directory) after dateTimeOriginal and createDate metadata. As this is an irreversible process (unless you keep backups), it asks you to enter a password, which it presents to you, to continue.
+
+# DEPENDENCIES
+# ExifTool, and `printAllVideoFileNames.sh` and `printAllSoundFileNames.sh` from _ebDev repository.
 
 # USAGE
 # Run from a directory with media files you wish to so rename, e.g.:
@@ -29,7 +32,7 @@
 if [ "$1" != "NORTHERP" ]
 then
 	echo ""
-	echo "WARNING: THIS SCRIPT PERMANENTLY RENAMES as many files as it can in the current directory, for many image types and all .mov and .mp4 video files. It renames them after what creation metadata it can find. If this is what you want to do, type NORTHERP and then press <enter> (or <return>)."
+	echo "WARNING: THIS SCRIPT PERMANENTLY RENAMES as many files as it can in the current directory, for many image types and all .m4a, .mov and .mp4 video files. It renames them after what creation metadata it can find. If this is what you want to do, type NORTHERP and then press <enter> (or <return>)."
 	read -p "TYPE HERE: " SILLYWORD
 
 	if ! [ "$SILLYWORD" == "NORTHERP" ]
@@ -44,10 +47,19 @@ fi
 
 # renames all image formats in current directory which exiftool decides to:
 exiftool -v -overwrite_original '-Filename<${dateTimeOriginal}${subsecTimeOriginal;$_.=0 x(3-length)}.%e' -d "%Y_%m_%d__%H_%M_%S" .
-# renames all .mov files in current directory:
-exiftool -v -overwrite_original '-Filename<${createDate}.%e' -d "%Y_%m_%d__%H_%M_%S" *.mov
-# renames all .m4v files in current directory:
-exiftool -v -overwrite_original '-Filename<${createDate}.%e' -d "%Y_%m_%d__%H_%M_%S" *.mp4
+# renames many video format files in current directory:
+allVideoFileNames=($(printAllVideoFileNames.sh))
+for fileName in ${allVideoFileNames[@]}
+do
+	exiftool -v -overwrite_original '-Filename<${createDate}.%e' -d "%Y_%m_%d__%H_%M_%S" $fileName
+done
+# renames many sound format files in the current directory:
+allSoundFileNames=($(printAllSoundFileNames.sh))
+for fileName in ${allSoundFileNames[@]}
+do
+	exiftool -v -overwrite_original '-Filename<${createDate}.%e' -d "%Y_%m_%d__%H_%M_%S" $fileName
+done
+
 
 # OPTIONAL:
 # It's important that these next commands are run last:
