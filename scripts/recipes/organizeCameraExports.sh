@@ -25,6 +25,8 @@ PNG
 HEIC
 MP4
 GIF
+M4A
+3GP
 )
 
 lowerCaseExtensions=()
