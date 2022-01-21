@@ -12,8 +12,8 @@
 
 
 # CODE
-xSampleOffset=0.165
-ySampleOffset=0.165
+xSampleOffset=0.149
+ySampleOffset=0.179
 
 allImageFileNames=( $(printAllIMGfileNames.sh) )
 for imageFileName in ${allImageFileNames[@]}
@@ -51,7 +51,7 @@ do
 	cd $directory
 	# command that will get color samples for every image in that (this) directory:
 	get_color_sample_grids_sRGB.sh ALL $columns $rows $xSampleOffset $ySampleOffset
-	# OPTIONAL hard coded render of resultant palettes; comment out if you don't want to do that from this script:
+	# OPTIONAL but hard coded render of resultant palettes; comment out if you don't want to do that from this script:
 	renderAllHexPalettes.sh
 	popd 1>/dev/null
 done
