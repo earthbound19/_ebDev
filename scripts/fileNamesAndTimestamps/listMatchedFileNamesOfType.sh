@@ -55,9 +55,7 @@ for file in ${srcFileTypesArray[@]}
 do
 	if [ "$mode" == "mode=1" ]
 	then
-		echo "pairs for $file, itself excluded:"
 		listMatchedFileNames.sh $file
-		echo ""
 	fi
 	if [ "$mode" == "mode=2" ]
 	then
