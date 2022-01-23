@@ -2,7 +2,7 @@
 # Renames many image, sound and video files (of many supported types, and in the current directory) after dateTimeOriginal and createDate metadata. As this is an irreversible process (unless you keep backups), it asks you to enter a password, which it presents to you, to continue.
 
 # DEPENDENCIES
-# ExifTool, and `printAllVideoFileNames.sh` and `printAllSoundFileNames.sh` from _ebDev repository.
+# ExifTool
 
 # USAGE
 # Run from a directory with media files you wish to so rename, e.g.:
@@ -46,19 +46,23 @@ then
 fi
 
 # renames all image formats in current directory which exiftool decides to:
-exiftool -v -overwrite_original '-Filename<${dateTimeOriginal}${subsecTimeOriginal;$_.=0 x(3-length)}.%e' -d "%Y_%m_%d__%H_%M_%S" .
+# q. on DateTimeOriginal vs. CreateDate (I had previously used the latter) answered here: DateTimeOriginal;
+# the %%-c does some magic that renames with a -<number> in case of duplicate file names. Can't seem to get it to format that way with anything other than a dash:
+exiftool -v -overwrite_original '-Filename<DateTimeOriginal' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" .
+
+# BONEYARD: APPARENTLY UNECESSARY CODE, which may have been developed when the above was in a broken state (it's fixed now) and so I thought it just wasn't working for video and audio files, but I was just using unsupported (?) tag names:
 # renames many video format files in current directory:
-allVideoFileNames=($(printAllVideoFileNames.sh))
-for fileName in ${allVideoFileNames[@]}
-do
-	exiftool -v -overwrite_original '-Filename<${createDate}.%e' -d "%Y_%m_%d__%H_%M_%S" $fileName
-done
+#allVideoFileNames=($(printAllVideoFileNames.sh))
+#for fileName in ${allVideoFileNames[@]}
+#do
+#	exiftool -v -overwrite_original '-Filename<DateTimeOriginal' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" $fileName
+#done
 # renames many sound format files in the current directory:
-allSoundFileNames=($(printAllSoundFileNames.sh))
-for fileName in ${allSoundFileNames[@]}
-do
-	exiftool -v -overwrite_original '-Filename<${createDate}.%e' -d "%Y_%m_%d__%H_%M_%S" $fileName
-done
+#allSoundFileNames=($(printAllSoundFileNames.sh))
+#for fileName in ${allSoundFileNames[@]}
+#do
+#	exiftool -v -overwrite_original '-Filename<DateTimeOriginal' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" $fileName
+#done
 
 
 # OPTIONAL:
