@@ -21,7 +21,7 @@
 # CODE
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source audio file name) passed to script. Exit."; exit 1; else sourceAudioFile=$1; fi
 if [ ! "$2" ]; then outputVideoDimensions='1280x720'; else outputVideoDimensions=$2; fi
-if [ ! "$3" ]; then stillImageColor=#180028; else stillImageColor=$3; fi
+if [ ! "$3" ]; then stillImageColor='#180028'; else stillImageColor=$3; fi
 
 # -pix_fmt yuv420p is for silly platforms that require that:
 pixelFormat="-pix_fmt yuv420p"
