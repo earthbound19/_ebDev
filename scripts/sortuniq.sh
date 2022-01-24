@@ -15,10 +15,11 @@
 # CODE
 lines=($(<$1))
 # Saved by a genius yonder: https://stackoverflow.com/a/11789688/1397555
+OIFS="$IFS"
 IFS=$'\n'
 lines=($(sort <<<"${lines[*]}"))
 lines=($(uniq <<<"${lines[*]}"))
-unset IFS
+IFS="$OIFS"
 
 if [ ! "$2" ]
 then
