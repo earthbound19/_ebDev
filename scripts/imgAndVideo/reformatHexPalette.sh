@@ -55,18 +55,31 @@ printf "" > $srcHexplt
 # write reformatted contents back to it:
 echo Writing reformatted .hexplt file . . .
 colorPrintCounter=0
+rowsArray=()
+OIFS="$IFS"
+IFS=$'\n'
 for r in $(seq 1 $rows)
 do
+	rowSTR=""
 	for q in $(seq 1 $cols)
-		do
-			printf "${colorsArray[$colorPrintCounter]} " >> $srcHexplt
-			colorPrintCounter=$((colorPrintCounter + 1))
-		done
+	do
+		rowSTR="$rowSTR ${colorsArray[$colorPrintCounter]}"
+		colorPrintCounter=$((colorPrintCounter + 1))
+	done
+	
 	if [[ $colorPrintCounter == $cols ]]
 	then
-		printf "  columns: $cols rows: $rows" >> $srcHexplt
+		rowSTR="$rowSTR  columns: $cols rows: $rows"
 	fi
-	printf "\n" >> $srcHexplt
+	# trim resultant leading space off string:
+	rowSTR="${rowSTR:1}"
+	rowsArray+=($rowSTR)
 done
 
-echo DONE reformatting $srcHexplt.
+# either of these print options works; uncomment one (I'm guessing the first is faster) :
+printf "${rowsArray[*]}" > $srcHexplt
+# printf '%s\n' "${rowsArray[@]}" > $srcHexplts
+
+IFS="$OIFS"
+
+printf "\nDONE reformatting $srcHexplt."
