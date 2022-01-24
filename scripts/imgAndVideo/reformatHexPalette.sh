@@ -50,10 +50,8 @@ fi
 # END PARAMETER PARSING AND GLOBALS SETUP
 
 # MAIN WORK
-# wipe source hexplt to prep for rewriting to it:
-printf "" > $srcHexplt
-# write reformatted contents back to it:
-echo Writing reformatted .hexplt file . . .
+echo Reformatting palette in memory . . .
+
 colorPrintCounter=0
 rowsArray=()
 OIFS="$IFS"
@@ -75,6 +73,11 @@ do
 	rowSTR="${rowSTR:1}"
 	rowsArray+=($rowSTR)
 done
+
+# wipe source hexplt to prep for rewriting to it:
+printf "" > $srcHexplt
+# write reformatted contents back to it:
+echo Writing reformatted .hexplt file . . .
 
 # either of these print options works; uncomment one (I'm guessing the first is faster) :
 printf "${rowsArray[*]}" > $srcHexplt
