@@ -6,7 +6,7 @@
 
 # USAGE
 # Run without any parameters:
-#    groupAllHexpltsAndSortInOkLab.sh
+#    joinAllHexpltsAndSortInOkLab.sh
 # Result palette name will be named after the current directory plus random characters, and printed for your information after operations are complete.
 
 
