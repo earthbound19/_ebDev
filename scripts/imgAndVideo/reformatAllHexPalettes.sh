@@ -28,4 +28,4 @@ do
 	reformatHexPalette.sh $hexpltFileName $cols $rows
 done
 
-echo "DONE reformatting all .hexplt format files in the current directory."
+echo "DONE reformatting all .hexplt format files in the current directory.\n"
