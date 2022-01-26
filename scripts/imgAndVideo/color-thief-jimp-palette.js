@@ -23,5 +23,7 @@ Jimp.read('./' + process.argv[2], (err, sourceImage) => {
     // console.log('dominant color found is [HEX]:\n' + dominantColor);
   var palette = ColorThief.getPaletteHex(sourceImage, process.argv[3]);
     // console.log('color palette extracted is [HEX]:');
-  console.log(palette);
+  for (const idx in palette) {
+    console.log('#' + palette[idx]);
+  }
 });
