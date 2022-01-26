@@ -9,9 +9,10 @@
 # - $1 input image file name
 # - $2 width of cut tiles
 # - $3 height of cut tiles
-# - Use this wolframalpha.com query to find a common factor (divisor) for square tiles (adjust the numbers) : http://www.wolframalpha.com/input/?i=common+factors+of+6400+and+3600
 # Example that cuts input.png to 640x480 slices:
-#    IMgridSlice.sh input.png 640 480
+#    imageGridSlice.sh input.png 640 480
+# NOTES
+# - Use this wolframalpha.com query to find a common factor (divisor) for square tiles (adjust the numbers) : http://www.wolframalpha.com/input/?i=common+factors+of+6400+and+3600
 
 
 # CODE
