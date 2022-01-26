@@ -49,10 +49,15 @@ catch(err) {
 const regexp = /#[a-fA-F0-9]{6}/g;
 const searchResults = [...inputFileContent.matchAll(regexp)];
 // init array of colors from file + regex search result:
-var colorsArray = [];
+var originalColorsArray = [];
 for (const element of searchResults) {
-  colorsArray.push(element[0]);
+  originalColorsArray.push(element[0]);
 }
+
+// remove duplicates from original list, but maintain order (keep all unique in the same order), re: https://stackoverflow.com/a/15868720/1397555
+originalColorsArray = [ ... new Set(originalColorsArray) ];
+const deduplicatedOriginalColorsArrayLength = originalColorsArray.length
+
 // get a color space converter function varaible noun noun noun noun (okLCHconverter):
 let okLCHconverter = culori.converter('oklch');
 
@@ -67,35 +72,35 @@ okLCHdistance = culori.differenceEuclidean(mode = 'oklch', weights = [1, 1, 1]);
 
 // init final sort list (as empty):
 finalSortedList = [];
-// Add first item to final list, as the first item will be the first in the original list; colorsArray[0].sRGBhex and searchResults[0][0] SHOULD both be the first color in the list:
-finalSortedList.push(colorsArray[0]);
+// Add first item to final list, as the first item will be the first in the original list; originalColorsArray[0].sRGBhex and searchResults[0][0] SHOULD both be the first color in the list:
+finalSortedList.push(originalColorsArray[0]);
 
-while (finalSortedList.length < searchResults.length) {
-	var sRGB_hex_A = colorsArray[0];
+while (finalSortedList.length < deduplicatedOriginalColorsArrayLength) {
+	var sRGB_hex_A = originalColorsArray[0];
 	var sRGB_hex_B;
-	var okLCHval_A = okLCHconverter(colorsArray[0]);
+	var okLCHval_A = okLCHconverter(originalColorsArray[0]);
 	var okLCHval_B;
 	var okDist = 58848;								// way beyond any distance that will be found.
 	var lowestFoundDistanceForThisPair = 58849;		// "
 	var nearestFoundColorHEX;
 	// figuring out this i = 1 (not zero) was the final thing that finished this script:
-	for (var i = 1; i < colorsArray.length; i++) {
-		sRGB_hex_B = colorsArray[i]
-		okLCHval_B = okLCHconverter(colorsArray[i]);
+	for (var i = 1; i < originalColorsArray.length; i++) {
+		sRGB_hex_B = originalColorsArray[i]
+		okLCHval_B = okLCHconverter(originalColorsArray[i]);
 		okDist = okLCHdistance(okLCHval_A, okLCHval_B);
 		if (okDist < lowestFoundDistanceForThisPair) {
 			lowestFoundDistanceForThisPair = okDist;
-			nearestFoundColorHEX = colorsArray[i];
+			nearestFoundColorHEX = originalColorsArray[i];
 		}
 	}
 	finalSortedList.push(nearestFoundColorHEX);
-	// recreate colorsArray with sRGB_hex_A removed and nearestFoundColorHEX moved to start:
+	// recreate originalColorsArray with sRGB_hex_A removed and nearestFoundColorHEX moved to start:
 	// remove sRGB_hex_A; re this horror: https://stackoverflow.com/a/20690490/1397555 :
-	colorsArray = colorsArray.filter(item => item !== sRGB_hex_A);
+	originalColorsArray = originalColorsArray.filter(item => item !== sRGB_hex_A);
 	// remove nearestFoundColorHEX:
-	colorsArray = colorsArray.filter(item => item !== nearestFoundColorHEX);
+	originalColorsArray = originalColorsArray.filter(item => item !== nearestFoundColorHEX);
 	// add nearestFoundColorHEX to start:
-	colorsArray.unshift(nearestFoundColorHEX);
+	originalColorsArray.unshift(nearestFoundColorHEX);
 }
 
 // print final perceptually sorted color list:
