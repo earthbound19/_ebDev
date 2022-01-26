@@ -78,7 +78,7 @@ fullPathToScript=$(getFullPathToFile.sh get_color_sample_grid_sRGB.py)
 
 for fileName in ${fileNamesArray[@]}
 do
-	renderTarget=$(echo ${fileName%.*})_palette.hexplt
+	renderTarget=${fileName%.*}_palette.hexplt
 	if [ ! -f $renderTarget ]
 	then
 		# get image width and height into variables:
@@ -93,6 +93,7 @@ do
 		echo "Attempting to sample from $fileName at $sampleNcols sample columns and $sampleNrows rows . ."
 		# passing along xPercentOffset yPercentOffset with everything else:
 		python $fullPathToScript $fileName $sampleNcols $sampleNrows $xPercentOffset $yPercentOffset > $renderTarget
+		echo ""
 
 		# OPTIONAL HEXPLT REFORMATTING  -- reworked source Python script with just a few bytes to accomplish the same! :facepalm:
 		# Reformat lines to $sampleNcols per line; re: https://docstore.mik.ua/orelly/unix3/upt/ch21_15.htm
