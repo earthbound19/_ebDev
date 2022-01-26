@@ -49,13 +49,12 @@ catch(err) {
   process.exit(1);
 }
 
-// print warning and exit of no modify parameters provided:
+// print warning and exit if no modify parameters provided:
 if ( (! options.lightness && ! options.chroma && ! options.hue) ) {
 	console.log("WARNING: no -l --lightness, -c --chroma, or -h --hue option(s) passed to script. Output would be identical to input; no point in running the script without those options. Script will exit.\n!========\n"); process.exit(2);
 	}
 
 const regexp = /#[a-fA-F0-9]{6}/g;
-// const str = '#f2aece floarif #002139 bepfj #4a2e3f';
 const searchResults = [...inputFileContent.matchAll(regexp)];
 // resulting structure is: searchResults[arrayIndex][hexStringIWant]
 var RGBhexColors = [];
