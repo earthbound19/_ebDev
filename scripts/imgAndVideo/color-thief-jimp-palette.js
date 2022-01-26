@@ -8,13 +8,9 @@
 // For example, substituting /path/to/this with the actual path to this script on your system:
 //    node /path/to/this/color-thief-jimp-palette.js input.png 12
 
-// TO DO
-// - EXAMINE other means proffered yon: http://stackoverflow.com/questions/26889358/generate-color-palette-from-image-with-imagemagick
-// -- a working test command adapted from yon:
-//    magick convert ./tsfVt.jpg -format %c -colorspace LAB -colors 9 histogram:info:- | sort > wut.txt
-// - cross-compile this to an exe targeting any platform? roll all dependencies into one repo I control?
-var ColorThief = require('color-thief-jimp.js');
 
+// CODE
+var ColorThief = require('color-thief-jimp');
 var Jimp = require('jimp');
 
 Jimp.read('./' + process.argv[2], (err, sourceImage) => {
