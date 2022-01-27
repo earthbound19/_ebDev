@@ -63,9 +63,10 @@ for x in *.jpeg; do mv -i "$x" "${x%.jpeg}.jpg"; done
 # OPTIONAL: uncomment if you want to lossleslly recontain all .mov files to .mp4 -- but be warned that this will lose metadata if you destroy the original mov files (metadata is not copied)! :
 # allVideo2mp4Lossless.sh
 
-for lowerCaseExt in ${lowerCaseExtensions[@]}
-do
-	toTypeFolder.sh $lowerCaseExt
-done
+# OPTIONAL: move all file types into subfolders named after that file type; uncomment the next four lines of code:
+# for lowerCaseExt in ${lowerCaseExtensions[@]}
+# do
+	# toTypeFolder.sh $lowerCaseExt
+# done
 
 echo "DONE."
