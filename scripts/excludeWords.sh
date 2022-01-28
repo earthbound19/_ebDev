@@ -6,11 +6,11 @@
 # - $1 text file name of filter words (words you do not want printed)
 # - $2 text file name to filter words out of (words you want printed minus filter words).
 # For example:
-#    excludeWords.sh filterWords.txt fileToFilterWordsFrom.txt
+#    filterWords.sh filterWords.txt fileToFilterWordsFrom.txt
 # NOTES
 # - The source text files are expected to have one word per line. This will not work the way you might want with paragraphs.
 # - To capture results to a new file, use a redirect operator, like this:
-#    excludeWords.sh filterWords.txt fileToFilterWordsFrom.txt > filteredWords.txt
+#    filterWords.sh filterWords.txt fileToFilterWordsFrom.txt > filteredWords.txt
 
 
 # CODE
