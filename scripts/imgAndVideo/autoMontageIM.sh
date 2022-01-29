@@ -122,7 +122,7 @@ echo Will pad final montage from $originalIMGwidth to $paddedImageW and $origina
 # Construct final file name first:
 thisPath=$(pwd)
 thisFolderName=$(basename $thisPath)
-gm convert ___oooot_n4yR24PG.png -gravity center -background '#363636' -extent "$paddedImageW"x"$paddedImageH" _montage__"$thisFolderName".png
+gm convert ___oooot_n4yR24PG.png -gravity center -background '#4f4f4f' -extent "$paddedImageW"x"$paddedImageH" _montage__"$thisFolderName".png
 # Remove temp image file:
 rm ___oooot_n4yR24PG.png
 
