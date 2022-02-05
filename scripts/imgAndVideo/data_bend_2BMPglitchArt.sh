@@ -13,7 +13,7 @@
 # CODE
 # DETAILS
 # Does a square root calculation (rounded) from the byte size of the data to determine the bmp X and Y dimensions which this creates a header from.
-if [ ! "$1" ]; then echo "No parameter \$1 (source file to bend). Exit."; exit; else sourceFile=$1 fi;
+if [ ! "$1" ]; then echo "No parameter \$1 (source file to bend). Exit."; exit 1; else sourceFile=$1; fi
 
 ppmDestFileName=${1%.*}_asBMP.bmp
 
