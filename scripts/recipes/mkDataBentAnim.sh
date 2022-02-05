@@ -26,7 +26,16 @@ if [ -z "$1" ]; then echo No parameter one \(input files extension e.g. txt\)\. 
 
 pushd . >/dev/null
 
-all_data_bend_type2PPMglitchArt.sh $fileExt
+# get array of file names, of type $fileExt, listed by oldest file first:
+filesArray=($(ls --sort=time --reverse *."$fileExt" | tr '\0' '\n'))
+
+# iterate over that array and make data bent ppms of each file:
+for file in ${filesArray[@]}
+do
+	data_bend_2PPMglitchArt00padded.sh $file
+done
+
+# do the things with the resulting art files ot make an animation:
 mkdir ppm
 mv *.ppm ./ppm
 cd ppm
