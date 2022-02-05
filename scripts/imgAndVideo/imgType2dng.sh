@@ -1,9 +1,11 @@
 # DESCRIPTION
-# Calls img2dng for every file of type $1 in the current directory.
+# Calls img2dng.sh for every file of type $1 in the current directory. But that script is DEPRECATED; the functional code of it is commented out and you'll accomplish nothing by calling that script from this one unless you uncomment the functional code in that one.
 
 # USAGE
-# Call this script with one parameter $1, being a file type in the directory from which you run this script--a file type for which all thing whom what this yes you wish to convert to Adobe digital negatives format (.dng), e.g.:
+# Call with on parameter, which is:
+# - $1 file extension for which you wish to pass every file of that type in this directory to img2dng.sh. For example:
 #    imgType2dng.sh CR2
+# -- will cause this script to call img2dng.sh once for every file of type .CR2 in the current directory.
 
 
 # CODE

@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Converts file $1 to Adobe DNG (digital negative), but don't use DNG. At best you have to keep the original raw image around anyway (in case the DNG toolchain becomes outdated), and DNG has not seen wide adoption.
+# DEPRECATED. Converts file $1 to Adobe DNG (digital negative), but don't use DNG. At best you have to keep the original raw image around anyway (in case the DNG toolchain becomes outdated), and DNG has not seen wide adoption.
 
 # DEPENDENCIES
 # AdobeDNGConverter.exe in your PATH.
@@ -12,8 +12,8 @@
 # CODE
 # Command line options and use of program found here: http://cpicture.thecloudsite.net/blog/content/public/upload/convert-Raw-to-TIFF.ps1.txt 08/20/2015 06:06:35 PM -RAH
 # NOTE if you add the -e switch it will embed the original raw (/CR2 etc) file in the dng.
-echo "I recommend against using DNG files because they have mixed support among software vendors and manufacturers . . ."
-AdobeDNGConverter.exe -c -fl -cr7.1 $1
+echo "I recommend against using DNG files because they have mixed support among software vendors and manufacturers. This script is therefore DEPRECATED. If you want to convert to dng, you'll need to open the source of this script and uncomment the line of code after this echo statement."
+# AdobeDNGConverter.exe -c -fl -cr7.1 $1
 
 
 # DEVELOPER NOTES
