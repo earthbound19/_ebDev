@@ -1,15 +1,14 @@
 # DESCRIPTION
-# Creates a .ppm (plain text file bitmap format) image which is W x H pixels of randomly generated colors OR colors randomly selected from a list. Generates Z such images. See USAGE for script parameters and examples.
+# Creates one or more .ppm (plain text file bitmap format) images which is W x H pixels of randomly generated colors OR colors randomly selected from a .hexplt format list of colors. Generates $3 such images. See USAGE for script parameters and examples.
 
 # USAGE
-# BECAUSE I KEEP FORGETTING: $4, $5 and $6 are actually different things.
 # Pass this script the following parameters:
 # - $1 How many pixels wide you want the random image grid to be
 # - $2 How many pixels tall ~
 # - $3 How many such random images you want to create
-# - $4 Hex color list file name to pick colors from randomly (if omitted, colors are generated randomly). May or may not result in all colors from source list showing up in final image--it depends on pseudo-random "chance."
-# - $5 any value (e.g. "foo") pick colors from list (in $4) sequentially.
-# - $6 any value (e.g. "florghulment") pick colors from list (in $4) sequentially *after sorting it randomly*.
+# - $4 .hexplt format color list file name (a list of sRGB hex color codes in format e.g. #f800fc, one color per line), to pick colors from randomly (if omitted, colors are generated randomly). May or may not result in all colors from source list showing up in final image--it depends on pseudo-random "chance."
+# - $5 any value (e.g. "foo"). Pick colors from list (in $4) sequentially.
+# - $6 any value (e.g. "florghulment"). Pick colors from list (in $4) sequentially *after sorting it randomly*.
 # NOTE that if you provide a source list of colors ($4), but numbers too small in parameters $1 and $2, it will not use all colors from the list (as it will generate tiles against only part of the list).
 # AFTER RUNNING this script you may wish to run e.g.:
 #    imgs2imgsNN.sh ppm png 4280 4280
@@ -21,6 +20,8 @@
 #    colorsGridFromRNDorList.sh 16 9 170 rainbowHexColorsByMyEye.txt
 # The same as the previous command, but reading colors from the list sequentially:
 #    colorsGridFromRNDorList.sh 16 9 170 rainbowHexColorsByMyEye.txt foo
+# NOTES
+# - $4, $5 and $6 are three different things.
 
 
 # CODE
@@ -31,7 +32,7 @@
 # - make the cols / rows parameter input sequence consistent between this and makeBWGridRandomNoise.sh, if they aren't (check).
 # - set named global values from all parameters and use the named globals to eliminate parameter confusion in coding.
 # - set default values if no $1 $2 and $3 variables passed to script.
-# - could $5 and $6 just be $5 / not $5?
+# - could $5 and $6 just be $5 / not $5? Uh, wait, isn't $6 the same as $4?
 
 numCols=$1
 numRows=$2
@@ -85,7 +86,7 @@ do
 												# colorListIterate=0
 											# fi
 						else
-							pick=`shuf -i 0-"$sizeOf_hexColorsArray" -n 1`
+							pick=$(shuf -i 0-"$sizeOf_hexColorsArray" -n 1)
 						fi
 				hex=${hexColorsArray[$pick]}
 				# If $hex is an invalid hex color (0, because I assigned from out of range of the array, or in other words we used all the colors in the list), default to gray #404040, re stdout error when this was a bug: "line 69: printf: 0x: invalid hex number" :
@@ -119,7 +120,7 @@ do
 	" > ppmheader.txt
 
 					echo Concatenating generated rows into one new .ppm file . . .
-	timestamp=`date +"%Y_%m_%d__%H_%M_%S__%N"`
+	timestamp=$(date +"%Y_%m_%d__%H_%M_%S__%N")
 	cat ppmheader.txt grid.ppm > "$numCols"x"$numRows"gridRND_"$timestamp".ppm
 	rm ppmheader.txt grid.ppm
 
