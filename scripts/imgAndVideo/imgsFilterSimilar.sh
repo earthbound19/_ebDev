@@ -34,7 +34,7 @@ do
 		threshold=$(gm compare -metric MAE $sourceIMGfileName $comparisonIMG | sed -n 's/.*Total: \([0-9\.]\{1,\}\).*/\1/p')
 		if (( $(echo "$threshold <= $differenceThreshold" |bc -l) ))
 		then
-			# echo "true for $threshold <= $differenceThreshold"
+			"echo MOVING image $comparisonIMG (within similarity threshold $threshold) to ./$rndSortSubfolderName/ . . ."
 			mv $comparisonIMG ./$rndSortSubfolderName/
 		fi
 	fi
