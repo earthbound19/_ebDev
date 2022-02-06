@@ -32,11 +32,13 @@ copyIncrementedBytesSubfolderName="$fileNameNoExt"_bytesCopies_"$rndStr"
 mkdir $copyIncrementedBytesSubfolderName
 
 # speedup (no call to printf for digit pad formattting) obtained via genius breath yon: https://stackoverflow.com/a/8789815/1397555
+countByOneIncrement=0
 for i in $(seq -f %0"$numDigitsToPadTo"g 0 $byteIncrement $byteSizeOfSourceFile)
 do
 	echo Running byte copy operation $i of $byteSizeOfSourceFile . . .
 	outfile="$copyIncrementedBytesSubfolderName""/""$fileNameNoExt"_toByte_$i.dat
-	dd bs=$byteIncrement count=$i if=$sourceFile > $outfile
+	dd bs=$byteIncrement count=$countByOneIncrement if=$sourceFile > $outfile
+	countByOneIncrement=$(($countByOneIncrement + 1))
 done
 
 echo "DONE. Files are in folder $copyIncrementedBytesSubfolderName."
