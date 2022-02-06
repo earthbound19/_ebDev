@@ -14,7 +14,7 @@
 # From a path containing so many incremental (or otherwise saved!) *.bak files, run this script with:
 # - $1 the file extension of so many files to make an animation from. Do not include a . character in the extension.
 # Example that will produce an animation from all files in the current directory that end in .bak:
-#    mkDataBentAnim.sh bak
+#    makeDataBentAnim.sh bak
 # NOTES
 # - This script names the result mp4 after the folder containing the .bak files. So, if they are in a folder named `hexplt2rgbplt_as_dataBentAnim`, the mp4 will be named `hexplt2rgbplt_as_dataBentAnim.mp4`.
 # - See gitDumpAllFileVersions.sh to get a collection of all versions of a file from any git repository's history, to work up to a data bent animation via this script.
