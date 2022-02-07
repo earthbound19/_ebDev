@@ -1,5 +1,8 @@
 # DESCRIPTION
-# Creates cropped .bmp images with white borders and a black interior (I think) from all .png images in a directory tree. Useful for prepping art for conversion to a vector format without wasted border space. NOTE: this relies on one of Fred's ImageMagick scripts, which are not freely redistributable; you'll have to download it from the source yourself at: http://www.fmwconcepts.com/ImageMagick/innercrop/index.php -- However, I use GraphicsMagick, so that all ImageMagick utilities are executed as `gm (utility name)`.
+# Creates cropped .bmp images with white borders and a black interior (I think) from all images of many types in a directory tree. Useful for prepping art for conversion to a vector format without wasted border space.
+
+# DEPENDENCIES
+# `innercrop.sh` from Fred's ImageMagick scripts, in your PATH. As those scripts are not freely redistributable, you'll have to download it from the source yourself at: http://www.fmwconcepts.com/ImageMagick/innercrop/index.php 
 
 # USAGE
 # Run from a directory tree full of .png images, without any parameter:
@@ -7,35 +10,25 @@
 
 
 # CODE
-# TO DO:
-# - upgrade listing to all possible image types.
-# - make a private fork of Fred's scripts that use GraphicsMagick, since I've migrated to that for all of my scripts? Keep a legacy ImageMagick install? :/
-find . -maxdepth 1 -iname \*.png > crop_imgs.txt
+allImageFileNames=($(printAllIMGfileNames.sh))
 
-i=0
-while read element
+counter=0
+for imageFileName in ${allImageFileNames[@]}
 do
-	imgFileNoExt=${element%.*}
-	if [ -a $imgFileNoExt.bmp ]
+	imgFileNoExt=${imageFileName%.*}
+	renderTarget=$imgFileNoExt.bmp
+	echo renderTarget is $renderTarget
+	if [ ! -f $renderTarget ]
 	then
-		der=duh
+		echo Processing $imageFileName . . .
+		echo Command is\:
+		echo innerCrop.sh -o black $imageFileName 
+		innerCrop.sh -o black $imageFileName $renderTarget
+		echo ""
 	else
-		echo processing $imgFileNoExt
-		echo command is\:
-		echo innerCrop.sh -o black $element $imgFileNoExt.bmp
-		innerCrop.sh -o black $element $imgFileNoExt.bmp
-# UNCOMMENT the next line to pause between conversions and thereby reduce CPU usage/heat:
-echo pausing for a bit to cool the processor . . . && sleep 4
-# ! --------
-# OPTIONAL--COMMENT OUT THE NEXT LINE IF YOU DON'T WANT THE ORIGINAL IMAGE DELETED! :
-rm $element
-# ! --------
-	i=$[ $i+1 ]
+		echo "Render target $renderTarget already exists; skipping. If you intended to do something with source file $imageFileName, perhaps change it to another file format and run this script again."
 	fi
-done < crop_imgs.txt
+	counter=$[ $counter+1 ]
+done
 
-echo Cropped $i images. Done.
-
-rm crop_imgs.txt
-
-# ex. command: innerCrop.sh -o black der.png out.bmp
+echo DONE processing $counter images.
