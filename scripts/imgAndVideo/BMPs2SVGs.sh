@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Runs the potrace utility to convert all black and white .bmp images (in the directory in which this script is run) to convert them to .svg vector images.
+# Runs the potrace utility to convert all black and white .bmp images (in the directory in which this script is run) to .svg vector images.
 
 # DEPENDENCIES
 # potrace.
@@ -14,11 +14,11 @@
 
 
 # CODE
-imgs=$(find . -maxdepth 1 -iname \*.bmp)
+imgs=($(find . -maxdepth 1 -iname \*.bmp))
 for element in "${imgs[@]}"
 do
 	imgFileNoExt=${element%.*}
-	if [ ! -a $imgFileNoExt.svg ]
+	if [ ! -f $imgFileNoExt.svg ]
 	then
 	echo tracing $element . . .
 	# original command:
