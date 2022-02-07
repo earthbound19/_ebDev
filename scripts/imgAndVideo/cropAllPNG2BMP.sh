@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates cropped .bmp images with white borders and a black interior (I think) from all images of many types in a directory tree. Useful for prepping art for conversion to a vector format without wasted border space.
+# Creates cropped .bmp images from all images of many types in the current directory, such that white area outside black areas is discarded. Useful for preparing art for later conversion to a vector format without wasted border space.
 
 # DEPENDENCIES
 # `innercrop.sh` from Fred's ImageMagick scripts, in your PATH. As those scripts are not freely redistributable, you'll have to download it from the source yourself at: http://www.fmwconcepts.com/ImageMagick/innercrop/index.php 
