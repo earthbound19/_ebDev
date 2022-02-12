@@ -22,7 +22,9 @@ sort export_resolutions_list.txt -n -r | uniq -i > _tmp_HWPqYyXjv7pGCN.txt
 mv -f _tmp_HWPqYyXjv7pGCN.txt export_resolutions_list.txt
 
 printf "" > tmp_axdTM39jAC38cr.txt
-while IFS= read -r line || [ -n "$line" ]; do
+OIFS="$IFS"
+IFS=
+while read -r line || [ -n "$line" ]; do
 	width=`echo $line | sed 's/\([0-9]\{1,\}\)x.*/\1/g'`
 	height=`echo $line | sed 's/.*x\([0-9]\{1,\}\)/\1/g'`
 	aspect=`echo "scale=2; $width / $height" | bc`
@@ -31,6 +33,7 @@ while IFS= read -r line || [ -n "$line" ]; do
 	echo "Logging information on $line to temp file . . ."
 	echo "$line"",""$aspect"",""$nPixels" >> tmp_axdTM39jAC38cr.txt
 done < export_resolutions_list.txt
+IFS="$OIFS"
 
 # alter the x in NNNNxNNNN format in that to comma (,)
 sed -i 's/x/,/' tmp_axdTM39jAC38cr.txt

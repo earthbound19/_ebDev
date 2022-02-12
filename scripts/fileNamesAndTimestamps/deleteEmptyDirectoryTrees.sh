@@ -12,6 +12,7 @@
 
 # CODE
 # saved again by a genius breath yonder: https://stackoverflow.com/a/16831721/1397555
+OIFS="$IFS"
 IFS=$'\n'
 
 directories=( $(find . -type d) )
@@ -39,4 +40,4 @@ do
 	foundEmptyDirectory=FALSE
 done
 
-unset IFS
+IFS="$OIFS"

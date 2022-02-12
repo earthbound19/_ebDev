@@ -15,7 +15,9 @@ find *.png *.jpg *.gif *.tif *.tiff > all_imgs.txt
 
 printf "# Images Markdown Gallery\n\nClick any image or title header to go to the source image.\n\n" > README.md
 
-while IFS= read -r element || [ -n "$element" ]
+OIFS="$IFS"
+IFS=
+while read -r element || [ -n "$element" ]
 do
     # echo current image is\: $element
 	imageFileName="${element%.*}"
@@ -25,7 +27,7 @@ do
 	printf "[ ![$element]($element) ]($element)\n\n" >> README.md
 	# printf "bruh\n\n" >> README.md
 done < all_imgs.txt
-
+IFS="$OIFS"
 rm all_imgs.txt
 
 printf "*Created with [img2MDgallery.sh](https://github.com/earthbound19/_ebDev/blob/master/scripts/imgAndVideo/imgs2MDgallery.sh).*" >> README.md

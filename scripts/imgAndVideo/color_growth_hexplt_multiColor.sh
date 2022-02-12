@@ -103,6 +103,7 @@ cgpFileName="$numColorsToUse"_from_"$paletteFileNoExt"__"$dateTimeString"__"$rnd
 # (randomly repeating some colors):
 # If we don't set the delimiter as newline, it splits up RGB triplet
 # values; we want them as one, which we get if we split on newlines:
+OIFS="$IFS"
 IFS=$'\n'
 numColorsInPalette=$(wc -l < $convertedPaletteFile)
 drawFromPaletteNtimesToGetnumColorsToUse=$(echo "$numColorsToUse / $numColorsInPalette + 1" | bc)		# +1 because math reasons.
@@ -181,3 +182,5 @@ printf "Executing command:\n$command\n via temp script tmp_color_growth_hexplt_m
 printf "Waiting 4 seconds before deleting ~multiColor~ temp script file . . .\n"
 sleep 4
 rm ./$tmpBashScriptFileName
+
+IFS="$OIFS"

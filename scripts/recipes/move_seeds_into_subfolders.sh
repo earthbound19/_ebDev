@@ -14,9 +14,12 @@ folders=( $(find . -type d -printf '%f\n' | sort -n | sed 's/.*[AM|PM] \.\/\(.*\
 folders=("${folders[@]:1}")
 
 seeds_idx=0
-while IFS= read -r line || [ -n "$line" ]; do
+OIFS="$IFS"
+IFS=
+while read -r line || [ -n "$line" ]; do
 	# echo line "$line" seeds_idx "$seeds_idx" echo folder ${folders[$seeds_idx]}
 	print_to_file_name=$(echo "${folders[$seeds_idx]}"/$line.txt)
 	echo "The random seed for the variant that produced the images in this folder is $line." > $print_to_file_name
 	seeds_idx=$((seeds_idx + 1))
 done < seeds.txt
+IFS="$OIFS"

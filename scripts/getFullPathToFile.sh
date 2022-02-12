@@ -31,6 +31,7 @@ then
 fi
 
 # If `which` failed, use full manual path search:
+OIFS="$IFS"
 IFS=':'
 for directory in $PATH
 do
@@ -45,3 +46,4 @@ do
 		fi
 	fi
 done
+IFS="$OIFS"
