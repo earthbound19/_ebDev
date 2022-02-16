@@ -12,7 +12,7 @@
 
 # CODE
 # TO DO
-# Parameterize arbitrary sort color; default to black-black-black-magenta if not provided.
+# After arbitrary sort on first color is added to the script this calls, add it as an optional parameter (and use it) for this.
 scriptLocation=$(getFullPathToFile.sh rgbHexColorSortInOkLab.js)
 
 array=( $(find . -maxdepth 1 -type f -iname \*.hexplt -printf '%f\n') )
