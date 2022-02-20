@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Prints a list of unique words in file $1 (parameter), without duplicates, and maintaining order. (the `uniq` utility only removes consequtive duplicates, but this removes all duplicates). Optionally writes the filtered result over the original file instead of printing it to the screen. To instead sort and deduplicate, use sortuniq.sh.
+# Prints a list of unique words in file $1 (parameter), without duplicates, and maintaining order. (the `uniq` utility only removes consecutive duplicates, but this removes all duplicates). Optionally writes the filtered result over the original file instead of printing it to the screen. To instead sort and deduplicate, use sortuniq.sh.
 
 # USAGE
 # Run with these parameters:
