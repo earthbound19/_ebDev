@@ -1,6 +1,5 @@
 # DESCRIPTION
-# Makes a teensy ppm palette image (one pixel per color) from a hex palette .hexplt source file. Result is usable as a basis for a scaled up palette image via e.g.:
-#    img2imgNN.sh ppm png 640 480
+# Makes a teensy ppm palette image (one pixel per color) from a hex palette .hexplt source file. Result is usable as a basis for a scaled up palette image; see NOTES
 
 # USAGE
 # Run this script with the following parameters:
@@ -11,13 +10,18 @@
 #    hexplt2ppm.sh RAHfavoriteColorsHex.hexplt 5 40
 # To create a tiny ppm image with columns and rows calculated by the script from that same palette, run:
 #    hexplt2ppm.sh RAHfavoriteColorsHex.hexplt
+# NOTES
+# To use another script to upscale the image to a palette by nearest neighbor (hard edge) method to a png image, run e.g.:
+#    img2imgNN.sh source.ppm png 640 480
+
 
 
 # CODE
 
 # =============
 # BEGIN SETUP GLOBAL VARIABLES
-paletteFile=$1
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (source hexplt format file) passed to script. Exit."; exit 1; else paletteFile=$1; fi
+
 renderTargetFile=${1%.*}.ppm
 
 # Search current path for $1; if it exists set hexColorSrcFullPath to just $1 (we don't need the full path). If it doesn't exist in the local path, search the path in palettesRootDir.txt and make decisions based on that result:
