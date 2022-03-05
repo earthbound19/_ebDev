@@ -54,7 +54,9 @@ do
 	else
 		echo converting $element . . .
 		ffmpeg -i "$IMGfilenameNoExt"."$srcIMGformat" $additionalParams -crf 13 $pixelFormat "$IMGfilenameNoExt"_converted."$destIMGformat"
+		# copy metadata from source file to render target:
 		exiftool -overwrite_original -TagsFromFile "$IMGfilenameNoExt"."$srcIMGformat" "$IMGfilenameNoExt"_converted."$destIMGformat"
-		ExifTool -overwrite_original "-FileModifyDate>FileCreateDate" $renderTarget
+		# Update time stamp of file to metadata creation date; uses a conditional like is given in this post: https://exiftool.org/forum/index.php?topic=6519.msg32511#msg32511 -- but adding an -else clause:
+		exiftool -if "defined $CreateDate" -v -overwrite_original '-FileModifyDate<CreateDate' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" -else -v -overwrite_original '-FileModifyDate<DateTimeOriginal' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" $renderTarget
 	fi
 done
