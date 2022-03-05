@@ -6,7 +6,7 @@
 
 # USAGE
 # From a terminal, in a folder with terminal-unfriendly file or folder names, execute with these parameters:
-# - $1 OPTIONAL. File extension without . in it, for example png. Causes script to rename all file names with that extension. To rename all files of every type (`.txt`, `.png`, `.hexplt`, `.ttf`, or whatever -- everything found), pass the keyword 'ALL'.
+# - $1 OPTIONAL. File extension without . in it, for example png. Causes script to rename all file names with that extension. To rename all files of every type (`.txt`, `.png`, `.hexplt`, `.ttf`, or whatever -- everything found), pass the keyword 'ALL'. NOTE that ALL will cause renaming of directories also.
 # - $2 OPTIONAL. Anything (for example the word 'SNORFBLARN'). Causes script to rename all files of type $1 in all subdirectories also.
 # Example that would rename all files with the .png extension to terminal-friendly names:
 #    ftun.sh png
