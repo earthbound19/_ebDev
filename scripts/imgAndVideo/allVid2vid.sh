@@ -1,13 +1,13 @@
 # DESCRIPTION
-# Converts all video files of type $1 to type $2, with default crf (constant rate factor or quality) 13 (quite high quality). Conversion may be to the same type, as the target is named after the original but adds "_converted" to the file name.
+# Converts all video files of type $1 (in the current directory) to type $2, with default crf (constant rate factor or quality) 13 (quite high quality). Conversion may be to the same type, as the target is named after the original but adds "_converted" to the file name. Also copies all possible metadata from the source file to the destination, via exiftool, and changes file time stamp to match original.
 
 # DEPENDENCIES
-# ffmpeg
+# ffmpeg, ExifTool
 
 # USAGE
 # Run with these parameters:
 # - $1 the source format (or file extension)
-# - $1 the target format
+# - $2 the target format
 # Example that will re-encode all files with the extension .mov to .mp4 files:
 #    allVid2vid.sh mov mp4
 # SEE ALSO the "ADDITIONAL PARAMETERS" comment section.
@@ -19,7 +19,7 @@ destIMGformat=$2
 
 if [ "$1" ]
 	then
-		IMGconvertList=(`find . -maxdepth 1 -type f -iname \*.$srcIMGformat -printf '%f\n'`)
+		IMGconvertList=($(find . -maxdepth 1 -type f -iname \*.$srcIMGformat -printf '%f\n'))
 	else
 		echo "No parameter 1 (source format) passed to script. Will exit script."
 		exit
@@ -54,5 +54,7 @@ do
 	else
 		echo converting $element . . .
 		ffmpeg -i "$IMGfilenameNoExt"."$srcIMGformat" $additionalParams -crf 13 $pixelFormat "$IMGfilenameNoExt"_converted."$destIMGformat"
+		exiftool -overwrite_original -TagsFromFile "$IMGfilenameNoExt"."$srcIMGformat" "$IMGfilenameNoExt"_converted."$destIMGformat"
+		ExifTool -overwrite_original "-FileModifyDate>FileCreateDate" $renderTarget
 	fi
 done
