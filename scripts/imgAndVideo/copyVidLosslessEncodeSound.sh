@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Copies the video stream of a source video into a new container and re-encodes the audio in aac high quality, into an mp4 container. Intended for slightly modified video distribution from source video from some (silly) devices that record AVC/PCM videos (which have like 1:10 ratio waste in sound stream size via the PCM; ergo this script to get them compressed audio to save space. Output files are named after the input file, but add ~_aacSound to the file name.
+# Copies the video stream of a source video into a new container and re-encodes the audio in aac high quality, into an mp4 container. Intended for slightly modified video distribution from source video from some (silly) devices that record AVC/PCM videos (which have like 1:10 ratio waste) in sound stream size via PCM; ergo this script to get them compressed audio to save space. Output files are named after the input file, but add ~_aacSound to the file name. Also, metadata and timestamps are copied from the source to the target.
 
 # DEPENDENCIES
 #    ffmpeg
@@ -21,4 +21,9 @@ then
 else
 	echo Converting $inputFile . . .
 	ffmpeg -i $inputFile -map 0:v -vcodec copy -map 0:a -acodec aac -crf 10 ${inputFile%.*}_aacSound.mp4
+	# copy metadata from source file to render target:
+	exiftool -overwrite_original -TagsFromFile $inputFile ${inputFile%.*}_aacSound.mp4
+	# Update time stamp of file to metadata creation date; uses a conditional like is given in this post: https://exiftool.org/forum/index.php?topic=6519.msg32511#msg32511 -- but adding an -else clause:
+	exiftool -if "defined $CreateDate" -v -overwrite_original '-FileModifyDate<CreateDate' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" -else -v -overwrite_original '-FileModifyDate<DateTimeOriginal' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" ${inputFile%.*}_aacSound.mp4
+
 fi
