@@ -14,5 +14,5 @@
 
 pixelFormat="-pix_fmt yuv420p"
 
-ffmpeg -y -i $1 -vf scale=iw/2:-1 -crf 17 $pixelFormat "$1"_half_resolution.mp4
+ffmpeg -y -i $1 -vf scale=iw/2:-1 -crf 13 $pixelFormat "$1"_half_resolution.mp4
 
