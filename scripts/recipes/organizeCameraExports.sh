@@ -7,7 +7,7 @@
 #    - sorts all these file types into subfolders by type
 
 # DEPENDENCIES
-# Various scripts. See the flat list of those called after CODE.
+# Various scripts. See throughout the code.
 
 # USAGE
 # From a folder with such files to organize (and no other files!), run without any parameters:
