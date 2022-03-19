@@ -1,13 +1,7 @@
------BEGIN PGP MESSAGE-----
-Version: OpenPGP.js v2.6.2
-Comment: https://openpgpjs.org
-
-wy4ECQMIVd9TnPTjxXtgV07DriFQr4BnyVeCPtj2+/AUGxZeh0EmhEDhzCtX
-Y6HY0sAoASJ+o8PDLPYrV00r2LvjuSD7opWhCBiy+yqPdb6TUlMtFQF5wDEV
-PYMcw34L6oIaBJOTFDBZfsIDtRJ/QRhmJHrgRR3EofMPlE0rW2OYX1Q9Q8pj
-dqNwSFVkncI/KN2I8bC6HOno9Jff5SjINoNdSikqK3ebF3GrlRkgvznT3NAO
-eMug3HdkGNZG6fZppp/qR5bYl5jsdr+0U8N1ucFoSi75rFjgAlABCa8rZfOw
-tJpc+22EUOdp6zJea3gq6PZ49HMRRWz+xfheQtKXmGs19Xc+vntre1nCEnM9
-v6UwAsuSaD5rlZqwpg==
-=KJGM
------END PGP MESSAGE-----
+<nppcrypt version="1016">
+<encryption cipher="rijndael" key-length="32" mode="gcm" aad="true" encoding="base64" />
+<key algorithm="scrypt" N="16384" r="8" p="1" salt="Po+jBwXxPiCoL6OnkUL4cw==" />
+<iv value="dzrgOXIoywz7Vdq5uLiapg==" method="random" /><tag value="tPtzLR6P4Kj7i/0sfJaEDg==" />
+</nppcrypt>
+OhUKsZnmey64PrGcsDaaXAs0mVwJ75L/T1hypOK3wZ7Odzw5PLZ48CDs5zTcT+RBdz5HWI946bU/L3M18PzFGQrp3/i85ATW+AqOx7OdfeZizm/rMDy5OGuZ+LgxHa+m
+t4Uw1EOTGqsVxrDAiqX1OvMiPdGSQ6F/KFyxxbWQEU6A0U6s4dfgG8fHVEaPE2Dg9MF04s9Tg3PHFm8X45xx6u+FtGNdPKLe3zb5SpAABvk=
