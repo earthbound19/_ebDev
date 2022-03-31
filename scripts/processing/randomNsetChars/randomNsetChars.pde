@@ -9,7 +9,6 @@
 
 // DEPENDENCIES
 // Babel Stone True Type Font from: https://www.babelstone.co.uk/Fonts/Shapes.html
-// https://www.babelstone.co.uk/Fonts/Shapes.html
 // or my copy of it from:   http://earthbound.io/data/dist/BabelStoneShapes.ttf
 // also to toy with:        http://earthbound.io/data/dist/bitBlocks.ttf
 
