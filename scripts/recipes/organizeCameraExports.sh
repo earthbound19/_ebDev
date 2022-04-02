@@ -5,6 +5,8 @@
 #    - extracts preview thumbnails from CR2s
 #    - renames all .jpeg file extensions to .jpg
 #    - sorts all these file types into subfolders by type
+#    - optionally losslessly copies all video files to mp4 containers, with metadata and timestamps copied from the original
+#    - optionally move all relevant data into subfolders named by type; see the comment labeled UNCOMMENT for that.
 
 # DEPENDENCIES
 # Various scripts. See throughout the code.
@@ -12,6 +14,8 @@
 # USAGE
 # From a folder with such files to organize (and no other files!), run without any parameters:
 #    organizeCameraExports.sh
+# Or optionally, run with any word for parameter $1 to losslessly convert many video formats to mp4, and copy metadata and timestamps to the converted target; for example:
+#    organizeCameraExports.sh BYORF
 
 
 # CODE
@@ -53,15 +57,17 @@ renameByMetadata.sh NORTHERP
 mv -i * ..
 cd ..
 rm -rf tmp_renames_2ydTVzqG
-# Extract thumbs:
-dcraw -e *.cr2
-# Thanks to a genius breath yon https://stackoverflow.com/a/45703829 ;
-# rename all .thumb.jpg files to just .jpg:
-for x in *.thumb.jpg; do mv -i "$x" "${x%.thumb.jpg}.jpg"; done
-# rename all .jpeg to .jpg:
+
+getEmbeddedThumbsDCRAW.sh cr2
+
+# re https://stackoverflow.com/a/45703829, rename all .jpeg to .jpg:
 for x in *.jpeg; do mv -i "$x" "${x%.jpeg}.jpg"; done
-# OPTIONAL: uncomment if you want to lossleslly recontain all .mov files to .mp4 -- but be warned that this will lose metadata if you destroy the original mov files (metadata is not copied)! :
-# allVideo2mp4Lossless.sh
+
+# OPTIONALLY lossleslly recontain all .mov files to .mp4, and copy metadata and timestamp from the original to the target mp4:
+if [ "$1" ]
+then
+	allVideo2mp4Lossless.sh
+fi
 
 # OPTIONAL: move all file types into subfolders named after that file type; uncomment the next four lines of code:
 # for lowerCaseExt in ${lowerCaseExtensions[@]}
