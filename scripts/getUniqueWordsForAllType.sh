@@ -9,7 +9,6 @@
 
 
 # CODE
-# DELETE this line and the next if your script doesn't need them; otherwise adapt per your needs:
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (file type to run getUniqueWords.sh repeatedly for all files of that type in the current directory) passed to script. Exit."; exit 1; else fileType=$1; fi
 
 echo florf

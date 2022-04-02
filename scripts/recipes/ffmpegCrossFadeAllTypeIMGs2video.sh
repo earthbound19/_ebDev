@@ -17,7 +17,6 @@
 
 
 # CODE
-# DELETE this line and the next if your script doesn't need them; otherwise adapt per your needs:
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (image type to crossfade) passed to script. Exit."; exit 1; else srcFileType=$1; fi
 if [ "$2" ]; then stillDuration=$2; else stillDuration=5.75; fi
 if [ "$3" ]; then xFadeDuration=$3; else xFadeDuration=4.25; fi

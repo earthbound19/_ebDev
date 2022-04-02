@@ -16,7 +16,6 @@
 
 
 # CODE
-# DELETE this line and the next if your script doesn't need them; otherwise adapt per your needs:
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (file name of source file to copy metadata from) passed to script. Exit."; exit 1; else sourceFileName=$1; fi
 
 if [ ! "$2" ]; then printf "\nNo parameter \$2 (file name of target file to copy metadata to) passed to script. Exit."; exit 2; else targetFileName=$2; fi

@@ -17,7 +17,6 @@
 
 
 # CODE
-# DELETE this line and the next if your script doesn't need them; otherwise adapt per your needs:
 if [ "$1" ]; then cols=$1; fi
 if [ "$2" ]; then rows=$2; fi
 

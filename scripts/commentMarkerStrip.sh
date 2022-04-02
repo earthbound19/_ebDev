@@ -15,7 +15,6 @@
 
 
 # CODE
-# DELETE this line and the next if your script doesn't need them; otherwise adapt per your needs:
 if [ ! "$1" ]; then printf "\nNo parameter \$1 passed to script (input file to remove comment markers from, writing to a new file or overwriting the original if parameter \$2 is present). Exit."; exit 1; else inputFile=$1; fi
 
 # With the following variable left at default empty (''), passing it as a switch to sed will do nothing; but if parameter 2 is passed to this script, it will be set to '-i', which when passed to sed will cause in-place overwrite of file with result of sed processing:

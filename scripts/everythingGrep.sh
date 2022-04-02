@@ -16,7 +16,6 @@
 
 
 # CODE
-# DELETE this line and the next if your script doesn't need them; otherwise adapt per your needs:
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (Everything file name match string) passed to script. Exit."; exit 1; else EverythingFileNameSearch=$1; fi
 if [ ! "$2" ]; then printf "\nNo parameter \$2 (search within files for string) passed to script. Exit."; exit 1; else searchWithinFileString=$1; fi
 
