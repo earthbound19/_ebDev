@@ -38,6 +38,8 @@ do
 	then
 		echo Target file $srcThumbName OR $destThumbRename already exists\; will not overwrite.
 	else
+			# DEPRECATED approach because I want to skip renaming if the target existed; thanks to a genius breath yon https://stackoverflow.com/a/45703829, rename all .thumb.jpg files to just .jpg, and all .jpeg to jpg:
+			# for x in *.thumb.jpg; do mv -i "$x" "${x%.thumb.jpg}.jpg"; done
 		dcraw -e $file
 		fileNameNoExt=${file%.*}
 		mv "$fileNameNoExt".thumb.jpg "$fileNameNoExt".jpg
