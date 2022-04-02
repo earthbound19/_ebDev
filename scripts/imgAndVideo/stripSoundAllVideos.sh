@@ -3,7 +3,7 @@
 
 # USAGE
 # Run with one parameter, which is the extension of videos you wish to strip of sound, e.g.:
-#    stripSoundAllVideos.sh
+#    stripSoundAllVideosType.sh
 
 
 # CODE
