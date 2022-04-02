@@ -1,8 +1,8 @@
 # DESCRIPTION
-# Converts all video files of type $1 (in the current directory) to type $2, with default crf (constant rate factor or quality) 13 (quite high quality). Conversion may be to the same type, as the target is named after the original but adds "_converted" to the file name. Also copies all possible metadata from the source file to the destination, via exiftool, and changes file time stamp to match original.
+# Converts all video files of type $1 (in the current directory) to type $2, with default crf (constant rate factor or quality) 13 (quite high quality). Conversion may be to the same type, as the target is named after the original but adds "_converted" to the file name. Also copies metadata from source to target and updates target time stamp to match media creation, via another script.
 
 # DEPENDENCIES
-# ffmpeg, ExifTool
+# ffmpeg, ExifTool, copyMetadataFromSourceFileToTarget.sh
 
 # USAGE
 # Run with these parameters:
@@ -54,9 +54,7 @@ do
 	else
 		echo converting $element . . .
 		ffmpeg -i "$IMGfilenameNoExt"."$srcIMGformat" $additionalParams -crf 13 $pixelFormat "$IMGfilenameNoExt"_converted."$destIMGformat"
-		# copy metadata from source file to render target:
-		exiftool -overwrite_original -TagsFromFile "$IMGfilenameNoExt"."$srcIMGformat" "$IMGfilenameNoExt"_converted."$destIMGformat"
-		# Update time stamp of file to metadata creation date; uses a conditional like is given in this post: https://exiftool.org/forum/index.php?topic=6519.msg32511#msg32511 -- but adding an -else clause:
-		exiftool -if "defined $CreateDate" -v -overwrite_original '-FileModifyDate<CreateDate' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" -else -v -overwrite_original '-FileModifyDate<DateTimeOriginal' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" $renderTarget
+		# copy metadata from source file to render target; the script also updates target timestamp to match metadata media creation date:
+		copyMetadataFromSourceFileToTarget.sh "$IMGfilenameNoExt"."$srcIMGformat" "$IMGfilenameNoExt"_converted."$destIMGformat"
 	fi
 done

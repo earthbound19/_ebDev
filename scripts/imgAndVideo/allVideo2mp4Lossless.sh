@@ -1,8 +1,8 @@
 # DESCRIPTION
-# Converts all of many video media container (file) types in the current directory to mp4 containers, losslessly; there is no recompression: it directly copies the video streams into a new container. It also copies the file timestamps (including Windows-unique ones) and relevant metadata from the original file to the converted target file. For options for lossless video but lossy sound, see NOTES.
+# Converts all of many video media container (file) types in the current directory to mp4 containers, losslessly; there is no recompression: it directly copies the video streams into a new container. It also copies the file timestamps (including Windows-unique ones) and relevant metadata from the original file to the converted target file, via another script. For options for lossless video but lossy sound, see NOTES.
 
 # DEPENDENCIES
-# ffmpeg, GNU touch, ExifTool
+# ffmpeg, GNU touch, copyMetadataFromSourceFileToTarget.sh 
 
 # USAGE
 # Run without any parameters:
@@ -27,9 +27,6 @@ do
 	echo "Converting $fileName to mp4 container as $fileNameNoExt.mp4 . . ."
 	renderTarget=$fileNameNoExt.mp4
 	ffmpeg -y -i $fileName -c copy $renderTarget
-	# Copy metadata from original file to render target:
-	exiftool -overwrite_original -TagsFromFile $fileName $renderTarget
-	# Update time stamp of file to metadata creation date; uses a conditional like is given in this post: https://exiftool.org/forum/index.php?topic=6519.msg32511#msg32511 -- but adding an -else clause:
-	exiftool -if "defined $CreateDate" -v -overwrite_original '-FileModifyDate<CreateDate' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" -else -v -overwrite_original '-FileModifyDate<DateTimeOriginal' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" $renderTarget
-
+	# copy metadata from source file to render target; the script also updates target timestamp to match metadata media creation date:
+	copyMetadataFromSourceFileToTarget.sh $fileName $renderTarget
 done
