@@ -22,7 +22,7 @@
 fileName="${1%.*}"
 # fileExt=`echo "${1##*.}"`
 
-if [ ! -f $fileName.tif ]
+if [ ! -f $fileName.tiff ]
 then
   echo Target file "$fileName".tif does not exist. Will render.
 		# Something I tried and it didn't help much; maybe I know too little;
