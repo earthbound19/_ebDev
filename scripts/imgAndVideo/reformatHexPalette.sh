@@ -85,4 +85,4 @@ printf "${rowsArray[*]}" > $srcHexplt
 
 IFS="$OIFS"
 
-printf "\nDONE reformatting $srcHexplt."
+printf "\nDONE reformatting $srcHexplt.\n"
