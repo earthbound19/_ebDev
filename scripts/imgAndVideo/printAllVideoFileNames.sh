@@ -29,6 +29,7 @@ filetypes=(
 amv
 asf
 avi
+avc
 bik
 divx
 dpg
