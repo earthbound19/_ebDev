@@ -1,12 +1,12 @@
 # DESCRIPTION
-# Organizes exported media files (e.g. from cameras and devices) this way, using other scripts:
+# Organizes exported media files (e.g. from cameras and devices), using other scripts, this way:
 #    - renames various common camera/device media file extensions to lowercase
 #    - renames files after metadata date
-#    - extracts preview thumbnails from CR2s
-#    - renames all .jpeg file extensions to .jpg
-#    - sorts all these file types into subfolders by type
-#    - optionally losslessly copies all video files to mp4 containers, with metadata and timestamps copied from the original
-#    - optionally move all relevant data into subfolders named by type; see the comment labeled UNCOMMENT for that.
+#    - renames all .jpeg file extensions to .jpg (including doing this after optional thumbnail extraction, where dcraw extracts thumbnails as .jpeg files)
+# For the following optional features, search for comments with "uncomment" instructions:
+#    - extracts embedded thumbnails from cr2 raw files. (Performs the rename of .jpeg files .jpg after this.)
+#    - losslessly copies all video files to mp4 containers, with metadata and timestamps copied from the original.
+#    - moves all relevant data into subfolders named by type.
 
 # DEPENDENCIES
 # Various scripts. See throughout the code.
@@ -14,11 +14,12 @@
 # USAGE
 # From a folder with such files to organize (and no other files!), run without any parameters:
 #    organizeCameraExports.sh
-# Or optionally, run with any word for parameter $1 to losslessly convert many video formats to mp4, and copy metadata and timestamps to the converted target; for example:
-#    organizeCameraExports.sh BYORF
-
+# See the various comments with "uncomment" instructions for the optional features.
 
 # CODE
+# TO DO
+# - parameterize optional features?
+
 # ADD AN EXTENSION to this list if you need it operated on with this script:
 extensions=(
 MOV
@@ -58,18 +59,16 @@ mv -i * ..
 cd ..
 rm -rf tmp_renames_2ydTVzqG
 
-getEmbeddedThumbsDCRAW.sh cr2
+# TO EXTRACT EMBEDDED THUMBNAILS FROM ALL .cr2 FILES in the current directory, uncomment the next line:
+# getEmbeddedThumbsDCRAW.sh cr2
 
 # re https://stackoverflow.com/a/45703829, rename all .jpeg to .jpg:
 for x in *.jpeg; do mv -i "$x" "${x%.jpeg}.jpg"; done
 
-# OPTIONALLY lossleslly recontain all .mov files to .mp4, and copy metadata and timestamp from the original to the target mp4:
-if [ "$1" ]
-then
-	allVideo2mp4Lossless.sh
-fi
+# LOSSLESLLY RECONTAIN ALL .mov FILES TO .mp4, and copy metadata and timestamp from the original to the target mp4; uncomment the next line:
+# allVideo2mp4Lossless.sh
 
-# OPTIONAL: move all file types into subfolders named after that file type; uncomment the next four lines of code:
+# MOVE ALL FILES OF GIVEN EXTENSIONS (that this script operates on) INTO SUBFOLDERS; uncomment the next four lines of code:
 # for lowerCaseExt in ${lowerCaseExtensions[@]}
 # do
 	# toTypeFolder.sh $lowerCaseExt
