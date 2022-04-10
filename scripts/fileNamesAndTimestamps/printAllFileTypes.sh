@@ -5,13 +5,13 @@
 # Run with or without this parameter:
 # - $1 OPTIONAL. Any string (for example 'BLARFARFARBARG'), which will cause the script to search subfolders also for files to print their type.
 # To print only file types from the current directory, pass no parameter to the script:
-#    printAllFileTypes.sh
+#    printAllExtensionsHere.sh
 # To print file types from the current directory and all subdirectories, pass anything as a parameter to the scripr:
-#    printAllFileTypes.sh BLARFARFARBARG
+#    printAllExtensionsHere.sh BLARFARFARBARG
 # To store the printout in an array for further use, do a command substitution like this:
-#    allFileTypes=$(printAllFileTypes.sh BLARFARFARBARG)
+#    allFileTypes=$(printAllExtensionsHere.sh BLARFARFARBARG)
 # Or to pipe the results to a file, do this:
-#    printAllFileTypes.sh BLARFARFARBARG > allFileTypesRecursive.txt
+#    printAllExtensionsHere.sh BLARFARFARBARG > allFileTypesRecursive.txt
 # NOTES
 # - This omits everything in any .git folder from printout.
 # - BLARFARFARBARG! SNARFARFARBARG! BLARG! BLARG! FLARFARFARBARG!
