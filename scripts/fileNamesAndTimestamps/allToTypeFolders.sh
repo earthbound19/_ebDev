@@ -16,7 +16,7 @@ optionalParam=''
 # Override that if $1 exists:
 if [ "$1" ]; then optionalParam='FLIBFLUB'; fi
 
-allFileTypes=( $(printAllFileTypes.sh $optionalParam) )
+allFileTypes=( $(printAllExtensionsHere.sh $optionalParam) )
 for fileType in ${allFileTypes[@]}
 do
 	toTypeFolder.sh $fileType $optionalParam
