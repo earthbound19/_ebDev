@@ -28,7 +28,7 @@ if [ "$5" ]
 then
 	if [ "$5" != "NULL" ]		# If we want to use $6 but not $5 (as $6 is positional), we use NULL for $5.
 	then
-		rescaleParams="-vf scale=$5:-1:flags=neighbor"
+		rescaleParams="-vf scale=$5:flags=neighbor"
 			# echo rescaleParams val is\:
 			# echo $rescaleParams
 	else
