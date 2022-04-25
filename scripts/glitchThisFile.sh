@@ -12,13 +12,15 @@
 
 # CODE
 # TO DO
-# - speed up using maths discovered in data2BMPglitchArt.sh (see comments in that) development
+# - Try a rewrite to do in-memory corruption and conversion back to binary via xxd. If I have a string which is only hex characters (no newlines, spaces or anything else), I can convert it back to (for example) a legitimate png file (if the hex characters form that format) like this:
+#    printf $modifiedHexString | xxd -r -p > out.png
+# -- also see NOTES in printHex.sh about possibility of modifying array contents (from imported data from a file) and then re-writing as binary.
+# - speed up using maths discovered in data2BMPglitchArt.sh (see comments in that) development -- CHECK if I already did that and modify this to do list if so (see DEVELOPMENT LOG, then delete that if so).
 # - optional random truncation (deletion) of bytes
 # - throw errors for missing parameters and exit.
 # - If the source file is a common movie format, convert it first to a transport stream and corrupt that?
-
-# NOT TO DO
-# - In-memory instead of on-disk corruption via xxd. Tried hexStr=`xxd -ps imgData.dat` . . . then (after corruption), with the -r switch reverse the operation. It was prohibitively slow. Piping the output to a file also (resulted in gigabytes-size file).
+# - check compression level for known compressed formats (like png, jpg, and mp4 OR an exported transport stream) and modify percent to corrupt to match percent of data compressed?
+# - rnd more often random congtiguous bytes (area) corruption instead of random scattering of bytes
 
 # DEVELOPMENT LOG
 # Discovered by reading help and re-examining that for my purposes (prompted by data2BMPglitchArt.sh development) that I must add bs=1 to dd operations or I am copying way more bytes than I intend (I think?). Updated script accordingly. 11/21/2017 09:37:02 PM -RAH
