@@ -36,10 +36,12 @@ then
 	fi
 fi
 
+hexValues=$(xxd -p $inputFileName | tr -d '[[:space:]]')
+
 # if bytesToSplitNewlinesOn was not defined (is empty) in parameter checking, don't split on byte count $bytesToSplitNewlinesOn (as it effectively doesn't exist for our purposes). If it was defined, split newlines every $bytesToSplitNewlinesOn bytes:
 if [ "$bytesToSplitNewlinesOn" == "" ]
 then
-	xxd -p $inputFileName | tr -d '\n'
+	printf $hexValues
 else
-	xxd -p $inputFileName | tr -d '\n' | fold -w$bytesToSplitNewlinesOn
+	fold -w$bytesToSplitNewlinesOn <<< $hexValues
 fi
