@@ -225,7 +225,7 @@ rm style-template.odt
 soffice.exe --convert-to pdf $odtOutputFileName --headless
 soffice.exe --convert-to docx $odtOutputFileName --headless
 # Convert md to HTML:
-generate-md --lagenerate-md --layout jasonm23-foghorn --input ./$MDtargetDocumentationName --output ./
+generate-md --lagenerate-md --layout jasonm23-dark --input ./$MDtargetDocumentationName --output ./
 
 cd ..
 
