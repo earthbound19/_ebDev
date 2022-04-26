@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Prints the binary values of the data in file $1, with no spaces or newlines or any other information other than the binary digits.
+# Prints the binary values of the data in file $1, with no spaces or newlines or any other information other than the binary digits. Optionally breaks into newlines on every Nth ($2) binary digit.
 
 # DEPENDENCIES
 #    xxd

@@ -1,5 +1,5 @@
 # DESCRIPTION
-# prints a serialized (not line breaks or other interruptions) hexdump (hex character translation) of every byte of file $1.
+# Prints the hex values of the data in file $1, with no spaces or newlines or any other information other than the binary digits. Optionally breaks into newlines on every Nth ($2) hex value.
 
 # DEPENDENCIES
 # xxd, bash
