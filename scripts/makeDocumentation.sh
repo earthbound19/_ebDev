@@ -3,7 +3,7 @@
 
 # USAGE
 # In the source code of every script in this repository (or any other repository that you want to use this script for), follow this documentation convention:
-# - REQUIREMENT. Write a documentationHeader.md file which introduces and generally describes this document, or otherwise introduces it. Also a documentationFooter.md document, which has whatever information you want to follow the general body document (which is made from documentation comments in so many scripts) with.
+# - REQUIREMENT. Write a documentationHeader.md file which introduces and generally describes this document, or otherwise introduces it. Also a documentationFooter.md document, which has whatever information you want to follow the general body document (which is made from documentation comments in so many scripts) with. NOTE: this script inserts a newline and a "Generated at <date and time> print on the 2nd line of the header (so that the format is <header line>\n<Generated at <date and time>. It expects the result of this to be a header, a blank line, an inserted document generation time, another blank line, and the remainder of the header.
 # - REQUIREMENT. Everything before a code begin comment marker is documentation that will be collated into <repoName>_DOCUMENTATION.md (adapted to markdown format) when you run this script.
 # - REQUIREMENT. The code begin comment marker is simply the word 'CODE' (without the quote marks, and with no punctuation and no other words or anything else other than the comment marker, thought whitespace is allowed before or after the comment marker and/or the word 'CODE'). Supported comment markers are: #, //, %, ::, REM, ;, ;;, and possibly others I may add (check the awk command in this script). An example of a code begin marker for a powershell file would be:
 #        % CODE
@@ -192,6 +192,9 @@ do
 		mv tmp_makeDocumentation_sh__DCW8Jxyx4.txt $MDtargetDocumentationName
 	fi
 done
+
+# Write document generation date and time just after first header line of file:
+sed -i "2 i\\\n_Generated $(date +%Y-%m-%d) $(date +%I:%M:%S) $(date +%p)_" _ebDev_Documentation.md
 
 # Wipe target conversion subfolder if it exists (will be recreated immediately) :
 if [ -d _tmp_WPcnYHrGD_documentation_rendering ]
