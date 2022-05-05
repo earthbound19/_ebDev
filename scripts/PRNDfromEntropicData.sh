@@ -1,5 +1,6 @@
 # DESCRIPTION
-# Produces pseudo-random data which for all anyone knows could be called true random data if you begin with pure random entropy files like jpeg photographs. Reference: https://crypto.stackexchange.com/a/43121 
+# Produces pseudo-random data which for all anyone knows could be called true random data if you begin with pure random entropy files like jpeg photographs. Reference: https://crypto.stackexchange.com/a/43121
+# See also entropyFromFile.sh
 
 # WARNING
 # Run this script only against a copy of data or on expendable data--it will destroy all original data in the folder from which it was run! It moves generated PRND data into the ../_final_TRND_archive folder.
@@ -74,7 +75,7 @@ rm *.*
 mv ../superBlock.dat .
 splits superBlock.dat $blockSplitSize
 rm ./superBlock.dat
-# Psuedo-randomly renames all files, effectively shuffing their order so they can be re-concatenated into a new, unique, timestamped ~superBlock.dat at the end of the script; this is VERY inneficient and could be replaced by a shuffled array of file names iterating over cat commands to append to the dest data:
+# Psuedo-randomly renames all files, effectively shuffing their order so they can be re-concatenated into a new, unique, timestamped ~superBlock.dat at the end of the script; this is VERY inneficient and could be replaced by a shuffled array of file names iterating over cat commands to append to the dest. data:
 allRandomFileNames.sh 11
 
 # NOTE: fcs32 hashes collide with crc32.
@@ -87,8 +88,6 @@ sed -i -e 's/.*: \(.*\).*/\1/g' -e 's/<.*>//g' rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZH
 timestamp=$(date +"%Y_%m_%d__%H_%M_%S__%N")
 tr -d '\n' < rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt > __trueRandomData_"$timestamp"_HEXsrcTable.txt
 rm rnd_H3pDjjUNgmbsYjGfaYrKQk6mz8yZHNKSqx.txt
-# Huh? There is no -p flag. Did I mean -ps? TO DO: check:
-# xxd -r -p __trueRandomData_"$timestamp"_HEXsrcTable.txt __trueRandomData_"$timestamp".dat
 xxd -r -ps __trueRandomData_"$timestamp"_HEXsrcTable.txt __trueRandomData_"$timestamp".dat
 
 mv __trueRandomData_"$timestamp"_HEXsrcTable.txt __trueRandomData_"$timestamp".dat ../_final_TRND_archive
@@ -119,8 +118,8 @@ mv ../_superblock_SOURCE_notPRND__$timestamp.dat ./
 # sha512-224        sha512-256        shake128          shake256          
 # sm3
 # . .
-# run any of these with binary output, converted to hex, without extranous print information, for example, this way; re https://Unix.stackexchange.com/a/90242/110338 :
-# openssl dgst -md5 Photo_on_11-6-19_at_10.41_PM.jpg
+# run any of these with binary output, converted to hex, without extranous print information, then reduce to only the hex wanted; for example, this way; re https://Unix.stackexchange.com/a/90242/110338 :
+# openssl dgst -md5 Photo_on_11-6-19_at_10.41_PM.jpg | sed 's/.*= //g'
 
 # what hash functions are unique to what tool (preferring openssl where multiple tools have it;
 # --openssl:
