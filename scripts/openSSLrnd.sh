@@ -1,15 +1,11 @@
 # DESCRIPTION
-# Very simple openSSL wrapper: get N ($1) random bytes from it.
+# Get N random bytes (from parameter $1) using openssl.
 
 # DEPENDENCIES
-# OpenSSL.
+# openssl
 
 # USAGE
-# Call with these parameters:
-# - $1 number of random bytes to generate using OpenSSL.
-# Example that will get 512 random bytes:
-#    openSSLrnd.sh 512
-# To write N random bytes to a file via this script, pipe the output to a file:
+# To write N random bytes to a file via this script, run it this way; here, 512 can be changed to any number of bytes you wish to generate:
 #    openSSLrnd.sh 512 > rnd.dat
 
 
