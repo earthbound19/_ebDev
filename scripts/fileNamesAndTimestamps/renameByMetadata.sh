@@ -43,3 +43,6 @@ fi
 # renames all image formats in current directory which exiftool can; the %%-c does some magic that renames with a -<number> in case of duplicate file names. Can't seem to get it to format that way with anything other than a dash; uses a conditional like is given in this post: 
 # https://exiftool.org/forum/index.php?topic=6519.msg32511#msg32511 -- but adding an -else clause:
 exiftool -if "defined $CreateDate" -v -overwrite_original '-Filename<CreateDate' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" -else -v -overwrite_original '-Filename<DateTimeOriginal' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" *.*
+
+# DEV NOODLING: attempt to rename sidecars and other files with the same base filename when you rename a master such as a raw (e.g. cr2) file: re: https://exiftool.org/forum/index.php?topic=9423.0 -- this command works IF there's metadata in both files (source raw and xmp sidecar) identifying them as a pair! :
+# exiftool -V -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" '-FileName<${DateTimeOriginal}' .
