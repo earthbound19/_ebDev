@@ -17,7 +17,7 @@
 
 # CODE
 # TO DO
-# - add more hash types via other tools? See TO DO iteams in PRNDfromEntropicData.sh.
+# - add more hash types via other tools? See TO DO items in PRNDfromEntropicData.sh.
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (input file name to generate entropy from) passed to script. Exit."; exit 1; else entropySourceFileName=$1; fi
 
 if [ ! -f $entropySourceFileName ]
@@ -38,6 +38,7 @@ renderTargetFileName=${entropySourceFileName%.*}_hashEntropy.bin
 
 # TEH PIPES TEH PIPES THREE TEH PIPES
 # print all but first line, strip hash algo info from start (up to ' : '), then delete whitespace and newlines, then convert hex characters to binary data and pipe to $renderTargetFileName via xxd:
+# NOTE: if I wanted to avoid algorithms that produce zeros or other not random data (instead of checking if file size is zero), I might add these switches before the file name in rehash: -none -gost -md2 -md4 -md5 -sha1 -sha256 -sha384 -sha512 -tiger -ed2k -fnv32 -fnv64 -haval3 -haval4 -haval5 -rmd128 -rmd160
 rehash $entropySourceFileName | tail -n +2 | sed 's/.* : //g' | tr -d '[[:space:]]\n' | xxd -r -ps > $renderTargetFileName
 
 printf "DONE rendering hash-derived binary entropy from source file $entropySourceFileName to target file $renderTargetFileName.\n"
