@@ -25,8 +25,8 @@ parent_directory=$(pwd)
 for directory in ${repo_directories[@]}
 do
 	cd $directory
-	printf "\n\n"
-	echo "running git pull for directory ""$parent_directory"/"$directory . . ."
+	printf "\n\nSyncing local git repos with remotes. . .\n"
 	git pull
+	git fetch --prune
 	cd $parent_directory
 done
