@@ -7,8 +7,8 @@
 # - $2 number of files per folder
 # - $3 OPTIONAL. Prefix name for folders. If not provided, defaults to `_toEndFR_`. If you want to use $4 and leave this as the default, pass the word DEFAULT for this parameter.
 # - $4 OPTIONAL. Anything, such as the word FLORGULB, which will cause the files to be randomly shuffled into subfolders (instead of using the default list order).
-# Example command that will axe all files with the extension .hexplt into 80 files per folder, prefixing the numbered folder names with _startN_:
-#    axeNfiles.sh hexplt 80 _startN_
+# Example command that will axe all files with the extension .hexplt into 80 files per folder, prefixing the numbered folder names with _to:
+#    axeNfiles.sh hexplt 80 _to
 # Example command that will do the same thing but using the default folder prefix name, and randomly shuffling the list of files before sorting into folders:
 #    axeNfiles.sh hexplt 80 DEFAULT FLORGULB
 # NOTE

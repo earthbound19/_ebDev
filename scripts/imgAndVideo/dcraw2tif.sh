@@ -19,12 +19,12 @@
 
 # CODE
 # I feel stupid that this far more efficient and elegant method of extracting file base names and extensions has eluded me for years, re: https://www.cyberciti.biz/faq/Unix-linux-extract-filename-and-extension-in-bash/ -- this will speed up at least a few scripts.
-fileName="${1%.*}"
-# fileExt=`echo "${1##*.}"`
+fileNameNoExt="${1%.*}"
+targetFileName=$fileNameNoExt.tiff
 
-if [ ! -f $fileName.tiff ]
+if [ ! -f $targetFileName ]
 then
-  echo Target file "$fileName".tif does not exist. Will render.
+  echo Target file $targetFileName does not exist. Will render.
 		# Something I tried and it didn't help much; maybe I know too little;
 		# Re: http://www.guillermoluijk.com/tutorial/dcraw/index_en.htm 
 		#
@@ -53,7 +53,7 @@ then
   # ALSO SEE: https://www.cambridgeincolour.com/forums/thread47002.htm -- the "4) sRGB II" preset given there is what I settled on here, which is "..exactly the same as opening the CR2 in RawDigger and saving it as 'RGB render', with 'As Shot' white balance."
   dcraw -v -w -H 2 -q 3 -o 1 -6 -T "$1"
 else
-  echo Target file "$fileName".tif already exists. Will not overwrite.
+  echo Target file $targetFileName already exists. Will not overwrite.
 fi
 # -h \
 # NOTE: move those additional optional switches line one up before the "$1" and uncomment them to use them.
