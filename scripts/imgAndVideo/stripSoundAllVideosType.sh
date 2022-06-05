@@ -2,8 +2,10 @@
 # Losslessly removes sound from all videos of type $1 (parameter 1), renaming the previous version of the file to <filename>_backup.ext, and putting the video with sound stripped in place of the original file name.
 
 # USAGE
-# Run with one parameter, which is the extension of videos you wish to strip of sound, e.g.:
-#    stripSoundAllVideosType.sh
+# Run with these parameters:
+# - $1 the extension of videos you wish to strip of sound
+# For example, to strip sound from all video files with the extension mp4, run:
+#    stripSoundAllVideosType.sh mp4
 
 
 # CODE
