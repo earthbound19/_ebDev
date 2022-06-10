@@ -8,8 +8,11 @@
 # Run with these parameters:
 # - $1 file name of source .hexplt format file to augment. Must be in the same directory you call this script from.
 # - $2 how many linearly interpolated colors to insert between each color in palette file $1.
+# - $3 OPTIONAL. Anything, such as the word SNALFOO, which will cause this script to pass a parameter to get_color_gradient_OKLAB.js telling it to deduplicate any adjacent colors from interpolations. In other words, don't ever have the same color repeat. Note that this may effectively override $2 if that results in fewer interpolations between each color. If you have a high number for $2, I strongly recommend using this adjecent deduplication parameter.
 # For example, to interpolate 13 colors in between each color in the file Firebird.hexplt, run:
 #    augmentPalette.sh Firebird.hexplt 13
+# To do the same thing but interpolate 70 colors but also remove duplicate adjacent colors, run:
+#    augmentPalette.sh Firebird.hexplt 70 CHELPIGOR
 # The result file for this example would be `Firebird_augmented_13.hexplt`.
 # NOTES
 # - This script checks for a local environment variable $fullPathToOKLABAugmentationScript, which is the full path to the dependency script `get_color_gradient_OKLAB.js`. If that environment variable is not set, it will look for the path to the dependency script via `getFullPathToFile.sh`, and set that variable to what `getFullPathToFile.sh` finds. If you call this script via `source`, that newly set variable will still exist in your shell when this script returns. This will save a call to `getFullPathToFile.sh` if you call this script (`augmentPalette.sh`) again, which can save a lot of time, as that path finding script can run very slow. (It saves time because after the first call, the variable is set and so on the second call, it checks and sees it's already set and doesn't look for it again.) So, if you call this script repeatedly from another script, call it with `source` this way, where `<palette_file_name>` and/or `<N>` change with each call:
@@ -21,6 +24,9 @@
 # CODE
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source .hexplt format file) passed to script. Return."; return 1; else sourceHexplt=$1; fi
 if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many steps to interpolate between each color in the source palette) passed to script. Return."; return 1; else interpolationSteps=$2; fi
+# set deduplicateAdjacentSamplesParameter as '' (will override in next check if parameter $3 passed to script) :
+if [ "$3" ]; then deduplicateAdjacentSamplesParameter='-d'; fi
+
 # Because each new interpolation iteration will start with the same color as the end color of the previous interpolation, we're going to remove the tail color of each interpolation (iteration) via the `-l 1` switch. That means $((N - 1)). ALSO, the understood literal intent of interpolation in this documentation is _how many additional colors in between), which means (start color + inserted colors + end color), which means $((N + 2)). Summing that, it's $((N - 1 + 2)) = $((N + 3)). SO:
 interpolationSteps=$(($interpolationSteps + 2))
 # (This process will need to tack that last removed color back on after everything is removed.)
@@ -56,6 +62,7 @@ do
 	-s $thisElement \
 	-e $nextElement \
 	-n $interpolationSteps \
+	$deduplicateAdjacentSamplesParameter \
 	-l 1 \
 	)
 	)
