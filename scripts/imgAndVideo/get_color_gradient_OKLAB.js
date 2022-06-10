@@ -26,6 +26,7 @@ program
   .option('-r, --reverse', '\n\tReverse order of samples before print.\n')
   .option('-c, --chromaOverrideOnEndColor [number between 0, 0.322≈]', '\n\tOverrides chroma on -e (--end) color with float value provided with this switch. For example, if you pass \'-c 0\' (or zero), end color will have no chroma (it will be gray for that color). This would make gradient from the -s (--start) color to a perfect desaturation (gray) for the -e (--end) color. If the -s and -e colors are the same and you use -c 0, you will get a gradient of shades of the color to gray (and the gradient may be a better gradient than if you just use gray for the end color; the colors in the gradient may have more lightness and chroma on their way to gray).\n')
   .option('-b, --lightnessOverrideOnEndColor [number between 0 and 1]', '\n\tOverrides lightness on -e (--end) color with float value provided with this switch. For example, if you pass \'-b 0\' (or zero), end color will have no lightness (it will be black). This would cause a gradient from the -s (--start) color to a perfect shade (black) for the -e (--end) color. If the -s and -e colors are the same and you use -b 0, you will get a gradient of shades of the color to black (and the gradient may be a better gradient than if you just use black for the end color; the colors in the gradient may have more lightness and chroma on their way to black.\n')
+  .option('-d, --deduplicateAdjacentSamples', '\n\tRemove adjacent duplicate samples before print. In other words, make it so that there are no duplicate colors next to each other. This could probably technically just be "remove duplicate colors," without any adjacency criteria, but was implemented with the adjacency criteria.\n')
 program.parse();
 const options = program.opts();
 // if n < 3, abort with error as there's no point.
@@ -86,6 +87,12 @@ if (options.endColorRemove) {
 }
 // reverse order of colors if switch so commands:
 if (options.reverse) { samples.reverse(); }
+
+// remove duplicate adjacent samples (array elements) if switch so commands:
+if (options.deduplicateAdjacentSamples) {
+// re: https://stackoverflow.com/a/54603424/1397555
+  samples = samples.filter((i,idx) => samples[idx-1] !== i)
+}
 
 // print interpolated colors, one per line:
 idx = 0;
