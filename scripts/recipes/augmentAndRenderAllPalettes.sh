@@ -37,7 +37,7 @@ do
 		# get length of augmented palette:
 		augmentedPaletteArrayLength=${#augmentedPaletteArray[@]}
 		echo "Length of augmented palette is $augmentedPaletteArrayLength colors. Rendering palette . . ."
-	#	renderHexPalette.sh $paletteRenderTargetFileName 'NULL' 'NULL' $augmentedPaletteArrayLength 1
+		renderHexPalette.sh $paletteRenderTargetFileName 'NULL' 'NULL' $augmentedPaletteArrayLength 1
 	else
 		printf "Render target $paletteRenderTargetFileName already exists; will not clobber. To recreate it, delete it and run this script the same way again.\n\n"
 	fi
