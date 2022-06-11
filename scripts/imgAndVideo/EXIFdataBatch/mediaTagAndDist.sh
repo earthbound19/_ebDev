@@ -54,7 +54,6 @@ find . -iname \*MD_ADDS.txt > images_MD_ADDS_list.txt
 mapfile -t images_MD_ADDS_list < images_MD_ADDS_list.txt
 for element in "${images_MD_ADDS_list[@]}"
 do
-echo element is $element
 	# Retrieve image title from ~MD_ADDS.txt for use in adding search engine query for original image source--adding that to the description tag:
 	imageTitle=$(sed -n 's/^-IPTC:ObjectName="\(.*\)"$/\1/p' $element)
 	# Strip out characters (from imageTitle) which may choke the Sphider search engine which I use; adapted from ftun.sh; dunno why, but that backtick \` had to be triple-escaped \\\ and also a backslash double-escaped, and even that only worked if everything is surrounded by single-quote marks ':
@@ -85,28 +84,37 @@ echo command to run will be\:
 	tr '\n' ' ' < $element > ghor.txt
 	exifTagArgs=$( < ghor.txt)
 	rm ghor.txt
-	# Retrieve extension of source final master file name (SFMFN) from ~MD_ADDS; and store it in a variable; thanks re http://stackoverflow.com/a/1665574 :
-	SFMFNextension=$(sed -n 's/.*from master file.*\(\..\{1,4\}\)"/\1/p' $element)
-	# Retrieve and store full ~ file name with extension; the \.\/ part escapes ./ (which ./ this sed command also strips) :
-				# SFMFNnoExtension=`sed -n 's/.*from master file: \.\/\(.*\)\..\{1,4\}"/\1/p' $element`
+	# get fullp path to master file:
+	SFMFNfullPath=$(sed 's/.*from master file: \(.*\)"/\1/g' <<< $exifTagArgs)
+	# get file name without path from that:
+	SFMFNfileNameNoPath=${SFMFNfullPath##*/}
+	# get file extension from that; and FOR THE LOVE OF ALL THAT IS UNHOLY AND IMPURE, I had to fight with an extraneous newline character here (trim it out with tr) ending up in a file name! :
+	SFMFNextension=$(echo .${SFMFNfullPath##*.} | tr -d '\15\32')
+	# get path without file name from that:
 	# SFMFNpath will preserve any subdirectory paths and duplicate them to the target ./_dist path:
-	SFMFNpath=$(sed -n 's/.*from master file: \.\/\(.*\/\).*\"/\1/p' $element)
+	SFMFNpath=${SFMFNfullPath%\/*}
 # e.g. result val of SFMFNpath: subdir/
 # OR if no subdir, it is blank.
-	SFMFNwithExtension=$(sed -n 's/.*from master file: \.\/\(.*\..\{1,4\}\)"/\1/p' $element)
 					# echo ~~~~
-						# echo SFMFNwithExtension is $SFMFNwithExtension
+						# echo SFMFNfullPath is $SFMFNfullPath
 						# echo SFMFNnoExtension is $SFMFNnoExtension
 						# echo that plus extension is $SFMFNnoExtension$SFMFNextension
 					# echo ====
+	CYGPATH_TO_MEDIA_FILE=$SFMFNpath/__tagAndDistPrepImage$SFMFNextension
+	DOSPATH_TO_MEDIA_FILE=$(cygpath -w $CYGPATH_TO_MEDIA_FILE)
+
+	# echo -=-=
+	# Copy to new ~tagAndDistPrep image before running metadata update batch against it (so that the batch will even do any work) ; NOTE that if $SFMFNpath is empty, the dest path to copy to will simply be ./ ; this doom of using two sets of double quotes for the dest path was at last prophecied 06/20/2016 11:18:51 PM -RAH; BUT WAIT, THERE'S MORE!--and rediscovered thanks to a missing double quote mark typographical error 07/01/2016 10:18:40 PM -RAH:
+	cp -f $SFMFNfullPath $CYGPATH_TO_MEDIA_FILE
+
 	# If SFMFNextension is .tif, strip all EXIF data by custom command upon inserting custom metadata; otherwise use a more general exif data strip command:
-	if [ $SFMFNextension == ".tif" ] || [ $SFMFNextension == ".png" ] || [ $SFMFNextension == ".psd" || [ $SFMFNextension == ".svg" ]
+	if [ $SFMFNextension == ".tif" ] || [ $SFMFNextension == ".png" ] || [ $SFMFNextension == ".psd" ] || [ $SFMFNextension == ".svg" ]
 	then
 		# echo is tif.
 # TO DO: double-check: I *think* the -m flag, in ignoring minor warnings, allows writing strings into metadata longer than specs allow:
 				echo writing commmand for tif file to exiftool_temp_update_metadata.bat\:
-				echo exiftool -CommonIFD0= -adobe:all= -xmp:all= -Photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension
-		echo exiftool -CommonIFD0= -adobe:all= -xmp:all= -Photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension > exiftool_temp_update_metadata.bat
+				echo exiftool -CommonIFD0= -adobe:all= -xmp:all= -Photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $DOSPATH_TO_MEDIA_FILE
+		echo exiftool -CommonIFD0= -adobe:all= -xmp:all= -Photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $DOSPATH_TO_MEDIA_FILE > exiftool_temp_update_metadata.bat
 		# In two commands because for wait what?
 		# echo exiftool $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension >> exiftool_temp_update_metadata.bat
 				# e.g.:   exiftool -CommonIFD0= testimg.tif    NECESSARY FOR removing tags from tiffs! RE: http://www.sno.phy.queensu.ca/~phil/exiftool/faq.html#Q7
@@ -115,8 +123,8 @@ echo command to run will be\:
 	else
 		# echo is not tif.
 				echo writing commmand for non-tif file to exiftool_temp_update_metadata.bat\:
-				echo exiftool -adobe:all= -xmp:all= -Photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension
-		echo exiftool -adobe:all= -xmp:all= -Photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $SFMFNpath\__tagAndDistPrepImage$SFMFNextension > exiftool_temp_update_metadata.bat
+				echo exiftool -adobe:all= -xmp:all= -Photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $DOSPATH_TO_MEDIA_FILE
+		echo exiftool -adobe:all= -xmp:all= -Photoshop:all= -iptc:all= -m -overwrite_original -k $exifTagArgs $DOSPATH_TO_MEDIA_FILE > exiftool_temp_update_metadata.bat
 	fi
 		# Use any/which? :
 		# -@ ARGFILE ?
@@ -127,14 +135,8 @@ echo command to run will be\:
 
 	# run created script, then delete it:
 	if [ ! -d ./_dist ]; then mkdir ./_dist; fi
-	# echo -=-=
-	# Copy to new ~tagAndDistPrep image before running metadata update batch against it (so that the batch will even do any work) ; NOTE that if $SFMFNpath is empty, the dest path to copy to will simply be ./ ; this doom of using two sets of double quotes for the dest path was at last prophecied 06/20/2016 11:18:51 PM -RAH; BUT WAIT, THERE'S MORE!--and rediscovered thanks to a missing double quote mark typographical error 07/01/2016 10:18:40 PM -RAH:
-	cp -f "./$SFMFNwithExtension" "./$SFMFNpath""__tagAndDistPrepImage""$SFMFNextension"
-	# Because (it seems) Cygwin can create a batch file the system doesn't have permission to run? AND no permissions are given to open that copied file:
-	chmod 777 exiftool_temp_update_metadata.bat "./$SFMFNpath""__tagAndDistPrepImage""$SFMFNextension"
 	start exiftool_temp_update_metadata.bat
-	echo Ran exiftool_temp_update_metadata.bat . . .
-# printf "" > exiftool_temp_update_metadata.bat
+#	echo Ran exiftool_temp_update_metadata.bat . . .
 	# Move the new, properly metadata tagged file to a permanent distribution location; but only if the dist. file doesn't exist:
 	if [ -e "./_dist/$SFMFNpath$imageTitle$SFMFNextension" ]
 	then
@@ -142,7 +144,8 @@ echo command to run will be\:
 	else
 		# Make target directory for dist file, only if it doesn't exist:
 		if [ ! -e ./_dist/$SFMFNpath ]; then mkdir ./_dist/$SFMFNpath; fi
-		mv -f "./$SFMFNpath""__tagAndDistPrepImage$SFMFNextension" "./_dist/$SFMFNpath$imageTitle$SFMFNextension"
+		sleep 3
+		mv -f $CYGPATH_TO_MEDIA_FILE ./_dist/$SFMFNfileNameNoPath
 	fi
 	echo -~-~
 done
@@ -154,11 +157,13 @@ echo Metadata modified for each image\, and each final distribution image copied
 
 # DEVELOPMENT HISTORY:
 
+# 2022-06-11 04:24 AM
+# Resurrected and went absolutely mad getting it to work with Windows/DOS quirks that fight with MSYS2 in the process. Complete mystery why it wasn't working: I was using it for a while. But the POLR engine is not up nor working; using without POLR URL replacement. 
 # 12/04/2016 11:30:53 PM
 # Strip non-alpha-numeric characters out of title before sending it as a Sphider search engine query to Polr2 URL shortener (workaround for Sphider apparently stopping query on unusual characters).
 # 2016-06-20 11:47:00 PM
 # Bug fix: tagged files in root of dir from which script is run wouldn't create in same dir, and therefore wouldn't get metadata update and move to ../dist/[path]. Corrected relevant code line to:
-# cp -f "$SFMFNwithExtension" "./$SFMFNpath""__tagAndDistPrepImage$SFMFNextension"
+# cp -f "$SFMFNfullPath" "./$SFMFNpath""__tagAndDistPrepImage$SFMFNextension"
 # .. and modified other relevant lines to have two sets of "" for the target.
 
 # 2016-05-08 01:03:47 PM--2016-05-08 10:35:46 PM
