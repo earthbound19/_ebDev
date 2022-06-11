@@ -7,4 +7,5 @@ scripts\filter_forge
 scripts\font
 scripts\imgAndVideo
 scripts\imgAndVideo\EXIFdataBatch
+scripts\imgAndVideo\EXIFdataBatch\metaDataTemplates
 scripts\recipes
