@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Wrapper that renders any text within quote marks to a randomly named audio file. Windows-only. For MacOS, you can run this:
+# Wrapper that renders any text within quote marks to a .wav audio file, with the text incorporated in the file name, and then starts the .wav file with the default player or handler. Windows-only. For MacOS, you can run this:
 #    say "blorf blefl horple"
 # OR
 #    cat inputFile.txt | say
@@ -23,5 +23,14 @@
 # TO DO
 # - Examine http://espeak.sourceforge.net/
 
-textSay=$1; fileName=$1
-balcon -t "$textSay" -w "$fileName"".wav"
+textSay=$1;
+# replace any terminal-unfriendly characters in the source string with underscores to help form the render target file name:
+renderTargetFileNamePart=$(echo $1 | tr \`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \. _)
+# truncate that to 32 characters max.:
+renderTargetFileNamePart=$(cut -c -32 <<< $renderTargetFileNamePart)
+# get a random string to append to that (will avoid any file name part that already exists in the current directory) :
+rndString=$(cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c 11)
+# -- and append it:
+renderTargetFileName="$renderTargetFileNamePart"_"$rndString".wav
+balcon -t "$textSay" -s -3 -w "$renderTargetFileName"
+start "" "$renderTargetFileName"
