@@ -59,7 +59,7 @@ float rowHeight;
 int columns;
 int rows;
 
-boolean saveImageSeries = true;
+boolean saveImageSeries = false;
 boolean rapidBWhdAlphaGenMode = false;		// overrides some of the above globals
 
 // FOR OTHER POSSIBLE characters to use in superset, see: http://s.earthbound.io/RNDblockChars
@@ -209,14 +209,12 @@ void settings() {
 
     fontPointSize = width/32;
     
-    saveImageSeries = true;
-    
     rndColorChangeMode = true;  // no BW images will be made, only black (because of rnd func nature/call)
     // unless that is true; so override to true here in case it is set by user in global vars as false
 	} else {
 		// fullScreen();
 		// OR:
-	  size(1920, 1080);
+	  size(800, 800);
 		bgColors = new color[]{
 			#1C1C1C, #151D1D,	#0E1D1F, #031E21,	#06161E, #0A0E1C,	#0B0B1B, #080813,
 			#030308, #000000,	#0D0B00, #171201,	#201901
@@ -236,7 +234,7 @@ void settings() {
 		fillColorsLength = fillColors.length;
 		fillColorsArrayIndex = 0;
 		
-    delayBetweenRenders = 84; // has been: 84, 112, 141;
+    delayBetweenRenders = 640; // has been: 84, 112, 141, 640
     
 		numRendersToDisplaySubset = 15;
 	  reloadAfterNrenders = numRendersToDisplaySubset * 4;
@@ -269,12 +267,14 @@ void setupNewVariant() {
   subsetDisplayedrendersCounter = 0;
   
   String variantCountPaddedString = nf(variantCount, 5);
-  animFramesSaveSUBdir = animFramesSaveDir + "/" + variantCountPaddedString + "/";
-  String variantString = str(seed);
-  output = createWriter(animFramesSaveSUBdir + variantString + ".txt"); 
-  output.println("The random seed for the variant that produced the images in this folder is " + variantString + ".\n");
-  output.flush();
-  output.close();
+  if (saveImageSeries == true) {
+    animFramesSaveSUBdir = animFramesSaveDir + "/" + variantCountPaddedString + "/";
+    String variantString = str(seed);
+    output = createWriter(animFramesSaveSUBdir + variantString + ".txt"); 
+    output.println("The random seed for the variant that produced the images in this folder is " + variantString + ".\n");
+    output.flush();
+    output.close();
+  }
 }
 
 void setup() {
