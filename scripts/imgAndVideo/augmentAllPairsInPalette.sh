@@ -1,15 +1,17 @@
 # DESCRIPTION
 # For every pair of colors in a palette, creates a new gradient palette by repeat calls of augmentPalette.sh.
 
+# DEPENDENCIES
+# `get_color_gradient_OKLAB.js` (and nodeJS and the packages that script requires), `getFullPathToFile.sh`
+
 # USAGE
 # Run with these parameters:
 # - $1 the source palette file name
 # - $2 OPTIONAL. How many linearly interpolated colors to insert between each color pair in palette file $1. If omitted, a default is used.
 # For example, to create a new augmented (gradient) palette for every pair of colors in some_favorite_colors.hexplt, with 16 colors from the start to end color in each pair, run:
 #    augmentPalette.sh some_favorite_colors.hexplt 16
+# NOTE that this passes the -d (removed duplicate colors from output) switch to get_color_gradient_OKLAB.js. If you don't want that, hack this to remove that switch from the command.
 
-# DEPENDENCIES
-# `get_color_gradient_OKLAB.js` (and nodeJS and the packages that script requires), `getFullPathToFile.sh`
 
 
 # CODE
@@ -39,6 +41,6 @@ do
 	do
 		outputFileName="$outerLoopColor"_to_"$innerLoopColor"_gradient_"$nColorsAugment"_okLab.hexplt
 		# invoke the script we want to use with parameters, and pipe the result to file for this invocation:
-		node $fullPathToScript -s $outerLoopColor -e $innerLoopColor -n $nColorsAugment > $augmentedPalettesOutputDir/$outputFileName
+		node $fullPathToScript -s $outerLoopColor -e $innerLoopColor -n $nColorsAugment -d > $augmentedPalettesOutputDir/$outputFileName
 	done
 done
