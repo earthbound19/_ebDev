@@ -2,7 +2,7 @@
 # Rips all glyphs out of any TrueType (~`.ttf`) font, saving each glyph into a vector file (`eps` or `svg` are possible, and maybe other formats).
 
 # DEPENDENCIES
-# FontForge and ImageMagick, both in your PATH.
+# FontForge, ImageMagick, and getFullPathToFile.sh, all in your PATH.
 
 # USAGE
 # Run with these parameters:
@@ -21,4 +21,8 @@
 # CODE
 # Template command; meaning use the ripGlyphs.pe script, and rip arial.ttf into individual eps glyph files:
 # FontForge.exe -script ripGlyphs.pe arial.ttf eps
-FontForge -script ripGlyphs.pe $1 $2
+
+# Previously this worked without a full path to the script file (I thought?), but as of this writing it seems to need a full path, so get it and store it in a variable:
+scriptPath=$(getFullPathToFile.sh ripGlyphs.pe)
+
+FontForge -script $scriptPath $1 $2
