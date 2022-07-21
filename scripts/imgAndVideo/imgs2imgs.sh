@@ -16,7 +16,7 @@ if [ ! "$1" ]; then printf "\nNo parameter \$1 (source image type to convert) pa
 if [ ! "$2" ]; then printf "\nNo parameter \$2 (source image type to convert) passed to script. Exit."; exit 1; else destIMGformat=$2; fi
 if [ "$3" ]; then param3=$3; fi
 
-fileNamesList=$(find . -maxdepth 1 -type f -name \*.$sourceIMGformat -printf "%f\n")
+fileNamesList=($(find . -maxdepth 1 -type f -name \*.$sourceIMGformat -printf "%f\n"))
 
 for fileName in ${fileNamesList[@]}
 do
