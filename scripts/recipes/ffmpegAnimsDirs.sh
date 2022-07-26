@@ -16,7 +16,8 @@ if ! [ "$2" ]; then destRate=30; else destRate=$2; fi
 if ! [ "$3" ]; then quality=7; else quality=$3; fi
 if ! [ "$4" ]; then imgFormat='png'; else imgFormat=$4; fi
 if ! [ "$5" ]; then rescaleParam='NULL'; else rescaleParam=$5; fi
-if ! [ "$6" ]; then finalStillSeconds=13; else finalStillSeconds=$6; fi
+# If I define finalStillSeconds even without a value, then ffmpegAnim.sh does things with it. So, don't even define it if no $6 parameter is passed (only define it if there is a parameter $6) :
+if [ "$6" ]; then finalStillSeconds=$6; fi
 
 # sorts by newest first:
 directories=( $(find . -maxdepth 1 -type d -printf '%f\n' | sort -n | sed 's/.*[AM|PM] \.\/\(.*\)/\1/g') )
