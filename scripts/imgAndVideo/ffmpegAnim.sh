@@ -6,7 +6,7 @@
 
 # USAGE
 # From the directory with the image animation source images, run this script with these parameters:
-# - $1 input "frame rate" (how to interpret the speed of input images in fps)
+# - $1 input "frame rate" (how to interpret the speed of input images in fps). Suggested range for abstract / noise art: anywhere from ~0.9 (a bit more than a still per second) to 7 (7 stills per second). To use an input frames per second that is a randomly chosen number between 0.9 and 7, pass the keyword 'RND' for $1.
 # - $2 desired output framerate
 # - $3 desired constant quality (crf)
 # - $4 the file extension of the input images.
@@ -22,22 +22,45 @@
 
 # CODE
 # TO DO
-# - Make it name the output file after the ../.. parent folder name?
+# - Make the output file name after the ../.. parent folder name? Or just the parent folder name? IF YOU DO THAT, modify scripts that call this script (ffmpegAnimsDirs.sh and maybe others?) to no longer do output file renaming.
 
-if [ "$5" ]
+# ==== BEGIN PARAMETER CHECKING and globals setting therefrom.
+if [ ! "$1" ]
 then
-	if [ "$5" != "NULL" ]		# If we want to use $6 but not $5 (as $6 is positional), we use NULL for $5.
+	printf "\nNo parameter \$1 (input frame rate) passed to script. Exit."
+	exit 1
+else
+	if [ "$1" == "RND" ]
 	then
-		rescaleParams="-vf scale=$5:flags=neighbor"
-			# echo rescaleParams val is\:
-			# echo $rescaleParams
+		inFPS=$(seq 0.9 0.1 7 | shuf | head -n1)
+		# echo source FPS set to randomly chosen number $inFPS.
 	else
-		echo parameter 5 was the string \"NULL\"\. Will not use.
+		inFPS=$1
+		# echo source FPS is $inFPS.
 	fi
 fi
 
-array=( $(find . -maxdepth 1 -type f -name "*.$4" -printf '%f\n') )
-# last element of array is last found file type $4 :
+if [ ! "$2" ]; then printf "\nNo parameter \$2 (output frame rate) passed to script. Exit."; exit 2; else outFPS=$2; fi
+
+if [ ! "$3" ]; then printf "\nNo parameter \$3 (constant rate factor, or quality, where 0 is best and 50 is worst) passed to script. Exit."; exit 3; else crf=$3; fi
+
+if [ ! "$4" ]; then printf "\nNo parameter \$4 (file extension of input images) passed to script. Exit."; exit 4; else inFileType=$4; fi
+
+if [ "$5" ] && [ "$5" != "NULL" ]		# If we want to use $6 but not $5 (as $6 is positional), we use NULL for $5.
+then
+	rescaleParams="-vf scale=$5:flags=neighbor"
+	# echo rescaleParams val is\:
+	# echo $rescaleParams
+else
+	echo parameter 5 was the string \"NULL\"\. Will not use.
+fi
+
+if [ "$6" ]; then finalLoopSeconds=$6; fi
+# ==== END PARAMETER CHECKING and globals setting therefrom.
+
+# get array of input files:
+array=( $(find . -maxdepth 1 -type f -name "*.$inFileType" -printf '%f\n') )
+# last element of array is last found file type $inFileType :
 lastFoundFileType=${array[-1]}
 lastFoundTypeFileNameNoExt=${lastFoundFileType%.*}
 digitsPadCount=${#lastFoundTypeFileNameNoExt}
@@ -56,14 +79,15 @@ pixelFormat="-pix_fmt yuv420p"
 
 # Because something funky and evil in DOS and/or Unix emulation chokes on some forms of $additionalParams inline, but not if printed to and executed from a script;
 # FOR LOSSLESS BUT COMPRESSED AVI, end the command instead with: -codec:v utvideo _out.avi :
-echo "ffmpeg -y -f image2 -framerate $1 -i %0"$digitsPadCount"d.$4 $additionalParams $rescaleParams -r $2 $pixelFormat -crf $3 _out.mp4" > tmp_enc_script_P4b3ApXC.sh
+echo "ffmpeg -y -f image2 -framerate $inFPS -i %0"$digitsPadCount"d.$inFileType $additionalParams $rescaleParams -r $outFPS $pixelFormat -crf $crf _out.mp4" > tmp_enc_script_P4b3ApXC.sh
 ./tmp_enc_script_P4b3ApXC.sh
 rm ./tmp_enc_script_P4b3ApXC.sh
 
-# If $6 is passed to the script, create a looped still video ($6 seconds long) from the last frame and append it to the video:
-if [ "$6" ]
+# If $6 is passed to the script (which is assigned to finalLoopSeconds in the PARAMETER CHECKING section), create a looped still video ($finalLoopSeconds seconds long) from the last frame and append it to the video.
+# If $6 is not passed to the script, a variable named finalLoopSeconds is never declared, so this same type of check for variable existence works here: true if the variable name exists, false if it doesn't":
+if [ "$finalLoopSeconds" ]
 then
-	ffmpeg -y -loop 1 -i $lastFoundFileType -vf fps=$2 -t $6 -crf $3 $pixelFormat _append.mp4
+	ffmpeg -y -loop 1 -i $lastFoundFileType -vf fps=$outFPS $additionalParams $rescaleParams -t $finalLoopSeconds -crf $crf $pixelFormat _append.mp4
 	printf "" > tmp_ft2N854f.txt
 	echo _out.mp4 >> tmp_ft2N854f.txt
 	echo _append.mp4 >> tmp_ft2N854f.txt
