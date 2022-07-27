@@ -31,6 +31,7 @@
 
 # CODE
 # TO DO
+# - implement e.g. -tile 8x40 flag depending on desired aspect, etc. (will determine values of $tilesAcross and $tilesDown depending on desired aspect)?
 # - UM. WOULDN'T THIS BE A TON FASTER creating a ppm and then upscaling it by nearest neighbor method?! Redo script (or make variant method script) for that?! -- trying that in hexplt2ppm.sh.
 # - Math to determine tile size dynamically for a target total image resolution?
 
@@ -175,8 +176,6 @@ do
 	echo "running command: magick convert -size "$tileEdgeLen"x"$tileEdgeLen" xc:\#$color $tmp_render_dir/$color.png"
 	magick convert -size "$tileEdgeLen"x"$tileEdgeLen" xc:\#$color $tmp_render_dir/$color.png
 done
-
-# TO DO? : implement e.g. -tile 8x40 flag depending on desired aspect, etc. (will determine values of $tilesAcross and $tilesDown depending on desired aspect?)
 
 # make the actual montage image. Example command: magick montage colors/5A6D40.png colors/757F26.png colors/C68C15.png colors/8F322F.png colors/954B29.png out.png
 # make temporary script to create a grid montage of the colors:
