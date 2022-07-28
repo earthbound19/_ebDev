@@ -95,7 +95,7 @@ colorsArray=( $(grep -i -o '#[0-9a-f]\{6\}' $hexColorSrcFullPath | tr -d '#') )	
 # Get number of colors (from array):
 numColors=${#colorsArray[@]}
 
-# WHETHER NUM tiles across (and down) is specified; if so, use as specified, if not so, do some math to figure for a 2:1 aspect; OR look for instruction syntax in source hexplt (read on) ;
+# IF NUM TILES ACROSS (AND DOWN) IS SPECIFIED; use it, if not so, do some math to figure for a 2:1 aspect; OR look for instruction syntax in source hexplt (read on) ;
 # $4 is across. If $4 is not specified, do some math. Otherwise use $4:
 if [ ! $4 ]
 then
