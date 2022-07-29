@@ -16,7 +16,7 @@
 // Changes this version:
 // Rework documentation comments per preferences.
 // GLOBAL VARIABLE DECLARATIONS
-String versionNumber = "1.9.2";
+String versionNumber = "1.10.1";
 
 
 // TO DO
@@ -71,6 +71,7 @@ boolean rapidBWhdAlphaGenMode = false;		// overrides some of the above globals
  //String masterCharset = "∧∨∩∪∴∵∶∷∸∹∺⊂⊃⊏⊐⊓⊔⊢⊣⋮⋯⋰⋱";      // math operators subset
  //String masterCharset = "◈⟐⟢ːˑ∺≋≎≑≣⊪⊹☱☰☲☳☴☵☶☷፨჻܀";   //Apple emoji subset
  //String masterCharset = "─│┌┐└┘├┤┬┴┼╭╮╯╰╱╲╳▂▃▄▌▍▎▏▒▕▖▗▘▚▝○●◤◥♦";	// Commodore 64 font/drawing glyphs set--which, it happens, combines characters from some of the others interestingly.
+ //String masterCharset = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWZ!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ 0";  // all usable from bitBlocks.ttf
 String masterCharset = "▔▀▆▄▂▌▐█▊▎░▒▓▖▗▘▙▚▛▜▝▞▟";			// block characters subset
 int masterCharsetLength = masterCharset.length();
 
@@ -201,45 +202,43 @@ void settings() {
     fillColors = new color[]{ #000000 };
 		fillColorsLength = fillColors.length;
 		fillColorsArrayIndex = 0;
-    
+
     delayBetweenRenders = 0;
-    
+
     numRendersToDisplaySubset = 1;
     reloadAfterNrenders = 1;
 
     fontPointSize = width/32;
-    
+
     rndColorChangeMode = true;  // no BW images will be made, only black (because of rnd func nature/call)
     // unless that is true; so override to true here in case it is set by user in global vars as false
 	} else {
 		// fullScreen();
 		// OR:
 	  size(800, 800);
+    // palette used up to v1.9.2: darkBG.hexplt. Now: taken from soil_pigments.hexplt
 		bgColors = new color[]{
-			#1C1C1C, #151D1D,	#0E1D1F, #031E21,	#06161E, #0A0E1C,	#0B0B1B, #080813,
-			#030308, #000000,	#0D0B00, #171201,	#201901
+			#382F2A, #673D2E, #713820, #763436, #9B4831, #8E5237, #A26F3E, #BD8A58,
+      #CD844B, #DCA651, #EEC382, #DEC6A6, #D7C7B0, #9E9287, #7E7A6D, #A39461
 		};
 		bgColorsLength = bgColors.length;
 		bgColorsArrayIndex = 0;
-    // palette tweaked (and expanded with more cyans and greens, and lighter those) from:
-    // https://github.com/earthbound19/_ebArt/blob/master/palettes/fundamental_vivid_hues_v2.hexplt
+    // up to up to v1.9.2, palette tweaked (and expanded with more cyans and greens, and lighter those) from fundamental_vivid_hues_v2.hexplt, which at this writing is either renamed or deprecated (can't find it anymore). Now: taken from 32_max_chroma_med_light.hexplt
 		fillColors = new color[]{
-			#FF00FF, #FF00C0, #FF007F, #DB12A3, #C91BB5, #B624C8, #A42DDA, #7F40FF,
-			#6060FF, #6A6AFF, #7F7FFF, #608BF3, #4894EA, #00AFCF, #00C1EA, #00CFFF, #00C4FF,
-			#00E4FF, #2DEEFF, #3EF1FF, #7FFFFF, #6DFFFF, #5BFFFF, #25FFFF, #00FFFF,
-			#32F2DA, #43EECD, #54EAC1, #76E1A8, #40F37E, #52FE79, #00E77D, #1DCF00,
-			#65D700, #85FF00, #00FF00, #B5FF00, #B2F300, #AFE300, #D1EF00, #FFD500,
-			#FFB700, #FD730A, #FF5100, #FF0000, #FF0047, #FF006B, #FF009C
+			#f800fc, #ff00c8, #ff0596, #f80061, #ea0000, #fe3100, #ff5d00, #ff8005,
+      #ff9710, #ffb224, #ffc900, #ffe335, #feff06, #bae901, #a0d901, #60cd01,
+      #00b000, #00be72, #0ccab3, #18dbd7, #01edfd, #00ccff, #00a6fe, #0181fb,
+      #0041ff, #443bfe, #5c38ff, #7c38fd, #9937ff, #b732ff, #c830ff, #df26fd
 		};
 		fillColorsLength = fillColors.length;
 		fillColorsArrayIndex = 0;
-		
+
     delayBetweenRenders = 640; // has been: 84, 112, 141, 640
-    
+
 		numRendersToDisplaySubset = 15;
 	  reloadAfterNrenders = numRendersToDisplaySubset * 4;
-    
-    fontPointSize = width/43;    // tried sizes list: 83.4 51.5 43 39.1 32 24 12; unifont was last width/28.46
+
+    fontPointSize = width/12;    // tried sizes list: 83.4 51.5 43 39.1 32 24 12; unifont was last width/28.46
 	}
 
 	setRNDanimFramesSaveDirName();
@@ -265,12 +264,12 @@ void setupNewVariant() {
   displayRNDsubsets = true;
   renderCount = 0;
   subsetDisplayedrendersCounter = 0;
-  
+
   String variantCountPaddedString = nf(variantCount, 5);
   if (saveImageSeries == true) {
     animFramesSaveSUBdir = animFramesSaveDir + "/" + variantCountPaddedString + "/";
     String variantString = str(seed);
-    output = createWriter(animFramesSaveSUBdir + variantString + ".txt"); 
+    output = createWriter(animFramesSaveSUBdir + variantString + ".txt");
     output.println("The random seed for the variant that produced the images in this folder is " + variantString + ".\n");
     output.flush();
     output.close();
@@ -279,11 +278,13 @@ void setupNewVariant() {
 
 void setup() {
   setupNewVariant();
-  
-  // Uncomment the following two lines to see the available fonts 
+
+  // Uncomment the following two lines to see the available fonts
   //String[] fontList = PFont.list();
   //printArray(fontList);
   myFont = createFont("../BabelStoneShapes.ttf", fontPointSize);
+  // OR (and with necessary changes in masterCharset to use what the font offers), try:
+  // myFont = createFont("../bitBlocks.ttf", fontPointSize);
   textFont(myFont);
   textAlign(CENTER, TOP);
 
@@ -291,10 +292,11 @@ void setup() {
   // https://processing.org/reference/textLeading_.html -- so reset that with textLeading():
   characterWidth = textWidth('█');
   columns = int(width / characterWidth);
-  rowHeight = fontPointSize * 0.965;    // for unifont-12.1.04.ttf: = * 1.987;
+  // discovered settings for fontPointSize: BabelStoneShapes.ttf = * 0.965; unifont-12.1.04.ttf = * 1.987; bitBlocks.ttf = 0.7;
+  rowHeight = fontPointSize * 0.965;
   // I'm mystified why (textAscent() + textDescent() gave wrong val here with Fira Mono:
   textLeading(rowHeight);
-  
+
   rows = int(height / rowHeight);
 }
 
@@ -306,10 +308,10 @@ void renderRNDcharsScreen () {
   if (subsetDisplayedrendersCounter == numRendersToDisplaySubset) {
     subsetDisplayedrendersCounter = 0;
   }
-  
+
   mutateBGcolor();
   mutateFillColor();
-  
+
   // length of subCharSetRND can be changed, so this needs to be done every call of this func.:
   charsDisplayString = "";
   int subCharSetRNDlength = subCharSetRND.length();
