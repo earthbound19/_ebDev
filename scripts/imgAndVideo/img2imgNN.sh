@@ -28,11 +28,6 @@ if [ ! -f $targetFileName ]; then
 			# DEPRECATED: if source file is ppm or pbm, use IrfanView -- graphicsmagick works fine now (if at one point it didn't?) for converting ppm format files.
 			#if [ $imgFileExt == "ppm" ] || [ $imgFileExt == "pbm" ]; then
 			#	echo converting ppm file via i_view32 . . .
-				# IRFANVIEW PAREMETER SETUP VIA SCRIPT PARAMS
-				# set default empty value for targetShortDim; will be populated if $4 passed:
-			#	iViewTargetShortDimParam=""
-				# set default i_view64 maintain aspect parameter; will be cleared if $4 passed:
-			#	iViewAspectParam="/aspectratio"
 			#	if [ "$4" ]		# $4 is shorter edge length override, if it's passed
 			#	then
 			#		iViewTargetShortDimParam="/resize_short=$4"
