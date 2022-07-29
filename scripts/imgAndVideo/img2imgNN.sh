@@ -2,7 +2,7 @@
 # Resizes an image of type $1, in the current directory, by nearest-neighbor method, to target format $2, with the longest edge scaled up (or down!) to pixels $3. The shortest edge is scaled to maintain aspect, but that can be overriden to change aspect, with $4. Nearest neighbor method will keep hard edges, or look "pixelated." Uses GraphicsMagick, unless the file is ppm or pbm format, in which case it uses IrfanView (which to my knowledge is Windows only).
 
 # DEPENDENCIES
-# GraphicsMagick and/or IrfanView, both in your $PATH.
+# GraphicsMagick
 
 # USAGE
 # Run with the following parameters:
@@ -25,30 +25,32 @@ if [ ! "$3" ]; then printf "\nNo parameter \$3 (scale by nearest neighbor method
 imgFileExt=${srcFileName##*.}
 targetFileName=${srcFileName%.*}.$destFormat
 if [ ! -f $targetFileName ]; then
-	# if source file is ppm or pbm, use IrfanView
-	if [ $imgFileExt == "ppm" ] || [ $imgFileExt == "pbm" ]; then
-		echo converting ppm file via i_view32 . . .
-		# IRFANVIEW PAREMETER SETUP VIA SCRIPT PARAMS
-		# set default empty value for targetShortDim; will be populated if $4 passed:
-		iViewTargetShortDimParam=""
-		# set default i_view64 maintain aspect parameter; will be cleared if $4 passed:
-		iViewAspectParam="/aspectratio"
-		if [ "$4" ]		# $4 is shorter edge length override, if it's passed
-		then
-			iViewTargetShortDimParam="/resize_short=$4"
-			iViewAspectParam=""
-		fi
-		# re: http://www.etcwiki.org/wiki/IrfanView_Command_Line_Options
-		# ROTATE 90 DEGREES OPTION; uncomment next line (used with other options) :
-		# extraIrfanViewParam1="/rotate_r"
-		i_view64 "$srcFileName /resize_long=$targetLongDim $iViewTargetShortDimParam $iViewAspectParam $extraIrfanViewParam1 /convert=$targetFileName"
-	# otherwise use graphicsmagic:
-	else
+			# DEPRECATED: if source file is ppm or pbm, use IrfanView -- graphicsmagick works fine now (if at one point it didn't?) for converting ppm format files.
+			#if [ $imgFileExt == "ppm" ] || [ $imgFileExt == "pbm" ]; then
+			#	echo converting ppm file via i_view32 . . .
+				# IRFANVIEW PAREMETER SETUP VIA SCRIPT PARAMS
+				# set default empty value for targetShortDim; will be populated if $4 passed:
+			#	iViewTargetShortDimParam=""
+				# set default i_view64 maintain aspect parameter; will be cleared if $4 passed:
+			#	iViewAspectParam="/aspectratio"
+			#	if [ "$4" ]		# $4 is shorter edge length override, if it's passed
+			#	then
+			#		iViewTargetShortDimParam="/resize_short=$4"
+			#		iViewAspectParam=""
+			#	fi
+				# re: http://www.etcwiki.org/wiki/IrfanView_Command_Line_Options
+				# ROTATE 90 DEGREES OPTION; uncomment next line (used with other options) :
+				# extraIrfanViewParam1="/rotate_r"
+				# because irfanView at some point started needing the full path to an image for scripting (or something about my environment changed such that that is needed?), prefix the full path to it:
+			#	currentDir=$(pwd); currentDir=$(cygpath -w $currentDir)
+			#	i_view64 "$currentDir\\$srcFileName /resize_long=$targetLongDim $iViewTargetShortDimParam $iViewAspectParam $extraIrfanViewParam1 /convert=$targetFileName"
+			# otherwise use graphicsmagic:
+			#else
 		echo converting image via GraphicsMagick . . .
 		# GRAPHICSMAGIC PAREMETER SETUP VIA SCRIPT PARAMS
 		# Identify whether width or height of src image is longer (or the same!) :
-			# re: http://jeromebelleman.gitlab.io/posts/graphics/gmresize/
-			# re: http://www.graphicsmagick.org/GraphicsMagick.html#details-format
+		# re: http://jeromebelleman.gitlab.io/posts/graphics/gmresize/
+		# re: http://www.graphicsmagick.org/GraphicsMagick.html#details-format
 		srcIMGw=$(gm identify $srcFileName -format "%w")
 		srcIMGh=$(gm identify $srcFileName -format "%h")
 		if [ "$4" ]		# $4 is shorter edge length override, if it's passed
@@ -61,7 +63,8 @@ if [ ! -f $targetFileName ]; then
 			fi
 		else
 			gmScaleParam="-sample $targetLongDim"
-		fi
+			# if clause end from deprecated irfanview option:
+			#fi
 		gm convert $srcFileName $gmScaleParam $targetFileName
 	fi
 	echo converted to $targetFileName . .
