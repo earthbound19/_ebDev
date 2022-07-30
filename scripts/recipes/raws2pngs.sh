@@ -2,7 +2,7 @@
 # Converts all raw images in the current directory to tiffs and then small pngs, using other scripts.
 
 # DEPENDENCIES
-# dcraw, 
+# dcraw, allRAWtoTIFF.sh, imgs2imgs.sh
 
 # USAGE
 # Run with these parameters:
