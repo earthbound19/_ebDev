@@ -6,7 +6,7 @@
 # - $1 The svg file name to create an image from e.g. in.svg
 # - $2 OPTIONAL. Longest side in pixels for rendered output image. Default 4280 if not given.
 # - $3 OPTIONAL. Target file format e.g. png or jpg -- default jpg if not given.
-# - $4 A hex color code (format ffffff, no pound/hex symbol) which will be used to render the svg background (if it has a transparent background). To force a transparent background for an SVG without one (or if it isn't specified), you may be able to set an eight-hex color with 00 as the last two hex digits, to indicate zero transparency, like this: ffffff00. If your argument is not hex digits, [a-f0-9] (you can pass anything as this parameter), a hard-coded hex color will be used. See the BACKGROUND COLOR OPTIONS comment to hack that. IF OMITTED, the background will be transparent.
+# - $4 OPTIONAL. A hex color code (format ffffff, no pound/hex symbol) which will be used to render the svg background (if it has a transparent background). To force a transparent background for an SVG without one (or if it isn't specified), you may be able to set an eight-hex color with 00 as the last two hex digits, to indicate zero transparency, like this: ffffff00. If your argument is not hex digits, [a-f0-9] (you can pass anything as this parameter), a hard-coded hex color will be used. See the BACKGROUND COLOR OPTIONS comment to hack that. IF OMITTED, the background will be transparent.
 
 
 # CODE
