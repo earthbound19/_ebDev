@@ -1,17 +1,17 @@
 # DESCRIPTION
-# Takes a list of hex color codes, one per line, and renders a PNG image composed of tiles of those colors (a palette image), via ImageMagick. This script is inefficient; there are probably much faster ways to make a palette image in the structure/format made by this script (it creates color tile images and then montages them), but at this writing, this script is what I have.
+# Takes a list of hex color codes, one per line, and renders a PNG image composed of tiles of those colors (a palette image), via other scripts.
 
 # DEPENDENCIES
-# - ImageMagick
+# - graphicsmagick, hexplt2ppm.sh, img2imgNN.sh
 # - Optionally a file `~/palettesRootDir.txt` (in your home folder) which contains one line, which is a Unix-style path to the folder where you keep hex palette (`.hexplt`) files. If this file is not found, the script searches for palette files in the current directory.
 
 # USAGE
 # Run this script with the following parameters:
 # - $1 A palette file in `.hexplt` format, which is a list of RGB colors expressed as hexadecimal (hex color codes), one color per line. If this file is in the directory you run this script from, it will be used. If the file is not in the current directory, it may be anywhere in a directory tree in a path given in a file `~/palettesRootDir.txt`, and the script will find the palette in that directory tree and render from it.
-# - $2 OPTIONAL. Edge length of each square tile to be composited into final image. If not provided a default is used. To use additional parameters and use the default for this, provide the string 'NULL' for this.
+# - $2 OPTIONAL. Edge length of each square tile in final image. (Image width will be this X columns; image height will be this X rows.) If not provided a default is used. To use additional parameters and use the default for this, provide the string 'NULL' for this.
 # - $3 OPTIONAL. If not provided, or provided as string 'NULL', the order of elements in the palette will be preserved. If provided and anything other than NULL (for example 2 or foo or 1 or 3), the script will randomly shuffle the hex color files before compositing them to one image. I have gone back and forth on requiring this in the history of this script :/
-# - $4 OPTIONAL. Number of tiles across of tiles-assembled image (columns). If omitted, the script will try to come up with a number of columns that will best fit color tiles with minimal wasted gray "no color" remaining tiles. AND/OR, if columns and rows syntax is found in the source hexplt file (see NOTES) and you omit $4, it will use the columns and rows specified in the source hexplt.
-# - $5 OPTIONAL. Number of tiles down of tiles-assembled image (rows). If omitted, the script will do math to make sure the needed number of rows are used to render all tiles with the given number of columns. At one point I wrote that if $5 was omitted, the script might do wrong math for the number of rows, but I don't see that being the case. If $5 is provided and is too small, the collage will be split vertically into truncated, numbered collages. I don't know why. Also, you can't use $5 unless you use $4.
+# - $4 OPTIONAL. Columns. If omitted, the script will try to come up with a number of columns that will best fit color tiles with minimal wasted gray "no color" remaining tiles. AND/OR, if columns and rows syntax is found in the source hexplt file (see NOTES) and you omit $4, it will use the columns and rows specified in the source hexplt.
+# - $5 OPTIONAL. Rows. If omitted, the script will do math to make sure the needed number of rows are used to render all tiles with the given number of columns. At one point I wrote that if $5 was omitted, the script might do wrong math for the number of rows, but I don't see that being the case. If $5 is provided and is too small, the collage will be split vertically into truncated, numbered collages. I don't know why. Also, you can't use $5 unless you use $4.
 # EXAMPLE COMMAND; create a palette image from the hex color list RGB_combos_of_255_127_and_0_repetition_allowed.hexplt, where each tile is a square 250px wide, the palette is 5 columns wide and 6 rows down, and tiles in the palette are rendered in random order:
 #    renderHexPalette.sh RGB_combos_of_255_127_and_0_repetition_allowed.hexplt 250 foo 5 6
 # ANOTHER EXAMPLE COMMAND; create a palette image from tigerDogRabbit_many_shades.hexplt, with each tile 300 pixels wide, no shuffling, the script deciding how many across and down to make the tiles:
@@ -31,22 +31,23 @@
 
 # CODE
 # TO DO
-# - implement e.g. -tile 8x40 flag depending on desired aspect, etc. (will determine values of $tilesAcross and $tilesDown depending on desired aspect)?
+# - implement e.g. -tile 8x40 flag depending on desired aspect, etc. (will determine values of $columns and $rows depending on desired aspect)?
 # - UM. WOULDN'T THIS BE A TON FASTER creating a ppm and then upscaling it by nearest neighbor method?! Redo script (or make variant method script) for that?! -- trying that in hexplt2ppm.sh.
 # - Math to determine tile size dynamically for a target total image resolution?
 
 # BEGIN SETUP GLOBAL VARIABLES
 paletteFile=$1
 # IF RENDER TARGET already exists, abort script with error 2. Otherwise continue.
-renderTarget=${paletteFile%.*}.png
-if [ -f ./$renderTarget ]
+PPMrenderTarget=${paletteFile%.*}.ppm
+PNGrenderTarget=${paletteFile%.*}.png
+if [ -f ./$PNGrenderTarget ]
 then
-	echo Render target $renderTarget already exists\; SKIPPING render.
+	echo Render target $PNGrenderTarget already exists\; SKIPPING render.
 	# exit with error code
 	exit 2
 fi
 # Effectively, else:
-echo Render target $renderTarget does not exist\; WILL ATTEMPT TO RENDER.
+echo Render target $PNGrenderTarget does not exist\; WILL ATTEMPT TO RENDER.
 
 # Search current path for $1; if it exists set hexColorSrcFullPath to just $1 (we don't need the full path). If it doesn't exist in the local path, search the path in palettesRootDir.txt and make decisions based on that result:
 if [ -e ./$1 ]
@@ -65,7 +66,7 @@ else	# Search for specified palette file in palettesRootDir (if that dir exists;
 		if [ "$hexColorSrcFullPath" == "" ]
 			then
 				echo No file of name $paletteFile found in the path this script was run from OR in path \"$palettesRootDir\" \! ABORTING script.
-				exit
+				exit 2
 			else
 				echo File name $paletteFile found in the path \"$palettesRootDir\" \! PROCEEDING. IN ALL CAPS.
 		fi
@@ -77,7 +78,7 @@ else	# Search for specified palette file in palettesRootDir (if that dir exists;
 		echo
 		echo ABORTING script.
 		echo !--------------------------------------------------------!
-		exit
+		exit 3
 	fi
 fi
 if [ "$2" ] && [ "$2" != "NULL" ]; then tileEdgeLen=$2; else tileEdgeLen=250; fi
@@ -104,7 +105,7 @@ then
 	# $columnSyntaxSearchResult will be blank if that search failed; use that fact:
 	if [ "$columnSyntaxSearchResult" != "" ]
 	then
-		tilesAcross=$(sed 's/.*columns[^0-9]\{0,\}\([0-9]\{1,\}\).*/\1/g' <<< $columnSyntaxSearchResult)
+		columns=$(sed 's/.*columns[^0-9]\{0,\}\([0-9]\{1,\}\).*/\1/g' <<< $columnSyntaxSearchResult)
 	# OTHERWISE do math to figure out a hopefully good number of tiles accross:
 	else
 		# If number of colors is above N (12?), try to render a ~2:1 aspect palette (columns will be the square root of the number of colors, x2). If it is N or below, render only one row, with as many columns as there are colors.
@@ -112,17 +113,17 @@ then
 		if [[ $numColors -le $N ]]
 		then
 			# printf "\nAt $numColors, number of colors in palette is $N or less; will render only one row of that many colors."
-			tilesAcross=$numColors
+			columns=$numColors
 		else
 			# printf "\nAt $numColors, number of colors in palette is greater than $N; will calculate rows and columns to try to render a ~2:1 aspect palette."
 			sqrtOfColorCount=$(echo "sqrt ($numColors)" | bc)
-			tilesAcross=$(( $sqrtOfColorCount * 2 ))
+			columns=$(( $sqrtOfColorCount * 2 ))
 		fi
 	fi
 else
-	tilesAcross=$4
+	columns=$4
 fi
-printf "\ntilesAcross is $tilesAcross.\n"
+printf "\ncolumns is $columns.\n"
 
 # SAME LOGIC as for $4 (but relying on $4 being calculated/set first:
 # $5 is down. If $5 is not specified, do some math. Otherwise use $5.
@@ -133,94 +134,51 @@ then
 	# $rowsSyntaxSearchResult will be blank if that search failed; use that fact:
 	if [ "$rowsSyntaxSearchResult" != "" ]
 	then
-		tilesDown=$(sed 's/.*rows[^0-9]\{0,\}\([0-9]\{1,\}\).*/\1/g' <<< $rowsSyntaxSearchResult)
-	# OTHERWISE do math to figure out a hopefully good number of tiles accross:
+		rows=$(sed 's/.*rows[^0-9]\{0,\}\([0-9]\{1,\}\).*/\1/g' <<< $rowsSyntaxSearchResult)
+	# OTHERWISE do math to figure out the number of rows needed:
 	else
-		sqrtOfColorCount=$(echo "sqrt ($numColors)" | bc)
-				# echo sqrtOfColorCount is $sqrtOfColorCount
-		tilesDown=$(( $sqrtOfColorCount / 2 ))
-		# If the value of ($tilesAcross times $tilesDown) is less than $numColors (the total number of colors), we will fail to print all colors in the palette; add rows to the print queue for as long as necessary:
-		tilesToRender=$(( $tilesAcross * $tilesDown ))
-		# echo tilesToRender is $tilesToRender\.
-		while [ $tilesToRender -lt $numColors ]
-		do
-			# echo tilesDown was $tilesDown.
-			tilesDown=$(( $tilesDown + 1 ))
-			tilesToRender=$(( $tilesAcross * $tilesDown ))
-					# TO DO: checking that twice . . . is that a code smell? Rework for more concise/elegant/sensical logic?
-		done
+		rows=$(( $numColors / $columns ))
+		# if this modulo returns nonzero, we need to add a row; do so:
+		modulo=$(( $numColors % $columns ))
+		if [ $modulo != "0" ]
+		then
+			rows=$(( $rows + 1 ))
+		fi
 	fi
 else
-	tilesDown=$5
+	rows=$5
 fi
-printf "tilesDown is $tilesDown.\n"
+printf "rows is $rows.\n"
 
 # END SETUP GLOBAL VARIABLES
 # =============
 
-# setup temp swatches / montage render dir:
-# prior dir name that meant I can't run this script concurrently: _hexPaletteIMGgenTMP_2bbVyVxD
-rndSTR=$(cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c 8)
-tmp_render_dir=_hexPaletteIMGgenTMP_"$rndSTR"
-if [ ! -d $tmp_render_dir ]		# this will only be true in ridiculous circumstances :shrug:
-then
-	mkdir $tmp_render_dir
-else
-	rm -rf $tmp_render_dir
-	mkdir $tmp_render_dir
-fi
-
-# make directory of color tiles from palette:
-for color in ${colorsArray[@]}
-do
-	echo "running command: magick convert -size "$tileEdgeLen"x"$tileEdgeLen" xc:\#$color $tmp_render_dir/$color.png"
-	magick convert -size "$tileEdgeLen"x"$tileEdgeLen" xc:\#$color $tmp_render_dir/$color.png
-done
-
-# make the actual montage image. Example command: magick montage colors/5A6D40.png colors/757F26.png colors/C68C15.png colors/8F322F.png colors/954B29.png out.png
-# make temporary script to create a grid montage of the colors:
-echo "magick montage -tile $tilesAcross"x"$tilesDown -background '#919191' -geometry $tileEdgeLen"x"$tileEdgeLen+0+0 \\" > mkGridHead.txt
-
 # IF $shuffleValues is nonzero, randomly sort color list (array):
 if [ $shuffleValues -ne 0 ]; then colorsArray=( $(shuf -e ${colorsArray[@]}) ); fi
 
-# convert hex color scheme text list file to parameter list for ~magick:
-printf "" > ./mkGridSRCimgs.txt
-for color in ${colorsArray[@]}
-do
-	# escaped escaped \\ in the printf command (to print a backslash \ character),
-	printf "$tmp_render_dir"/"$color"".png \\" >> ./mkGridSRCimgs.txt
-	# FOLLOWED BY a newline \n	:
-	printf "\n" >> ./mkGridSRCimgs.txt
-done
+# vestigal tile render reference:
+# magick convert -size "$tileEdgeLen"x"$tileEdgeLen" xc:\#$color $tmp_render_dir/$color.png
 
-echo $renderTarget > mkGridTail.txt
-rndSTRtwo=$(cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c 8)
-tempScriptFileName=mkColorPaletteGrid_tmp_"$rndSTR".sh
-cat mkGridHead.txt mkGridSRCimgs.txt mkGridTail.txt > ./$tempScriptFileName
-
-rm mkGridHead.txt mkGridSRCimgs.txt mkGridTail.txt
-chmod 777 ./$tempScriptFileName
-./$tempScriptFileName
-rm ./$tempScriptFileName
-
-# OPTIONALLY leave palette swatched dir behind (by renaming temp dir to it); uncomment these next lines to do that:
-# paletteSwatchesDir=${hexColorSrcFullPath%.*}_swatches
-# if [ -d ./$paletteFile.colors ]
-# then
-
-	# rm -rf $paletteFile.colors
-# fi
-# mv $tmp_render_dir $paletteSwatchesDir
-# OR:
-rm -rf $tmp_render_dir
+# convert source hexplt to intermediary ppm format image if it does not already exist; perhaps erroneously assumes it is what we want if it does exist already:
+if [ ! -f $PPMrenderTarget ]
+then
+	ppmDidNotExistBeforeNow="TRUE"
+	hexplt2ppm.sh $paletteFile $columns $rows
+fi
+# convert that ppm to png:
+PNGwidth=$(($tileEdgeLen * $columns))
+PNGheight=$(($tileEdgeLen * $rows))
+# it's not necessary to pass $PNGheight at the end of this:
+img2imgNN.sh $PPMrenderTarget png $PNGwidth
+# delete the intermediary ppm file if it didn't exist before this script checked for it:
+if [ "$ppmDidNotExistBeforeNow" ]; then rm $PPMrenderTarget; fi
 
 # These next three lines will make palette creation take longer, but optimize the palette png. Comment them out if you don't want that delay:
 #echo ""
 #echo OPTIMIZING rendered png . . .
-#optipng -o7 $renderTarget
+#optipng -o7 $PNGrenderTarget
 
 echo ""
-echo DONE--created color palette image is $renderTarget
+echo DONE--created color palette image is $PNGrenderTarget
 
 # TO DO? : make the following statement optionally true (via parameter), and echo it: "You will also find color swatch images from the palette in the folder $paletteFile.colors."
