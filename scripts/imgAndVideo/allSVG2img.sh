@@ -32,9 +32,6 @@ fi
 if [ "$3" ]
 then
 	bgColorParam=$3
-else
-	echo "No parameter \$3; setting to default hex 000000 background color."
-	bgColorParam='000000'
 fi
 
 # Do the conversions.
