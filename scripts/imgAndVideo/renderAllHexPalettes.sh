@@ -37,7 +37,7 @@ do
 	renderTargetFileName=${hexpltFileName%.*}.png
 	if [ -f $renderTargetFileName ]
 	then
-		printf "\nRender target $renderTargetFileName already exists (check from renderAllHexPalettes.sh). Will skip render attempt."
+		printf "\nRender target $renderTargetFileName already exists (check from renderAllHexPalettes.sh). Will skip render attempt.\n"
 		# (else block isn't run; nothing more is done in this loop in this case.)
 	else
 # BEGIN OPTIONAL COOLDOWN PERIOD; uncomment these outdented lines if you want that:
