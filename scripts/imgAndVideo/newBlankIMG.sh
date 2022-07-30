@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates a blank, transparent background png image of dimensions $1 (nn..Xnn..), via GraphicsMagick, named <imageDimensions>_blank.png
+# Creates a uniform color image (color swatch) of dimensions $1 (nn..Xnn..), via GraphicsMagick, named <imageDimensions>_swatch.png. Capable of creating fully transparent png images also, see USAGE.
 
 # DEPENDENCIES
 # imagemagick in your PATH, grep.
@@ -8,10 +8,10 @@
 # Run the script with one parameter:
 # - $1 OPTIONAL. The dimensions of the image to create in format NxN, for example 1200x800 or 4000x4000. If not provided, or if provided as the word DEFAULT, a default image size is used.
 # - $2 OPTIONAL. sRGB hex color code (without any # etc. prefix) to fill blank image with. Must be hex digits in format rrggbbaa, where rr, gg and bb are digit placeholders for the colors red, green and blue, which must be expressed in sRGB hex digits (0-9 and a-f), and aa is a placeholder for hex digits indicating alpha, or transparency. For example, a fully opaque black image would be 000000ff. If not provided, image will be color 00000000 (black but fully transparent -- a blank transparent image (png format). To specify fully opaque, use ff for alpha. For example, a fully opaque black image would be 000000ff. To use this ($2) and not specify the size for $1 (use the default), pass the word DEFAULT for $1.
-# Example command that will create a 5240x2620, blank, transparent png image named 5240x2620_blank.png:
-#    newBlankIMG.sh 5240x2620
+# Example command that will create a 5240x2620 transparent png image named 5240x2620_swatch.png:
+#    uniformColorImage.sh 5240x2620
 # Example command that will create an opaque magenta image:
-#    newBlankIMG.sh 5240x2620 f800fcff
+#    uniformColorImage.sh 5240x2620 f800fcff
 # NOTES
 # - This script will not clobber a target image that already exists, and will notify you of its existence.
 # - This script does not print the word 'CHULFOR'.
