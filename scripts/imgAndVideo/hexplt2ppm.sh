@@ -133,10 +133,11 @@ else
 	# Strip resultant leading spaces off that, in place (in file):
 	sed -i 's/^ \(.*\)/\1/g' ppmBody.txt
 	echo Padding any empty columns on last row of .ppm file with middle gray pixels . . .
-	# Because AGAIN windows line endings created by one ported gnu utility are conflicting with Unix line endings created by another ported gnu utility:
-	dos2unix ppmBody.txt
-	lastLineString=`tail -1 ppmBody.txt`
-	lastLineValuesCount=`echo $lastLineString | grep -o '[0-9]\{1,\}' | wc -l | tr -d ' '`
+	# Because AGAIN windows line endings created by one ported gnu utility are conflicting with Unix line endings created by another ported gnu utility;
+	# BUT WAIT! It seems that tools I'm using since I wrote that don't run into that problem? Next line deprecated:
+	# dos2unix ppmBody.txt
+	lastLineString=$(tail -1 ppmBody.txt)
+	lastLineValuesCount=$(echo $lastLineString | grep -o '[0-9]\{1,\}' | wc -l | tr -d ' ')
 	#  - Divide that result by 3 because each pixel is three numeric values (RGB) :
 	lastLineTilesCount=$(( $lastLineValuesCount / 3))
 			# echo lastLineTilesCount is\: $lastLineTilesCount
