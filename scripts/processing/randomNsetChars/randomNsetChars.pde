@@ -16,7 +16,7 @@
 // Changes this version:
 // Rework documentation comments per preferences.
 // GLOBAL VARIABLE DECLARATIONS
-String versionNumber = "1.11.0";
+String versionNumber = "1.12.1";
 
 
 // TO DO
@@ -215,19 +215,34 @@ void settings() {
 	} else {
 		// fullScreen();
 		// OR:
-	  size(800, 800);
-    // from soil_pigments_accents.hexplt:
+	  size(1920, 1080);
+    // from soil_pigments_darker_gradient.hexplt:
 		bgColors = new color[]{
-      #6970c6, #4A7CF2, #6CAAC2, #85B4B8, #46BAE3, #00C4F8, #67D5E6, #55E1F7,
-      #F5B492, #FFBA95, #E69686, #F38788, #FF878B, #CD847D, #C38DA3, #CF91B1,
-      #BA8CB9, #C590CF, #E798CD, #AC879B, #8A808C, #899394, #92968F,
+      #a4a19f, #a3a1a0, #a2a1a1, #a1a1a1, #a6a199, #aba091, #b0a089, #b59f80,
+      #b19876, #ad916b, #a88b61, #a48456, #a07d53, #9b764f, #976f4c, #926849,
+      #8e694c, #8b6a4f, #876a52, #836b55, #7f6c57, #7c6d5a, #786e5c, #746f5e,
+      #736f62, #716f67, #706f6b, #6f6f6f, #696969, #626262, #5c5c5c, #565656,
+      #5b5550, #60544a, #655344, #6a523d, #654c39, #5f4635, #5a4032, #553a2e,
+      #58382c, #5c372a, #5f3528, #623326, #592e25, #512a24, #482523, #402122,
+      #3f2220, #3e221e, #3c231c, #3b231a, #39241c, #37251e, #342520, #322622,
+      #2a211e, #221c1a, #1a1817, #131313, #333232, #565554, #7c7a78, #a4a19f
 		};
 		bgColorsLength = bgColors.length;
 		bgColorsArrayIndex = 0;
-    // from soil_pigments_darker.hexplt:
+    // from soil_pigments_accents_gradient.hexplt:
 		fillColors = new color[]{
-			#131313, #322622, #3b231a, #402122, #623326, #553a2e, #6a523d, #836b55,
-			#926849, #a48456, #b59f80, #a4a19f, #a1a1a1, #6f6f6f, #565656, #746f5e
+			#ffba95, #fcb894, #fab794, #f7b593, #f5b492, #f1ac8f, #eea58c, #ea9d89,
+      #e69686, #e99287, #ed8f87, #f08b88, #f38788, #f68789, #f98789, #fc878a,
+      #ff878b, #f28787, #e68684, #d98580, #cd847d, #cb8687, #c88990, #c68b9a,
+      #c38da3, #c68ea6, #c98faa, #cc90ad, #cf91b1, #ca90b3, #c48fb5, #bf8db7,
+      #ba8cb9, #bd8dbe, #bf8ec4, #c28fc9, #c590cf, #cd92cf, #d694ce, #de96ce,
+      #e798cd, #d894c0, #c990b4, #bb8ba7, #ac879b, #a48597, #9b8493, #938290,
+      #8a808c, #8a858e, #8a8a90, #898e92, #899394, #8b9493, #8e9592, #909590,
+      #92968f, #8a9b9c, #81a0a9, #77a5b5, #6caac2, #72adc0, #79afbd, #7fb2bb,
+      #85b4b8, #78b6c3, #6ab7ce, #5ab9d8, #46bae3, #3dbde8, #31bfed, #22c2f3,
+      #00c4f8, #30c8f4, #46cdef, #58d1eb, #67d5e6, #63d8ea, #5fdbee, #5adef3,
+      #55e1f7, #51c9f7, #4eb0f6, #4b96f4, #4a7cf2, #5379e7, #5b76dc, #6373d1,
+      #6970c6, #8d85be, #b298b4, #d8aaa7, #FFBA95
 		};
 		fillColorsLength = fillColors.length;
 		fillColorsArrayIndex = 0;
