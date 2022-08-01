@@ -38,6 +38,7 @@ for directory in ${directories[@]}
 do
 	pushd . &>/dev/null
 	cd $directory
+	echo in directory $directory . . .
 	# Create array to use to loop over files.
 	# previous version of command; doesn't sort by file date:
 	# filesArray=`find . -maxdepth 1 -iname "*.$fileTypeToRenumber" | sort`
@@ -51,8 +52,7 @@ do
 	do
 		counter=$((counter + 1))
 		countString=$(printf "%0""$digitsToPadTo""d\n" $counter)
-				# echo old file name is\: $filename
-				# echo new file name is\: $countString.$fileTypeToRenumber
+		# echo "echo command is: mv $filename $countString.$fileTypeToRenumber"
 		mv $filename $countString.$fileTypeToRenumber
 	done
 	popd &>/dev/null
