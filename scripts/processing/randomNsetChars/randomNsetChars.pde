@@ -16,7 +16,7 @@
 // Changes this version:
 // Rework documentation comments per preferences.
 // GLOBAL VARIABLE DECLARATIONS
-String versionNumber = "1.12.1";
+String versionNumber = "1.12.2";
 
 
 // TO DO
@@ -81,10 +81,8 @@ int subCharSetRNDlength;
 String charsDisplayString;
 
 boolean displayRNDsubsets;
-int numRendersToDisplaySubset;
 int reloadAfterNrenders;
 int renderCount;
-int subsetDisplayedrendersCounter;
 int variantCount = 0;
 
 String animFramesSaveDir;
@@ -205,7 +203,6 @@ void settings() {
 
     delayBetweenRenders = 0;
 
-    numRendersToDisplaySubset = 1;
     reloadAfterNrenders = 1;
 
     fontPointSize = width/32;
@@ -249,8 +246,7 @@ void settings() {
 
     delayBetweenRenders = 640; // has been: 84, 112, 141, 640
 
-		numRendersToDisplaySubset = 15;
-	  reloadAfterNrenders = numRendersToDisplaySubset * 4;
+	  reloadAfterNrenders = 60;
 
     fontPointSize = width/48;    // tried sizes list: 83.4 51.5 43 39.1 32 24 12; unifont was last width/28.46. NOTE: a PointSize that doesn't evenly divide by the canvas width may lead to gaps in the text that cause a look like gaps in wallpaper.
 	}
@@ -277,10 +273,9 @@ void setupNewVariant() {
 
   displayRNDsubsets = true;
   renderCount = 0;
-  subsetDisplayedrendersCounter = 0;
 
   String variantCountPaddedString = nf(variantCount, 5);
-  if (saveImageSeries == true) {
+  if (saveFrames == true) {
     animFramesSaveSUBdir = animFramesSaveDir + "/" + variantCountPaddedString + "/";
     String variantString = str(seed);
     output = createWriter(animFramesSaveSUBdir + variantString + ".txt");
@@ -318,10 +313,6 @@ void setup() {
 // EXCEPT MOAR CUSTOM FUNCTION
 void renderRNDcharsScreen () {
 	clear();
-  subsetDisplayedrendersCounter += 1;
-  if (subsetDisplayedrendersCounter == numRendersToDisplaySubset) {
-    subsetDisplayedrendersCounter = 0;
-  }
 
   mutateBGcolor();
   mutateFillColor();
@@ -339,17 +330,17 @@ void renderRNDcharsScreen () {
   }
   text(charsDisplayString, width/2, 0);
   // only delay if we are not saving PNG images:
-  if (saveImageSeries == false) {
+  if (saveFrames == false) {
 	delay(delayBetweenRenders);
   }
 
   // SAVE PNG AS PART OF ANIMATION FRAMES conditioned on boolean;
-  if (rapidBWhdAlphaGenMode == false && saveImageSeries == true) {
+  if (rapidBWhdAlphaGenMode == false && saveFrames == true) {
     saveFrame(animFramesSaveSUBdir + "/##########.png");
   }
   // OR HD BW png named after variation (if in that mode AND
   // the defaults hard-coded for that mode say save pngs:):
-  if (rapidBWhdAlphaGenMode == true && saveImageSeries == true) {
+  if (rapidBWhdAlphaGenMode == true && saveFrames == true) {
     saveFrame("randomNsetChars_Alphas/randomNsetChars_AlphaGenMode__seed_" + seed + ".png");
   }
 
