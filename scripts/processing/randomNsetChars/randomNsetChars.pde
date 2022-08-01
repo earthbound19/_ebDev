@@ -16,7 +16,7 @@
 // Changes this version:
 // Rework documentation comments per preferences.
 // GLOBAL VARIABLE DECLARATIONS
-String versionNumber = "1.10.1";
+String versionNumber = "1.11.0";
 
 
 // TO DO
@@ -216,19 +216,18 @@ void settings() {
 		// fullScreen();
 		// OR:
 	  size(800, 800);
-    // palette used up to v1.9.2: darkBG.hexplt. Now: taken from soil_pigments.hexplt
+    // from soil_pigments_accents.hexplt:
 		bgColors = new color[]{
-			#382F2A, #673D2E, #713820, #763436, #9B4831, #8E5237, #A26F3E, #BD8A58,
-      #CD844B, #DCA651, #EEC382, #DEC6A6, #D7C7B0, #9E9287, #7E7A6D, #A39461
+      #6970c6, #4A7CF2, #6CAAC2, #85B4B8, #46BAE3, #00C4F8, #67D5E6, #55E1F7,
+      #F5B492, #FFBA95, #E69686, #F38788, #FF878B, #CD847D, #C38DA3, #CF91B1,
+      #BA8CB9, #C590CF, #E798CD, #AC879B, #8A808C, #899394, #92968F,
 		};
 		bgColorsLength = bgColors.length;
 		bgColorsArrayIndex = 0;
-    // up to up to v1.9.2, palette tweaked (and expanded with more cyans and greens, and lighter those) from fundamental_vivid_hues_v2.hexplt, which at this writing is either renamed or deprecated (can't find it anymore). Now: taken from 32_max_chroma_med_light.hexplt
+    // from soil_pigments_darker.hexplt:
 		fillColors = new color[]{
-			#f800fc, #ff00c8, #ff0596, #f80061, #ea0000, #fe3100, #ff5d00, #ff8005,
-      #ff9710, #ffb224, #ffc900, #ffe335, #feff06, #bae901, #a0d901, #60cd01,
-      #00b000, #00be72, #0ccab3, #18dbd7, #01edfd, #00ccff, #00a6fe, #0181fb,
-      #0041ff, #443bfe, #5c38ff, #7c38fd, #9937ff, #b732ff, #c830ff, #df26fd
+			#131313, #322622, #3b231a, #402122, #623326, #553a2e, #6a523d, #836b55,
+			#926849, #a48456, #b59f80, #a4a19f, #a1a1a1, #6f6f6f, #565656, #746f5e
 		};
 		fillColorsLength = fillColors.length;
 		fillColorsArrayIndex = 0;
@@ -238,7 +237,7 @@ void settings() {
 		numRendersToDisplaySubset = 15;
 	  reloadAfterNrenders = numRendersToDisplaySubset * 4;
 
-    fontPointSize = width/12;    // tried sizes list: 83.4 51.5 43 39.1 32 24 12; unifont was last width/28.46
+    fontPointSize = width/48;    // tried sizes list: 83.4 51.5 43 39.1 32 24 12; unifont was last width/28.46. NOTE: a PointSize that doesn't evenly divide by the canvas width may lead to gaps in the text that cause a look like gaps in wallpaper.
 	}
 
 	setRNDanimFramesSaveDirName();
