@@ -16,7 +16,7 @@
 // Changes this version:
 // Rework documentation comments per preferences.
 // GLOBAL VARIABLE DECLARATIONS
-String versionNumber = "1.13.1";
+String versionNumber = "1.13.2";
 
 
 // TO DO
@@ -222,7 +222,7 @@ void settings() {
 			#6a523d, #654c39, #5f4635, #5a4032, #553a2e, #58382c, #5c372a, #5f3528,
 			#623326, #592e25, #512a24, #482523, #402122, #3f2220, #3e221e, #3c231c,
 			#3b231a, #39241c, #37251e, #342520, #322622, #292123, #201d23, #171823,
-			#0e1323, #0f1323, #101224, #111124
+			#0e1323, #0f1323, #101224, #111124, #313141, #54545f, #7b797e
 		};
 		bgColorsLength = bgColors.length;
 		bgColorsArrayIndex = 0;
