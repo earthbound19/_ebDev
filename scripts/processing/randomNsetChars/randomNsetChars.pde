@@ -16,7 +16,7 @@
 // Changes this version:
 // Rework documentation comments per preferences.
 // GLOBAL VARIABLE DECLARATIONS
-String versionNumber = "1.12.2";
+String versionNumber = "1.13.0";
 
 
 // TO DO
@@ -213,33 +213,38 @@ void settings() {
 		// fullScreen();
 		// OR:
 	  size(1920, 1080);
-    // from soil_pigments_darker_gradient.hexplt:
+    // from soil_pigments_darker_and_dark_backgrounds_tweak_gradient.hexplt:
 		bgColors = new color[]{
-      #a4a19f, #a3a1a0, #a2a1a1, #a1a1a1, #a6a199, #aba091, #b0a089, #b59f80,
-      #b19876, #ad916b, #a88b61, #a48456, #a07d53, #9b764f, #976f4c, #926849,
-      #8e694c, #8b6a4f, #876a52, #836b55, #7f6c57, #7c6d5a, #786e5c, #746f5e,
-      #736f62, #716f67, #706f6b, #6f6f6f, #696969, #626262, #5c5c5c, #565656,
-      #5b5550, #60544a, #655344, #6a523d, #654c39, #5f4635, #5a4032, #553a2e,
-      #58382c, #5c372a, #5f3528, #623326, #592e25, #512a24, #482523, #402122,
-      #3f2220, #3e221e, #3c231c, #3b231a, #39241c, #37251e, #342520, #322622,
-      #2a211e, #221c1a, #1a1817, #131313, #333232, #565554, #7c7a78, #a4a19f
+			#a4a19f, #a8a198, #ada090, #b1a088, #b59f80, #b19876, #ad916b, #a88b61,
+			#a48456, #a07d53, #9b764f, #976f4c, #926849, #8e694c, #8b6a4f, #876a52,
+			#836b55, #7f6c57, #7c6d5a, #786e5c, #746f5e, #736f62, #716f67, #706f6b,
+			#6f6f6f, #696969, #626262, #5c5c5c, #565656, #5b5550, #60544a, #655344,
+			#6a523d, #654c39, #5f4635, #5a4032, #553a2e, #58382c, #5c372a, #5f3528,
+			#623326, #592e25, #512a24, #482523, #402122, #3f2220, #3e221e, #3c231c,
+			#3b231a, #39241c, #37251e, #342520, #322622, #292123, #201d23, #171823,
+			#0e1323, #0f1323, #101224, #111124
 		};
 		bgColorsLength = bgColors.length;
 		bgColorsArrayIndex = 0;
-    // from soil_pigments_accents_gradient.hexplt:
+    // from soil_pigments_accents_and_32_max_chroma_tweak_gradient.hexplt:
 		fillColors = new color[]{
-			#ffba95, #fcb894, #fab794, #f7b593, #f5b492, #f1ac8f, #eea58c, #ea9d89,
-      #e69686, #e99287, #ed8f87, #f08b88, #f38788, #f68789, #f98789, #fc878a,
-      #ff878b, #f28787, #e68684, #d98580, #cd847d, #cb8687, #c88990, #c68b9a,
+			#25ffff, #37f7fd, #44f0fb, #4de8f9, #55e1f7, #5adef3, #5fdbee, #63d8ea,
+      #67d5e6, #59d4ec, #48d2f3, #32d1f9, #00cfff, #00ccfd, #00c9fc, #00c7fa,
+      #00c4f8, #56d1d7, #80dcb2, #a4e584, #c5ed3a, #aedd73, #97cd94, #81bcad,
+      #6caac2, #72adc0, #79afbd, #7fb2bb, #85b4b8, #89adae, #8da5a3, #909e99,
+      #92968f, #909590, #8e9592, #8b9493, #899394, #898e92, #8a8a90, #8a858e,
+      #8a808c, #938290, #9b8493, #a48597, #ac879b, #b2899d, #b78a9f, #bd8ca1,
       #c38da3, #c68ea6, #c98faa, #cc90ad, #cf91b1, #ca90b3, #c48fb5, #bf8db7,
       #ba8cb9, #bd8dbe, #bf8ec4, #c28fc9, #c590cf, #cd92cf, #d694ce, #de96ce,
-      #e798cd, #d894c0, #c990b4, #bb8ba7, #ac879b, #a48597, #9b8493, #938290,
-      #8a808c, #8a858e, #8a8a90, #898e92, #899394, #8b9493, #8e9592, #909590,
-      #92968f, #8a9b9c, #81a0a9, #77a5b5, #6caac2, #72adc0, #79afbd, #7fb2bb,
-      #85b4b8, #78b6c3, #6ab7ce, #5ab9d8, #46bae3, #3dbde8, #31bfed, #22c2f3,
-      #00c4f8, #30c8f4, #46cdef, #58d1eb, #67d5e6, #63d8ea, #5fdbee, #5adef3,
-      #55e1f7, #51c9f7, #4eb0f6, #4b96f4, #4a7cf2, #5379e7, #5b76dc, #6373d1,
-      #6970c6, #8d85be, #b298b4, #d8aaa7, #FFBA95
+      #e798cd, #ea94bc, #ed90ab, #f08c9a, #f38788, #f68789, #f98789, #fc878a,
+      #ff878b, #f98b8a, #f38f89, #ec9387, #e69686, #ea9d89, #eea58c, #f1ac8f,
+      #f5b492, #f7b593, #fab794, #fcb894, #ffba95, #f2ac8f, #e69f89, #d99183,
+      #cd847d, #da846c, #e68358, #f2823e, #ff8005, #ff6d26, #ff5735, #ff3c3f,
+      #ff0047, #fd014e, #fb0155, #fa015b, #f80061, #fa046f, #fb077c, #fd0789,
+      #ff0596, #ff08a3, #ff08af, #ff05bc, #ff00c8, #fd06d5, #fb08e2, #fa06ef,
+      #f800fc, #e81cfd, #d727fe, #c72efe, #b732ff, #a241f9, #8c4bf3, #7552ed,
+      #5b57e7, #5e5edf, #6165d7, #656bce, #6970c6, #737ace, #7e84d6, #888edd,
+      #9398e5, #8796e5, #7b94e6, #6e91e6, #608fe6, #5babed, #53c7f4, #44e3fa
 		};
 		fillColorsLength = fillColors.length;
 		fillColorsArrayIndex = 0;
