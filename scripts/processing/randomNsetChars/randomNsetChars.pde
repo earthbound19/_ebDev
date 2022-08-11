@@ -16,7 +16,7 @@
 // Changes this version:
 // Rework documentation comments per preferences.
 // GLOBAL VARIABLE DECLARATIONS
-String versionNumber = "1.13.0";
+String versionNumber = "1.13.1";
 
 
 // TO DO
@@ -280,7 +280,7 @@ void setupNewVariant() {
   renderCount = 0;
 
   String variantCountPaddedString = nf(variantCount, 5);
-  if (saveFrames == true) {
+  if (saveImageSeries == true) {
     animFramesSaveSUBdir = animFramesSaveDir + "/" + variantCountPaddedString + "/";
     String variantString = str(seed);
     output = createWriter(animFramesSaveSUBdir + variantString + ".txt");
@@ -335,17 +335,17 @@ void renderRNDcharsScreen () {
   }
   text(charsDisplayString, width/2, 0);
   // only delay if we are not saving PNG images:
-  if (saveFrames == false) {
+  if (saveImageSeries == false) {
 	delay(delayBetweenRenders);
   }
 
   // SAVE PNG AS PART OF ANIMATION FRAMES conditioned on boolean;
-  if (rapidBWhdAlphaGenMode == false && saveFrames == true) {
+  if (rapidBWhdAlphaGenMode == false && saveImageSeries == true) {
     saveFrame(animFramesSaveSUBdir + "/##########.png");
   }
   // OR HD BW png named after variation (if in that mode AND
   // the defaults hard-coded for that mode say save pngs:):
-  if (rapidBWhdAlphaGenMode == true && saveFrames == true) {
+  if (rapidBWhdAlphaGenMode == true && saveImageSeries == true) {
     saveFrame("randomNsetChars_Alphas/randomNsetChars_AlphaGenMode__seed_" + seed + ".png");
   }
 
