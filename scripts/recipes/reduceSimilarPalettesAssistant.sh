@@ -1,6 +1,9 @@
 # DESCRIPTION
 # Helps either eliminate or group palettes (.hexplt files) in all subfolders of the current folder (but not palettes in the folder itself) which are perceptually similar (technically and logically: not very different below a threshold). Does this with a custom loop in this script, using other scripts also. To understand how all this works, you must examine the DESCRIPTION and USAGE etc. comments of all the scripts which this script runs.
 
+# DEPENDENCIES
+# `listAllSubdirs.sh`, `allPalettesCompareCIECAM02.sh`, `listPaletteDifferencesBelowThreshold.sh`, `groupPalettesDifferentBelowThreshold.sh`, `pruneByUnmatchedExtension.sh`, and any of their dependencies.
+
 # USAGE
 # Hack the global value right after the CODE comment per your want. Then run the script:
 #    reduceSimilarPalettesAssistant.sh
