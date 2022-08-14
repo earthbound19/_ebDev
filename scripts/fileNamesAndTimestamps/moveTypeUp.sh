@@ -32,9 +32,8 @@ else
 	echo continuing . .
 fi
 
-# If this operates on a super duper long list of files, and I store that all in an array, it will probably throw an error about something being too long, unless I print the results to a file and scan it line by line. So use a file:
-find . $subDirSearchParam -iname \*.$searchFileType -printf "%P\n" > filesOfTypeList_tmp_ut9NaYAH.txt
-while read fileNameWithPath
+filesList=( $(find . $subDirSearchParam -iname \*.$searchFileType -printf "%P\n") )
+for fileNameWithPath in ${filesList[@]}
 do
 	fileNameNoPath="${fileNameWithPath##*/}"
 	# If the target file already exists, print a notice and skip move. Otherwise move the source file here:
@@ -44,6 +43,4 @@ do
 	else
 		mv $fileNameWithPath .
 	fi
-done < filesOfTypeList_tmp_ut9NaYAH.txt
-
-rm filesOfTypeList_tmp_ut9NaYAH.txt
+done
