@@ -7,7 +7,7 @@
 
 # USAGE
 # Run with these parameters:
-# - $1 A decimal between 0 and 1, which is the difference threshold to consider a file similar enough to sort. Similarity is defined as nearer to 1; a different threshold of 0 means the images are identical, and 1 means they're completely different. Comparisons where the found threshold are equal to or lower than this number will be sorted as meeting the difference threshold.
+# - $1 A decimal between 0 and 1, which is the difference threshold to consider a file similar enough to sort. Similarity is defined as nearer to 1; a difference threshold of 0 means the images are identical, and 1 means they're completely different. Comparisons where the found threshold are equal to or lower than this number will be sorted as meeting the difference threshold.
 # - $2 File name of image to compare all other images to.
 
 
