@@ -16,7 +16,7 @@
 // Changes this version:
 // Rework documentation comments per preferences.
 // GLOBAL VARIABLE DECLARATIONS
-String versionNumber = "1.13.3";
+String versionNumber = "1.13.4";
 
 
 // TO DO
@@ -66,13 +66,13 @@ boolean rapidBWhdAlphaGenMode = false;		// overrides some of the above globals
 // SUPER SET DEFINITION from which subsets may be randomly drawn; combining any of these can produce interesting results:
 // -- here are some possible subsets of them to use as supersets (from which sub-subsets would
 // be made) :
- //String masterCharset = "┈┉┊┋┌└├┤┬┴┼╌╍╎╭╮╯╰╱╲╳╴╵╶╷";     // box drawing subset
- //String masterCharset = "▲△◆◇○◌◍◎●◜◝◞◟◠◡◢◣◤◥◸◹◺◿◻◼";     // geometric shapes subset
- //String masterCharset = "∧∨∩∪∴∵∶∷∸∹∺⊂⊃⊏⊐⊓⊔⊢⊣⋮⋯⋰⋱";      // math operators subset
- //String masterCharset = "◈⟐⟢ːˑ∺≋≎≑≣⊪⊹☱☰☲☳☴☵☶☷፨჻܀";   //Apple emoji subset
- //String masterCharset = "─│┌┐└┘├┤┬┴┼╭╮╯╰╱╲╳▂▃▄▌▍▎▏▒▕▖▗▘▚▝○●◤◥♦";	// Commodore 64 font/drawing glyphs set--which, it happens, combines characters from some of the others interestingly.
+ //String masterCharset = "┈┉┊┋┌└├┤┬┴┼╌╍╎╭╮╯╰╱╲╳╴╵╶╷ ";     // box drawing subset
+ //String masterCharset = "▲△◆◇○◌◍◎●◜◝◞◟◠◡◢◣◤◥◸◹◺◿◻◼ ";     // geometric shapes subset
+ //String masterCharset = "∧∨∩∪∴∵∶∷∸∹∺⊂⊃⊏⊐⊓⊔⊢⊣⋮⋯⋰⋱ ";      // math operators subset
+ //String masterCharset = "◈⟐⟢ːˑ∺≋≎≑≣⊪⊹☱☰☲☳☴☵☶☷፨჻܀ ";   //Apple emoji subset
+ //String masterCharset = "─│┌┐└┘├┤┬┴┼╭╮╯╰╱╲╳▂▃▄▌▍▎▏▒▕▖▗▘▚▝○●◤◥♦ ";	// Commodore 64 font/drawing glyphs set--which, it happens, combines characters from some of the others interestingly.
  //String masterCharset = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWZ!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ 0";  // all usable from bitBlocks.ttf
-String masterCharset = "▔▀▆▄▂▌▐█▊▎░▒▓▖▗▘▙▚▛▜▝▞▟";			// block characters subset
+String masterCharset = "▔▀▆▄▂▌▐█▊▎░▒▓▖▗▘▙▚▛▜▝▞▟ ";			// block characters subset
 int masterCharsetLength = masterCharset.length();
 
 String subCharSetRND;
