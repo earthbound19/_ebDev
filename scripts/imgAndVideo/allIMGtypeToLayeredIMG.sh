@@ -7,13 +7,14 @@
 # USAGE
 # Run this script with these parameters:
 # - $1 The extension of all files in your current directory to operate on
-# - $2 OPTIONAL. The desired final layered file format, e.g. tif or psd
+# - $2 OPTIONAL. The desired final layered file format, e.g. tif or psd. If omitted, defaults to psd.
 # Example run command:
 #    allIMGtypeToLayeredIMG.sh tif ora
 # NOTES
 # - For best results, start with .tif images that store alpha information. Otherwise, IF YOUR SOURCE images are in a format (even with alpha information) other than .tif, GraphicsMagick may replace alpha values in each layer with black, which you'll want to eliminate with an unmultiply filter (in Photoshop and/or filter forge).
 # - This script first converts to a layered .tif, then the target format. I discourage archiving images in layered .tif format, because Krita and Photoshop (at least) read them differently; Krita understands them, but Photoshop only reads one layer!
-
+# - If the target format is .tif, it doesn't do an extra conversion step, it just gives you the layered .tif.
+# - It may take a VERY long time to composite large image layers in Krita to psd, or in fact run out of memory (apparently?) and crash. If this happens, and this is sad: axe the layers into folders with fewer images, composite in the folders, and merge the composites.
 
 # CODE
 # TO DO
@@ -21,20 +22,26 @@
 # Template command:
 # gm convert 1.png 2.png 3.png 4.png out.tif
 
-find *.$1 > all_$1.txt
-dos2unix all_$1.txt
+if [ "$1" ]; then intermediate_target=_all_"$1"_layered.tif; else printf "\nNo parameter $1 (input images type) passed to script. Exit."; exit 1; fi
 
-while read element
-do
-	# echo $element
-	inputFiles="$inputFiles $element"
-done < all_$1.txt
-rm all_$1.txt
+if [ "$2" ]; then final_target=_all_"$1"_layered.$2; else final_target=_all_"$1"_layered.psd; fi
 
-# echo $inputFiles
-gm convert $inputFiles _all_$1_layered.tif
+# check for non-error level after attempt to run krita executable as findable (hopefully) in PATH; if errorlevel exit with that errorlevel:
+krita --version &>/dev/null
+capturedErrorLevel="$?"
+if [ "$capturedErrorLevel" != 0 ]; then echo captured error level $capturedErrorLevel on attempt to run krita. Krita apparently not installed or present in PATH. exit.; exit $capturedErrorLevel; fi
 
-krita _all_$1_layered.tif --export --export-filename _all_$1_layered.$2
-# rm _all_$1_layered.tif
+# list input files on one line with spaces in between, for formatting as parameters to `gm convert`; the tr command deletes any Windows newlines:
+inputFiles=$(find -maxdepth 1 -type f -iname \*.$1 -printf "%P " | tr -d '\15\32')
+# echo is $inputFiles
 
-echo DONE. See result image _all_$1_layered.$2
+gm convert $inputFiles $intermediate_target
+
+# if the final layered file format specified is tif, the final file already exists; do nothing else. if it's another format, convert to that format and delete the intermediary tif.:
+if [ "$final_target" != "$intermediate_target" ]
+then
+	krita $intermediate_target --export --export-filename $final_target
+	rm $intermediate_target
+fi
+
+echo DONE. See result image $final_target.
