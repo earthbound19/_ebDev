@@ -1,15 +1,16 @@
 # DESCRIPTION
-# Lists all files in the current directory, then deletes all copies of those files *that have the same base file name* (meaning no extension), which Everything search engine (voidtools) finds everywhere on the computer. THAT MEANS all of the files found in this folder, too. USE WITH EXTREME CAUTION, knucklehead.
+# Finds all files in the current directory, and all subdirectories, then deletes all copies of those files *that have the same base file name* (meaning no extension), which Everything search engine (voidtools) finds everywhere on the computer. THAT MEANS all of the files found in this folder and its subfolders, too (for whichever folder you run this script from). USE WITH EXTREME CAUTION, knucklehead.
 
-# WARNING
-# Deletes from this script are permanent and immediate, and all files in the current folder you run this from are part of that deletion. It prompts to type a confirmation password first.
+# WARNINGS
+# - Deletes from this script are permanent and immediate, and all files in the current folder you run this from are part of that deletion. It prompts to type a confirmation password first.
+# - If the base file name of any files in this folder has words that even appear as *part* of other file names, all those files will be destroyed, also.
 
 # USAGE
 #    lsEverythingDelete.sh
 
 
 # CODE
-echo "WARNING: this script will list every file in the current directory, extract the base file name for each (remove any extension), and then delete every file that the Everything search engine (CLI) finds ON THE ENTIRE COMPUTER which has that same base file name. This can be extremely and irreversibly destructive. If you know what you are doing and you wish to to this, type GONUKE. Otherwise, press CTRL+C, or CTRL+Z, or close this terminal window."
+echo "WARNING: this script will list every file in the current directory, extract the base file name for each (remove any extension), and then delete every file that the Everything search engine (CLI) finds ON THE ENTIRE COMPUTER which has that contains that base file name. This can be extremely and irreversibly destructive. As an example, if any file in the current directory has the word 'installer' in it, *all files on the computer that contain that word in their file name will be destroyed.* So only use this if you're very sure that the base names of all files in this directory are unique such that no unintended deletes from partial base name matches elsewhere on the computer will be deleted. If you know what you are doing and you wish to to this, type GONUKE. Otherwise, press CTRL+C, or CTRL+Z, or close this terminal window."
 read -p "TYPE HERE: " USERINPUT
 
 echo "Will destroy all files that Everything finds (everywhere that it searches on the computer) which match all base file names in the current directory. If parameter \$1 was passed, will go through all subdirectories and do this also."
