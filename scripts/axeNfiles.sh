@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Splits all files in the current directory of type $1 into subdirectories by multiples of $2 (axe files into folders), with folder prefix name $3. If a IMGlistByMostSimilar.txt file (used by some scripts in _ebDev) is present, splits that into copies in the subfolders, these partitioned text file copies reflecting the files in the subfolders.
+# Splits all files in the current directory of type $1 into subdirectories by multiples of $2 (axe files into folders), with folder prefix name $3.
 
 # USAGE
 # With this script in your PATH, run with these paramters:
@@ -11,8 +11,6 @@
 #    axeNfiles.sh hexplt 80 _to
 # Example command that will do the same thing but using the default folder prefix name, and randomly shuffling the list of files before sorting into folders:
 #    axeNfiles.sh hexplt 80 DEFAULT FLORGULB
-# NOTE
-# If you use parameter $4 in a folder with an accompanying IMGlistByMostSimilar.txt, it will render the generated text file lists useless, because they won't reflect the random (shuffled and not matched) files in the folders.
 
 
 # CODE
@@ -71,14 +69,6 @@ do
 	if [ $i == 1 ]; then helpFirstFolderName=$folderName; fi    # Store first folder name in variable for later help text.
 	if ! [ -d $folderName ]; then mkdir $folderName; fi
 	mv $element ./$folderName/
-		# Only do anything with IMGlistByMostSimilar.txt if it exists:
-	if [ -f ./IMGlistByMostSimilar.txt ]
-	# re: https://Unix.stackexchange.com/a/47423/110338
-	then
-		tail -n+$linesCPStartAtMultiple IMGlistByMostSimilar.txt | head -n$numberToAxeOn > $folderName/IMGlistByMostSimilar.txt
-		linesCPStartAtMultiple=$(( ($linesCPmultiplier * $numberToAxeOn) + 1))
-		linesCPmultiplier=$(($linesCPmultiplier + 1))
-	fi
 	# increment iterator:
 	i=$((i + 1))
 done
