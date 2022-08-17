@@ -1,7 +1,7 @@
-/PATH_backup.txt
-/setPathsLog.txt
+PATH_backup.txt
+setPathsLog.txt
 .DS_Store
-node_modules
+node_modules/
 package-lock.json
 *__pycache__*
 /processing/by_me/digit_glyph_combos/data/lastDisplayedVariant.txt
@@ -11,3 +11,4 @@ firstGitCommitTimeStamps.txt
 *_tmp_WPcnYHrGD_documentation_rendering
 BabelStoneShapes.ttf
 bitBlocks.ttf
+build/
