@@ -23,22 +23,35 @@
 # CODE
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (type of file to search for in subdirectories) passed to script. Exit."; exit 1; else searchFileType=$1; fi
 
-if [ ! "$2" ] || [[ "$2" == "NULL" ]]; then subDirSearchParam='-maxdepth 1'; fi
+if [ ! "$2" ] || [ "$2" == "NULL" ]; then subDirSearchParam='-maxdepth 1'; fi
+echo subDirSearchParam is $subDirSearchParam
 
 originalDirectory=$(pwd)
 directoriesList=( $(find . $subDirSearchParam -type d -printf "%P\n") )
 
-for directory in ${directoriesList[@]}
+for subdirectory in ${directoriesList[@]}
 do
 	pushd . &>/dev/null
-	cd $directory
-	echo "in: $directory"
+	cd $subdirectory
+	echo "in: $subdirectory"
 
 	if [ "$3" ]
 	then
 		filesList=( $(find . -maxdepth 1 -iname \*.$searchFileType -printf "%P\n") )
-		cp -n ${filesList[$3]} $originalDirectory
+		# get intended index of file to copy, which is n-1 because the array is zero-index based:
+		aktul_index=$(($3 - 1))
+		# get intended file name to copy from the array:
+		fileToCopy=${filesList[$aktul_index]}
+echo fileToCopy is $fileToCopy . . .
+		if [ -f $originalDirectory\\$fileToCopy ]
+		then
+			echo "WARNING: target file name $fileToCopy already exists. Will rename target to contain parent folder name in file name to diffirentiate it. DOUBLE WARNING: if that different name already exists, this copy will clobber (overwrite) it.";
+			cp -n $fileToCopy $originalDirectory\\"$subdirectory"__"$fileToCopy"
+		else
+			cp -n $fileToCopy $originalDirectory
+		fi
 	else
+		echo "WARNING: if any files in subfolders have the same name as other subfolders, the copy command now run will clobber (overwrite) them with copies from that folder, and you won't be able to distinguish what is what (and will end up with fewer files than intended). This happens for example if all files in all subfolders are in a number series like 01.png, 02.png, then again 01.png, 02.png . . etc."
 		cp -n *.$searchFileType $originalDirectory
 	fi
 	
