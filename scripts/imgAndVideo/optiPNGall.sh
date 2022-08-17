@@ -7,8 +7,8 @@
 
 
 # CODE
+# TO DO: backup time stamp of file and restore it? optipng can't do that (the --preserve switch doesn't, anyway).
 pngsFileNamesArray=( $(find . -type f -name "*.png") )
-# NOTE
 
 for element in ${pngsFileNamesArray[@]}
 do
