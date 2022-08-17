@@ -52,7 +52,7 @@ then
 	# echo rescaleParams val is\:
 	# echo $rescaleParams
 else
-	echo parameter 5 was the string \"NULL\"\. Will not use.
+	echo parameter 5 was absent or the string \"NULL\"\. Will not use.
 fi
 
 if [ "$6" ]; then finalLoopSeconds=$6; fi
