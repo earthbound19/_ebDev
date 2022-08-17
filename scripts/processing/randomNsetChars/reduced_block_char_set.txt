@@ -21,3 +21,5 @@
 ▝	Quadrant upper right
 ▞	Quadrant upper right and lower left
 ▟	Quadrant upper right and lower left and lower right
+
+SUGGESTION: throw a space " " character in the mix (functionally an "empty block")

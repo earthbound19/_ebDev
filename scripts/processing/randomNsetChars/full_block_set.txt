@@ -30,3 +30,5 @@ U+259C	▜	Quadrant upper left and upper right and lower right
 U+259D	▝	Quadrant upper right
 U+259E	▞	Quadrant upper right and lower left
 U+259F	▟	Quadrant upper right and lower left and lower right
+
+SUGGESTION: throw a space " " character in the mix (functionally an "empty block")
