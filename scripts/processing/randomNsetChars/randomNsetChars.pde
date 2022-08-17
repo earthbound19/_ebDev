@@ -20,6 +20,7 @@ String versionNumber = "1.13.4";
 
 
 // TO DO
+// - require minimum two unique glyphs in character subset, to avoid problem of one glyph which is fill block char, which means just a uniform color field -- IF THAT IS THE PROBLEM. Debug variant 802289152 to figure out.
 // - reduce the huge font file to only the glyphs I want (dramatically reduce its size).
 // - something with this? https://stackoverflow.com/questions/51702011/can-we-create-partially-colored-text-in-processing
 // - unique rnd colors of rows? Might entail:
