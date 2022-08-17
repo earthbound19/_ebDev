@@ -59,7 +59,6 @@ folderNumberDigitsPadding=${#highestAxeFolderNumberWillBe}
 i=0			# iterator
 for element in ${allFilesType[@]}
 do
-	zeroPaddedNumber=$(printf "%0"$padToDigits"d" $i)
 	if [ $(($i % $numberToAxeOn)) == 0 ]
 	then
 		toEndFrameMultiple=$(( $toEndFrameMultiple + $numberToAxeOn))
