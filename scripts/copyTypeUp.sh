@@ -4,7 +4,7 @@
 # USAGE
 # Run with these parameters:
 # - $1 The extension of files you wish to copy from subdirectories into the current directory.
-# - $2 OPTIONAL. Any word (such as 'FALSNARF'), which will cause the script also to search and copy files up from all subdirectories (all levels down, not just 1 level). To use $3 but not use $2, pass 'NULL' for $2.
+# - $2 OPTIONAL. If omitted, the script defaults to search 1 level down. If used, any word (such as 'FALSNARF'), will cause the script also to search and copy files up from all subdirectories (all levels down, not just 1 level). To use $3 but not use $2 (to use the default search of one directory down), pass 'NULL' for $2.
 # - $3 OPTIONAL. A number, which will cause the script to only copy the Nth ($3) found file from each subdirectory. For example, if you pass 2, it will only copy the 2nd found file from each subdirectory. If omitted, all will be copied.
 # Example that will copy all files of type .hexplt from directories one level down (subdirectories, but not their sub-directories) to the current directory:
 #    copyTypeUp.sh hexplt
@@ -23,8 +23,7 @@
 # CODE
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (type of file to search for in subdirectories) passed to script. Exit."; exit 1; else searchFileType=$1; fi
 
-subDirSearchParam='-maxdepth 2'
-if [ "$2" ] && [ "$2" != "NULL" ]; then subDirSearchParam=''; fi
+if [ ! "$2" ] || [[ "$2" == "NULL" ]]; then subDirSearchParam='-maxdepth 1'; fi
 
 originalDirectory=$(pwd)
 directoriesList=( $(find . $subDirSearchParam -type d -printf "%P\n") )
@@ -40,7 +39,7 @@ do
 		filesList=( $(find . -maxdepth 1 -iname \*.$searchFileType -printf "%P\n") )
 		cp -n ${filesList[$3]} $originalDirectory
 	else
-	cp -n *.$searchFileType $originalDirectory
+		cp -n *.$searchFileType $originalDirectory
 	fi
 	
 	popd &>/dev/null
