@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Prints full paths (relative to current directory and subdirectories) of all file types passed as parameters to this script, optionally with sort by newest file modification date first.
+# Prints full paths (relative to current directory and subdirectories) of all file types passed as parameters to this script, optionally with sort by newest file modification date first. Files search is recursive.
 
 # USAGE
 # Run with these parameters:
@@ -9,6 +9,8 @@
 #    printFilesTypes.sh sh py c
 # Example that will print many file types, with the custom sort order of most recently modified first per type:
 #    printFilesTypes.sh NEWEST_FIRST sh py pl c cpp bat ahk reg
+# NOTE: if you can remember it (or look it up and use it), this may be more efficient than the loop and repeated call of `find` in this script:
+#    find . -maxdepth 1 -type f \( -iname \*.fileTypeOne -o -iname \*.fileType2 \) -printf "%P\n"
 
 
 # CODE
