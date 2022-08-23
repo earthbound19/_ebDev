@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Prints all directories in the current directory, and optionally all their subdirectories. Print is relative to the current directory (so sub-subdirectories etc. will show their parent, then /). Prints sorted by numeric string value (| sort -n).
+# Prints all directories in the current directory, and optionally all their subdirectories. Print is relative to the current directory (so sub-subdirectories etc. will show their parent, then /). Prints sorted by default sort of the `find` command.
 
 # USAGE
 # Call this script with these parameters:
@@ -15,4 +15,6 @@
 # CODE
 if [ "$1" ]; then subdirSearchCommand="-maxdepth 1"; fi
 
-find . $subdirSearchCommand -type d -printf "%P\n" | sort -n
+# previously added a `sort -n` pipe after find:
+# find . $subdirSearchCommand -type d -printf "%P\n" | sort -n
+find . $subdirSearchCommand -type d -printf "%P\n"
