@@ -16,12 +16,20 @@
 // Changes this version:
 // Rework documentation comments per preferences.
 // GLOBAL VARIABLE DECLARATIONS
-String versionNumber = "1.13.4";
+String versionNumber = "1.16.3";
 
 
 // TO DO
 // - require minimum two unique glyphs in character subset, to avoid problem of one glyph which is fill block char, which means just a uniform color field -- IF THAT IS THE PROBLEM. Debug variant 802289152 to figure out.
 // - reduce the huge font file to only the glyphs I want (dramatically reduce its size).
+// - merge glyphs I want to use from disparate fonts into one purpose-only hacked font? Using proper unicode areas in the case of C64 font?
+// - move everything I need to change for new variations into one function if possible or needed.
+// MAYBE VERSION 2: forsake the text render approach and divide the canvase into cells on a grid. Give each cell a random character, and:
+//  - Randomly mutate characters by next nearest most similar (position in masterCharset array).
+//   - Sometimes just randomly jump to somewhere else altogether in the array.
+//    - Sometimes do that with all characters (already doing this every call of draw() at this writing; change it to sometimes after the above are done).
+//  - Randomly mutate indidual character colors.
+//  - Sometimes randomly mutate _all_ character colors at the same time.
 // - something with this? https://stackoverflow.com/questions/51702011/can-we-create-partially-colored-text-in-processing
 // - unique rnd colors of rows? Might entail:
 //  - converting text to PShape; possibly re: https://discourse.processing.org/t/convert-text-to-pshape/15552/2
@@ -31,8 +39,7 @@ String versionNumber = "1.13.4";
 // - optionally use the bit blocks font
 
 
-int delayBetweenRenders;
-// to figure ffmpegAnim.sh "source" framerate, calculate: 1000 / delayBetweenRenders
+int delayBetweenRenders;    // time in milleseconds before redraw of each image; to figure ffmpegAnim.sh "source" framerate, calculate: 1000 / delayBetweenRenders
 
 boolean booleanOverrideSeed = false;
 // rnd seed may be in range (-2147483648, 2147483647) :
@@ -63,25 +70,16 @@ int rows;
 boolean saveImageSeries = false;
 boolean rapidBWhdAlphaGenMode = false;		// overrides some of the above globals
 
-// FOR OTHER POSSIBLE characters to use in superset, see: http://s.earthbound.io/RNDblockChars
-// SUPER SET DEFINITION from which subsets may be randomly drawn; combining any of these can produce interesting results:
-// -- here are some possible subsets of them to use as supersets (from which sub-subsets would
-// be made) :
- //String masterCharset = "┈┉┊┋┌└├┤┬┴┼╌╍╎╭╮╯╰╱╲╳╴╵╶╷ ";     // box drawing subset
- //String masterCharset = "▲△◆◇○◌◍◎●◜◝◞◟◠◡◢◣◤◥◸◹◺◿◻◼ ";     // geometric shapes subset
- //String masterCharset = "∧∨∩∪∴∵∶∷∸∹∺⊂⊃⊏⊐⊓⊔⊢⊣⋮⋯⋰⋱ ";      // math operators subset
- //String masterCharset = "◈⟐⟢ːˑ∺≋≎≑≣⊪⊹☱☰☲☳☴☵☶☷፨჻܀ ";   //Apple emoji subset
- //String masterCharset = "─│┌┐└┘├┤┬┴┼╭╮╯╰╱╲╳▂▃▄▌▍▎▏▒▕▖▗▘▚▝○●◤◥♦ ";	// Commodore 64 font/drawing glyphs set--which, it happens, combines characters from some of the others interestingly.
- //String masterCharset = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWZ!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ 0";  // all usable from bitBlocks.ttf
-String masterCharset = "▔▀▆▄▂▌▐█▊▎░▒▓▖▗▘▙▚▛▜▝▞▟ ";			// block characters subset
-int masterCharsetLength = masterCharset.length();
+ArrayList<String> masterCharsSETS = new ArrayList<String>();
+
+String masterCharset;
+int masterCharsetLength;
 
 String subCharSetRND;
 int subCharSetRNDlength;
 
 String charsDisplayString;
 
-boolean displayRNDsubsets;
 int reloadAfterNrenders;
 int renderCount;
 int variantCount = 0;
@@ -90,6 +88,8 @@ String animFramesSaveDir;
 String animFramesSaveSUBdir;
 
 PrintWriter output;
+
+IntList screenDivisors = new IntList();
 // END GLOBAL VARIABLES DECLARATIONS
 
 
@@ -186,7 +186,7 @@ void setRNDanimFramesSaveDirName() {
 
 // END CUSTOM FUNCTIONS
 
-
+// settings() is called ONCE before all other functions, and exists to accomodate either the need to call size() before setup() and other functions AND/OR to do things outside of the Processing IDE.
 void settings() {
   // If boolean rapidBWhdAlphaGenMode set true, set defaults for black and white colors,
   // and rapid creation of large pngs.
@@ -215,8 +215,7 @@ void settings() {
 		// OR:
 	  size(1920, 1080);
     // these palettes use gradients and colors adapted from the following palettes, with additions:
-    // tweaked from soil_pigments_darker_and_dark_backgrounds_tweak_gradient.hexplt
-    // tweaked from soil_pigments_accents_and_32_max_chroma_tweak_gradient.hexplt
+    // soil_pigments_darker_and_dark_backgrounds_tweak_gradient.hexplt, soil_pigments_accents_and_32_max_chroma_tweak_gradient.hexplt
 		bgColors = new color[]{
       #a4a19f, #a8a198, #ada090, #b1a088, #b59f80, #b19876, #ad916b, #a88b61,
       #a48456, #a07d53, #9b764f, #976f4c, #926849, #8e694c, #8b6a4f, #876a52,
@@ -250,49 +249,57 @@ void settings() {
 		fillColorsLength = fillColors.length;
 		fillColorsArrayIndex = 0;
 
-    delayBetweenRenders = 640; // has been: 84, 112, 141, 640
+    delayBetweenRenders = (int) random(87, 875); // has been: 84, 112, 141, 640
+	  reloadAfterNrenders = (int) random(28, 65);
 
-	  reloadAfterNrenders = 60;
+    // get divisors of screenWidth that result from dividing by multiples of 2 between M and N; but we're counting by a larger multiple of 2 to give fewer possibilities; NOTE that this assumes the screen width is an even number:
+    for (int i=20; i<80; i+=2) {
+      int divisor = width / i;
+      screenDivisors.append(divisor);
+    }
 
-    fontPointSize = width/48;    // tried sizes list: 83.4 51.5 43 39.1 32 24 12; unifont was last width/28.46. NOTE: a PointSize that doesn't evenly divide by the canvas width may lead to gaps in the text that cause a look like gaps in wallpaper.
+    // get and use the last item of that list:
+    fontPointSize = screenDivisors.get(screenDivisors.size() - 1);
 	}
 
 	setRNDanimFramesSaveDirName();
 }
 
+// For repeat calls, to create a new variant:
 void setupNewVariant() {
+	// ALTERS GLOBALS:
 	variantCount += 1;
-  // this check ensures manual seed is only done once, expecting no other code to ever set
-  // booleanOverrideSeed to true again:
-  if (booleanOverrideSeed == true) {
-    randomSeed(seed);
-    booleanOverrideSeed = false;
-  } else {
-    seed = (int) random(-2147483648, 2147483647);
-    randomSeed(seed);
-  }
 
-  subCharSetRND = getRNDcharsSubset(masterCharset);
+  // FOR OTHER POSSIBLE characters to use in superset, see: http://s.earthbound.io/RNDblockChars
+  // SUPER SETS DEFINITION from which a superset may be randomly drawn;
+  // from that drawn in turn a random subset will be drawn.
+  masterCharsSETS.add("┈┉┊┋┌└├┤┬┴┼╌╍╎╭╮╯╰╱╲╳╴╵╶╷");     // box drawing subset
+  masterCharsSETS.add("▲△◆◇○◌◍◎●◜◝◞◟◠◡◢◣◤◥◸◹◺◿◻◼");         // geometric shapes subset
+  // masterCharsSETS.add("∧∨∩∪∴∵∶∷∸∹∺⊂⊃⊏⊐⊓⊔⊢⊣⋮⋯⋰⋱");               // math operators subset
+  // masterCharsSETS.add("◈⟐⟢ːˑ∺≋≎≑≣⊪⊹☱☰☲☳☴☵☶☷፨჻܀");           //Apple emoji subset
+  // masterCharsSETS.add("─│┌┐└┘├┤┬┴┼╭╮╯╰╱╲╳▂▃▄▌▍▎▏▒▕▖▗▘▚▝○●◤◥♦");	// Commodore 64 font/drawing glyphs set--which, it happens, combines characters from some of the others interestingly.
+  // masterCharsSETS.add("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWZ!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ 0");  // all usable from bitBlocks.ttf
+  // COLLECTION OF SUPERSETS:
+  masterCharsSETS.add("▔▀▆▄▂▌▐█▊▎░▒▓▖▗▘▙▚▛▜▝▞▟");			// block characters subset
+  masterCharsSETS.add("▔▀▆▄▂▌▐█▊▎░▒▓▖▗▘▙▚▛▜▝▞▟");			// adding multipel times to make it used more. Hacky.
+  masterCharsSETS.add("▔▀▆▄▂▌▐█▊▎░▒▓▖▗▘▙▚▛▜▝▞▟");
+  masterCharsSETS.add("┈┉┊┋┌└├┤┬┴┼╌╍╎╭╮╯╰╱╲╳╴╵╶╷▲△◆◇○◌◍◎●◜◝◞◟◠◡◢◣◤◥◸◹◺◿◻◼▔▀▆▄▂▌▐█▊▎░▒▓▖▗▘▙▚▛▜▝▞▟");   // combining some of those sets
 
-  setRNDbgColor();
-  setRNDfillColor();
+  // randomly select a master superset:
+  int masterCharsSETSrndIDX = (int) random(0, masterCharsSETS.size());
+  masterCharset = masterCharsSETS.get(masterCharsSETSrndIDX);
+  masterCharsetLength = masterCharset.length();
 
-  displayRNDsubsets = true;
-  renderCount = 0;
+  delayBetweenRenders = (int) random(87, 875); // has been: 84, 112, 141, 640
+  reloadAfterNrenders = (int) random(28, 65);
+  print("delayBetweenRenders: " + delayBetweenRenders + "; reloadAfterNrenders: " + reloadAfterNrenders + ".\n");
 
-  String variantCountPaddedString = nf(variantCount, 5);
-  if (saveImageSeries == true) {
-    animFramesSaveSUBdir = animFramesSaveDir + "/" + variantCountPaddedString + "/";
-    String variantString = str(seed);
-    output = createWriter(animFramesSaveSUBdir + variantString + ".txt");
-    output.println("The random seed for the variant that produced the images in this folder is " + variantString + ".\n");
-    output.flush();
-    output.close();
-  }
-}
-
-void setup() {
-  setupNewVariant();
+	// set up random fontPointSize from options available in screenDivisors (via division);
+	// tried sizes list: 83.4 51.5 43 39.1 32 24 12; unifont was last width/28.46. NOTE: a PointSize that doesn't evenly divide by the canvas width may lead to gaps in the text that cause a look like gaps in wallpaper.
+	int rndScreenDivisorIDX = (int) random(0, screenDivisors.size());
+	int screenDivisor = screenDivisors.get(rndScreenDivisorIDX);
+	fontPointSize = width/screenDivisor;
+	print("Randomly chose a fontPointSize of " + fontPointSize + " at variantCount " + variantCount + ".\n");
 
   // Uncomment the following two lines to see the available fonts
   //String[] fontList = PFont.list();
@@ -313,6 +320,38 @@ void setup() {
   textLeading(rowHeight);
 
   rows = int(height / rowHeight);
+
+  // this check ensures manual seed is only done once, expecting no other code to ever set
+  // booleanOverrideSeed to true again:
+  if (booleanOverrideSeed == true) {
+    randomSeed(seed);
+    booleanOverrideSeed = false;
+  } else {
+    seed = (int) random(-2147483648, 2147483647);
+    randomSeed(seed);
+  }
+
+  subCharSetRND = getRNDcharsSubset(masterCharset);
+
+  setRNDbgColor();
+  setRNDfillColor();
+
+  renderCount = 0;
+
+  String variantCountPaddedString = nf(variantCount, 5);
+  if (saveImageSeries == true) {
+    animFramesSaveSUBdir = animFramesSaveDir + "/" + variantCountPaddedString + "/";
+    String variantString = str(seed);
+    output = createWriter(animFramesSaveSUBdir + variantString + ".txt");
+    output.println("The random seed for the variant that produced the images in this folder is " + variantString + ".\n");
+    output.flush();
+    output.close();
+  }
+}
+
+// setup is called ONCE, AFTER settings(), to do anything needed before other functions (e.g. before draw()).
+void setup() {
+  setupNewVariant();
 }
 
 
