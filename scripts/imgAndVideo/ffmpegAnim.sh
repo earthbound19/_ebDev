@@ -6,7 +6,7 @@
 
 # USAGE
 # From the directory with the image animation source images, run this script with these parameters:
-# - $1 input "frame rate" (how to interpret the speed of input images in fps). Suggested range for abstract / noise art: anywhere from ~0.9 (a bit more than a still per second) to 7 (7 stills per second). To use an input frames per second that is a randomly chosen number between 0.9 and 7, pass the keyword 'RND' for $1.
+# - $1 input "frame rate" (how to interpret the speed of input images in fps). Suggested range for abstract / noise art: anywhere from ~0.9 (a bit more than a still per second) to 7 (7 stills per second). To use an input frames per second that is a randomly chosen number in a hard-coded range (see `seq` command in script), pass the keyword 'RND' for $1.
 # - $2 desired output framerate
 # - $3 desired constant quality (crf)
 # - $4 the file extension of the input images.
@@ -32,7 +32,7 @@ then
 else
 	if [ "$1" == "RND" ]
 	then
-		inFPS=$(seq 0.9 0.1 7 | shuf | head -n1)
+		inFPS=$(seq 0.9 0.1 9 | shuf | head -n1)
 		# echo source FPS set to randomly chosen number $inFPS.
 	else
 		inFPS=$1
