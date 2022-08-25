@@ -24,6 +24,7 @@
 # NOTES
 # - Renames are logged to a text file named after the date and time the renames were done.
 # - Spaces in file names are supported; surround the appropriate parameter with single or double quotes to use spaces.
+# - It may rename folders first, which could change the path to any found files that match the search string, causing rename of those files to fail (as the path has changed and the rename command won't find them). In that case, re-running this script with the same search and replace parameters will find them in the new path and rename them.
 
 # CODE
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source string) passed to script. Exit."; exit 1; else srcString=$1; fi
