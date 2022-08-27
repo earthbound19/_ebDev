@@ -15,12 +15,12 @@
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (file name of input video) passed to script. Exit."; exit 1; else inputFile=$1; fi
 
 outputFileName=${inputFile%.*}_aacSound.mp4
-if [ -e ${inputFile%.*}_aacSound.mp4 ]
+if [ -e $outputFileName ]
 then
 	echo "Output file name $outputFileName already exists; will not clobber; skip. To re-render it, rename or delete that file, and run this script with the same input file again."
 else
 	echo Converting $inputFile . . .
-	ffmpeg -i $inputFile -map 0:v -vcodec copy -map 0:a -acodec aac -crf 10 ${inputFile%.*}_aacSound.mp4
+	ffmpeg -i $inputFile -map 0:v -vcodec copy -map 0:a -acodec aac -crf 10 $outputFileName
 	# copy metadata from source file to render target; the script also updates target timestamp to match metadata media creation date:
-	copyMetadataFromSourceFileToTarget.sh $inputFile ${inputFile%.*}_aacSound.mp4
+	copyMetadataFromSourceFileToTarget.sh $inputFile $outputFileName
 fi
