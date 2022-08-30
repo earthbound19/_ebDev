@@ -6,7 +6,7 @@
 
 # USAGE
 # Call this script with these parameters:
-# - $1 OPTIONAL. Number of columns. If omitted, defaults to 1. May also be keyword 'ALL' to make columns equal number of colors.
+# - $1 OPTIONAL. Number of columns. If omitted, defaults to 1. May also be keyword 'ALL' to make columns equal to number of colors.
 # - $2 OPTIONAL. Number of rows. If omitted, the script this calls (`reformatHexPalette.sh) will use its defaults for its parameter $3 (see USAGE details for $3 for that script), with handling to fit rows/columns as also described in that script.
 # Example that passes 16 for the columns parameter:
 #    reformatAllHexPalettes.sh 16
