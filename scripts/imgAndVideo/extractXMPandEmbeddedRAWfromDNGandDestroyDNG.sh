@@ -1,5 +1,9 @@
 # DESCRIPTION
-# Extracts embedded raw image and xmp sidecar from DNG file $1, then deletes the DNG. (This delete is permanent and irreversible!) Does not overwrite raw image files that would be overwritten if they already exist, and notifies that they already exist. Also, warns if extracted raw file is different from any found raw file of the same file name. Also, it sets the timestamps of the extracted raw files (from their metadata) to match their creation/modify dates.
+# Extracts embedded raw image and xmp sidecar from DNG file $1, then deletes the DNG only if there was no error extracting the raw image. Does not overwrite raw image files that would be overwritten if they already exist, and notifies that they already exist. Also, warns if extracted raw file is different from any found raw file of the same file name. Also, it sets the timestamps of the extracted raw files (from their metadata) to match their creation/modify dates.
+
+# WARNINGS
+# - If this script deletes a DNG file, the delete is permanent and irreversible! 
+# - This script makes a perhaps invalid assumption that only one embedded raw file per DNG file. The DNG command line options mention the possibility of extracting file(s) (possibly more than one file).
 
 # DEPENDENCIES
 # adobeDNGconverter, exiftool, toOldestWindowsDateTime.sh, and binarez_touch (Windows only!), all in your PATH.
@@ -15,6 +19,7 @@
 # - checks for duplicate file name of file extracted to temp subfolder vs. original parent folder. If it doesn't exist in the parent folder, it moves file from tmp subfolder to current folder.
 
 # CODE
+# TO DO: make $extractedRawFileName a proper array in case of multiple embedded files, and iterate over the array. And code for the possibility of multiple file names in that case. OR: just leave off with the warning above about that possibility, as I never would have made a multiple-raw-file DNG!
 # SET GLOBALS:
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (type short explanation of parameter) passed to script. Exit."; exit 1; else sourceFile=$1; fi
 extractedSideCarDifferent=0
@@ -32,9 +37,7 @@ cp ../$sourceFile .
 adobeDNGconverter -x $sourceFile
 rawExtractErrorLevel="$?"
 
-# delete copy of dng:
-rm $sourceFile
-# list (the only) file name to variable, which will be the file name of the extracted raw file:
+# put the file name in variable, which will be the file name of the extracted raw file:
 extractedRawFileName=$(find . -printf "%P" | tr -d '\15\32')
 # conditionally reconstruct an xmp sidecar from a dng such as will still be recognized and used by camera raw; first make variable with blank value which may be overwritten:
 targetXMPfileName=""
@@ -95,5 +98,5 @@ if [ $rawExtractErrorLevel == 0 ] && [ $extractedSideCarDifferent == 0 ]
 then
 	rm $sourceFile
 else
-	printf "\n\nNOTE: because one or more problems was encountered with extracted data, the DNG source file $sourceFile was left alone (not deleted), so you can examine it."
+	printf "\n\nNOTE: there was either a problem extracting a raw file from the DNG or the DNG has no embedded raw file. Therefore the DNG source file $sourceFile was left alone (not deleted), so you can examine it."
 fi
