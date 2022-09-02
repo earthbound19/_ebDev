@@ -6,7 +6,7 @@
 # - $1 OPTIONAL. Any string (for example 'BLARFARFARBARG'), which will cause the script to search subfolders also for files to print their type.
 # To print only file types from the current directory, pass no parameter to the script:
 #    printAllExtensionsHere.sh
-# To print file types from the current directory and all subdirectories, pass anything as a parameter to the scripr:
+# To print file types from the current directory and all subdirectories, pass anything as a parameter to the script:
 #    printAllExtensionsHere.sh BLARFARFARBARG
 # To store the printout in an array for further use, do a command substitution like this:
 #    allFileTypes=$(printAllExtensionsHere.sh BLARFARFARBARG)
@@ -21,14 +21,13 @@
 subDirSearchParam='-maxdepth 1'
 if [ "$1" ]; then subDirSearchParam=''; fi
 
-	# orig. command; re:
-	# Always the genius breaths are helping; modified from these:
-	# - https://stackoverflow.com/questions/4210042/how-to-exclude-a-directory-in-find-command?rq=1#comment38334264_4210072
-	# - https://stackoverflow.com/a/4998326/1397555
-	# find . $subDirSearchParam -type f -not -path "./.git*" | sed 's|.*\.||' | sort -u
-
-# new commands of my own devising:
-files=( $(find . $subDirSearchParam -type f -not -path "./.git*" -printf "%P\n" | sed 's|[^\.]*.||' | sort -u) )
+# orig. command; re:
+# Always the genius breaths are helping; modified from these:
+# - https://stackoverflow.com/questions/4210042/how-to-exclude-a-directory-in-find-command?rq=1#comment38334264_4210072
+# - https://stackoverflow.com/a/4998326/1397555
+# find . $subDirSearchParam -type f -not -path "./.git*" | sed 's|.*\.||' | sort -u
+# That, adapted:
+files=( $(find . -type f -name '*.*' -not -path "./.git*" -printf "%P\n" | sed 's|.*\.||' | sort -u) )
 for file in ${files[@]}
 do
 	echo $file
