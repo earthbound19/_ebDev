@@ -20,7 +20,7 @@
 if [ "$1" ]; then cols=$1; fi
 if [ "$2" ]; then rows=$2; fi
 
-allHexpltFileNames=( $(find . -type f -iname "*.hexplt" -printf "%P\n") )
+allHexpltFileNames=( $(find . -maxdepth 1 -type f -iname "*.hexplt" -printf "%P\n") )
 
 for hexpltFileName in ${allHexpltFileNames[@]}
 do
