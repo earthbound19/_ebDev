@@ -12,8 +12,8 @@
 
 
 # CODE
-xSampleOffset=0.5
-ySampleOffset=0.5
+xSampleOffset=0.363
+ySampleOffset=0.363
 
 allImageFileNames=( $(printAllIMGfileNames.sh) )
 for imageFileName in ${allImageFileNames[@]}
