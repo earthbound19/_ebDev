@@ -39,8 +39,8 @@ for file in ${fileMatches[@]}
 do
 	if [ "$file" != "$srcFile" ]
 	then
-		echo "$srcFile ->"
+		# echo "$srcFile ->"
 		echo "$file"
-		echo ""
+		# echo ""
 	fi
 done
