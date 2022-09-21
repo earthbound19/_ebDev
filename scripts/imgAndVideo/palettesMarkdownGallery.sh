@@ -43,6 +43,6 @@ do
 	printf "[ ![$element]($element) ]($element)\n\n" >> README.md
 done
 
-printf "Created with [palettesMarkdownGallery.sh](https://github.com/earthbound19/_ebDev/blob/master/scripts/palettesMarkdownGallery.sh)." >> README.md
+printf "Created with [palettesMarkdownGallery.sh](https://github.com/earthbound19/_ebDev/blob/master/scripts/imgAndVideo/palettesMarkdownGallery.sh)." >> README.md
 
 echo DONE.
