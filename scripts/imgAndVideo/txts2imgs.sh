@@ -41,8 +41,6 @@ then
 		fi
 	fi
 echo "Font file $fontFileName found at $fullPathToFontFile."
-fontParameter="-font '$fullPathToFontFile'";
-echo "fontParameter is $fontParameter"
 fi
 
 fileNamesArray=( $(find . -maxdepth 1 -type f -iname \*.txt -printf '%f\n') )
@@ -53,23 +51,15 @@ do
 	renderTargetFileName="$fileNameNoExt".png
 	if [ ! -e "$renderTargetFileName" ]
 	then
-		cp $fileName tmp_txts2imgs_hZE9WjFeS.txt
-		dos2unix tmp_txts2imgs_hZE9WjFeS.txt
-		# IFS='\n'
-		printString=$(cat tmp_txts2imgs_hZE9WjFeS.txt)
-# print everyting to a temp script file and then execute the script, because something goes on otherwise with variables not working and the only solution I know is this workaround:
-printf "magick convert -background white -size $sizeParameter \
+		printString=$(cat $fileName)
+# image render command on lines connected by  \:
+magick convert -background white -size $sizeParameter \
 -gravity Center \
 -pointsize $pointSizeParameter \
-$fontParameter \
-caption:'$printString' \
-$renderTargetFileName" > txts2imgs_tmp_script__KX9CPaFdB.sh
-	./txts2imgs_tmp_script__KX9CPaFdB.sh
+-font $fullPathToFontFile \
+caption:"$printString" \
+$renderTargetFileName
 	else
 		echo "Render target $renderTargetFileName already exists; will not clobber."
 	fi
 done
-
-# cleanup temp files if we created them (if they exist) :
-if [ -e tmp_txts2imgs_hZE9WjFeS.txt ]; then rm tmp_txts2imgs_hZE9WjFeS.txt; fi
-if [ -e txts2imgs_tmp_script__KX9CPaFdB.sh ]; then rm txts2imgs_tmp_script__KX9CPaFdB.sh; fi
