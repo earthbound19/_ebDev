@@ -6,7 +6,7 @@
 # - $1 file type to get random copies of files for
 # - $2 how many files to copy. Should be less than the number of files of type $1 in the current directory.
 # For example, to make 15 random copies of jpg files:
-#    copyRandomFileNamesOfType.sh jpg 15
+#    copyRandomFilesOfType.sh jpg 15
 
 
 # CODE
