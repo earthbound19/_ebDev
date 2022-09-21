@@ -64,7 +64,6 @@ do
 	fi
 	if [ "$mode" == "mode=3" ]
 	then
-		blrugfh='blarg'
 		len=$(listMatchedFileNames.sh $file | wc -l)
 		if [ "$len" == "0" ]
 		then
