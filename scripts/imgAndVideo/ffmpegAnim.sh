@@ -75,6 +75,8 @@ digitsPadCount=${#lastFoundTypeFileNameNoExt}
 # additionalParams="-filter:v crop=1920:1080"
 # rotate video 90 degrees, re https://stackoverflow.com/a/9570992 ;
 # additionalParams='-vf "transpose=1"'				Transpose parameter options: 0 = 90CounterCLockwise and Vertical Flip (default); 1 = 90Clockwise; 2 = 90CounterClockwise; 3 = 90Clockwise and Vertical Flip
+# available presets, from fastest with large file size to slowest with small file size: ultrafast, superfast,, veryfast, faster, fast, medium (this is the default), slow, slower, veryslow
+additionalParams="-preset veryslow"
 
 # yuv420p is apparently required by instagram and probably facebook and others:
 pixelFormat="-pix_fmt yuv420p"
