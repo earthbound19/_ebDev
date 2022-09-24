@@ -23,7 +23,7 @@
 # CODE
 if [ "$1" ]; then metaDataSrcExtension=$1; else printf "\nNo parameter \$1 (metadata source extension) passed to script. Defaulting to txt."; metaDataSrcExtension='txt'; fi
 
-filesList=($(find . -type f -iname \*.$metaDataSrcExtension -printf "%P\n"))
+filesList=($(find . -maxdepth 1 -type f -iname \*.$metaDataSrcExtension -printf "%P\n"))
 
 for fileName in ${filesList[@]}
 do
