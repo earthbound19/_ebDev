@@ -32,7 +32,7 @@ fi
 
 fileNameNoExt=${srcFile%.*}
 
-fileMatches=( $(find . $subDirSearchFlag -iname "*$fileNameNoExt*" -printf "%P\n") )
+fileMatches=( $(find . $subDirSearchFlag -iwholename "*$fileNameNoExt*" -printf "%P\n") )
 
 # Print all elements except for the one which is the source file name (which ends up in that array):
 for file in ${fileMatches[@]}
