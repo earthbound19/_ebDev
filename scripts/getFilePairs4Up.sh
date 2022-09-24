@@ -3,8 +3,8 @@
 
 # USAGE
 # Run with these parameters:
-# - $1 extension of file types in current directory to find files with the same base name (file minus extension).
-# - $2 extension of file types to find that have the same base name as any file $1 plus this extension.
+# - $1 extension of file types in current directory to find file pairs for, such that they are:
+# - $2 extension of file types that have the same base name as any file $1 plus this extension.
 # - $3 how many directories up to search for files $2 and move them into the current directory.
 # - $4 OPTIONAL. Any word, for example KRIDTALB, which will cause the script to force overwrite existing files in the current directory, by moving found matches from any directory up to $3 levels up over them.
 # EXAMPLE
