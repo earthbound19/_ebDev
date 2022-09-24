@@ -25,5 +25,12 @@ descriptionMetaData=$(cat $metaDataSourceFileName)
 matchedFileNames=( $(listMatchedFileNames.sh $metaDataSourceFileName) )
 for filename in ${matchedFileNames[@]}
 do
-	exiftool -overwrite_original -MWG:Description="$descriptionMetaData" $filename
+	# Handle metadata writing for png vs. other extensions. (Assuming only jpg vs png, which handles cases I want to handle at this writing if not forever.)
+	fileExt=${filename##*.}
+	if [ "$fileExt" == "png" ] || [ "$fileExt" == "PNG" ]
+	then
+		exiftool -overwrite_original -Description="$descriptionMetaData" $filename
+	else
+		exiftool -overwrite_original -MWG:Description="$descriptionMetaData" $filename
+	fi
 done
