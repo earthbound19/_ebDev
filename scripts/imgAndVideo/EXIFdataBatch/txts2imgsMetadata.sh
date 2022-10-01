@@ -24,7 +24,7 @@
 # CODE
 if [ "$1" ]; then metaDataSrcExtension=$1; else printf "\nNo parameter \$1 (metadata source extension) passed to script. Defaulting to txt."; metaDataSrcExtension='txt'; fi
 
-# make a paths array which is of all subdirectories if $4 was passed, or only the current directory if $4 was _not_ passed:
+# make a paths array which is of all subdirectories if $2 was passed, or only the current directory if that was _not_ passed:
 if [ "$2" ]
 then
 	paths=($(find . -type d))
