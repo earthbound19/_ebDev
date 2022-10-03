@@ -13,6 +13,7 @@
 #    sortuniq.sh fileNameToSortAndDedup.txt FLOURPESCENSE
 
 # CODE
+# TO DO: fix this breaking on a file I'm using now. It breaks on spaces.
 lines=($(<$1))
 # Saved by a genius yonder: https://stackoverflow.com/a/11789688/1397555
 OIFS="$IFS"
