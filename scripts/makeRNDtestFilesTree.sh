@@ -30,7 +30,7 @@ set_rndSTR () {
 	rndLen=$(seq $lengthRangeOfNames | shuf | head -n 1)
 	if [ "$includeTerminalUnfriendlyCharacters" == "True" ]
 	then
-		rndSTR=$(cat /dev/urandom | tr -dc "a-km-z2-9'@=~!#$%^&()+[{]};. ,-" | fold -w $rndLen | head -n 1)
+		rndSTR=$(cat /dev/urandom | tr -dc "a-km-z2-9'@=~!#$%^&()+[{]};.                ,-" | fold -w $rndLen | head -n 1)
 	else
 		rndSTR=$(cat /dev/urandom | tr -dc "a-km-z2-9" | fold -w $rndLen | head -n 1)
 	fi
