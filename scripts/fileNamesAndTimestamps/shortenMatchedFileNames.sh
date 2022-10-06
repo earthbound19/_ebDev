@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Solves a problem of file names and (possibly also) associated file names that are far too long and make file systems choke.* For all files in the current directory of type $1, finds all other files that have the same base file name, and renames the file with its matches to have the shortened base file name, $2 characters long (plus 8 random chracters to avoid file name conflicts). Does this via original logic and another script. Renames preserve the left-hand side of a name (the right is truncated). NOTE that this functionally will just shorten file names of type $1 that are too long regardless of whether there are any companion files that have the same base file name (this works for only shortening all files of type $1).
+# Solves a problem of file names and (possibly also) associated file names that are far too long and make file systems choke.* For all files in the current directory of type $1, finds all other files that have the same base file name, and renames the file with its matches to have the shortened base file name, $2 characters long (plus 8 random characters to avoid file name conflicts). Does this via original logic and another script. Renames preserve the left-hand side of a name (the right is truncated). NOTE that this functionally will just shorten file names of type $1 that are too long regardless of whether there are any companion files that have the same base file name (this works for only shortening all files of type $1).
 
 # WARNING
 # Does not check for duplicate file names, but designs around that by sufficient file rename entropy. Still, there's a vanishingly small chance it can clobber other files by override of duplicate generated file name.
@@ -10,11 +10,12 @@
 # USAGE
 # Run with these parameters:
 # - $1 file type to find matches of via `listMatchedFileNames.sh`.
-# - $2 OPTIONAL. How many chracters to shorten source and match file names to. Minimum 25 strongly recommended. If not provided, a default is used. To use the default, pass the word DEFAULT.
+# - $2 OPTIONAL. How many characters to shorten source and match file names to. Minimum 25 strongly recommended. If not provided, a default is used. To use the default, pass the word DEFAULT.
 # - $3 Anything, such as the word FLORGBUAR, which will cause the script to recurse through all subdirectories and perform these operations in each. You must use $2 if you use this.
 #    scriptFileName.sh parameterOne
-# NOTE
-# *This script was made by necessity of renaming files that a renderer made way, way too long: 146+ characters! Nobody needs that. Around 30 to 40 characters can be plenty. File or path names that are excessively long can cause weird, mystifying errors in Windows. Instead of complaining that paths are too long, for example, in some contexts Windows simply fails to read files, or gives weird ill-conceived security warning popups.
+# NOTES
+# - *This script was made by necessity of renaming files that a renderer made way, way too long: 146+ characters! Nobody needs that. Around 30 to 40 characters can be plenty. File or path names that are excessively long can cause weird, mystifying errors in Windows. Instead of complaining that paths are too long, for example, in some contexts Windows simply fails to read files, or gives weird ill-conceived security warning popups.
+# - If you're renaming a lot of files that you know don't have matches, temporarily rename `listMatchedFileNames.sh` to `-listMatchedFileNames.sh` so that the script will fail to load and use it, bypassing its slowdown (if you don't want the tasks it performs) logic. The script will still perform the renames on the file with would-be matches, but much faster.
 
 # CODE
 if [ "$1" ]; then fileTypeToMatch=$1; else printf "\nNo parameter \$1 (file type to find matches of.) passed to script. Exit."; exit 1; fi
