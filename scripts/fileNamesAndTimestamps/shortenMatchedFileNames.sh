@@ -12,7 +12,14 @@
 # - $1 file type to find matches of via `listMatchedFileNames.sh`.
 # - $2 OPTIONAL. How many characters to shorten source and match file names to. Minimum 25 strongly recommended. If not provided, a default is used. To use the default, pass the word DEFAULT.
 # - $3 Anything, such as the word FLORGBUAR, which will cause the script to recurse through all subdirectories and perform these operations in each. You must use $2 if you use this.
-#    scriptFileName.sh parameterOne
+# For example, to rename all png files in the current directory, and all files that correlate to any of those png files (have the same base file name), run:
+#    shortenMatchedFileNames.sh png
+# To do the same and specify shortened file length of 50, run:
+#    shortenMatchedFileNames.sh png 50
+# To do the same and also so in all subdirectories, run:
+#    shortenMatchedFileNames.sh png 50 FLORGBUAR
+# To do the same but use the default shorten length, run:
+#    shortenMatchedFileNames.sh png DEFAULT FLORGBUAR
 # NOTES
 # - *This script was made by necessity of renaming files that a renderer made way, way too long: 146+ characters! Nobody needs that. Around 30 to 40 characters can be plenty. File or path names that are excessively long can cause weird, mystifying errors in Windows. Instead of complaining that paths are too long, for example, in some contexts Windows simply fails to read files, or gives weird ill-conceived security warning popups.
 # - If you're renaming a lot of files that you know don't have matches, temporarily rename `listMatchedFileNames.sh` to `-listMatchedFileNames.sh` so that the script will fail to load and use it, bypassing its slowdown (if you don't want the tasks it performs) logic. The script will still perform the renames on the file with would-be matches, but much faster.
