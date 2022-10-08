@@ -42,7 +42,7 @@ do
 	echo Directory name is $directory.
 	columns=$(sed 's/\([0-9]\{1,\}\).*/\1/g' <<< $directory)
 	echo Number of columns from directory name is $columns.
-	rows=$(sed 's/[0-9]\{1,\}x\([0-9]\{1,\}\)/\1/g' <<< $directory)
+	rows=$(sed 's/[0-9]\{1,\}[^0-9]\{1,\}\([0-9]\{1,\}\)/\1/g' <<< $directory)
 	echo Number of rows from directory name is $rows.
 	# USE THAT INFO to get color samples! :
 	# save currend directory to directory stack but suppress directory print (redirect to /dev/null) :
