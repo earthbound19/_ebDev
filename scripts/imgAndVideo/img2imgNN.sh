@@ -60,8 +60,8 @@ if [ ! -f $targetFileName ]; then
 			gmScaleParam="-sample $targetLongDim"
 			# if clause end from deprecated irfanview option:
 			#fi
+		fi
 		gm convert $srcFileName $gmScaleParam $targetFileName
-	fi
 	echo converted to $targetFileName . .
 else
 	echo target file $targetFileName already exists\; skipping.
