@@ -22,6 +22,11 @@
 if [ "$1" ]; then fileTypeToMatch=$1; else printf "\nNo parameter \$1 (file type to find matches of.) passed to script. Exit."; exit 1; fi
 if [ ! "$2" ] || [ "$2" == "DEFAULT" ]; then shortenToNchars=36; else shortenToNchars=$2; fi
 
+# Function that sets a global RNDstr variable with a new random 9-character string
+setRNDstr () {
+	RNDstr=$(cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c 9)
+}
+
 # make a paths array which is of all subdirectories if $3 was passed, or only the current directory if $3 was _not_ passed:
 if [ "$3" ]
 then
@@ -41,16 +46,22 @@ do
 	do
 		echo ----
 		echo working on $fileToMatch . . .
-		# get RND string that will be used in renaming:
-		RNDstr=$(cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c 9)
-
 		# rename fileToMatch (because it will not be included in the list fileMatches) ;
 		# construct new file name for fileToMatch:
 		fileNameNoExt=${fileToMatch%.*}
 		fileExt=${fileToMatch##*.}
-		fileToMatchNewName="${fileToMatch:0:$shortenToNchars}"__$RNDstr.$fileExt
+		fileToMatchNewName="${fileToMatch:0:$shortenToNchars}".$fileExt
 		# do the actual rename:
-		mv $fileToMatch $fileToMatchNewName
+		if [ ! -f $fileToMatchNewName ]
+		then
+			mv $fileToMatch $fileToMatchNewName
+		else
+			setRNDstr
+			fileToMatchNewNameTwo="${fileToMatch:0:$shortenToNchars}"__$RNDstr.$fileExt
+			printf "\nRename target $fileToMatchNewName would clobber existing file! Renaming to $fileToMatchNewNameTwo . . ."
+			mv $fileToMatch $fileToMatchNewNameTwo
+		fi
+
 	done
 
 	cd $thisRootDir
