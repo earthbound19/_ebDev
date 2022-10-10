@@ -8,7 +8,8 @@
 # USAGE
 # Run with these parameters:
 # - $1 the file extension you wish for it to operate on, for example png
-# - $2 OPTIONAL. Anything, such as the word FLUBNOR, which will cause the script to recurse into all subdirectories of the current directory and renumber files in every directory. Meaning, it repeats the operation in every directory. So for example `dir01` would end up with files inside it renamed `001.png`, `002.png`, `003.png`, and `dir02` would also end up with files named `001.png`, `002.png`, `003.png`, etc. If you wish to use $3 (see next) but not this, pass the word NULL for this.
+# - $2 OPTIONAL. Anything, such as the word FLUBNOR, which will cause the script to recurse into all subdirectories of the current directory and renumber files in every directory. Meaning, it repeats the operation in every directory. So for example `dir01` would end up with files inside it renamed `001.png`, `002.png`, `003.png`, and `dir02` would also end up with files named `001.png`, `002.png`, `003.png`, etc. If you wish to use $3 (see next) but not this, pass the word NULL for this. OR
+# - $2 OPTIONAL. Pass a number value for $2, and file renumbering will start with that number. The other option for $2 (recursion) will not be invoked in this case.
 # - $3 OPTIONAL. Anything, such as the word WHELF, which will cause sort by oldest file first before renumbering. If omitted, uses the `find` command's default sort (which seems to do well for maintaining the ordering of numbered files in renumbering).
 # Example that will renumber all png format files in the current directory:
 #    renumberFiles.sh png
@@ -27,7 +28,20 @@
 
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (file extension (type) to renumber) passed to script. Exit."; exit 1; else fileTypeToRenumber=$1; fi
 
-if [ "$2" ] && [ "$2" != "NULL" ]
+# set default fileRenumberingCounter value; override if numeric value passed for $2:
+fileRenumberingCounter=0
+# check if $2 is numeric: $? will be set to 0 if it is; nonzero if it is not:
+echo $2 | grep -E '^[0-9]{1,}$' &>/dev/null
+if [ "$?" == "0" ]
+then
+	echo "Number format detected for parameter \$2. Setting starting number to that number: $2"
+	fileRenumberingCounter="$2"
+	# set a variable, which, if it is set (exists), tells a future check that $2 was numeric -- or that is the intended use. If we never enter this code block because $2 is not numeric, this variable will never be set:
+	NUMERIC_PARAMETER_2=YORGHBOI
+fi
+
+# THE && [ ! $NUMERIC_PARAMETER_2 ] returns true IF $NUMERIC_PARAMETER_2 DOES NOT EXIST (is not set) :
+if [ "$2" ] && [ "$2" != "NULL" ] && [ ! $NUMERIC_PARAMETER_2 ]
 then
 	# if $2 was passed to script, put folder names of all subdirectories into an array, and remove the first element ('.', or this folder) :
 	directories=($(find -type d))
@@ -36,6 +50,7 @@ else
 	# otherwise put one element, the current directory, into an array:
 	directories=($(pwd))
 fi
+
 
 echo "Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem"
 
@@ -59,11 +74,10 @@ do
 	# Get digits to pad to from length of array.
 	digitsToPadTo=${#filesArray[@]}; digitsToPadTo=${#digitsToPadTo}
 
-	counter=0
 	for filename in ${filesArray[@]}
 	do
-		counter=$((counter + 1))
-		countString=$(printf "%0""$digitsToPadTo""d\n" $counter)
+		countString=$(printf "%0""$digitsToPadTo""d\n" $fileRenumberingCounter)
+		fileRenumberingCounter=$((fileRenumberingCounter + 1))
 		# echo "echo command is: mv $filename $countString.$fileTypeToRenumber"
 		mv $filename $countString.$fileTypeToRenumber
 	done
@@ -71,6 +85,8 @@ do
 done
 
 # DEVELOPMENT HISTORY
+# 2022-10-09 added numeric option for parameter $2 that will set the start number for numbering
+# (Also added paramter 3 (to sort by oldest date file first) on or after that 2022-07-25 log)
 # 2022-07-25 add option ($2) to iterate over subdirectories and run renumbering command in each
 # 2021-02-21 change sed parsing command that isn't working in whatever changed situation broke it.
 # 2020-09-11 simplify script logic, require parameter 1 and print error if absent, true array creation, better command substitution
