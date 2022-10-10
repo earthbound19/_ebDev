@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Renames all files in the current directory with random character strings of length n (parameter $1, and a default is used if not provided), but with the same file extension.
+# Renames all files in the current directory with random character strings of length n (parameter $1, and a default is used if not provided), but with the same file extension. Optionally limits this to a given file type ($2). Also optionally does this over all files in all subdirectories also.
 
 # WARNINGS
 # - Depending on how you use this, it can randomly rename _all_ files in the current directory (non-recursive; it will not rename files in subfolders). It will keep the same file extensions (a file with a .png or .hexplt or any extension will still have that; it will just have a randomly different base file name).
