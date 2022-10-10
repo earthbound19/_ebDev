@@ -8,7 +8,7 @@
 # USAGE
 # Run with these parameters:
 # - $1 the file extension you wish for it to operate on, for example png
-# - $2 OPTIONAL. Anything, such as the word FLUBNOR, which will cause the script to recurse into all subdirectories of the current directory and renumber files in every directory. Meaning, it repeats the operation in every directory. So for example `dir01` would end up with files inside it renamed `001.png`, `002.png`, `003.png`, and `dir02` would also end up with files named `001.png`, `002.png`, `003.png`, etc. If you wish to use $3 (see next) but not this, pass the word NULL for this. OR
+# - $2 OPTIONAL. Anything, such as the word FLUBNOR, which will cause the script to recurse into all subdirectories of the current directory and renumber files in every subdirectory. Meaning, it repeats the operation in every subdirectory. So for example `dir01` would end up with files inside it renamed `001.png`, `002.png`, `003.png`, and `dir02` would also end up with files named `001.png`, `002.png`, `003.png`, etc. If you wish to use $3 (see next) but not this, pass the word NULL for this.
 # - $2 OPTIONAL. Pass a number value for $2, and file renumbering will start with that number. The other option for $2 (recursion) will not be invoked in this case.
 # - $3 OPTIONAL. Anything, such as the word WHELF, which will cause sort by oldest file first before renumbering. If omitted, uses the `find` command's default sort (which seems to do well for maintaining the ordering of numbered files in renumbering).
 # Example that will renumber all png format files in the current directory:
@@ -43,9 +43,10 @@ fi
 # THE && [ ! $NUMERIC_PARAMETER_2 ] returns true IF $NUMERIC_PARAMETER_2 DOES NOT EXIST (is not set) :
 if [ "$2" ] && [ "$2" != "NULL" ] && [ ! $NUMERIC_PARAMETER_2 ]
 then
-	# if $2 was passed to script, put folder names of all subdirectories into an array, and remove the first element ('.', or this folder) :
+	# if $2 was passed to script, put folder names of all subdirectories into an array:
 	directories=($(find -type d))
-	directories=(${directories[@]:1})
+	# uncomment to remove the first element ('.', or this folder) :
+	# directories=(${directories[@]:1})
 else
 	# otherwise put one element, the current directory, into an array:
 	directories=($(pwd))
@@ -81,6 +82,8 @@ do
 		# echo "echo command is: mv $filename $countString.$fileTypeToRenumber"
 		mv $filename $countString.$fileTypeToRenumber
 	done
+	# while we wouldn't want to reset this variable for the case of recursion through subdirectories, we won't encounter that in the case of a parameter to this script ($2 at this writing) specifying a starting count number, as we'll only renumber files in this directory but not any subdirectories. But in the case of recursion through subdirectories and doing the renumbering process in all subdirectories, we _do_ want this reset, otherwise it would count up and start at a higher number in each new subdirectory, which would defeat my purpose for this script:
+	fileRenumberingCounter=0
 	popd &>/dev/null
 done
 
