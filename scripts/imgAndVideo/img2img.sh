@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates a converted copy of image file name $1 to format $2, via ImageMagick. Will not convert if render target already exists. Optionally downsizes (with good downsizing method) via $3.
+# Creates a converted copy of image file name $1 to format $2, via ImageMagick, optionally downsizing (with good downsizing method) via $3. If downsizing is done, to try to avoid file name conflicts (to avoid clobbering the original file if converting to the same target format as source), it adds an _x800 (or the number of pixels accross) phrase to the target file name. Will not convert if render target already exists (including if the render target has that number of pixels phrase.
 
 # DEPENDENCY
 # ImageMagick installed in your PATH.
@@ -24,6 +24,12 @@ additionalConvertOptions=""
 if [ "$3" ]; then additionalConvertOptions="-colorspace RGB -filter Lanczos -resize $3 -colorspace sRGB"; dimSTR=_"$3x"; fi
 
 renderTarget=${sourceIMG%.*}$dimSTR.$destIMGformat
+
+# check for redundant dimension string in render target name and exit with warning if there is one, because we would be doing a duplicate render if that is the case:
+redundantStringCheck="$dimSTR""$dimSTR"
+echo $renderTarget | grep "$redundantStringCheck"
+if [ "$?" == "0" ]; then echo "WARNING: redundant dimension string \"$redundantStringCheck\" in would-be render target file name \"$renderTarget\", because you may be attempting a conversion that was already done. Skipping render. Exit."; exit; fi
+
 if [ -e $renderTarget ]
 then
 	printf "\n~\nRender target $renderTarget already exists; skipping render. To recreate it, delete it and run this script again with the same parameters.\n"
