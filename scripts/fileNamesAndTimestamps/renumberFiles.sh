@@ -8,8 +8,8 @@
 # USAGE
 # Run with these parameters:
 # - $1 the file extension you wish for it to operate on, for example png
-# - $2 OPTIONAL. Anything, such as the word FLUBNOR, which will cause the script to recurse into all subdirectories of the current directory and renumber files in every subdirectory. Meaning, it repeats the operation in every subdirectory. So for example `dir01` would end up with files inside it renamed `001.png`, `002.png`, `003.png`, and `dir02` would also end up with files named `001.png`, `002.png`, `003.png`, etc. If you wish to use $3 (see next) but not this, pass the word NULL for this.
-# - $2 OPTIONAL. Pass a number value for $2, and file renumbering will start with that number. The other option for $2 (recursion) will not be invoked in this case.
+# - $2 OPTIONAL. Anything, such as the word FLUBNOR, which will cause the script to recurse into all subdirectories of the current directory and renumber files in every subdirectory. Meaning, it repeats the operation in every subdirectory. So for example `dir01` would end up with files inside it renamed `001.png`, `002.png`, `003.png`, and `dir02` would also end up with files named `001.png`, `002.png`, `003.png`, etc. If you wish to use $3 but not this, pass the word NULL for this.
+# - $2 OPTIONAL: NOTE that this is a variant option for $2. Pass a number value for $2, and file renumbering will start with that number. The other variant option for $2 (recursion, triggered by a non-numeric parameter for $2) will not be invoked in this case.
 # - $3 OPTIONAL. Anything, such as the word WHELF, which will cause sort by oldest file first before renumbering. If omitted, uses the `find` command's default sort (which seems to do well for maintaining the ordering of numbered files in renumbering).
 # Example that will renumber all png format files in the current directory:
 #    renumberFiles.sh png
