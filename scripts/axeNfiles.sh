@@ -50,9 +50,6 @@ padToDigits=${#numberOfFiles}
 # MAIN LOGIC
 # Figure out how many folders we'll need to create to move $numberToAxeOn into each:
 n=$(($numberOfFiles / $numberToAxeOn+1))
-# Variables used in the coming control block to break up lines of a text file (created by and useful for other scripts) into partitioned copies of it in created subfolders:
-linesCPmultiplier=1
-linesCPStartAtMultiple=1
 # For folder name by number zero-padding digits:
 highestAxeFolderNumberWillBe=$(($n * $numberToAxeOn))
 folderNumberDigitsPadding=${#highestAxeFolderNumberWillBe}
