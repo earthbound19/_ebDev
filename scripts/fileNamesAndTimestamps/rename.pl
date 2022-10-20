@@ -6,7 +6,7 @@
 # http://plasmasturm.org/code/rename/rename via http://plasmasturm.org/code/rename/
 
 # SEE ALSO
-# ftun.sh, preferred, which uses this but with my particular preferences.
+# For file name cleanup to be terminal friendly, ftun.sh is preferred, which uses this but with my particular preferences.
 
 # MORE GENERAL USAGE
 # To get the path to this script, assuming it is in your PATH, try both of these commands and hope that one works:
