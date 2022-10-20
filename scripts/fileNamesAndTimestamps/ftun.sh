@@ -2,7 +2,7 @@
 # Replaces terminal-unfriendly characters in all files of a given type (parameter 1) in the current directory, via rename.pl. If $1 is not provided, does this to ALL files in the current directory. Why ftun.sh? FTUN stands for "Fix Terminal Unfriendly [folder and file] Names." Terminal-unfriendly characters in file names are any character that may make a script choke if you attempt to pass a file name (or folder name) containing them to a script. See NOTES under USAGE.
 
 # DEPENDENCIES
-# Perl, and `rename.pl` (from http://plasmasturm.org/code/rename/rename) in your PATH, and a Unix or emulated Unix environment.
+# Perl and `rename.pl` (from http://plasmasturm.org/code/rename/rename) in your PATH, and a Unix or emulated Unix environment. Also getFullPathToFile.sh from _ebDev.
 
 # USAGE
 # From a terminal, in a folder with terminal-unfriendly file or folder names, execute with these parameters:
