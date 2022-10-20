@@ -61,13 +61,9 @@ if [ "$6" ]; then finalLoopSeconds=$6; fi
 # get array of input files:
 array=( $(find . -maxdepth 1 -type f -name "*.$inFileType" -printf '%f\n') )
 # if files are numbered, first file in array is also the first frame number:
-first_frame_number=${array[0]}
-# but ffmpeg won't have any leading zeros on the first frame number, so trim any off:
-first_frame_number=$(echo $first_frame_number | sed "s/^0\{0,\}\(.*\)\.$inFileType/\1/g")
-# last element of array is last found file type $inFileType :
+first_frame_from_filename=${array[0]%.*}
 lastFoundFileType=${array[-1]}
-lastFoundTypeFileNameNoExt=${lastFoundFileType%.*}
-digitsPadCount=${#lastFoundTypeFileNameNoExt}
+digitsPadCount=${#first_frame_from_filename}
 
 # ex commands to fetch and parse src pix dimensions is in getDoesIMGinstagram.sh.
 # also could do bc math e.g: echo "scale=5; 3298 / 1296" | bc
@@ -87,7 +83,7 @@ pixelFormat="-pix_fmt yuv420p"
 
 # Because something funky and evil in DOS and/or Unix emulation chokes on some forms of $additionalParams inline, but not if printed to and executed from a script;
 # FOR LOSSLESS BUT COMPRESSED AVI, end the command instead with: -codec:v utvideo _out.avi :
-echo "ffmpeg -y -f image2 -framerate $inFPS -start_number $first_frame_number -i %0"$digitsPadCount"d.$inFileType $additionalParams $rescaleParams -r $outFPS $pixelFormat -crf $crf _out.mp4" > tmp_enc_script_P4b3ApXC.sh
+echo "ffmpeg -y -f image2 -framerate $inFPS -start_number $first_frame_from_filename -i %0"$digitsPadCount"d.$inFileType $additionalParams $rescaleParams -r $outFPS $pixelFormat -crf $crf _out.mp4" > tmp_enc_script_P4b3ApXC.sh
 ./tmp_enc_script_P4b3ApXC.sh
 rm ./tmp_enc_script_P4b3ApXC.sh
 
