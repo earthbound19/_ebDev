@@ -30,7 +30,7 @@
 #    lsEverythingMoveHere.sh NULL YORFPLERION
 # NOTES
 # - If you specify a file name for $1 (and don't pass 'NULL'), but also pass parameter $2, parameter $1 is ignored (the file list is not used). This is because that would lead to duplicate work (it would recurse through subdirectories and repeatedly move all files from the file list, and on all subsequent directory changes it would find and move all those files again).
-# - Any list of file names you provide via $1 must contain file names without paths. Paths may screw things up and lead to attempts to result files you don't expect!
+# - Any list of file names you provide via $1 must contain file names without paths. Paths may screw things up and lead to results you don't expect!
 # - This skips all moves of any files named README.md and README.txt.
 
 
@@ -71,7 +71,7 @@ else
 					printf "!----\nPROBLEM: file list $1 includes character '/' and/or '\' (path delimiters). Those will cause problems. File should only include file names, no paths. Exit.\n\n"
 					exit 2
 				fi
-				echo "Moving all copies of files found in $1 (which are found everywhere else on the computer) to directory $currDir."
+				echo "Will move all copies of files found in list $1 (which are found everywhere else on the computer) to directory $currDir."
 				allFileNamesToMove=( $(<$1) )		# -- and import every line (which should each be one file name!) into an array.
 			else
 				echo "ERROR: file list $1 not found. Exit."		# Otherwise, exit with error code.
