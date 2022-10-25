@@ -7,43 +7,89 @@
 
 # USAGE
 # Run with these parameters:
-# - $1 the file extension you wish for it to operate on, for example png
-# - $2 OPTIONAL. Anything, such as the word FLUBNOR, which will cause the script to recurse into all subdirectories of the current directory and renumber files in every subdirectory. Meaning, it repeats the operation in every subdirectory. So for example `dir01` would end up with files inside it renamed `001.png`, `002.png`, `003.png`, and `dir02` would also end up with files named `001.png`, `002.png`, `003.png`, etc. If you wish to use $3 but not this, pass the word NULL for this.
-# - $2 OPTIONAL: NOTE that this is a variant option for $2. Pass a number value for $2, and file renumbering will start with that number. The other variant option for $2 (recursion, triggered by a non-numeric parameter for $2) will not be invoked in this case.
-# - $3 OPTIONAL. Anything, such as the word WHELF, which will cause sort by oldest file first before renumbering. If omitted, uses the `find` command's default sort (which seems to do well for maintaining the ordering of numbered files in renumbering).
-# Example that will renumber all png format files in the current directory:
-#    renumberFiles.sh png
-# Example that will renumber all png format files in the current directory and all subdirectories (as explained for parameter $2) :
-#    renumberFiles.sh png FLUBNOR
-# Example that will renumber all png format files in the current directory and all subdirectories, but override default sort (before rename) of oldest file first to number-oriented sort of `find` command:
-#    renumberFiles.sh png FLUBNOR WHELF
-# Example that will do the same thing but not over subfolders:
-#    renumberFiles.sh png NULL WHELF
+# - -e --extension of file you wish for it to operate on, e.g. 'png'.
+# - -r --recurse OPTIONAL. Recurse into all subdirectories of the current directory and renumber files in every subdirectory. Meaning, it repeats the operation in every subdirectory. So for example `dir01` would end up with files inside it renamed `001.png`, `002.png`, `003.png`, and `dir02` would also end up with files named `001.png`, `002.png`, `003.png`, etc.
+# - -s --start-number OPTIONAL. Start file renumbering at this number. Must be rammed right on to the s with no trailing space, e.g. a start number of 42 would be expressed as -s42. Must be an integer.
+# - -o --oldest-file-first OPTIONAL. Sort by oldest file first before renumbering. If omitted, uses the `find` command's default sort (which seems to do well for maintaining the ordering of numbered files in renumbering).
+# - -d digits-to-pad-to OPTIONAL. Pad to this many digits, e.g. if 3 and counting starts at 1 then files will be named 001, 002, 003 etc. If omitted, defaults to however many leading zeros are required to for all file names to have as many digits as the count of type -e --extension in the directory.
+# EXAMPLES
+# Renumber all png format files in the current directory:
+#    renumberFiles.sh -e png
+# Renumber all png format files in the current directory, and start at the number 42:
+#    renumberFiles.sh -e png -s42
+# Renumber all png format files in the current directory and all subdirectories:
+#    renumberFiles.sh --extension png -r
+# Renumber all png format files in the current directory and all subdirectories, but override default sort (before rename) of oldest file first to number-oriented sort of `find` command:
+#    renumberFiles.sh -e png -r -o
+# Do the same thing and start renumbering at 50 in each subfolder:
+#    renumberFiles.sh -e png -r -o -s50
+# Do the same thing but not over subfolders, padding leading zeros in file names to 7 digits:
+#    renumberFiles.sh -e png -o -s50 -d7
 # NOTES:
 # - this will choke on file names with console-unfriendly characters e.g. spaces, parenthesis and probably others.
-# - I want an option to override the number of digits to pad to, but the options would become too many and confusing (unless I recoded it to use switches). If you want to override, see the "HACK OVERRIDE HERE" comment.
 
 
 # CODE
 # TO DO
 # - Mitigate what is warned about (in the WARNINGS section) of overwrite clobbers. Or error out or skip if it would happen in a given directory?
 
-if [ ! "$1" ]; then printf "\nNo parameter \$1 (file extension (type) to renumber) passed to script. Exit."; exit 1; else fileTypeToRenumber=$1; fi
 
-# set default fileRenumberingCounter value; override if numeric value passed for $2:
-fileRenumberingCounter=0
-# check if $2 is numeric: $? will be set to 0 if it is; nonzero if it is not:
-echo $2 | grep -E '^[0-9]{1,}$' &>/dev/null
-if [ "$?" == "0" ]
+function print_halp {
+	echo u need halp k read doc in comments at start of script. kthxbai.
+}
+
+# print help and exit if no paramers passed:
+if [ ${#@} == 0 ]; then print_halp; exit 0; fi
+
+PROGNAME=$(basename $0)
+OPTS=`getopt -o he:rs::od:: --long help,extension:,recurse,start-number::oldest-file-first,digits-to-pad-to:: -n $PROGNAME -- "$@"`
+
+if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
+
+eval set -- "$OPTS"
+
+# set default:
+startCountingFrom=0
+while true; do
+  case "$1" in
+    -h | --help ) print_halp; exit 0 ;;
+    -e | --extension ) fileTypeToRenumber=$2; shift; shift ;;
+    -r | --recurse ) do_recurse=true; shift ;;
+    -s | --start-number ) startCountingFrom=$2; shift; shift ;;
+	# the next two variables will be checked whether they even exist (are set) to control logic:
+    -o | --oldest-file-first ) sort_by_oldest_first=true; shift ;;
+    -d | --digits-to-pad-to ) digitsToPadTo=$2; shift; shift ;;
+   -- ) shift; break ;;
+    * ) break ;;
+  esac
+done
+
+# Throw error and exit if mandatory arguments missing:
+if [ ! $fileTypeToRenumber ]; then echo "No -e --extension argument passed to script. Exit."; exit 2; fi
+# check if $startCountingFrom is numeric; throw an error and exit if it is not:
+echo $startCountingFrom | grep -E '^[0-9]{1,}$' &>/dev/null
+if [ ! "$?" == "0" ]
 then
-	echo "Number format detected for parameter \$2. Setting starting number to that number: $2"
-	fileRenumberingCounter="$2"
-	# set a variable, which, if it is set (exists), tells a future check that $2 was numeric -- or that is the intended use. If we never enter this code block because $2 is not numeric, this variable will never be set:
-	NUMERIC_PARAMETER_2=YORGHBOI
+	echo "-s --start-number parameter ($startCountingFrom) not an interger. Exit."; exit 3
 fi
+# check that digits-to-pad-to is numeric and exit with error if not:
+if [ $digitsToPadTo ]
+then
+	echo $digitsToPadTo | grep -E '^[0-9]{1,}$' &>/dev/null
+	if [ ! "$?" == "0" ]
+	then
+		echo "-d --digits-to-pad-to parameter ($digitsToPadTo) not an interger. Exit."; exit 4
+	fi
+fi
+# dev debug prints:
+# echo fileTypeToRenumber is $fileTypeToRenumber
+# echo do_recurse is $do_recurse
+# echo startCountingFrom is $startCountingFrom
+# echo sort_by_oldest_first is $sort_by_oldest_first
+# echo digitsToPadTo is $digitsToPadTo
 
-# THE && [ ! $NUMERIC_PARAMETER_2 ] returns true IF $NUMERIC_PARAMETER_2 DOES NOT EXIST (is not set) :
-if [ "$2" ] && [ "$2" != "NULL" ] && [ ! $NUMERIC_PARAMETER_2 ]
+# if recursion variable (flag) set, make array of all subdirectory paths; otherwise make array of only the current directory:
+if [ $do_recurse ]
 then
 	# if $2 was passed to script, put folder names of all subdirectories into an array:
 	directories=($(find -type d))
@@ -54,17 +100,18 @@ else
 	directories=($(pwd))
 fi
 
-
 echo "Hi persnonzez!!!!!!!!!!!!!!! HI!! -Nem"
 
+# set counter before loop:
+fileRenumberingCounter=$startCountingFrom
 for directory in ${directories[@]}
 do
 	pushd . &>/dev/null
 	cd $directory
 	echo in directory $directory . . .
 	# Create array to use to loop over files.
-	# if $3 was passed, do custom sort, otherwise use `find` command's custom sort:
-	if [ "$3" ]
+	# if sort_by_oldest_first flag was set, do custom sort, otherwise use `find` command's custom sort:
+	if [ $sort_by_oldest_first ]
 	then
 		# previous version of command; doesn't sort by file date:
 		# filesArray=`find . -maxdepth 1 -iname "*.$fileTypeToRenumber" | sort`
@@ -74,10 +121,12 @@ do
 		filesArray=( $(find . -maxdepth 1 -type f -iname "*.$fileTypeToRenumber" -printf "%P\n") )
 	fi
 	
-	# Get digits to pad to from length of array.
-	digitsToPadTo=${#filesArray[@]}; digitsToPadTo=${#digitsToPadTo}
-# HACK OVERRIDE HERE IF YOU NEED TO; change and uncomment the next line:
-# digitsToPadTo=4
+	# Get digits to pad to from length of array, IF no custom digits to pad to were passed.
+	if [ ! $digitsToPadTo ]
+	then
+		digitsToPadTo=${#filesArray[@]}; digitsToPadTo=${#digitsToPadTo}
+	fi
+
 	for filename in ${filesArray[@]}
 	do
 		countString=$(printf "%0""$digitsToPadTo""d\n" $fileRenumberingCounter)
@@ -85,12 +134,12 @@ do
 		# echo "echo command is: mv $filename $countString.$fileTypeToRenumber"
 		mv $filename $countString.$fileTypeToRenumber
 	done
-	# while we wouldn't want to reset this variable for the case of recursion through subdirectories, we won't encounter that in the case of a parameter to this script ($2 at this writing) specifying a starting count number, as we'll only renumber files in this directory but not any subdirectories. But in the case of recursion through subdirectories and doing the renumbering process in all subdirectories, we _do_ want this reset, otherwise it would count up and start at a higher number in each new subdirectory, which would defeat my purpose for this script:
-	fileRenumberingCounter=0
+	fileRenumberingCounter=$startCountingFrom
 	popd &>/dev/null
 done
 
 # DEVELOPMENT HISTORY
+# 2022/10/25 refactored to use getopt to admit many options, adding option to specify how many digits to pad numbers to, and simulataneous (not alternate) option for start count number.
 # 2022-10-09 added numeric option for parameter $2 that will set the start number for numbering
 # (Also added paramter 3 (to sort by oldest date file first) on or after that 2022-07-25 log)
 # 2022-07-25 add option ($2) to iterate over subdirectories and run renumbering command in each
