@@ -19,7 +19,9 @@
 #    renumberFiles.sh png FLUBNOR WHELF
 # Example that will do the same thing but not over subfolders:
 #    renumberFiles.sh png NULL WHELF
-# NOTE: this will choke on file names with console-unfriendly characters e.g. spaces, parenthesis and probably others.
+# NOTES:
+# - this will choke on file names with console-unfriendly characters e.g. spaces, parenthesis and probably others.
+# - I want an option to override the number of digits to pad to, but the options would become too many and confusing (unless I recoded it to use switches). If you want to override, see the "HACK OVERRIDE HERE" comment.
 
 
 # CODE
@@ -74,7 +76,8 @@ do
 	
 	# Get digits to pad to from length of array.
 	digitsToPadTo=${#filesArray[@]}; digitsToPadTo=${#digitsToPadTo}
-
+# HACK OVERRIDE HERE IF YOU NEED TO; change and uncomment the next line:
+# digitsToPadTo=4
 	for filename in ${filesArray[@]}
 	do
 		countString=$(printf "%0""$digitsToPadTo""d\n" $fileRenumberingCounter)
