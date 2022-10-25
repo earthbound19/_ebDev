@@ -59,7 +59,7 @@ while true; do
 	# the next two variables will be checked whether they even exist (are set) to control logic:
     -o | --oldest-file-first ) sort_by_oldest_first=true; shift ;;
     -d | --digits-to-pad-to ) digitsToPadTo=$2; shift; shift ;;
-   -- ) echo "Unknown script input encountered: $1 $2. Exit."; shift; exit 2 ;;
+   -- ) shift; break ;;
     * ) break ;;
   esac
 done
