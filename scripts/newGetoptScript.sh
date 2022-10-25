@@ -30,7 +30,6 @@ start $newScriptName
 #    https://sookocheff.com/post/bash/parsing-bash-script-arguments-with-shopts/
 #    https://gist.github.com/dyndna/3b8e7c3e693cdd8b4c6af13abb0523b1
 
-# args=("$@")
 function print_halp {
 	echo u need halp k read doc. here is doc. bai. wait what programmer no wrote doc? sad.
 }
@@ -51,33 +50,27 @@ if [ ${#@} == 0 ]; then print_halp; exit 1; fi
 PROGNAME=$(basename $0)
 # -- and then use that with the --name argument of getopts:
 #    ARGS=`getopt -q --name "$PROGNAME" --long help,output:,verbose --options ho:v -- "$@"`
-OPTS=`getopt -o hab:c:: --long helparga,argb:,argc:: -n $PROGNAME -- "$@"`
+OPTS=`getopt -o hab:c:: --long help,arga,argb:,argc:: -n $PROGNAME -- "$@"`
 
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 
 eval set -- "$OPTS"
 
-# IN PRACTICE I would like to set defaults in this case switch:
+# SET ANY DEFAULTS that would be overriden by optional arguments here:
+ARG_C=default_value
 while true; do
   case "$1" in
     -h | --help ) print_halp; exit 0 ;;
     -a | --arga ) ARG_A=flag_a_set; shift ;;
     -b | --argb ) ARG_B=$2; shift; shift ;;
-    -c | --argc )
-		# This uses the value passed with c | --argc if it exists; otherwise it sets a default:
-		if [ "$2" != "" ]
-		then
-			ARG_C=$2
-			shift
-			shift
-		else
-			ARG_C=default_value
-			shift
-		fi ;;
+    -c | --argc ) ARG_C=$2; shift; shift ;;
     -- ) shift; break ;;
     * ) break ;;
   esac
 done
+
+# Throw error and exit if mandatory argument(s) missing:
+if [ ! $ARG_B ]; then echo "No argument b --argb (explaination of argument) passed to script. Exit."; exit 1; fi
 
 echo ARG_A is $ARG_A
 echo ARG_B is $ARG_B
