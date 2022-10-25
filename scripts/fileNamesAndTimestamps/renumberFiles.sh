@@ -59,18 +59,18 @@ while true; do
 	# the next two variables will be checked whether they even exist (are set) to control logic:
     -o | --oldest-file-first ) sort_by_oldest_first=true; shift ;;
     -d | --digits-to-pad-to ) digitsToPadTo=$2; shift; shift ;;
-   -- ) shift; break ;;
+   -- ) echo "Unknown script input encountered: $1 $2. Exit."; shift; exit 2 ;;
     * ) break ;;
   esac
 done
 
 # Throw error and exit if mandatory arguments missing:
-if [ ! $fileTypeToRenumber ]; then echo "No -e --extension argument passed to script. Exit."; exit 2; fi
+if [ ! $fileTypeToRenumber ]; then echo "No -e --extension argument passed to script. Exit."; exit 3; fi
 # check if $startCountingFrom is numeric; throw an error and exit if it is not:
 echo $startCountingFrom | grep -E '^[0-9]{1,}$' &>/dev/null
 if [ ! "$?" == "0" ]
 then
-	echo "-s --start-number parameter ($startCountingFrom) not an interger. Exit."; exit 3
+	echo "-s --start-number parameter ($startCountingFrom) not an interger. Exit."; exit 4
 fi
 # check that digits-to-pad-to is numeric and exit with error if not:
 if [ $digitsToPadTo ]
@@ -78,7 +78,7 @@ then
 	echo $digitsToPadTo | grep -E '^[0-9]{1,}$' &>/dev/null
 	if [ ! "$?" == "0" ]
 	then
-		echo "-d --digits-to-pad-to parameter ($digitsToPadTo) not an interger. Exit."; exit 4
+		echo "-d --digits-to-pad-to parameter ($digitsToPadTo) not an interger. Exit."; exit 5
 	fi
 fi
 # dev debug prints:
