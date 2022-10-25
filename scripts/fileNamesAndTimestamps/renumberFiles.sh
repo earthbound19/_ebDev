@@ -131,8 +131,13 @@ do
 	do
 		countString=$(printf "%0""$digitsToPadTo""d\n" $fileRenumberingCounter)
 		fileRenumberingCounter=$((fileRenumberingCounter + 1))
-		# echo "echo command is: mv $filename $countString.$fileTypeToRenumber"
-		mv $filename $countString.$fileTypeToRenumber
+		renameTarget=$countString.$fileTypeToRenumber
+		# conditional feedback print of every 20th renumbering:
+		if [[ $(($fileRenumberingCounter % 20)) == 0 ]]
+		then
+			echo "renaming file no. $fileRenumberingCounter ($filename) to $renameTarget . . "
+		fi
+		mv $filename $renameTarget
 	done
 	fileRenumberingCounter=$startCountingFrom
 	popd &>/dev/null
