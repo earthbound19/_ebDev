@@ -43,7 +43,7 @@ do
 		# TO DO: obviate the need of renumberFiles.sh by detecting number of padded zeros,
 		# and first file number, and passing that to ffmpeg re:
 		# https://en.wikibooks.org/wiki/FFMPEG_An_Intermediate_Guide/image_sequence
-		renumberFiles.sh svg
+		renumberFiles.sh -e svg
 # OPTIONAL: delete all svg files after count N with this script call:
 # rmnn.sh svg 600 NULL BLUBARG
 		allSVG2img.sh 720 png

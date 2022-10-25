@@ -47,7 +47,7 @@ imgs2imgsNN.sh ppm png 720 720
 mkdir ../png
 mv *.png ../png/
 cd ../png
-renumberFiles.sh png
+renumberFiles.sh -e png
 ffmpegAnim.sh 11 30 13 png NULL 6
 # rename the result _out.mp4 after this directory;
 # re a genius breath: parentname="$(basename "$(dirname "$filepath")")" -- forgot to link to source of that finding!
