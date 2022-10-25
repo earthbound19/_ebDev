@@ -64,7 +64,7 @@ while true; do
     -a | --arga ) ARG_A=flag_a_set; shift ;;
     -b | --argb ) ARG_B=$2; shift; shift ;;
     -c | --argc ) ARG_C=$2; shift; shift ;;
-    -- ) shift; break ;;
+    -- ) echo "Unknown script input encountered: $1 $2. Exit."; exit 1 ;;
     * ) break ;;
   esac
 done
