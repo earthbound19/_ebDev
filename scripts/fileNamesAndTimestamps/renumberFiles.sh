@@ -135,7 +135,7 @@ do
 		# conditional feedback print of every 20th renumbering:
 		if [[ $(($fileRenumberingCounter % 20)) == 0 ]]
 		then
-			echo "renaming file no. $fileRenumberingCounter ($filename) to $renameTarget . . "
+			echo "renaming $filename to $renameTarget . . "
 		fi
 		mv $filename $renameTarget
 	done
