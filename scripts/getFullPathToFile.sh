@@ -12,8 +12,9 @@
 # You may exploit this print from any other script that wants that full path, by assigning it to a variable. For example, in another script, you might do this:
 #    pathToScript=$(getFullPathToScript.sh color_growth.py)
 #    python $pathToScript $colorGrowthPyParameters
-# NOTE
-# This script was created because the `which` command apparently doesn't actually search every directory in the $PATH on MSYS2, or if it does, something with it is broken on my setup for some files I try to find with it.
+# NOTES
+# - this script was created because the `which` command apparently doesn't actually search every directory in the $PATH on MSYS2, or if it does, something with it is broken on my setup for some files I try to find with it.
+# - ther may be many possible solutions for utility path searching and command information lookup (or something like that??) for shells, some of which (ha) may better address the problem than the way this script did, re: https://unix.stackexchange.com/questions/85249/why-not-use-which-what-to-use-then
 
 
 # CODE
