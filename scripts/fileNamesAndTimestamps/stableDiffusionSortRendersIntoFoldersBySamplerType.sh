@@ -5,9 +5,9 @@
 # Run with the following parameters:
 # - $1 OPTIONAL. File type of source renders. If omitted, defaults to png.
 # For example, to use the default file type, run the script without any parameter:
-#    stableDiffusionSortRendersIntoFoldersByType.sh
+#    stableDiffusionSortRendersIntoFoldersBySamplerType.sh
 # Or to use a different file type, for example jpg, pass that as the first parameter:
-#    stableDiffusionSortRendersIntoFoldersByType.sh jpg
+#    stableDiffusionSortRendersIntoFoldersBySamplerType.sh jpg
 
 
 # CODE
