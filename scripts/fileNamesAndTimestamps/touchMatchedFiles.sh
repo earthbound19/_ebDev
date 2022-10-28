@@ -10,7 +10,7 @@
     # woodcut_inspired_by_choral_013973d3.png
     # woodcut_inspired_by_choral_013973d3.txt
 # -- and you want to follow this process for them, run:
-#    reTouchMatchedFiles.sh png
+#    touchMatchedFiles.sh png
 # -- and the script will update e.g. `woodcut_inspired_by_choral_00c8c538.txt` with the same time stamp as `woodcut_inspired_by_choral_00c8c538.png`, and `woodcut_inspired_by_choral_013973d3.txt` with the same time stamp as `woodcut_inspired_by_choral_013973d3.png`, and so on, for every png/txt file pair where they have the same file name.
 # This process will also work where files of multiple extensions have the same base file name as (for example as given here) .png.
 
