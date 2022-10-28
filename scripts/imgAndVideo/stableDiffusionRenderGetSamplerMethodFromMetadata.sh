@@ -6,7 +6,7 @@
 # - $1 file type to scan all files in the current directory for render method metadata
 # For example, if the metadata is stored in .jpg images, run:
 #    stableDiffusionRenderGetSamplerMethodFromMetadata.sh jpg
-# NOTE: if you're not concerned with printing file names, you can far more quickly print all sampler methods wit this command, assuming you're searching through png files metadata:
+# NOTE: if you're not concerned with printing file names, you can far more quickly print all sampler methods with this command, assuming you're searching through png files metadata:
 #    exiftool "*.png" | sed -n 's/.*Sampler: \([^,]\{0,\}\)\,.*/\1/p'
 
 
