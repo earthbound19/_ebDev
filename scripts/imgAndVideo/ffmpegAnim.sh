@@ -58,8 +58,8 @@ fi
 if [ "$6" ]; then finalLoopSeconds=$6; fi
 # ==== END PARAMETER CHECKING and globals setting therefrom.
 
-# get array of input files:
-array=( $(find . -maxdepth 1 -type f -name "*.$inFileType" -printf '%f\n') )
+# get array of input files; tacked sort on to the end of this because find displays newer files first which can break numbering if files in the middle of a sequence have an older time stamp than the start; also apparently `find` has no built-in options for sorting so this would be the correct way to sort, re: https://serverfault.com/questions/181787/find-command-default-sorting-order
+array=( $(find . -maxdepth 1 -type f -name "*.$inFileType" -printf '%f\n' | sort -n) )
 # if files are numbered, first file in array is also the first frame number:
 first_frame_from_filename=${array[0]%.*}
 lastFoundFileType=${array[-1]}
