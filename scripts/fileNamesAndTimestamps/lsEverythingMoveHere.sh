@@ -29,6 +29,7 @@
 # Example that will recurse through all subdirectories and move all files into that directory (which are found elsewhere on the computer that have the same file name as files in that directory):
 #    lsEverythingMoveHere.sh NULL YORFPLERION
 # NOTES
+# - To do naive copy-over (clobbering files in the current directory with the last found copy of the same file name elsewhere), hack this script this way: find the `mv` command and change it to `cp`.
 # - If you specify a file name for $1 (and don't pass 'NULL'), but also pass parameter $2, parameter $1 is ignored (the file list is not used). This is because that would lead to duplicate work (it would recurse through subdirectories and repeatedly move all files from the file list, and on all subsequent directory changes it would find and move all those files again).
 # - Any list of file names you provide via $1 must contain file names without paths. Paths may screw things up and lead to results you don't expect!
 # - This skips all moves of any files named README.md and README.txt.
