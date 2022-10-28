@@ -8,7 +8,7 @@
 # Run with these parameters:
 # - $1 file type to operate on (e.g. png)
 # - $2 OPTIONAL. How many characters to shorten source and match file names to. Minimum 25 strongly recommended. If not provided, a default is used. If $2 is not provided, a default will be used. To use the default (for example if you use $3 so that you must provide $2), pass the word DEFAULT.
-# - $3 Anything, such as the word FLORGBUAR, which will cause the script to recurse through all subdirectories and perform these operations in each. You must use $2 if you use this.
+# - $3 OPTIONAL. Anything, such as the word FLORGBUAR, which will cause the script to recurse through all subdirectories and perform these operations in each. If you use this ($3) you must use $2.
 # For example, to rename all png files in the current directory, run:
 #    shortenMatchedFileNames.sh png
 # To do the same and specify shortened file length of 50, run:
