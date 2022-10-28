@@ -17,7 +17,7 @@
 # terminal friendly renaming
 ftun.sh png
 # shorten the file names that are probably way too long; works for pngs alone even if they have no matching files of the same name:
-shortenMatchedFileNames.sh png
+shortenFileNamesType.sh png
 # metadata extract from PNG data block to sidecar
 StableDiffusion_webUI_2txt.sh
 # organize renders into subfolders by prompt (the text that was given an AI to make the image):
