@@ -8,8 +8,8 @@
 # USAGE
 # Run with these parameters:
 # - -e --extension of file you wish for it to operate on, e.g. 'png'.
-# - -r --recurse OPTIONAL. Recurse into all subdirectories of the current directory and renumber files in every subdirectory. Meaning, it repeats the operation in every subdirectory. So for example `dir01` would end up with files inside it renamed `001.png`, `002.png`, `003.png`, and `dir02` would also end up with files named `001.png`, `002.png`, `003.png`, etc.
-# - -s --start-number OPTIONAL. Start file renumbering at this number. Must be rammed right on to the s with no trailing space, e.g. a start number of 42 would be expressed as -s42. Must be an integer.
+# - -r --recurse OPTIONAL. Recurse into all subdirectories of the current directory and renumber files in every subdirectory. Meaning, it repeats the operation in every subdirectory. So for example `dir01` would end up with files inside it renamed `001.png`, `002.png`, `003.png`, and `dir02` would also end up with files named `001.png`, `002.png`, `003.png`, etc. If omitted, only files of type -e --extension in the current directory are renamed (and files of that type in any subdirectories are _not_ renamed).
+# - -s --start-number OPTIONAL. Start file renumbering at this number. Must be rammed right on to the s with no trailing space, e.g. a start number of 42 would be expressed as -s42. Must be an integer. If omitted defaults to 0 (zero).
 # - -o --oldest-file-first OPTIONAL. Sort by oldest file first before renumbering. If omitted, uses the `find` command's default sort (which seems to do well for maintaining the ordering of numbered files in renumbering).
 # - -d digits-to-pad-to OPTIONAL. Pad to this many digits, e.g. if 3 and counting starts at 1 then files will be named 001, 002, 003 etc. If omitted, defaults to however many leading zeros are required to for all file names to have as many digits as the count of type -e --extension in the directory.
 # EXAMPLES
