@@ -20,15 +20,17 @@
 # CODE
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source image type to convert) passed to script. Exit."; exit 1; else sourceIMG=$1; fi
 if [ ! "$2" ]; then printf "\nNo parameter \$2 (format or extension to convert to) passed to script. Exit."; exit 1; else destIMGformat=$2; fi
-additionalConvertOptions=""
 if [ "$3" ]; then additionalConvertOptions="-colorspace RGB -filter Lanczos -resize $3 -colorspace sRGB"; dimSTR=_"$3x"; fi
 
 renderTarget=${sourceIMG%.*}$dimSTR.$destIMGformat
 
-# check for redundant dimension string in render target name and exit with warning if there is one, because we would be doing a duplicate render if that is the case:
-redundantStringCheck="$dimSTR""$dimSTR"
-echo $renderTarget | grep "$redundantStringCheck"
-if [ "$?" == "0" ]; then echo "WARNING: redundant dimension string \"$redundantStringCheck\" in would-be render target file name \"$renderTarget\", because you may be attempting a conversion that was already done. Skipping render. Exit."; exit; fi
+# if additionalConvertOptions is set, check for redundant dimension string in render target name and exit with warning if there is one, because we would be doing a duplicate render if that is the case:
+if [ "$additionalConvertOptions" ]
+then
+	redundantStringCheck="$dimSTR""$dimSTR"
+	echo $renderTarget | grep "$redundantStringCheck"
+	if [ "$?" == "0" ]; then echo "WARNING: redundant dimension string \"$redundantStringCheck\" in would-be render target file name \"$renderTarget\", because you may be attempting a conversion that was already done. Skipping render. Exit."; exit; fi
+fi
 
 if [ -e $renderTarget ]
 then
