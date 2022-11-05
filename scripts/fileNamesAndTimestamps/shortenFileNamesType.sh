@@ -17,6 +17,8 @@
 #    shortenMatchedFileNames.sh png 50 FLORGBUAR
 # To do the same but use the default shorten length, run:
 #    shortenMatchedFileNames.sh png DEFAULT FLORGBUAR
+# NOTE: logic that avoids clobbering file names can lead to file names longer than what you instruct, because it adds random characters to the end of the base file name. While there could be logic to avoid that case, this script doesn't bother with it.
+
 
 # CODE
 if [ "$1" ]; then fileTypeToMatch=$1; else printf "\nNo parameter \$1 (file type to find matches of.) passed to script. Exit."; exit 1; fi
@@ -44,22 +46,29 @@ do
 	filesToMatch=($(find . -maxdepth 1 -iname \*.$fileTypeToMatch -printf "%P\n"))
 	for fileToMatch in ${filesToMatch[@]}
 	do
-		echo ----
-		echo working on $fileToMatch . . .
-		# rename fileToMatch (because it will not be included in the list fileMatches) ;
-		# construct new file name for fileToMatch:
-		fileNameNoExt=${fileToMatch%.*}
-		fileExt=${fileToMatch##*.}
-		fileToMatchNewName="${fileToMatch:0:$shortenToNchars}".$fileExt
-		# do the actual rename:
-		if [ ! -f $fileToMatchNewName ]
+		echo ~ Checking characters length of $fileToMatch . . .
+		# only shorten the file if its name is longer than $shortenToNchars; otherwise do nothing but notify:
+		fileToMatchLength=${#fileToMatch}
+		if [[ $fileToMatchLength > $shortenToNchars ]]
 		then
-			mv $fileToMatch $fileToMatchNewName
+			echo "File $fileToMatch basename length ($fileToMatchLength) is longer than $shortenToNchars. Will shorten."
+			# rename fileToMatch (because it will not be included in the list fileMatches) ;
+			# construct new file name for fileToMatch:
+			fileNameNoExt=${fileToMatch%.*}
+			fileExt=${fileToMatch##*.}
+			fileToMatchNewName="${fileToMatch:0:$shortenToNchars}".$fileExt
+			# do the actual rename:
+			if [ ! -f $fileToMatchNewName ]
+			then
+				mv $fileToMatch $fileToMatchNewName
+			else
+				setRNDstr
+				fileToMatchNewNameTwo="${fileToMatch:0:$shortenToNchars}"__$RNDstr.$fileExt
+				printf "\nRename target $fileToMatchNewName would clobber existing file! Renaming to $fileToMatchNewNameTwo . . ."
+				mv $fileToMatch $fileToMatchNewNameTwo
+			fi
 		else
-			setRNDstr
-			fileToMatchNewNameTwo="${fileToMatch:0:$shortenToNchars}"__$RNDstr.$fileExt
-			printf "\nRename target $fileToMatchNewName would clobber existing file! Renaming to $fileToMatchNewNameTwo . . ."
-			mv $fileToMatch $fileToMatchNewNameTwo
+			echo "File $fileToMatch basename length ($fileToMatchLength) is equal to or shorter than $shortenToNchars. Will _not_ shorten."
 		fi
 
 	done
