@@ -37,7 +37,7 @@
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (image type to sample) passed to script. Exit."; exit 1; else searchFileType=$1; fi
 # NOTE: if the keyword 'ALL' was passed for $1, the value of $searchFileType there will have been set to 'ALL'!
 
-if [ ! "$2" ]; then printf "\nNo parameter \$2 (number of columns to sample per image) passed to script. Exit."; exit 1; else sampleNcols=$2; fi
+if [ ! "$2" ]; then printf "\nNo parameter \$2 (number of columns to sample per image) passed to script. Exit."; exit 2; else sampleNcols=$2; fi
 
 if [ ! "$3" ] || [ "$3" == "AUTO" ]; then sampleNrows="AUTO"; else sampleNrows=$3; fi
 
@@ -73,6 +73,9 @@ else
 	fi
 fi
 # -- OY! So complex!
+
+# if array length of source files to sample is 0, warn and exit.
+if [[ ${#fileNamesArray[@]} == 0 ]]; then printf "\nWARNING: no source files to sample were found by using search parameter:\n\t$searchFileType\n--in current directory/ies. Exit.\n" exit 3; fi
 
 fullPathToScript=$(getFullPathToFile.sh get_color_sample_grid_sRGB.py)
 
