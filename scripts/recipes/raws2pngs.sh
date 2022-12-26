@@ -7,7 +7,7 @@
 # USAGE
 # Run with these parameters:
 # - $1 file format of raw files to convert from. If omitted, defaults to cr2.
-# - $2 OPTIONAL. Pixels across to images down to for the pngs. If not provided, png conversion won't even take place. If provided, pngs will be scaled down proportionally using a better resizing method, to this many pixels wide.
+# - $2 OPTIONAL. Pixels across to scale the png images down to, maintaining aspect ratio, and using a better downscale resizing method. If omitted, a default pixels across value is used.
 # Example that will convert all cr2 images in the current directory to tiffs at the same resolution as the original images:
 #    raws2imgs.sh
 # Example that will convert all NEF format images (assuming they have the extension .nef) in the current directory to tiff images:
