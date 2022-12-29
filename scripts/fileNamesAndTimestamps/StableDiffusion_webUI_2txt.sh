@@ -20,15 +20,21 @@
 srcFiles=($(find . -maxdepth 1 -type f -iname \*.png -printf "%P\n"))
 for file in ${srcFiles[@]}
 do
-	echo "working on $file . . ."
 	metadataTargetFileName=${file%.*}".txt"
 	metadataString=$(exiftool -Parameters $file)
-	# write first line of metadata to file; it's weird that it prints ellipses between tag names; the . in front of .Steps eliminates part of an ellipses I don't want:
-	echo $metadataString | sed 's/^Parameters[ :]\{0,\}\(.*\).Steps: .*/Prompt: \1/gI' > $metadataTargetFileName
-	# get label/value pair section of metadata:
-	keysValues=$(echo $metadataString | sed 's/^Parameters[ :]\{0,\}\(.*\)\(Steps: .*\)/\2/gI')
-	# break those into newlines on commas and append to metadata file -- with a sed call to delete spaces from start of line:
-	echo $keysValues | tr ',' '\n' | sed 's/^ //g' >> $metadataTargetFileName
+	# only write to metadata target if it does not exist; otherwise skip and warn (don't clobber) :
+	if [ ! -f $metadataTargetFileName ]
+	then
+		echo "Working on $file . . ."
+		# write first line of metadata to file; it's weird that it prints ellipses between tag names; the . in front of .Steps eliminates part of an ellipses I don't want:
+		echo $metadataString | sed 's/^Parameters[ :]\{0,\}\(.*\).Steps: .*/Prompt: \1/gI' > $metadataTargetFileName
+		# get label/value pair section of metadata:
+		keysValues=$(echo $metadataString | sed 's/^Parameters[ :]\{0,\}\(.*\)\(Steps: .*\)/\2/gI')
+		# break those into newlines on commas and append to metadata file -- with a sed call to delete spaces from start of line:
+		echo $keysValues | tr ',' '\n' | sed 's/^ //g' >> $metadataTargetFileName
+	else
+		printf "WARNING: metadata target $metadataTargetFileName already exists; will not clobber. Skip.\n\n"
+	fi
 done
 
 echo DONE.
