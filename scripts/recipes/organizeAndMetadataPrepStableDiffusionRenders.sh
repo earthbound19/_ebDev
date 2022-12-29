@@ -15,7 +15,7 @@
 
 # CODE
 # terminal friendly renaming
-ftun.sh png
+ftun.sh png NORECURSION YARSH
 # shorten the file names that are probably way too long; works for pngs alone even if they have no matching files of the same name:
 shortenFileNamesType.sh png
 # metadata extract from PNG data block to sidecar
