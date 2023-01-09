@@ -67,7 +67,7 @@ if (options.chromaOverrideOnEndColor) {
 
 // alter lightness of end color if a switch so commands:
 if (options.lightnessOverrideOnEndColor) {
-  let end_color_lightness_override = culori.oklch(options.end);
+  var end_color_lightness_override = culori.oklch(options.end);
   end_color_lightness_override.l = options.lightnessOverrideOnEndColor;
   end_color = end_color_lightness_override;
 }
