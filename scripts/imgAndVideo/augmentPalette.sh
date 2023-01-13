@@ -22,12 +22,12 @@
 
 
 # CODE
-if [ ! "$1" ]; then printf "\nNo parameter \$1 (source .hexplt format file) passed to script. Return."; return 1; else sourceHexplt=$1; fi
-if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many steps to interpolate between each color in the source palette) passed to script. Return."; return 1; else interpolationSteps=$2; fi
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (source .hexplt format file) passed to script. Exit."; exit 1; else sourceHexplt=$1; fi
+if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many steps to interpolate between each color in the source palette) passed to script. Exit."; exit 1; else interpolationSteps=$2; fi
 # set deduplicateAdjacentSamplesParameter as '' (which will do nothing, and it will be overriden in next check if parameter $3 passed to script) :
 if [ "$3" ]; then deduplicateAdjacentSamplesParameter='-d'; fi
 
-# Because each new interpolation iteration will start with the same color as the end color of the previous interpolation, we're going to remove the tail color of each interpolation (iteration) via the `-l 1` switch. That means $((N - 1)). ALSO, the understood literal intent of interpolation in this documentation is _how many additional colors in between), which means (start color + inserted colors + end color), which means $((N + 2)). Summing that, it's $((N - 1 + 2)) = $((N + 3)). SO:
+# Because each new interpolation iteration will start with the same color as the end color of the previous interpolation, we're going to remove the tail color of each interpolation (iteration) via the `-l 1` switch. That means $((N - 1)). ALSO, the understood literal intent of interpolation in this documentation is _how many additional colors in between_, which means (start color + inserted colors + end color), which means $((N + 2)). Summing that, it's $((N - 1 + 2)) = $((N + 3)). SO:
 interpolationSteps=$(($interpolationSteps + 2))
 # (This process will need to tack that last removed color back on after everything is removed.)
 
@@ -36,8 +36,8 @@ if [ ! "$fullPathToOKLABAugmentationScript" ]
 then
 	scriptName=get_color_gradient_OKLAB.js
 	fullPathToOKLABAugmentationScript=$(getFullPathToFile.sh $scriptName)
-	# return with error if that's empty:
-	if [[ "$fullPathToOKLABAugmentationScript" == "" ]]; then echo "ERROR: could not find script $scriptName in \$PATH. Return."; return 3; fi
+	# exit with error if that's empty:
+	if [[ "$fullPathToOKLABAugmentationScript" == "" ]]; then echo "ERROR: could not find script $scriptName in \$PATH. Exit."; exit 3; fi
 fi
 # echo "Found $scriptName at $fullPathToOKLABAugmentationScript -- will use that."
 
