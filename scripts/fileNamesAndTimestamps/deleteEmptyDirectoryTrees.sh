@@ -19,7 +19,7 @@ directories=( $(find . -type d) )
 directories=( ${directories[@]:1} )
 foundEmptyDirectory=FALSE
 
-while [ borf ]		# Bash eveluates even an expression that will cause an error as true in a while loop condition?!
+while :
 do
 	for directory in ${directories[@]}
 	do
