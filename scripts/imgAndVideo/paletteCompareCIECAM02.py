@@ -1,11 +1,11 @@
 # DESCRIPTION
-# Compares two palettes (.hexplt format, from parameter 1 and 2) and prints a dissimilarity ranking float between 0 and 1 (zero and one hundred percent). See USAGE for how it works.
+# Compares two palettes (.hexplt format, from parameter 1 and 2) and prints a dissimilarity ranking float between 0 and 1 (zero and one hundred percent). a _lower_ delta value (toward zero) indicates that the colors are perceptually nearer together, and 0 would be identical. A _higher_ delta value (toward 100) indicates that the colors are perceputally further apart, and 1 would be completely different (probably technically opposite in some sense).
 
 # USAGE
 # Run this script through a Python interpreter, with these parameters:
 # - arvg[1] palette one file name, e.g. FD613A_F9C956_BAB25B_3D9676_1F463E.hexplt
 # - arvg[2] palette two file name, e.g. FE6737_F8D845_9DC17E_489B73_375557.hexplt
-# Example that will result in a print of a similarity ranking percent (a float between 0 and 1) for two palettes:
+# Example that will result in a print of a dissimilarity ranking percent (a float between 0 and 1) for two palettes:
 #    python /path/to_this_script/paletteCompareCIECAM02.py FD613A_F9C956_BAB25B_3D9676_1F463E.hexplt FE6737_F8D845_9DC17E_489B73_375557.hexplt
 # NOTES
 # - As the printed number is a dissimilarity ranking, a lower float means the palettes are more similar. Zero means they are identical and one means they are opposite.
