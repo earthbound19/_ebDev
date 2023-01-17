@@ -1,5 +1,5 @@
 # DESCRIPTION
-# By use of other scripts, for each .hexplt file in the current directory, copies the palette into subdirectories and sorts the colors in each palette these different ways:
+# By use of other scripts, for each .hexplt file in the current directory, copies the palette into subdirectories, and sorts the colors in each palette into a copy of the palette, all these different ways:
 #    oklab starting on black
 #    oklab starting on white
 #    CIECAM02 starting on black
