@@ -25,10 +25,10 @@
 
 
 # CODE
-if [ ! "$1" ]; then printf "\nNo parameter \$1 (how many steps to interpolate between each color in the source palettes and between generated rows) passed to script. Exit."; exit 1; else interpolationSteps=$1; fi
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (how many steps to interpolate between each color in the source palettes and between generated rows) passed to script. Exit."; exit 1; else interpolationStepsOriginalParameter=$1; fi
 
 # Because each new interpolation iteration will start with the same color as the end color of the previous interpolation, we're going to remove the tail color of each interpolation (iteration) via the `-l 1` switch. That means $((N - 1)). ALSO, the understood literal intent of interpolation in this documentation is _how many additional colors in between_, which means (start color + inserted colors + end color), which means $((N + 2)). Summing that, it's $((N - 1 + 2)) = $((N + 3)). SO:
-interpolationSteps=$(($interpolationSteps + 2))
+interpolationSteps=$(($interpolationStepsOriginalParameter + 2))
 # (This process will need to tack that last removed color back on after everything is removed.)
 
 # set local environment variable fullPathToOKLABAugmentationScript:
@@ -42,7 +42,7 @@ if [[ "$fullPathToOKLABAugmentationScript" == "" ]]; then echo "ERROR: could not
 # get directory name without path:
 currentDirNoPath=$(basename $(pwd))
 # build target file name from that:
-outputFileName="$currentDirNoPath"_augmented_"$interpolationSteps"_grid.hexplt
+outputFileName="$currentDirNoPath"_augmented_"$interpolationStepsOriginalParameter"_grid.hexplt
 
 # horrifyingly large bash function; augments all .hexplt files in the current directory; REQUIRES PARAMETER (effectively $1), which is the target file to write all augmented palette lines to:
 augment_palettes () {
