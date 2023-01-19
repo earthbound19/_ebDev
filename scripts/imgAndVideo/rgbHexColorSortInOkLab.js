@@ -87,7 +87,7 @@ okLCHdistance = culori.differenceEuclidean(mode = 'oklch', weights = [1, 1, 1]);
 
 // init final sort list (as empty):
 finalSortedList = [];
-// Add first item to final list, as the first item will be the first in the original list; comparisonColorsArray[0].sRGBhex and searchResults[0][0] SHOULD both be the first color in the list (although arbitraryFirstCompareColor can mess with that, but the result we intent will be the same):
+// Add first item to final list, as the first item will be the first in the original list; comparisonColorsArray[0].sRGBhex and searchResults[0][0] SHOULD both be the first color in the list (although arbitraryFirstCompareColor can mess with that, but the result we intend will be the same):
 finalSortedList.push(comparisonColorsArray[0]);
 
 while (finalSortedList.length < comparisonColorsArrayLength) {
