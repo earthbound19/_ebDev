@@ -1,8 +1,8 @@
 # DESCRIPTION
-# Via other scripts, compares all .hexplt palettes in the current directory, creates a list of them ordered by next most similar, and makes numbered copies of them in that order in a subfolder. Intended prep script for further use by augmentPalettesGrid.sh, but useful for visual comparisons or whatever else you might imagine uses for examining similar palettes. NOTE: at this writing an algorithm rewrite is intended, which will produce better results. See comments after CODE comment.
+# Via other scripts, compares all .hexplt palettes in the current directory, creates a list of them ordered by next most similar, and makes numbered copies of them in that order in a subfolder. Intended prep script for further use by augmentPalettesGrid.sh, but useful for visual comparisons or whatever other uses you might imagine for examining similar palettes.
 
 # DEPENDENCIES
-# `allPalettesCompareCIECAM02.sh` and its dependencies, `getUniqueWords.sh` and its dependencies, grep
+# `allPalettesCompareCIECAM02.sh` and its dependencies, `sortByNextMostSimilarFromComparisonsList.sh` and its dependencies.
 
 # USAGE
 # Run without any parameters:
@@ -10,13 +10,6 @@
 
 
 # CODE
-# TO DO:
-# rewrite sort with this algorithm; ALSO DO THIS for imgsGetSimilar.sh:
-# - sort entire list of comparisons from lowest decimal to highest
-# - fetch first pair; add them to sorted list
-# - find all other pairs that contain pair A and eliminate them
-# - find first pair that contains B; add them to list
-# - that B becomes A; repeat until no more pairs remain
 
 # sets/changes a global variable rndStr:
 function setRNDstr {
@@ -31,19 +24,7 @@ else
 	echo "paletteDifferenceRankings.txt exists; will attempt to make use of it."
 fi
 
-# Sort results by rank of most similar (nearest to zero) first, which is on the first bar "|" separated key:
-sort -n -b -t\| -k1 paletteDifferenceRankings.txt > _tmp_afXRPJwpE.txt
-
-# Strip the numeric column so we can work up a file list of said ordering for animation;
-sed -i 's/[^|]*|\(.*\)/\1/g' _tmp_afXRPJwpE.txt
-
-# get unique palette names from that in the order they appear; grep to get them:
-grep -o '[^|]\{1,\}' _tmp_afXRPJwpE.txt > palettesListByMostSimilar.txt
-# delete temp file:
-rm *_tmp_afXRPJwpE.txt
-
-# reduce that to unique file names (words), in place:, and store it in an array:
-getUniqueWords.sh palettesListByMostSimilar.txt FLOURBALP
+sortByNextMostSimilarFromComparisonsList.sh paletteDifferenceRankings.txt > palettesListByMostSimilar.txt
 
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 echo "A result list is in palettesListByMostSimilar.txt, which is a list of all .hexplt files in this directory sorted by approximately nearest most perceptually similar."
