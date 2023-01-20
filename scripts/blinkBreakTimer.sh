@@ -54,7 +54,8 @@ breakMinutes=7
 blink1-tool --playpattern '5,#ff00ff,0.4,0,#00ffff,0.4,0';
 blink1-tool --random=4 -l 1 -l 2 -q;
 # do work/break loop / echoes / blinking lights:
-while (true); do    # eternal loop
+while :
+do    # eternal loop
     # OPTIONALLY at start of work loop, dim screen to black and then full brightness again, once:
   # brightness 0 2> /dev/null; sleep 0.8; brightness 1 2> /dev/null;
     # echo prompt for work run:
