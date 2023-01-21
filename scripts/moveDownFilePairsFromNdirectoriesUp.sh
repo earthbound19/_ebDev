@@ -9,7 +9,7 @@
 # - $4 OPTIONAL. Any word, for example KRIDTALB, which will cause the script to force overwrite existing files in the current directory, by moving found matches from any directory up to $3 levels up over them.
 # EXAMPLE
 # Suppose you've got some files named `rnd_43aB.png` and `rnd43Cd.png` in the current path, which you rendered from source files `rnd_43aB.flame` and `rnd43Cd.flame`, which are two directories up from the current directory, and you want to move those matching `.flame` files into the current directory. To move those matching `.flame` files from up to two parent directories down to the current directory, run this script with these parameters:
-#    getFilePairs4Up.sh png flame 2
+#    moveDownFilePairsFromNdirectoriesUp.sh png flame 2
 # This will result in all those matching `.flame` file names being moved from up to two directories above into this directory.
 # NOTES
 # - The script will not overwrite existing files in the current directory with identically named files from any parent directory. If it finds duplicate file names, it will log the full paths to the duplicates to a file named something like this: `getFilePairs4Up_run_EB213A_log.txt`
