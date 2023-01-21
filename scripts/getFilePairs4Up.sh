@@ -15,7 +15,7 @@
 # - The script will not overwrite existing files in the current directory with identically named files from any parent directory. If it finds duplicate file names, it will log the full paths to the duplicates to a file named something like this: `getFilePairs4Up_run_EB213A_log.txt`
 # - To override that safe behavior and force overwrite existing files, pass anything for parameter $4. Adapting the example to that purpose, the command to do that would be:
 #
-#    getFilePairs4Up.sh png flame 2 KRIDTALB
+#    moveDownFilePairsFromNdirectoriesUp.sh png flame 2 KRIDTALB
 
 
 # CODE
@@ -52,21 +52,21 @@ if [ "$4" ]; then clobberExistingFiles='True'; fi
 
 # MAIN FUNCTIONALITY
 # for mv target, and to move back to after moving up N directories:
-currentDirectory=`pwd`
+currentDirectory=$(pwd)
 
-filesToFindPairsFor=(`find . -maxdepth 1 -type f -iname \*.$findPairsForType -printf '%f\n'`)
+filesToFindPairsFor=($(find . -maxdepth 1 -type f -iname \*.$findPairsForType -printf '%f\n'))
 
 # create unique log file name and initialize log:
-rndHexString=`cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6`
+rndHexString=$(cat /dev/urandom | tr -dc 'a-f0-9' | head -c 6)
 logFileName="$currentDirectory"/getFilePairs4Up_run_"$rndHexString"_log.txt
 echo "Duplicate file names in different paths found from run of command: 'getFilePairs4Up.sh $1 $2 $3', separated by bars | :" > $logFileName
 echo "" >> $logFileName
 
 duplicateFileNamesFoundInCurrentAndParentDirectories='False'
-for i in `seq 1 $searchThisManyDirectoriesUp`
+for i in $(seq 1 $searchThisManyDirectoriesUp)
 do
 	cd ..
-	tmpDirectory=`pwd`
+	tmpDirectory=$(pwd)
 	printf "\nWorking in directory $tmpDirectory . . ."
 	for element in ${filesToFindPairsFor[@]}
 	do
