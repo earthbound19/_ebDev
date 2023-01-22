@@ -10,12 +10,6 @@
 
 
 # CODE
-
-# sets/changes a global variable rndStr:
-function setRNDstr {
-   RNDstr=$(cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c 8)
-}
-
 if [ ! -f paletteDifferenceRankings.txt ]
 then
 	echo "paletteDifferenceRankings.txt does not exist; will generate via call of allPalettesCompareCIECAM02.sh."
@@ -34,7 +28,7 @@ echo ""
 finalList=($(<palettesListByMostSimilar.txt))
 
 # make randomly named numbered copies folder name:
-setRNDstr
+RNDstr=$(cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c 8)
 targetDirRNDname=_paletteRenamedCopiesByNextMostSimilar_"$RNDstr"
 mkdir $targetDirRNDname
 # iterate over final list placing numbered copies into that folder:
