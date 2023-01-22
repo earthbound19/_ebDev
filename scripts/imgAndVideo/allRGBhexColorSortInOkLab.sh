@@ -25,10 +25,8 @@ then
 	arbitraryColorParam="-f $1"
 fi
 
-# set default maxdepth parameter 1 (current directory only):
-maxdepthParameter='-maxdepth 1'
-# --but override to no maxdepth (all subdirectories) if parameter $2 passed to script:
-if [ "$2" ]; then maxdepthParameter=''; fi
+# if no $2 parameter passed to script, set maxdepth parameter 1 (current directory only); otherwise it will be default of search subdirs:
+if [ ! "$2" ]; then maxdepthParameter='-maxdepth 1'; fi
 
 scriptLocation=$(getFullPathToFile.sh rgbHexColorSortInOkLab.js)
 
