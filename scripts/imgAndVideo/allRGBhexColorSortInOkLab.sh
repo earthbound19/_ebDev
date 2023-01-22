@@ -20,7 +20,6 @@
 
 
 # CODE
-# if $1 was passed to script, override that with a legitimate parameter that uses $1:
 if [ "$1" ] && [ "$1" != "NULL" ]
 then
 	arbitraryColorParam="-f $1"
