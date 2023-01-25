@@ -14,12 +14,17 @@
 # - $1 how many linearly interpolated colors to insert between each color and between rows in palette files.
 # For example, to interpolate 5 colors horizontally and vertically over all .hexplt files in the current directory, run:
 #    augmentPalettesGrid.sh 5
-# NOTE
+# NOTES
+# - the script `paletteRenamedCopiesByNextMostSimilar.sh` may be useful for getting copies of palettes into a dedicated folder for this purpose (with potentially really interesting and beautiful results).
+# - to not augment any colors, but create a grid of palettes (e.g. in a folder with copies of them made by the previously mentioned script), instead of using this script, from the directory with the palettes, concatenated them to one file with a pipe command, like this:
+#    cat *.hexplt > grid.hexplt
+# -- and then mark up the result with:
+#    columns: [the number of columns], rows: [the number of rows]
 # The process of augmentation in detail is:
-# - For every .hexplt format palette in the current directory:
-# - Do linear interpolation in N ($1) steps between each color in it in okLab color space (using CHL coordinates). Think of every resulting color as an X-direction set of columns.
-# - Do the same for the next palette in the directory
-# - For every column between those two palettes, augment colors between them and create new rows with those colors (think of that as a Y-direction).
+# - for every .hexplt format palette in the current directory:
+# - do linear interpolation in N ($1) steps between each color in it in okLab color space (using CHL coordinates). Think of every resulting color as an X-direction set of columns.
+# - do the same for the next palette in the directory
+# - for every column between those two palettes, augment colors between them and create new rows with those colors (think of that as a Y-direction).
 # - Repeat for last palette and next palette
 # This is accomplished with a series of inefficient hacks using repeated calls of other scripts and GNU datamash.
 
