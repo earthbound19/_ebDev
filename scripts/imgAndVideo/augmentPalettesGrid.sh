@@ -2,7 +2,7 @@
 # Creates a grid study of augmented colors from palettes such that:
 # There are N colors added between every color in each palette horizontally
 # There are N colors added between every row of augmented palettes.
-# This is done with all .hexplt format palettes in the current directory. Writes the result to a .hexplt file in a grid and with markup declaring number of columns and rows. The result file is named after the containing folder you run the script from. Source palettes may have color codes arranged in any way and include comments; the only requirement is that sRGB hex color codes in the palette are prefixed with a number/hex/pound # symbol and are separated by white space.
+# This is done with all .hexplt format palettes in the current directory (other than any with output file names made by this script). Writes the result to a .hexplt file in a grid and with markup declaring number of columns and rows. The result file is named after the containing folder you run the script from. Source palettes may have color codes arranged in any way and include comments; the only requirement is that sRGB hex color codes in the palette are prefixed with a number/hex/pound # symbol and are separated by white space.
 
 # DEPENDENCIES
 # `get_color_gradient_OKLAB.js` (and nodeJS and the packages that script requires), `getFullPathToFile.sh`
@@ -15,6 +15,7 @@
 # For example, to interpolate 5 colors horizontally and vertically over all .hexplt files in the current directory, run:
 #    augmentPalettesGrid.sh 5
 # NOTES
+# - you can run this in a directory where you have created palettes from it which have the regex pattern `_augmented_.*_grid` in them, and it will not operate on those files (it will skip them). You can therefore reuse this script in the same directory easily, passing it different parameters each time.
 # - the script `paletteRenamedCopiesByNextMostSimilar.sh` may be useful for getting copies of palettes into a dedicated folder for this purpose (with potentially really interesting and beautiful results).
 # - to not augment any colors, but create a grid of palettes (e.g. in a folder with copies of them made by the previously mentioned script), instead of using this script, from the directory with the palettes, concatenated them to one file with a pipe command, like this:
 #    cat *.hexplt > grid.hexplt
@@ -55,6 +56,10 @@ augment_palettes () {
 	hexplts=($(find . -maxdepth 1 -type f -name \*.hexplt -printf "%f\n"))
 	for hexplt in ${hexplts[@]}
 	do
+	# only do things if the file name of the palette doesn't indicate that it is an augmented palette; to avoid broken things / unintended work, and to allow re-running this script where such a palette aleady exists, but with different parameters; print any results from grep search to null so as not to distract pointlessly:
+	grep '_augmented_.*_grid' <<< $hexplt &>/dev/null
+	if [[ $(echo $?) != 0 ]]
+	then
 		# get array of colors from file by extracting all matches of a pattern of six hex digits preceded by a #:
 		colorsArray=( $(grep -i -o '#[0-9a-f]\{6\}' $hexplt | tr -d '#') )		# tr command removes pound symbol, and surrounding () makes it an actual array
 		# Get number of colors (from array),
@@ -97,6 +102,7 @@ augment_palettes () {
 			printf "$color " >> $1
 		done
 		printf "\n" >> $1
+	fi
 	done
 }
 
