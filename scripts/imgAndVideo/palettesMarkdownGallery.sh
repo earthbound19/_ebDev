@@ -3,7 +3,6 @@
 
 # WARNINGS
 # - This will overwrite a palette README.md file that already exists.
-# - It will also delete a README.md if there are no .pngs in the directory you run this in.
 
 # USAGE
 # Run this script without any parameters:
@@ -16,18 +15,10 @@
 array=($(find . -maxdepth 1 -type f -iname \*.png -printf '%f\n' | tr -d '\15\32' | sort -n))
 array_length=${#array[@]}
 
-# If no png files were found (if find threw an error), destroy any README.md gallery file and exit the script:
+# If no png files were found (if find threw an error), print message to that effect and exit. Otherwise print that they were found and continue.
 if (( array_length == "0" ))
 then
-	echo "--no png files were found. Destroying any README.md and will then exit script!";
-	if [ -e README.md ]
-	then
-		echo "--> README.md found. Will delete."
-		rm README.md
-	else
-		echo "--> No README.md found."
-	fi
-	exit
+	echo "--no png files were found in this directory. Exit."; exit
 else
 	echo "--png files were found. Will create README.md gallery."
 fi
