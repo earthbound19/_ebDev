@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Reverses the lines of all files of type $1 in the current directory, in place. Overwrites the original files. TAC in this script name as a keyword: it's after tac or cat or concatenate backward.
+# Reverses the lines of all files of type $1 in the current directory, in place. Overwrites the original files. TAC in this script name is a keyword: it's after GNU's tac command, which is cat (for concatenate) backward.
 
 # USAGE
 # Run with these parameters:
