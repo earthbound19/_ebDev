@@ -5,7 +5,7 @@
 # Run with these parameters:
 # - $1 source hexplt format file name.
 # - $2 OPTIONAL. Number of columns. If omitted, defaults to 1. If passed as the keyword 'ALL', the columns will equal the number of colors in the source hexplt.
-# - $3 OPTIONAL. Number of rows. If omitted, defaults to however many rows will fit specified number of columns (including if the last row has empty remainder columns). If specified and the number of rows will not fit all colors, the script overrides what you specify to give enough rows to fit them.
+# - $3 OPTIONAL. Number of rows. If omitted, will be calculated as the number of rows that fit specified number of columns (including if the last row has empty remainder columns). If specified and the number of rows will not fit all colors, the script overrides what you specify to give enough rows to fit them.
 # For example, to reformat a .hexplt file with defaults, run:
 #    reformatHexPalette.sh hobby_art_0001-0003.hexplt
 # To reformat the same with 
