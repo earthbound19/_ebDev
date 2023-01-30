@@ -45,7 +45,7 @@ if [ ${#@} == 0 ]; then print_halp; exit 1; fi
 # - no colon after a parameter means no parameter is taken for it (it's functionally a flag)
 # - one colon means it takes one required parameter
 # - two colons means it can take on optional parameter.
-# ALSO NOTE: optional parameters must no space between the option letter and parameter; e.g. if an optional parameter `-a` is used than it must be passed as `-aOption`!
+# ALSO NOTE: optional parameters must have no space between the option letter and parameter; e.g. if an optional parameter `-a` is used than it must be passed as `-aOption`!
 # ALSO ALSO NOTE: from a script I saw it can be useful to get the name of the script:
 PROGNAME=$(basename $0)
 # -- and then use that with the --name argument of getopts:
