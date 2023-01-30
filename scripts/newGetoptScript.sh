@@ -63,7 +63,7 @@ while true; do
     -h | --help ) print_halp; exit 0 ;;
     -a | --arga ) ARG_A=flag_a_set; shift ;;
     -b | --argb ) ARG_B=$2; shift; shift ;;
-    -c | --argc ) ARG_C=$2; shift; shift ;;
+    -c | --argc ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -c --argc. Pass a value without any space after -c (for example: -cvalue), or else don't pass -c and a default value will be used for it. Exit."; exit 4; fi; ARG_C=$2; shift; shift ;;
     -- ) shift; break ;;
     * ) break ;;
   esac
