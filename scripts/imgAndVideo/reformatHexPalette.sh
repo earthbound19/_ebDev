@@ -64,7 +64,7 @@ setRowsToFitColors
 
 # MAIN WORK
 echo Reformatting palette in memory . . .
-echo noLayoutComment $noLayoutComment
+
 colorPrintCounter=0
 rowsArray=()
 OIFS="$IFS"
@@ -95,7 +95,8 @@ printf "" > $srcHexplt
 echo Writing reformatted .hexplt file . . .
 
 # either of these print options works; uncomment one (I'm guessing the first is faster) :
-printf "${rowsArray[*]}" > $srcHexplt
+printf "${rowsArray[*]}"
+ # > $srcHexplt
 # printf '%s\n' "${rowsArray[@]}" > $srcHexplts
 
 IFS="$OIFS"
