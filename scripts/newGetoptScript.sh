@@ -37,7 +37,8 @@ function print_halp {
 # print help and exit if no paramers passed:
 if [ ${#@} == 0 ]; then print_halp; exit 1; fi
 
-# IN THE FOLLOWING options string:
+# NOTES:
+# In the following options string:
 # - "a" and "arga" (different names for the same option) have no arguments, acting as sort of a flag.
 # - "b" and "argb" (different names for the same option) have required arguments.
 # - "c" and "argc" (") have optional arguments with default values.
@@ -45,8 +46,9 @@ if [ ${#@} == 0 ]; then print_halp; exit 1; fi
 # - no colon after a parameter means no parameter is taken for it (it's functionally a flag)
 # - one colon means it takes one required parameter
 # - two colons means it can take on optional parameter.
-# ALSO NOTE: optional parameters must have no space between the option letter and parameter; e.g. if an optional parameter `-a` is used than it must be passed as `-aOption`!
-# ALSO ALSO NOTE: from a script I saw it can be useful to get the name of the script:
+# Also, optional parameters must have no space between the option letter and parameter; e.g. if an optional parameter `-a` is used than it must be passed as `-aOption`!
+# Also, see MORE NOTES in the case switch below.
+# Also, from a script I saw it can be useful to get the name of the script:
 PROGNAME=$(basename $0)
 # -- and then use that with the --name argument of getopts:
 #    ARGS=`getopt -q --name "$PROGNAME" --long help,output:,verbose --options ho:v -- "$@"`
@@ -58,6 +60,7 @@ eval set -- "$OPTS"
 
 # SET ANY DEFAULTS that would be overriden by optional arguments here:
 ARG_C=default_value
+# MORE NOTES: cases that operate on 2 words, for example '-b foo', should use the shift statement twice, to remove both used words from the option list, while options that only operate on one word, for example '-a', should use the shift statement once, to remove only the one used word from the option list.
 while true; do
   case "$1" in
     -h | --help ) print_halp; exit 0 ;;
@@ -70,7 +73,7 @@ while true; do
 done
 
 # Throw error and exit if mandatory argument(s) missing:
-if [ ! $ARG_B ]; then echo "No argument b --argb (explaination of argument) passed to script. Exit."; exit 1; fi
+if [ ! $ARG_B ]; then echo "No argument b --argb (explanation of argument) passed to script. Exit."; exit 1; fi
 
 echo ARG_A is $ARG_A
 echo ARG_B is $ARG_B
