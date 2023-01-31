@@ -25,7 +25,7 @@ if [ "$2" ]; then firstCompareColor=$2; else firstCompareColor=000000; fi
 # get directory name without path:
 currentDirNoPath=$(basename $(pwd))
 # build target file name from that:
-outputFileName=_"$currentDirNoPath"_palettesColumnsOklabSortGrid.hexplt
+outputFileName="$currentDirNoPath"_palettesColumnsOklabSortGrid.hexplt
 
 # delete any temp files from any previous interrupted or otherwise erred run:
 rm -rf _palettesColumnsGrid_temp*
