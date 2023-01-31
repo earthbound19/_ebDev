@@ -8,6 +8,9 @@
 # `get_color_gradient_OKLAB.js` (and nodeJS and the packages that script requires), `getFullPathToFile.sh`
 # GNU datamash (binaries available for various platforms: https://www.gnu.org/software/datamash/) in your PATH
 
+# WARNING
+# Deletes any pre-exisisting folders and files with the pattern _augmentPalettes* before doing its work.
+
 # USAGE
 # - copy palettes you wish to make a multi-augment grid from into their own dedicated operating folder.
 # - from that folder, run this script with these parameters:
