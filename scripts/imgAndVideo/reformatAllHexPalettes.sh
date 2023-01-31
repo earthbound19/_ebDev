@@ -30,5 +30,3 @@ for hexpltFileName in ${allHexpltFileNames[@]}
 do
 	reformatHexPalette.sh -i $hexpltFileName $extraParameters
 done
-
-printf "DONE reformatting all .hexplt format files in the current directory.\n"

@@ -102,12 +102,18 @@ then
 	# write reformatted contents back to it:
 	# either of these print options works; uncomment one (I'm guessing the first is faster) :
 	printf "${rowsArray[*]}" > $srcHexplt
+	printf "\n"
 	# printf '%s\n' "${rowsArray[@]}" > $srcHexplts
 else
 	printf "${rowsArray[*]}"
+	printf "\n"
 fi
 
 IFS="$OIFS"
 
 # info print if no flag saying print to standard out (if writing to original .hexplt file) :
-if [ ! $printToStdout ]; then echo "DONE reformatting $srcHexplt."; fi
+if [ ! $printToStdout ]
+then
+	echo "DONE reformatting $srcHexplt."
+	echo ""
+fi
