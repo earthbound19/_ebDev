@@ -26,6 +26,11 @@
 
 
 # CODE
+# TO DO: remove these from parsed files (allows print_halp function: )
+#    function print_halp {
+#    echo "
+#    "
+#    }
 # DEVELOPER NOTES
 # - Always ensure this list of supported comment markers is in both the AWK_CODE_MARKER_SEARCH_COMMAND (see commment with that string) and SED_COMMENT_STRIP_COMMAND (see also comment with that string): # // """ % :: REM ; ;;
 # - To manually clean up my preference of not having a colon after all caps pseudo (not markdown) headers in code comments, I found them via npp search all files, with "Match case" ticked and "Regular expression" selected, and this find string: ^[#/%:RrEeMm ]*[[:UPPER:]]{1,}:$
