@@ -9,6 +9,7 @@ Options:
     -c<integer or keyword>, --columns=<integer or keyword> Number of columns. OPTIONAL. If omitted, defaults to 1.
     -a, --all-columns OPTIONAL flag to set number of columns to all colors. Overrides any value of -c, --columns.
 	-n, --no-comment OPTIONAL flag: No \"columns: <n> rows: <n>\" comment in reformatted file
+	-p, --print-to-stdout OPTIONAL flag: Do not overwrite palette file, only print reformatting result to stdtout (with none of the other progress print otherwise done without -p)
 For example, to reformat a .hexplt file with defaults, run:
     reformatHexPalette.sh -i hobby_art_0001-0003.hexplt
 "
@@ -19,7 +20,7 @@ For example, to reformat a .hexplt file with defaults, run:
 # START PARAMETER PARSING AND GLOBALS SETUP
 if [ ${#@} == 0 ]; then print_halp; exit 1; fi
 PROGNAME=$(basename $0)
-OPTS=`getopt -o hi:c::an --long help,input-file:,columns::,all-columns,no-comment -n $PROGNAME -- "$@"`
+OPTS=`getopt -o hi:c::anp --long help,input-file:,columns::,all-columns,no-comment,--print-to-stdout -n $PROGNAME -- "$@"`
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 eval set -- "$OPTS"
 # --- END PARSING STUFF ---
@@ -44,12 +45,14 @@ while true; do
     -c | --columns ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -c --columns. Pass a value without any space after -c (for example: -c5), or else don't pass -c and a default value will be used for it. Exit."; exit 2; fi; columns=$2; shift; shift ;;
 	-a | --all-columns ) columnForEveryColor=true; shift; ;;
 	-n | --no-comment ) noLayoutComment=true; shift; ;;
+	-p | --print-to-stdout ) printToStdout=true; shift; ;;
     -- ) shift; break ;;
     * ) break ;;
   esac
 done
 
-echo Loading source .hexplt file $srcHexplt . . .
+# info print if no flag saying print to standard out (if writing to original .hexplt file) :
+if [ ! $printToStdout ]; then echo "Loading source .hexplt file $srcHexplt . . ."; fi
 # get array of colors from file by extracting all matches of a pattern of six hex digits preceded by a #:
 colorsArray=( $(grep -i -o '#[0-9a-f]\{6\}' $srcHexplt) )
 # Get number of colors (from array):
@@ -63,7 +66,8 @@ setRowsToFitColors
 # END PARAMETER PARSING AND GLOBALS SETUP
 
 # MAIN WORK
-echo Reformatting palette in memory . . .
+# info print if no flag saying print to standard out (if writing to original .hexplt file) :
+if [ ! $printToStdout ]; then echo "Reformatting palette in memory . . ."; fi
 
 colorPrintCounter=0
 rowsArray=()
@@ -89,16 +93,21 @@ do
 	rowsArray+=($rowSTR)
 done
 
-# wipe source hexplt to prep for rewriting to it:
-printf "" > $srcHexplt
-# write reformatted contents back to it:
-echo Writing reformatted .hexplt file . . .
-
-# either of these print options works; uncomment one (I'm guessing the first is faster) :
-printf "${rowsArray[*]}"
- # > $srcHexplt
-# printf '%s\n' "${rowsArray[@]}" > $srcHexplts
+# info print if no flag saying print to standard out (if writing to original .hexplt file) :
+if [ ! $printToStdout ]
+then
+	echo "Writing reformatted .hexplt file . . ."
+	# wipe source hexplt to prep for rewriting to it:
+	printf "" > $srcHexplt
+	# write reformatted contents back to it:
+	# either of these print options works; uncomment one (I'm guessing the first is faster) :
+	printf "${rowsArray[*]}" > $srcHexplt
+	# printf '%s\n' "${rowsArray[@]}" > $srcHexplts
+else
+	printf "${rowsArray[*]}"
+fi
 
 IFS="$OIFS"
 
-printf "\nDONE reformatting $srcHexplt.\n"
+# info print if no flag saying print to standard out (if writing to original .hexplt file) :
+if [ ! $printToStdout ]; then echo "DONE reformatting $srcHexplt."; fi
