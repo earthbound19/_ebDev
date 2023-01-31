@@ -8,8 +8,8 @@ Options:
     -i, --input-file <source hexplt format file name>
     -c<integer or keyword>, --columns=<integer or keyword> Number of columns. OPTIONAL. If omitted, defaults to 1.
     -a, --all-columns OPTIONAL flag to set number of columns to all colors. Overrides any value of -c, --columns.
-	-n, --no-comment OPTIONAL flag: No \"columns: <n> rows: <n>\" comment in reformatted file
-	-p, --print-to-stdout OPTIONAL flag: Do not overwrite palette file, only print reformatting result to stdtout (with none of the other progress print otherwise done without -p)
+    -n, --no-comment OPTIONAL flag: No \"columns: <n> rows: <n>\" comment in reformatted file
+    -p, --print-to-stdout OPTIONAL flag: Do not overwrite palette file, only print reformatting result to stdtout (with none of the other progress print otherwise done without -p)
 For example, to reformat a .hexplt file with defaults, run:
     reformatHexPalette.sh -i hobby_art_0001-0003.hexplt
 "
