@@ -19,7 +19,7 @@
 
 # CODE
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (number of columns that palettes are organized into) passed to script. Exit."; exit 1; else columns=$1; fi
-if [ "$2" ]; then firstCompareColor=$2; else firstCompareColor=000000; fi
+if [ "$2" ]; then firstCompareColor=$2; fi
 # echo columns is $columns and firstCompareColor is $firstCompareColor
 
 # get directory name without path:
@@ -37,10 +37,11 @@ reformatAllHexPalettes.sh '-c5 -n -p' > ./_palettesColumnsGrid_temp/temp1.txt
 cd _palettesColumnsGrid_temp
 # transpose that result to new file:
 datamash transpose --field-separator=' ' < temp1.txt > temp2.txt
+
 # delete trailing whitespace/lines from that result (which would otherwise result in empty split files, maybe augment errors:
 sed -i -e :a -e '/[^[:blank:]]/,$!d; /^[[:space:]]*$/{ $d; N; ba' -e '}' temp2.txt
 
-# split temp file into it as one line files:
+# split temp file into one line palettes:
 split --additional-suffix='.hexplt' -l 1 temp2.txt augment_
 
 # sort all those palettes in okLab space starting on firstCompareColor:
