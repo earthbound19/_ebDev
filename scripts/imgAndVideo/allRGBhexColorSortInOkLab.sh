@@ -17,6 +17,12 @@
 # Example that will specify an arbitrary first comparison color and operate on all `.hexplt` files in all subdirectories also:
 #    allRGBhexColorSortInOkLab.sh f800fc FROGBALF
 # SEE ALSO `allRGBhexColorSortInCAM16-UCS.sh` and `allRGBhexColorSortInCIECAM02.sh`.
+# NOTE
+# This script does not use a -k option for rgbHexColorSortInOkLab.js, which would cause it to keep duplicate colors. If you want to do that, you must find and hack this code line:
+#    results=( $(node $scriptLocation -i $element $arbitraryColorParam) )
+# -- and modify it to this:
+#    results=( $(node $scriptLocation -i $element $arbitraryColorParam -k) )
+# (I may eventually modify this script to use getopt to parse multiple optional switches; unless/until I do that, this hack is necessary for that.)
 
 
 # CODE
