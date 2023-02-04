@@ -27,6 +27,7 @@ program
   // the <fileName> thing here leads to capture of a series of values (file name):
   .requiredOption('-i --inputFile <fileName>', '\n\tInput palette file name (e.g. \'floral_print_00002.hexplt\'), which is a list of sRGB colors in hex format (e.g. #f800fc).\n')
   .option('-f, --firstComparisonColor <digits>', '\n\tFirst color to start comparisons with, in sRGB hex format (e.g. 0a000a) (NOTE: no number/hex/pound (\'#\') symbol should be in the color code)\n')
+  .option('-k, --keepDuplicateColors', '\n\tDo not remove duplicate colors from list. Without this switch (by default), duplicate colors are removed.\n')
 program.parse();
 const options = program.opts();
 
@@ -64,8 +65,10 @@ for (const element of searchResults) {
   comparisonColorsArray.push(element[0]);
 }
 
-// remove duplicates from original list, but maintain order (keep all unique in the same order), re: https://stackoverflow.com/a/15868720/1397555
+// If there is not a -k switch instructing to keep duplicate colors, remove duplicates from original list, but maintain order (keep all unique in the same order), re: https://stackoverflow.com/a/15868720/1397555
+if(typeof options.keepDuplicateColors == 'undefined') {
 comparisonColorsArray = [ ... new Set(comparisonColorsArray) ];
+}
 // if the value of arbitraryFirstCompareColor was changed from default empty string (''), because a valid sRGB hex color value for the -f option was passed to the script, add it to the start of the list; colors will therefore be sorted by first comparing to it; will remove it afterward:
 if (arbitraryFirstCompareColor != '') {
 	comparisonColorsArray.unshift(arbitraryFirstCompareColor);
