@@ -1,47 +1,45 @@
 # DESCRIPTION
 # runs `rgbHexColorSortInOkLab.js` against all .hexplt files in the current directory (and optionally all subdirectories), overwriting the original files with the result.
+# SEE ALSO `allRGBhexColorSortInCAM16-UCS.sh` and `allRGBhexColorSortInCIECAM02.sh`.
 
 # DEPENDENCIES
 # `getFullPathToFile.sh`, `rgbHexColorSortInOkLab.js`.
 
 # USAGE
 # With more than one .hexplt file in your current directory, and `rgbHexColorSortInOkLab.js` in your PATH, run with these parameters:
-# - $1 OPTIONAL. Arbitrary first color (in sRGB hex format, e.g. f800fc) to compare all other colors in the list to (for each file that this script calls `rgbHexColorSortInOkLab.js` to sort perceptually by next nearest color to this color). If provided, it must not have the '#' symbol at the start of the sRGB color (for example, to use a magenta color, just pass f800fc, not #f800fc). If not provided, no arbitrary first color parameter will be passed to `rgbHexColorSortInOkLab.js`.
-# - $2 OPTIONAL. Anything, such as the word FROGBALF, which will cause the script to also search for `.hexplt` files in all subdirectories under the current directory, and call `rgbHexColorSortInOkLab.js` for all such found `.hexplt` files (in subdirectories) also. If omitted, only `.hexplt` files in the current directory will be found and passed to `rgbHexColorSortInOkLab.js`. To use this paramter but not $1, pass the word NULL for $1.
-# Example that will call `rgbHexColorSortInOkLab.js` repeatedly for every `.hexplt` format file in the current directory, with no additional parameter:
+# - $1 OPTIONAL. Surrounded by quote marks, the same parameters as you would pass to `rgbHexColorSortInOkLab.js` (see), but without any input file parameter. You don't want to specify any input file because this script repeatedly calls `rgbHexColorSortInOkLab.js` with your parameters but a different source file paramater for each call. (At this writing the input file parameter is -i; don't use -i.) To clarify this, read on to examples.
+# - $2 OPTIONAL. Anything, such as the word FROGBALF, which will cause the script to also search for `.hexplt` files in all subdirectories under the current directory, and call `rgbHexColorSortInOkLab.js` for all such found `.hexplt` files (in subdirectories) also. If omitted, only `.hexplt` files in the current directory will be found and passed to `rgbHexColorSortInOkLab.js`. To use this parameter but not $1, pass an empty string '' (two single or double quote marks in a row) for $1.
+# EXAMPLES
+# At this writing, the following examples are current; if you find they don't work, refer to the documentation in `rgbHexColorSortInOkLab.js`:
+# Example that will use all defaults of this script and the script this calls; call it without any parameters and it will operate on all .hexplt palettes in this directory, using the first color in each as the first sort color:
 #    allRGBhexColorSortInOkLab.sh
-# Example that will call `rgbHexColorSortInOkLab.js` repeatedly for every `.hexplt` format file in the current directory, with a parameter telling it to set #0a000a (a magenta black) as the arbitrary first color to start comparisons with for every `.hexplt` file:
-#    allRGBhexColorSortInOkLab.sh 0a000a
-# Example that will call `rgbHexColorSortInOkLab.js` for every `.hexplt` file found in all subdirectories also, but not specify any arbitrary first comparison color:
-#    allRGBhexColorSortInOkLab.sh NULL FROGBALF
-# Example that will specify an arbitrary first comparison color and operate on all `.hexplt` files in all subdirectories also:
-#    allRGBhexColorSortInOkLab.sh f800fc FROGBALF
-# SEE ALSO `allRGBhexColorSortInCAM16-UCS.sh` and `allRGBhexColorSortInCIECAM02.sh`.
-# NOTE
-# This script does not use a -k option for rgbHexColorSortInOkLab.js, which would cause it to keep duplicate colors. If you want to do that, you must find and hack this code line:
-#    results=( $(node $scriptLocation -i $element $arbitraryColorParam) )
-# -- and modify it to this:
-#    results=( $(node $scriptLocation -i $element $arbitraryColorParam -k) )
-# (I may eventually modify this script to use getopt to parse multiple optional switches; unless/until I do that, this hack is necessary for that.)
+# Example that will specify an arbitrary first comparison color of f800fc and operate on all palettes in this directrory only (no recursion):
+#    allRGBhexColorSortInOkLab.sh '-f f800fc'
+# Example that will specify an arbitrary first comparison color for every palette in the current directory, and operate on all `.hexplt` files in all subdirectories also; note that the part which is a parameter to `rgbHexColorSortInOkLab.js` is surrounded by single quote marks:
+#    allRGBhexColorSortInOkLab.sh '-f f800fc' FROGBALF
+# Example that will specify an arbitrary first comparison color for every palette in the current directory, and keep any duplicate colors (instead of the default behavior of removing duplicates) :
+#    allRGBhexColorSortInOkLab.sh '-f f800fc -k'
+# Example that will do the same but recurse into subdirectories:
+#    allRGBhexColorSortInOkLab.sh '-f f800fc -k' FROGBALF
 
 
 # CODE
-if [ "$1" ] && [ "$1" != "NULL" ]
+if [ "$1" ]
 then
-	arbitraryColorParam="-f $1"
+	additionalParametersToScript="$1"
 fi
 
-# if no $2 parameter passed to script, set maxdepth parameter 1 (current directory only); otherwise it will be default of search subdirs:
+# if no $2 parameter passed to script, set maxdepth parameter 1 (current directory only); otherwise maxdepthParameter will be undefined, which will result in find's default search behavior to search subdirs:
 if [ ! "$2" ]; then maxdepthParameter='-maxdepth 1'; fi
 
 scriptLocation=$(getFullPathToFile.sh rgbHexColorSortInOkLab.js)
 
 array=( $(find . $maxdepthParameter -type f -iname \*.hexplt) )
-# or to find every file,`find .` . .
+
 for element in ${array[@]}
 do
 	echo "Running comparisons for file $element . . ."
-	results=( $(node $scriptLocation -i $element $arbitraryColorParam) )
+	results=( $(node $scriptLocation -i $element $additionalParametersToScript) )
 	# print array re: https://stackoverflow.com/a/15692004/1397555
 	printf '%s\n' "${results[@]}" | tr -d '\15\32' > $element
 	echo "DONE and result written back over file $element."
