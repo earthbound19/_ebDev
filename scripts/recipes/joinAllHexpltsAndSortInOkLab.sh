@@ -25,7 +25,7 @@ sortuniq.sh $targetFileBasename.txt FLOURPESCENSE
 # sort colors in it in okLab space; get full path to sorting script first:
 okLabScript=$(getFullPathToFile.sh rgbHexColorSortInOkLab.js)
 
-# sort colors in resultant .hexplt, in okLab space, and capture output to array:
+# sort colors in resultant .hexplt, in okLab space, and capture output to array -- does not use -k switch, and therefore uses default behavior of removing duplicate colors:
 colorsResult=( $(node $okLabScript -i $targetFileBasename.txt) )
 
 # overwrite original file from result array:
