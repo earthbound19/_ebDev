@@ -30,7 +30,7 @@ do
 	cat $palette | grep -i -o '#[0-9a-f]\{6\}' > ./$sort_folder/$palette
 done
 cd $sort_folder
-allRGBhexColorSortInOkLab.sh $color_one
+allRGBhexColorSortInOkLab.sh "-f $color_one"
 renderAllHexPalettes.sh
 cd ..
 
@@ -42,7 +42,7 @@ do
 	cat $palette | grep -i -o '#[0-9a-f]\{6\}' > ./$sort_folder/$palette
 done
 cd $sort_folder
-allRGBhexColorSortInOkLab.sh $color_two
+allRGBhexColorSortInOkLab.sh "-f $color_two"
 renderAllHexPalettes.sh
 cd ..
 
