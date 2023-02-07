@@ -1,6 +1,9 @@
 // DESCRIPTION
 // Groups colors in a .hexplt palette to nearest match of -n discrete ranges from Hue value 0 to 360, in okLab space. Writes resultant groups to new .hexplt files named after the original file plus additional range match information.
 
+// KNOWN ISSUES
+// It may be that this can drop colors, such as grays, that it does not "see" as fitting into any of the defined hue ranges. In other words, if you collect all the colors this splits into different palettes back into one palette, it may be that some colors from the original palette are lost. If you use this script from other scripts for sorting/organizing, you may need to check for colors that literally get lost in the shuffle, and add them back.
+
 // DEPENDENCIES
 // - nodejs, with a version of the `culori` module greater than `culori@0.20.1` (I think?), as this uses the CommonJS export of culori at `'culori/require'`.
 // - you may have to install culori locally (in the same directory as this script) via `npm install <package_name>`, or globally, via `npm install -g <package_name>`.
