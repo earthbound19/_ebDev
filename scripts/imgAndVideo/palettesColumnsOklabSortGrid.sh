@@ -89,7 +89,7 @@ then
 			for splitHexplt in ${allSplitHexpltFileNames[@]}
 			do
 				# store results in tmp array:
-				lines=( $(node $rgbHexColorSortInOkLabPath -i $splitHexplt -f $hueDivisionRangeSRGBcompare -k) )
+				lines=( $(node $rgbHexColorSortInOkLabPath -i $splitHexplt -s $hueDivisionRangeSRGBcompare -k) )
 				# write results from array back to file, one color per line, for later file comparison:
 				printf "%s\n" ${lines[@]} > $splitHexplt
 			done

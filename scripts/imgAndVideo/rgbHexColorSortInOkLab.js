@@ -49,7 +49,7 @@ if(typeof options.startComparisonColor !== 'undefined') {
 	// if it does not match sRGB hex color code pattern (including exactly six characters, no more or less), throw error and exit; otherwise assign the value to arbitraryStartCompareColor and continue:
 	var pattern = new RegExp("\^[0-9a-fA-F]{6}$")
 	if (pattern.test(options.startComparisonColor) == false) {
-		console.log("\n\n!========\nERROR: provided value for parameter -f --startComparisonColor is not in sRGB hex format (six hex digits, e.g. 0a000a); value is:\n\t", options.startComparisonColor, "\nExit code 2.\n!========\n");
+		console.log("\n\n!========\nERROR: provided value for parameter -s --startComparisonColor is not in sRGB hex format (six hex digits, e.g. 0a000a); value is:\n\t", options.startComparisonColor, "\nExit code 2.\n!========\n");
 		process.exit(2);
 	} else {
 		arbitraryStartCompareColor = '#' + String(options.startComparisonColor);
@@ -69,7 +69,7 @@ for (const element of searchResults) {
 if(typeof options.keepDuplicateColors == 'undefined') {
 comparisonColorsArray = [ ... new Set(comparisonColorsArray) ];
 }
-// if the value of arbitraryStartCompareColor was changed from default empty string (''), because a valid sRGB hex color value for the -f option was passed to the script, add it to the start of the list; colors will therefore be sorted by first comparing to it; will remove it afterward:
+// if the value of arbitraryStartCompareColor was changed from default empty string (''), because a valid sRGB hex color value for the -s option was passed to the script, add it to the start of the list; colors will therefore be sorted by first comparing to it; will remove it afterward:
 if (arbitraryStartCompareColor != '') {
 	comparisonColorsArray.unshift(arbitraryStartCompareColor);
 }
@@ -121,7 +121,7 @@ while (finalSortedList.length < comparisonColorsArrayLength) {
 	comparisonColorsArray.unshift(nearestFoundColorHEX);
 }
 
-// if the value of arbitraryStartCompareColor was changed from default empty string (''), because a valid sRGB hex color value for the -f option was passed to the script, we earlier added arbitraryStartCompareColor to the list; in that case remove it now from the final list (it will be the first item in the list):
+// if the value of arbitraryStartCompareColor was changed from default empty string (''), because a valid sRGB hex color value for the -s option was passed to the script, we earlier added arbitraryStartCompareColor to the list; in that case remove it now from the final list (it will be the first item in the list):
 if (arbitraryStartCompareColor != '') {
 	finalSortedList.shift();
 }
