@@ -1,8 +1,8 @@
 # DESCRIPTION
-# concatenates all .hexplt files in the current directory into one, then deduplicates colors from it and sorts it in okLab color space (using various scripts).
+# concatenates all .hexplt files in the current directory into one, then sorts it in okLab color space and deduplicates colors from it.
 
 # DEPENDENCIES
-# nodejs, the culori package for it, and various scripts in _ebDev
+# nodejs with the culori package installed (probably globally)
 
 # USAGE
 # Run without any parameters:
@@ -19,12 +19,8 @@ targetFileBasename=_"$dirBasename"__all_hexplts_concatenated__"$targetFileNameRN
 # concatenate all .hexplt files into one new file:
 cat *.hexplt > $targetFileBasename.txt
 
-# sort and deduplicate the colors in it:
-sortuniq.sh $targetFileBasename.txt FLOURPESCENSE
-
 # sort colors in it in okLab space; get full path to sorting script first:
 okLabScript=$(getFullPathToFile.sh rgbHexColorSortInOkLab.js)
-
 # sort colors in resultant .hexplt, in okLab space, and capture output to array -- does not use -k switch, and therefore uses default behavior of removing duplicate colors:
 colorsResult=( $(node $okLabScript -i $targetFileBasename.txt) )
 
