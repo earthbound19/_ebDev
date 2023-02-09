@@ -26,7 +26,7 @@ const { program } = require('commander');
 program
   // the <fileName> thing here leads to capture of a series of values (file name):
   .requiredOption('-i --inputFile <fileName>', '\n\tInput palette file name (e.g. \'floral_print_00002.hexplt\'), which is a list of sRGB colors in hex format (e.g. #f800fc).\n')
-  .option('-f, --firstComparisonColor <digits>', '\n\tFirst color to start comparisons with, in sRGB hex format (e.g. 0a000a) (NOTE: no number/hex/pound (\'#\') symbol should be in the color code)\n')
+  .option('-s, --startComparisonColor <digits>', '\n\tFirst color to start comparisons with, in sRGB hex format (e.g. 0a000a) (NOTE: no number/hex/pound (\'#\') symbol should be in the color code)\n')
   .option('-k, --keepDuplicateColors', '\n\tDo not remove duplicate colors from list. Without this switch (by default), duplicate colors are removed.\n')
 program.parse();
 const options = program.opts();
@@ -44,15 +44,15 @@ catch(err) {
   process.exit(1);
 }
 // ARBITRARY FIRST SORT COLOR
-var arbitraryFirstCompareColor = '';		// set default blank
-if(typeof options.firstComparisonColor !== 'undefined') {
-	// if it does not match sRGB hex color code pattern (including exactly six characters, no more or less), throw error and exit; otherwise assign the value to arbitraryFirstCompareColor and continue:
+var arbitraryStartCompareColor = '';		// set default blank
+if(typeof options.startComparisonColor !== 'undefined') {
+	// if it does not match sRGB hex color code pattern (including exactly six characters, no more or less), throw error and exit; otherwise assign the value to arbitraryStartCompareColor and continue:
 	var pattern = new RegExp("\^[0-9a-fA-F]{6}$")
-	if (pattern.test(options.firstComparisonColor) == false) {
-		console.log("\n\n!========\nERROR: provided value for parameter -f --firstComparisonColor is not in sRGB hex format (six hex digits, e.g. 0a000a); value is:\n\t", options.firstComparisonColor, "\nExit code 2.\n!========\n");
+	if (pattern.test(options.startComparisonColor) == false) {
+		console.log("\n\n!========\nERROR: provided value for parameter -f --startComparisonColor is not in sRGB hex format (six hex digits, e.g. 0a000a); value is:\n\t", options.startComparisonColor, "\nExit code 2.\n!========\n");
 		process.exit(2);
 	} else {
-		arbitraryFirstCompareColor = '#' + String(options.firstComparisonColor);
+		arbitraryStartCompareColor = '#' + String(options.startComparisonColor);
 	}
 }
 
@@ -69,9 +69,9 @@ for (const element of searchResults) {
 if(typeof options.keepDuplicateColors == 'undefined') {
 comparisonColorsArray = [ ... new Set(comparisonColorsArray) ];
 }
-// if the value of arbitraryFirstCompareColor was changed from default empty string (''), because a valid sRGB hex color value for the -f option was passed to the script, add it to the start of the list; colors will therefore be sorted by first comparing to it; will remove it afterward:
-if (arbitraryFirstCompareColor != '') {
-	comparisonColorsArray.unshift(arbitraryFirstCompareColor);
+// if the value of arbitraryStartCompareColor was changed from default empty string (''), because a valid sRGB hex color value for the -f option was passed to the script, add it to the start of the list; colors will therefore be sorted by first comparing to it; will remove it afterward:
+if (arbitraryStartCompareColor != '') {
+	comparisonColorsArray.unshift(arbitraryStartCompareColor);
 }
 
 const comparisonColorsArrayLength = comparisonColorsArray.length
@@ -90,7 +90,7 @@ okLCHdistance = culori.differenceEuclidean(mode = 'oklch', weights = [1, 1, 1]);
 
 // init final sort list (as empty):
 finalSortedList = [];
-// Add first item to final list, as the first item will be the first in the original list; comparisonColorsArray[0].sRGBhex and searchResults[0][0] SHOULD both be the first color in the list (although arbitraryFirstCompareColor can mess with that, but the result we intend will be the same):
+// Add first item to final list, as the first item will be the first in the original list; comparisonColorsArray[0].sRGBhex and searchResults[0][0] SHOULD both be the first color in the list (although arbitraryStartCompareColor can mess with that, but the result we intend will be the same):
 finalSortedList.push(comparisonColorsArray[0]);
 
 while (finalSortedList.length < comparisonColorsArrayLength) {
@@ -121,8 +121,8 @@ while (finalSortedList.length < comparisonColorsArrayLength) {
 	comparisonColorsArray.unshift(nearestFoundColorHEX);
 }
 
-// if the value of arbitraryFirstCompareColor was changed from default empty string (''), because a valid sRGB hex color value for the -f option was passed to the script, we earlier added arbitraryFirstCompareColor to the list; in that case remove it now from the final list (it will be the first item in the list):
-if (arbitraryFirstCompareColor != '') {
+// if the value of arbitraryStartCompareColor was changed from default empty string (''), because a valid sRGB hex color value for the -f option was passed to the script, we earlier added arbitraryStartCompareColor to the list; in that case remove it now from the final list (it will be the first item in the list):
+if (arbitraryStartCompareColor != '') {
 	finalSortedList.shift();
 }
 
