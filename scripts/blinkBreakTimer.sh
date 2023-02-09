@@ -3,11 +3,11 @@
 # - For L minutes (customizable), echoes a prompt to work. If you have a blink1 device, changes the device to a random color every M seconds during that work period. (Also with N millisecond color gradation change.)
 # - If you have a blink device, randomly changes the blink color every Y seconds (customizable) during break period Y. 
 # - With Z millisecond customizable color gradation change.
-# - Dims the computer screen to black and back quickly three times at that break prompt.
+# - OPTIONALLY dims the computer screen to black and back quickly three times at that break prompt. (Uncomment code to do this. Mac only (via homebrew brightness package).
 # - Repeats this cycle indefinitely.
 
 # DEPENDENCIES
-# homebrew, homebrew brightness package (Mac)
+# blink1-tool, and optionally homebrew and homebrew brightness package (Mac)
 
 # WARNING
 # If you terminate this script in an interval of screen darkness, you will be left in darkness. DARKNESS, Batman. DARKNESS.
@@ -25,9 +25,6 @@
 
 
 # CODE
-# DEVELOPER NOTE
-# `2> /dev/null` suppresses error print.
-
 # USER VARIABLES
 # CHANGE THESE VALUES to your liking:
 workMinutes=35
@@ -44,8 +41,8 @@ breakMinutes=7
   # we change colors every breakBlinkColorChangeIntervalMS? The following figures that out:
   breakBlinkChangeColorTimes=`echo "$breakMinutesInMS / $breakBlinkColorChangeIntervalMS" | bc`
       # The following statements are for testing; comment them out in producton:
-      echo "workBlinkChangeColorTimes value is $workBlinkChangeColorTimes over workMinutesInMS $workMinutesInMS"
-      echo "breakBlinkChangeColorTimes value is $breakBlinkChangeColorTimes over breakMinutesInMS $breakMinutesInMS"
+      # echo "workBlinkChangeColorTimes value is $workBlinkChangeColorTimes over workMinutesInMS $workMinutesInMS"
+      # echo "breakBlinkChangeColorTimes value is $breakBlinkChangeColorTimes over breakMinutesInMS $breakMinutesInMS"
   breakBlinkColorChangeMilliseconds=1400
 
 
