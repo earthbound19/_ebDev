@@ -14,13 +14,13 @@
 # Example that will use all defaults of this script and the script this calls; call it without any parameters and it will operate on all .hexplt palettes in this directory, using the first color in each as the first sort color:
 #    allRGBhexColorSortInOkLab.sh
 # Example that will specify an arbitrary first comparison color of f800fc and operate on all palettes in this directrory only (no recursion):
-#    allRGBhexColorSortInOkLab.sh '-f f800fc'
+#    allRGBhexColorSortInOkLab.sh '-s f800fc'
 # Example that will specify an arbitrary first comparison color for every palette in the current directory, and operate on all `.hexplt` files in all subdirectories also; note that the part which is a parameter to `rgbHexColorSortInOkLab.js` is surrounded by single quote marks:
-#    allRGBhexColorSortInOkLab.sh '-f f800fc' FROGBALF
+#    allRGBhexColorSortInOkLab.sh '-s f800fc' FROGBALF
 # Example that will specify an arbitrary first comparison color for every palette in the current directory, and keep any duplicate colors (instead of the default behavior of removing duplicates) :
-#    allRGBhexColorSortInOkLab.sh '-f f800fc -k'
+#    allRGBhexColorSortInOkLab.sh '-s f800fc -k'
 # Example that will do the same but recurse into subdirectories:
-#    allRGBhexColorSortInOkLab.sh '-f f800fc -k' FROGBALF
+#    allRGBhexColorSortInOkLab.sh '-s f800fc -k' FROGBALF
 
 
 # CODE

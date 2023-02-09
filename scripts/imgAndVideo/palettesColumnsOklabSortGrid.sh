@@ -42,7 +42,7 @@ if [ "$4" ]; then hueDivisionRangeSRGBcompare=$4; fi
 # get directory name without path:
 currentDirNoPath=$(basename $(pwd))
 # build target file name from that; add script parameter details to it:
-outputFileName="$currentDirNoPath"_palettesColumnsOklabSortGrid_n"$hueDivisionRangesCount"_f"$hueDivisionRangeSRGBcompare".hexplt
+outputFileName="$currentDirNoPath"_palettesColumnsOklabSortGrid_n"$hueDivisionRangesCount"_s"$hueDivisionRangeSRGBcompare".hexplt
 
 # delete any temp files from any previous interrupted or otherwise erred run:
 rm -rf _palettesColumnsGrid_temp*
