@@ -22,8 +22,8 @@ do
 	then
 		echo Processing $imageFileName . . .
 		echo Command is\:
-		echo innerCrop.sh -o black $imageFileName 
-		innerCrop.sh -o black $imageFileName $renderTarget
+		echo innercrop.sh -o black $imageFileName 
+		innercrop.sh -o black $imageFileName $renderTarget
 		echo ""
 	else
 		echo "Render target $renderTarget already exists; skipping. If you intended to do something with source file $imageFileName, perhaps change it to another file format and run this script again."
