@@ -3,8 +3,10 @@
 # - collates them all to one palette. Assumes that they all have the same number of colors which will evenly divide over $1 columns (and things may go wonky if they don't).
 # - sorts colors in columns by next-nearest perceptual, either to the first color (top of column) by default, or optionally compares starting with an arbitrary sRGB hex format color $2, and sorts them in the column in that order. The comparisons to sort are done in the Oklab color space.
 # - writes that result to a new palette in a subdirectory, named partly after the directory you run this script from, arranged in $1 columns and with a layout comment so that render scripts that make use of the comment will lay out colors in a grid such that the color sorting by column will hopefully be visually apparent.
-# - optionally also dividing columns into sorted hue bands. optionally starting sort with arbitrary color per band.
+# - optionally also dividing columns into sorted hue bands.
+# - optionally with a starting sort arbitrary color for the hue bands.
 # - renders the result palette with a renderer that will make use of the layout comment
+# - also places a comment in the palette giving the script parameters (from this script call) that created the palette
 
 # DEPENDENCIES
 # A lot of things. `allRGBhexColorSortInOkLab.sh`, `reformatAllHexPalettes.sh`, `reformatHexPalette.sh`, `hexplt_split_to_channel_ranges_OKLAB.js`, `rgbHexColorSortInOkLab.js`, `filterExcludedWords.sh`, `renderAllHexPalettes.sh`, and their dependencies.
@@ -15,15 +17,16 @@
 # - $1 REQUIRED. number of columns that all the palettes in this directory will evenly divide into. This is expected to be the same for every palette, and things may go wonky if they are not. Palettes are also expected to all have the same number of colors (no tests without that have been done).
 # - $2 OPTIONAL. Any parameter(s) usable by `allRGBhexColorSortInOkLab.sh`, surrounded by quote marks. This gets hairy, because that script passes it on to `rgbHexColorSortInOkLab.js`, and while it's technically one parameter it can be a group of parameters surrounded by quote marks. (I even internally named the variable that receives this parameter parametricHairball.) See the parameter documentation comments in `allRGBhexColorSortInOkLab.sh` and maybe the script it calls.
 # - $3 OPTIONAL. Number of hue divisions for `hexplt_split_to_channel_ranges_OKLAB.js`, which, if provided, will cause split of colors per column into hue ranges via that script. (for example groups like red, orange, yellow, green, cyan, blue, violet, and magenta if you pass 8.) Note that this will result in an override of any first -f sort color in $2 (for `allRGBhexColorSortInOkLab.sh`)
-# - $4 OPTIONAL, and recommended if you use $3: sRGB hex color code to start sorting of the hue division ranges of $3 on, via `hexplt_split_to_channel_ranges_OKLAB.js`. This will result in the hue groups each being sorted by next nearest perceptually similar color, starting on this color. You might try 000000 (black) or ffffff (white) for example.
+# - $4 OPTIONAL, and recommended if you use $3: sRGB hex color code to start sorting of the `hexplt_split_to_channel_ranges_OKLAB.js` hue division ranges of $3 on (sorting them via `rgbHexColorSortInOkLab.js` custom calls sorting those ranges). This will result in the hue groups each being sorted by next nearest perceptually similar color, starting on this color. You might try 000000 (black) or ffffff (white) for example.
 # Example with 5 columns for every palette in the directory, and default keeping any duplicate colors (no parameters for $2 / `allRGBhexColorSortInOkLab.sh`):
 #    palettesColumnsOklabSortGrid.sh 5
 # Example with 5 columns for every palette in the directory, keeping any duplicate colors, and starting sort on a vivid brick red sRGB color (via an available parameter -f for `allRGBhexColorSortInOkLab.sh` at this writing) :
 #    palettesColumnsOklabSortGrid.sh 5 '-k'
-# Example that has 5 columns, keeps duplicates, splits into 8 hue ranges, and sortes hue ranges starting on next most similar to black:
-#    palettesColumnsOklabSortGrid.sh 5 '-k' 8 000000
-# NOTE
-# The path and name of the result file is in the format: ./_palettesColumnsOklabSortGrids/_<host_directory_name>_palettesColumnsOklabSortGrid_<a few random characters>.hexplt
+# Example that has 5 columns, keeps duplicates, splits into 8 hue ranges, and sortes hue ranges starting on next most similar to an almost black red-red-orange:
+#    palettesColumnsOklabSortGrid.sh 5 '-k' 8 0c0001
+# NOTES
+# - The way that sRGB color code for the last example was contrived is: started with OKHSV S (saturation) 100 and value (non-black) 5, then H (hue) that lies in the middle of the boundaries of red and orange in the okHSV hue angle 360/8, so that the hue ranging in the logic will capture everything between red and orange at intervale of 360/8; or 360/8/2 = 22 (from 22.5). The division by 8 is for the 8 parameter for number of hue divisions (groups).
+# - The path and name of the result file is in the format: ./_palettesColumnsOklabSortGrids/_<host_directory_name>_palettesColumnsOklabSortGrid_<a few random characters>.hexplt
 
 
 # CODE
@@ -38,9 +41,8 @@ if [ "$4" ]; then hueDivisionRangeSRGBcompare=$4; fi
 
 # get directory name without path:
 currentDirNoPath=$(basename $(pwd))
-# build target file name from that; randomize it a bit to avoid file clobber in case of re-runs of this script:
-rndSTRfileNamePart=$(cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c 4)
-outputFileName="$currentDirNoPath"_palettesColumnsOklabSortGrid_"$rndSTRfileNamePart".hexplt
+# build target file name from that; add script parameter details to it:
+outputFileName="$currentDirNoPath"_palettesColumnsOklabSortGrid_n"$hueDivisionRangesCount"_f"$hueDivisionRangeSRGBcompare".hexplt
 
 # delete any temp files from any previous interrupted or otherwise erred run:
 rm -rf _palettesColumnsGrid_temp*
@@ -127,6 +129,10 @@ datamash transpose --field-separator=' ' < temp1.txt > ../$outputFileName
 # cd to final dir and reformat final file to include layout comment:
 cd ..
 reformatHexPalette.sh -i $outputFileName -c"$columns"
+# place a comment on the second row of the result giving the script call with parameters that made it; via echo syntax for script name without path, array of parameters to script; construct variable with those values:
+appendStr="${0##*/} $@"
+# use that variable to append to 2nd line, in place:
+sed -i "2 s/\(.*\)/\1  built with command: $appendStr/" $outputFileName
 
 # move it into its own final subfolder (creating it if necessary), to avoid a problem of re-using it should this script be run again:
 if [ ! -d _palettesColumnsOklabSortGrids ]; then mkdir _palettesColumnsOklabSortGrids; fi
