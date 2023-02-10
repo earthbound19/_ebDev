@@ -47,8 +47,8 @@ breakMinutes=7
 
 
 # WORK / BREAK LOOP
-# At start of loop, flash blink device magenta and cyan 5 times, then 4 random colors:
-blink1-tool --playpattern '5,#ff00ff,0.4,0,#00ffff,0.4,0';
+# At start of loop, flash blink device magenta-magenta-rose and cyan 5 times, then 4 random colors:
+blink1-tool --playpattern '5,#ff0596,0.4,0,#01edfd,0.4,0';
 blink1-tool --random=4 -l 1 -l 2 -q;
 # do work/break loop / echoes / blinking lights:
 while :
