@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Deletes (`rm`) all files of type `$1` in range `$2` to `$3` (N1 to N2), in the current directory. Prompts to type a displayed password to confirm you wish to do so. Sorts by default of `find` command.
+# Deletes (`rm`) all files of type `$1` in number range `$2` to `$3` (N1 to N2), in the current directory. Prompts to type a displayed password to confirm you wish to do so. Sorts by default of `find` command.
 
 # USAGE
 # Run with these parameters:
