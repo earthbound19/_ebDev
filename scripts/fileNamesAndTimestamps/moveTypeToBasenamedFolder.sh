@@ -1,5 +1,5 @@
 # DESCRIPTION
-# For all files of a given type (parameter $1) in the current directory (and optionally all subdirectories), moves them into a new subdirectory (in the immediate folder) named after the base file names. Creates that subfolder only if it does not already exist, and moves files to them only if they do not already exist. SEE ALSO `moveToTypeFolder.sh`.
+# For all files of a given type (parameter $1) in the current directory (and optionally all subdirectories), moves them into a new subdirectory (in the immediate folder) named after the base file name, an underscore, and the file extension. Creates such subfolders only if they do not already exist, and moves files to them only if they do not already exist (will not clobber pre-existing files). SEE ALSO `moveToTypeFolder.sh`.
 
 # USAGE
 # Run with these parameters:
@@ -7,7 +7,7 @@
 # - $2 OPTIONAL. Any string (for example 'EKTHELPOI'), which will cause the script to operate also on subfolders which contain type $1.
 # Example that will sort all files with the extension .hexplt into new subfolders named after the files:
 #    moveTypeToBasenamedFolder.sh hexplt
-# Example that will sort all files with the extension .hexplt in the current folder and all subfolders into a new directory named /hexplt:
+# Example that will sort all files with the extension .hexplt in the current folder and all subfolders into a new director(ies) named after the files:
 #    moveTypeToBasenamedFolder.sh hexplt EKTHELPOI
 
 
