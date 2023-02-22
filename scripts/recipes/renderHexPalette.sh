@@ -32,7 +32,6 @@
 # CODE
 # TO DO
 # - implement e.g. -tile 8x40 flag depending on desired aspect, etc. (will determine values of $columns and $rows depending on desired aspect)?
-# - UM. WOULDN'T THIS BE A TON FASTER creating a ppm and then upscaling it by nearest neighbor method?! Redo script (or make variant method script) for that?! -- trying that in hexplt2ppm.sh.
 # - Math to determine tile size dynamically for a target total image resolution?
 
 # BEGIN SETUP GLOBAL VARIABLES
@@ -42,12 +41,12 @@ PPMrenderTarget=${paletteFile%.*}.ppm
 PNGrenderTarget=${paletteFile%.*}.png
 if [ -f ./$PNGrenderTarget ]
 then
-	echo Render target $PNGrenderTarget already exists\; SKIPPING render.
+	echo "-SKIPPING Render target $PNGrenderTarget, as it already exists."
 	# exit with error code
 	exit 2
 fi
 # Effectively, else:
-echo Render target $PNGrenderTarget does not exist\; WILL ATTEMPT TO RENDER.
+echo "+RENDERING target $PNGrenderTarget, as it does not exist."
 
 # Search current path for $1; if it exists set hexColorSrcFullPath to just $1 (we don't need the full path). If it doesn't exist in the local path, search the path in palettesRootDir.txt and make decisions based on that result:
 if [ -e ./$1 ]
@@ -164,6 +163,9 @@ if [ ! -f $PPMrenderTarget ]
 then
 	ppmDidNotExistBeforeNow="TRUE"
 	hexplt2ppm.sh $paletteFile $columns $rows
+else
+	echo "WARNING: intended intermediate render file $PPMrenderTarget already exists (renderHexPalette.sh). If you intended to re-render target $PNGrenderTarget, delete or rename the intermediate file and attempt rendering again. Exit."
+	exit 4
 fi
 # convert that ppm to png:
 PNGwidth=$(($tileEdgeLen * $columns))
@@ -179,6 +181,6 @@ if [ "$ppmDidNotExistBeforeNow" ]; then rm $PPMrenderTarget; fi
 #optipng -o7 $PNGrenderTarget
 
 echo ""
-echo DONE--created color palette image is $PNGrenderTarget
+echo "DONE. Created color palette image is $PNGrenderTarget".
 
 # TO DO? : make the following statement optionally true (via parameter), and echo it: "You will also find color swatch images from the palette in the folder $paletteFile.colors."
