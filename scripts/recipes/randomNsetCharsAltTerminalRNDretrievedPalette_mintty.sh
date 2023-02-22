@@ -25,6 +25,6 @@ do
 		echo -ne "\e]11;$BGcolor\a"
 		echo -ne "\e]10;$FGcolor\a"
 		echo -ne "\e]12;$FGcolor\a"
-		randomNsetCharsAlt.sh 8 CHALPUR 1
+		randomNsetCharsAlt.sh 12 CHALPUR 1
 	fi
 done
