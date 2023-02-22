@@ -48,4 +48,4 @@ do
 	digitPad=
 done
 
-echo DONE making copies numbered by next most similar are in the folder $targetDirRNDname. Renamed renders of the palettes have also been copied into that folder.
+echo DONE making copies numbered by next most similar. They are in the folder $targetDirRNDname. Renamed renders of the palettes have also been copied into that folder.
