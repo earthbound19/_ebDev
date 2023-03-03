@@ -1,8 +1,8 @@
 # DESCRIPTION
 # Creates a grid study of augmented colors from palettes such that:
-# There are N colors added between every color in each palette horizontally
-# There are N colors added between every row of augmented palettes.
-# This is done with all .hexplt format palettes in the current directory (other than any with output file names made by this script). Writes the result to a .hexplt file in a grid and with markup declaring number of columns and rows. The result file is named after the containing folder you run the script from. Source palettes may have color codes arranged in any way and include comments; the only requirement is that sRGB hex color codes in the palette are prefixed with a number/hex/pound # symbol and are separated by white space.
+# There are $1 colors added between every color (column) in each palette horizontally
+# There are $2 colors added between every row of augmented palettes vertically
+# This is done by a process that uses all .hexplt format palettes in the current directory (other than any with output file names made by this script). The result is written to a .hexplt file in a grid and with markup declaring number of columns and rows. The result file is named after the containing folder you run the script from, and the columns x rows. Source palettes may have color codes arranged in any way and include comments; the only requirement is that sRGB hex color codes in the palette are prefixed with a number/hex/pound # symbol and are separated by white space.
 
 # DEPENDENCIES
 # `get_color_gradient_OKLAB.js` (and nodeJS and the packages that script requires), `getFullPathToFile.sh`
@@ -14,9 +14,15 @@
 # USAGE
 # - copy palettes you wish to make a multi-augment grid from into their own dedicated operating folder.
 # - from that folder, run this script with these parameters:
-# - $1 how many linearly interpolated colors to insert between each color and between rows in palette files.
+# - $1 how many linearly interpolated colors to insert between each color (column) in palette files.
+# - $1 how many linearly interpolated colors to insert between each row of colors, between the $1-interpolated palette files.
 # For example, to interpolate 5 colors horizontally and vertically over all .hexplt files in the current directory, run:
-#    augmentPalettesGrid.sh 5
+#    augmentPalettesGrid.sh 5 5
+# Or to insert 3 colors horizonatallybetween columns), and 5 colors vertically (between rows):
+#    augmentPalettesGrid.sh 3 5
+# Or to do no vertical interpolation (only use the original colors with no added colors in between), and insert 5 colors horizontally between columns:
+#    augmentPalettesGrid.sh 5 0
+# You could pass 0 for both $1 and $2 to make a grid of all palettes, but then you would just want to use `catHexpltsGrid.sh`, which will do that more straightforwardly (and probably more efficiently).
 # NOTES
 # - you can run this in a directory where you have created palettes from it which have the regex pattern `_augmented_.*_grid` in them, and it will not operate on those files (it will skip them). You can therefore reuse this script in the same directory easily, passing it different parameters each time.
 # - the script `paletteRenamedCopiesByNextMostSimilar.sh` may be useful for getting copies of palettes into a dedicated folder for this purpose (with potentially really interesting and beautiful results).
@@ -34,26 +40,26 @@
 
 
 # CODE
-if [ ! "$1" ]; then printf "\nNo parameter \$1 (how many steps to interpolate between each color in the source palettes and between generated rows) passed to script. Exit."; exit 1; else interpolationStepsOriginalParameter=$1; fi
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (how many steps to interpolate between each column (color) in the source palettes) passed to script. Exit."; exit 1; else columnsInterpolateOrigParam=$1; fi
+if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many steps to interpolate between each row from one source palette to the next) passed to script. Exit."; exit 2; else rowsInterpolateOrigParam=$2; fi
 
 # Because each new interpolation iteration will start with the same color as the end color of the previous interpolation, we're going to remove the tail color of each interpolation (iteration) via the `-l 1` switch. That means $((N - 1)). ALSO, the understood literal intent of interpolation in this documentation is _how many additional colors in between_, which means (start color + inserted colors + end color), which means $((N + 2)). Summing that, it's $((N - 1 + 2)) = $((N + 3)). SO:
-interpolationSteps=$(($interpolationStepsOriginalParameter + 2))
+colsInterpolationSteps=$(($columnsInterpolateOrigParam + 2))
+rowsInterpolationSteps=$(($rowsInterpolateOrigParam + 2))
 # (This process will need to tack that last removed color back on after everything is removed.)
 
 # set local environment variable fullPathToOKLABAugmentationScript:
-scriptName=get_color_gradient_OKLAB.js
-fullPathToOKLABAugmentationScript=$(getFullPathToFile.sh $scriptName)
+fullPathToOKLABAugmentationScript=$(getFullPathToFile.sh get_color_gradient_OKLAB.js)
 # return with error if that's empty:
 if [[ "$fullPathToOKLABAugmentationScript" == "" ]]; then echo "ERROR: could not find script $scriptName in \$PATH. Exit."; exit 2; fi
-
 # echo "Found $scriptName at $fullPathToOKLABAugmentationScript -- will use that."
 
 # get directory name without path:
 currentDirNoPath=$(basename $(pwd))
 # build target file name from that:
-outputFileName="$currentDirNoPath"_augmented_"$interpolationStepsOriginalParameter"_grid.hexplt
+outputFileName="$currentDirNoPath"_augmented_"$columnsInterpolateOrigParam"x"$rowsInterpolateOrigParam"_grid.hexplt
 
-# horrifyingly large bash function; augments all .hexplt files in the current directory; REQUIRES PARAMETER (effectively $1), which is the target file to write all augmented palette lines to:
+# horrifyingly large bash function; augments all .hexplt files in the current directory; REQUIRES TWO PARAMETERS (effectively $1 and $2), which are, respectively, the target file to write all augmented palette lines to, and the number of augmentation steps:
 augment_palettes () {
 	printf "" > $1
 	hexplts=($(find . -maxdepth 1 -type f -name \*.hexplt -printf "%f\n"))
@@ -83,7 +89,7 @@ augment_palettes () {
 			$(node $fullPathToOKLABAugmentationScript \
 			-s $thisElement \
 			-e $nextElement \
-			-n $interpolationSteps \
+			-n $2 \
 			-l 1 \
 			)
 			)
@@ -113,7 +119,7 @@ augment_palettes () {
 rm -rf _augmentPalettes*
 
 # first augmentation pass -- "X"; writes to _augmentPalettesGrid_temp_step1.txt; CALL OF augment_palettes FUNCTION:
-augment_palettes _augmentPalettesGrid_temp1.txt
+augment_palettes _augmentPalettesGrid_temp1.txt $colsInterpolationSteps
 
 # transpose that result to new file:
 datamash transpose --field-separator=' ' < _augmentPalettesGrid_temp1.txt > _augmentPalettesGrid_temp2.txt
@@ -126,7 +132,7 @@ split --additional-suffix='.hexplt' -l 1 _augmentPalettesGrid_temp2.txt ./_augme
 # change to temp dir and augment all those resultant transposed line-split palettes into another big palette;
 cd _augmentPalettesGrid_temp_dir
 # CALL OF augment_palettes FUNCTION:
-augment_palettes _augmentPalettesGrid_temp3.txt
+augment_palettes _augmentPalettesGrid_temp3.txt $rowsInterpolationSteps
 # transpose that to our final result, named after the directory:
 datamash transpose --field-separator=' ' < _augmentPalettesGrid_temp3.txt > ../$outputFileName
 # cd back up and trim trailing whitespace off result palette:
