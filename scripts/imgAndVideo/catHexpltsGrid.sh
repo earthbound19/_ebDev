@@ -1,5 +1,5 @@
 # DESCRIPTION
-# concatenates all .hexplt files in the current directory into one hexplt named after the directory, and reformats it to include only one comment if any. May be useful after a run of `paletteRenamedCopiesByNextMostSimilar.sh`, as the files created by that and concatenated to a new palette by this will give a palette that visually lays out next most similar colors (from the palettes it was made of).
+# concatenates all .hexplt files in the current directory into one hexplt named after the directory, and reformats the result to include only one comment, if any. May be useful after a run of `paletteRenamedCopiesByNextMostSimilar.sh`, as the files created by that and concatenated to a new palette by this will give a palette that visually lays out next most similar colors (from the palettes it was made of).
 
 # DEPENDENCIES
 # `reformatHexPalette.sh`
