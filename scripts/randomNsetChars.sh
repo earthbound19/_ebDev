@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Returns approximately N ($1) characters randomly chosen from hackable string CHARSET. If parameter 1 not provided, a default number is used. DEPRECATED; use randomNsetChars.py instead: it is far faster, can write to files, and produces unique subsets.
+# Returns approximately N ($1) characters randomly chosen from hackable string CHARSET. If parameter 1 not provided, a default number is used. DEPRECATED; use randomNsetChars.py instead: it is far faster, and can write to files.
 
 # DEPENDENCIES
 # A 'Nixy environment with seq, shuf, and printf, printf and your file system able to handle the block characters or whatever else you might hack into CHARSET.
