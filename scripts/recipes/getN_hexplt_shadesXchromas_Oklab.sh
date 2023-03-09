@@ -45,8 +45,9 @@ if [ "$6" ] && [ "$6" != "NULL" ]; then extraParameters=$7; fi
 		# echo nColorsRemoved $nColorsRemoved
 # END MAIN SETUP AND CHECKS
 
-# create array of RGB hex color codes from source palette:
-sourceHexpltFileColorsArray=( $(<$sourceHexpltFile) )
+# create array of sRGB hex color codes colors from file by extracting all matches of a pattern of six hex digits preceded by a #:
+sourceHexpltFileColorsArray=( $(grep -i -o '#[0-9a-f]\{6\}' $sourceHexpltFile) )
+
 # Before we loop, create a palette counting variable:
 counter=0
 # -- which, with a padding size, we will number the created palettes so that image viewers / file systems will present them in the sort order of the colors in the original palette:
@@ -59,12 +60,13 @@ do
 	colorNoHashSign=$(echo ${color:1})
 	destFileName="$paddedCounterString"__x"$colorNoHashSign"_"$nShades"tints_"$nShades"shades_times"$nChroma"chromas.hexplt
 	printf "" > $destFileName
+
 	# write tints to palette files, whiter first; also doing nShades + 1 else we get fewer than wanted; we want tints not including orig. color:
-	node $fullPathToCuloriScript -s ffffff -e $colorNoHashSign -n $(($nShades +1)) $tintsRemoveSwitch $extraParameters >> $destFileName
+	node $fullPathToCuloriScript -s ffffff -e $colorNoHashSign -n $(($nShades +1)) "$tintsRemoveSwitch" "$extraParameters" >> $destFileName
 	# write lower luminance toward black to palette files, luminance nearer original color first;
 	# removing first color here, even though user switch doesn't say so, else the original color will be duplicated;
 	# same addition applies here:
-	node $fullPathToCuloriScript -s $colorNoHashSign -e $colorNoHashSign -n $(($nShades + 1)) -b 0 -f 1 $shadesRemoveSwitch $extraParameters >> $destFileName
+	node $fullPathToCuloriScript -s $colorNoHashSign -e $colorNoHashSign -n $(($nShades + 1)) -b 0 -f 1 "$shadesRemoveSwitch" "$extraParameters" >> $destFileName
 	# META! :
 	# Read that result file into an array:
 	chromaSourceColorsArray=($(<$destFileName))
@@ -75,9 +77,9 @@ do
 		chromaSourceNoHashSign=$(echo ${chromaSource:1})
 		# UNCOMMENT ONLY ONE of the following options; if you use the first, you must -1 in the later calc. renderColumns=$nChroma to renderColumns=$(($nChroma - 1)) :
 		# OPTION THAT REMOVES LAST GRAY:
-		node $fullPathToCuloriScript -s $chromaSourceNoHashSign -e $chromaSourceNoHashSign -n $nChroma -c 0 -l 1 $extraParameters >> $destFileName
+		node $fullPathToCuloriScript -s $chromaSourceNoHashSign -e $chromaSourceNoHashSign -n $nChroma -c 0 -l 1 "$extraParameters" >> $destFileName
 		# OPTION THAT KEEPS LAST GRAY:
-		# node $fullPathToCuloriScript -s $chromaSourceNoHashSign -e $chromaSourceNoHashSign -n $nChroma -c 0 $extraParameters >> $destFileName
+		# node $fullPathToCuloriScript -s $chromaSourceNoHashSign -e $chromaSourceNoHashSign -n $nChroma -c 0 "$extraParameters" >> $destFileName
 	done
 done
 
