@@ -6,32 +6,49 @@
 
 # USAGE
 # Alter the hard-coded x offset and y offset variables (`xSampleOffset` and `ySampleOffset` at the start of the script (right after the CODE comment) per your want. (See "$4..X percent offset to sample from left edge of cells.." and "$5..Y percent offset.." parameters in `get_color_sample_grids_sRGB.sh` (which in turn map to the Python script that calls).
-# Then, run this script without any parameters:
+# Then, run this script with these parameters:
+# - $1 OPTIONAL. The number of columns and rows you wish to sample, as a string parameter surrounded by double or single quote marks, in the format 'columns <space> rows', e.g. '4 3'. If not provided, it will prompt you for such a string for every image. If provided, it will use this same columns and rows string for every image. If you want to use $2 and/or $3 but not this, pass the word 'NULL' for this.
+# - $2 OPTIONAL. X percent to offset sample from cell grid edge (from the left), as decimal. e.g. 50 percent would be 0.5. If omitted, a default is used.
+# - $3 OPTIONAL. Y percent to offset sample from cell grid edge (from the top), as decimal. e.g. 25 percent would be 0.25. If omitted, a default is used.
+# Example that will sample 10 columns and 8 rows for every image:
+#    get_color_sample_grids_sRGB_assistant.sh '10 8'
+# Example that will prompt you for the columns and rows per image:
 #    get_color_sample_grids_sRGB_assistant.sh
-# -- and follow the prompts.
+# Example that will prompt you for the columns and rows per image and set the X sample offset to 72 percent and the Y sample offset to 50 percent:
+#    get_color_sample_grids_sRGB_assistant.sh NULL 0.72 0.5
+# NOTE
 
 
 # CODE
-xSampleOffset=0.363
-ySampleOffset=0.363
+# set a global var if $1 exists; otherwise it will not be set:
+if [ "$1" ]; then paramColsXrowsSTR=$1; fi
+if [ "$2" ]; then xSampleOffset=$2; else xSampleOffset=0.363; fi
+if [ "$3" ]; then ySampleOffset=$3; else ySampleOffset=0.363; fi
 
 allImageFileNames=( $(printAllIMGfileNames.sh) )
 for imageFileName in ${allImageFileNames[@]}
 do
-	start $imageFileName
-	echo Image file $imageFileName opened.
-	printf "Close the image, and enter the grid dimensions of it (for color sampling). If there is a problem with the image, type something like 'e' to sort it into a folder for editing (sample operations won't happen in any folder that starts with a non-numeral -- such as a letter). Type in the format 'columns <space> rows', e.g.\n4 3\n"
-	read -p "n n: " colsXrowsSTR
-	# read that into array (space is default delimiter) :
-	arr=($(echo $colsXrowsSTR))
-	cols=${arr[0]}		# element 1
-	rows=${arr[1]}		# element 2
-	sortDir="$cols"x"$rows"
-	if [ ! -d $sortDir ]
+	# check for existence of global var and alter behavior depending:
+	if [ ! "$paramColsXrowsSTR" ] || [ "$paramColsXrowsSTR" == 'NULL' ]
 	then
-		mkdir $sortDir
+		start $imageFileName
+		echo Image file $imageFileName opened.
+		printf "Close the image, and enter the grid dimensions of it (for color sampling). If there is a problem with the image, type something like 'e' to sort it into a folder for editing (sample operations won't happen in any folder that starts with a non-numeral -- such as a letter). Type in the format 'columns <space> rows', e.g.\n4 3\n"
+		read -p "n n: " colsXrowsSTR
+	else
+		# even though this is redudant to set this repeatedly in this case, as it won't change intra-run of this script:
+		colsXrowsSTR="$paramColsXrowsSTR"
 	fi
-	mv $imageFileName ./$sortDir/
+		# read that into array (space is default delimiter) :
+		arr=($(echo $colsXrowsSTR))
+		cols=${arr[0]}		# element 1
+		rows=${arr[1]}		# element 2
+		sortDir="$cols"x"$rows"
+		if [ ! -d $sortDir ]
+		then
+			mkdir $sortDir
+		fi
+		mv $imageFileName ./$sortDir/
 done
 
 directories=( $(find . -type d -printf "%P\n") )
