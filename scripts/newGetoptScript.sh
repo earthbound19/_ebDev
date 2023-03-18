@@ -45,7 +45,7 @@ if [ ${#@} == 0 ]; then print_halp; exit 1; fi
 # Because:
 # - no colon after a parameter means no parameter is taken for it (it's functionally a flag)
 # - one colon means it takes one required parameter
-# - two colons means it can take on optional parameter.
+# - two colons means it can take one optional parameter.
 # Also, optional parameters must have no space between the option letter and parameter; e.g. if an optional parameter `-a` is used than it must be passed as `-aOption`!
 # Also, see MORE NOTES in the case switch below.
 # Also, from a script I saw it can be useful to get the name of the script:
