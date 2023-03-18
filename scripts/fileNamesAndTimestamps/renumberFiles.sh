@@ -12,6 +12,8 @@
 # - -s --start-number OPTIONAL. Start file renumbering at this number. Must be rammed right on to the s with no trailing space, e.g. a start number of 42 would be expressed as -s42. Must be an integer. If omitted defaults to 0 (zero).
 # - -o --oldest-file-first OPTIONAL. Sort by oldest file first before renumbering. If omitted, uses the `find` command's default sort (which seems to do well for maintaining the ordering of numbered files in renumbering).
 # - -d digits-to-pad-to OPTIONAL. Pad to this many digits, e.g. if 3 and counting starts at 1 then files will be named 001, 002, 003 etc. If omitted, defaults to however many leading zeros are required to for all file names to have as many digits as the count of type -e --extension in the directory.
+# - -p --prefix-string OPTIONAL. String to insert before number in filename.
+# - -x --postfix-string OPTIONAL. String to insert after number in filename. This will end up at the end of the basename and before the file extension.
 # EXAMPLES
 # Renumber all png format files in the current directory:
 #    renumberFiles.sh -e png
@@ -25,6 +27,12 @@
 #    renumberFiles.sh -e png -r -o -s50
 # Do the same thing but not over subfolders, padding leading zeros in file names to 7 digits:
 #    renumberFiles.sh -e png -o -s50 -d7
+# Renumber all hexplt format files in the current directory, inserting the string 'rnd_select_' before the number and '_from_final' after the number (and before the file extension), and starting with number 1:
+#    renumberFiles.sh -e hexplt --prefix-string='rnd_sel_' --postfix-string='_from_final' -s 1
+# -- which will result in file names like:
+#    rnd_sel_00_from_final.hexplt
+#    rnd_sel_02_from_final.hexplt
+#    rnd_sel_03_from_final.hexplt
 # NOTES:
 # - this will choke on file names with console-unfriendly characters e.g. spaces, parenthesis and probably others.
 
@@ -42,7 +50,7 @@ function print_halp {
 if [ ${#@} == 0 ]; then print_halp; exit 0; fi
 
 PROGNAME=$(basename $0)
-OPTS=`getopt -o he:rs::od:: --long help,extension:,recurse,start-number::oldest-file-first,digits-to-pad-to:: -n $PROGNAME -- "$@"`
+OPTS=`getopt -o he:rs::od::p::x:: --long help,extension:,recurse,start-number::,oldest-file-first,digits-to-pad-to::,prefix-string::,postfix-string:: -n $PROGNAME -- "$@"`
 
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 
@@ -59,6 +67,8 @@ while true; do
 	# the next two variables will be checked whether they even exist (are set) to control logic:
     -o | --oldest-file-first ) sort_by_oldest_first=true; shift ;;
     -d | --digits-to-pad-to ) digitsToPadTo=$2; shift; shift ;;
+	-p | --prefix-string ) prefixString=$2; shift; shift ;;
+	-x | --postfix-string ) postfixString=$2; shift; shift ;;
    -- ) shift; break ;;
     * ) break ;;
   esac
@@ -131,7 +141,7 @@ do
 	do
 		countString=$(printf "%0""$digitsToPadTo""d\n" $fileRenumberingCounter)
 		fileRenumberingCounter=$((fileRenumberingCounter + 1))
-		renameTarget=$countString.$fileTypeToRenumber
+		renameTarget="$prefixString""$countString""$postfixString".$fileTypeToRenumber
 		# conditional feedback print of every 20th renumbering:
 		if [[ $(($fileRenumberingCounter % 20)) == 0 ]]
 		then
