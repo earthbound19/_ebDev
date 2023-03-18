@@ -26,7 +26,7 @@ eval set -- "$OPTS"
 # --- END PARSING STUFF ---
 
 # Global function takes number of specified columns and calculates number of rows to fit all colors: ASSUMES AND OPERATES ON GLOBAL VARIABLES:
-setRowsToFitColors() {
+calculateRowsToFitColors() {
 	rows=$(($howManyColors / $columns))
 	# check if there's a remainder from the division (if columns * rows less than howManyColors); if so, add another row:
 	if [[ $(($columns * $rows)) < $howManyColors ]]
@@ -62,54 +62,29 @@ howManyColors=${#colorsArray[@]}
 if [ "$columnForEveryColor" ]; then columns=$howManyColors; fi
 
 # Function call:
-setRowsToFitColors
+calculateRowsToFitColors
 # END PARAMETER PARSING AND GLOBALS SETUP
 
 # MAIN WORK
 # info print if no flag saying print to standard out (if writing to original .hexplt file) :
-if [ ! $printToStdout ]; then echo "Reformatting palette in memory . . ."; fi
+if [ ! $printToStdout ]; then echo "Reformatting palette . . ."; fi
 
-colorPrintCounter=0
-rowsArray=()
-OIFS="$IFS"
-IFS=$'\n'
-for r in $(seq 1 $rows)
+# create layoutComment variable only if $noLayoutComment flag was not set (I know, I set up the logic with a confusing double negative) :
+if [ ! "$noLayoutComment" ];then layoutComment="  columns: $columns rows: $rows"; fi
+
+# build '- - -' - style parameter, $pasteColumnDashes, for paste command:
+for i in $(seq $columns)
 do
-	rowSTR=""
-	for q in $(seq 1 $columns)
-	do
-		rowSTR="$rowSTR ${colorsArray[$colorPrintCounter]}"
-		colorPrintCounter=$((colorPrintCounter + 1))
-	done
-	
-	# if we are at number of columns for color count; we are at the end of the first row;
-	# if that is the case and there is no flag to not write a columns and rows layout comment, write one:
-	if [[ $colorPrintCounter == $columns ]] && [[ ! "$noLayoutComment" ]]
-	then
-		rowSTR="$rowSTR  columns: $columns rows: $rows"
-	fi
-	# trim resultant leading space off string:
-	rowSTR="${rowSTR:1}"
-	rowsArray+=($rowSTR)
+	pasteColumnDashes="$pasteColumnDashes -"
 done
 
-# info print if no flag saying print to standard out (if writing to original .hexplt file) :
+# info print if no flag saying print to standard out (if writing to original .hexplt file) ; note that in both these cases $layoutComment will only print anything if that variable (and any value for it) was set at all; otherwise it will not print any layout comment:
 if [ ! $printToStdout ]
 then
-	echo "Writing reformatted .hexplt file . . ."
-	# wipe source hexplt to prep for rewriting to it:
-	printf "" > $srcHexplt
-	# write reformatted contents back to it:
-	# either of these print options works; uncomment one (I'm guessing the first is faster) :
-	printf "${rowsArray[*]}" > $srcHexplt
-	printf "\n"
-	# printf '%s\n' "${rowsArray[@]}" > $srcHexplts
+	printf '%s\n' "${colorsArray[@]}" | paste $pasteColumnDashes | sed "1s/\(.*\)/\1$layoutComment/" > $srcHexplt
 else
-	printf "${rowsArray[*]}"
-	printf "\n"
+	printf '%s\n' "${colorsArray[@]}" | paste $pasteColumnDashes | sed "1s/\(.*\)/\1$layoutComment/"
 fi
-
-IFS="$OIFS"
 
 # info print if no flag saying print to standard out (if writing to original .hexplt file) :
 if [ ! $printToStdout ]
