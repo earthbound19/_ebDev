@@ -2,7 +2,7 @@
 # Renders a phrase to an image using every font file found in the current directory, with a caption that gives the font name. Useful for logo/font prototyping. Caption, point size, and image width are customizable via parameters; see USAGE. The render png is named after the source font file. Will not render to target file name that already exists.
 
 # DEPENDENCIES
-# ImageMagick and a directory full of `.ttf` and/or `.otf` fonts you wish to render a phrase from.
+# ImageMagick, a directory full of `.ttf` and/or `.otf` fonts you wish to render a phrase from, and ftunStr.sh
 
 # USAGE
 # Run with these parameters:
@@ -24,10 +24,10 @@
 # CODE
 # modifies global string:
 set_rndSTR () {
-	renderSTR=$(cat /dev/urandom | tr -dc "a-zA-Z0-9'@=~!#$%^&()+[{]};. ,-" | fold -w 20 | head -n 1)
+	rndSTR=$(cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c 7)
 }
 
-if [ "$1" ] && [ "$1" != "RANDOM" ]; then renderSTR=$1; else useRNDstrEachRender="True"; set_rndSTR; fi
+if [ "$1" ] && [ "$1" != "RANDOM" ]; then renderSTR="$1"; else useRNDstrEachRender="True"; set_rndSTR; fi
 if [ "$2" ]; then imgWidth=$2; else imgWidth=1240; fi
 if [ "$3" ];
 then
@@ -39,10 +39,13 @@ fi
 # CODE
 allFontsFilesHere=$(find . -maxdepth 1 -iname \*.ttf -printf "%P\n" -o -iname \*.otf -printf "%P\n" -o -iname \*.FON -printf "%P\n")
 
+ftunRenderSTR=$(ftunStr.sh "$renderSTR")
+
 for fontFileName in ${allFontsFilesHere[@]}
 do
 	fontFileNameNoExt=${fontFileName%.*}
-	renderTarget=$fontFileNameNoExt.png
+	set_rndSTR
+	renderTarget="$fontFileNameNoExt"_"$ftunRenderSTR"__"$rndSTR".png
 	echo -~-~
 	if [ ! -e $renderTarget ]
 	then
