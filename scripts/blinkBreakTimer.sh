@@ -7,7 +7,7 @@
 # - Repeats this cycle indefinitely.
 
 # DEPENDENCIES
-# blink1-tool, and optionally homebrew and homebrew brightness package (Mac)
+# blink1-tool, and on Windows optionally mintty and printContentsOfRandomlyChosenPalette.ms, and optionally on Mac homebrew and homebrew brightness packages
 
 # WARNING
 # If you terminate this script in an interval of screen darkness, you will be left in darkness. DARKNESS, Batman. DARKNESS.
@@ -33,17 +33,19 @@ workMinutes=35
   # How many times do we need to change the color to reach workMinutesInMS duration if
   # we change colors every workBlinkColorChangeIntervalMS? The following figures that out:
   workBlinkChangeColorTimes=`echo "$workMinutesInMS / $workBlinkColorChangeIntervalMS" | bc`
-  workBlinkColorChangeMilliseconds=14000   # 14 seconds
+  workBlinkColorTransitionMilliseconds=14000   # 14 seconds
 breakMinutes=7
   breakMinutesInMS=$((breakMinutes * 60000))
-  breakBlinkColorChangeIntervalMS=1400
+  # breakMinutesInEveryTwoSeconds is used by commands to change terminal color:
+  breakMinutesInEveryTwoSeconds=$((breakMinutes * 30))
+  breakBlinkColorChangeIntervalMS=550
   # How many times do we need to change the color to reach breakMinutes duration if
   # we change colors every breakBlinkColorChangeIntervalMS? The following figures that out:
   breakBlinkChangeColorTimes=`echo "$breakMinutesInMS / $breakBlinkColorChangeIntervalMS" | bc`
       # The following statements are for testing; comment them out in producton:
       # echo "workBlinkChangeColorTimes value is $workBlinkChangeColorTimes over workMinutesInMS $workMinutesInMS"
       # echo "breakBlinkChangeColorTimes value is $breakBlinkChangeColorTimes over breakMinutesInMS $breakMinutesInMS"
-  breakBlinkColorChangeMilliseconds=1400
+  breakBlinkColorChangeMilliseconds=80
 
 
 # WORK / BREAK LOOP
@@ -60,21 +62,44 @@ do    # eternal loop
 ---- DO THE THINGS ----"
     # blink color prompt for work run;
     # blink1 device randomly change color every M seconds, randomly change both lights, quiet mode;
-    # via semicolon is non-waiting command; no idea whether no gamma correction (-g) effects anything:
-  blink1-tool -g -t $workBlinkColorChangeIntervalMS --random=$workBlinkChangeColorTimes --millis=$workBlinkColorChangeMilliseconds -l 1 -l 2 -q;
+  blink1-tool -g -t $workBlinkColorChangeIntervalMS --random=$workBlinkChangeColorTimes --millis=$workBlinkColorTransitionMilliseconds -l 1 -l 2 -q
         # UNCOMMENT the next line only if you don't have a blink device:
         # sleep $(echo "60 * $workMinutes" | bc)    # workMinutes times 60 seconds per minute
   echo "
 ---- TAKE A BREAK ----"
+    # blink color prompt for break; similar to that for work run (see comments above):
+    # ALSO calling this via mintty with these switches; re https://mintty.github.io/mintty.1.html :
+	# -w hide hides the window
+	# -D flag which does something (what I don't know) to make the command run in a subshell and not wait for it to return;
+	# -e switch means "the rest of this is the command for the subshell"; so that I can run the terminal recolor commands after it immediately without waiting:
+	# `-h never` means don't "hold" the window for the terminal after the process completes, or in other words, terminate the terminal after the command. Avoids unusued terminal process clutter.
+  mintty -h never -D -e blink1-tool -t $breakBlinkColorChangeIntervalMS --random=$breakBlinkChangeColorTimes --millis=$breakBlinkColorChangeMilliseconds -l 1 -l 2 -q
+  # loop to change the terminal colors every 2 seconds; if printContentsOfRandomlyChosenPalette.sh fails or doesn't exist, this will just be harmless ineffective busy work:
+  counter=0
+  while [ $counter -le $breakMinutesInEveryTwoSeconds ]
+  do
+    randomColors=( $(printContentsOfRandomlyChosenPalette.sh | shuf) )
+	arrayLength=${#randomColors[@]}
+	if [ $arrayLength -ge 2 ]
+	then
+		# 1st color of that shuffle will be background, 2nd will be foreground and cursor; only use them if there are at least 2 colors in the palette though:
+		BGcolor=${randomColors[0]}
+		FGcolor=${randomColors[1]}
+		# cursorColor=${randomColors[2]}
+		# set colors from those; 11 is bg, 10 is fg, 12 is cursor:
+		echo -ne "\e]11;$BGcolor\a"
+		echo -ne "\e]10;$FGcolor\a"
+		echo -ne "\e]12;$FGcolor\a"
+		counter=$((counter + 1))
+	fi
+	sleep 2
+  done
     # OPTIONALLY fade computer monitor in and out of black 3 times to prompt to take a break:
   # for x in $(seq 3)
   # do
   #   brightness 0 2> /dev/null; sleep 0.8; brightness 1 2> /dev/null; sleep 0.8;
   # done
-    # blink color prompt for break; similar to that for work run (see comments above):
-  blink1-tool -t $breakBlinkColorChangeIntervalMS --random=$breakBlinkChangeColorTimes --millis=$breakBlinkColorChangeMilliseconds -l 1 -l 2 -q;
-        # UNCOMMENT the next line only if you don't have a blink device:
-        # sleep $(echo "60 * $breakMinutes" | bc)    # breakMinutes times 60 seconds per minute
+
 done
 
 # DEVELOPMENT CODE
