@@ -17,6 +17,9 @@
 # Example that will prompt you for the columns and rows per image and set the X sample offset to 72 percent and the Y sample offset to 50 percent:
 #    get_color_sample_grids_sRGB_assistant.sh NULL 0.72 0.5
 # NOTE
+# To use this from another script and make use of the last resultant sample grid subfolder name, call it with `source`:
+#    source get_color_sample_grids_sRGB_assistant.sh '10 8'
+# -- and then from the calling script use the variable $sampleDirectoryName, which will be set in your environment if you call this script and return from it that way. However, this may only be consistent and useful if you use parameter $1 of this script to specify the sample grid size (as otherwise it could change if you provide different grid size parameters per image when prompted).
 
 
 # CODE
@@ -52,20 +55,20 @@ do
 done
 
 directories=( $(find . -type d -printf "%P\n") )
-for directory in ${directories[@]}
+for sampleDirectoryName in ${directories[@]}
 do
 	# Extract columns and rows from directory names! :
 	echo --
-	echo Directory name is $directory.
-	columns=$(sed 's/\([0-9]\{1,\}\).*/\1/g' <<< $directory)
+	echo Directory name is $sampleDirectoryName.
+	columns=$(sed 's/\([0-9]\{1,\}\).*/\1/g' <<< $sampleDirectoryName)
 	echo Number of columns from directory name is $columns.
-	rows=$(sed 's/[0-9]\{1,\}[^0-9]\{1,\}\([0-9]\{1,\}\)/\1/g' <<< $directory)
+	rows=$(sed 's/[0-9]\{1,\}[^0-9]\{1,\}\([0-9]\{1,\}\)/\1/g' <<< $sampleDirectoryName)
 	echo Number of rows from directory name is $rows.
 	# USE THAT INFO to get color samples! :
 	# save currend directory to directory stack but suppress directory print (redirect to /dev/null) :
 	pushd . 1>/dev/null
 	# change to that directory:
-	cd $directory
+	cd $sampleDirectoryName
 	# command that will get color samples for every image in that (this) directory:
 	get_color_sample_grids_sRGB.sh ALL $columns $rows $xSampleOffset $ySampleOffset
 	# OPTIONAL but hard coded render of resultant palettes; comment out if you don't want to do that from this script:
