@@ -9,7 +9,7 @@
 #    python /path/to_this_script/paletteCompareCIECAM02.py FD613A_F9C956_BAB25B_3D9676_1F463E.hexplt FE6737_F8D845_9DC17E_489B73_375557.hexplt
 # NOTES
 # - As the printed number is a dissimilarity ranking, a lower float means the palettes are more similar. Zero means they are identical and one means they are opposite.
-# - You may want to use allRGBhexColorSortInOkLab.sh (preferred at this writing as it is much faster) or allRGBhexColorSortIn2CIECAM02.sh to sort all colors in all palettes in the directory you work in (with any .hexplt format color palettes) before running this script. The similarity ranking produced by this script will probably be meaningless without that.
+# - You may want to use allRGBhexColorSortInOkLab.sh (preferred at this writing as it is much faster) or allRGBhexColorSortIn2CIECAM02.sh to sort all colors in all palettes in the directory you work in (with any .hexplt format color palettes) _in the same way_ (for example starting sort on the same arbitrary color, for example black) before running this script. The similarity ranking produced by this script will probably be meaningless without that.
 # - The similarity ranking between two palettes is obtained by comparison of color 1 in palette one to color 1 in palette 2 (which produces a _dissimilarity_ ranking float between 0 and 1, where 0 would mean the colors are identical), then color 2 in palette 1 to color 2 in palette 2, and so on. The sum of these rankings is then divided by the number of colors in each palette.
 
 
