@@ -10,7 +10,7 @@
 # NOTE
 # To use this from another script and make use of the subfolder name, call it with `source`:
 #    source copyIncrementedBytes.sh A_Screed_Into_the_Void.txt
-# -- and then use the $copyIncrementedBytesSubfolderName, which will be set in your environment if you call this script and return from it that way.
+# -- and then from the calling script, use the $copyIncrementedBytesSubfolderName variable set by this script, which will be set in your environment if you call this script and return from it that way.
 
 # KEYWORDS
 # print, copy, byte, data bending, data bent, animation, type, increment
