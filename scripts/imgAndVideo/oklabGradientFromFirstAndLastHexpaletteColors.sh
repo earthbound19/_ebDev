@@ -9,7 +9,7 @@
 # - $1 REQUIRED. Input .hexplt format file name
 # - $2 REQUIRED. How many colors to interpolate between the first and last color in that .hexplt file.
 # For example, to print a gradient of 7 colors interpolated between the first and last colors of the file 2ag7_palette.hexplt, run:
-#    oklabGradientFromFirstAndLastHexpaletteColor.sh 2ag7_palette.hexplt 5
+#    oklabGradientFromFirstAndLastHexpaletteColors.sh 2ag7_palette.hexplt 5
 # NOTE
 # The number of colors interpolated includes the first and last color. Asking for 5 colors will give you the start color, three colors between it and the end color, and the end color: start + 3 + end = 5.
 
