@@ -8,7 +8,7 @@
 # Hack the global value right after the CODE comment per your want. Then run the script:
 #    reduceSimilarPalettesAssistant.sh
 # NOTES
-# - Search for comments that read UNCOMMENT and OPTINOAL and examine them and follow their instructions, if you wish.
+# - Search for comments that read UNCOMMENT and OPTIONAL and examine them and follow their instructions, if you wish.
 # - Also search for an OPTIONS comment to see alternate steps at that point. The grouping option is the hard-coded default.
 # - Before working, this checks for the existence of similar_palettes_deleted.txt. If that file does not exist, work continues. If it does exist, work stops. If it does exist, work is skipped with a print notification of that fact. This allows breaking and resuming run of this script.
 # - Via pruneByUnmatchedExtension.sh, this script sorts any resultant orphaned .hexplt files (for which matching png palettes were deleted) into a folder for review to delete.
@@ -48,7 +48,7 @@ do
 			groupPalettesDifferentBelowThreshold.sh
 		# move any leftover .hexplt (no matched .png file -- matching png deleted) into a folder for review for deletion, via this script; not necessary if you use groupPalettesDifferentBelowThreshold.sh:
 		pruneByUnmatchedExtension.sh hexplt png
-		printf "Similar palettes which were in this directory below difference threshold 0.14 were either moved or deleted (depending on which option you have uncommented in the code).\nOrphan .hexplt files which have no matching png were sorted into a subfolder for review to delete.\n" > similar_palettes_deleted.txt
+		printf "Similar palettes which were in this directory below difference threshold $deletePalettesBelowDifferenceThreshold were either moved or deleted (depending on which option you have uncommented in the code).\nOrphan .hexplt files which have no matching png were sorted into a subfolder for review to delete.\n" > similar_palettes_deleted.txt
 	else
 		printf "\nNo hexplt file found in directory OR log file similar_palettes_deleted.txt was found; skipping directory."
 	fi
