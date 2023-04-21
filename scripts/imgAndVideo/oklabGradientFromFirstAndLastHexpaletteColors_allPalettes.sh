@@ -21,7 +21,7 @@
 if [ "$1" ]; then gradientColorsN=$1; else printf "\nNo parameter \$1 (the number of colors in the intended gradient of each modified .hexplt file) passed to script. Exit."; exit 1; fi
 
 # if $2 passed and equals SYMBCOZ, bypass check. Otherwise do check.
-if [ "$1" != "SYMBCOZ" ]
+if [ "$2" != "SYMBCOZ" ]
 then
 	echo ''
 	echo 'WARNING: this script will overwrite every .hexplt format file'
