@@ -1,8 +1,8 @@
 # DESCRIPTION
-# Lists pairs of palettes that are visually similar to each other below a threshold, $1. Operates on a file created by allPaletteCompareCIECAM02.sh, which must be run before this, and creates a list of all image pairs in a directory ranked by dissimilarity from each other. This script filters results from that _below_ float parameter $1. See USAGE for notes on similarity rank float.
+# Lists pairs of palettes that are visually similar to each other below a threshold, $1. Operates on a file created by allPalettesCompareCIECAM02.sh, which must be run before this, and creates a list of all image pairs in a directory ranked by dissimilarity from each other. This script filters results from that _below_ float parameter $1. See USAGE for notes on similarity rank float.
 
 # USAGE
-# First, run allPaletteCompareCIECAM02.sh as instructed in its comments. This is necessary to create the file paletteDifferenceRankings.txt, which this script relies on. Then, run with one parameter:
+# First, run allPalettesCompareCIECAM02.sh as instructed in its comments. This is necessary to create the file paletteDifferenceRankings.txt, which this script relies on. Then, run with one parameter:
 # - $1 A float value between 0 and 1. Image pairs that have a comparison value _below_ that float will be written to a new file: paletteDifferencesBelowThreshold.txt
 # Example run that will list every palette pair where the difference value is _below_ 0.065:
 #    listPaletteDifferencesBelowThreshold.sh 0.065
