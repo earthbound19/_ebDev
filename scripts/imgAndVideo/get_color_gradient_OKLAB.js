@@ -20,7 +20,7 @@ const { program } = require('commander');
 program
   .requiredOption('-s, --start [RGB hex color code]', '\n\tStart color for gradient. Expected format is RGB hex \(without any pound or 0x hex symbols at the start\), but any other format which the culori.interpolate function can accept may work.\n')
   .requiredOption('-e, --end [RGB hex color code]', '\n\tEnd color for gradient. Expected format is RGB hex \(without any pound or 0x hex symbols at the start\), but any other format which the culori.interpolate function can accept may work.\n')
-  .requiredOption('-n, --number [natural number > 2]', '\n\tNumber of colors in gradient.\n')
+  .requiredOption('-n, --number [natural number > 2]', '\n\tNumber of colors in gradient. Note that this number includes the first and last color. Asking for 5 colors will give you the start color, three colors between it and the end color, and the end color: start + 3 + end = 5.\n')
   .option('-f, --startColorRemove [natural number > 0]', '\n\tRemoves the N (f)irst) colors from gradient before print.\n')
   .option('-l, --endColorRemove [natural number > 0]', '\n\tRemove the N (l)ast) colors from gradient before print.\n')
   .option('-r, --reverse', '\n\tReverse order of samples before print.\n')
