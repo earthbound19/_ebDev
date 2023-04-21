@@ -14,20 +14,17 @@
 # The number of colors interpolated includes the first and last color. Asking for 5 colors will give you the start color, three colors between it and the end color, and the end color: start + 3 + end = 5.
 
 # CODE
-
 if [ "$1" ]; then inputFile=$1; else printf "\nNo parameter \$1 (input .hexplt format file) passed to script. Exit."; exit 1; fi
 if [ "$2" ]; then nColorsToInterpolate=$2; else printf "\nNo parameter \$2 (how many colors to interpolate between the first and last color in input file $1) passed to script. Exit."; exit 2; fi
-# define a variable overwriteOriginalFile if parameter $3 passed to script
-if [ "$3" ]; then overwriteOriginalFile=; fi
 
 # get array of colors from file by extracting all matches of a pattern of six hex digits preceded by a #:
 colorsArray=( $(grep -i -o '#[0-9a-f]\{6\}' $inputFile) )
 # Get number of colors (from array):
 howManyColors=${#colorsArray[@]}
 
-# get first and last colors from source palette:
+# get first colors from source palette:
 firstColor=${colorsArray[0]}
-# - 1 on the following because of zero-based indexing:
+# get last color from source palette: - 1 index because of zero-based indexing:
 lastColor=${colorsArray[$(($howManyColors - 1))]}
 
 # locate script to call, via another script:
