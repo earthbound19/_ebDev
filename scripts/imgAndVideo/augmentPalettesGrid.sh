@@ -65,8 +65,8 @@ augment_palettes () {
 	hexplts=($(find . -maxdepth 1 -type f -name \*.hexplt -printf "%f\n"))
 	for hexplt in ${hexplts[@]}
 	do
-	# only do things if the file name of the palette doesn't indicate that it is an augmented palette; to avoid broken things / unintended work, and to allow re-running this script where such a palette aleady exists, but with different parameters; print any results from grep search to null so as not to distract pointlessly:
-	grep '_augmented_.*_grid' <<< $hexplt &>/dev/null
+	# only do things if the file name of the palette doesn't indicate that it is a grid (possibly from augmentation or concatenation) palette; to avoid broken things / unintended work, and to allow re-running this script where such a palette aleady exists, but with different parameters; print any results from grep search to null so as not to distract pointlessly:
+	grep '_grid' <<< $hexplt &>/dev/null
 	if [[ $(echo $?) != 0 ]]
 	then
 		# get array of colors from file by extracting all matches of a pattern of six hex digits preceded by a #:
