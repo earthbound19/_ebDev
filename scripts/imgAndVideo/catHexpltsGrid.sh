@@ -6,7 +6,7 @@
 
 # USAGE
 # From a directory in which all .hexplt files have the same number of columns in their layout _or_ have a number of colors that will evenly divide into N columns, run without these parameters:
-# - $1 the number of columns that source hexplts have in their layout.
+# - $1 OPTIONAL, but strongly recommended, as you may get unexpected results without it, depending on commenting and/or layout of the source files: the number of columns that source hexplts have in their layout. This parameters causes result reformatting via a call to `reformatHexPalette.sh` with a parameter for this many coluns of layout.
 # For example:
 #    catHexpltsGrid.sh 5
 
@@ -18,20 +18,23 @@ if [ "$1" ]; then columnsParameter="-c$1"; fi
 # get directory name without path:
 currentDirNoPath=$(basename $(pwd))
 # build target file name from that; add script parameter details to it:
-outputFileName="$currentDirNoPath"_palettesGrid.hexplt
+outputFileName="$currentDirNoPath"_palettes_grid.hexplt
 # warn and exit if output file already exists, which could result in redundant concatenation:
 if [ -f $outputFileName ]; then echo "WARNING: would-be result file name $outputFileName already exists. To re-create it delete it and run this script again. Exit."; exit 1; fi
 
-# concatenate palettes to array and check if it is length 0 (no palettes found); only continue if that is not the case; if it is the case print an info log and exit:
-paletteFileNames=( $(find . -maxdepth 1 -iname "*.hexplt" -printf "%P\n") )
-if [ ${#paletteFileNames[@]} == 0 ]
+# concatenate palettes only if there are any; if there are not print error an exit:
+# get list of file names separated by spaces, excluding ones with *_grid* (concatendated or augmented) in the name:
+paletteFileNamesList=$(find . -maxdepth 1 -not -iname "*_grid*" -iname "*.hexplt" -printf "%P ")
+if [ $paletteFileNamesList == "" ]
 then
 	thisDir=$(pwd)
 	echo "NOTE: No .hexplt files found in directory $thisDir. Exit."; exit 2;
 else
-	foof=blor
-	cat *.hexplt > $outputFileName
-	# reformat it if $columns variable was set (by passing $1) :
-	reformatHexPalette.sh -i $outputFileName $columnsParameter
+	cat $paletteFileNamesList > $outputFileName
+	# reformat it if $columnsParameter variable was set (by passing $1) :
+	if [ "$columnsParameter" ]
+	then
+		reformatHexPalette.sh -i $outputFileName $columnsParameter
+	fi
 	echo "DONE. Resulting palette file is $outputFileName."
 fi
