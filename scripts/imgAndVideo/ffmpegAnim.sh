@@ -15,7 +15,8 @@
 # Example run:
 #    ffmpegAnim.sh 29.97 29.97 13 png
 # NOTES
-# - Search for the pixelFormat parameter and modify it or don't.
+# - Search for the pixelFormat variable, and modify it, or don't.
+# - Also search for an outExt parameter, and modify it, or don't.
 # - Search for the additionalParams options and uncomment or modify them (or don't) as you wish.
 # - You can hack this script to produce an animated .gif image simply by changing the extension at the end of the applicable command line (line 32).
 
@@ -23,6 +24,13 @@
 # CODE
 # TO DO
 # - Make the output file name after the ../.. parent folder name? Or just the parent folder name? IF YOU DO THAT, modify scripts that call this script (ffmpegAnimsDirs.sh and maybe others?) to no longer do output file renaming.
+# - parameterize as in newGetoptScript.sh? Because it's already at too many parameters, and I want to add to it.. 
+#  - and update all scripts that call this, and any scripts that call them, with the new parameters
+# - add option to define output extension (e.g. gif, mkv ..)
+# - update doc if I do those things.
+
+# GLOBAL that I would like to turn into a parameter; the output file extension (for example mp4, gif, mkv)
+outExt=mp4
 
 # ==== BEGIN PARAMETER CHECKING and globals setting therefrom.
 if [ ! "$1" ]
@@ -83,7 +91,7 @@ pixelFormat="-pix_fmt yuv420p"
 
 # Because something funky and evil in DOS and/or Unix emulation chokes on some forms of $additionalParams inline, but not if printed to and executed from a script;
 # FOR LOSSLESS BUT COMPRESSED AVI, end the command instead with: -codec:v utvideo _out.avi :
-echo "ffmpeg -y -f image2 -framerate $inFPS -start_number $first_frame_from_filename -i %0"$digitsPadCount"d.$inFileType $additionalParams $rescaleParams -r $outFPS $pixelFormat -crf $crf _out.mp4" > tmp_enc_script_P4b3ApXC.sh
+echo "ffmpeg -y -f image2 -framerate $inFPS -start_number $first_frame_from_filename -i %0"$digitsPadCount"d.$inFileType $additionalParams $rescaleParams -r $outFPS $pixelFormat -crf $crf _out.$outExt" > tmp_enc_script_P4b3ApXC.sh
 ./tmp_enc_script_P4b3ApXC.sh
 rm ./tmp_enc_script_P4b3ApXC.sh
 
@@ -91,13 +99,13 @@ rm ./tmp_enc_script_P4b3ApXC.sh
 # If $6 is not passed to the script, a variable named finalLoopSeconds is never declared, so this same type of check for variable existence works here: true if the variable name exists, false if it doesn't":
 if [ "$finalLoopSeconds" ]
 then
-	ffmpeg -y -loop 1 -i $lastFoundFileType -vf fps=$outFPS $additionalParams $rescaleParams -t $finalLoopSeconds -crf $crf $pixelFormat _append.mp4
+	ffmpeg -y -loop 1 -i $lastFoundFileType -vf fps=$outFPS $additionalParams $rescaleParams -t $finalLoopSeconds -crf $crf $pixelFormat _append.$outExt
 	printf "" > tmp_ft2N854f.txt
-	echo _out.mp4 >> tmp_ft2N854f.txt
-	echo _append.mp4 >> tmp_ft2N854f.txt
+	echo _out.$outExt >> tmp_ft2N854f.txt
+	echo _append.$outExt >> tmp_ft2N854f.txt
 	sed -i "s/^\(.*\)/file '\1'/g" tmp_ft2N854f.txt
-	ffmpeg -y -f concat -i tmp_ft2N854f.txt -c copy _tmp_TXF6PmWe.mp4
+	ffmpeg -y -f concat -i tmp_ft2N854f.txt -c copy _tmp_TXF6PmWe.$outExt
 	rm ./tmp_ft2N854f.txt
-	rm ./_out.mp4 ./_append.mp4
-	mv ./_tmp_TXF6PmWe.mp4 ./_out.mp4
+	rm ./_out.$outExt ./_append.$outExt
+	mv ./_tmp_TXF6PmWe.$outExt ./_out.$outExt
 fi
