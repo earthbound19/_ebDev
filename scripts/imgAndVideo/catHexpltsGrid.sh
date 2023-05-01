@@ -6,7 +6,7 @@
 
 # USAGE
 # From a directory in which all .hexplt files have the same number of columns in their layout _or_ have a number of colors that will evenly divide into N columns, run without these parameters:
-# - $1 OPTIONAL, but strongly recommended, as you may get unexpected results without it, depending on commenting and/or layout of the source files: the number of columns that source hexplts have in their layout. This parameters causes result reformatting via a call to `reformatHexPalette.sh` with a parameter for this many coluns of layout.
+# - $1 OPTIONAL, but strongly recommended, as you may get unexpected results without it, depending on commenting and/or layout of the source files: the number of columns that source hexplts have in their layout. This parameter causes physical layout and a comment giving that layout, via a call to `reformatHexPalette.sh`.
 # For example:
 #    catHexpltsGrid.sh 5
 
