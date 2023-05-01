@@ -26,10 +26,7 @@
 # NOTES
 # - you can run this in a directory where you have created palettes from it which have the regex pattern `_augmented_.*_grid` in them, and it will not operate on those files (it will skip them). You can therefore reuse this script in the same directory easily, passing it different parameters each time.
 # - the script `paletteRenamedCopiesByNextMostSimilar.sh` may be useful for getting copies of palettes into a dedicated folder for this purpose (with potentially really interesting and beautiful results).
-# - to not augment any colors, but create a grid of palettes (e.g. in a folder with copies of them made by the previously mentioned script), instead of using this script, from the directory with the palettes, concatenated them to one file with a pipe command, like this:
-#    cat *.hexplt > grid.hexplt
-# -- and then mark up the result with:
-#    columns: [the number of columns], rows: [the number of rows]
+# - to not augment any colors, but create a grid of palettes (e.g. in a folder with copies of them made by the previously mentioned script), see `catHexpltsGrid.sh`.
 # The process of augmentation in detail is:
 # - for every .hexplt format palette in the current directory:
 # - do linear interpolation in N ($1) steps between each color in it in okLab color space (using CHL coordinates). Think of every resulting color as an X-direction set of columns.
