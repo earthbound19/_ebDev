@@ -42,14 +42,14 @@ strNumPalettesToCreate = str(len(color_combinations))
 
 # subfolder_name structure: = <sourceFileBaseName>_<N>_combo_<CombinationNumber>.hexplt
 sourcePaletteFileBaseName = re.sub('\..*', '', sourcePaletteFileName)
-subdirName = sourcePaletteFileBaseName + '_' + str(howManyColors) + '_combos'
+subdirName = sourcePaletteFileBaseName + '_' + str(howManyColors) + '-combos'
 
 if not os.path.isdir(subdirName):
     os.mkdir(subdirName)
 for idx, data in enumerate(color_combinations):
     # if not idx + 1 it starts at zero:
     comboNumberStr = str(idx + 1).zfill(zeroPadToDigits)
-    targetFileName = subdirName + '/' + sourcePaletteFileBaseName + '__' + str(howManyColors) + '_combo_' + comboNumberStr + '.hexplt'
+    targetFileName = subdirName + '/' + sourcePaletteFileBaseName + '__' + str(howManyColors) + '-combo_' + comboNumberStr + '.hexplt'
     print("Generating palette " + comboNumberStr + " of " + strNumPalettesToCreate + " . . .")
     paletteList = ''
     for element in data:
