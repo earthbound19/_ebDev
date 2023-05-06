@@ -23,9 +23,11 @@
 # TO DO
 # - Examine http://espeak.sourceforge.net/
 
-textSay=$1;
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (source text file to convert to wav sound file) passed to script. Exit."; exit 1; fi
+
+textSay=$(cat $1 | tr '\n' ' ');
 # replace any terminal-unfriendly characters in the source string with underscores to help form the render target file name:
-renderTargetFileNamePart=$(echo $1 | tr \`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \. _)
+renderTargetFileNamePart=$(echo $textSay | tr \`\~\!\@#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\;\'\,\ \. _)
 # truncate that to 32 characters max.:
 renderTargetFileNamePart=$(cut -c -32 <<< $renderTargetFileNamePart)
 # get a random string to append to that (will avoid any file name part that already exists in the current directory) :
