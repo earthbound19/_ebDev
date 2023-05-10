@@ -88,7 +88,7 @@ do
 				writeLine=$(echo $color | tr -d '\15\32')		# moar horror and serious slowdown
 				printf "'$writeLine', " >> ../$targetFileName
 				# conditionally print newlines to arrange background colors in columns to match BG colors extracter per color, for easier visual reference:
-				if [ $(($counter % $numCols)) == 0 ]; then printf "\n\t\t" >> ../$targetFileName; fi
+				if [ $(($counter % $numCols)) == 0 ]; then printf "\n        " >> ../$targetFileName; fi
 			done
 			# copy generated bg hexplt up one dir where we want to keep it:
 			mv $BGtargetFileName ..
