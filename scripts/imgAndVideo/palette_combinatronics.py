@@ -49,7 +49,7 @@ if not os.path.isdir(subdirName):
 for idx, data in enumerate(color_combinations):
     # if not idx + 1 it starts at zero:
     comboNumberStr = str(idx + 1).zfill(zeroPadToDigits)
-    targetFileName = subdirName + '/' + sourcePaletteFileBaseName + '__' + str(howManyColors) + '-combo_' + comboNumberStr + '.hexplt'
+    targetFileName = subdirName + '/' + sourcePaletteFileBaseName + '_' + str(howManyColors) + '-combo_' + comboNumberStr + '.hexplt'
     print("Generating palette " + comboNumberStr + " of " + strNumPalettesToCreate + " . . .")
     paletteList = ''
     for element in data:
