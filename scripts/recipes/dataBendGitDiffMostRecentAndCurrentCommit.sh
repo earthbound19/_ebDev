@@ -16,8 +16,8 @@
 printGitDiffMostRecentAndCurrentCommit.sh > gitDiffMostRecentAndCurrentCommit_data_bent.txt
 data_bend_2PPMglitchArt00padded.sh gitDiffMostRecentAndCurrentCommit_data_bent.txt
 # remove temp intermediary:
-# rm gitDiffMostRecentAndCurrentCommit_data_bent.txt
+rm gitDiffMostRecentAndCurrentCommit_data_bent.txt
 # that data bend script ran resulted in the file gitDiffMostRecentAndCurrentCommit_data_bent_asPPM.ppm; convert it to png:
 img2imgNN.sh gitDiffMostRecentAndCurrentCommit_data_bent_asPPM.ppm png 1200
 
-printf "\nDONE. Result image is gitDiffMostRecentAndCurrentCommit_data_bent_asPPM.png.\n"
+printf "\nDONE. Result files are gitDiffMostRecentAndCurrentCommit_data_bent_asPPM.ppm and gitDiffMostRecentAndCurrentCommit_data_bent_asPPM.png.\n"
