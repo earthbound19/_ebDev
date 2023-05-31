@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Variant of `data_bend_2PPMglitchArt.sh`. Represents arbitrary bytes (from any file) as data where each byte becomes one of the components of an RGB color (hard-coded to result in blue to violet depending on the 0 to 255 value of the raw data which is made into a component of <VALUE 0 255>, where VALUE is the data value from the source data). See also `all_data_bend_type2PPMglitchArt.sh`, which will call this script against every file of a given time in a path.
+# Variant of `data_bend_2PPMglitchArt.sh`. Represents arbitrary bytes (from any file) as data where each byte becomes one of the components of an RGB color. The color is hard-coded to result in blue to violet depending on the 0 to 255 value of the raw data, which is made into a component of <VALUE 0 255>, where VALUE is the data value from the source data. See also `all_data_bend_type2PPMglitchArt.sh`, which will call this script against every file of a given type in a path.
 
 # DEPENDENCIES
 # a Unix environment including the `od` utility, and optionally IrfanView and `img2imgNN.sh`
