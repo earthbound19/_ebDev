@@ -1,9 +1,6 @@
 # DESCRIPTION
 # Calls ffmpeg2imgNN.sh repeatedly for every file of type $1, converting to format $2, upscaled to target max dimension $3.
 
-
-
-
 # USAGE
 # Run with these parameters:
 # - $1 input file types to upscale by nearest neighbor method
