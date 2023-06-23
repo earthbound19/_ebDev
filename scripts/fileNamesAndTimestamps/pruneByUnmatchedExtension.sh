@@ -48,8 +48,8 @@
 
 
 # CODE
-if ! [ "$1" ]; then	echo "No parameter \$1 (source file type) passed to script. Exit."; exit 1; fi
-if ! [ "$2" ]; then	echo "No parameter \$2 (extension of matches to search for and move $1 if no match) passed to script. Exit."; exit 2; fi
+if ! [ "$1" ]; then	echo "No parameter \$1 (source file type) passed to script. Exit."; exit 1; else fileMoveType=$1; fi
+if ! [ "$2" ]; then	echo "No parameter \$2 (extension of matches to search for and move $1 if no match) passed to script. Exit."; exit 2; else ifNoMatchType=$2; fi
 # Make an array which has only one item: "." for the current directory (if using the command `cd`). If parameter 3 passed to script, add to that array all subfolder relative paths. In both cases, iterating over all directories will iterate over every directory we want to:
 allSubfolderNames=()
 allSubfolderNames+='.'
@@ -64,21 +64,23 @@ do
 	# change to the subfolder, redirecting print output to nowhere:
 	cd $folderName &>/dev/null
 	echo "Working in folder $folderName."
-	list=$(find . -maxdepth 1 -type f -iname \*.$1 -printf '%f\n' | tr -d '\15\32')
+	list=($(find . -maxdepth 1 -type f -iname \*.$fileMoveType -printf '%f\n' | tr -d '\15\32'))
+	# if no files of type $fileMoveType found, skip this loop (and avoid making an empty sorting subfolder) :
+	if [ ${#list[@]} -eq 0 ]; then echo "No files of type $fileMoveType found; no work to do."; continue; fi
 
-	RND16HEX=`cat /dev/urandom | tr -dc '0-9A-F' | head -c 16`
+	RND16HEX=$(cat /dev/urandom | tr -dc '0-9A-F' | head -c 16)
 	sort_folder_name=___file_sorting_tmp__"$RND16HEX"
 	mkdir $sort_folder_name
 
 	for element in ${list[@]}
 	do
 		fileNameNoExt=${element%.*}
-		searchFileName="$fileNameNoExt"."$2"
+		searchFileName="$fileNameNoExt"."$ifNoMatchType"
 				# echo searchFileName is\: $searchFileName
 		if ! [ -f $searchFileName ]
 		then
-			echo "File matching source file name $element but with $2"
-			echo " extension NOT FOUND\: SORTING into folder"
+			echo "File with same base name as $element but with extension $ifNoMatchType"
+			echo " extension not found\: SORTING into folder:"
 			echo " $sort_folder_name"
 			mv $element ./$sort_folder_name
 		fi
