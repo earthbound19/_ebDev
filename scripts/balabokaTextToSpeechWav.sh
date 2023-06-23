@@ -35,4 +35,4 @@ rndString=$(cat /dev/urandom | tr -dc 'a-hj-km-np-zA-HJ-KM-NP-Z2-9' | head -c 11
 # -- and append it:
 renderTargetFileName="$renderTargetFileNamePart"_"$rndString".wav
 balcon -t "$textSay" -s -3 -w "$renderTargetFileName"
-start "" "$renderTargetFileName"
+start "$renderTargetFileName"
