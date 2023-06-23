@@ -1,6 +1,11 @@
 # DESCRIPTION
 # Collates documentation comments from all code/script files in the current directory and subdirectories into one file: `<repoName>_DOCUMENTATION.md` (assumes it is part of a git repository and names the first part of the file after the repository; if that isn't the case it may just end up named `_DOCUMENTATION.md`), for easier documentation reference. Uses a subset of Mardkwon to allow source code comments loosely styled after Markdown to be converted for final rendered documentation. See USAGE.
 
+# DEPENDENCIES
+# - LibreOffice installed with soffice.exe in your PATH
+# - generate-md (markdown-styles) from npm https://github.com/mixu/markdown-styles/blob/master/bin/generate-md (install with `npm install -g markdown-styles`)
+# git (a requirement I don't like and would like to change), various GNU tools that come with most Bash environments (e.g. MSYS2), wget
+
 # USAGE
 # In the source code of every script in this repository (or any other repository that you want to use this script for), follow this documentation convention:
 # - REQUIREMENT. Write a documentationHeader.md file which introduces and generally describes this document, or otherwise introduces it. Also a documentationFooter.md document, which has whatever information you want to follow the general body document (which is made from documentation comments in so many scripts) with. NOTE: this script inserts a newline and a "Generated at <date and time> print on the 2nd line of the header (so that the format is <header line>\n<Generated at <date and time>. It expects the result of this to be a header, a blank line, an inserted document generation time, another blank line, and the remainder of the header.
@@ -26,7 +31,9 @@
 
 
 # CODE
-# TO DO: remove these from parsed files (allows print_halp function: )
+# TO DO
+# - remove dependency of git/repo and define folder/project/file name of output .pdf a better way?
+# - remove these from parsed files (allows print_halp function: )
 #    function print_halp {
 #    echo "
 #    "
