@@ -8,7 +8,7 @@
 # Run with these parameters:
 # - $1 grid dimensions to sample, in the format 'cols <space> rows'. See get_color_sample_grids_sRGB_assistant.sh
 # For example:
-# get_color_sample_grids_unique_and_compare_palettes.sh '40 x 40'
+#    get_color_sample_grids_unique_and_compare_palettes.sh '40 x 40'
 
 
 # CODE
