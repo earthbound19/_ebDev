@@ -14,6 +14,7 @@
 #    imgs2imgs.sh png jpg 450
 # Example that will convert all png images to jpg images in all subdirectories as well, but without any resizing (effectively no parameter $3) :
 #    imgs2imgs.sh png jpg NULL HOIHOI
+# NOTE: for a hack to delete the source image also (too many switches in this script to add that without converting to named instead of positional switches), see line 42 :)
 
 # CODE
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source image type to convert) passed to script. Exit."; exit 1; else sourceIMGformat=$1; fi
@@ -37,6 +38,8 @@ do
 	for fileName in ${fileNamesList[@]}
 	do
 		img2img.sh $fileName $destIMGformat $param3
+		# HACK TO DELETE SOURCE FILE; uncomment the next line if you want this:
+		# if [ ${fileName%.*}.$destIMGformat ]; then echo "TARGET ${fileName%.*}.$destIMGformat MADE; deleting original $fileName."; rm $fileName; fi
 	done
 	cd $thisRootDir
 done
