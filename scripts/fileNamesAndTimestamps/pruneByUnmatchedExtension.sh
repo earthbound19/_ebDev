@@ -50,13 +50,10 @@
 # CODE
 if ! [ "$1" ]; then	echo "No parameter \$1 (source file type) passed to script. Exit."; exit 1; else fileMoveType=$1; fi
 if ! [ "$2" ]; then	echo "No parameter \$2 (extension of matches to search for and move $1 if no match) passed to script. Exit."; exit 2; else ifNoMatchType=$2; fi
-# Make an array which has only one item: "." for the current directory (if using the command `cd`). If parameter 3 passed to script, add to that array all subfolder relative paths. In both cases, iterating over all directories will iterate over every directory we want to:
+# Make an array which has only one item: "." for the current directory (if using the command `cd`). If parameter $3 passed to script, add to that array all subfolder relative paths. In both cases, iterating over all directories will iterate over every directory we want to:
 allSubfolderNames=()
 allSubfolderNames+='.'
-if [ "$3" ]
-then
-	allSubfolderNames+=($(find . -type d -printf "%P\n"))
-fi
+if [ "$3" ]; then allSubfolderNames+=($(find . -type d -printf "%P\n")); fi
 
 baseDir=$(pwd)
 for folderName in ${allSubfolderNames[@]}
