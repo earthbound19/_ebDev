@@ -45,7 +45,7 @@ do
 	currDir=$(pwd)
 	echo "~"
 	echo "in dir $currDir"
-	allFilesType=( $(find . $maxdepthParameter -iname "*.$sourceExtension" -printf "%P\n") )
+	allFilesType=( $(find . -maxdepth 1 -iname "*.$sourceExtension" -printf "%P\n") )
 	for file in ${allFilesType[@]}
 	do
 		echo --
