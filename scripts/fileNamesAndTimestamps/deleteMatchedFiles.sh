@@ -45,22 +45,32 @@ do
 	currDir=$(pwd)
 	echo "~"
 	echo "in dir $currDir"
-	allFilesType=( $(find . -maxdepth 1 -iname "*.$sourceExtension" -printf "%P\n") )
-	for file in ${allFilesType[@]}
-	do
-		echo --
-		echo checking for matches of $file with extension $extensionToDelete . . .
-		files=($(listMatchedFileNames.sh $file))
-		for j in ${files[@]}
+
+	# Check first if there are even any of $extensionToDelete in this directory at all. If there are, skip this loop iteration, as there will be no $extensionToDelete matches at all, and the following inner loop would be wasteful redundant time-wasting repeated failed searches. We can check this by running a search and redirecting the output to nowhere, then checking the errorlevel ($?) for success (0) or failure (nonzero):
+	ls *.$extensionToDelete &>/dev/null
+	# I wonder if there is a potentially more efficient way to check? A command that returns after the _first_ file of that type is found, without finding and listing them all if there are many?
+	if [ $? != 0 ]
+	then
+		echo "Pre-check: no files of *.$extensionToDelete were found in this directory (search failed). Skipping work in this directory."
+		# (the whole following else clause will not be executed; this echo statement is the only work done this loop.)
+	else
+		allFilesType=( $(find . -maxdepth 1 -iname "*.$sourceExtension" -printf "%P\n") )
+		for file in ${allFilesType[@]}
 		do
-			# check if extension is same as $extensionToDelete; if so, DELETE! -- as we know it exists, because listMatchedFileNames.sh listed it among existing files!
-			if [ ${j##*.} == $extensionToDelete ]
-			then
-				echo "MATCH:                  $j; will delete!"
-				rm $j
-			fi
+			echo --
+			echo checking for matches of $file with extension $extensionToDelete . . .
+			files=($(listMatchedFileNames.sh $file))
+			for j in ${files[@]}
+			do
+				# check if extension is same as $extensionToDelete; if so, DELETE! -- as we know it exists, because listMatchedFileNames.sh listed it among existing files!
+				if [ ${j##*.} == $extensionToDelete ]
+				then
+					echo "MATCH:                  $j; will delete!"
+					rm $j
+				fi
+			done
 		done
-	done
+	fi
 	# change back to the original base foldere from which the next relative directory change (next loop iteration) will be correct:
 	cd $baseDir &>/dev/null
 done
