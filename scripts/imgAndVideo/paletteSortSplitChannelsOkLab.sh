@@ -27,7 +27,7 @@ cp $sourceFile ./$tmpDir
 cd $tmpDir
 node $fullPathToScript -i $sourceFile -n $numberOfHueDivisions
 rm $sourceFile
-# Note the need to escape quote marks to pass two "words" as one parameter:
+
 parametricHairball="-s $startSortColor"
 allRGBhexColorSortInOkLab.sh "$parametricHairball"
 cat *.hexplt > ../$destinationFileName
