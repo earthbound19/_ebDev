@@ -1,8 +1,9 @@
 # DESCRIPTION
-# Calls `get_color_gradient_OKLAB.js` repeatedly to construct palettes from files in a source .hexplt file ($1), such that:
-# - There is a perceptually uniform gradient of M ($2) tints from white to the color, then the color, then M ($2) shades
+# Obtains and lists a gamut of tints, shades and saturated and unsaturated colors for every color in a palette.
+# How: this calls `get_color_gradient_OKLAB.js` repeatedly to construct palettes from every color in a source .hexplt file ($1), such that:
+# - There is a perceptually uniform gradient of M ($2) tints from white to the color (tints of the color), then the color, then M ($2) shades of the color
 # - Every color in that resulting tint <-> shades palette is taken, and a perceptually uniform gradient of N ($3) grays made from each to near desaturated (no chroma, or gray) for that color
-# In other words, this script obtains and lists a gamut of tints, shades and saturated and unsaturated colors for every color in a palette. Results will be in palette files named after each color in the source palette. Also, this calls a script to render the result palettes in a layout that shows the tint, shade and chroma gradients' relationships.
+# Results will be in palette files named after each color in the source palette. Also, this calls a script to render the result palettes in a layout that shows the tint, shade and chroma gradients' relationships.
 
 # DEPENDENCIES:
 # getFullPathToFile.sh, get_color_gradient_OKLAB.js
