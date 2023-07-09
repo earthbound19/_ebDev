@@ -1,12 +1,12 @@
 # DESCRIPTION
-# Retrieves a random palette from the /palettes subdirectory of the _ebPalettes repository, and prints the colors from it, one per line.
+# Retrieves a random palette from the /palettes subdirectory of the _ebPalettes repository, and prints the colors from it, one per line. To do the same from a GitHub API call against the remote _ebPalettes repository, see `printContentsOfRandomPalette_GitHubAPI.sh`.
 
 # DEPENDENCIES
 # The _ebPalettes repository, with the ~/palettesRootDir.txt file created from the createPalettesRootDirTXT.sh in it.
 
 # USAGE
 # Run without any parameters:
-#    printContentsOfRandomlyChosenPalette.sh
+#    printContentsOfRandomPalette_ls.sh
 
 
 # CODE

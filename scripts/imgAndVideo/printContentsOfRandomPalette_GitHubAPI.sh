@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Retrieves the contents of a random .hexplt file from the _ebPalettes repository (at GitHub) via the GitHub API. To do the same from a local copy of the repository, see `printContentsOfRandomlyChosenPalette.sh`.
+# Retrieves the contents of a random .hexplt file from the _ebPalettes repository (at GitHub) via the GitHub API. To do the same from a local copy of the repository, see `printContentsOfRandomPalette_ls.sh`.
 
 # DEPENDENCIES
 # - A hard-coded current tree SHA of the current palettes subdirectory from the repository https://github.com/earthbound19/_ebPalettes/tree/master/palettes -- re: https://stackoverflow.com/a/2833142/1397555
