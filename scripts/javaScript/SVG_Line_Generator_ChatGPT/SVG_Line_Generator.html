@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-<!-- v 0.0.6 via collaboration with chatGPT -->
-<!-- connect derived lines alongside length of original longer line instead of between each new point at side of lines -->
+<!-- v 0.0.7 via collaboration with chatGPT -->
+<!-- stores the points generated on the left and right sides of the original line in separate arrays (leftPoints and rightPoints). After generating the points, it combines them and reverses the array of right points. Then, it creates a continuous fatter line by connecting the points in the combined array, closing the path with a 'Z' command to form a closed shape. -->
 <head>
   <title>Random Art Nouveau SVG</title>
   <style>
@@ -69,21 +69,26 @@
 
       const combinedPoints = leftPoints.concat(rightPoints.reverse());
 
-      let linePathData = `M${combinedPoints[0].x},${combinedPoints[0].y}`;
+      let curvePathData = `M${combinedPoints[0].x},${combinedPoints[0].y}`;
 
       for (let i = 1; i < combinedPoints.length; i++) {
-        linePathData += ` L${combinedPoints[i].x},${combinedPoints[i].y}`;
+        const currentPoint = combinedPoints[i];
+        const prevPoint = combinedPoints[i - 1];
+
+        const controlX = (prevPoint.x + currentPoint.x) / 2;
+        const controlY = (prevPoint.y + currentPoint.y) / 2;
+
+        curvePathData += ` Q${prevPoint.x},${prevPoint.y} ${controlX},${controlY}`;
       }
 
-      linePathData += ' Z'; // Close the path
+      curvePathData += ' Z'; // Close the path
 
-      const linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      linePath.setAttribute('d', linePathData);
-      linePath.setAttribute('fill', 'none');
-      linePath.setAttribute('stroke', 'black');
-      linePath.setAttribute('stroke-width', '2');
+      const curvePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      curvePath.setAttribute('d', curvePathData);
+      curvePath.setAttribute('fill', 'black');
+      curvePath.setAttribute('stroke', 'none');
 
-      svgContainer.appendChild(linePath);
+      svgContainer.appendChild(curvePath);
     }
 
     // Clear the SVG container
