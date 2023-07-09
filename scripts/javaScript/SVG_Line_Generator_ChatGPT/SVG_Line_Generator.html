@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-<!-- v 0.0.5 via collaboration with chatGPT -->
-<!-- interesting variation of intent: dashed lines -->
+<!-- v 0.0.6 via collaboration with chatGPT -->
+<!-- connect derived lines alongside length of original longer line instead of between each new point at side of lines -->
 <head>
   <title>Random Art Nouveau SVG</title>
   <style>
@@ -50,19 +50,32 @@
       const pathLength = path.getTotalLength();
       const step = Math.floor(Math.random() * 10) + 5; // Randomly determine the step size for walking along the path
 
-      let linePathData = '';
+      const leftPoints = [];
+      const rightPoints = [];
+
       for (let i = 0; i < pathLength; i += step) {
         const point = path.getPointAtLength(i);
         const angle = Math.atan2(point.y - height / 2, point.x - width / 2);
         const lineWidth = Math.random() * 6 + 2; // Randomly determine the line width
 
-        const x1 = point.x + Math.cos(angle - Math.PI / 2) * lineWidth / 2;
-        const y1 = point.y + Math.sin(angle - Math.PI / 2) * lineWidth / 2;
-        const x2 = point.x + Math.cos(angle + Math.PI / 2) * lineWidth / 2;
-        const y2 = point.y + Math.sin(angle + Math.PI / 2) * lineWidth / 2;
+        const leftX = point.x + Math.cos(angle - Math.PI / 2) * lineWidth / 2;
+        const leftY = point.y + Math.sin(angle - Math.PI / 2) * lineWidth / 2;
+        const rightX = point.x + Math.cos(angle + Math.PI / 2) * lineWidth / 2;
+        const rightY = point.y + Math.sin(angle + Math.PI / 2) * lineWidth / 2;
 
-        linePathData += `M${x1},${y1} L${x2},${y2} `;
+        leftPoints.push({ x: leftX, y: leftY });
+        rightPoints.push({ x: rightX, y: rightY });
       }
+
+      const combinedPoints = leftPoints.concat(rightPoints.reverse());
+
+      let linePathData = `M${combinedPoints[0].x},${combinedPoints[0].y}`;
+
+      for (let i = 1; i < combinedPoints.length; i++) {
+        linePathData += ` L${combinedPoints[i].x},${combinedPoints[i].y}`;
+      }
+
+      linePathData += ' Z'; // Close the path
 
       const linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       linePath.setAttribute('d', linePathData);
