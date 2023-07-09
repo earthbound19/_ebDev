@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<!-- v 0.0.4 via collaboration with chatGPT -->
+<head>
+  <title>Random Art Nouveau SVG</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <svg id="svg-container" width="300" height="300"></svg>
+
+  <script>
+    // Generate a random Art Nouveau-style set of curves
+    function generateRandomCurves() {
+      const svgContainer = document.getElementById('svg-container');
+      const width = svgContainer.getAttribute('width');
+      const height = svgContainer.getAttribute('height');
+
+      const numCurves = Math.floor(Math.random() * 5) + 1; // Randomly generate 1-5 curves
+
+      let pathData = '';
+
+      for (let i = 0; i < numCurves; i++) {
+        const startX = Math.random() * width;
+        const startY = Math.random() * height;
+        const controlX1 = Math.random() * width;
+        const controlY1 = Math.random() * height;
+        const controlX2 = Math.random() * width;
+        const controlY2 = Math.random() * height;
+        const endX = Math.random() * width;
+        const endY = Math.random() * height;
+
+        pathData += `M${startX},${startY} C${controlX1},${controlY1} ${controlX2},${controlY2} ${endX},${endY} `;
+      }
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', pathData);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', 'black');
+      path.setAttribute('stroke-width', '2');
+
+      svgContainer.appendChild(path);
+    }
+
+    // Clear the SVG container
+    function clearSVG() {
+      const svgContainer = document.getElementById('svg-container');
+      while (svgContainer.firstChild) {
+        svgContainer.firstChild.remove();
+      }
+    }
+
+    // Generate a new random set of curves on page reload
+    window.onload = function () {
+      clearSVG();
+      generateRandomCurves();
+    };
+  </script>
+</body>
+</html>
