@@ -74,11 +74,11 @@ do    # eternal loop
 	# -e switch means "the rest of this is the command for the subshell"; so that I can run the terminal recolor commands after it immediately without waiting:
 	# `-h never` means don't "hold" the window for the terminal after the process completes, or in other words, terminate the terminal after the command. Avoids unusued terminal process clutter.
   mintty -w hide -h never -D -e blink1-tool -t $breakBlinkColorChangeIntervalMS --random=$breakBlinkChangeColorTimes --millis=$breakBlinkColorChangeMilliseconds -l 1 -l 2 -q
-  # loop to change the terminal colors every 2 seconds; if printContentsOfRandomlyChosenPalette.sh fails or doesn't exist, this will just be harmless ineffective busy work:
+  # loop to change the terminal colors every 2 seconds; if printContentsOfRandomPalette_ls.sh fails or doesn't exist, this will just be harmless ineffective busy work:
   counter=0
   while [ $counter -le $breakMinutesInEveryTwoSeconds ]
   do
-    randomColors=( $(printContentsOfRandomlyChosenPalette.sh | shuf) )
+    randomColors=( $(printContentsOfRandomPalette_ls.sh | shuf) )
 	arrayLength=${#randomColors[@]}
 	if [ $arrayLength -ge 2 ]
 	then
