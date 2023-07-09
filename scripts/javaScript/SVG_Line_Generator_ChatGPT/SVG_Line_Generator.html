@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v 0.0.10 via collaboration with chatGPT https://chat.openai.com/share/9bb19cca-20a7-46fd-9adf-7d5e57d08a7c -->
+<!-- v 0.0.11 via collaboration with chatGPT https://chat.openai.com/share/9bb19cca-20a7-46fd-9adf-7d5e57d08a7c -->
 <html>
 <head>
   <title>Random Art Nouveau SVG</title>
@@ -20,7 +20,11 @@
   <button id="download-svg-btn">Download SVG</button>
 
   <script>
-    // Generate a random Art Nouveau-style set of curves
+    // Generate a random set of curves
+	
+	// GLOBAL:
+    let randomBaseFileName = '';
+
     function generateRandomCurves() {
       const svgContainer = document.getElementById('svg-container');
       const width = svgContainer.getAttribute('width');
@@ -111,16 +115,15 @@
     window.onload = function () {
       clearSVG();
       generateRandomCurves();
+	  generateRandomBaseFileName();
     };
 
-    // Generate a random base file name
+    // Generate a random base file name; modifies a global!
     function generateRandomBaseFileName() {
       const alphanumeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let randomBaseFileName = '';
       for (let i = 0; i < 12; i++) {
         randomBaseFileName += alphanumeric.charAt(Math.floor(Math.random() * alphanumeric.length));
       }
-      return randomBaseFileName;
     }
 
     // Download PNG
@@ -137,7 +140,7 @@
         ctx.drawImage(img, 0, 0);
         const link = document.createElement('a');
         link.href = canvas.toDataURL('image/png');
-        link.download = generateRandomBaseFileName() + '.png';
+        link.download = randomBaseFileName + '.png';
         link.click();
       };
 
@@ -151,7 +154,7 @@
       const link = document.createElement('a');
       const blob = new Blob([svgData], { type: 'image/svg+xml' });
       link.href = URL.createObjectURL(blob);
-      link.download = generateRandomBaseFileName() + '.svg';
+      link.download = randomBaseFileName + '.svg';
       link.click();
     }
 
