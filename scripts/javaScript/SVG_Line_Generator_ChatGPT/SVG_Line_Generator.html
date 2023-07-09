@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-<!-- v 0.0.7 via collaboration with chatGPT -->
-<!-- stores the points generated on the left and right sides of the original line in separate arrays (leftPoints and rightPoints). After generating the points, it combines them and reverses the array of right points. Then, it creates a continuous fatter line by connecting the points in the combined array, closing the path with a 'Z' command to form a closed shape. -->
+<!-- v 0.0.8 via collaboration with chatGPT -->
+<!-- a random distance value is calculated for each point along the left and right sides of the original curve lines. This value determines how far the new points deviate from the original line. The distance is randomly generated within a range (-5 to +5), providing broader variation. --> 
 <head>
   <title>Random Art Nouveau SVG</title>
   <style>
@@ -58,10 +58,12 @@
         const angle = Math.atan2(point.y - height / 2, point.x - width / 2);
         const lineWidth = Math.random() * 6 + 2; // Randomly determine the line width
 
-        const leftX = point.x + Math.cos(angle - Math.PI / 2) * lineWidth / 2;
-        const leftY = point.y + Math.sin(angle - Math.PI / 2) * lineWidth / 2;
-        const rightX = point.x + Math.cos(angle + Math.PI / 2) * lineWidth / 2;
-        const rightY = point.y + Math.sin(angle + Math.PI / 2) * lineWidth / 2;
+        const distance = Math.random() * 10 - 5; // Randomly determine the distance from the original line
+
+        const leftX = point.x + Math.cos(angle - Math.PI / 2) * (lineWidth / 2 + distance);
+        const leftY = point.y + Math.sin(angle - Math.PI / 2) * (lineWidth / 2 + distance);
+        const rightX = point.x + Math.cos(angle + Math.PI / 2) * (lineWidth / 2 + distance);
+        const rightY = point.y + Math.sin(angle + Math.PI / 2) * (lineWidth / 2 + distance);
 
         leftPoints.push({ x: leftX, y: leftY });
         rightPoints.push({ x: rightX, y: rightY });
