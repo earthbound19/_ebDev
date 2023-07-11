@@ -17,20 +17,20 @@
 # CODE
 if [ "$1" ]; then includeTerminalUnfriendlyCharacters="True"; fi
 
-howManyBaseDirectories=$(seq 3 9 | shuf | head -n 1)
+howManyBaseDirectories=$(shuf -i 3-9 -n 1)
 subfolderDepth=4
-lengthRangeOfNames='16 28'
+lengthRangeOfNames='1-4'
 # Note that even if you give it 0 for the low range, it will still make at least 1 (limitation of how I'm using 'seq') :
-rangeOfRNDfilesPerFolder='1 2'
+rangeOfRNDfilesPerFolder='1-3'
 fileTypesToMake='png tif cgp hexplt mp4 avi JPG PNG MP4 MOV'
 rndSTR=''
 
 # ALTERS the global variable rndSTR:
 set_rndSTR () {
-	rndLen=$(seq $lengthRangeOfNames | shuf | head -n 1)
+	rndLen=$(shuf -i $lengthRangeOfNames -n 1)
 	if [ "$includeTerminalUnfriendlyCharacters" == "True" ]
 	then
-		rndSTR=$(cat /dev/urandom | tr -dc "a-km-z2-9'@=~!#$%^&()+[{]};.                ,-" | fold -w $rndLen | head -n 1)
+		rndSTR=$(cat /dev/urandom | tr -dc "a-km-z2-9'@=~!#$%^&()+[{]};.,-" | fold -w $rndLen | head -n 1)
 	else
 		rndSTR=$(cat /dev/urandom | tr -dc "a-km-z2-9" | fold -w $rndLen | head -n 1)
 	fi
@@ -50,7 +50,10 @@ cd testFiles
 for i in $(seq 1 $howManyBaseDirectories)
 do
 	set_rndSTR
-	mkDir $rndSTR
+	subDirName="$rndSTR"
+	set_rndSTR
+	subDirName="$subDirName""$rndSTR"
+	mkDir $subDirName
 done
 
 nSubDirs=$(echo "scale=0; $howManyBaseDirectories / 2" | bc)
@@ -62,7 +65,10 @@ do
 	for directoryName in ${subsetOfDirectories[@]}
 	do
 		set_rndSTR
-		mkdir $directoryName/$rndSTR
+		subDirName="$rndSTR"
+		set_rndSTR
+		subDirName="$subDirName""$rndSTR"
+		mkdir $directoryName/$subDirName
 	done
 done
 
@@ -71,13 +77,30 @@ printf "\n~\nTest random files generation in progress . . .\n~\n"
 allDirectories=$(find . -type d)
 for directory in ${allDirectories[@]}
 do
-	howManyFilesToCreate=$(seq $rangeOfRNDfilesPerFolder | shuf | head -n 1)
-	for j in $(seq 0 $howManyFilesToCreate)
+	howManyFilesToCreate=$(shuf -i $rangeOfRNDfilesPerFolder -n 1)
+	for i in $(seq 0 $howManyFilesToCreate)
 	do
+		# construct random file base name which may include a number of spaces or underscores
+		# reset base of constructed base file name:
 		set_rndSTR
+		constructedFileName="$rndSTR"
+		numSpacesOrUnderscoresInFiles=$(shuf -i 0-3 -n 1)
+		# randomly choose a space or underscore inter-word characer, or no character
+		spaceOrNot=$(shuf -i 0-1 -n 1)
+		spaceChar=
+		if [ $spaceOrNot == 1 ]
+		then
+			spaceChar=$(cat /dev/urandom | tr -dc "_ " | fold -w 1 | head -n 1)
+		fi
+		for j in $(seq 0 $numSpacesOrUnderscoresInFiles)
+		do
+			set_rndSTR
+			constructedFileName="$constructedFileName""$spaceChar""$rndSTR"
+		done
+		# make files of multiple types with that same base name
 		for fileType in ${fileTypesToMake[@]}
 		do
-			echo "" > "$directory/$rndSTR.$fileType"
+			echo "" > "$directory/$constructedFileName.$fileType"
 		done
 	done
 done
