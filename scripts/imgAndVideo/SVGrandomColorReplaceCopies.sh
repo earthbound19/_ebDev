@@ -5,12 +5,12 @@
 # Run with these parameters:
 # - $1 source SVG file name.
 # - $2 how many copies of the svg to make with random color replacements.
-# - $3 OPTIONAL. hexplt (palette) file to use. See parameter $2 in BWsvgRandomColorFill.sh. Note that this uses $2 there as $3 here.
-# - $4 OPTIONAL. hex color to do random replacements of from hexplt file. See parameter $3 in BWsvgRandomColorFill.sh. Note that this uses $3 there as $4 here.
+# - $3 OPTIONAL. hexplt (palette) file to use. See parameter $2 in SVGrandomColorReplace.sh. Note that this uses $2 there as $3 here.
+# - $4 OPTIONAL. hex color to do random replacements of from hexplt file. See parameter $3 in SVGrandomColorReplace.sh. Note that this uses $3 there as $4 here.
 # Example that will create 38 copies of `2021-09-13-zb_v5.svg` with random color replacements via optional parameter $3 (a source .hexplt file, `earth_pigments_dark.hexplt`), replacing hex color 000000 via optional parameter $4:
 #    SVGrandomColorReplaceCopies.sh 2021-09-13-zb_v5.svg 38 earth_pigments_dark.hexplt 000000
 # NOTE
-# If you call this script from another script a certain way (which, I know, this script calls another script) in turn), the $subDirForRenders variable which this script sets will be available (as a new global or environment variable) in the shell that called this script. The way to set that variable in the calling environment is to use `source` before calling this script, like this:
+# If you call this script from another script a certain way (which, I know, this script calls another script in turn), the $subDirForRenders variable which this script sets will be available (as a new global or environment variable) in the shell that called this script. The way to set that variable in the calling environment is to use `source` before calling this script, like this:
 #    source SVGrandomColorReplaceCopies.sh <script parameters>
 # -- which may be handy for use of this script in a "recipe" to do multiple passes of replacing specific colors with random selections from palettes. Handy, because if you know the name of the random subfolder it made, you can cd into it to list svg files into an array and modify the files with additional passes.
 
