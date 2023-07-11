@@ -21,7 +21,7 @@
 # CODE
 # TO DO: make $extractedRawFileName a proper array in case of multiple embedded files, and iterate over the array. And code for the possibility of multiple file names in that case. OR: just leave off with the warning above about that possibility, as I never would have made a multiple-raw-file DNG!
 # SET GLOBALS:
-if [ ! "$1" ]; then printf "\nNo parameter \$1 (type short explanation of parameter) passed to script. Exit."; exit 1; else sourceFile=$1; fi
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (source DNG format file name) passed to script. Exit."; exit 1; else sourceFile=$1; fi
 extractedSideCarDifferent=0
 
 export LC_CTYPE=C
