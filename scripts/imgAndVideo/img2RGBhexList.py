@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Samples every pixel in an image and dumps to a list of hex color codes contained in the image.
+# Samples every pixel in an image, and dumps a list of all sRGB colors therefrom, in hex format.
 
 # USAGE
 # Run this script through a Python interpreter, with the image file name as the first parameter to this script. Example:
