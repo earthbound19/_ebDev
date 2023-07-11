@@ -25,18 +25,16 @@
 	# - Test with many image pairs, and if necessary fix complex filter timings math (in ffmpeg command). It seems that the crossfade starts and ends later than it should.
 	# - Add fps param?
 	# - Option to adapt this to automatically detect the duration of two pre-existing input clips and crossfade almost the whole length of the shorter over the longer?
-# GLOBAL HARD-CODED OPTIONS--tweak these per your want:
 vidExt=avi
 # vidExt=mp4
-# codecParam=""
-# codecParam="-q 13"
-codecParam="-vcodec rawvideo"
+# SWITCH OPTIONS REFERENCE; NOTE: these were originally intended to be used as variables that contain switches to ffmpeg, and are used that way in some code below, BUT: for whatever reason, ffmpeg drops the '-' dash prefix from a switch when it's passed from a variable. SO, ANY OF THE FOLLOWING need to be hard-coded into the ectual ffmpeg commands throughout this script; until a fix is found, in other words, in the last ffmpeg call in this script, don't use $codecParam or $pixelFormat to pass switches to ffmpeg: literally hack the ffmpeg command itself to have the switches that are shown as assigned here to varaibles only as reference. i.e. insted of passing $codecParam pass -vcodec
+codecParam='-vcodec rawvideo'
 # codecParam="-codec:v utvideo -r 30"
 # codecParam="-codec:v qtrle -r 30"
 	# looks horrible at video start for animations! :
 # codecParam="-codec:v libvpx-vp9 -lossless 1 -r 30"
 # yuv420p is apparently required by instagram and probably facebook and others:
-pixelFormat="-pix_fmt yuv420p"
+pixelFormat='-pix_fmt yuv420p'
 # additionalParams="-vf scale=990:-1:force_original_aspect_ratio=1,pad=1080:1080:\(ow-iw\)/2:\(oh-ih\)/2:color=#130a14"
 
 # ====
@@ -81,14 +79,19 @@ else
 	then
 				echo target render image for still image video fade source "$fadeSRConeFileName"."$vidExt" doesn\'t exist\; RENDERING\; render command is\:
 				echo ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $pixelFormat $codecParam $additionalParams "$fadeSRConeFileName"."$vidExt"
-		ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $pixelFormat $codecParam $additionalParams "$fadeSRConeFileName"."$vidExt"
+		# write commands to temp script and execute it, sigh. Because it's throwing errors about unrecognize options to pass parameters from variables (it cuts off dashes to options, it seems) :
+		echo ffmpeg -loop 1 -i "$imgOne" -t "$srcClipLengths" "$pixelFormat" "$codecParam" "$additionalParams" "$fadeSRConeFileName"."$vidExt" > tmp_script_fneoime3.sh
+		./tmp_script_fneoime3.sh
+		rm tmp_script_fneoime3.sh
 	fi
 	# This also avoids repeat work:
 	if [ ! -e "$fadeSRCtwoFileName"."$vidExt" ]
 	then
 				echo target render image for still image video fade source "$fadeSRCtwoFileName"."$vidExt" doesn\'t exist\; RENDERING\; render command is\:
 				echo ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $pixelFormat $codecParam $additionalParams "$fadeSRCtwoFileName"."$vidExt"
-		ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $pixelFormat $codecParam $additionalParams "$fadeSRCtwoFileName"."$vidExt"
+		echo ffmpeg -loop 1 -i "$imgTwo" -t "$srcClipLengths" "$pixelFormat" "$codecParam" "$additionalParams" "$fadeSRCtwoFileName"."$vidExt" > tmp_script_fneoime3.sh
+		./tmp_script_fneoime3.sh
+		rm tmp_script_fneoime3.sh
 	fi
 	# CREATE the video crossfade from those two static image (looped) video files we just made.
 	# The following complex filter taken and adapted from https://superuser.com/a/1001040/130772
@@ -119,7 +122,7 @@ else
 		[fadeoutfifo][fadeinfifo]overlay[crossfade]; \
 		[clip1cut][crossfade][clip2cut]concat=n=3[output] \
 		" \
-	-map "[output]" $pixelFormat $codecParam $targetRenderFile
+	-map "[output]" -vcodec rawvideo -pix_fmt yuv420p $targetRenderFile
 
 	# Cygwin option: auto-launch the completed cross-faded video:
 	# cygstart $targetRenderFile
