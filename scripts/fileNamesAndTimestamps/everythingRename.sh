@@ -22,6 +22,7 @@
 # - You're also looking at files found from a search string using Everything, to verify renames and to be able to undo any breaks.
 # - You know and can see that there's no funky crap (like terminal-unfriendly characters) in file and folder names you operate on.
 # NOTES
+# - Search matches case. If you search for EB_Favorites and files are named eb_favorites, the search will not match; you will need to search for eb_favorites in that case.
 # - Renames are logged to a text file named after the date and time the renames were done.
 # - Spaces in file names are supported; surround the appropriate parameter with single or double quotes to use spaces.
 # - It may rename folders first, which could change the path to any found files that match the search string, causing rename of those files to fail (as the path has changed and the rename command won't find them). In that case, re-running this script with the same search and replace parameters will find them in the new path and rename them.
@@ -37,7 +38,8 @@ if [ ! "$3" == "YOINK" ]; then printf "\nParameter 3 incorrect. See USAGE commen
 # IFS trickery to stop spaces in files from mucking with es search; saved by a genius breath yonder -- https://unix.stackexchange.com/a/9500/110338 :
 OIFS="$IFS"
 IFS=$'\n'
-foundPaths=( $(es $1) )
+foundPaths=( $(es -i $1) )
+foundPathsArrayLength=${#foundPaths[@]}
 
 # build file name for log, and create the log:
 dateTimeString=$(date +"%Y_%m_%d__%H_%M_%S")
@@ -45,8 +47,11 @@ renameLog=_everythingRename_log_"$dateTimeString".txt
 printf "" > $renameLog
 
 # iterate over found paths and do rename operation on each, logging each rename to log file, and also printing feedback:
+counter=0
 for path in ${foundPaths[@]}
 do
+	counter=$((counter + 1))
+	printf "\nWorking on file $counter of $foundPathsArrayLength . . ."
 	nixyPath=$(cygpath $path)
 	renameTarget=$(echo $nixyPath | sed "s/$srcString/$destString/g")
 	mv "$nixyPath" "$renameTarget"
