@@ -26,9 +26,10 @@ do
 	# check for text file render target file name, and render to it if it doesn't already exist:
 	if [ -f $targetFileName ]
 	then
-		echo "Target file $targetFileName already exists; will not overwite it. To recreate it, delete it and re-run this script."
+#		echo "Target file $targetFileName already exists; will not overwite it. To recreate it, delete it and re-run this script."
+furnf=feef
 	else
-		echo "Will create target file $targetFileName . . ."
+		printf "\nWill create target file $targetFileName . . ."
 		# create everything at start of object definition up to square bracket start of palette (foreground) contents:
 		printf "      {\n        name: \"$printPaletteName\",\n        fg: [" > $targetFileName
 		# get colors from hexplt into array, then print them to JS objects' array content:
@@ -50,7 +51,7 @@ do
 		then
 			rm -rf shadesXchromas_build_tmp
 			mkdir shadesXchromas_build_tmp
-			pushd .
+			pushd . &>/dev/null
 			cd shadesXchromas_build_tmp
 			cp ../$filename .
 # TO DO: okLab auto-generate background palette that is all colors turned 75 percent toward nuetral gray #919191, OR 80 percent toward white, OR 80 percent toward black?
@@ -92,11 +93,11 @@ do
 			done
 			# copy generated bg hexplt up one dir where we want to keep it:
 			mv $BGtargetFileName ..
-			popd
+			popd &>/dev/null
 			rm -rf shadesXchromas_build_tmp
 			# END BUILD OF BACKGROUND COLORS ARRAY
 		fi
-		echo "Accompanying background colors file $BGtargetFileName either found or built; will use colors from it."
+		printf "\n\nAccompanying background colors file $BGtargetFileName either found or built; will use colors from it."
 		# get colors from hexplt into array, then print them to JS objects' array content:
 		bgColors=( $(grep -i -o '#[0-9a-f]\{6\}' $BGtargetFileName) )
 		# write the bg colors to the array in the render target:
