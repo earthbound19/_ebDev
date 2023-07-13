@@ -3,7 +3,7 @@
 
 # DEPENDENCIES
 # - A hard-coded current tree SHA of the current palettes subdirectory from the repository https://github.com/earthbound19/_ebPalettes/tree/master/palettes, as descrbied in USAGE. Re: https://stackoverflow.com/a/2833142/1397555
-# - jq
+# - jq installed and in your PATH
 # - a GitHub personal access token, usable with the API, re: https://github.com/settings/tokens -- stored in your .bashrc file this way, where `the_actual_API_token` is not that literal value, but is (as that placeholder text suggests) the actual API key:
 #    export GITHUBAPIKEY=the_actual_API_token
 # git (for obtaining hash info of a folder if you wish to update or change a hard-coded variable)
