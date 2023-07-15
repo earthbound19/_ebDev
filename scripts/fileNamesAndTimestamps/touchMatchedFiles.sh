@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Solves a problem of file system views that sort by date not displaying related files of the same base file name near each other. For every file of type $1 in the current directory, finds all files with the same base file name and updates thier creation/modification date to match that corresponding file $1.
+# Solves a problem of file system views that sort by date not displaying related files of the same base file name near each other. For every file of type $1 in the current directory, finds all files with the same base file name and updates thier creation/modification date to match that corresponding to file $1.
 
 # DEPENDENCIES
 # `listMatchedFileNames.sh`
