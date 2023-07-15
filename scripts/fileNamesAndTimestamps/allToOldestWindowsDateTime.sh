@@ -8,10 +8,7 @@
 #    allToOldestWindowsDateTime.sh WABYEG
 
 # CODE
-# If no parameter one, maxdepthParameter will be left at default, which causes find to search only the current directory:
-maxdepthParameter='-maxdepth 1'
-# If parameter one is passed to script, that changes to nothing, and find's default recursive search will be used (as no maxdepth switch will be passed) :
-if [ "$1" ]; then maxdepthParameter=''; fi
+if [ ! "$1" ]; then maxdepthParameter="-maxdepth 1"; fi
 
 allFiles=($(find . $maxdepthParameter -type f -printf "%P\n"))
 
