@@ -1,8 +1,8 @@
 # DESCRIPTION
-# Resizes an image of type $1, in the current directory, by nearest-neighbor method, to target format $2, with the longest edge scaled up (or down!) to pixels $3. The shortest edge is scaled to maintain aspect, but that can be overriden to change aspect, with $4. Nearest neighbor method will keep hard edges, or look "pixelated." Uses GraphicsMagick, unless the file is ppm or pbm format, in which case it uses IrfanView (which to my knowledge is Windows only).
+# Resizes an image of type $1, in the current directory, by nearest-neighbor method, to target format $2, with the longest edge scaled up (or down!) to pixels $3. The shortest edge is scaled to maintain aspect, but that can be overriden to change aspect, with $4. Nearest neighbor method will keep hard edges, or look "pixelated." Uses GraphicsMagick, unless the file is ppm or pbm format, in which case it uses IrfanView (which to my knowledge is Windows only). Also updates timestamp of target file to match the source it was converted from, for file by time stamp sorting (or any other) reference.
 
 # DEPENDENCIES
-# GraphicsMagick
+# GraphicsMagick, touch
 
 # USAGE
 # Run with the following parameters:
@@ -62,7 +62,9 @@ if [ ! -f $targetFileName ]; then
 			#fi
 		fi
 		gm convert $srcFileName $gmScaleParam $targetFileName
-	echo converted to $targetFileName . .
+		# update timestamp of target file to match the source it was converted from, for file by time stamp sorting (or any other) reference:
+		touch -r $srcFileName $targetFileName
+	echo "Converted $srcFileName to $targetFileName and modified time stamp of target to match source."
 else
 	echo target file $targetFileName already exists\; skipping.
 fi
