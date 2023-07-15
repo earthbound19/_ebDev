@@ -28,17 +28,20 @@ sed -n 's/\(.*Metadata Date *: \)\([0-9]\{4\}:[0-9]\{2\}:[0-9]\{2\} [0-9]\{2\}:[
 sed -i 's/\([0-9]\{4\}\):\([0-9]\{2\}\):\([0-9]\{2\}\) \([0-9]\{2\}\)/\1-\2-\3T\4/g' tmp2_E8eK5t4aw.txt
 
 sort tmp2_E8eK5t4aw.txt > tmp_E8eK.txt
-dos2unix tmp_E8eK.txt
+# redirect output of command to to &>/dev/null to suppress feedback print I don't care about and which clutters up information print when this script is called repeatedly:
+dos2unix tmp_E8eK.txt &>/dev/null
 createAdjustmentDateStamp=`head -n 1 tmp_E8eK.txt`
 modifyAdjustmentDateStamp=`tail -n 1 tmp_E8eK.txt`
 rm tmp_E8eK.txt tmp2_E8eK5t4aw.txt
 
-# ---- START EXIFTOOL OPTION--DEPRECATED. IF YOU USE THIS OPTION, uncomment the next two lines of code, comment out the code in the BINAREZ_TOUCH section below, and also comment out the line of code after the "TRANSFORM FOR BINAREZ_TOUCH" comment above. (Do the invert of those instructions if you use binarez_touch.) NOTE: previously this erroneously updated CreateDate, which I believe alters file metadata--but the intent of this script was to modify Windows file system time stamp attributes, which this has been corrected to do via FileCreateDate:
-#exiftool -overwrite_original -FileCreateDate=\""$createAdjustmentDateStamp"\" $1
-#exiftool -overwrite_original -FileModifyDate=\""$modifyAdjustmentDateStamp"\" $1
+# ---- START EXIFTOOL OPTION--DEPRECATED. IF YOU USE THIS OPTION, uncomment the next two lines of code, comment out the code in the BINAREZ_TOUCH section below, and also comment out the line of code after the "TRANSFORM FOR BINAREZ_TOUCH" comment above. (Do the invert of those instructions if you use binarez_touch.) NOTE: previously this erroneously updated CreateDate, which I believe alters file metadata--but the intent of this script was to modify Windows file system time stamp attributes, which this has been corrected to do via FileCreateDate;
+# redirect output of these commands to /dev/null also:
+# exiftool -overwrite_original -FileCreateDate=\""$createAdjustmentDateStamp"\" $1 &>/dev/null
+# exiftool -overwrite_original -FileModifyDate=\""$modifyAdjustmentDateStamp"\" $1 &>/dev/null
 # ---- END EXIFTOOL OPTION
-
-# ---- START BINAREZ_TOUCH OPTION--PREFERRED: this will update time stamps for files that exiftool won't; ex. call binarez_touch 027_cover.jpg -acxv -d 2019-01-18T05:15:32:
-binarez_touch $1 -cxv -d $createAdjustmentDateStamp
-binarez_touch $1 -cmv -d $modifyAdjustmentDateStamp
+exit
+# ---- START BINAREZ_TOUCH OPTION--PREFERRED: this will update time stamps for files that exiftool won't; ex. call binarez_touch 027_cover.jpg -acxv -d 2019-01-18T05:15:32;
+# redirect output of these commands to /dev/null also:
+binarez_touch $1 -cxv -d $createAdjustmentDateStamp &>/dev/null
+binarez_touch $1 -cmv -d $modifyAdjustmentDateStamp &>/dev/null
 # ---- END BINAREZ_TOUCH OPTION
