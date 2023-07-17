@@ -104,7 +104,6 @@ do
 		done
 	done
 done
-exit
 
 cd ..
 
