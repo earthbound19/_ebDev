@@ -12,15 +12,19 @@
 #    timeStampRNDShiftType.sh png 7200
 # To do the same operating on all png files in all subdirectories also, run:
 #    timeStampRNDShiftType.sh png 7200 YGRDRARD
+# NOTES:
+# - On Windows, this modifies the Date Modified stamp, which for file sorting purposes you would want to reference after running this script.
+# - Because on Windows this changes the Date Modified stamp and leaves other Date stamps untouched, and that drives me a little crazy, you may optionally additionally call toOldestWindowsDateTime.sh on the Date-stamp-updated file to make them all the same as the oldest stamp, by hacking the script to uncomment the line that has that call. Which might after running this be incorrect if the oldest stamp is yet older. Which I'm okay with for my purposes.
+# - It's not going to work if you give seconds past 12 digits. So not more than -999,999,999,999 (999 billion +)
 
 
 # CODE
 if [ "$1" ]; then modifyFileType=$1; else printf "\nNo parameter \$1 (file type to randomly shift time stamps for) passed to script. Exit."; exit 1; fi
 # timeStampSecondShiftBackMax defaults to 900 (up to 15 minutes ago), but overrides to $2 if $2 is provided.
-if [ "$2" ]; then timeStampSecondShiftBackMax=$2; else timeStampSecondShiftBackMax=900; fi
+if [ "$2" ]; then timeStampSecondShiftBackMax=$2; else timeStampSecondShiftBackMax=100000; fi
 if [ ! "$3" ]; then maxdepthParam="-maxdepth 1"; fi
 
-fileNamesList=($(find . $maxdepthParam -type f -name \*.$modifyFileType -printf "%f\n"))
+fileNamesList=($(find . $maxdepthParam -type f -name \*.$modifyFileType -printf "%P\n"))
 arrayLength=${#fileNamesList[@]}
 count=0
 for file in ${fileNamesList[@]}
@@ -28,7 +32,12 @@ do
 	count=$((count + 1))
 	echo "~ file count $count of $arrayLength"
 	echo "Modifying time stamp for file $file . . ."
+		# deprecated alternate explored when I wondered if `$((RANDOM % ..` wasn't working:
+		# rndSHIFT=$(shuf -i 3-$timeStampSecondShiftBackMax -n 1)
+		# touch -r $file -d "-$rndSHIFT seconds" $file
 	touch -r $file -d "-$((RANDOM % $timeStampSecondShiftBackMax + 0)) seconds" $file
+	# OPTIONAL update all timestamps (supposedly) to oldest:
+	# toOldestWindowsDateTime.sh $file
 done
 
 echo DONE randomizing timestamps of all files of type $modifyFileType in the current directory by up to -$timeStampSecondShiftBackMax seconds.
