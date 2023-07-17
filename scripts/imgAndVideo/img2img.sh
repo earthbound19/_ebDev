@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates a converted copy of image file name $1 to format $2, via ImageMagick, optionally downsizing (with good downsizing method) via $3. If downsizing is done, to try to avoid file name conflicts (to avoid clobbering the original file if converting to the same target format as source), it adds an _x800 (or the number of pixels accross) phrase to the target file name. Will not convert if render target already exists (including if the render target has that number of pixels phrase.
+# Creates a converted copy of image file name $1 to format $2, via ImageMagick, optionally downsizing (with good downsizing method) via $3. If downsizing is done, to try to avoid file name conflicts (to avoid clobbering the original file if converting to the same target format as source), it adds an _x800 (or the number of pixels accross) phrase to the target file name. Will not convert if render target already exists (including if the render target has that number of pixels phrase. Also updates timestamp of target file to match the source it was converted from, for file by time stamp sorting (or any other) reference.
 
 # DEPENDENCY
 # ImageMagick installed in your PATH.
@@ -38,4 +38,5 @@ then
 else
 	printf "\n~\nWill create converted copy of $sourceIMG as $renderTarget . . .\n"
 	magick convert $sourceIMG -flatten $additionalConvertOptions $renderTarget 2>/dev/null
+	touch -r $sourceIMG $renderTarget
 fi
