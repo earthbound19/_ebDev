@@ -36,6 +36,6 @@ then
 else
 	for fileType in ${fileTypesArray[@]}
 	do
-		find . -iname \*.$fileType | sed 's/\.\/\(.*\)/\1/g'
+		find . -iname \*.$fileType -printf "%P\n"
 	done
 fi
