@@ -12,10 +12,10 @@
 # To do the operation in DESCRIPTION for every .hexplt format file in the current directory, run with these parameters:
 # - $1 REQUIRED. The number of colors in the intended gradient of each modified .hexplt file
 # - $2 OPTIONAL. The word SYMBCOZ, which will cause the script to perform operations without warning. If omitted, you are prompted to type this password to continue.
-# For example, to run the script and be prompted for this password, run it without any parameter:
+# For example, to run the script and be prompted for this password, run it with only a number of colors parameter:
 #    oklabGradientFromFirstAndLastHexpaletteColors_allPalettes.sh
-# To run the script and perform the changes on all files as described without warning, run the script with that password as the first parameter:
-#    oklabGradientFromFirstAndLastHexpaletteColors_allPalettes.sh SYMBCOZ
+# To run the script and perform the changes on all files using 256 colors per file without warning, run the script with that password as the second parameter:
+#    oklabGradientFromFirstAndLastHexpaletteColors_allPalettes.sh 256 SYMBCOZ
 
 # CODE
 if [ "$1" ]; then gradientColorsN=$1; else printf "\nNo parameter \$1 (the number of colors in the intended gradient of each modified .hexplt file) passed to script. Exit."; exit 1; fi
