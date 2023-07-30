@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Renames all files in the current directory of type $1 such that their base file name is in Title Case. This could possibly theoretically be done via rename.pl, but I didn't figure out how.
+# Renames all files in the current directory of type $1 such that their base file name is in Title Case. (This could possibly theoretically be done via rename.pl, but I didn't figure out how.) Optionally does so through all subdirectories also.
 
 # USAGE
 # Run with these parameters:
@@ -35,7 +35,5 @@ do
 	fileNameNoExt=${filename%.*}
 	fileExt=${filename##*.}
 	newFileNameNoExt=$(echo "$fileNameNoExt" | sed 's/\<.\|_./\U&/g')
-	# echo was $fileNameNoExt
-	# echo now $newFileNameNoExt
 	mv $filename $newFileNameNoExt.$fileExt
 done
