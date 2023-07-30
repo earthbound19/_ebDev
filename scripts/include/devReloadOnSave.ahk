@@ -3,7 +3,11 @@
 ; Adapted from BETLOG's modification, re:http://www.autohotkey.com/board/topic/122-automatic-reload-of-changed-script/page-2
 
 ; USAGE
-; To cause any script to function as explained under DESCRIPTION, copy this script into the same directory as the script you are developing, and then in your development script, copy the lines of code from this script between the labels " ---- BEGIN AUTO-RELOAD INCLUDE" and " ---- END AUTO-RELOAD INCLUDE," but removing the comments (semicolons) from the start of the code lines in that include section. You may also be able to include this script by _not_ copying it into the same directory of your development script, and only adjusting the include code line to an absolute or relative path to this script. See also the NOTE right after that comment section.
+; NOTE that you may find it more simple to to just add the following code to the end of any script, instead of including this script -- the following code being the next two lines of comment but (if you put them in a script), without the leading semicolons (;) :
+;    ~^!/::	;HOTKEY_COMMENT [For programmers] CTRL+ALT+/ (forward slash, on the ? question mark key) reload this script.
+;    Reload
+; That said: to cause any script to function as explained under DESCRIPTION, copy this script into the same directory as the script you are developing, and then in your development script, copy the lines of code from this script between the labels " ---- BEGIN AUTO-RELOAD INCLUDE" and " ---- END AUTO-RELOAD INCLUDE," but removing the comments (semicolons) from the start of the code lines in that include section. You may also be able to include this script by _not_ copying it into the same directory of your development script, and only adjusting the include code line to an absolute or relative path to this script. See also the NOTE right after that comment section.
+
 
 ; CODE
 ; ---- BEGIN AUTO-RELOAD INCLUDE
