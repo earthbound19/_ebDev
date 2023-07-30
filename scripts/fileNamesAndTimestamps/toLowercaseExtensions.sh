@@ -8,12 +8,12 @@
 # EXAMPLES
 # To rename all PNG files in the current directory which have have uppercase letters in their extensions to all lowercase in their extensions, run:
 #    toLowercaseExtensions.sh png
-# To rename all files with every extension that has uppercase letters in them to have all lowercase letters in their extensions, run:
+# To rename all files with every extension that has uppercase letters in them to lowercase, run:
 #    toLowercaseExtensions.sh ALL_EXTENSIONS
-# To rename all MOV files in the current directory and all subdirectories which have any uppercase letters in their extension so that they are all lowercase in the extension, run:
+# To rename all MOV files in the current directory and all subdirectories which have any uppercase letters in their extension to lowercase, run:
 #    toLowercaseExtensions.sh mov foo
-# To rename all extensions with uppercase letters in all file types in the current directory and all subdirectories, run:
-#    toLowercaseExtensions.sh mov ALL_EXTENSIONS foo
+# To rename all extensions with uppercase letters in all file types in the current directory and all subdirectories (to all be lowercase), run:
+#    toLowercaseExtensions.sh ALL_EXTENSIONS foo
 
 
 # CODE
