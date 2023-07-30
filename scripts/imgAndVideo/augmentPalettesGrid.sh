@@ -1,7 +1,8 @@
 # DESCRIPTION
 # Creates a grid study of augmented colors from palettes such that:
-# There are $1 colors added between every color (column) in each palette horizontally
-# There are $2 colors added between every row of augmented palettes vertically
+# - there are $1 colors added between every color (column) in each palette horizontally
+# - there are $2 colors added between every row of those augmented palettes vertically
+# - all this is concatenated to a grid of combined horizontal and vertical augmentations
 # This is done by a process that uses all .hexplt format palettes in the current directory (other than any with output file names made by this script). The result is written to a .hexplt file in a grid and with markup declaring number of columns and rows. The result file is named after the containing folder you run the script from, and the columns x rows. Source palettes may have color codes arranged in any way and include comments; the only requirement is that sRGB hex color codes in the palette are prefixed with a number/hex/pound # symbol and are separated by white space.
 
 # DEPENDENCIES
@@ -24,7 +25,7 @@
 #    augmentPalettesGrid.sh 5 0
 # You could pass 0 for both $1 and $2 to make a grid of all palettes, but then you would just want to use `catHexpltsGrid.sh`, which will do that more straightforwardly (and probably more efficiently).
 # NOTES
-# - you can run this in a directory where you have created palettes from it which have the regex pattern `_augmented_.*_grid` in them, and it will not operate on those files (it will skip them). You can therefore reuse this script in the same directory easily, passing it different parameters each time.
+# - you can run this in a directory where you have created palettes from it which have the regex pattern `_Augmented-.*_grid` in their file name, and it will not operate on those files (it will skip them). You can therefore reuse this script in the same directory easily, passing it different parameters each time.
 # - the script `paletteRenamedCopiesByNextMostSimilar.sh` may be useful for getting copies of palettes into a dedicated folder for this purpose (with potentially really interesting and beautiful results).
 # - to not augment any colors, but create a grid of palettes (e.g. in a folder with copies of them made by the previously mentioned script), see `catHexpltsGrid.sh`.
 # The process of augmentation in detail is:
@@ -54,7 +55,7 @@ if [[ "$fullPathToOKLABAugmentationScript" == "" ]]; then echo "ERROR: could not
 # get directory name without path:
 currentDirNoPath=$(basename $(pwd))
 # build target file name from that:
-outputFileName="$currentDirNoPath"_augmented_"$columnsInterpolateOrigParam"x"$rowsInterpolateOrigParam"_grid.hexplt
+outputFileName="$currentDirNoPath"_augmented-"$columnsInterpolateOrigParam"x"$rowsInterpolateOrigParam"-grid.hexplt
 
 # horrifyingly large bash function; augments all .hexplt files in the current directory; REQUIRES TWO PARAMETERS (effectively $1 and $2), which are, respectively, the target file to write all augmented palette lines to, and the number of augmentation steps:
 augment_palettes () {
