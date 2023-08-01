@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Calls dcraw2tif.sh for every file of type $1 (should be a camera raw format file) in the current directory, and optionally all subdirectories.
+# Calls dcraw2tif.sh for every file of type $1 (should be a camera raw format file) in the current directory, and optionally all subdirectories. NOTE: rawtherapeeAllType2type.sh (or Raw Therapee) is preferred over this, as it uses a patched newer version of dcraw (if not other/better things).
 
 # USAGE
 # Run with these parameters:
@@ -12,13 +12,13 @@
 
 
 # CODE
-if [ ! "$1" ]; then printf "\nNo parameter \$1 (extension of source files to convert to tiff) passed to script. Exit."; exit 1; else inputFileTypes=$1; fi
+if [ ! "$1" ]; then printf "\nNo parameter \$1 (extension of source files to convert to tiff) passed to script. Exit."; exit 1; else inputFileType=$1; fi
 
 # set default maxdepth parameter of this directory only; if parameter $2 passed, set it to '' (the default of any depth) :
 maxdepthParameter="-maxdepth 1"
 if [ "$2" ];then maxdepthParameter=''; fi
 
-inputFiles=( $(find . $maxdepthParameter -type f -iname "*.$inputFileTypes" -printf "%P\n") )
+inputFiles=( $(find . $maxdepthParameter -type f -iname "*.$inputFileType" -printf "%P\n") )
 for inputFile in ${inputFiles[@]}
 do
 	dcraw2tif.sh $inputFile

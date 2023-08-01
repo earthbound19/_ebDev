@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Converts (almost?) any camera raw format image file into a .tif file via dcraw. See NOTES for a command to quickly extract any embedded thumbnails.
+# Converts (almost?) any camera raw format image file into a .tif file via dcraw. NOTE: rawtherapee2type.sh (or Raw Therapee) is preferred over this, as it uses a patched newer version of dcraw (if not other/better things). Also see NOTES for a command to quickly extract any embedded thumbnails. 
 
 # DEPENDENCIES
 #    dcraw
