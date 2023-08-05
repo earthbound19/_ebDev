@@ -3,9 +3,9 @@
 
 # USAGE
 # Run with these parameters:
-# - $1 source SVG file name.
-# - $2 how many copies of the svg to make with random color replacements.
-# - $3 OPTIONAL. hexplt (palette) file to use. See parameter $2 in SVGrandomColorReplace.sh. Note that this uses $2 there as $3 here.
+# - $1 REQUIRED. Source SVG file name.
+# - $2 REQUIRED. How many copies of the svg to make with random color replacements.
+# - $3 OPTIONAL. hexplt (palette) file to use. See parameter $2 in SVGrandomColorReplace.sh. Note that this uses $2 there as $3 here. If $3 is omitted, the script will select a random production palette from a local _ebPalettes repository via `printContentsOfRandomPalette_ls.sh`. If you want to use $4 but not specify any pallette file here with $3 (and have randomly select one), pass the word RANDOM for $3.
 # - $4 OPTIONAL. hex color to do random replacements of from hexplt file. See parameter $3 in SVGrandomColorReplace.sh. Note that this uses $3 there as $4 here.
 # Example that will create 38 copies of `2021-09-13-zb_v5.svg` with random color replacements via optional parameter $3 (a source .hexplt file, `earth_pigments_dark.hexplt`), replacing hex color 000000 via optional parameter $4:
 #    SVGrandomColorReplaceCopies.sh 2021-09-13-zb_v5.svg 38 earth_pigments_dark.hexplt 000000
@@ -18,7 +18,23 @@
 # CODE
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (svg file to make color-replaced copies of) passed to script. Exit."; exit 1; else svgFileName=$1; fi
 if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many copies of the svg to make with random color replacements) passed to script. Exit."; exit 2; else howManySVGcopies=$2; fi
-if [ "$3" ]; then paletteFile=$3; fi
+# If no $3 (source palette file) passed to script OR $3 is "RANDOM", retrieve a random production palette from _ebPalettes, and use that for colors. Otherwise, create the array from the list in the filename specified in $2.
+if [ ! "$3" ] || [ "$3" == "RANDOM" ]
+then
+	echo "no parameter \$3 passed to script, OR passed as RANDOM; selecting random production palette from _ebPalettes  . . ."
+	# calling this with `source` because that script sets a variable retrievedPaletteFileName with just that:
+	# using a temp file for memory because if I do command substitution with source, I lose the assignment to retrievedPaletteFileName in the discared subshell:
+	source printContentsOfRandomPalette_ls.sh > tmpFile_75JbuqBTN.txt
+	rndHexColors=( $(<tmpFile_75JbuqBTN.txt) )
+	rm tmpFile_75JbuqBTN.txt
+	# modify $retrievedPaletteFileName to just the file name without the path:
+	retrievedPaletteFileName="${retrievedPaletteFileName##*/}"
+	paletteFile=$retrievedPaletteFileName
+else
+	paletteFile=$3
+fi
+paletteFileBaseName=${paletteFile%.*}
+
 if [ "$4" ]; then replaceThisHexColor=$4; fi
 
 rndString=$(cat /dev/urandom | tr -dc 'a-hj-km-np-z2-9' | head -c 7)
@@ -37,9 +53,10 @@ for i in $(seq $howManySVGcopies)
 do
 	echo Generating variant $i of $generateThisMany . . .
 	timestamp=$(date +"%Y%m%d_%H%M%S_%N")
-	tmpRenderFileName=_colorSwapping_"$timestamp"_rndColorFill__$svgFileName
-	moveToFileAfterRender="$subDirForRenders"/"$timestamp"_rndColorFill__$svgFileName
+	tmpRenderFileName=_colorSwapping_"$timestamp"_rndColorFill_"$paletteFileBaseName"_$svgFileName
+	moveToFileAfterRender="$subDirForRenders"/"$timestamp"_rndColorFill_"$paletteFileBaseName"_$svgFileName
 	cp $svgFileName $tmpRenderFileName
+echo ----------------------------------
 	SVGrandomColorReplace.sh $tmpRenderFileName $paletteFile $replaceThisHexColor
 	mv $tmpRenderFileName $moveToFileAfterRender
 done

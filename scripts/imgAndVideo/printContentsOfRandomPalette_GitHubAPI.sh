@@ -2,17 +2,23 @@
 # Retrieves the contents of a random .hexplt file from the _ebPalettes repository (at GitHub) via the GitHub API. To do the same from a local copy of the repository, see `printContentsOfRandomPalette_ls.sh`.
 
 # DEPENDENCIES
-# - A hard-coded current tree SHA of the current palettes subdirectory from the repository https://github.com/earthbound19/_ebPalettes/tree/master/palettes, as descrbied in USAGE. Re: https://stackoverflow.com/a/2833142/1397555
-# - jq installed and in your PATH
-# - a GitHub personal access token, usable with the API, re: https://github.com/settings/tokens -- stored in your .bashrc file this way, where `the_actual_API_token` is not that literal value, but is (as that placeholder text suggests) the actual API key:
+# - a current tree SHA of the current palettes subdirectory from the GitHub repository earthbound19/_ebPalettes, stored in your .bashrc file this way:
+#    export EBPALETTES_PLT_DIR_SHA_TREE='the_actual_tree_SHA'
+# -- where `the_actual_tree_SHA` is not that literal value, but is (as that placeholder text suggests) the actual tree SHA; re https://stackoverflow.com/a/2833142/1397555
+# - a GitHub personal access token, usable with the API, re: https://github.com/settings/tokens -- stored in your .bashrc file this way:
 #    export GITHUBAPIKEY=the_actual_API_token
-# git (for obtaining hash info of a folder if you wish to update or change a hard-coded variable)
+# -- where `the_actual_API_token` is not that literal value, but is the actual API key.
+# You'll also need:
+# - jq installed and in your PATH
 
-# USAGE PRECONDITIONS
-# - Set the global variable SHA_TREE to the hash of a folder for which you wish to retrieve a list of all .hexplt files via API call (to randomly select one of them). The hash of the final/production /palettes subfolder is hard coded already. To obtain that (if it changes) or any other hash, from the root of a cloned _ebPalettes repository -- or from within any other subdirectory of the repository for which you wish to list the hashes of its subfolders -- run this command:
+# DETAILS ON DEPENDENCIES
+# - The tree SHA updates every time there's a change to anything in the /palettes subfolder (apparently) of the _ebPalettes repository. To obtain that, from the root of a cloned _ebPalettes repository, run this command:
+#    git rev-parse master:palettes
+# SEE also ebPalettes/setBASHRC_palettesTreeHash.sh to automatically update that when it's changed.
+# Also note that from any folder in the _ebPalettes repository, you may type:
 #    git ls-tree HEAD
-# -- and copy the hash shown alongside the directory name you wish to obtain the hash for.
-# - Set up a GitHub access token and store in .bashrc as detailed in DEPENDENCIES.
+# -- to get any other tree SHA you may wish to use (and set in EBPALETTES_PLT_DIR_SHA_TREE) from a current checkout out git state/branch.
+
 # USAGE
 # Run with these parameters:
 # - $1 OPTIONAL. Anything, for example the word THURF, which will cause this script to write the contents of a randomly retrieved palette to a file with the same name as what the palette is stored in. If omitted, only the contents of the file print to stdout (the terminal screen).
@@ -20,21 +26,25 @@
 #    printContentsOfRandomPalette_GitHubAPI.sh
 # Or for example to retrieve the colors of a randomly selected palette and write them to the same file name the palette is associated with, run:
 #    printContentsOfRandomPalette_GitHubAPI.sh THURF
-# NOTE: sources of any palette may have comments or layout markup in addition to sRGB hex color codes, but this script parses and prints only the color codes (eliminating anything else), one per line. If you want those comments etc., hack the script to remove this pipe to grep from the color retrieval command: | grep -i -o '#[0-9a-f]\{6\}
+# NOTE: original sources of any palette may have comments or layout markup in addition to sRGB hex color codes, but this script parses a retrieved source and prints only the color codes (eliminating anything else), one per line. If you want those comments etc., hack the script to remove this pipe to grep from the color retrieval command: | grep -i -o '#[0-9a-f]\{6\}
+
 
 # CODE
-# UNCOMMENT ONLY ONE of the following SHA_TREE options:
-# for testing: a subfolder with fewer palettes and another subfolder in it:
-# SHA_TREE=df2fcfd22e637da93f34d4bc33eaa7124e0fca66
-# for production: the whole palettes subfolder:
-SHA_TREE=0688719693baf392fa3c03d7830d1ee2e0f513a3
+# Uncomment the following to override the global (expected to have exported from .bashrc into the environment of this script); for example for testing: a subfolder with fewer palettes and another subfolder in it:
+# EBPALETTES_PLT_DIR_SHA_TREE=df2fcfd22e637da93f34d4bc33eaa7124e0fca66
 
 # Retrieve the entire directory contents of the palettes subdir, re https://docs.github.com/en/rest/git/trees?apiVersion=2022-11-28#get-a-tree -- adding the ?recursive=1 API parameter -- and store it in a variable; printing feedback to /dev/null:
 PALETTES_TREE=$(curl -s -L \
   -H "Accept: application/vnd.github+json" \
   -H "Authorization: Bearer $GITHUBAPIKEY"\
   -H "X-GitHub-Api-Version: 2022-11-28" \
-  https://api.github.com/repos/earthbound19/_ebPalettes/git/trees/$SHA_TREE?recursive=1 )
+  https://api.github.com/repos/earthbound19/_ebPalettes/git/trees/$EBPALETTES_PLT_DIR_SHA_TREE?recursive=1 )
+
+# Check that grep of result for the string "Bad credentials" (meaning I can't access the API) *fails*, and if it succeeds, exit with error:
+echo $PALETTES_TREE | grep ': "Bad credentials'
+if [[ $? == 0 ]]; then echo "ERROR: bad credentials. Make sure that GITHUBAPIKEY is set and a valid token, as described in comments of this script. Exit."; exit 1; fi
+
+# Otherwise it will continue:
 # filter PALETTES_TREE to only objects whose paths contain .hexplt, and print the .sha of those; the -r removes the quote marks from around the value:
 FILTERED_PALETTES_TREE=( $(jq -r '.tree[] | select(.path | contains(".hexplt")) .sha' <<< $PALETTES_TREE | tr -d '\15\32') )
 

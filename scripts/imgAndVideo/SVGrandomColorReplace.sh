@@ -4,11 +4,14 @@
 # WARNING
 # Changes (overwrites) input svg file without warning. You may wish to only operate on a copy of the svg file, or make many copies and alter them by calling this script from another script, such as `SVGrandomColorReplaceCopies.sh`.
 
+# DEPENDENCIES
+# If you use random palette selection, you need a local install of the _ebPalettes repository, and working copy of the the printContentsOfRandomPalette_ls.sh script, with its dependencies.
+
 # USAGE
 # Run with these parameters:
-# - $1 the file name of an .svg file in the current directory, which this script will directly modify (overwrite with changes).
-# - $2 OPTIONAL. A flat text file list of hexadecimal RGB color codes, one per line, from which to choose random colors for this fill. NOTE: each hex color must be preceded by #. This script makes a copy of the .svg with a name being a time stamp. If $2 is omitted, the script will produce random colors fills. If you want to use $2 but not specify any pallette file (and have it generate random colors), pass the word RANDOM for $2.
-# - $3 OPTIONAL. RGB hex color code in format f800fc (six hex digits, no starting # symbol) to search and replace with random colors from $2. If omitted, defaults to ffffff.
+# - $1 REQUIRED. The file name of an .svg file in the current directory, which this script will directly modify (overwrite with changes).
+# - $2 REQUIRED. A flat text file list of hexadecimal RGB color codes, one per line, from which to choose random colors for this fill. NOTE: each hex color must be preceded by #.
+# - $3 OPTIONAL. RGB hex color code in format f800fc (six hex digits, no starting # symbol) to search and replace with random colors from $2. If omitted, defaults to ffffff. If you use this parameter, you must use $2.
 # Example that will replace every color fill of ffffff (white) in input.svg with randomly generated sRGB colors:
 #    SVGrandomColorReplace.sh input.svg
 # Example that will replace every color fill of ffffff (white) in input.svg with randomly selected colors from `eb_favorites_v2.hexplt`:
@@ -25,72 +28,54 @@
 # TO DO:
 # ? - implement an optional buffer memory of the last three colors used, and if the current picked color is among them, pick another color until it is not among them.
 
-# PARAMETER CHECKING:
+# START PARAMETER CHECKING AND GLOBALS SETTING
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source SVG file name) passed to script. Exit."; exit 1; else svgFileName=$1; fi
-if [ "$2" ] && [ "$2" != "RANDOM" ]
+if [ ! "$2" ]
 then
-	paletteFile=$2
+	echo "\nNo parameter \$2 (source .hexplt file name) passed to script. Exit."; exit 2
+else
+	# Search for palette with utility script; exit with error if it returns nothing:
+	paletteFile=$(findPalette.sh $2)
+	if [ "$paletteFile" == "" ]
+	then
+		echo "!---------------------------------------------------------------!"
+		echo "No file of name $2 found. Consult findPalette.sh. Exit."
+		echo "!---------------------------------------------------------------!"
+		exit 1
+	fi
+	echo "File name $paletteFile found! PROCEEDING. IN ALL CAPS."
+	rndHexColors=( $(grep -i -o '#[0-9a-f]\{6\}' $paletteFile) )
+	# assign retrievedPaletteFileName with just the file name of without the path:
+	retrievedPaletteFileName="${paletteFile##*/}"
 fi
-# Set a default that will be overriden in the next check if $4 was passed to script:
+
+# Set a default that will be overriden in the next check if $3 was passed to script:
 replaceThisHexColor='ffffff'
 if [ "$3" ]
 then
 	# check that $3 is in hex color code format; if so use it, if not exit with error.
-	echo ''
-	echo 'Attempt RGB hex color code from parameter \$3, $3 . . .'
+	echo ""
+	echo "Attempt RGB hex color code from parameter \$3, $3 . . ."
 	replaceThisHexColor=$(echo $3 | grep -i -o "[0-9a-f]\{6\}")
 	# The result of that operation will be that $replaceThisHexColor will be empty if no match was found, and not empty if a match was found. This check uses that fact:
 	if [ "$replaceThisHexColor" != "" ]
 	then
 		echo "Will attempt to replace color $replaceThisHexColor in copies of $svgFileName."
-	fi
-fi
-
-# PALETTE FILE SEARCH if applicable:
-if [ "$paletteFile" != "" ] && [ -e $paletteFile ]		# check if != "" because GNU/Cygwin returns true for search for an undefined or empty string file?!
-then
-	echo Source pallete file $paletteFile found in the current directory. Will use that.
-	rndHexColors=( $(grep -i -o '#[0-9a-f]\{6\}' $paletteFile) )
-else
-	paletteFileNotFound='true'
-fi
-
-if [ "$paletteFile" != "" ] && [ "$paletteFileNotFound" == 'true' ]
-then
-	echo "Specified palette file name not found in current path. Will search for palettesRootDir.txt and search those pathes for palette . . ."
-	# Search for specified palette file in palettesRootDir (if that dir exists; if it doesn't, exit with an error) :
-	if [ -e ~/palettesRootDir.txt ]
-	then
-		palettesRootDir=$(< ~/palettesRootDir.txt)
-				echo palettesRootDir.txt found\;
-				echo searching in path $palettesRootDir
-				echo -- for file $paletteFile . . .
-		hexColorSrcFullPath=$(find $palettesRootDir -iname "$paletteFile")
-		echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
-		if [ "$hexColorSrcFullPath" == "" ]
-		then
-			echo File of name $paletteFile NOT FOUND in the path this script was run from OR in path \"$palettesRootDir\" \! ABORTING script.
-			exit 3
-		else
-			echo File name $paletteFile FOUND in the path this script was run from OR in path \"$palettesRootDir\" \!
-			echo File is at\:
-			echo $hexColorSrcFullPath
-			echo PROCEEDING. IN ALL CAPS.
-			rndHexColors=( $(grep -i -o '#[0-9a-f]\{6\}' $hexColorSrcFullPath) )
-		fi
 	else
-		echo !--------------------------------------------------------!
-		echo "file ~/palettesRootDir.txt \(in your root user path\) not found. If you wish to use your intended palette from a directory within a global path containing palettes, this file should exist and have one line, being the root directory that contains palettes (which may be in subfolders of that directory), e.g.:"
-		echo
-		echo /c/Users/YourUserName/Documents/_ebPalettes/palettes
-		echo
-		echo see the _ebPalettes repo with its createPalettesRootDirTXT.sh script.
-		echo ABORTING script.
-		echo !--------------------------------------------------------!
-		exit
+		echo "PROBLEM: parameter \$3 nonconformant to sRGB hex color code format. Exit."
+		exit 2
 	fi
 fi
+# END PARAMETER CHECKING AND GLOBALS SETTING
 
+# dev test prints -- comment out in production:
+# for element in ${rndHexColors[@]}
+# do
+	# echo test $element
+# done
+# echo retrievedPaletteFileName is $retrievedPaletteFileName.
+
+# MAIN FUNCTIONALITY
 # remove # from start of every element of hex array:
 counter=0
 replArr=()
@@ -101,20 +86,6 @@ do
 	replArr+=($newSTR)
 done
 rndHexColors=("${replArr[@]}")
-
-# If no $paletteFile set (no parameter $3 passed to script), create an array of 9 random hex RGB color values. Otherwise, create the array from the list in the filename specified in $3.
-if [ -z "$paletteFile" ]
-then
-	echo "no parameter \$3 passed to script, OR passed as RANDOM; generating random hex colors array . . ."
-	rndHexColors=()
-	for i in $(seq 9);
-	do
-		# TO DO: make this work faster with one pre-generated string in memory that you bite six bytes off in increments?
-		rndHexColor=$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 6)
-			echo Generated random RGB hex color "$rndHexColor" . . .
-		rndHexColors+=($rndHexColor)
-	done
-fi
 
 sizeOf_rndHexColors=${#rndHexColors[@]}
 sizeOf_rndHexColors=$(($sizeOf_rndHexColors - 1))		# Else we get an out of range error for the zero-based index of arrays.

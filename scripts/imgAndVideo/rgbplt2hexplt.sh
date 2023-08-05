@@ -13,50 +13,22 @@
 if [ ! "$1" ]; then printf "No .rgbplt file name passed to script. Expected as parameter \$1."; exit 1; else paletteFile=$1; fi
 renderTargetFile=${paletteFile%.*}.hexplt
 
-# IF RENDER TARGET already exists, abort script. Otherwise continue.
-if [ -f ./$renderTargetFile ]
+# Search for palette with utility script; exit with error if it returns nothing:
+rgbColorSrcFullPath=$(findPalette.sh $paletteFile)
+if [ "$rgbColorSrcFullPath" == "" ]
 then
-	echo Converted color palette target $renderTargetFile already exists\; SKIPPING conversion.
-	exit
-else
-	if [ -e ./$1 ]
-	then
-		rgbColorSrcFullPath=$1
-	else
-		echo Converted color palette target $renderTargetFile does not exist\; WILL CONVERT.
-		if [ -e ~/palettesRootDir.txt ]
-		then
-			palettesRootDir=$(< ~/palettesRootDir.txt)
-					echo palettesRootDir.txt found\;
-					echo searching in path $palettesRootDir --
-					echo for file $paletteFile . . .
-			rgbColorSrcFullPath=$(find $palettesRootDir -iname "$paletteFile")
-			echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
-			if [ "$rgbColorSrcFullPath" == "" ]
-				then
-					echo No file of name $paletteFile found in the path this script was run from OR in path \"$palettesRootDir\" \! ABORTING script.
-					exit
-				else
-					echo File name $paletteFile found in the path this script was run from OR in path \"$palettesRootDir\" \! PROCEEDING. IN ALL CAPS.
-			fi
-		else
-			echo !--------------------------------------------------------!
-			echo file ~/palettesRootDir.txt \(in your root user path\) not found. This file should exist and have one line, being the path of your palette text files e.g.:
-			echo
-			echo /cygdrive/c/_ebdev/scripts/imgAndVideo/palettes
-			echo
-			echo ABORTING script.
-			echo !--------------------------------------------------------!
-			exit
-		fi
-	fi
-
-	paletteFileLines=$(tr ' ' ',' < $paletteFile)		# replace spaces with commas on add to array to bypass IFS confusion of space/newline as separator..
-	for line in ${paletteFileLines[@]}
-	do
-		# .. and replace it with a space here:
-		line=$(echo $line | tr ',' ' ')
-		line=$(printf %02x $line)
-		echo \#$line >> $renderTargetFile
-	done
+	echo "!---------------------------------------------------------------!"
+	echo "No file of name $paletteFile found. Consult findPalette.sh. Exit."
+	echo "!---------------------------------------------------------------!"
+	exit 1
 fi
+echo "File name $paletteFile found at $hexColorSrcFullPath! PROCEEDING. IN ALL CAPS."
+
+paletteFileLines=$(tr ' ' ',' < $rgbColorSrcFullPath)		# replace spaces with commas on add to array to bypass IFS confusion of space/newline as separator..
+for line in ${paletteFileLines[@]}
+do
+	# .. and replace it with a space here:
+	line=$(echo $line | tr ',' ' ')
+	line=$(printf %02x $line)
+	echo \#$line >> $renderTargetFile
+done

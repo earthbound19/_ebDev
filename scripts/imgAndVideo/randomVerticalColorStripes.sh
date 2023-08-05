@@ -1,12 +1,12 @@
 # DESCRIPTION
-# Creates a `.ppm` (plain text file bitmap format) image of a random number of color columns, each column repeating one color a random number of times, to effectively make a vertical stripe of a random width. Colors used can be random or configurable via input file parameter (of a list of hex color values). Generates Z such images. All random ranges, dimensions, and colors to use configurable; see USAGE for script parameters and example.
+# Creates N `.ppm` (plain text file bitmap format) images of a random number of color columns, each column repeating one color a random number of times, to effectively make a vertical stripe of a random width. Colors used can be random or configurable via a .hexplt source list. All random ranges, dimensions, and colors to use configurable; see USAGE for script parameters and example.
 
 # USAGE
 # Run with the following parameters:
 # - $1 The minimum number vertical color stripes to make (before* image upscale).
 # - $2 The maximum number "
 # - $3 How many such images to make
-# - $4 OPTIONAL. The name of a file list of hex color values to randomly pick from, findable in any of the directories or sub-directories of a path given in ~/palettesRootDir.txt (the script uses another script, findPalette.sh, to search subfolders in the path listed in that file). If not provided, every stripe is a pseudo-randomly generated color (the color created from entropy at run time). FOR HELP creating that file, see createPalettesRootDirTXT.sh in the _ebArt repository.
+# - $4 OPTIONAL. The name of a file list of hex color values to randomly pick from, findable in any of the directories or sub-directories of a path searched by `findPalette.sh` (see documentation in taht script). If not provided, every stripe is a pseudo-randomly generated color (the color created from entropy at run time). Random color creation isn't recommended; using a good palette is.
 # Example that will produce minimum 3 vertical stripes, maximum 80, and 5 such images, from the palette sparkleHeartHexColors.hexplt:
 #    randomVerticalColorStripes.sh 3 80 5 sparkleHeartHexColors.hexplt
 # NOTES
@@ -21,7 +21,12 @@ if ! [ "$3" ]; then printf "\nNo parameter \$3. Exit."; exit; fi
 
 # In case of interrupted run, clean up first:
 if [ -e temp.txt ]; then rm temp.txt; fi
-if [ -e *.temp ]; then rm *.temp; fi
+# Test list of all *.temp files; if the command succeeds (zero value of errolevel $?), we know they exist, so delete them:
+ls *.temp &>/dev/null
+if [ $? == 0 ]
+then
+	rm *.temp
+fi
 
 # GLOBAL VARIABLES
 minColorColumnRepeat=$1
@@ -29,17 +34,20 @@ maxColorColumnRepeat=$2
 padDigitsTo=${#maxColorColumnRepeat}
 howManyImages=$3
 # set hexColorSrcFullPath variable from printout of script call:
-hexColorSrcFullPath=$(findPalette.sh $4)
-
-if [ "$hexColorSrcFullPath" != "" ]
+if [ "$4" ]
+then
+	hexColorSrcFullPath=$(findPalette.sh $4)
+	if [ "$hexColorSrcFullPath" != "" ]
 	then
-	echo IMPORTING COLOR LIST from file name\:
-	echo $hexColorSrcFullPath
-	mapfile -t hexColorsArray < $hexColorSrcFullPath
-	sizeOf_hexColorsArray=${#hexColorsArray[@]}
-	sizeOf_hexColorsArray=$(( $sizeOf_hexColorsArray - 1))		# Else we get an out of range error for the zero-based index of arrays.
-else
-	printf "\nERROR: \$hexColorSrcFullPath has an empty value. Test calls to findPalette.sh $4 and examine that script for help. Exit."; exit 1
+		echo IMPORTING COLOR LIST from file name\:
+		echo $hexColorSrcFullPath
+		# grep command filters out any comments etc. from file and retrieves only the sRGB hex values to an array:
+		hexColorsArray=( $(grep -i -o '#[0-9a-f]\{6\}' $hexColorSrcFullPath) )		# tr command removes
+		sizeOf_hexColorsArray=${#hexColorsArray[@]}
+		sizeOf_hexColorsArray=$(( $sizeOf_hexColorsArray - 1))		# Else we get an out of range error for the zero-based index of arrays.
+	else
+		printf "\nERROR: \$hexColorSrcFullPath has an empty value (no palette of file name $4 found). Test calls to findPalette.sh $4 and examine that script for help. Exit."; exit 1
+	fi
 fi
 	# IN DEVELOPMENT:
 	# ? Pregenerate a long string which is so many random hex colors smushed together (without any delimiters), to pull hex colors from in chuncks of six characters for greater efficiency; re: http://stackoverflow.com/a/1405641

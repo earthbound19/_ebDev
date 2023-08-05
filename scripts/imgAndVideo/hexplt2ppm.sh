@@ -28,39 +28,16 @@ if [ ! "$1" ]; then printf "\nNo parameter \$1 (source hexplt format file) passe
 
 renderTargetFile=${1%.*}.ppm
 
-# Search current path for $1; if it exists set hexColorSrcFullPath to just $1 (we don't need the full path). If it doesn't exist in the local path, search the path in palettesRootDir.txt and make decisions based on that result:
-if [ -e ./$1 ]
+# Search for palette with utility script; exit with error if it returns nothing:
+hexColorSrcFullPath=$(findPalette.sh $paletteFile)
+if [ "$hexColorSrcFullPath" == "" ]
 then
-	hexColorSrcFullPath=$1
-else	# Search for specified palette file in palettesRootDir (if that dir exists; if it doesn't, exit with an error) :
-	if [ -e ~/palettesRootDir.txt ]
-	then
-		palettesRootDir=$(< ~/palettesRootDir.txt)
-				echo palettesRootDir.txt found\;
-				echo searching in path $palettesRootDir --
-				echo for file $paletteFile . . .
-						# FAIL:
-						# hexColorSrcFullPath=$(find "$palettesRootDir" -iname *$paletteFile)
-		hexColorSrcFullPath=$(find $palettesRootDir -iname "$paletteFile")
-		echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
-		if [ "$hexColorSrcFullPath" == "" ]
-			then
-				echo No file of name $paletteFile found in the path this script was run from OR in path \"$palettesRootDir\" \! ABORTING script.
-				exit
-			else
-				echo File name $paletteFile found in the path this script was run from OR in path \"$palettesRootDir\" \! PROCEEDING. IN ALL CAPS.
-		fi
-	else
-		echo !--------------------------------------------------------!
-		echo file ~/palettesRootDir.txt \(in your root user path\) not found. This file should exist and have one line, being the path of your palette text files e.g.:
-		echo
-		echo /cygdrive/c/_ebdev/scripts/imgAndVideo/palettes
-		echo
-		echo ABORTING script.
-		echo !--------------------------------------------------------!
-		exit
-	fi
+	echo "!---------------------------------------------------------------!"
+	echo "No file of name $paletteFile found. Consult findPalette.sh. Exit."
+	echo "!---------------------------------------------------------------!"
+	exit 1
 fi
+echo "File name $paletteFile found at $hexColorSrcFullPath! PROCEEDING. IN ALL CAPS."
 
 # get array of colors from file by extracting all matches of a pattern of six hex digits preceded by a #:
 colorsArray=( $(grep -i -o '#[0-9a-f]\{6\}' $hexColorSrcFullPath | tr -d '#') )		# tr command removes pound symbol, and surrounding () makes it an actual array

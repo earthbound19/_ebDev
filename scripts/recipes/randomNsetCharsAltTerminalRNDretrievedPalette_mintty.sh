@@ -8,9 +8,12 @@
 # Run without any parameters:
 #    randomNsetCharsAltTerminalRNDretrievedPalette_mintty.sh
 
-# if ~/palettesRootDir.txt not found, notify and exit.
-if [ ! -f ~/palettesRootDir.txt ]; then echo "No ~/palettesRootDir.txt file found (needed by printContentsOfRandomPalette_ls.sh). Exit."; exit 1; fi
-# (effectively) else continue:
+# if EB_PALETTES_ROOT_DIR undefined found, notify and exit.
+if [ ! "$EB_PALETTES_ROOT_DIR" ] || [ ! -e $EB_PALETTES_ROOT_DIR ]
+then
+	echo "EB_PALETTES_ROOT_DIR undefined, or path defined by that string (\"$EB_PALETTES_ROOT_DIR\") does not exist, or is inaccessible. Needed by printContentsOfRandomPalette_ls.sh (see). Exit."
+	exit 1
+fi
 
 # infinite loop
 while :

@@ -3,11 +3,11 @@
 
 # DEPENDENCIES
 # - graphicsmagick, hexplt2ppm.sh, img2imgNN.sh
-# - Optionally a file `~/palettesRootDir.txt` (in your home folder) which contains one line, which is a Unix-style path to the folder where you keep hex palette (`.hexplt`) files. If this file is not found, the script searches for palette files in the current directory.
+# - Optionally, an environment variable export of EB_PALETTES_ROOT_DIR set in `~/.bashrc` (in your home folder) which contains one line, set with a Unix-style path to the folder where you keep hex palette (`.hexplt`) files (for example /some_path/_ebPalettes/palettes). See _ebPalettes/setEBpalettesEnvVars.sh. If this environment variable is set, the script can look for a palette file name in that directory tree and render from it. See _ebPalettes/setEBpalettesEnvVars.sh.
 
 # USAGE
 # Run this script with the following parameters:
-# - $1 A palette file in `.hexplt` format, which is a list of RGB colors expressed as hexadecimal (hex color codes), one color per line. If this file is in the directory you run this script from, it will be used. If the file is not in the current directory, it may be anywhere in a directory tree in a path given in a file `~/palettesRootDir.txt`, and the script will find the palette in that directory tree and render from it.
+# - $1 A palette file in `.hexplt` format, which is a list of RGB colors expressed as hexadecimal (hex color codes), one color per line. If this file is in the directory you run this script from, it will be used. If the file is not in the current directory, it may be anywhere in a directory tree in a path given in the environment variable EB_PALETTES_ROOT_DIR, and the script will find the palette in that directory tree and render from it.
 # - $2 OPTIONAL. Edge length of each square tile in final image. (Image width will be this X columns; image height will be this X rows.) If not provided a default is used. To use additional parameters and use the default for this, provide the string 'NULL' for this.
 # - $3 OPTIONAL. If not provided, or provided as string 'NULL', the order of elements in the palette will be preserved. If provided and anything other than NULL (for example 2 or foo or 1 or 3), the script will randomly shuffle the hex color files before compositing them to one image. I have gone back and forth on requiring this in the history of this script :/
 # - $4 OPTIONAL. Columns. If omitted, the script will try to come up with a number of columns that will best fit color tiles with minimal wasted gray "no color" remaining tiles. AND/OR, if columns and rows syntax is found in the source hexplt file (see NOTES) and you omit $4, it will use the columns and rows specified in the source hexplt.
@@ -39,47 +39,28 @@ paletteFile=$1
 # IF RENDER TARGET already exists, abort script with error 2. Otherwise continue.
 PPMrenderTarget=${paletteFile%.*}.ppm
 PNGrenderTarget=${paletteFile%.*}.png
+
+# Search for palette with utility script; exit with error if it returns nothing:
+hexColorSrcFullPath=$(findPalette.sh $paletteFile)
+if [ "$hexColorSrcFullPath" == "" ]
+then
+	echo "!---------------------------------------------------------------!"
+	echo "No file of name $paletteFile found. Consult findPalette.sh. Exit."
+	echo "!---------------------------------------------------------------!"
+	exit 1
+fi
+echo "File name $paletteFile found at $hexColorSrcFullPath! PROCEEDING. IN ALL CAPS."
+
 if [ -f ./$PNGrenderTarget ]
 then
 	echo "-SKIPPING Render target $PNGrenderTarget, as it already exists."
 	# exit with error code
-	exit 2
+	exit 1
 fi
 # Effectively, else:
+echo ""
 echo "+RENDERING target $PNGrenderTarget, as it does not exist."
 
-# Search current path for $1; if it exists set hexColorSrcFullPath to just $1 (we don't need the full path). If it doesn't exist in the local path, search the path in palettesRootDir.txt and make decisions based on that result:
-if [ -e ./$1 ]
-then
-	hexColorSrcFullPath=$1
-	echo File name $paletteFile found in the path this script was run from\! PROCEEDING. IN ALL CAPS.
-else	# Search for specified palette file in palettesRootDir (if that dir exists; if it doesn't, exit with an error) :
-	if [ -e ~/palettesRootDir.txt ]
-	then
-		palettesRootDir=$(< ~/palettesRootDir.txt)
-				echo palettesRootDir.txt found\;
-				echo searching in path $palettesRootDir --
-				echo for file $paletteFile . . .
-		hexColorSrcFullPath=$(find $palettesRootDir -iname "$paletteFile")
-		echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
-		if [ "$hexColorSrcFullPath" == "" ]
-			then
-				echo No file of name $paletteFile found in the path this script was run from OR in path \"$palettesRootDir\" \! ABORTING script.
-				exit 2
-			else
-				echo File name $paletteFile found in the path \"$palettesRootDir\" \! PROCEEDING. IN ALL CAPS.
-		fi
-	else
-		echo !--------------------------------------------------------!
-		echo file ~/palettesRootDir.txt \(in your root user path\) not found. This file should exist and have one line, which is the path of your palette text files e.g.:
-		echo
-		echo /cygdrive/c/_ebdev/scripts/imgAndVideo/palettes
-		echo
-		echo ABORTING script.
-		echo !--------------------------------------------------------!
-		exit 3
-	fi
-fi
 if [ "$2" ] && [ "$2" != "NULL" ]; then tileEdgeLen=$2; else tileEdgeLen=250; fi
 
 # Set default no shuffle, and only alter if $3 is not equal to 'NULL':
