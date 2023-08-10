@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Copies the video stream of a source video into a new container and re-encodes the audio in aac high quality, into an mp4 container. Intended for slightly modified video distribution from source video from some (silly) devices that record AVC/PCM videos (which have like 1:10 ratio waste) in sound stream size via PCM; ergo this script to get them compressed audio to save space. Output files are named after the input file, but add ~_aacSound to the file name. Also, metadata and timestamps are copied from the source to the target via another script.
+# Copies the video stream of a source video and re-encodes the audio in aac high quality, into an mp4 container. Intended for slightly modified video distribution from source video from some (silly) devices that record AVC/PCM videos. Where PCM takes excessive file space, converting the PCM sound stream to aac saves a lot of space. Output files are named after the input file, but add ~_aacSound to the file name. Also, metadata and timestamps are copied from the source to the target via another script.
 
 # DEPENDENCIES
 #    ffmpeg, copyMetadataFromSourceFileToTarget.sh.
