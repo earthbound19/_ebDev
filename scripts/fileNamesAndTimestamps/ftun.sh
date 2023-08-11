@@ -1,5 +1,6 @@
 # DESCRIPTION
-# Replaces terminal-unfriendly characters in all files of a given type (parameter 1) in the current directory, via rename.pl. If $1 is not provided, does this to ALL files in the current directory. Why ftun.sh? FTUN stands for "Fix Terminal Unfriendly [folder and file] Names." Terminal-unfriendly characters in file names are any character that may make a script choke if you attempt to pass a file name (or folder name) containing them to a script. See NOTES under USAGE.
+# Replaces terminal-unfriendly characters in all files of a given type (parameter 1) in the current directory, via rename.pl. If $1 is not provided, does this to ALL files in the current directory, and optionally in all sub-directories. In the case of subdirectories, first renames subdirectories themselves, lowest depth first, to not have terminal-unfriendly folder names. So as a warning, it can change paths too.
+# Why ftun.sh? FTUN stands for "Fix Terminal Unfriendly [folder and file] Names." Terminal-unfriendly characters in file names are any character that may make a script choke if you attempt to pass a file name (or folder name) containing them to a script. See NOTES under USAGE.
 
 # DEPENDENCIES
 # Perl and `rename.pl` (from http://plasmasturm.org/code/rename/rename) in your PATH, and a Unix or emulated Unix environment. Also getFullPathToFile.sh from _ebDev.
@@ -83,6 +84,43 @@ OIFS="$IFS"
 IFS=$'\n'
 if [ "$2" ] && [ "$2" != 'NORECURSION' ]
 then
+	# reverse the print so that it lists children directories before parents, to avoid the problem that renaming parent paths first would alter the path to children:
+	paths=($(find . -type d | tac))
+else
+	paths=$(pwd)
+fi
+
+# TO DO: make this work with all these characters, if it doesn't:
+# '@=`~!#$%^&()+[{]}; ,-
+renameExpression='s/[^\w.-]+/_/g'
+
+echo RENAMING FOLDERS first . .
+# back up current working dir path:
+pushd . &>/dev/null
+workingBaseDir=$(pwd)
+# rename folders first:
+for path in ${paths[@]}
+do
+		echo ""
+		echo full path is \'$path\'
+	parentPath="${path%\/*}"
+		echo parent path is $parentPath
+	subPath="${path##*/}"
+		echo sub path in that is $subPath
+	cd $workingBaseDir/$parentPath
+		echo "Working in directory: $path"
+		echo Renaming subfolder $path if necessary . . .
+	perl $pathToRenamePerl -e $renameExpression $subPath
+done
+# change back to saved (then current) working dir path:
+popd . &>/dev/null
+
+# REMAKE a paths array (since we may have renamed folders!) which is of all subdirectories if $2 was passed, or only the current directory if $2 was _not_ passed:
+OIFS="$IFS"
+IFS=$'\n'
+if [ "$2" ] && [ "$2" != 'NORECURSION' ]
+then
+	# don't reverse the print (no cat) here:
 	paths=($(find . -type d))
 else
 	paths=$(pwd)
@@ -95,9 +133,7 @@ do
 	cd $path
 	echo "Working in directory: $path"
 
-	# TO DO: make this work with all these characters, if it doesn't:
-	# '@=`~!#$%^&()+[{]}; ,-
-	perl $pathToRenamePerl -g -e 's/[^\w.-]+/_/g' \"$extension\"
+	perl $pathToRenamePerl -g -e $renameExpression \"$extension\"
 
 	cd $thisRootDir
 done
