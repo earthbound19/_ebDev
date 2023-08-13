@@ -2,7 +2,7 @@
 # Prints the full path to a `.hexplt` file if found, else prints nothing.
 
 # DEPENDENCIES
-# An environment variable export of EB_PALETTES_ROOT_DIR set in `~/.bashrc` (in your home folder) which contains one line, set with a Unix-style path to the folder where you keep hex palette (`.hexplt`) files (for example /some_path/_ebPalettes/palettes). See _ebPalettes/setEBpalettesEnvVars.sh.
+# An environment variable export of EB_PALETTES_ROOT_DIR set in `~/.bashrc` (in your home folder) which contains one line, set with a Unix-style path to the folder (and optionally subfolders within it) where you keep hex palette (`.hexplt`) files (for example /some_path/_ebPalettes/palettes). See _ebPalettes/setEBpalettesEnvVars.sh.
 
 # USAGE
 # With this script in your PATH, run it with one parameter, which is the file name of a palette (such as a .hexplt file name, which is a list of RGB color codes in hex format, one color per line) you wish to locate. For example:

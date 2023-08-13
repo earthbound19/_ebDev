@@ -20,7 +20,8 @@
 
 # CODE
 # TO DO:
-# - Refactor to allow continuation of interrupted runs (do not erase temp files; rather append to them.) This means not resizing for comparision any pre-existing files of the pattern __superShrunkRc6d__*, not wiping comparision result temp files, picking up where comparisons left off, and . . . ?
+# - Allow continuation of interrupted runs (do not erase temp files; rather append to them)? This means not resizing for comparision any pre-existing files of the pattern __superShrunkRc6d__*, not wiping comparision result temp files, picking up where comparisons left off, and . . . ? Unless until that is done, exit on detect of info target file:
+if [ -f IMGlistByMostSimilar.txt ]; then echo "NOTE: information target file IMGlistByMostSimilar.txt already exists. To recreate it, rename or delete it and run this script again. Exit."; exit 1; fi
 
 allIMGs=()
 if [ ! "$1" ]

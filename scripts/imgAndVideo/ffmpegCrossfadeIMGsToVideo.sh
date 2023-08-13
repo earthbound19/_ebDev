@@ -8,8 +8,8 @@
 # run this script with three parameters:
 # - $1 File name of input image one
 # - $2 File name of input image two
-# - $3 Duration of crossfade between them
-# - $4 OPTIONAL. Padding, in seconds (time for images to be shown without crossfade), at start and end of video. If not specified, defaults to 4.36.
+# - $3 OPTIONAL. Duration of crossfade between them, in decimal seconds, e.g. 2.5
+# - $4 OPTIONAL. Padding, in decimal seconds of still image, at start and end of video (before and after crossfades). If not specified, defaults to 4.36.
 # Example that creates a video of a 7-second crossfade from one image to another, with 4.36 seconds padding before and after:
 #    ffmpegCrossfadeIMGsToVideo.sh inputImageOne.png inputImageTwo.png 7 4.36
 # NOTES
