@@ -2,10 +2,14 @@
 # Renders a sequence of image crossfades from a list (e.g. by next most similar image), by calling `ffmpegCrossfadeIMGsToVideo.sh` repeatedly.
 
 # DEPENDENCIES
-# a 'Nixy environment, sed, paste, tail, Perl, and the tools needed by `ffmpegCrossfadeIMGsToVideo.sh`.
+# - a 'Nixy environment, sed, paste, tail, Perl, and the tools needed by `ffmpegCrossfadeIMGsToVideo.sh`.
+# - a list of images (possibly sorted by next most similar), named `IMGlistByMostSimilar.txt`, as prepared by `imgsGetSimilar.sh` and/or `re_sort_imgsMostSimilar.sh`.
 
 # USAGE
-# See "DEPENDENCIES" first. Then run:
+# Ensure you have DEPENDENCIES (see) in place. Then run with these parameters:
+# - $1 OPTIONAL. Duration of crossfade, in decimal seconds, e.g. 2.5. If omitted, the script this calls uses a default.
+# - $1 OPTIONAL. Duration of still image pad between crossfades, in decimal seconds, e.g. 0.7. If omitted, the script this calls uses a default.
+# For example, to create 
 #    ffmpegCrossfadeIMGsToVideoFromFileList.sh
 
 # RECIPE
@@ -14,42 +18,11 @@
 
 # CODE
 # TO DO
-# - Interrupted run handling / resume? What to do with fadeSRCvideosList.txt in that case?
-# - Fill out dependencis documentation.
-# - Let this script take parameters.
-# - Figure out why its not allowing less than one second of padding; I thought it did before?
 # - Parameterize source image extension.
-
-# START GLOBALS
-# UNCOMMENT THE VALUE ASSIGNMENTS you'd like to try:
-# crossFadeDuration=0.23
-# crossFadeDuration=0.62
-# crossFadeDuration=1.68
-# crossFadeDuration=1.28
-# crossFadeDuration=2.4
-# crossFadeDuration=3.28
-# crossFadeDuration=3.92
-# crossFadeDuration=4.36
-# crossFadeDuration=5.1
-# crossFadeDuration=5.8
-crossFadeDuration=6.35
-# crossFadeDuration=7.2
-# crossFadeDuration=8
-# crossFadeDuration=11.7
-# NOTE: padding less than 1 (e.g. 0.17) will throw an error, apparently.
-padding=1.1
-# padding=1.25
-# padding=1.54
-# padding=1.65
-# padding=1.78
-# padding=1.91
-# padding=2.24
-# padding=2.81
-# padding=3.2
-# padding=4.7
-
-# END GLOBALS
-# ====
+# - Interrupted run handling / resume? What to do with fadeSRCvideosList.txt in that case?
+# - Figure out why its not allowing less than one second of padding; I thought it did before?
+if [ "$1" ]; then crossFadeDuration=$1; fi
+if [ "$2" ]; then padding=$2; fi
 
 echo ~~~~
 echo Creating image crossfade pairs list . . .
