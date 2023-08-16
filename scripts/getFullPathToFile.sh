@@ -1,11 +1,11 @@
 # DESCRIPTION
-# Searches the operating system PATH for a script file name $1 (parameter 1) and prints the full path to it if found. First tries `which`, which is a lot faster, and if that fails, searches every directory in $PATH. Can help other scripts find the full path to a script they rely on and use, if they capture and utilize the printed output from this.
+# Searches for file name $1 (parameter 1) and prints the full path to it if found. Tries the current directory first, then tries which`, and if that fails, searches every directory in $PATH. Can help other scripts find the full path to a script or resource they use, if they capture and utilize the printed output from this.
 
 # USAGE
 # Suppose you have a script that calls other scripts which you know are in your PATH, but it's inconvenient and/or impractical to hard-code the full path to those other scripts in your script. On top of that, the `which` and `realpath` commands fail to find a file which you know exists in your $PATH on MSYS2 (and maybe other emulated Unix-like environments).
 # Run this script with these parameters:
-# - $1 the file name of a script you want the full path to
-# For example, if the script you want the full path to is color_growth.py, run this script with only that, like this:
+# - $1 the file name of a script or other file you want the full path to
+# For example, if the script you want the full path to is color_growth.py, run this script with only that file name, like this:
 #    getFullPathToScript.sh color_growth.py
 # If this script finds the full path to it, it will print it, e.g.:
 #    /c/_ebDev/scripts/imgAndVideo/color_growth.py
@@ -13,13 +13,21 @@
 #    pathToScript=$(getFullPathToScript.sh color_growth.py)
 #    python $pathToScript $colorGrowthPyParameters
 # NOTES
-# - this script was created because the `which` command apparently doesn't actually search every directory in the $PATH on MSYS2, or if it does, something with it is broken on my setup for some files I try to find with it.
-# - ther may be many possible solutions for utility path searching and command information lookup (or something like that??) for shells, some of which (ha) may better address the problem than the way this script did, re: https://unix.stackexchange.com/questions/85249/why-not-use-which-what-to-use-then
+# - this script will (hopefully) locate any resource by file name in the current directory or PATHs, for example image or font files.
+# - this was created because the `which` command apparently doesn't actually search every directory in the $PATH on MSYS2, or if it does, something with it is broken on my setup for some files I try to find with it.
+# - there may be many possible solutions for utility path searching and command information lookup (or something like that??) for shells, some of which (ha) may better address the problem than the way this script did, re: https://unix.stackexchange.com/questions/85249/why-not-use-which-what-to-use-then
 
 
 # CODE
 if ! [ "$1" ]; then printf "\nNo parameter \$1 (script file name to find the full path to) passed to script. Exit."; exit; else fileNameToFind=$1; fi
 # If `which` works, it is _much_ faster, so try it first:
+
+if [ -e ./$fileNameToFind ]
+then
+	fullPathToFile=$(pwd)
+	echo $fullPathToFile/$fileNameToFind
+	exit 0
+fi
 
 # Note to self: 2>/dev/null redirects stderror if there are errors; if there are not errors it will not redirect, but will print to stdout:
 fullPathToFile=$(which $fileNameToFind 2>/dev/null)
