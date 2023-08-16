@@ -108,7 +108,8 @@ heightPadding=$(echo "scale=0; $tileHeight - ($tileHeight * 95.5 / 100)" | bc)
 
 # Create the montage to a temp image file.
 # Because I can't seem to find the escape sequence necessary to do this from bash+cmd, print the command to a bash script, then execute the script:
-geometryParam="$tileWidth"x$tileHeight\>+$heightPadding+$heightPadding
+paddingParam=">+$heightPadding+$heightPadding"
+geometryParam="$tileWidth"x"$tileHeight""$paddingParam"
 echo "magick montage -background '#919191' $tilesAcrossParam -geometry '$geometryParam' *.$imageType ___oooot_n4yR24PG.png" > tmp_command_MbVTjRGUYXUJ.sh
 ./tmp_command_MbVTjRGUYXUJ.sh
 rm tmp_command_MbVTjRGUYXUJ.sh
