@@ -5,10 +5,10 @@
 function print_halp {
 	echo "
 Options:
-    -i, --input-file <source hexplt format file name>
-    -c<integer or keyword>, --columns=<integer or keyword> Number of columns. OPTIONAL. If omitted, defaults to 1.
+    -i, --input-file <source hexplt format file name> REQUIRED
+    -c<integer or keyword>, --columns=<integer or keyword> OPTIONAL number of columns. If omitted, defaults to 1.
     -a, --all-columns OPTIONAL flag to set number of columns to all colors. Overrides any value of -c, --columns.
-    -n, --no-comment OPTIONAL flag: No \"columns: <n> rows: <n>\" comment in reformatted file
+    -n, --no-comment OPTIONAL flag: No \"columns: <n> rows: <n>\" comment in reformatted file. Default set true.
     -p, --print-to-stdout OPTIONAL flag: Do not overwrite palette file, only print reformatting result to stdtout (with none of the other progress print otherwise done without -p)
 For example, to reformat a .hexplt file with defaults, run:
     reformatHexPalette.sh -i hobby_art_0001-0003.hexplt
@@ -41,7 +41,7 @@ columns=1
 while true; do
   case "$1" in
     -h | --help ) print_halp; exit 0 ;;
-    -i | --inputfile ) srcHexplt=$2; if [ ! -f $srcHexplt ]; then echo "WARNING: source file $srcHexplt not found. Specify an existing file. Exit."; exit 1; fi; shift; shift ;;
+    -i | --inputfile ) srcHexplt=$2; if [ ! -f $srcHexplt ]; then echo "WARNING: source file $srcHexplt not found. Specify an existing file. Exit."; exit 2; fi; shift; shift ;;
     -c | --columns ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -c --columns. Pass a value without any space after -c (for example: -c5), or else don't pass -c and a default value will be used for it. Exit."; exit 2; fi; columns=$2; shift; shift ;;
 	-a | --all-columns ) columnForEveryColor=true; shift; ;;
 	-n | --no-comment ) noLayoutComment=true; shift; ;;
@@ -50,6 +50,8 @@ while true; do
     * ) break ;;
   esac
 done
+
+if [ ! $srcHexplt ]; then print_halp; exit 1; fi
 
 # info print if no flag saying print to standard out (if writing to original .hexplt file) :
 if [ ! $printToStdout ]; then echo "Loading source .hexplt file $srcHexplt . . ."; fi
