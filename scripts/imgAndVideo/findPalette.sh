@@ -15,7 +15,7 @@
 # -- which results in the full path to `turtleGreenTetradicEtcHex.hexplt` being stored in the variable `$fullPathToHexplt`.
 # - This script searches for an exact file name match. If you are looking for `turtleGreenTetradicEtcHex.hexplt` but pass `turtleGreenTetradicEtcHex` or `turtleGreen`, it will fail.
 # - Because this script only prints the full path to a palette file if it finds it, scripts that call this script may be coded to exit with an error if it prints nothing (if a variable assigned via command substitution which calls this script turn out to be empty). That is suggested as best practice (otherwise, things could not work as expected and the reason could be a mystery).
-# - If the envrionment variable $EB_PALETTES_ROOT_DIR is a path the doesn't exist or is unreadable, this script doesn't let you know. You have to figure that out for yourself, but a clue is that this script prints nothing.
+# - If the environment variable $EB_PALETTES_ROOT_DIR is a path which doesn't exist or is unreadable, this script doesn't let you know. You have to figure that out for yourself, but a clue is that this script prints nothing.
 
 
 # CODE
