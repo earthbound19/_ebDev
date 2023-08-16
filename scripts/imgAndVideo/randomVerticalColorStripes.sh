@@ -32,12 +32,12 @@ then
 	rm *.temp
 fi
 
-padDigitsTo=${#maxColorColumnRepeat}
-
 # set hexColorSrcFullPath variable from printout of script call:
 if [ "$4" ]
 then
 	hexColorSrcFullPath=$(findPalette.sh $4)
+	paletteFileBaseName="${hexColorSrcFullPath##*/}"
+	paletteFileBaseName=${paletteFileBaseName%.*}
 	if [ "$hexColorSrcFullPath" != "" ]
 	then
 		echo IMPORTING COLOR LIST from file name\:
@@ -67,14 +67,14 @@ fi
 			# multCounter=$(($multCounter + $getNrandChars))
 			# newFileBaseName=${randomCharsString:$multCounter:$getNrandChars}
 
-for a in $( seq $howManyImages )
+for imgNum in $( seq $howManyImages )
 do
 	howManyStripes=$(shuf -i $minColorColumnRepeat-$maxColorColumnRepeat -n 1)
 	count=0
 	masterPPMvaluesSTR=
 	for i in $( seq $howManyStripes )
 	do
-		echo Generating stripe $i of $howManyStripes for image $a of $howManyImages . . .
+		echo Generating stripe $i of $howManyStripes for image $imgNum of $howManyImages . . .
 		repeatColumnColorCount=$(shuf -i $minColorColumnRepeat-$maxColorColumnRepeat -n 1)
 		# (re)initialize empty tmp constructiong string to append new color columns to:
 		tmpSTR=
@@ -106,9 +106,13 @@ $count 1
 
 	echo Concatenating generated rows into one new .ppm file . . .
 	timestamp=$(date +"%Y_%m_%d__%H_%M_%S__%N")
-		# Format $howManyStripes by padding digits to the number of digits in the highest possible number $maxColorColumnRepeat:
-		paddedNum=$(printf "%0""$padDigitsTo""d\n" $howManyStripes)
-	ppmFileName=1x"$paddedNum"stripesRND_"$timestamp"
+		# Format image number by padding digits to the number of digits in $howManyImages:
+		padDigitsTo=${#howManyImages}
+		imgNumPadded=$(printf "%0""$padDigitsTo""d\n" $imgNum)
+		# Format number of colors (stripes) in image to four digits. Yeah it would be wild to ever pad to that, but for file sorting reasons I want it.
+		padDigitsTo=4
+		stripesPaddedNum=$(printf "%0""$padDigitsTo""d\n" $howManyStripes)
+	ppmFileName="$imgNumPadded"_"$stripesPaddedNum"x1_stripes_"$paletteFileBaseName"_"$timestamp"
 	cat ppmheader.txt ppmBody.txt > $ppmFileName.ppm
 	echo wrote new ppm file $ppmFileName.ppm
 	rm ppmheader.txt ppmBody.txt
