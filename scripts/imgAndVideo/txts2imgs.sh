@@ -8,9 +8,9 @@
 
 # USAGE
 # With this script in your PATH, run it with these parameters:
-# - $1 OPTIONAL. Dimensions of image in format NNxNN. If not provided, a default is used.
-# - $2 OPTIONAL. Point size to render font at. If not provided, a default is used.
-# - $3 OPTIONAL. Font to use. Must be either in the directory you run this script from or in your PATH. If not provided, imagemagick's default will be used. If provided but not found by script, script will exit with an error message.
+# - $1 OPTIONAL. Dimensions of image in format NNxNN. If not provided, a default is used. To use $2 and/or $3 and use the default for this, pass the word DEFAULT for $1.
+# - $2 OPTIONAL. Point size to render font at. If not provided, a default is used. To use $3 and use the default for this, pass the word DEFAULT for $2.
+# - $3 OPTIONAL. Font to use. Must be either in the directory you run this script from or in your PATH. If not provided, a default will be searched for, and used if found; otherwise imagemagick's default will be used. If provided but not found by the script, script will exit with an error message.
 # To use defaults, run the script without any parameter:
 #    texts2imgs.sh
 # Example that will produce a 1920x1080 image with font point size 120, using NotoSerif-Regular.ttf:
@@ -18,30 +18,31 @@
 
 
 # CODE
-if [ ! "$1" ]; then sizeParameter="1920x1920"; else sizeParameter=$1; fi
-if [ ! "$2" ]; then pointSizeParameter=72; else pointSizeParameter=$2; fi
+if [ ! "$1" ] || [ "$1" == "DEFAULT" ]; then sizeParameter="1920x1920"; else sizeParameter=$1; fi
+if [ ! "$2" ] || [ "$2" == "DEFAULT" ]; then pointSizeParameter=72; else pointSizeParameter=$2; fi
 
-# Build variable that is full path to font file name assigned to $fontFileName (from $3); if can't find font (and build variable), error out:
-fullPathToFontFile=""
 if [ "$3" ]
 then
 	fontFileName=$3
-	# fixed vs. ls command, which "finds" a font file if you give everything correctly and then add characters after the name (not correct! -- find command does exact search! ) :
-	fullPathToFontFile=$(find . -maxdepth 1 -name $fontFileName -printf "%P")
-	# if result of that is not blank, the following check will fail and the variable will be left as we want it (non-blank, having found the file, in the current directory).
-	if [ "$fullPathToFontFile" == "" ]
-	# but if it is blank, the search failed (and this check for a blank result will succeed), and we should search the PATH for it:
-	then
-		fullPathToFontFile=$(getFullPathToFile.sh $fontFileName)
-		# if it was found by THAT script, now it will be a non-empty string, and we can leave that variable as is and use it.
-		if [ "$fullPathToFontFile" == "" ]
-		# But if it was also not found by that check; if it is an empty string, we did not find the file in the PATH either, and we should error out:
-		then
-			printf "\n~\nPROBLEM: Font file $fontFileName not found in current directory or anywhere in PATH. Change things so that either is the case, then run the script again, or don't pass a font file name variable to the script. Will exit script."; exit 1
-		fi
-	fi
-echo "Font file $fontFileName found at $fullPathToFontFile."
+	fullPathToFontFile=$(getFullPathToFile.sh $fontFileName)
+else
+	fontFileName="NotoSerif-Regular.ttf"
+	fullPathToFontFile=$(getFullPathToFile.sh $fontFileName)
 fi
+if [ "$3" ] && [ "$fullPathToFontFile" == "" ]
+then
+	printf "\n~\nPROBLEM: Font file $fontFileName not found in current directory or anywhere in PATH. Change things so that either is the case, then run the script again, or don't pass a font file name variable to the script. Will exit script."; exit 1
+fi
+if [ "$fullPathToFontFile" != "" ]
+then
+	echo "Font file $fontFileName found at $fullPathToFontFile. Will use."
+	magickFontSwith="-font $fullPathToFontFile"
+fi
+# reference pseudocode that can be commented out and be effectively the same, for this case:
+# if [ ! "$3" ] && [ "$fullPathToFontFile" == "" ]
+# then
+	# magickFontSwith=
+# fi
 
 fileNamesArray=( $(find . -maxdepth 1 -type f -iname \*.txt -printf '%f\n') )
 for fileName in ${fileNamesArray[@]}
@@ -56,7 +57,7 @@ do
 magick convert -background white -size $sizeParameter \
 -gravity Center \
 -pointsize $pointSizeParameter \
--font $fullPathToFontFile \
+$magickFontSwith \
 caption:"$printString" \
 $renderTargetFileName
 	else
