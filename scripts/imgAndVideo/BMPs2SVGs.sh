@@ -29,6 +29,7 @@ do
 		# potrace -n -s --group -r 72 -u 5 -t 4 -a 10 -O 10 -C \#000000 --fillcolor \#ffffff $element
 		# potrace -s -t 2 -a 0.73 -r 150 -O 0.71 -C \#000000 --fillcolor \#ffffff $element
 		potrace -s -t 12 -a 0.88 -r 150 -O 0.86 -C \#000000 --fillcolor \#ffffff $element
+		# potrace -s -t 12 -a 0.64 -r 150 -O 0.78 -C \#000000 --fillcolor \#ffffff $element
 		# potrace -s -t 4 -a 0.84 -r 150 -O 0.347 -C \#000000 --fillcolor \#ffffff $element
 	fi
 done
