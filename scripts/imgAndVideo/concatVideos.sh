@@ -28,6 +28,7 @@
 #    source concatVideos.sh YORGBLAF fadeSRCvideosList.txt
 # The purpose of setting that variable is to use it in other scripts that need to know the result encoded file name (to do things with it).
 
+
 # CODE
 if [ "$1" ]; then vidExt=$1; else vidExt=mp4; fi
 if [ "$2" ]; then srcFileList=$2; fi

@@ -9,7 +9,7 @@
 # Run with these parameters:
 # - $1 REQUIRED. File type to move (every one of) into a sorting folder if no pair with the same filename but different extension is found.
 # - $2 REQUIRED. Extension of pair files to look for.
-# - OPTIONAL. Any word, such as FRONPL, which will cause the script to repeat the operation through every subfolder (in every subfolder, it will search for files with unmatched extensions and move them into a new randomly named sorting subfolder). If this is omitted, work will only be done (and one sorting sub-folder made) in the current folder, and not in subfolders.
+# - $3 OPTIONAL. Any word, such as FRONPL, which will cause the script to repeat the operation through every subfolder (in every subfolder, it will search for files with unmatched extensions and move them into a new randomly named sorting subfolder). If this is omitted, work will only be done (and one sorting sub-folder made) in the current folder, and not in subfolders.
 # So, the parameter format more concisely described is:
 #    pruneByUnmatchedExtension.sh FileTypeToMove ifNoMatchedFileOfThisType
 # For example, suppose you have a set of render source or configuration files (in my case it might be files of extension .cgp, or .hexplt) for which you have rendered targets (e.g. .png images of color growth script settings or palettes). You may then go through and delete the .png results you don't like, and run this script to move all the associated .cgp or .hexplt files into a temp folder. You can then review the files in the temp folder to be sure you want to manually delete them.
