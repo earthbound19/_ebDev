@@ -8,6 +8,7 @@
 # With this script in your PATH, and the listed dependency file in the folder you run this script from, run it with these parameters:
 # - $1 how many files from the list `IMGlistByMostSimilar.txt` to move into each subfolder
 # - $2 OPTIONAL. Prefix name for folders. If not provided, defaults to `_toEndFR_`.
+# NOTE: if the dependency IMGlistByMostSimilar.txt does not exist, this script will run imgsGetSimilar.sh to create it.
 
 
 # CODE
@@ -26,7 +27,11 @@ fi
 # END SET GLOBALS
 
 # check for IMGlistByMostSimilar.txt and error out if it is not found.
-if [ ! -f IMGlistByMostSimilar.txt ]; then echo "ERROR! Dependency file IMGlistByMostSimilar.txt (to be created by imgsGetSimilar.sh) does not exist. Exit."; exit 3; fi
+if [ ! -f IMGlistByMostSimilar.txt ]
+then
+	echo "NOTICE! Dependency file IMGlistByMostSimilar.txt (to be created by imgsGetSimilar.sh) does not exist; running that script to create it."
+	imgsGetSimilar.sh
+fi
 
 # Count number of files listed in IMGlistByMostSimilar.txt, so we can figure out how many 0 columns to pad numbers with via printf:
 numberOfFiles=$(cat IMGlistByMostSimilar.txt | wc -l)
