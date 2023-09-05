@@ -47,18 +47,42 @@ do
 		gm convert $element -scale 11 __superShrunkRc6d__$element
 	fi
 done
-i_count=0
 printf "" > compare__superShrunkRc6d__col1.txt
 printf "" > compare__superShrunkRc6d__col2.txt
+
+# calculate number of comparisons to be done as reference for feedback print; re https://www.calculator.net/permutation-and-combination-calculator.html?cnv=8&crv=2&x=55&y=16
+# yes, this is crazy. Do it with inline Python code calls to the Python interpreter;
+# see if Python is installed and gives errorlevel 0 for version check:
+python --version &>/dev/null
+if [ $? == 0 ]
+then
+	allIMGsArrLen=${#allIMGs[@]}
+	combinationsCalcNumerator=$(
+	echo $allIMGsArrLen | python -c 'import sys; import math; print(math.factorial(int(sys.stdin.readline())));'
+	)
+	combinationsCalcDenominator_calcOne=$(($allIMGsArrLen - 2))
+	combinationsCalcDenominator_calcTwo=$(
+	echo $combinationsCalcDenominator_calcOne | python -c 'import sys; import math; print(math.factorial(int(sys.stdin.readline())));'
+	)
+	combinationsCalcDenominator=$((2 * $combinationsCalcDenominator_calcTwo))
+	numComparisonsToDo=$(($combinationsCalcNumerator / $combinationsCalcDenominator))
+else
+	numComparisonsToDo="(UNKNOWN -- you may wish to install Pyhon and be sure it is in your PATH)"
+fi
+
 # List all possible pairs of file type $1, order is not important, repetition is not allowed (math algorithm $1 pick 2).
+i_count=0
+j_count=0
 for i in ${allIMGs[@]}
 do
 	i_count=$(( i_count + 1 ))
 	# Remove element i from a copy of the array so that we only iterate through the remaining in the array which have not already been compared; re http://Unix.stackexchange.com/a/68323 :
 	allIMGs_innerLoop=("${allIMGs[@]:$i_count}")
-			# echo size of arr for inner loop is ${#allIMGs_innerLoop[@]}
 	for j in ${allIMGs_innerLoop[@]}
 	do
+		j_count=$(( j_count + 1 ))
+		echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
+		echo "MAKING COMPARISON $j_count of $numComparisonsToDo . . ."
 # Template GraphicsMagick compare command, re: http://www.ImageMagick.org/Usage/compare/
 # compare -metric MAE img_11.png img_3.png null: 2>&1
 				comp1="__superShrunkRc6d__""$i"
