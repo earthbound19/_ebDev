@@ -23,7 +23,6 @@
 import sys
 import numpy as np
 import colorspacious
-from colormap import rgb2hex
 import argparse
 
 # configure arguments / help
