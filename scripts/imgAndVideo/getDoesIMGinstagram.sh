@@ -11,7 +11,7 @@
 # - if you run this script with the source command before it, e.g.:
 #    source getDoesIMGinstagram.sh ./_EXPORTED_M_variantWork_00099_FFsideToside_v02_PZ-8280x.jpg
 # -- then the boolean variable $doesInstagram created by this script survives in the shell (for e.g. another script to use) after this script returns.
-# - in the case of the image being under or over aspect requirements, the script also calculates and sets environment variables targetXpix and targetYpix, which are dimensions that would bring the image into aspect requirements if you pad the image to them. Those environment variables may be set the same way by calling the script with `source`.
+# - in the case of the image being under or over aspect requirements, the script also calculates and sets environment variables $targetXpix and $targetYpix, which are dimensions that would bring the image into aspect requirements if you pad the image to them. Those environment variables may be set the same way by calling the script with `source`.
 # - instagram allows uploads under/over aspect requirements, or over/under recommended resolutions, but will modify the image by cropping/padding/resizing. re: https://help.instagram.com/1631821640426723 -- and other URLs in comments in this script.
 
 
