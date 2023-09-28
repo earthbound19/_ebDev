@@ -43,14 +43,16 @@ then
 		if [ "$lssMinBool" -eq "1" ]
 		then
 			# printf to correctly round a result to nearest integer; re: https://askubuntu.com/a/574474 :
-			targetXpix=$(echo "($yPix * $minAllowedAspect)" | bc -l | xargs printf %.0f)
+			# ADDING ARBITRARY 1 pixel to calculation because decimal/rounding calcs can get it extremely near but not AT desired aspect; + 2 will nudge it over:
+			targetXpix=$(echo "($yPix * $minAllowedAspect) + 1" | bc -l | xargs printf %.0f)
 			echo "You can adjust the image to meet aspect $minAllowedAspect (minimum allowed) by padding the X pixels (dimension across) to:"
 			echo $targetXpix
 			targetYpix=$yPix
 		fi
 		if [ "$grtMaxBool" -eq "1" ]
 		then
-			targetYpix=$(echo "($xPix / $maxAllowedAspect)" | bc -l | xargs printf %.0f)
+			# ADDING ARBITRARY 1 pixel to calculation because decimal/rounding calcs can get it 	extremely near but not AT desired aspect; + 2 will nudge it over:
+			targetYpix=$(echo "($xPix / $maxAllowedAspect) + 1" | bc -l | xargs printf %.0f)
 			echo "You can adjust the image to meet aspect $maxAllowedAspect (maximum allowed) by padding the Y pixels (dimension down) to:"
 			echo $targetYpix
 			targetXpix=$xPix
