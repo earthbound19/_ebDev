@@ -29,3 +29,16 @@ Jimp.read('./' + process.argv[2], (err, sourceImage) => {
     console.log('#' + palette[idx]);
   }
 });
+
+// ALTERNATE LIBRARY OPTION; is binary RGB triplets that I would want to convert to hex:
+// const { getPaletteFromURL } = require('color-thief-node');
+
+// (async () => {
+    // const dominantColor = await getColorFromURL(process.argv[2]);
+// })();
+
+// (async () => {
+    // const colorPallete = await getPaletteFromURL(process.argv[2], 6);
+	// console.log(colorPallete);
+// })();
+
