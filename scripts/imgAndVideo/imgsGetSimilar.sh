@@ -34,6 +34,27 @@ fi
 # OPTIONAL wipe of all leftover files from previous run; comment out the next line if you don't want or need that:
 rm -rf __superShrunkRc6d__*
 
+# calculate number of comparisons to be done as reference for feedback print; re https://www.calculator.net/permutation-and-combination-calculator.html?cnv=8&crv=2&x=55&y=16
+# yes, this is crazy. Do it with inline Python code calls to the Python interpreter;
+# see if Python is installed and gives errorlevel 0 for version check:
+python --version &>/dev/null
+if [ $? == 0 ]
+then
+	allIMGsArrLen=${#allIMGs[@]}
+	combinationsCalcNumerator=$(
+	echo $allIMGsArrLen | python -c 'import sys; import math; print(math.factorial(int(sys.stdin.readline())));'
+	)
+	combinationsCalcDenominator_calcOne=$(($allIMGsArrLen - 2))
+	combinationsCalcDenominator_calcTwo=$(
+	echo $combinationsCalcDenominator_calcOne | python -c 'import sys; import math; print(math.factorial(int(sys.stdin.readline())));'
+	)
+	# using Python here also because ridiculous integer digit counts broke bash math :)
+	combinationsCalcDenominator=$(python -c "val = 2 * $combinationsCalcDenominator_calcTwo; print(val)")
+	numComparisonsToDo=$(python -c "val = $combinationsCalcNumerator / $combinationsCalcDenominator; print(int(val))")
+else
+	numComparisonsToDo="(UNKNOWN -- you may wish to install Python and be sure it is in your PATH)"
+fi
+
 # Create heavily shrunken image copies to run comparison on.
 echo Generating severely shrunken image copies to run comparisons against . . .
 for element in "${allIMGs[@]}"
@@ -49,26 +70,6 @@ do
 done
 printf "" > compare__superShrunkRc6d__col1.txt
 printf "" > compare__superShrunkRc6d__col2.txt
-
-# calculate number of comparisons to be done as reference for feedback print; re https://www.calculator.net/permutation-and-combination-calculator.html?cnv=8&crv=2&x=55&y=16
-# yes, this is crazy. Do it with inline Python code calls to the Python interpreter;
-# see if Python is installed and gives errorlevel 0 for version check:
-python --version &>/dev/null
-if [ $? == 0 ]
-then
-	allIMGsArrLen=${#allIMGs[@]}
-	combinationsCalcNumerator=$(
-	echo $allIMGsArrLen | python -c 'import sys; import math; print(math.factorial(int(sys.stdin.readline())));'
-	)
-	combinationsCalcDenominator_calcOne=$(($allIMGsArrLen - 2))
-	combinationsCalcDenominator_calcTwo=$(
-	echo $combinationsCalcDenominator_calcOne | python -c 'import sys; import math; print(math.factorial(int(sys.stdin.readline())));'
-	)
-	combinationsCalcDenominator=$((2 * $combinationsCalcDenominator_calcTwo))
-	numComparisonsToDo=$(($combinationsCalcNumerator / $combinationsCalcDenominator))
-else
-	numComparisonsToDo="(UNKNOWN -- you may wish to install Pyhon and be sure it is in your PATH)"
-fi
 
 # List all possible pairs of file type $1, order is not important, repetition is not allowed (math algorithm $1 pick 2).
 i_count=0
