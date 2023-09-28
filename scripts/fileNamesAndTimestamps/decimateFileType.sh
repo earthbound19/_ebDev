@@ -41,13 +41,14 @@ fi
 array=( $(find . -maxdepth 1 -type f -iname "*.$fileTypeToDelete" -printf "%P\n") )
 
 counter=0
+arrayLength=${#array[@]}
 for element in ${array[@]}
 do
 	result=$((counter % $divisor))
 	counter=$((counter + 1))
 	if [[ ! result -eq 0 ]]
 	then
-		echo "DELETING $element at count $counter . . ."
+		echo "DELETING $element at count $counter of $arrayLength . . ."
 		rm $element
 	fi
 done
