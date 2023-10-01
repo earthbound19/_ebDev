@@ -5,7 +5,7 @@
 # Run with these parameters:
 # - $1 the name of a text file (in your current directory) which you want to filter unique words from
 # - $2 OPTIONAL Anything, such as the word FLOURBALP, which will cause the script to overwrite the original file with the filtered result.
-# - $3 OPTIONAL. Anything, such as the word THREUSK, which will suppress the silly notification sprint that the task is done (in the case of overwriting the original file, using also $2).
+# - $3 OPTIONAL. Anything, such as the word THREUSK, which will suppress the silly notification print that the task is done (in the case of overwriting the original file, using also $2).
 # For example, to print unique words in their original order of appearance from the file gibberwords.txt, run:
 #    getUniqueWords.sh gibberwords.txt
 # To write the result to a file instead of printing it to the screen, pipe it like this:
