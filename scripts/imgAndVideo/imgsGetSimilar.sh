@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Produces list of images in the current directory arranged by next most similar. Compares all images in a directory. For the first image, it lists which image is most similar to it, then does the same for the second, then third image, and on until the end of the image list. The result is a list of images where every image is adjacent to the two images which are most similar to it. See NOTES for potential uses. It may end up that sort order is not strict; there may be some some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list. I have not re-examined this since coding it and did not document that. NOTE: at this writing an algorithm rewrite is intended that will produce better results. See comments in paletteRenamedCopiesByNextMostSimilar.sh.
+# Produces list of images in the current directory arranged by next most similar. Compares all images in a directory. For the first image, it lists which image is most similar to it, then does the same for the second, then third image, and on until the end of the image list. The result is a list of images where every image is adjacent to the two images which are most similar to it. See NOTES for potential uses. It may end up that sort order is not strict; there may be some some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list. I have not re-examined this since coding it and did not document that.
 
 # DEPENDENCIES
 # `printAllIMGfileNames.sh`, GraphicsMagick, image files in a directory to work on, and bash / GNU utilities
@@ -65,7 +65,8 @@ do
 	else
 				echo converting $element to new shrunken image "__superShrunkRc6d__""$element" to make image comparison much faster . . .
 		# gm convert $element -scale 7 __superShrunkRc6d__$element
-		gm convert $element -scale 11 __superShrunkRc6d__$element
+		# gm convert $element -scale 11 __superShrunkRc6d__$element
+		gm convert $element -scale 48 __superShrunkRc6d__$element
 	fi
 done
 printf "" > compare__superShrunkRc6d__col1.txt
@@ -101,11 +102,17 @@ dos2unix compare__superShrunkRc6d__col1.txt
 paste -d '' compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt > comparisons__superShrunkRc6d__cols.txt
 # Filter out information cruft; NOTE that if the first column isn't preceded by | then the later sort command won't work as intended:
 sed -i 's/.*Total: \([0-9]\{1,11\}\.[0-9]\{1,11\}\).*|\([^|]*\).*|\([^|]*\).*/\1|\2|\3/g' comparisons__superShrunkRc6d__cols.txt
-# Sort results by reverse rank of keys by priority of certain columns in an attempt at most similar pairs adjacent (usually) ; or . . . some other thingy similar? Uncomment one option and comment out all others:
-sort -n -b -t\| -k3r -k1 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
-	# sort -n -b -t\| -k2r -k1r -k3 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
-	# sort -n -b -t\| -k1r -k2 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
-	# sort -n -b -t\| -k3r -k1 comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
+
+# UNCOMMENT ONLY ONE of the below sort lines; the columns are comparasion float (lower is closer image is least different), file name pair A, file name pair B:
+# DEFAULT: sort by first column, lowest value first:
+sort -n -b -t\| -k1						comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
+# Sort by third column reversed, then first column:
+# sort -n -b -t\| -k3r -k1				comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
+# etc:
+# sort -n -b -t\| -k2r -k1r -k3			comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
+# sort -n -b -t\| -k1r -k2				comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
+# sort -n -b -t\| -k3r -k1				comparisons__superShrunkRc6d__cols.txt > tmp_fx49V6cdmuFp.txt
+
 # Strip the numeric column so we can work up a file list of said ordering for animation:
 sed -i 's/[^|]*|\(.*\)/\1/g' tmp_fx49V6cdmuFp.txt
 # In which my utter frustration at windows newline-related bugs strikes again; re: https://stackoverflow.com/questions/3134791/how-do-i-remove-newlines-from-a-text-file

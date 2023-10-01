@@ -36,11 +36,20 @@ cp $sourceFile ./$tmpSortingFileName
 
 # MAIN ALGORITHM described in numbered comments.
 # 1. sort entire list of comparisons from lowest decimal to highest
-# Sort results by rank of most similar (nearest to zero) first, which is on the first bar "|" separated key:
+# Sort results by preferred rank (default hard-coded: most similar (nearest to zero) first), which is on the first bar "|" separated key:
 # function call:
 setRNDstr
 tmpSortingFileName2=tmpSortByNextMostSimilar_"$RNDstr".temp2_sort
-sort -n -b -t\| -k1 $tmpSortingFileName > $tmpSortingFileName2
+# UNCOMMENT ONLY ONE of the below sort lines; the columns are comparasion float (lower is closer image is least different), file name pair A, file name pair B:
+# DEFAULT: sort by first column, lowest value first:
+sort -n -b -t\| -k1						$tmpSortingFileName > $tmpSortingFileName2
+# Sort by third column reversed, then first column:
+# sort -n -b -t\| -k3r -k1				$tmpSortingFileName > $tmpSortingFileName2
+# etc:
+# sort -n -b -t\| -k2r -k1r -k3			$tmpSortingFileName > $tmpSortingFileName2
+# sort -n -b -t\| -k1r -k2				$tmpSortingFileName > $tmpSortingFileName2
+# sort -n -b -t\| -k3r -k1				$tmpSortingFileName > $tmpSortingFileName2
+
 # Strip the numeric column so we can work up a file list of said ordering for animation;
 sed -i 's/[^|]*|\(.*\)/\1/g' $tmpSortingFileName2
 
