@@ -26,8 +26,10 @@ yTopBottomPad = int((sys_argv_3_int - height) / 2)
 new_height = height + yTopBottomPad + yTopBottomPad
 
 # hex to sRGB integer conversion thanks to a genius breath yonder: https://stackoverflow.com/a/29643643/1397555
-h = sys.argv[4]
-sRGB = tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+hex = sys.argv[4]
+# strip any leading '#' character off that:
+hex = hex.lstrip("#")
+sRGB = tuple(int(hex[i:i+2], 16) for i in (0, 2, 4))
 
 result = Image.new(im.mode, (new_width, new_height), sRGB)
 
