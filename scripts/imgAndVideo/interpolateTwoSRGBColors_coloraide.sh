@@ -12,7 +12,7 @@
 # - $1 REQUIRED. Start color, as sRGB hex color code, e.g. '#feff06' (a bright medium yellow)
 # - $2 REQUIRED. End color also as sRGB hex color code, e.g. '#00a6fe' (a medium light sky or robin-egg medium blue)
 # - $3 REQUIRED. Number of colors to obtain via interpolation, e.g. 11
-# - $4 OPTIONAL. Color space to interpolate through to obtain colors, e.g. hct, or oklab, okhsl, srgb etc. Defaults to HCT (as hct) if omitted.
+# - $4 OPTIONAL. Color space to interpolate through to obtain colors, for example 'hct', or 'oklab', 'okhsl', 'srgb' etc. Defaults to HCT (as 'hct') if omitted.
 # For example, to obtain and print gradient from '#feff06' to '#00a6fe' of 11 colors in default hct space, run:
 #    interpolateTwoSRGBColors_coloraide.sh '#feff06' '#00a6fe' 11
 # To do the same and interpolate in okHSL space, run:
