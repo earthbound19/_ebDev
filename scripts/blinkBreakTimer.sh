@@ -28,7 +28,7 @@
 # USER VARIABLES
 # CHANGE THESE VALUES to your liking:
 workMinutes=35
-  workMinutesInMS=$((workMinutes * 60000))
+  workMinutesInMS=$((workMinutes * 30000))
   workBlinkColorChangeIntervalMS=$((50000))   # ~every 50 seconds (in milliseconds)
   # How many times do we need to change the color to reach workMinutesInMS duration if
   # we change colors every workBlinkColorChangeIntervalMS? The following figures that out:

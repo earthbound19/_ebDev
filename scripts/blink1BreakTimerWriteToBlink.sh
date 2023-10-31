@@ -11,8 +11,11 @@
 
 
 # CODE
-# TO DO: option get color palettes and use them from some external source (a palette serving API
-# which maybe I want to develop).
+# TO DO
+# - figure out why, if I write the log of lines printed by this to a file, lines printed back by querying the device:
+#    blink1-tool --getpattline <line number>
+# -- don't match. Malforming the written number? Should it be hex-formatted somehow on write? But it still writes something. ??
+# - option to get color palettes and use them from some external source (a palette serving API, which maybe I want to develop?
 
 # DEVELOPER NOTES
 # For a long time this script had a minute defined as 60000 ms (which is accurate), but I wondered why it didn't seem to time the lights that way. The answer is that I am controlling two lights, and it waits for the delay of one light to finish before it controls the other light. It therefore took twice as long with work minutes and break minutes.
@@ -33,30 +36,45 @@ breakMinutes=8
   breakBlinkColorChangeMS=$((breakMinutesInMS / breakBlinkNtimes))
 
 echo "Will program $workBlinkNtimes color changes at $workBlinkColorChangeMS ms each (for work period) and $breakBlinkNtimes at $breakBlinkColorChangeMS ms each (for break period)."
+
 # blink1-tool --playpattern '5,#ff00ff,0.4,0,#00ffff,0.4,0';
 blink1-tool --clearpattern
 blink1-tool --savepattern
 for i in $(seq 0 2 $workBlinkNtimes)
 do
   iPlusOne=$((i + 1))
- rndR=`shuf -i 0-255 -n 1`
- rndG=`shuf -i 0-255 -n 1`
- rndB=`shuf -i 0-255 -n 1`
+ rndR=$(shuf -i 0-255 -n 1)
+ rndG=$(shuf -i 0-255 -n 1)
+ rndB=$(shuf -i 0-255 -n 1)
  # echo i $i iPlusOne $iPlusOne
- blink1-tool -m $workBlinkColorChangeMS --RGB $rndR,$rndG,$rndB -l 1 --setpattline $i
- blink1-tool -m $workBlinkColorChangeMS --RGB $rndR,$rndG,$rndB -l 2 --setpattline $iPlusOne
+blink1-tool --rgb=$rndR,$rndG,$rndB -m $workBlinkColorChangeMS -l 1 --setpattline $i
+blink1-tool --rgb=$rndR,$rndG,$rndB -m $workBlinkColorChangeMS -l 2 --setpattline $iPlusOne
 done
 
 for j in $(seq $((workBlinkNtimes +1)) 2 $breakBlinkNtimes)
 do
   jPlusOne=$((j + 1))
-  rndR=`shuf -i 0-255 -n 1`
-  rndG=`shuf -i 0-255 -n 1`
-  rndB=`shuf -i 0-255 -n 1`
-  # echo j $j jPlusOne $jPlusOne
-  blink1-tool -m $breakBlinkColorChangeMS --RGB $rndR,$rndG,$rndB -l 1 --setpattline $j
-  blink1-tool -m $breakBlinkColorChangeMS --RGB $rndR,$rndG,$rndB -l 2 --setpattline $jPlusOne
+ rndR=$(shuf -i 0-255 -n 1)
+ rndG=$(shuf -i 0-255 -n 1)
+ rndB=$(shuf -i 0-255 -n 1)
+  # echo i $i iPlusOne $iPlusOne
+ blink1-tool --rgb=$rndR,$rndG,$rndB -m $breakBlinkColorChangeMS -l 1 --setpattline $j
+ blink1-tool --rgb=$rndR,$rndG,$rndB -m $breakBlinkColorChangeMS -l 2 --setpattline $jPlusOne
 done
 
+# It works out that:
+patternLinesCount=$jPlusOne
+
 blink1-tool --savepattern
-blink1-tool --play 1
+# setting startup pattern; set startup true (1,), run line (pos) 0-3, (0,3), run forever (0); re: https://github.com/todbot/blink1/blob/main/docs/blink1-tool-tips.md#play-the-blue-part-of-the-startup-sequence-forever
+blink1-tool --setstartup 1,0,$patternLinesCount,0
+
+echo ""
+echo "DONE. $patternLinesCount""-line Pattern written and set to play on start. To see the pattern play, remove and re-insert the blink1."
+
+# dev note: to see a specific line of the pattern run:
+#    blink1-tool --getpattline <line number>
+# re: https://github.com/todbot/blink1/blob/main/docs/blink1-tool-tips.md#play-the-blue-part-of-the-startup-sequence-forever
+
+# OPTIONAL: play the pattern:
+# blink1-tool --play 1
