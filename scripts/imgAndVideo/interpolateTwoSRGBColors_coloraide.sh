@@ -12,8 +12,8 @@
 # - $1 REQUIRED. Start color, as sRGB hex color code, e.g. '#feff06' (a bright medium yellow)
 # - $2 REQUIRED. End color also as sRGB hex color code, e.g. '#00a6fe' (a medium light sky or robin-egg medium blue)
 # - $3 REQUIRED. Number of colors to obtain via interpolation, e.g. 11
-# - $4 OPTIONAL. Color space to interpolate through to obtain colors, for example 'hct', or 'oklab', 'okhsl', 'srgb' etc. Defaults to HCT (as 'hct') if omitted.
-# For example, to obtain and print gradient from '#feff06' to '#00a6fe' of 11 colors in default hct space, run:
+# - $4 OPTIONAL. Color space to interpolate through to obtain colors, for example 'hct', 'oklab', 'okhsl', or 'srgb' etc. Defaults to HCT (as 'hct') if omitted.
+# For example, to obtain and print a gradient from '#feff06' to '#00a6fe' of 11 colors in default hct space, run:
 #    interpolateTwoSRGBColors_coloraide.sh '#feff06' '#00a6fe' 11
 # To do the same and interpolate in okHSL space, run:
 #    interpolateTwoSRGBColors_coloraide.sh '#feff06' '#00a6fe' 11 okhsl
@@ -46,7 +46,7 @@ if [ "$4" ]; then colorspaceKey="$4"; else colorspaceKey='hct'; fi
 
 # for colorspaceKey in ${spaces[@]}
 # do
-# Yes, I am actually passing a lot of comments to a Python call. So they can be in context in this here source code:
+# Yes, I am actually passing a lot of comments to a Python call, to explain the code on revisiting:
 python -c "
 # reference:
 # sRGB color convert from/to hex: https://facelessuser.github.io/coloraide/colors/srgb/
@@ -54,13 +54,13 @@ python -c "
 # setup for any convert space, or convert through any space: https://github.com/facelessuser/coloraide-extras
 
 # CODE
-# We can import things such that it's specicially set up to convert in a given space:
+# We can import things so that it's specifically set up to convert in a given space:
 # from coloraide import Color as Base
 # from coloraide.spaces.hct import HCT
 # class Color(Base): ...
 # Color.register(HCT())
 
-# OR, strongly preferred for flexibility, set it up to convert in ANY supported space:
+# OR, strongly preferred for flexibility, and done here: set it up to convert in ANY supported space:
 from coloraide_extras.everything import ColorAll as Color
 
 # create sRGB color objects from hex codes
