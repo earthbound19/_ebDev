@@ -2,7 +2,7 @@
 // Prints interpolated colors from -s (--start) to -e (--end) at -n (--number) even intervals, using the Oklab color space, via the culori npm (JavaScript / Nodejs) package. Re: https://bottosson.github.io/posts/oklab/ -- https://raphlinus.github.io/color/2021/01/18/oklab-critique.html#update-2021-01-29
 
 // SEE ALSO
-//    `get_color_gradient_HCT.sh`
+//    `interpolateTwoSRGBColors_coloraide.sh` (can interpolate through many color spaces)
 
 // DEPENDENCIES
 // - nodejs, with a version of the `culori` module greater than `culori@0.20.1` (I think?), as this uses the CommonJS export of culori at `'culori/require'`.
