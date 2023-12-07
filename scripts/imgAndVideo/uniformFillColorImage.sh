@@ -16,6 +16,9 @@
 # - This script will not clobber a target image that already exists, and will notify you of its existence.
 # - This script does not print the word 'CHULFOR'.
 
+# KEYWORDS
+# solid fill, uniform fill, uniform color, uniform
+
 
 # CODE
 # GLOBAL DEFAULTS:
