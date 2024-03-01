@@ -59,6 +59,8 @@ else
 	xFadeLen=$3
 	echo SET xFadeLen to $3.
 	srcClipLengths=$(echo "scale=2; $xFadeLen + $clipPaddingSeconds" | bc)
+	# print leading zero before decimail via awk, re: https://unix.stackexchange.com/a/292105
+	srcClipLengthsLeadZeroDecimal=$(echo $srcClipLengths | awk '{printf "%.2f\n", $0}')
 fi
 
 fadeSRConeFileName="${imgOne%.*}"
@@ -80,7 +82,7 @@ else
 				echo target render image for still image video fade source "$fadeSRConeFileName"."$vidExt" doesn\'t exist\; RENDERING\; render command is\:
 				echo ffmpeg -loop 1 -i $imgOne -t $srcClipLengths $pixelFormat $codecParam $additionalParams "$fadeSRConeFileName"."$vidExt"
 		# write commands to temp script and execute it, sigh. Because it's throwing errors about unrecognize options to pass parameters from variables (it cuts off dashes to options, it seems) :
-		echo ffmpeg -loop 1 -i "$imgOne" -t "$srcClipLengths" "$pixelFormat" "$codecParam" "$additionalParams" "$fadeSRConeFileName"."$vidExt" > tmp_script_fneoime3.sh
+		echo ffmpeg -loop 1 -i "$imgOne" -t "$srcClipLengthsLeadZeroDecimal" "$pixelFormat" "$codecParam" "$additionalParams" "$fadeSRConeFileName"."$vidExt" > tmp_script_fneoime3.sh
 		./tmp_script_fneoime3.sh
 		rm tmp_script_fneoime3.sh
 	fi
@@ -89,7 +91,7 @@ else
 	then
 				echo target render image for still image video fade source "$fadeSRCtwoFileName"."$vidExt" doesn\'t exist\; RENDERING\; render command is\:
 				echo ffmpeg -loop 1 -i $imgTwo -t $srcClipLengths $pixelFormat $codecParam $additionalParams "$fadeSRCtwoFileName"."$vidExt"
-		echo ffmpeg -loop 1 -i "$imgTwo" -t "$srcClipLengths" "$pixelFormat" "$codecParam" "$additionalParams" "$fadeSRCtwoFileName"."$vidExt" > tmp_script_fneoime3.sh
+		echo ffmpeg -loop 1 -i "$imgTwo" -t "$srcClipLengthsLeadZeroDecimal" "$pixelFormat" "$codecParam" "$additionalParams" "$fadeSRCtwoFileName"."$vidExt" > tmp_script_fneoime3.sh
 		./tmp_script_fneoime3.sh
 		rm tmp_script_fneoime3.sh
 	fi
@@ -105,7 +107,8 @@ else
 			# - In practice you can probably usually eliminate the end= from both clip1fadeOut and clip2cut.
 			# - In the filter subcomplex section, st (e.g. st=0) means start, d (e.g. d=4) means duration.
 			# - You will probably always want to set d= to the duration of the first clip MINUS clip1cut's end=<n>. So if the duration of source 1 is 5 seconds, and clip1cut's end=1, that's 5-1=4, so d=4.
-	clip1CutAt=$(echo "scale=2; $srcClipLengths - $xFadeLen" | bc)
+	# again print leading zero before decimail via awk, re: https://unix.stackexchange.com/a/292105
+	clip1CutAt=$(echo "scale=2; $srcClipLengths - $xFadeLen" | bc | awk '{printf "%.2f\n", $0}')
 			echo RENDERING target crossfade file $targetRenderFile . . .
 	ffmpeg -i "$fadeSRConeFileName"."$vidExt" -i "$fadeSRCtwoFileName"."$vidExt" -an \
 	-filter_complex "\
