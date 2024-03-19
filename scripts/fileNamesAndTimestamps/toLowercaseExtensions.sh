@@ -48,7 +48,9 @@ do
 	then
 		fileNameNoExt=${filename%.*}
 		newFileName=$fileNameNoExt.$lowerCasedFileExt
-		echo RENAMING $filename to $newFileName . . .
-		mv $filename $newFileName
+		# workaround for case-retentive yet sensitivity of file system:
+		echo "RENAMING $filename to intermediary file $newFileName"_lwr."$lowerCasedFileExt temporarily to work around case-retentive . . . ness? then to $newFileName . . ."
+		mv $filename $newFileName"_lwr."$lowerCasedFileExt
+		mv $newFileName"_lwr."$lowerCasedFileExt $newFileName
 	fi
 done
