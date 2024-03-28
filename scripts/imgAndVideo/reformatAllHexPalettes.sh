@@ -12,7 +12,7 @@
 # Example that passes 5 for the columns parameter, with the -n switch to print no columns and rows layout comment:
 #    reformatAllHexPalettes.sh '-c16 -n'
 # Example that uses the -a switch to make as many columns as colors:
-#    reformatAllHexPalettes.sh 16 '-a'
+#    reformatAllHexPalettes.sh -a
 # NOTES
 # This script provides a different file name (pulling from every `.hexplt` format file in the current directory) for every call it makes to `reformatHexPalette.sh`. For each call it provides a new file name for -i, as if it were many calls like this:
 #    reformatHexPalette.sh -i <palette1.hexplt> <any parameters from $1>
