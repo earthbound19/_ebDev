@@ -63,12 +63,11 @@ python -c "
 # OR, strongly preferred for flexibility, and done here: set it up to convert in ANY supported space:
 from coloraide_extras.everything import ColorAll as Color
 
+from more_itertools import unique_everseen
+
 # create sRGB color objects from hex codes
 startColor = Color(\"$startColor\")
 endColor = Color(\"$endColor\")
-
-# I don't like this, but it works and I wasn't parsing these somehow correctly otherwise:
-nColors = $nColors
 
 	#UNUSED REFERENCE: use of hct for direct value create:
 	# thing = Color('hct', [27.41, 113.36, 53.237], 1)
@@ -87,14 +86,23 @@ nColors = $nColors
 
 # re: https://facelessuser.github.io/coloraide/interpolation/
 colors = Color.steps(
-	[\"$startColor\", \"$endColor\"],
+	[startColor, endColor],
 	steps=$nColors,
-	space=\"$colorspaceKey\",
+	space='$colorspaceKey',
 	out_space='srgb'
 )
 
+# make new hex color format array that we can remove duplicate elements from:
+hexColors = []
 for color in colors:
-	print(color.to_string(hex=True))
+	hexColors.append(color.to_string(hex=True))
+
+# Deduplicate elements in the list but maintain order:
+hexColors = list(unique_everseen(hexColors))
+
+# print result, one per line:
+for hexColor in hexColors:
+	print(hexColor)
 " \
 # > "$colorspaceKey"_test_interpolation.hexplt
 # done
