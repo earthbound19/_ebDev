@@ -1,5 +1,9 @@
 # DESCRIPTION
-# Generates random hex color schemes of file format `.hexplt` (randomly named), which are plain text files with one hex color per line.
+# Generates random hex color schemes of file format `.hexplt` (randomly named), which are plain text files with one hex color per line. As this is done in sRGB space (which has no alignment with any ideas about human perception), this may not be recommended, or it could be a generally very rough starting point for pallettes. Look elsewhere for better palette exploration or generation; for example:
+# - `get_colormind_RND_palette.sh`
+# - `getHybridPalette.sh`
+# - many other scripts in this repository that have `palette` in the file name?
+# - or the _ebPalettes repository has many carefully collected and crafted palettes.
 
 # USAGE
 # Run with these parameters:
