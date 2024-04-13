@@ -263,7 +263,21 @@ A perhaps broader tutorial and reference is [over here](https://www.thegeekstuff
 
 #### Bash array creation
 
-To create an array from every file of a type, e.g. png, use the find command (here, including a print command that chops off the leading `./` from every result:
+You can declare an empty array this way:
+
+    declare -a myArray
+
+Or this way:
+
+    myArray=()
+
+And append to it this way; for example using it as an array of strings:
+
+    myArray+=('fee')
+	myArray+=('fie')
+	myArray+=('fo')
+
+To create an array of file names of every file of a type, e.g. all png files, use the find command (here, including a print command that chops off the leading `./` from every result:
 
     array=( $(find . -maxdepth 1 -type f -iname \*.png -printf '%f\n') )
 
