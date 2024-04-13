@@ -15,6 +15,7 @@
 # To change the start colors sorted against, change the color_one and color_two variables in the script.
 
 # CODE
+# TO DO: add HCT sort?
 color_one='000000'
 color_two='ffffff'
 
