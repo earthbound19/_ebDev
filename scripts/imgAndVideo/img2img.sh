@@ -9,7 +9,7 @@
 # Run this script with these parameters::
 # - $1 the file name of the file to convert
 # - $2 the image extension (format) to convert it to (without any . in the extension).
-# - $3 OPTIONAL. New image X (pixels across) dimension. Smaller strongly recommended. Input image will be converted to linear RGB, downsized with Lanczos method, maintaining aspect, converted back to sRGB, and saved. This preserves lightness much better in my tests. Photoshop default downscaling produces a happy medium between preserved brightness and perceptual surrounding/mixed darkness. Direct sRGB (no linear intermediary) is worst.
+# - $3 OPTIONAL. New image X (pixels across) dimension. Smaller strongly recommended. Input image will be converted to linear RGB, downsized with Lanczos method, maintaining aspect, converted back to sRGB, and saved. NOTE: you may be able to use other imagmagick downscale flag options such as percent e.g. 33%, though in the case of percent at least, you'll need to use two percent signs to "escape" those characters on Windows; e.g. 30%% for thirty percent. The conversion to linear RGB described preserves lightness much better in my tests. Photoshop default downscaling produces a happy medium between preserved brightness and perceptual surrounding/mixed darkness. Direct sRGB (no linear intermediary) is worst.
 # For example, to create a converted copy of color_growth_title.psd to a .png image, run:
 #    img2img.sh color_growth_title.psd png
 # NOTES

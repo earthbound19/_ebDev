@@ -6,7 +6,7 @@
 # Run this script with these parameters::
 # - $1 the source file format e.g. bmp or png
 # - $2 the target file format e.g. tif or jpg
-# - $3 OPTIONAL. New image X (pixels across) dimension. Smaller strongly recommended. Aspect matching this many X pixels will be maintained. See details in img2img.sh
+# - $3 OPTIONAL. New image X (pixels across) dimension or percent. Smaller strongly recommended. Aspect matching this many X pixels will be maintained. See details in img2img.sh
 # - $4 OPTIONAL. Anything, for example the word HOIHOI, which will cause the script to do conversion in all subfolders also. To use this but not $3, pass the word NULL for $3
 # Example that will convert all png images in the current directory to jpgs:
 #    imgs2imgs.sh png jpg
