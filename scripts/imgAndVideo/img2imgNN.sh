@@ -2,7 +2,7 @@
 # Resizes an image of type $1, in the current directory, by nearest-neighbor method, to target format $2, with the longest edge scaled up (or down!) to pixels $3. The shortest edge is scaled to maintain aspect, but that can be overriden to change aspect, with $4. Nearest neighbor method will keep hard edges, or look "pixelated." Uses GraphicsMagick, unless the file is ppm or pbm format, in which case it uses IrfanView (which to my knowledge is Windows only). Also updates timestamp of target file to match the source it was converted from, for file by time stamp sorting (or any other) reference.
 
 # DEPENDENCIES
-# GraphicsMagick, touch
+# GraphicsMagick, touch, checkForTerminalProblematicPath.sh
 
 # USAGE
 # Run with the following parameters:
@@ -14,8 +14,16 @@
 #    img2imgNN.sh input.pbm png 640
 # OR, to force a given longest and shortest dimension for a ppm:
 #    img2imgNN.sh input.ppm png 640 480
+# KNOWN ISSUE
+# If you try to run this against files at a very long path name and/or with very long file names (excessive path depth), gm identify and/or convert may throw errors about files not existing (no image returned etc.) when in fact they exist. The workaround is to move work to a path that's much higher/shorter. OR it may be that it has a hard time if there are terminal-unfriendly characters in the path (such as spaces). Therefore this script calls another script to check for those problems and exits with an error if either is found.
+
 
 # CODE
+# PATH CHECK AND THROW IF ERROR
+checkForTerminalProblematicPath.sh
+checkError=$?
+if [ $checkError != 0 ]; then printf "\nERROR! errorlevel $checkError assigned from check of checkForTerminalProblematicPath.sh. Examine that script to isolate error. EXIT from $0"; exit 4; fi
+
 # PARAMETER CHECKING
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source image file name) passed to script. Exit."; exit 1; else srcFileName=$1; fi
 if [ ! "$2" ]; then printf "\nNo parameter \$2 (target image format) passed to script. Exit."; exit 2; else destFormat=$2; fi
