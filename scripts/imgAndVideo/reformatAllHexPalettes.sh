@@ -9,7 +9,7 @@
 # - $1 OPTIONAL. Any string of parameters/switches usable by `reformatHexPalette.sh` which you wish to pass to it; see documentation for that script. NOTE that if you use more than one paramater, you must surround them all with quotes. If omitted, the defaults of the called script will be used.
 # Example that passes 16 for the columns parameter:
 #    reformatAllHexPalettes.sh -c16
-# Example that passes 5 for the columns parameter, with the -n switch to print no columns and rows layout comment:
+# Example that passes 16 for the columns parameter, with the -n switch to print no columns and rows layout comment:
 #    reformatAllHexPalettes.sh '-c16 -n'
 # Example that uses the -a switch to make as many columns as colors:
 #    reformatAllHexPalettes.sh -a
