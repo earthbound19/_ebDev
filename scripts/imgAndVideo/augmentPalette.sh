@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Does linear interpolation in N ($2) steps between each color in a .hexplt palette ($1), in okLab color space (using CHL coordinates). Prints the result to stdout.
+# Does linear interpolation in N ($2) steps between each color in a .hexplt palette ($1), in hct color space. Other color spaces can be done with a simple hack. Prints the result to stdout.
 
 # DEPENDENCIES
 # - `interpolateTwoSRGBColors_coloraide.py` and its dependencies
