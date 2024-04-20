@@ -45,13 +45,13 @@ PARSER.add_argument('-v', '--VERSION', nargs=0, action='versionStringPrint', hel
 # suppress annoying redundant metavar print on help with metavar='' -- but MAYBE ONLY FOR REQUIRED ARGUMENTS? re: https://stackoverflow.com/a/62350140
 PARSER.add_argument('-s', '--START', metavar='\b', required=True, type=str, help=
 'Color to (s)tart interpolation (gradient) from. Must be six sRGB hex digits, \
-preceded by a # number character; for example \'#ff0596\' (your terminal may \
-need to surround the parameter with quote marks).'
+for example \'ff0596\' (your terminal may need to surround the parameter with \
+quote marks).'
 )
 PARSER.add_argument('-e', '--END', metavar='\b', required=True, type=str, help=
 'Color to (e)nd interpolation (gradient) with. Must be six sRGB hex digits, \
-preceded by a # number character; for example \'01edfd\' (you may \
-need to surround the parameter with quote marks).'
+for example \'01edfd\' (your terminal may need to surround the parameter with \
+quote marks).'
 )
 PARSER.add_argument('-n', '--NUMBER', metavar='\b', required=True, type=int, help=
 '[Natural number > 2] the (n)umber of colors to create by interpolation. Note \
@@ -81,8 +81,11 @@ ARGS = PARSER.parse_args()
 # INIT VALUES FROM ARGS
 INTERPOLATION_COLORSPACE = ARGS.COLORSPACE
 # create sRGB color objects from hex codes
-START_COLOR = Color(ARGS.START)
-END_COLOR = Color(ARGS.END)
+# This is dumb but could be necessary. If the user passes parameters with leading # symbols, remove them with lstrip . . . and add them back (so there's only 1, not 2 or more # characters):
+START_COLOR = "#" + ARGS.START.strip().lstrip("#")
+START_COLOR = Color(START_COLOR)
+END_COLOR = "#" + ARGS.END.strip().lstrip("#")
+END_COLOR = Color(END_COLOR)
 INTERPOLATION_STEPS = int(ARGS.NUMBER)
 # declare and init this global with default 0; override with argumetn if it is passed:
 N_END_COLORS_REMOVE = 0
