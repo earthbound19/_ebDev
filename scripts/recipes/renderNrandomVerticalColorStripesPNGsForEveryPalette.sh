@@ -22,25 +22,24 @@ pass2imagesPerPalette=2			# for 2-color palettes: maybe 1
 pngXdimension=1920
 pngYdimension=1080
 
-allPaletteFileNames=($(printAllPaletteFileNames.sh))
+# using -f switch to get full path to palette file:
+allPaletteFileNames=($(printAllPaletteFileNames.sh -f))
 
 allPaletteFileNamesLength=${#allPaletteFileNames[@]}
 counter=1
 for paletteFileName in ${allPaletteFileNames[@]}
 do
+	paletteFileNameNoPath="${paletteFileName##*/}"
+	paletteBaseName=${paletteFileNameNoPath%.*}
 	echo
 	echo "WORKING ON:"
-	echo "$counter of $allPaletteFileNamesLength palettes: $paletteFileName ($0) . . ."
+	echo "$counter of $allPaletteFileNamesLength palettes: $paletteFileNameNoPath ($0) . . ."
 	echo
-	printf "  Checking for render targets related to $paletteFileName _or_ that the palette only has one color . . . "
-
-	paletteBaseName=${paletteFileName%.*}
-	fullPathToPalette=$(findPalette.sh $paletteFileName)
-
+	printf "  Checking for render targets related to $paletteFileNameNoPath _or_ that the palette only has one color . . . "
 	# Check if the palette only has one color. If so, skip renders (which would only do a lot of work to do a solid color fill).
 	# Test statement found via a genius breath yonder: https://stackoverflow.com/a/7702334
-	# In the test statemetn: get array of colors from file by extracting all matches of a pattern of six hex digits preceded by a #, and then count via wc:
-	if test $(grep -i -o '#[0-9a-f]\{6\}' $fullPathToPalette | wc -l) -eq 1
+	# In the test statement: get array of colors from file by extracting all matches of a pattern of six hex digits preceded by a #, and then count via wc:
+	if test $(grep -i -o '#[0-9a-f]\{6\}' $paletteFileName | wc -l) -eq 1
 	then
 		echo "NOTE: source palette only has one color, so working with that would do a lot of work to just do a solid color fill. Skipping renders."
 		# skip this loop iteration:
@@ -57,18 +56,18 @@ do
 	# REZISED PALETTE RENDER; comment out the lines in this indented block if you don't want a vertical stripe palette render of the same rescaled size as the other images:
 	# temporarily copy the palette here
 	cp $fullPathToPalette . &>/dev/null
-	reformatHexPalette.sh -i $paletteFileName -a
-	renderHexPalette.sh $paletteFileName
-	paletteRenderTargetFileName=${paletteFileName%.*}.png
+	reformatHexPalette.sh -i $paletteFileNameNoPath -a
+	renderHexPalette.sh $paletteFileNameNoPath
+	paletteRenderTargetFileName=${paletteFileNameNoPath%.*}.png
 	img2imgNN.sh $paletteRenderTargetFileName bmp 1920 1080
 	rm $paletteRenderTargetFileName
-	intermediaryPaletteRenderTargetFileName=${paletteFileName%.*}.bmp
+	intermediaryPaletteRenderTargetFileName=${paletteFileNameNoPath%.*}.bmp
 	img2img.sh $intermediaryPaletteRenderTargetFileName png
 	rm $intermediaryPaletteRenderTargetFileName
 	# END REZISED PALETTE RENDER
 
 	# START FIRST PASS STRIPE COUNT PPM FILES
-	source randomVerticalColorStripes.sh $pass1minStripesPerImage $pass1maxStripesPerImage $pass1imagesPerPalette $paletteFileName
+	source randomVerticalColorStripes.sh $pass1minStripesPerImage $pass1maxStripesPerImage $pass1imagesPerPalette $paletteFileNameNoPath
 	# because we called that with `source` it gave us an array of output ppm file names randomVerticalColorStripsOutputFileNames, which we'll iterate over to render as pngs:
 	for PPMfileName in ${randomVerticalColorStripsOutputFileNames[@]}
 	do
@@ -82,9 +81,9 @@ do
 	done
 	# END FIRST PASS STRIPE COUNT PPM FILES
 	# START FIRST PASS STRIPE COUNT PPM FILES
-	source randomVerticalColorStripes.sh $pass2minStripesPerImage $pass2maxStripesPerImage $pass2imagesPerPalette $paletteFileName
+	source randomVerticalColorStripes.sh $pass2minStripesPerImage $pass2maxStripesPerImage $pass2imagesPerPalette $paletteFileNameNoPath
 				# delete the copied, modified palette file now that it has been rendered; it's not needed here) :
-				rm $paletteFileName
+				rm $paletteFileNameNoPath
 	# use that refreshed randomVerticalColorStripsOutputFileNames array to iterate over to render as pngs:
 	for PPMfileName in ${randomVerticalColorStripsOutputFileNames[@]}
 	do
