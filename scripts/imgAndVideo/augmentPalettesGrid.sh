@@ -33,12 +33,9 @@
 # - you can run this in a directory where you have created palettes from it which have the regex pattern `_Augmented-.*_grid` in their file name, and it will not operate on those files (it will skip them). You can therefore reuse this script in the same directory easily, passing it different parameters each time.
 # - the script `paletteRenamedCopiesByNextMostSimilar.sh` may be useful for getting copies of palettes into a dedicated folder for this purpose (with potentially really interesting and beautiful results).
 # - to not augment any colors, but create a grid of palettes (e.g. in a folder with copies of them made by the previously mentioned script), see `catHexpltsGrid.sh`.
-# The process of augmentation in detail is:
-# - for every .hexplt format palette in the current directory:
-# - do linear interpolation in N ($1) steps between each color in it in okLab color space (using CHL coordinates). Think of every resulting color as an X-direction set of columns.
-# - do the same for the next palette in the directory
-# - for every column between those two palettes, augment colors between them and create new rows with those colors (think of that as a Y-direction).
-# - Repeat for last palette and next palette
+# An overview of the process of palettes augmentation to a grid:
+# - for every .hexplt format palette in the current directory, do linear interpolation in J ($1) steps between each color in it, in the chosen color space. Think of every resulting color as an X-direction set of columns.
+# - for every resulting augmented palette, augment colors between the rows (by columns) in K ($2) steps in the chosen color space. Think of that as a Y-direction set of rows.
 # This is accomplished with a series of inefficient hacks using repeated calls of other scripts and GNU datamash.
 
 
@@ -48,7 +45,7 @@ if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many steps to interpolate be
 # Set default color space HCT if no parameter $3 says otherwise:
 if [ "$3" ]; then interpolationSpace=$3; else interpolationSpace='hct'; fi
 
-# For a very long time I had a comment which I think offered an explanation with an erred or different conclusaion than the following used numbers? But, at least, the understood intent of interpolation in this documentation is _how many additional colors in between_, which means:
+# For a very long time I had a comment which I think offered an explanation with an erred or different conclusion than the following used numbers? But, at least, the understood intent of interpolation in this documentation is _how many additional colors in between_, which means:
 #    (start color + inserted colors + end color)
 # Which has something to do with setting the following interpolation steps + 2? Maybe because we're going to generate but trim off the start and end colors of the interpolation, as they are the original colors (not the interpolated ones)? Anyway the math is:
 colsInterpolationSteps=$(($columnsInterpolateOrigParam + 2))
@@ -137,9 +134,9 @@ augment_palettes _augmentPalettesGrid_temp1.txt $colsInterpolationSteps
 datamash transpose --field-separator=' ' < _augmentPalettesGrid_temp1.txt > _augmentPalettesGrid_temp2.txt
 # delete trailing whitespace/lines from that result (which would otherwise result in empty split files, maybe augment errors:
 sed -i -e :a -e '/[^[:blank:]]/,$!d; /^[[:space:]]*$/{ $d; N; ba' -e '}' _augmentPalettesGrid_temp2.txt
-# recreate it:
+# recreate temp folder:
 mkdir _augmentPalettesGrid_temp_dir
-# split temp file into it as one line files:
+# split temp file into that as files, one line each:
 split --additional-suffix='.hexplt' -l 1 _augmentPalettesGrid_temp2.txt ./_augmentPalettesGrid_temp_dir/augment_
 # change to temp dir and augment all those resultant transposed line-split palettes into another big palette;
 cd _augmentPalettesGrid_temp_dir
