@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Inclusion text filter. Prints text file $2, modified, with only words that are also in text file $1. Another way of saying that is: prints only words in $2 that appear in $1. Both files must have one word per line.
+# Inclusion text filter. Prints text file $2, modified, with only words that are also in text file $1. Another way of saying that is: prints only words in $2 that are in both $1 and $2. Both files must have one word per line.
 
 # USAGE
 # Run with these parameters:
