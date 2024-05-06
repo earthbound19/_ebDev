@@ -2,7 +2,7 @@
 # Uses other scripts to make many rows of various numbers of vertical color stripes from a randomly chosen palette (from _ebPalettes). Alternately can use a specified palette name ($1). It does these things admittedly relatively extremely inefficiently.
 
 # DEPENDENCIES
-# `findPalette.sh`, `getRandomPaletteFileName.sh`, `printAllPaletteFileNames.sh`, `randomVerticalColorStripes.sh`, `imgs2imgsNN.sh`, `renumberFiles.sh`, everything they may rely on, and 7z CLI to archive source .ppm files.
+# `findPalette.sh`, `getRandomPaletteFileName.sh`, `printAllPaletteFileNames.sh`, `randomVerticalColorStripes.sh`, `imgs2imgsNN.sh`, `renumberFiles.sh`, everything they may rely on, and 7z CLI to archive source .ppm files. Also bc command line calculator if you do use the -v --variantspercent switch.
 
 # USAGE
 # Run this script with the -h or --help switch for parameters and usage examples:
@@ -34,6 +34,7 @@ Run with these parameters, all of optional:
     [-r|--rows] integer. Number of rows. If omitted a default will be used.
     [-x|--xdimension] integer. Number of pixels across of result PNG (x dimension). If omitted a default will be used.
     [-y|--ydimension] integer. Number of pixels down of result PNG (y dimension). If omitted a default will be used.
+    [-v|--variantspercent] percent expressed as decimal. Percent to vary the -m -n -r parameters by for a second run of vertical strips before compositing. Unused if omitted. May be e.g. 0.4 for 40% or 1.3 for 130%. Calculation results will be rounded to the nearest integer.
 
 EXAMPLES
 To generate an image using a randomly selected palette and all other defaults, run:
@@ -45,6 +46,8 @@ To have minimum 4 columns and maximum 12, using The_Mystic.hexplt as a source pa
    PNGofRowsOfRandomVerticalColorStripes.sh -sThe_Mystic.hexplt -m4 -n12
 To additionally specify 20 total rows and dimensions of 640 accross and 480 down, run:
    PNGofRowsOfRandomVerticalColorStripes.sh -sThe_Mystic.hexplt -m4 -n12 -r20 -x640 y480
+To do a second run of rows of columns before compositing, with -m -n and -r at 33 percent their values (it will round the results to integers), run:
+   PNGofRowsOfRandomVerticalColorStripes.sh -sThe_Mystic.hexplt -m4 -n12 -r20 -x640 y480 -v0.33
 NOTES
 - Output file name format is <timestamp>_<paletteFileBaseNameNoExt>_RORVCS.png. RORVCS is both a funny word and an acronym for Rows of Random Vertical Color Stripes.
 "
@@ -58,7 +61,7 @@ NOTES
 PROGNAME=$(basename $0)
 # -- and then use that with the --name argument of getopts:
 #    ARGS=`getopt -q --name "$PROGNAME" --long help,output:,verbose --options ho:v -- "$@"`
-OPTS=`getopt -o has::m::n::r::x::y:: --long help,sourcepalettefilename::,minstripes::,maxstripes::,rows::,xdimension::,ydimension:: -n $PROGNAME -- "$@"`
+OPTS=$(getopt -o has::m::n::r::x::y::v:: --long help,sourcepalettefilename::,minstripes::,maxstripes::,rows::,xdimension::,ydimension::,variantspercent:: -n $PROGNAME -- "$@")
 
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 
@@ -70,15 +73,7 @@ eval set -- "$OPTS"
 	rows=26
 	xDimension=1920
 	yDimension=1080
-    # [-h|--help] overrides all other script parameters to print usage help text and exit the script.
-    # [-s|--sourcepalettefilename] file name of a .hexplt palette to use (from the _ebPalettes repository /palettes subfolder). If not provided, a random one will be chosen. If provided as the keyword ALL, images will be made with the provided parameters from every palette from that subfolder.
-    # [-m|--minstripes] integer. Minimum random number of vertical stripes (columns) per row. If omitted a default will be used.
-    # [-n|--maxstripes] integer. Maximum random number of vertical stripes (columns) per row. If omitted a default will be used.
-    # [-r|--rows] integer. Number of rows. If omitted a default will be used.
-    # [-x|--xdimension] integer. Number of pixels across of result PNG (x dimension). If omitted a default will be used.
-    # [-y|--ydimension] integer. Number of pixels down of result PNG (y dimension). If omitted a default will be used.
-ARG_C=default_value
-# MORE NOTES: cases that operate on 2 words, for example '-b foo', should use the shift statement twice, to remove both used words from the option list, while options that only operate on one word, for example '-a', should use the shift statement once, to remove only the one used word from the option list.
+
 while true; do
   case "$1" in
     -h | --help ) print_halp; exit 0 ;;
@@ -88,6 +83,7 @@ while true; do
     -r | --rows ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -r | --rows. Pass a value without any space after -r (for example: -r64), or else don't pass -r and a default value will be used for it. Exit."; exit 4; fi; rows=$2; shift; shift ;;
     -x | --xdimension ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -x | --xdimension. Pass a value without any space after -x (for example: -x1080), or else don't pass -x and a default value will be used for it. Exit."; exit 4; fi; xDimension=$2; shift; shift ;;
     -y | --ydimension ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -y | --ydimension. Pass a value without any space after -y (for example: -y1920), or else don't pass -y and a default value will be used for it. Exit."; exit 4; fi; yDimension=$2; shift; shift ;;
+    -v | --variantspercent ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -v | --variantspercent. Pass a value without any space after -v (for example: -v0.33), or else don't pass -v and a default value will be used for it. Exit."; exit 4; fi; variantsPercent=$2; shift; shift ;;
     -- ) shift; break ;;
     * ) break ;;
   esac
@@ -132,7 +128,18 @@ do
 	mkdir $workBaseName
 	cd $workBaseName
 	# even though this script call wastes a file lookup the way that script is written now:
-	randomVerticalColorStripes.sh $minStripes $maxStripes $rows $fileNameNoPath
+	# randomVerticalColorStripes.sh $minStripes $maxStripes $rows $fileNameNoPath
+	if [ "$variantsPercent" ]
+	then
+		# printf to correctly round result to nearest integer; re: https://askubuntu.com/a/574474
+		varMinStripes=$(echo "$variantsPercent * $minStripes" | bc | xargs printf %.0f)
+		varMaxStripes=$(echo "$variantsPercent * $maxStripes" | bc | xargs printf %.0f)
+		varRows=$(echo "$variantsPercent * $rows" | bc | xargs printf %.0f)
+		# echo YARSH VARIANTS
+		# echo "$minStripes $maxStripes $rows >"
+		# echo "$varMinStripes $varMaxStripes $varRows"
+		randomVerticalColorStripes.sh $varMinStripes $varMaxStripes $varRows $fileNameNoPath
+	fi
 	numPPMs=$(count.sh ppm)
 	verticalTilesHeight=$(($yDimension / $numPPMs))
 	imgs2imgsNN.sh ppm png $xDimension $verticalTilesHeight
