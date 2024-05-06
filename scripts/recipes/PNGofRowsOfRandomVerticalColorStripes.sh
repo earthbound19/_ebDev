@@ -2,7 +2,7 @@
 # Uses other scripts to make many rows of various numbers of vertical color stripes from a randomly chosen palette (from _ebPalettes). Alternately can use a specified palette name ($1). It does these things admittedly relatively extremely inefficiently.
 
 # DEPENDENCIES
-# `findPalette.sh`, `getRandomPaletteFileName.sh`, `printAllPaletteFileNames.sh`, `randomVerticalColorStripes.sh`, `imgs2imgsNN.sh`, `renumberFiles.sh`, everything they may rely on, and 7z CLI to archive source .ppm files. Also bc command line calculator if you do use the -v --variantspercent switch.
+# `findPalette.sh`, `getRandomPaletteFileName.sh`, `printAllPaletteFileNames.sh`, `randomVerticalColorStripes.sh`, `imgs2imgsNN.sh`, `renumberFiles.sh`, everything they may rely on, and 7z CLI to archive source .ppm files. Also bc command line calculator if you use the [-o|--variantminstripes] and/or [-s|--variantrows] and [-p|--variantmaxstripes] options.
 
 # USAGE
 # Run this script with the -h or --help switch for parameters and usage examples:
@@ -17,12 +17,6 @@
    # The_Mystic.hexplt
 
 # CODE
-# TO DO
-# Make multiplier parameter for variant rows with math supporting something like the second randomVerticalColorStripes.sh call here:
-    # second ppm batch variant parameters with math supporting this:
-    # REFERENCE FOR PARAMETERS THAT WERE HARD-CODED:
-    # randomVerticalColorStripes.sh 3 22 26 $sourcePaletteFileName
-    # randomVerticalColorStripes.sh 23 111 12 $sourcePaletteFileName
 function print_halp {
 echo "
 USAGE
@@ -34,7 +28,9 @@ Run with these parameters, all of optional:
     [-r|--rows] integer. Number of rows. If omitted a default will be used.
     [-x|--xdimension] integer. Number of pixels across of result PNG (x dimension). If omitted a default will be used.
     [-y|--ydimension] integer. Number of pixels down of result PNG (y dimension). If omitted a default will be used.
-    [-v|--variantspercent] percent expressed as decimal. Percent to vary the -m -n -r parameters by for a second run of vertical strips before compositing. Unused if omitted. May be e.g. 0.4 for 40% or 1.3 for 130%. Calculation results will be rounded to the nearest integer.
+    [-o|--variantminstripes] integer. Minimum random number of vertical stripes (columns) per row for an additional batch of ppms (rows) to make before final composite image. Only in effect if [-s|--variantrows] is also used.
+    [-p|--variantmaxstripes] integer. Maximum random number of vertical stripes (columns) per row for an additional batch of ppms (rows) to make before final composite image. Only in effect if [-s|--variantrows] is also used.
+    [-v|--variantrows] integer. Number of rows for additional batch (as needs [-o|--variantminstripes] and/or [-p|--variantmaxstripes]). No point in using -v if you don't use one of those (as you could just make -r higher), and also no point using -o or p- if you don't use -v ). If omitted no variant rows (with their variant -o and/or -p) will be done.
 
 EXAMPLES
 To generate an image using a randomly selected palette and all other defaults, run:
@@ -61,7 +57,7 @@ NOTES
 PROGNAME=$(basename $0)
 # -- and then use that with the --name argument of getopts:
 #    ARGS=`getopt -q --name "$PROGNAME" --long help,output:,verbose --options ho:v -- "$@"`
-OPTS=$(getopt -o has::m::n::r::x::y::v:: --long help,sourcepalettefilename::,minstripes::,maxstripes::,rows::,xdimension::,ydimension::,variantspercent:: -n $PROGNAME -- "$@")
+OPTS=$(getopt -o has::m::n::r::x::y::v::o::p::v:: --long help,sourcepalettefilename::,minstripes::,maxstripes::,rows::,xdimension::,ydimension::,variantminstripes::,variantmaxstripes::,variantrows:: -n $PROGNAME -- "$@")
 
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 
@@ -77,13 +73,15 @@ eval set -- "$OPTS"
 while true; do
   case "$1" in
     -h | --help ) print_halp; exit 0 ;;
-    -s | --sourcepalettefilename ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -s | --sourcepalettefilename. Pass a value without any space after -s (for example: -sThe_Mystic.hexplt), or else don't pass -c and a default value will be used for it. Exit."; exit 4; fi; sourcePaletteFileName=$2; shift; shift ;;
-    -m | --minstripes ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -m | --minstripes. Pass a value without any space after -m (for example: -m8), or else don't pass -m and a default value will be used for it. Exit."; exit 4; fi; minStripes=$2; shift; shift ;;
-    -n | --maxstripes ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -n | --maxstripes. Pass a value without any space after -n (for example: -n42), or else don't pass -n and a default value will be used for it. Exit."; exit 4; fi; maxStripes=$2; shift; shift ;;
-    -r | --rows ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -r | --rows. Pass a value without any space after -r (for example: -r64), or else don't pass -r and a default value will be used for it. Exit."; exit 4; fi; rows=$2; shift; shift ;;
-    -x | --xdimension ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -x | --xdimension. Pass a value without any space after -x (for example: -x1080), or else don't pass -x and a default value will be used for it. Exit."; exit 4; fi; xDimension=$2; shift; shift ;;
-    -y | --ydimension ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -y | --ydimension. Pass a value without any space after -y (for example: -y1920), or else don't pass -y and a default value will be used for it. Exit."; exit 4; fi; yDimension=$2; shift; shift ;;
-    -v | --variantspercent ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -v | --variantspercent. Pass a value without any space after -v (for example: -v0.33), or else don't pass -v and a default value will be used for it. Exit."; exit 4; fi; variantsPercent=$2; shift; shift ;;
+    -s | --sourcepalettefilename ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -s | --sourcepalettefilename. Pass a value without any space after -s (for example: -sThe_Mystic.hexplt), or else don't pass -c and a default value will be used for it. Exit."; exit 2; fi; sourcePaletteFileName=$2; shift; shift ;;
+    -m | --minstripes ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -m | --minstripes. Pass a value without any space after -m (for example: -m8), or else don't pass -m and a default value will be used for it. Exit."; exit 2; fi; minStripes=$2; shift; shift ;;
+    -n | --maxstripes ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -n | --maxstripes. Pass a value without any space after -n (for example: -n42), or else don't pass -n and a default value will be used for it. Exit."; exit 2; fi; maxStripes=$2; shift; shift ;;
+    -r | --rows ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -r | --rows. Pass a value without any space after -r (for example: -r64), or else don't pass -r and a default value will be used for it. Exit."; exit 2; fi; rows=$2; shift; shift ;;
+    -x | --xdimension ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -x | --xdimension. Pass a value without any space after -x (for example: -x1080), or else don't pass -x and a default value will be used for it. Exit."; exit 2; fi; xDimension=$2; shift; shift ;;
+    -y | --ydimension ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -y | --ydimension. Pass a value without any space after -y (for example: -y1920), or else don't pass -y and a default value will be used for it. Exit."; exit 2; fi; yDimension=$2; shift; shift ;;
+    -o | --variantminstripes ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -o | --variantminstripes. Pass a value without any space after -o (for example: -o25), or else don't pass -o. Exit."; exit 2; fi; variantMinStripes=$2; shift; shift ;;
+    -p | --variantmaxstripes ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -p | --variantmaxstripes. Pass a value without any space after -p (for example: -o11), or else don't pass -p. Exit."; exit 2; fi; variantMaxStripes=$2; shift; shift ;;
+    -v | --variantrows ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -v | --variantrows. Pass a value without any space after -s (for example: -v15), or else don't pass -v. Exit."; exit 2; fi; variantRows=$2; shift; shift ;;
     -- ) shift; break ;;
     * ) break ;;
   esac
@@ -115,7 +113,7 @@ fi
 if [ -z ${arrayOfPaletteFileNames[0]} ];
 then
 	echo "ERROR: problem locating or using palette file. Check 1) that you passed a correct palette file name. 2) that it is a valid (non-empty) palette, or findPalette.sh, whichever you're using."
-	exit 1
+	exit 3
 fi
 
 for sourcePaletteFileName in ${arrayOfPaletteFileNames[@]}
@@ -128,18 +126,26 @@ do
 	mkdir $workBaseName
 	cd $workBaseName
 	# even though this script call wastes a file lookup the way that script is written now:
-	# randomVerticalColorStripes.sh $minStripes $maxStripes $rows $fileNameNoPath
-	if [ "$variantsPercent" ]
+	randomVerticalColorStripes.sh $minStripes $maxStripes $rows $fileNameNoPath
+    # REFERENCE FOR PARAMETERS THAT WERE HARD-CODED:
+    # second ppm batch variant parameters with math supporting this:
+    # randomVerticalColorStripes.sh 3 22 26 $sourcePaletteFileName
+    # randomVerticalColorStripes.sh 23 111 12 $sourcePaletteFileName
+	# VARIANT CHECKS/USE (variantMinStripes,variantMaxStripes and variantRows)
+	if [ "$variantMinStripes" ] || [ "$variantMaxStripes" ]
 	then
-		# printf to correctly round result to nearest integer; re: https://askubuntu.com/a/574474
-		varMinStripes=$(echo "$variantsPercent * $minStripes" | bc | xargs printf %.0f)
-		varMaxStripes=$(echo "$variantsPercent * $maxStripes" | bc | xargs printf %.0f)
-		varRows=$(echo "$variantsPercent * $rows" | bc | xargs printf %.0f)
-		# echo YARSH VARIANTS
-		# echo "$minStripes $maxStripes $rows >"
-		# echo "$varMinStripes $varMaxStripes $varRows"
-		randomVerticalColorStripes.sh $varMinStripes $varMaxStripes $varRows $fileNameNoPath
+		if [ "$variantRows" ]
+		then
+			# set either of these to the non-variants if they were not set:
+			if [ -z "$variantMinStripes" ]; then variantMinStripes=$minStripes; fi
+			if [ -z "$variantMaxStripes" ]; then variantMaxStripes=$maxStripes; fi
+			randomVerticalColorStripes.sh $variantMinStripes $variantMaxStripes $variantRows $fileNameNoPath
+		else
+			echo "
+NOTE: [-o|--variantminstripes] and/or -p|--variantmaxstripes] was passed, but not [-v|--variantrows]. -o and -p are of no effect without [-v|--variantrows], as you could just make [-r|--rows] bigger without variation in -o and -p. Skipping variant renders."
+		fi
 	fi
+
 	numPPMs=$(count.sh ppm)
 	verticalTilesHeight=$(($yDimension / $numPPMs))
 	imgs2imgsNN.sh ppm png $xDimension $verticalTilesHeight
