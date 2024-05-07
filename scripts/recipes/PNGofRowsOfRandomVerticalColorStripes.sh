@@ -20,8 +20,9 @@
 function print_halp {
 echo "
 USAGE
-Run with these parameters, all of optional:
-    [-h|--help] overrides all other script parameters to print usage help text and exit the script.
+Run with these parameters, all of them optional:
+    [-h|--help] flag (no parameter). Overrides all other script parameters to print usage help text and exit the script.
+    [-b|--bypassexistingrender] flag (no parameter). Skips any render for which an existing subdirectory (only in this directory) contains the same palette file base name. Allows interrupt and resume of incomplete batch.
     [-s|--sourcepalettefilename] file name of a .hexplt palette to use (from the _ebPalettes repository /palettes subfolder). If not provided, a random one will be chosen. If provided as the keyword ALL, images will be made with the provided parameters from every palette from that subfolder.
     [-m|--minstripes] integer. Minimum random number of vertical stripes (columns) per row. If omitted a default will be used.
     [-n|--maxstripes] integer. Maximum random number of vertical stripes (columns) per row. If omitted a default will be used.
@@ -57,7 +58,7 @@ NOTES
 PROGNAME=$(basename $0)
 # -- and then use that with the --name argument of getopts:
 #    ARGS=`getopt -q --name "$PROGNAME" --long help,output:,verbose --options ho:v -- "$@"`
-OPTS=$(getopt -o has::m::n::r::x::y::v::o::p::v:: --long help,sourcepalettefilename::,minstripes::,maxstripes::,rows::,xdimension::,ydimension::,variantminstripes::,variantmaxstripes::,variantrows:: -n $PROGNAME -- "$@")
+OPTS=$(getopt -o hbs::m::n::r::x::y::v::o::p::v:: --long help,bypassexistingrender,sourcepalettefilename::,minstripes::,maxstripes::,rows::,xdimension::,ydimension::,variantminstripes::,variantmaxstripes::,variantrows:: -n $PROGNAME -- "$@")
 
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 
@@ -73,6 +74,7 @@ eval set -- "$OPTS"
 while true; do
   case "$1" in
     -h | --help ) print_halp; exit 0 ;;
+    -b | --bypassexistingrender ) byPassExistingRender="TRUE"; shift ;;
     -s | --sourcepalettefilename ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -s | --sourcepalettefilename. Pass a value without any space after -s (for example: -sThe_Mystic.hexplt), or else don't pass -c and a default value will be used for it. Exit."; exit 2; fi; sourcePaletteFileName=$2; shift; shift ;;
     -m | --minstripes ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -m | --minstripes. Pass a value without any space after -m (for example: -m8), or else don't pass -m and a default value will be used for it. Exit."; exit 2; fi; minStripes=$2; shift; shift ;;
     -n | --maxstripes ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -n | --maxstripes. Pass a value without any space after -n (for example: -n42), or else don't pass -n and a default value will be used for it. Exit."; exit 2; fi; maxStripes=$2; shift; shift ;;
@@ -88,12 +90,16 @@ while true; do
 done
 
 # dev test prints -- comment out in production:
+# echo byPassExistingRender is $byPassExistingRender
 # echo sourcePaletteFileName is $sourcePaletteFileName
 # echo minStripes is $minStripes
 # echo maxStripes is $maxStripes
 # echo rows is $rows
 # echo xDimension is $xDimension
 # echo xDimension is $yDimension
+# echo variantMinStripes is $variantMinStripes
+# echo variantMaxStripes is $variantMaxStripes
+# echo variantRows is $variantRows
 
 arrayOfPaletteFileNames=()
 if [ "$sourcePaletteFileName" ] && [ "$sourcePaletteFileName" != "ALL" ]
@@ -122,7 +128,19 @@ do
 	paletteFileBaseNameNoExt=${fileNameNoPath%.*}
 
 	timestamp=$(date +"%Y_%m_%d__%H_%M_%S")
-	workBaseName="$timestamp"_"$paletteFileBaseNameNoExt"_RORVCS
+	workBaseName="$timestamp"__"$paletteFileBaseNameNoExt"_RORVCS
+
+	# if -b flag was passed (and therefore $byPassExistingRender was set), check for pre-existing folder with $paletteFileBaseNameNoExt in its name, and skip this render iteration if found:
+	if [ "$byPassExistingRender" ]
+	then
+		# if test $(grep -i -o '#[0-9a-f]\{6\}' $paletteFileName | wc -l) -eq 1
+		if test $(ls | grep -i -o $paletteFileBaseNameNoExt | wc -l) -gt 0
+		then
+			echo "NOTE, via -b switch: palette base name without extension found in existing folder for name $paletteFileBaseNameNoExt. Skip this render."
+			continue
+		fi
+	fi
+
 	mkdir $workBaseName
 	cd $workBaseName
 	# even though this script call wastes a file lookup the way that script is written now:
