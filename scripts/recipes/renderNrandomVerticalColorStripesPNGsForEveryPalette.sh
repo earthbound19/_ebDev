@@ -53,7 +53,7 @@ do
 		continue
 	fi
 
-	# REZISED PALETTE RENDER; comment out the lines in this indented block if you don't want a vertical stripe palette render of the same rescaled size as the other images:
+	# RESIZED PALETTE RENDER; comment out the lines in this indented block if you don't want a vertical stripe palette render of the same rescaled size as the other images:
 	# temporarily copy the palette here
 	cp $fullPathToPalette . &>/dev/null
 	reformatHexPalette.sh -i $paletteFileNameNoPath -a
@@ -64,7 +64,7 @@ do
 	intermediaryPaletteRenderTargetFileName=${paletteFileNameNoPath%.*}.bmp
 	img2img.sh $intermediaryPaletteRenderTargetFileName png
 	rm $intermediaryPaletteRenderTargetFileName
-	# END REZISED PALETTE RENDER
+	# END RESIZED PALETTE RENDER
 
 	# START FIRST PASS STRIPE COUNT PPM FILES
 	source randomVerticalColorStripes.sh $pass1minStripesPerImage $pass1maxStripesPerImage $pass1imagesPerPalette $paletteFileNameNoPath
