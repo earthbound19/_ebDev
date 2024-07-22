@@ -8,8 +8,6 @@
 # For example, to print 14 random strings, each 42 characters long, use:
 #    randomString.sh 14 42
 # To use default settings, omit any or all parameters, e.g.
-#    randomString.sh 8
-# Or:
 #    randomString.sh
 
 
