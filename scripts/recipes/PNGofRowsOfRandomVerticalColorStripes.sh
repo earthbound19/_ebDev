@@ -136,7 +136,7 @@ do
 		# if test $(grep -i -o '#[0-9a-f]\{6\}' $paletteFileName | wc -l) -eq 1
 		if test $(ls | grep -i -o $paletteFileBaseNameNoExt | wc -l) -gt 0
 		then
-			echo "NOTE, via -b switch: palette base name without extension found in existing folder for name $paletteFileBaseNameNoExt. Skip this render."
+			echo "NOTE, via -b switch: probable existing render target subfolder found for $paletteFileBaseNameNoExt. Skip this render."
 			continue
 		fi
 	fi
@@ -167,7 +167,7 @@ NOTE: [-o|--variantminstripes] and/or -p|--variantmaxstripes] was passed, but no
 	numPPMs=$(count.sh ppm)
 	verticalTilesHeight=$(($yDimension / $numPPMs))
 	imgs2imgsNN.sh ppm png $xDimension $verticalTilesHeight
-	renumberFiles.sh -e png
+	renumberFiles.sh -e png -o
 	# imgList=($(printFilesTypes.sh NEWEST_FIRST png))
 	mkdir pngIntermediaries
 	mv *.png ./pngIntermediaries
