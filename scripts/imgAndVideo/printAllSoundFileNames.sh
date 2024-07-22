@@ -40,7 +40,7 @@ wav
 wv
 )
 
-# build string listing lowercase and also uppercase extensions list section for `find` command:
+# build string listing lowercase and also uppercase extensions via `find` command -iname case-insensitive switch:
 fileTypesWithAlsoUppercase=
 for type in ${filetypes[@]}
 do
