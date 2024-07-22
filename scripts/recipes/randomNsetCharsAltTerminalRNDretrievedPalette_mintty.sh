@@ -2,7 +2,7 @@
 # I know, the script name is ridiculously long. To print random two-color block etc. character art. Runs `randomNsetCharsAlt.sh` repeatedly, interspersed with calls to `printContentsOfRandomPalette_ls.sh`, to print the contents of a randomly chosen palette), and custom code, to get two random colors from the randomly retrieved palette, and set the mintty terminal foreground and background color to those two random colors.
 
 # DEPENDENCIES
-# `printContentsOfRandomPalette_ls.sh` in your PATH, the `_ebPalettes` repository, and `~/palettesRootDir.txt` created via `createPalettesRootDirTXT.sh` of that same repository. Probably the mintty terminal; maybe compatible things would work.
+# `printContentsOfRandomPalette_ls.sh` in your PATH, the `_ebPalettes` repository, and an $EB_PALETTES_ROOT_DIR environment variable defined in `~/.bashrc` via `setEBpalettesEnvVars.sh` in the _ebPalettes repository. Probably the mintty terminal; maybe compatible things would work.
 
 # USAGE
 # Run without any parameters:
