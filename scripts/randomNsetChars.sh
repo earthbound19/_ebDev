@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Returns approximately N ($1) characters randomly chosen from hackable string CHARSET. If parameter 1 not provided, a default number is used. DEPRECATED; use randomNsetChars.py instead: it is far faster, and can write to files.
+# Returns approximately N ($1) characters randomly chosen from hackable string CHARSET, broken over rows (with newlines). If parameter 1 not provided, a default number is used. DEPRECATED; use randomNsetChars.py instead: it is far faster, and can write to files; OR USE randomNsetCharsAlt.sh
 
 # DEPENDENCIES
 # A 'Nixy environment with seq, shuf, and printf, printf and your file system able to handle the block characters or whatever else you might hack into CHARSET.
@@ -63,8 +63,8 @@ STR_LEN=$((${#CHARSET} - 1))
 # HOW IS THIS THE FIRST I've learned of this simpler expression form for native bash arithmetic?!
 # Re: https://ryanstutorials.net/bash-scripting-tutorial/bash-arithmetic.php
 let "HARD_NEWLINES = $N_CHARS_TO_GENERATE / $HARD_NEWLINE_AT_CHARACTER"
-# echo $HARD_NEWLINES
-# exit
+if [[ $HARD_NEWLINES -le 1 ]]; then HARD_NEWLINES=1; fi
+
 for NEWLINE in $(seq $HARD_NEWLINES)
 do
   for ELEMENT in $(seq $HARD_NEWLINE_AT_CHARACTER)
