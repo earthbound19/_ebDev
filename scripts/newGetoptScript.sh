@@ -34,8 +34,10 @@ function print_halp {
 	echo u need halp k read doc. here is doc. bai. wait what programmer no wrote doc? sad.
 }
 
-# print help and exit if no paramers passed:
-if [ ${#@} == 0 ]; then print_halp; exit 1; fi
+# Notify of use of defaults if no parameters passed:
+if [ ${#@} == 0 ]; then
+    echo "No options provided. Continuing with default settings."
+fi
 
 # NOTES:
 # In the following options string:
