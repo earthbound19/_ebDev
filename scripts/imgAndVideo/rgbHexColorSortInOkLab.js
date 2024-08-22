@@ -1,5 +1,5 @@
 // DESCRIPTION
-// Takes an input sRGB hex color list (in .hexplt format) and sorts the colors in it by next nearest perceptual distance in the okLab color space. (Tries to group colors by most similar in a list.) Does not write the result to any file; you'll need to redirect to do that (see NOTES under USAGE). NOTE THAT THIS IS BLAZING FAST compared to the rgbHex ~sort.py scripts.
+// Takes an input sRGB hex color list (in .hexplt format) and sorts the colors in it by next nearest perceptual distance in the okLab color space. (Tries to group colors by most similar in a list.) Does not write the result to any file; you'll need to redirect to do that (see NOTES under USAGE). NOTE THAT THIS IS BLAZING FAST compared to the rgbHex ~sort.py scripts. SEE ALSO `sortSRGBHexColorsColoraide.sh`.
 
 // DEPENDENCIES
 // nodejs with the culori library installed.
@@ -11,6 +11,8 @@
 // NOTES
 // To save the result to a new file, use a redirection operator, e.g.:
 //    node /path/to/this/rgbHexColorSortInOkLab.js -i 'all_humanae.hexplt' > humanae.hexplt
+// KNOWN ISSUES
+// It seems the way I have this set up to use or import the culori library may be broken vs. when I initially developed this.
 
 
 // CODE
