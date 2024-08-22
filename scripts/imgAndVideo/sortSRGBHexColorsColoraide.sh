@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Sorts sRGB hex colors in file $1 by next nearest starting on color $2 (optional; default first color in list), in HCT color space (can be overriden with other sort options; see URL in USAGE)
+# Sorts sRGB hex colors in file $1 by next nearest starting on color $2 (optional; default first color in list), in HCT color space, printing to stdout. Can be overriden with other sort options; see URL in USAGE
 
 # DEPENDENCIES
 # Python with coloraide_extras library installed (which I believe in turn installs coloraide as a dependency)
@@ -8,9 +8,15 @@
 # Run with these parameters:
 # - $1 REQUIRED. File name of source hexplt (sRGB hex color flat file list) to sort.
 # - $2 OPTIONAL. sRGB hex color code to begin sorting on, e.g. '#894a5e' (must be surrounded by quote marks). If omitted, the first color in the source file is used. To use $3 but not this, pass the word NULL for this ($2). This may be a color that is not in the source list, e.g. black to start sort on the darkest found color, or white to start sort on the lightest/brightest found color -- even if black or white is not in the original list.
-# - $3 OPTIONAL. coloraide color space keyword to sort in, for example 'hct', or '2000'. See https://facelessuser.github.io/coloraide/distance/
-# For example:
+# - $3 OPTIONAL. coloraide color space keyword to sort in, for example 'hct', 'ok', or '2000'. See the `Name` field for various spaces listed as supported at https://facelessuser.github.io/coloraide/distance/
+# For example, to sort a palette file named colors.hexplt in the default color space, and print the result to stdout, run:
 #    SortSRGBHexColorsColoraide.sh colors.hexplt
+# To sort that starting on the color black (whether that color is in the palette or not), run:
+#    SortSRGBHexColorsColoraide.sh colors.hexplt '#000000'
+# To sort that starting on the color black (whether that color is in the palette or not), and sort in oklab color space, run:
+#    SortSRGBHexColorsColoraide.sh colors.hexplt '#000000' 'ok'
+# To do the same but sort on the default color (the first in the source file), run:
+#    SortSRGBHexColorsColoraide.sh colors.hexplt NULL 'ok'
 
 # NOTE TO SELF: don't ever write a script that has meta parameter passing like that $searchColor after the Python call again?
 
