@@ -1,6 +1,6 @@
 # DESCRIPTION
 # runs `rgbHexColorSortInOkLab.js` against all .hexplt files in the current directory (and optionally all subdirectories), overwriting the original files with the result.
-# SEE ALSO `allRGBhexColorSortInCAM16-UCS.sh` and `allRGBhexColorSortInCIECAM02.sh`.
+# SEE ALSO `sortSRGBHexColorsColoraide.sh`, `allRGBhexColorSortInCAM16-UCS.sh`, and `allRGBhexColorSortInCIECAM02.sh`.
 
 # DEPENDENCIES
 # `getFullPathToFile.sh`, `rgbHexColorSortInOkLab.js`.
