@@ -1,14 +1,17 @@
 # DESCRIPTION
-# Wonky special purpose multi-purpose recipe script that uses other scripts. Takes NxN color samples from every supported image file type in the current directory, and creates .hexplt format palettes without duplicate colors from them, via other scripts. (It may make wreck the result of a sample grid by removing duplicate colors.) Then sorts all the result palettes into subfolders by similar. Wonky, because at least one script it calls calls another script that calls another . . .
+# Wonky special purpose multi-purpose recipe script that uses other scripts. Takes NxN color samples from every supported image file type in the current directory, and creates .hexplt format palettes from them, via other scripts. Optionally removes duplicate colors from palettes, which is not advised as it may break palette comparisons (it will also wreck the result of a sample grid). Then sorts all the result palettes into subfolders by similar. I say this is wonky because at least one script it calls calls another script that calls another.
 
 # DEPENDENCIES
 # `get_color_sample_grids_sRGB_assistant.sh`, and everything that relies on, `allRGBhexColorSortInOkLab.sh`, `renderAllHexPalettes,sh`, `pruneByUnmatchedExtension.sh`, and `paletteRenamedCopiesByNextMostSimilar.sh`.
 
 # USAGE
 # Run with these parameters:
-# - $1 grid dimensions to sample, in the format 'cols <space> rows'. See get_color_sample_grids_sRGB_assistant.sh
-# For example:
-#    get_color_sample_grids_unique_and_compare_palettes.sh '40 x 40'
+# - $1 grid dimensions to sample, in the format '<cols> <rows>', replacing <cols> and <rows> with integers. See get_color_sample_grids_sRGB_assistant.sh. Note this parameter is surrounded by quote marks. See examples.
+# - OPTIONAL. $2, anything, such as the word FNEUR, which will cause duplicate colors to be removed from the resultant palettes.
+# For example, to do all this without deduplicating colors from resultant palettes (the default), sampling 24 rows and 48 columns, run:
+#    get_color_sample_grids_unique_and_compare_palettes.sh '24 48'
+# Or to deduplicate colors (overriding the default), run:
+#    get_color_sample_grids_unique_and_compare_palettes.sh '24 48' SNURFY
 
 
 # CODE
@@ -30,8 +33,16 @@ mkdir _original_grid_sample
 
 mv *palette*.png ./_original_grid_sample
 
-# sort and uniqify all resultant palettes:
-allRGBhexColorSortInOkLab.sh '-s ffffff'
+if [ "$2" ]
+then
+	# sort and uniqify all resultant palettes:
+	printf "\nParameter \$2 (remove duplicate colors from palettes) passed to script. Will not pass any switch related to that to allRGBhexColorSortInOkLab (default)";
+	allRGBhexColorSortInOkLab.sh '--startComparisonColor ffffff'
+else
+	# sort without uniqifying all resultant palettes:
+	printf "\nNo parameter \$2 (which would remove duplicate colors from palettes) passed to script. Will pass switch --keepDuplicateColors to allRGBhexColorSortInOkLab (overrides default duplicate removal)";
+	allRGBhexColorSortInOkLab.sh '--keepDuplicateColors ffffff'
+fi
 
 # render them:
 renderAllHexPalettes.sh
