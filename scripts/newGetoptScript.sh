@@ -11,8 +11,10 @@
 fullPathToThisScript=$(getFullPathToFile.sh newGetoptScript.sh)
 rndString=$(cat /dev/urandom | tr -dc 'a-f0-9' | head -c 9)
 newScriptName=new_script_"$rndString".sh
-tail -n +17 $fullPathToThisScript > $newScriptName
-start $newScriptName
+#tail -n +19 $fullPathToThisScript > $newScriptName
+#start $newScriptName
+# exits if the shell level is greater than 1 (if not in the base shell), re: https://unix.stackexchange.com/a/761569/110338
+# if [[ $SHLVL -gt 1 ]]; then exit 0; fi
 # EVERYTHING AFTER THIS LINE IS META! IT WILL BE WRITTEN by the script to a new randomly named script, but everything on this line and above will not!
 # DESCRIPTION
 # omigoshomigoshomigoshomigoshomigoshomigoshomigoshomigosh
@@ -32,6 +34,10 @@ start $newScriptName
 
 function print_halp {
 	echo u need halp k read doc. here is doc. bai. wait what programmer no wrote doc? sad.
+}
+
+function check_space_in_opt_arg {
+	if [ "$2" == "" ]; then echo "ERROR: No value or a space (resulting in empty value) passed after optional switch $1. Pass a value without any space after $1 (for example: $1""value""), or if a default is available, don't pass $1, and the default will be used. Exit."; exit 4; fi;
 }
 
 # Notify of use of defaults if no parameters passed:
@@ -62,13 +68,15 @@ eval set -- "$OPTS"
 
 # SET ANY DEFAULTS that would be overriden by optional arguments here:
 ARG_C=default_value
-# MORE NOTES: cases that operate on 2 words, for example '-b foo', should use the shift statement twice, to remove both used words from the option list, while options that only operate on one word, for example '-a', should use the shift statement once, to remove only the one used word from the option list.
+# MORE NOTES:
+# - cases that consume only one value (I think?) such as flags without parameters (here for example '-a'), should use the shift statement once, to remove only the one used value from the option list. Cases that operate on 2 values, for example flags with required or optional values (here -b and -c), should use the shift statement twice, to remove both values from the option list. 
+# - this check_space_in_opt_arg helper function avoids the (horrible, no good, unbelievably terrible) quirk that optional parameters using the short switch form e.g. -c MUST NOT HAVE A SPACE after the switch, by checking if the would-be assigned value is empty, and throwing an error if so. BUT NOTE: only use that for checks of optional switches! OYY! . .
 while true; do
   case "$1" in
     -h | --help ) print_halp; exit 0 ;;
     -a | --arga ) ARG_A=flag_a_set; shift ;;
     -b | --argb ) ARG_B=$2; shift; shift ;;
-    -c | --argc ) if [ "$2" == "" ]; then echo "WARNING: No value or a space (resulting in empty value) after optional parameter -c --argc. Pass a value without any space after -c (for example: -cvalue), or else don't pass -c and a default value will be used for it. Exit."; exit 4; fi; ARG_C=$2; shift; shift ;;
+    -c | --argc ) check_space_in_opt_arg $1 $2; ARG_C=$2; shift; shift ;;
     -- ) shift; break ;;
     * ) break ;;
   esac
