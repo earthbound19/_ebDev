@@ -7,7 +7,7 @@
 # USAGE
 # Run with these parameters:
 # - $1 grid dimensions to sample, in the format '<cols> <rows>', replacing <cols> and <rows> with integers. See get_color_sample_grids_sRGB_assistant.sh. Note this parameter is surrounded by quote marks. See examples.
-# - OPTIONAL. $2, anything, such as the word FNEUR, which will cause duplicate colors to be removed from the resultant palettes.
+# - OPTIONAL. $2, anything, such as the word FNEUR, which will cause duplicate colors to be removed from the resultant palettes. Not recommended, as it may break palette comparison.
 # For example, to do all this without deduplicating colors from resultant palettes (the default), sampling 24 rows and 48 columns, run:
 #    get_color_sample_grids_unique_and_compare_palettes.sh '24 48'
 # Or to deduplicate colors (overriding the default), run:
@@ -37,18 +37,18 @@ if [ "$2" ]
 then
 	# sort and uniqify all resultant palettes:
 	printf "\nParameter \$2 (remove duplicate colors from palettes) passed to script. Will not pass any switch related to that to allRGBhexColorSortInOkLab (default)";
-	allRGBhexColorSortInOkLab.sh '--startComparisonColor ffffff'
+	allRGBhexColorSortInOkLab.sh '--startComparisonColor=#ffffff'
 else
 	# sort without uniqifying all resultant palettes:
 	printf "\nNo parameter \$2 (which would remove duplicate colors from palettes) passed to script. Will pass switch --keepDuplicateColors to allRGBhexColorSortInOkLab (overrides default duplicate removal)";
-	allRGBhexColorSortInOkLab.sh '--keepDuplicateColors ffffff'
+	allRGBhexColorSortInOkLab.sh '--keepduplicatecolors --startcolor=#ffffff'
 fi
 
 # render them:
 renderAllHexPalettes.sh
 
-read -p "Examine all the resulting *palette.png files, modify their corresponding .hexplt sources to your liking (and maybe re-render them), and delete any of the palette images for palettes you don't like. Then enter any input to continue with pruning corresponding .hexplt files, and to rename palettes by next most similar."
+# read -p "Examine all the resulting *palette.png files, modify their corresponding .hexplt sources to your liking (and maybe re-render them), and delete any of the palette images for palettes you don't like. Then enter any input to continue with pruning corresponding .hexplt files, and to rename palettes by next most similar."
 
-pruneByUnmatchedExtension.sh hexplt png
+# pruneByUnmatchedExtension.sh hexplt png
 
 paletteRenamedCopiesByNextMostSimilar.sh
