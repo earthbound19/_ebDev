@@ -4,6 +4,9 @@
 # DEPENDENCIES
 # Python 3, various python packages (see import list at start of code) which you may install with easy_install or pip; NOTE that the colour import is actually from the colour-science package; you must install colour-science.
 
+# KNOWN ISSUES
+# This uses a deprecated function signature. Pending fix or discard of this script for one using another library.
+
 # USAGE
 # Run this script through a Python interpreter, with these positional parameters:
 # - sys.argv[1] A list of RGB colors as hexadecimal numbers, in .hexplt format (a simple text list, one color per line).
@@ -19,9 +22,7 @@
 #    python /path/to_this_script/RGBhexColorSortInCAM16-UCS.py inputColors.hexplt foo #ff00ff
 # NOTES
 # - It seems the library this uses for CAM16-UCS is slower than the library used in the other mentioned script (for CIECAM02).
-# - This expects perfect data. If there's a blank line anywhere in the
-# input file, or any other unexpected data, it may stop with an unhelpful error.
-# - This will also delete duplicate colors in the list.
+# - This will remove duplicate colors in the list.
 # - The same input always produces the same output, though if you change the order of colors in the list, the results may change. This is because the script uses the first color in the list to begin its comparisons (but you may override that with parameter 3). You therefore may wish to decide which color you want first in the list for those comparison purposes, or pass an arbitrary color via parameter 3.
 # - Good comparisons with this script may be a matter of here figuring the best illuminant and transform matrix parameters, and hacking that. You can try different chromatic_adaptation_transform values from here:
 # https://colour.readthedocs.io/en/develop/generated/colour.RGB_to_XYZ.html
@@ -35,6 +36,11 @@ import sys
 import colour        # The colour-science package must be installed and imported under this name, NOT the colour package. It's confusing, because colour-science is imported under the name colour. But I think there is another package named just colour which imports under the same name.
 from itertools import combinations
 from more_itertools import unique_everseen
+import re
+
+# alas, the library we're using has deprecated a function signature and warns about it: \colour\utilities\verbose.py:265: ColourUsageWarning: The "colour.RGB_to_XYZ" definition signature has changed with "Colour 0.4.3". The used call arguments are deprecated, please refer to the documentation for more information about the new signature. warn(*args, **kwargs)  # noqa: B028. UNTIL THAT'S FIXED, ignore warnings:
+import warnings
+warnings.filterwarnings("ignore")
 
 # GLOBALS and positional parameters check, with clear boolean/value inits to describe:
 overwriteOriginalList = False
@@ -55,10 +61,16 @@ if len(sys.argv) > 3:
         arbitraryFirstCompareColor = '#' + arbitraryFirstCompareColor
 # END GLOBALS and positional parameters check
 
-# split input file into list on newlines:
-f = open(hexpltFileNamePassedToScript, "r")
-colors_list = list(f.read().splitlines())
-f.close()
+# import source file and grab all sRGB hex color codes from it into a list:
+# regular expression to match only 6-digit sRGB hex color codes:
+hex_color_pattern = r'#[0-9a-fA-F]{6}\b'
+
+# Read the content of the file
+with open(hexpltFileNamePassedToScript, 'r') as file:
+    file_content = file.read()
+
+# Find all 6-digit hex color codes in the file content and add to a list
+colors_list = re.findall(hex_color_pattern, file_content)
 
 if arbitraryFirstCompareColor != False:     # if a parameter was passed to script (arbitrary color in format '#ffffff' to start comparisons with), dynamically alter the list to insert that color at the start. BUT FIRST, track (with the following variable, countOfArbitraryFirstColorInOriginalList) the count of that color in the list before we add it to the list, because if that count is zero before adding, we will want to remove it from the list after comparisons and sorting (we don't want to permanently add it to the list; we only want to add it temporarily). (Because we don't want to add colors permanently to the list that were never there; we want to leave the list as it was found.) But if it _was_ originally in the list, we want to keep it there after adding, because the list will be deduplicated. Because the list will be deduplicated, the color we add to the list (even if it was in the list already before we added it) it would end up appearing only once in the list, and removing it after that would remove it entirely. That is a lot of explanation for the following two lines of code :)
     countOfArbitraryFirstColorInOriginalList = colors_list.count(arbitraryFirstCompareColor)

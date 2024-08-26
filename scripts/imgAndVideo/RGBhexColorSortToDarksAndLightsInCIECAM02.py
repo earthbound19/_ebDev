@@ -15,6 +15,7 @@ import sys
 from itertools import combinations
 from more_itertools import unique_everseen
 from colorspacious import cspace_convert, deltaE
+import re
 
 def hex_to_CIECAM02_JCh(in_string):
     """ Takes an RGB hex value and returns:
@@ -27,12 +28,18 @@ def hex_to_CIECAM02_JCh(in_string):
     CIECAM02_dimResult = cspace_convert(RGB, "sRGB255", CIECAM02_dimSTR)
     return CIECAM02_dimResult, CIECAM02_dimSTR
 
+# import source file and grab all sRGB hex color codes from it into a list:
+# regular expression to match only 6-digit sRGB hex color codes:
+hex_color_pattern = r'#[0-9a-fA-F]{6}\b'
 
-# split input file into list on newlines:
 inputFile = sys.argv[1]
-f = open(inputFile, "r")
-colors_list = list(f.read().splitlines())
-f.close()
+# Read the content of the file
+with open(inputFile, 'r') as file:
+    file_content = file.read()
+
+# Find all 6-digit hex color codes in the file content and add to a list
+colors_list = re.findall(hex_color_pattern, file_content)
+
 # strip beginning '#' character off every string in that list:
 colors_list = [element[1:] for element in colors_list]
 # deduplicate the list, but maintain same order:
