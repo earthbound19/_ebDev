@@ -17,6 +17,7 @@
 import sys
 from itertools import combinations
 from colorspacious import cspace_convert, deltaE
+import re
 
 # GLOBALS and positional parameters check and exit if not provided:
 if len(sys.argv) > 1:       # positional parameter 1
@@ -38,22 +39,32 @@ def hex_to_CIECAM02_JCh(in_string):
     return CIECAM02_dimResult, CIECAM02_dimSTR
 
 # CREATE FORMATTED LISTS (for comparisons) from input files:
-from more_itertools import unique_everseen
-# split input file one into list on newlines:
-f = open(hexpltFileNameOnePassedToScript, "r")
-colors_list_one = list(f.read().splitlines())
-f.close()
+# from more_itertools import unique_everseen
+
+# import source file on and grab all sRGB hex color codes from it into a list:
+# regular expression to match only 6-digit sRGB hex color codes:
+hex_color_pattern = r'#[0-9a-fA-F]{6}\b'
+# Read the content of the file
+with open(hexpltFileNameOnePassedToScript, 'r') as file:
+    file_content = file.read()
+# Find all 6-digit hex color codes in the file content and add to a list
+colors_list_one = re.findall(hex_color_pattern, file_content)
 # strip beginning '#' character off every string in that list:
 colors_list_one = [element[1:] for element in colors_list_one]
 # deduplicate the list, but maintain same order:
-colors_list_one = list(unique_everseen(colors_list_one))
+# BUT DON'T - COMMENTED OUT - as that breaks the method of comparing palettes if colors are removed and the palettes end up with different numbers of colors:
+# colors_list_one = list(unique_everseen(colors_list_one))
 
-# Do the same things for input file two:
-f = open(hexpltFileNameTwoPassedToScript, "r")
-colors_list_two = list(f.read().splitlines())
-f.close()
+# Do the same import and list building for input file two:
+with open(hexpltFileNameTwoPassedToScript, 'r') as file:
+    file_content = file.read()
+# Find all 6-digit hex color codes in the file content and add to a list
+colors_list_two = re.findall(hex_color_pattern, file_content)
+# strip beginning '#' character off every string in that list:
 colors_list_two = [element[1:] for element in colors_list_two]
-colors_list_two = list(unique_everseen(colors_list_two))
+# deduplicate the list, but maintain same order:
+# BUT DON'T - COMMENTED OUT - as that breaks the method of comparing palettes if colors are removed and the palettes end up with different numbers of colors:
+# colors_list_two = list(unique_everseen(colors_list_two))
 
 if (len(colors_list_one) != len(colors_list_two)):
     print('\nProblem: palette one and two are of different lengths (they have different numbers of colors). They must have the same number of colors for this to work. (This can also happen if there are duplicate elements in a list but it has the same number of elements as the other list to begin with, because this script eliminates duplicate colors before comparison.) Exiting script.')
