@@ -6,7 +6,7 @@
 
 # USAGE
 # Run from a python interpreter:
-#    python /path/to_this_script/randomSetCharsAlt.py
+#    python /path/to_this_script/randomNsetCharsAlt.py
 
 # CODE
 import random
