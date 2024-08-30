@@ -6,9 +6,9 @@
 
 # USAGE
 # Run with these parameters:
-# -i | --inputfile REQUIRED. File name of source hexplt (sRGB hex color flat file list) to sort.
-# [-s | --startcolor] OPTIONAL. sRGB hex color code to begin sorting on, e.g. '#894a5e' (must be surrounded by quote marks, and include a starting # pound/hex/number character, like that example). If omitted, the first color in the source file is used. This may be a color that is not in the source list, e.g. black to start sort on the darkest found color, or white to start sort on the lightest/brightest found color -- even if black or white is not in the original list.
-# [-c | --colorspace] OPTIONAL. coloraide color space keyword to sort in, for example 'hct', 'ok', or '2000'. Defaults to 'hct' if omitted. See the `Name` field for various spaces listed as supported at https://facelessuser.github.io/coloraide/distance/
+# - -i | --inputfile REQUIRED. File name of source hexplt (sRGB hex color flat file list) to sort.
+# - [-s | --startcolor] OPTIONAL. sRGB hex color code to begin sorting on, e.g. '#894a5e' (must be surrounded by quote marks, and include a starting # pound/hex/number character, like that example). If omitted, the first color in the source file is used. This may be a color that is not in the source list, e.g. black to start sort on the darkest found color, or white to start sort on the lightest/brightest found color -- even if black or white is not in the original list.
+# - [-c | --colorspace] OPTIONAL. coloraide color space keyword to sort in, for example 'hct', 'ok', or '2000'. Defaults to 'hct' if omitted. See the `Name` field for various spaces listed as supported at https://facelessuser.github.io/coloraide/distance/
 # 
 # NOTE: optional short switches MUST (annoyingly) not have a space after them and the parameter. The parameter may be clarified by surrounding it with quote marks; see below examples. Alternately, long options may be used and followed by = before the option value. See examples below for this also.
 # EXAMPLES
