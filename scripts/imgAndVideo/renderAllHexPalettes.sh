@@ -33,13 +33,6 @@ coolDownCounter=0
 coolDownSleepSeconds=27
 for hexpltFileName in ${hexpltFilesArray[@]}
 do
-	# I duplicate no-clobber target file check here (same as in (renderHexPalette.sh); if it already exists, no point loading that script which checks if it exists; that's just an extra operation (slowdown). This also sidesteps the problem of a sleep period in between lighter weight work (only a file existence check), which would be mostly a waste of time:
-	renderTargetFileName=${hexpltFileName%.*}.png
-	if [ -f $renderTargetFileName ]
-	then
-		echo "-SKIPPING Render target $renderTargetFileName, as it already exists. (renderAllHexPalettes.sh)"
-		# (else block isn't run; nothing more is done in this loop in this case.)
-	else
 # BEGIN OPTIONAL COOLDOWN PERIOD; uncomment these outdented lines if you want that:
 # coolDownCounter=$((coolDownCounter + 1))
 # cool down period check, and if it is time, cool down:
@@ -50,13 +43,12 @@ do
 # sleep $coolDownSleepSeconds
 # fi
 # END OPTIONAL COOLDOWN PERIOD
-		# Progress feedback and command log print:
-		renderCommand="renderHexPalette.sh $hexpltFileName $2 $3 $4 $5 $6"
-		echo "+RENDERING target $renderTargetFileName, as it does not exist; via command:"
-		echo "$renderCommand"
-		# Run the actual render command:
-		$renderCommand
-	fi
+	# Progress feedback and command log print:
+	renderCommand="renderHexPalette.sh $hexpltFileName $2 $3 $4 $5 $6"
+	# echo "+RENDERING target $renderTargetFileName, as it does not exist; via command:"
+	# echo "$renderCommand"
+	# Run the actual render command:
+	$renderCommand
 done
 
 echo "DONE. Color palettes have been rendered from all *.hexplt files in the current path for which there was not already a corresponding .png image. Palette images are named after the source *.hexplt files. If you passed any parameter to this script, this has been done recursively through all subfolders also."
