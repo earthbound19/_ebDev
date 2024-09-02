@@ -41,12 +41,22 @@
 #    b
 #    c
 # -- and -r 3 would end up with just a, b and c. You can of course use much larger and more complex lists; the simpler list is given here for illustation purposes.
+# This list provides return codes for errors. See the comment after CODE.
 # - This was developed with the assistance of a large language / code model chatGPT, and I don't know the intricacies of how it works. I just know that I described the intended algorithm clearly enough (finally--it took many frustrated tries) for it to do what I want after testing. The chat archive for this is: https://chatgpt.com/share/7bff6174-7342-4904-a06d-2a44be310b5e
 
 
 # CODE
+# RETURN CODES:
+#    0: Success (no errors).
+#    1: File not found.
+#    2: The source list is empty.
+#    3: reduce-to-count-n (reduceToElementsN) is not a positive integer.
+#    4: The source list does not have any duplicate elements.
+#    5: The source list is shorter than reduce-to-count-n (reduceToElementsN).
+#    6: The source list cannot be reduced to the specified number of elements.
 import argparse
 import itertools
+import sys
 
 def reduce_list(inputList, reduceToElementsN):
     def get_adjacent_unique_elements(lst):
@@ -65,10 +75,12 @@ def reduce_list(inputList, reduceToElementsN):
     
     # Initial validations
     if not inputList:
-        return ["Error: The source list is empty."]
+        print("Error: The source list is empty.")
+        return 2
     
     if reduceToElementsN <= 0:
-        return ["Error: reduceToElementsN must be a positive integer."]
+        print("Error: reduceToElementsN must be a positive integer.")
+        return 3
     
     # Step 1: Parse the input list
     adj_unique_elements = []
@@ -88,17 +100,20 @@ def reduce_list(inputList, reduceToElementsN):
     
     # Error handling for the list with no duplicates
     if len(adj_unique_elements) == len(inputList):
-        return ["Error: The source list does not have any duplicate elements."]
+        print("Error: The source list does not have any duplicate elements.")
+        return 4
     
     # Calculate the total number of elements
     total_elements = sum(len(group[0]) for group in adj_unique_elements)
     
     # Error handling if it's impossible to reduce to reduceToElementsN
     if reduceToElementsN > total_elements:
-        return ["Error: The source list is shorter than reduceToElementsN."]
+        print("Error: The source list is shorter than reduce-to-count-n (reduceToElementsN).")
+        return 5
     
     if reduceToElementsN < len(adj_unique_elements):
-        return ["Error: The source list cannot be reduced to the specified number of elements."]
+        print("Error: The source list cannot be reduced to the specified number of elements.")
+        return 6
     
     # Step 2: Reduce the list
     while sum(len(group[0]) for group in adj_unique_elements) > reduceToElementsN:
@@ -109,6 +124,7 @@ def reduce_list(inputList, reduceToElementsN):
                 reduction_done = True
                 if sum(len(group[0]) for group in adj_unique_elements) == reduceToElementsN:
                     return recombine_list(adj_unique_elements)
+
         # If no reduction was done, exit the loop
         if not reduction_done:
             break
@@ -128,14 +144,18 @@ def main():
             inputList = [line.strip() for line in file]
     except FileNotFoundError:
         print(f"Error: File {args.inputFile} not found.")
-        return
+        sys.exit(1)
 
     # Process the input list
     result = reduce_list(inputList, args.reduce_to_count_n)
 
-    # Print the final list elements, one per line
-    for element in result:
-        print(element)
+    # If result is a list, print the elements; if it's an error code, exit with that code
+    if isinstance(result, list):
+        for element in result:
+            print(element)
+        sys.exit(0)  # Success
+    else:
+        sys.exit(result)  # Exit with the error code returned by reduce_list
 
 if __name__ == "__main__":
     main()
