@@ -26,8 +26,7 @@ else
 	hexpltFilesArray=( $(find . -maxdepth 1 -type f -iname \*.hexplt -printf "%P\n") )
 fi
 
-# for progress feedback print:
-hexpltFilesArrayLen=${#hexpltFilesArray[@]}
+# for optional progress feedback print; see BEGIN OPTIONAL COOLDOWN PERIOD comment:
 coolDownEveryNrenders=23
 coolDownCounter=0
 coolDownSleepSeconds=27
