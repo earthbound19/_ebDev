@@ -58,6 +58,11 @@ import argparse
 import itertools
 import sys
 
+parser = argparse.ArgumentParser(description='Process and reduce a list of elements.')
+parser.add_argument('-i', '--inputFile', type=str, required=True, help='Path to the input file.')
+parser.add_argument('-r', '--reduce-to-count-n', type=int, required=True, help='Number of elements to reduce to.')
+args = parser.parse_args()
+
 def reduce_list(inputList, reduceToElementsN):
     def get_adjacent_unique_elements(lst):
         """Helper function to split list into adjacent unique groups."""
@@ -132,30 +137,20 @@ def reduce_list(inputList, reduceToElementsN):
     # Return the recombined list if reduction completed
     return recombine_list(adj_unique_elements)
 
-def main():
-    parser = argparse.ArgumentParser(description='Process and reduce a list of elements.')
-    parser.add_argument('-i', '--inputFile', type=str, required=True, help='Path to the input file.')
-    parser.add_argument('-r', '--reduce-to-count-n', type=int, required=True, help='Number of elements to reduce to.')
+try:
+    with open(args.inputFile, 'r') as file:
+        inputList = [line.strip() for line in file]
+except FileNotFoundError:
+    print(f"Error: File {args.inputFile} not found.")
+    sys.exit(1)
 
-    args = parser.parse_args()
-    
-    try:
-        with open(args.inputFile, 'r') as file:
-            inputList = [line.strip() for line in file]
-    except FileNotFoundError:
-        print(f"Error: File {args.inputFile} not found.")
-        sys.exit(1)
+# Process the input list
+result = reduce_list(inputList, args.reduce_to_count_n)
 
-    # Process the input list
-    result = reduce_list(inputList, args.reduce_to_count_n)
-
-    # If result is a list, print the elements; if it's an error code, exit with that code
-    if isinstance(result, list):
-        for element in result:
-            print(element)
-        sys.exit(0)  # Success
-    else:
-        sys.exit(result)  # Exit with the error code returned by reduce_list
-
-if __name__ == "__main__":
-    main()
+# If result is a list, print the elements; if it's an error code, exit with that code
+if isinstance(result, list):
+    for element in result:
+        print(element)
+    sys.exit(0)  # Success
+else:
+    sys.exit(result)  # Exit with the error code returned by reduce_list
