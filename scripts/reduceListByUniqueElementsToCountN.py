@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Takes an input file of a flat list of unique elements with some duplicates, of length M, and reduces it to (lesser) length N by removing from adjacent duplicate elements, one per group of unique elements, iteratively until it is of length N. And intended purpose is reducing .hexplt pallete files with duplicate colors while maintaining some duplicate colors (for example as placeholders to later interpolate between the start duplicate color and the next color change N spaces away).
+# Reduce a list of elements with duplicates proportionally per unique element to count N, keeping all elements. An intended purpose is reducing .hexplt pallete files with duplicate colors while maintaining some duplicate colors (for example as placehol. In more detail: takes an input file of a flat list of unique elements with some duplicates, of length M, and reduces it to (lesser) length N by removing from adjacent duplicate elements, one per group of unique elements, iteratively until it is of length N.ders to later interpolate between the start duplicate color and the next color change N spaces away).
 
 # USAGE
 # Run with these parameters:
@@ -58,7 +58,7 @@ import argparse
 import itertools
 import sys
 
-parser = argparse.ArgumentParser(description='Process and reduce a list of elements.')
+parser = argparse.ArgumentParser(description='Reduce a list of elements with duplicates proportionally per unique element to count N, keeping all elements. See more detailed DESCRIPTION comment in code.')
 parser.add_argument('-i', '--inputFile', type=str, required=True, help='Path to the input file.')
 parser.add_argument('-r', '--reduce-to-count-n', type=int, required=True, help='Number of elements to reduce to.')
 args = parser.parse_args()
