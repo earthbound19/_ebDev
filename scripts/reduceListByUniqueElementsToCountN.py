@@ -40,7 +40,7 @@
 #    b
 #    b
 #    c
-# -- and -r 3 would end up with just a, b and c. You can of course use much larger and more complex lists; the simpler list is given here for illustation purposes.
+# -- and -r 3 would end up with just a, b and c. You can use much larger and more complex source lists; the simpler list is given here for illustration purposes.
 # This list provides return codes for errors. See the comment after CODE.
 # - This was developed with the assistance of a large language / code model chatGPT, and I don't know the intricacies of how it works. I just know that I described the intended algorithm clearly enough (finally--it took many frustrated tries) for it to do what I want after testing. The chat archive for this is: https://chatgpt.com/share/7bff6174-7342-4904-a06d-2a44be310b5e
 
