@@ -65,8 +65,13 @@ do
 	fi
 	# run script $pathToPrintPaletteDuplicateColorsInterpolated against file to modify it to have gradients instead of duplicates, capture the output, and write it over the original file:
 	result2=($(python $pathToPrintPaletteDuplicateColorsInterpolated -i $paletteFile))
-	# print array to write over original file:
-	printf "%s\n" "${result2[@]}" > $paletteFile
+	# print array to write over original file, unless there was an error:
+	if [ "$errorLevelCapture" != "0" ]
+	then
+		echo "ERROR running $pathToPrintPaletteDuplicateColorsInterpolated; skipped modify of file $paletteFile."
+	else
+		printf "%s\n" "${result2[@]}" > $paletteFile
+	fi
 done
 
 if [ "$errorsDuringRun" ]; then printf "\nTHERE WAS AT LEAST ONE ERROR during the run. They have been written to $logFileName.\n"; fi
