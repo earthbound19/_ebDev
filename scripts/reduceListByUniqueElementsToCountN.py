@@ -54,9 +54,7 @@
 #    4: The source list does not have any duplicate elements.
 #    5: The source list is shorter than reduce-to-count-n (reduceToElementsN).
 #    6: The source list cannot be reduced to the specified number of elements.
-import argparse
-import itertools
-import sys
+import argparse, itertools, sys
 
 parser = argparse.ArgumentParser(description='Reduce a list of elements with duplicates proportionally per unique element to count N, keeping all elements. See more detailed DESCRIPTION comment in code.')
 parser.add_argument('-i', '--inputFile', type=str, required=True, help='Path to the input file.')
