@@ -4,12 +4,16 @@
 # DEPENDENCIES
 # Python with coloraide_extras library installed (which I believe in turn installs coloraide as a dependency)
 
+# WARNINGS
+# 
+
 # USAGE
 # Run with these parameters:
 # - -i | --inputfile REQUIRED. File name of source hexplt (sRGB hex color flat file list) to sort.
 # - [-s | --startcolor] OPTIONAL. sRGB hex color code to begin sorting on, e.g. '#894a5e' (must be surrounded by quote marks, and include a starting # pound/hex/number character, like that example). If omitted, the first color in the source file is used. This may be a color that is not in the source list, e.g. black to start sort on the darkest found color, or white to start sort on the lightest/brightest found color -- even if black or white is not in the original list.
 # - [-c | --colorspace] OPTIONAL. coloraide color space keyword to sort in, for example 'hct', 'ok', or '2000'. Defaults to 'hct' if omitted. See the `Name` field for various spaces listed as supported at https://facelessuser.github.io/coloraide/distance/
 # - [-k | --keepduplicatecolors OPTIONAL. Keep duplicate colors. Default off (duplicate colors are eliminated).
+# - [-w | --overwritesourcefile OPTIONAL. Overwrite source file with result. WARNING: this clobbers it (data loss of initial state). As this permanently alters the source file with no going back (including the possibility of emptying and failing to repopulate it if there's some error), use this option carefully. For example only use this option with disposable, backed up or version-controlled files. Also, with this option the result is not written to stdout, only written back over the source file.
 # NOTE: optional short switches MUST (annoyingly) not have a space after them and the parameter. The parameter may be clarified by surrounding it with quote marks; see below examples. Alternately, long options may be used and followed by = before the option value. See examples below for this also.
 # EXAMPLES
 # For example, to sort a palette file named colors.hexplt in the default color space, and print the result to stdout, run:
@@ -38,7 +42,7 @@ function check_space_in_opt_arg {
 }
 
 PROGNAME=$(basename $0)
-OPTS=`getopt -o hi:s::c::k --long help,inputfile:,startcolor::,colorspace::,keepduplicatecolors -n $PROGNAME -- "$@"`
+OPTS=`getopt -o hi:s::c::kw --long help,inputfile:,startcolor::,colorspace::,keepduplicatecolors,overwritesourcefile -n $PROGNAME -- "$@"`
 
 eval set -- "$OPTS"
 
@@ -46,7 +50,8 @@ eval set -- "$OPTS"
 sourceFileName=
 searchColor=
 sortingColorSpace='hct'		# or 'ok', or '2000', etc. See the `Name` field for various spaces listed as supported at https://facelessuser.github.io/coloraide/distance/
-keepDuplicateColorsBashVal=
+keepDuplicateColorsBashVal=no
+overWriteSourceFile=no
 while true; do
   case "$1" in
     -h | --help ) print_halp; exit 0 ;;
@@ -54,6 +59,7 @@ while true; do
     -s | --startcolor ) check_space_in_opt_arg $1 $2; searchColor=$2; shift; shift ;;
     -c | --colorspace ) check_space_in_opt_arg $1 $2; sortingColorSpace=$2; shift; shift ;;
     -k | --keepduplicatecolors ) keepDuplicateColorsBashVal='yes'; shift ;;
+    -w | --overwritesourcefile ) overWriteSourceFile='yes'; shift ;;
     -- ) shift; break ;;
     * ) break ;;
   esac
@@ -80,12 +86,13 @@ with open(\"$sourceFileName\", \"r\") as file_list:
         match = re.search(pattern, line)
         if match:
             append_str = str(match.group())
-			# convert to lowercase, to avoid a \"ValueError: list.remove(x): x not in list error\" if there are mixed cases in the source data:
+            # convert to lowercase, to avoid a \"ValueError: list.remove(x): x not in list error\" if there are mixed cases in the source data:
             append_str = append_str.lower()
             colors.append(append_str)
+file_list.close()
 
 # for color in colors:
-	# print(color)
+    # print(color)
 
 # - make an empty intended final list (a list to build)
 finalList = []
@@ -116,7 +123,19 @@ while (len(colors)) > 0:
 if \"$keepDuplicateColorsBashVal\" != 'yes':
 	finalList = list(unique_everseen(finalList))
 
-# - print the final list
-for color in finalList:
-    print(color)
+# - print the final list, optionally to the original file if told to.
+if \"$overWriteSourceFile\" == 'yes':
+    # blank and then ovewrite the source file with the modified palette; by not using the 'a' flag, we write nothing to it (empty it) :
+    print(\"~\nWill overwrite $sourceFileName with sorted palette.\")
+    open(\"$sourceFileName\", \"w\").close()
+    # ovewrite it with modified list:
+    with open(\"$sourceFileName\", \"a\") as file_list:
+        for color in finalList:
+            lineToWrite = str(color) + \"\n\"
+            file_list.write(lineToWrite)
+    file_list.close()
+    print(\"Done.\n~\")
+else:
+    for color in finalList:
+        print(color)
 "
