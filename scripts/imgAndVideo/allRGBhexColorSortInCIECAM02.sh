@@ -1,5 +1,5 @@
 # DESCRIPTION
-# runs RGBhexColorSortInCIECAM02.py with original file overwrite parameter against all .hexplt files in the current directory (no recursion into subdirectories), comparing them by sorting nearest to black-black-black-magenta first (makes a temporary copy of every hexplt file with black as the first color, runs the comparison, then removes the added color).
+# runs RGBhexColorSortInCIECAM02.py with original file overwrite parameter against all .hexplt files in the current directory (no recursion into subdirectories), comparing them by sorting nearest to black-black-black-magenta first (makes a temporary copy of every hexplt file with black as the first color, runs the comparison, then removes the added color). NOTE that you may be able to accomplish sorting in CIECAM-02 with `sortAllHexPalettesColoraide.sh` (this script could be deprecated.)
 
 # DEPENDENCIES
 # `getFullPathToFile.sh`, `RGBhexColorSortInCIECAM02.py`
