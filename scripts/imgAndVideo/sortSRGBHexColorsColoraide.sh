@@ -10,7 +10,7 @@
 # USAGE
 # Run with these parameters:
 # - -i | --inputfile REQUIRED. File name of source hexplt (sRGB hex color flat file list) to sort.
-# - [-s | --startcolor] OPTIONAL. sRGB hex color code to begin sorting on, e.g. '#894a5e' (must be surrounded by quote marks, and include a starting # pound/hex/number character, like that example). If omitted, the first color in the source file is used. This may be a color that is not in the source list, e.g. black to start sort on the darkest found color, or white to start sort on the lightest/brightest found color -- even if black or white is not in the original list.
+# - [-s | --startcolor] OPTIONAL. sRGB hex color code to begin sorting on, e.g. '#894a5e' or 'f800fc. If omitted, the first color in the source file is used. This may be a color that is not in the source list, e.g. black to start sort on the darkest found color, or white to start sort on the lightest/brightest found color -- even if black or white is not in the original list.
 # - [-c | --colorspace] OPTIONAL. coloraide color space keyword to sort in, for example 'hct', 'ok', or '2000'. Defaults to 'hct' if omitted. See the `Name` field for various spaces listed as supported at https://facelessuser.github.io/coloraide/distance/
 # - [-k | --keepduplicatecolors OPTIONAL. Keep duplicate colors. Default off (duplicate colors are eliminated).
 # - [-w | --overwritesourcefile OPTIONAL. Overwrite source file with result. WARNING: this clobbers it (data loss of initial state). As this permanently alters the source file with no going back (including the possibility of emptying and failing to repopulate it if there's some error), use this option carefully. For example only use this option with disposable, backed up or version-controlled files. Also, with this option the result is not written to stdout, only written back over the source file.
@@ -102,6 +102,15 @@ if \"$searchColor\" != '':
     pySearchColor = \"$searchColor\"
 else:
     pySearchColor = colors[0]
+# strip any gunk around that and reduce it to only six hex digits; throw an error and exit if its rong format:
+# Regex to match exactly 6 consecutive hex digits (case insensitive)
+found = re.search(r'[0-9a-fA-F]{6}', pySearchColor)
+# If a match was not found, throw an error and exit. It would be nice to play the Resetty music here.
+if not found:
+    print(\"\nERROR: -s | --startcolor or first color\", pySearchColor, \"from input file not a valid sRGB hex color code. Exit 2.\n\")
+    sys.exit(2)
+else:
+	pySearchColor = \"#\" + found.group(0)
 # only add pySearchColor (start search color) to the final list if it was on the original list, otherwise do not add it:
 if pySearchColor in colors:
     finalList.append(pySearchColor)

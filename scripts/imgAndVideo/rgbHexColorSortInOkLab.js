@@ -11,8 +11,6 @@
 // NOTES
 // To save the result to a new file, use a redirection operator, e.g.:
 //    node /path/to/this/rgbHexColorSortInOkLab.js -i 'all_humanae.hexplt' > humanae.hexplt
-// KNOWN ISSUES
-// It seems the way I have this set up to use or import the culori library may be broken vs. when I initially developed this.
 
 
 // CODE
@@ -28,7 +26,7 @@ const { program } = require('commander');
 program
   // the <fileName> thing here leads to capture of a series of values (file name):
   .requiredOption('-i --inputFile <fileName>', '\n\tInput palette file name (e.g. \'floral_print_00002.hexplt\'), which is a list of sRGB colors in hex format (e.g. #f800fc).\n')
-  .option('-s, --startComparisonColor <digits>', '\n\tFirst color to start comparisons with, in sRGB hex format (e.g. 0a000a) (NOTE: no number/hex/pound (\'#\') symbol should be in the color code)\n')
+  .option('-s, --startComparisonColor <digits>', '\n\tFirst color to start comparisons with, in sRGB hex format (e.g. 0a000a or #0a000a)\n')
   .option('-k, --keepDuplicateColors', '\n\tDo not remove duplicate colors from list. Without this switch (by default), duplicate colors are removed.\n')
 program.parse();
 const options = program.opts();
@@ -48,18 +46,18 @@ catch(err) {
 // ARBITRARY FIRST SORT COLOR
 var arbitraryStartCompareColor = '';		// set default blank
 if(typeof options.startComparisonColor !== 'undefined') {
-	// if it does not match sRGB hex color code pattern (including exactly six characters, no more or less), throw error and exit; otherwise assign the value to arbitraryStartCompareColor and continue:
-	var pattern = new RegExp("\^[0-9a-fA-F]{6}$")
-	if (pattern.test(options.startComparisonColor) == false) {
+	// try to grab six hex digits from the parameter, and throw an error if we can't.
+	const match = options.startComparisonColor.match(/[0-9a-fA-F]{6}/);
+	if (match) {
+	arbitraryStartCompareColor = match[0];
+	} else {
 		console.log("\n\n!========\nERROR: provided value for parameter -s --startComparisonColor is not in sRGB hex format (six hex digits, e.g. 0a000a); value is:\n\t", options.startComparisonColor, "\nExit code 2.\n!========\n");
 		process.exit(2);
-	} else {
-		arbitraryStartCompareColor = '#' + String(options.startComparisonColor);
 	}
 }
 
 // get array of sRGB hex format colors from the file:
-const regexp = /#[a-fA-F0-9]{6}/g;
+const regexp = /#?[a-fA-F0-9]{6}/g;
 const searchResults = [...inputFileContent.matchAll(regexp)];
 // init array of colors from file + regex search result:
 var comparisonColorsArray = [];
