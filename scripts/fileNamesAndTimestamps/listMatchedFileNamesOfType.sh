@@ -3,11 +3,13 @@
 
 # USAGE
 # Run with these parameters:
-# - $1 The extension of the file for which you want every file of that type to be passed to listMatchedFileNames.sh.
-# - $2 OPTIONAL. A string declaring one of three modes: 'mode=1', 'mode=2', or 'mode=3'. (Parameter can be with or without surrounding quote marks.) If omitted, defaults to 'mode=1'. Mode 2 causes the script to only list file names and how many matches were found, like this:
+# - $1 REQUIRED. The extension of the file for which you want every file of that type to be passed to listMatchedFileNames.sh.
+# - $2 OPTIONAL. A string declaring one of three modes: 'mode=1', 'mode=2', or 'mode=3'. (Parameter can be with or without surrounding quote marks.) If omitted, defaults to 'mode=1'.
+# Mode 1 prints unaltered output from calling listMatchedFileNames.sh, which at this writing means it prints all file names or directories that are base name matches for type $1.
+# Mode 2 causes the script to only list file names and how many matches were found, like this:
 #
-#    fBnhR9Ar.hexplt 8
-#    YWgZmFP3.hexplt 5
+#    fBnhR9Ar.hexplt: 8
+#    YWgZmFP3.hexplt: 5
 #
 # Mode 3 causes the script only to print notifications when a file has no match.
 # EXAMPLES
@@ -15,6 +17,9 @@
 #    listMatchedFileNamesOfType.sh hexplt
 # To run for every hexplt file in mode 2, run:
 #    listMatchedFileNamesOfType.sh hexplt mode=2
+# TO DO
+# - update the script to use getops to set options
+# - after getopts update, add option to pass subdir search parameter to the called script
 
 
 # CODE
