@@ -28,5 +28,5 @@ do
 	renderTarget=$fileNameNoExt.mp4
 	ffmpeg -y -i $fileName -c copy $renderTarget
 	# copy metadata from source file to render target; the script also updates target timestamp to match metadata media creation date:
-	copyMetadataFromSourceFileToTarget.sh $fileName $renderTarget
+	copyMetadataFromSourceFileToTarget.sh $fileName $renderTarget FNEORN
 done
