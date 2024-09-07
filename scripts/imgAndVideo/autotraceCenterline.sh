@@ -1,6 +1,9 @@
 # DESCRIPTION
 # Wrapper that runs autotrace.exe with custom parameters to retrieve (or attempt to retrieve) centerline paths from raster art of e.g. lines. Result will be found as `<input_file_base_name>_centerline.svg`.
 
+# DEPENDENCIES
+# Inkscape in your PATH
+
 # USAGE
 # Run with these parameters:
 # - $1 a .bmp bitmap (or other supported format?) file name to trace.
