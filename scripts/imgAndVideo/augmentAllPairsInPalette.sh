@@ -15,6 +15,8 @@
 
 
 # CODE
+# TO DO
+# Update this to use interpolateTwoSRGBColors_coloraide.py (and optionally specify a color space, as that script may support?)
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source palette file name) passed to script. Exit."; exit 1; else srcHexplt=$1; fi
 
 nColorsAugment=33
