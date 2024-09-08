@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Compares two palettes (.hexplt format, from parameter 1 and 2) and prints a dissimilarity ranking float between 0 and 1 (zero and one hundred percent). A ranking of lower to zero means perceptually nearer or identical, and higher to 1 (100 percent) means perceptually disimmilar to totally different (perhaps opposite).
+# SEE ALSO paletteCompareColoraide.py, PREFERRED, as it uses a color space by default that may be better for comparison. This script (paletteCompareCIECAM02.py) compares two palettes (.hexplt format, from parameter 1 and 2) and prints a dissimilarity ranking float between 0 and 1 (zero and one hundred percent). A ranking of lower to zero means perceptually nearer or identical, and higher to 1 (100 percent) means perceptually disimmilar to totally different (perhaps opposite).
 
 # USAGE
 # Run this script through a Python interpreter, with these parameters:
@@ -9,8 +9,8 @@
 #    python /path/to_this_script/paletteCompareCIECAM02.py FD613A_F9C956_BAB25B_3D9676_1F463E.hexplt FE6737_F8D845_9DC17E_489B73_375557.hexplt
 # NOTES
 # - Again as in the DESCRIPTION, the printed number is a dissimilarity ranking, so a lower float means the palettes are more similar. Zero means they are identical and one means they are opposite.
-# - You may want to use allRGBhexColorSortInOkLab.sh (preferred at this writing as it is much faster) or allRGBhexColorSortIn2CIECAM02.sh to sort all colors in all palettes in the directory you work in (with any .hexplt format color palettes) _in the same way_ (for example starting sort on the same arbitrary color, for example black) before running this script. The similarity ranking produced by this script will probably be meaningless without that.
-# - The similarity ranking between two palettes is obtained by comparison of color 1 in palette one to color 1 in palette 2, then color 2 in palette 1 to color 2 in palette 2, and so on. The sum of these rankings is then divided by the number of colors in each palette.
+# - You may want to use sortAllHexPalettesColoraide.sh to sort all colors in all palettes in the directory you work in (with any .hexplt format color palettes) _in the same way_ (for example starting sort on the same arbitrary color, for example black) before running this script. The similarity ranking produced by this script will probably be meaningless without that.
+# - The similarity ranking between two palettes is obtained by comparison of color 1 in palette one to color 1 in palette 2, then color 2 in palette 1 to color 2 in palette 2, and so on. The sum of these rankings is then divided by the number of colors in each palette, and that's divided by 100 to be expressed as a float percent.
 
 
 # CODE
