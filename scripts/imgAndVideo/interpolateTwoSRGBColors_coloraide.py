@@ -1,6 +1,6 @@
 # DESCRIPTION
 # Interpolates in -n steps between a start -s color and end -e
-# color in color space -c (default HCT as \'hct\'). Prints the original and
+# color in color space -c (default HCT as 'hct'). Prints the original and
 # the in-between (augmented) color results to stdout as sRGB hex color codes
 # like #ff0596.
 
