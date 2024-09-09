@@ -11,10 +11,10 @@
 fullPathToThisScript=$(getFullPathToFile.sh newGetoptScript.sh)
 rndString=$(cat /dev/urandom | tr -dc 'a-f0-9' | head -c 9)
 newScriptName=new_script_"$rndString".sh
-#tail -n +19 $fullPathToThisScript > $newScriptName
-#start $newScriptName
+tail -n +19 $fullPathToThisScript > $newScriptName
+start $newScriptName
 # exits if the shell level is greater than 1 (if not in the base shell), re: https://unix.stackexchange.com/a/761569/110338
-# if [[ $SHLVL -gt 1 ]]; then exit 0; fi
+if [[ $SHLVL -gt 1 ]]; then exit 0; fi
 # EVERYTHING AFTER THIS LINE IS META! IT WILL BE WRITTEN by the script to a new randomly named script, but everything on this line and above will not!
 # DESCRIPTION
 # omigoshomigoshomigoshomigoshomigoshomigoshomigoshomigosh
