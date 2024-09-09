@@ -3,8 +3,8 @@
 
 # USAGE
 # Run with these parameters:
-# - $1 string to find matching file names for
-# - $2 search string to grep (search within) all files found from Everything via $1.
+# - $1 REQUIRED. String to find matching file names for
+# - $2 REQUIRED. Search string to grep (search within) all files found from Everything via $1.
 # For example:
 #    everythingGrep.sh .sh BWsvgRandomColorFill
 # NOTE
