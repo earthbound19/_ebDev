@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Repeatedly calls `oklabGradientFromFirstAndLastHexpaletteColor.sh`, doing this:
+# Repeatedly calls `gradientFirstAndLastHexpaletteColors.sh`, doing this:
 # - for every .hexplt format file (hex palette) in the current directory:
 # - retrieve the first and last color in the palette
 # - interpolate N ($1) colors (to create a gradient) from the first to last color through oklab space
@@ -13,11 +13,13 @@
 # - $1 REQUIRED. The number of colors in the intended gradient of each modified .hexplt file
 # - $2 OPTIONAL. The word SYMBCOZ, which will cause the script to perform operations without warning. If omitted, you are prompted to type this password to continue.
 # For example, to run the script and be prompted for this password, run it with only a number of colors parameter:
-#    oklabGradientFromFirstAndLastHexpaletteColors_allPalettes.sh
+#    gradientFirstAndLastHexpaletteColors_allPalettes.sh
 # To run the script and perform the changes on all files using 256 colors per file without warning, run the script with that password as the second parameter:
-#    oklabGradientFromFirstAndLastHexpaletteColors_allPalettes.sh 256 SYMBCOZ
+#    gradientFirstAndLastHexpaletteColors_allPalettes.sh 256 SYMBCOZ
 
 # CODE
+# TO DO
+# rewrite and rename or supercede this and the calling script to call a script that uses the coloraide library, with a parameter accepting any valid color space for interpolation; re: https://facelessuser.github.io/coloraide/interpolation/#mixing
 if [ "$1" ]; then gradientColorsN=$1; else printf "\nNo parameter \$1 (the number of colors in the intended gradient of each modified .hexplt file) passed to script. Exit."; exit 1; fi
 
 # if $2 passed and equals SYMBCOZ, bypass check. Otherwise do check.
@@ -54,7 +56,7 @@ for file in ${filesArray[@]}
 do
 	echo "interpolating $gradientColorsN colors from first to last in file $file and overwriting it . . ."
 	# make an array of the interpolation result, because it failed if I tried to pipe that directly back to the file:
-	newGradient=( $(oklabGradientFromFirstAndLastHexpaletteColors.sh $file $gradientColorsN) )
+	newGradient=( $(gradientFirstAndLastHexpaletteColors.sh $file $gradientColorsN) )
 	# print that array result (one element per line) back to the file:
 	printf '%s\n' "${newGradient[@]}" > $file
 done

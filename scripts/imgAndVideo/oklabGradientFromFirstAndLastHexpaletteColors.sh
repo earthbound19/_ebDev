@@ -1,17 +1,22 @@
 # DESCRIPTION
-# Takes the first and last color from input .hexplt file $1 and makes a gradient of N ($2) colors from the first to the last color, by interpolating through oklab color space, via `get_color_gradient_OKLAB.js`. Prints the result to stdout.
+# Takes the first and last color from input .hexplt file $1 and makes a gradient of N ($2) colors from the first to the last color, by interpolating through oklab color space, via `interpolateTwoSRGBColors_coloraide.py`. Prints the result to stdout.
 
 # DEPENDENCIES
-# `get_color_gradient_OKLAB.js` and its dependencies (nodejs and a package), `getFullPathToFile.sh`
+# - `interpolateTwoSRGBColors_coloraide.py` and its dependencies.
+# - previously `get_color_gradient_OKLAB.js` and its dependencies (nodejs and a package), `getFullPathToFile.sh`
 
 # USAGE
 # Call with the following parameters:
 # - $1 REQUIRED. Input .hexplt format file name
 # - $2 REQUIRED. How many colors to interpolate between the first and last color in that .hexplt file.
-# For example, to print a gradient of 7 colors interpolated between the first and last colors of the file 2ag7_palette.hexplt, run:
-#    oklabGradientFromFirstAndLastHexpaletteColors.sh 2ag7_palette.hexplt 5
+# - $3 OPTIONAL. Any other flags that may be passed to `interpolateTwoSRGBColors_coloraide.py`, for example '-c oklab' to do interpolation in the oklab color space, or '-c oklch' to do interpolation in the oklch color space. The called script has a default of '-c hct' if this is omitted.
+# For example, to print a gradient of 7 colors interpolated between the first and last colors of the file 2ag7_palette.hexplt in the default (hct) space, run:
+#    gradientFirstAndLastHexpaletteColors.sh 2ag7_palette.hexplt 5
 # NOTE
-# The number of colors interpolated includes the first and last color. Asking for 5 colors will give you the start color, three colors between it and the end color, and the end color: start + 3 + end = 5.
+# To do the same but in oklch space, run:
+#    gradientFirstAndLastHexpaletteColors.sh 2ag7_palette.hexplt 5 '-c oklch'
+# - The number of colors interpolated includes the first and last color. Asking for 5 colors will give you the start color, three colors between it and the end color, and the end color: start + 3 + end = 5.
+# - To call the script `get_color_gradient_OKLAB.js` instead, uncomment line for that after the DEPRECATED comments, and comment out the line after it. It will work because that .js script uses the same switches. However, as noted above, you can interpolate in oklab space by passing '-c oklab' as a third parameter in this script.
 
 # CODE
 if [ "$1" ]; then inputFile=$1; else printf "\nNo parameter \$1 (input .hexplt format file) passed to script. Exit."; exit 1; fi
@@ -28,9 +33,12 @@ firstColor=${colorsArray[0]}
 lastColor=${colorsArray[$(($howManyColors - 1))]}
 
 # locate script to call, via another script:
-scriptToFind="get_color_gradient_OKLAB.js"
+	# DEPRECATED option:
+	# scriptToFind="get_color_gradient_OKLAB.js"
+scriptToFind="interpolateTwoSRGBColors_coloraide.py"
 pathToScript=$(getFullPathToFile.sh $scriptToFind)
 if [ "$pathToScript" == "" ]; then echo "ERROR: script to call $scriptToFind apparently not found. Exit."; exit 3; fi
 
-# create and print gradient via nodejs and script call
-node $pathToScript -s $firstColor -e $lastColor -n $nColorsToInterpolate
+	# DEPRECATED option: create and print gradient via nodejs and script call
+	# node $pathToScript -s $firstColor -e $lastColor -n $nColorsToInterpolate
+python $pathToScript -s $firstColor -e $lastColor -n $nColorsToInterpolate
