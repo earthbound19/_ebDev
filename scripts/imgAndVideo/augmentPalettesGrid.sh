@@ -19,7 +19,7 @@
 # - from that folder, run this script with these parameters:
 # - $1 REQUIRED. How many linearly interpolated colors to insert between each color (column) in palette files.
 # - $2 REQUIRED. How many linearly interpolated colors to insert between each row of colors, between the $1-interpolated palette files.
-# - $3 OPTIONAL. An identifier string for The colorspace through which to interpolate colors. Default 'hct' if omitted. Any colorpsace supported by the coloraide library's steps (interpolation) function may be given. Notable options include 'oklab' and 'oklch'. See https://facelessuser.github.io/coloraide/colors/
+# - $3 OPTIONAL. An identifier string for the colorspace through which to interpolate colors. Default 'hct' if omitted. Any colorpsace supported by the coloraide library's steps (interpolation) function may be given. Notable options include 'oklab' and 'oklch'. See https://facelessuser.github.io/coloraide/colors/
 # For example, to interpolate 5 colors horizontally and vertically over all .hexplt files in the current directory, run:
 #    augmentPalettesGrid.sh 5 5
 # Or to insert 3 colors horizonatallybetween columns), and 5 colors vertically (between rows):
@@ -62,7 +62,7 @@ if [[ "$fullPathToInterpolationScript" == "" ]]; then echo "ERROR: could not fin
 # get directory name without path:
 currentDirNoPath=$(basename $(pwd))
 # build target file name from that:
-outputFileName="$currentDirNoPath"_Augmented-"$interpolationSpace"-"$columnsInterpolateOrigParam"x"$rowsInterpolateOrigParam"-grid.hexplt
+outputFileName="$interpolationSpace"-"$columnsInterpolateOrigParam"x"$rowsInterpolateOrigParam"-"$currentDirNoPath"_Augmented-grid.hexplt
 
 # horrifyingly large bash function; augments all .hexplt files in the current directory; REQUIRES TWO PARAMETERS (effectively $1 and $2), which are, respectively, the target file to write all augmented palette lines to, and the number of augmentation steps:
 augment_palettes () {
@@ -91,6 +91,7 @@ augment_palettes () {
 				# optional debug print:
 				# echo "idx $counter, element \$color $color\: $thisElement, +1 element $nextElement"
 			# get the interpolated color list via call of interpolation script -- note the -l 1 parameter, which remove the last color of the augmentation! -- and put it in an array:
+			echo "Generating augmentation for $hexplt - start:end:count : $thisElement:$nextElement:$2 in $interpolationSpace space . . ."
 			augmentedPaletteSegment=(
 				$(python $fullPathToInterpolationScript \
 				-s $thisElement \
@@ -106,7 +107,7 @@ augment_palettes () {
 				augmentedPalette+=($augmentedColor)
 			done
 			# increment tracking counter:
-			counter=$(($counter + 1))
+			((counter++))
 			# break if counter at array size - 1, or stopLoopAt:
 			if [ $counter == $stopLoopAt ]; then break; fi
 		done
@@ -127,34 +128,41 @@ augment_palettes () {
 # delete any temp files from any previous interrupted or otherwise erred run:
 rm -rf _augmentPalettes*
 
-# first augmentation pass -- "X"; writes to _augmentPalettesGrid_temp_step1.txt; CALL OF augment_palettes FUNCTION:
-augment_palettes _augmentPalettesGrid_temp1.txt $colsInterpolationSteps
+# if the target file exists, skip render; otherwise render:
+if [ -e $outputFileName ]
+then
+	echo Target render file $outputFileName already exists. Skipping render.
+	exit
+else
+	# first augmentation pass -- "X"; writes to _augmentPalettesGrid_temp_step1.txt; CALL OF augment_palettes FUNCTION:
+	augment_palettes _augmentPalettesGrid_temp1.txt $colsInterpolationSteps
 
-# transpose that result to new file:
-datamash transpose --field-separator=' ' < _augmentPalettesGrid_temp1.txt > _augmentPalettesGrid_temp2.txt
-# delete trailing whitespace/lines from that result (which would otherwise result in empty split files, maybe augment errors:
-sed -i -e :a -e '/[^[:blank:]]/,$!d; /^[[:space:]]*$/{ $d; N; ba' -e '}' _augmentPalettesGrid_temp2.txt
-# recreate temp folder:
-mkdir _augmentPalettesGrid_temp_dir
-# split temp file into that as files, one line each:
-split --additional-suffix='.hexplt' -l 1 _augmentPalettesGrid_temp2.txt ./_augmentPalettesGrid_temp_dir/augment_
-# change to temp dir and augment all those resultant transposed line-split palettes into another big palette;
-cd _augmentPalettesGrid_temp_dir
-# CALL OF augment_palettes FUNCTION:
-augment_palettes _augmentPalettesGrid_temp3.txt $rowsInterpolationSteps
-# transpose that to our final result, named after the directory:
-datamash transpose --field-separator=' ' < _augmentPalettesGrid_temp3.txt > ../$outputFileName
-# cd back up and trim trailing whitespace off result palette:
-cd ..
-sed -i -e :a -e '/[^[:blank:]]/,$!d; /^[[:space:]]*$/{ $d; N; ba' -e '}' $outputFileName
-# delete temp files:
-rm -rf _augmentPalettes*
-# get count of columns:
-columns=$(head -n 1 $outputFileName | grep -o '#' | wc -l)
-# get count of rows:
-rows=$(wc -l < $outputFileName | xargs)
-# build columns and rows comment string from that and append it to end of first line:
-formatString="  columns: $columns rows: $rows"
-sed -i " 1 s/.*/&$formatString/" $outputFileName
+	# transpose that result to new file:
+	datamash transpose --field-separator=' ' < _augmentPalettesGrid_temp1.txt > _augmentPalettesGrid_temp2.txt
+	# delete trailing whitespace/lines from that result (which would otherwise result in empty split files, maybe augment errors:
+	sed -i -e :a -e '/[^[:blank:]]/,$!d; /^[[:space:]]*$/{ $d; N; ba' -e '}' _augmentPalettesGrid_temp2.txt
+	# recreate temp folder:
+	mkdir _augmentPalettesGrid_temp_dir
+	# split temp file into that as files, one line each:
+	split --additional-suffix='.hexplt' -l 1 _augmentPalettesGrid_temp2.txt ./_augmentPalettesGrid_temp_dir/augment_
+	# change to temp dir and augment all those resultant transposed line-split palettes into another big palette;
+	cd _augmentPalettesGrid_temp_dir
+	# CALL OF augment_palettes FUNCTION:
+	augment_palettes _augmentPalettesGrid_temp3.txt $rowsInterpolationSteps
+	# transpose that to our final result, named after the directory:
+	datamash transpose --field-separator=' ' < _augmentPalettesGrid_temp3.txt > ../$outputFileName
+	# cd back up and trim trailing whitespace off result palette:
+	cd ..
+	sed -i -e :a -e '/[^[:blank:]]/,$!d; /^[[:space:]]*$/{ $d; N; ba' -e '}' $outputFileName
+	# delete temp files:
+	rm -rf _augmentPalettes*
+	# get count of columns:
+	columns=$(head -n 1 $outputFileName | grep -o '#' | wc -l)
+	# get count of rows:
+	rows=$(wc -l < $outputFileName | xargs)
+	# build columns and rows comment string from that and append it to end of first line:
+	formatString="  columns: $columns rows: $rows"
+	sed -i " 1 s/.*/&$formatString/" $outputFileName
 
-echo DONE. Result file is $outputFileName.
+	echo DONE. Result file is $outputFileName.
+fi
