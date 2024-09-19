@@ -118,7 +118,7 @@ fi
 
 if [ -z ${arrayOfPaletteFileNames[0]} ];
 then
-	echo "ERROR: problem locating or using palette file. Check 1) that you passed a correct palette file name. 2) that it is a valid (non-empty) palette, or findPalette.sh, whichever you're using."
+	echo "ERROR: problem locating or using palette file. Check that you passed a correct palette file name, that it is a valid (non-empty) palette, that findPalette.sh is working, or that this script is working as it should."
 	exit 3
 fi
 
