@@ -3,7 +3,7 @@
 # - there are $1 colors added between every color (column) in each palette horizontally
 # - there are $2 colors added between every row of those augmented palettes vertically
 # - all this is concatenated to a grid of combined horizontal and vertical augmentations
-# This is done by a process that uses all .hexplt format palettes in the current directory (other than any with output file names made by this script). The result is written to a .hexplt file in a grid and with markup declaring number of columns and rows. The result file is named after the containing folder you run the script from, and the columns x rows. Source palettes may have color codes arranged in any way and include comments; the only requirement is that sRGB hex color codes in the palette are prefixed with a number/hex/pound # symbol and are separated by white space.
+# This is done by a process that uses all .hexplt format palettes in the current directory (other than any with output file names made by this script). It's done by default in a color space designed after human vision / color perception. See USAGE and NOTES under that for details.
 
 # DEPENDENCIES
 # - `interpolateTwoSRGBColors_coloraide.py` and its dependencies
@@ -12,7 +12,7 @@
 # DEPRECATED DEPENDENCY that could still be used with some hacking:# `get_color_gradient_OKLAB.js` (and nodeJS and the packages that script requires)
 
 # WARNING
-# Deletes any pre-exisisting folders and files with the pattern _augmentPalettes* before doing its work.
+# Deletes any pre-existing folders and files with the pattern _augmentPalettes* before doing its work.
 
 # USAGE
 # - copy palettes you wish to make a multi-augment grid from into their own dedicated operating folder.
@@ -30,6 +30,7 @@
 #    augmentPalettesGrid.sh 5 5 oklab
 # You could pass 0 for both $1 and $2 to make a grid of all palettes, but then you would just want to use `catHexpltsGrid.sh`, which will do that more straightforwardly (and probably more efficiently).
 # NOTES
+# - The result is written to a .hexplt file in a grid and with markup declaring number of columns and rows. The result file is named after the containing folder you run the script from, and the columns x rows. Source palettes may have color codes arranged in any way and include comments; the only requirement is that sRGB hex color codes in the palette are prefixed with a number/hex/pound # symbol and are separated by white space.
 # - you can run this in a directory where you have created palettes from it which have the regex pattern `_Augmented-.*_grid` in their file name, and it will not operate on those files (it will skip them). You can therefore reuse this script in the same directory easily, passing it different parameters each time.
 # - the script `paletteRenamedCopiesByNextMostSimilar.sh` may be useful for getting copies of palettes into a dedicated folder for this purpose (with potentially really interesting and beautiful results).
 # - to not augment any colors, but create a grid of palettes (e.g. in a folder with copies of them made by the previously mentioned script), see `catHexpltsGrid.sh`.
