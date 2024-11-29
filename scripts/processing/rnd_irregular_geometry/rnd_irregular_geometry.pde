@@ -14,18 +14,16 @@
 // by Richard Alexander Hall, Copyright 2019
 // Inspired by Daniel Bartholomew's "Abstractoons."
 // TO DO:
-// - rnd color fill / outline option logic (use that function)
+// - N random generations for every random palette (from API) retrieval, instead of a new palette retrieval for every generation?
 // - parameter control of iterations
 // - equilateral properly center-reference drawn triangle option (unpredictable triangle option commented out for now)
 // - random repeat translate from 1-3
 // - that with repeat shape or alterante shape
 
-// v0.9.16 changes:
-// - global varaible controlling iterations
-// - add version string global variable
-// - give both these items of information in saved file names.
-// - hard code img size to 11x95" @ 96DPI (not fullscreen)
-String versionString = "0.9.16";
+// v0.9.17 changes:
+// - option to set palette from a web API that provides colors in a structure this script translates, hard-coded to use API, with fallback to hard-coded colors.
+// - change Prismacolor markers array (palette) to soil pigments
+String versionString = "0.10.42";
 
 // DEPENDENCY INCLUDE
 import processing.svg.*;
@@ -34,30 +32,16 @@ import processing.svg.*;
 int iterationsArg = 2;    // controls how many subsequently smaller shape arrangements to make.
 color backgroundColor = #524547;  // Prismacolor Black
 // color backgroundColor = #FFFFFF;
+// if set to true, the generator will attempt to use an API which gives a randomly selected color palette, with fallback to use a hard-coded fallback colorful set. If set to false, hard-coded more muted colors will be used:
+boolean RNDcolorMode = true;
 
-// Prismacolor marker colors array:
-color[] Prismacolors = {
-  #E54D93, #F9E3E0, #D13352, #E14E6D, #F45674, #EA5287, #EF7FAD,
-  #F6C6D0, #F895AC, #F4DCD7, #F9C0BC, #F65C6A, #F86060, #FD9863,
-  #FA855B, #F7D580, #ECBF7A, #F5D969, #F3C77D, #EEE2C7, #EEE4DC,
-  #93CD87, #75755C, #C6DD8E, #687B57, #618979, #009E90, #A2B1A2,
-  #008D94, #4F8584, #00B3DB, #0090C7, #33549B, #405F89, #435BA3,
-  #574C70, #0BBDC4, #4CC8D9, #97C1DA, #934393, #CA4587, #E65F9F,
-  #D8308F, #B1A1C9, #88595C, #8D6E64, #BD6E6B, #EBB28B, #F5DCD5,
-  #F7DDCB, #C97B8E, #F0CCC4, #E5E4E9, #F5D3DD, #D46569, #CA5A62,
-  #A0716D, #DEBBB3, #C87F73, #EE8A74, #C9877F, #EDD6BF, #5B4446,
-  #524547, #F1E5E9, #F0D9DC, #E9C9D1, #C5AAB4, #B7A1AF, #A58E9A,
-  #8C7B87, #6A5B67, #62555E, #DDDBE0, #C7C6CD, #C8C7CE, #A4A1A9,
-  #9B98A2, #7F7986, #857F8A, #72727D, #615F6B, #FCC0BA, #FFC874,
-  #BEB27B, #367793, #6389AB, #8D6CA9, #AF62A2, #FEC29F, #F2D8A4,
-  #F8D9BE, #ECA6B9, #7AD2E2, #E497A4, #A7BCBB, #95B6BA, #7B91A2,
-  #69A2BE, #C9CBE0, #A1A6D0, #C0A9BE, #AA8E79, #8E4C5C, #AA4662,
-  #C14F6E, #D96A6E, #F98973, #F7DFD8, #D1BCBD, #CBADB1, #BFA9A8,
-  #B19491, #987D80, #877072, #745D5F, #72646C, #36B191, #66C7B0,
-  #8F4772, #B34958, #FA9394, #AC9EB8, #9B685D, #59746E, #1E7C72,
-  #009D79, #82B079, #91BACB, #E0BFB5, #74B3E3
+// from Soil_Pigments.hexplt:
+color[] FallbackColors = {
+  #382F2A, #673D2E, #713820, #763436, #9B4831, #8E5237, #A26F3E, #BD8A58,
+  #CD844B, #DCA651, #EEC382, #DEC6A6, #D7C7B0, #9E9287, #7E7A6D, #A39461
 };
-int PrismacolorArrayLength = Prismacolors.length; 
+// URL for random color palette selection API:
+String apiURL = "https://earthbound.io/data/random_ebPalette/";
 
 
 // irregular geometry generator class
@@ -74,12 +58,12 @@ class IrregularGeometryGenerator {
   int iterations;
   boolean inEraseMode;
   boolean useEraseMode;
-// TO DO: use the next variable:
-  boolean RNDcolorMode;
   color eraseModeColorFill;
   color eraseModeColorStroke;
   color fillModeColorFill;
   color fillModeColorStroke;
+  color[] Colors;
+  int ColorsArrayLength;
 
   // constructor
   IrregularGeometryGenerator(int iterationsArg) {
@@ -100,8 +84,7 @@ class IrregularGeometryGenerator {
     shapeStrokeWeight = 4;
     inEraseMode = false;
     useEraseMode = true;
-// TO DO: RND color mode things enabled via the following boolean when true! :
-    RNDcolorMode = false;
+    // TO DO: override these when RNDcolorMode is true? Just set them somewhere else one way or the other?
     eraseModeColorStroke = #615F6B;      // Prismacolor cool grey 90%
     eraseModeColorFill = #524547;      // Prismacolor black
     fillModeColorFill = #FFFFFF;
@@ -110,15 +93,58 @@ class IrregularGeometryGenerator {
     ellipseMode(CENTER);
   }
 
+  // Function to set colors, retrieving from API or using fallback
+  void setColorPalette() {
+    if (RNDcolorMode) {
+      print("Attempting to retrieve colors from API..\n");
+      Thread t = new Thread(new Runnable() {
+        public void run() {
+          try {
+            JSONObject json = loadJSONObject(apiURL);
+            JSONArray colorArray = json.getJSONArray("colors");
+            print("Extracted colors array: " + colorArray + "\n");
+            Colors = new color[colorArray.size()];
+            for (int i = 0; i < colorArray.size(); i++) {
+              Colors[i] = color(unhex("FF" + colorArray.getString(i).substring(1)));
+            }
+          } catch (Exception e) {
+            println("API fetch failed or timed out. Using fallback colors.");
+            Colors = FallbackColors;
+          }
+        }
+      });
+      t.start();
+      try {
+        t.join(7000); // Wait up to 7 seconds
+      } catch (InterruptedException e) {
+        println("Timeout reached. Using fallback colors.");
+        Colors = FallbackColors;
+      }
+    } else {
+      Colors = FallbackColors;  // Fallback colors if RNDcolorMode is false
+    }
+    ColorsArrayLength = Colors.length;
+  }
+
   void setRNDcolors() {
-     // shape etc. rnd color fill change
-     // DEPRECATED; pure random:
-     // fill( (int) random(255), (int) random(255), (int) random(255) );
-     // stroke( (int) random(255), (int) random(255), (int) random(255) );
-    int RNDarrayIndex = (int)random(PrismacolorArrayLength);
-    stroke(Prismacolors[RNDarrayIndex]);
-    RNDarrayIndex = (int)random(PrismacolorArrayLength);
-    fill(Prismacolors[RNDarrayIndex]);
+    // conditional shape etc. rnd color fill change
+    // color strokeColor = Colors[RNDarrayIndex];
+    // stroke(strokeColor);
+    // color fillColor = Colors[RNDarrayIndex];
+    // fill(fillColor);
+    int RNDarrayIndex = (int)random(ColorsArrayLength);
+    eraseModeColorStroke = Colors[RNDarrayIndex];
+    RNDarrayIndex = (int)random(ColorsArrayLength);
+    eraseModeColorFill = Colors[RNDarrayIndex];
+    RNDarrayIndex = (int)random(ColorsArrayLength);
+    fillModeColorFill = Colors[RNDarrayIndex];
+    RNDarrayIndex = (int)random(ColorsArrayLength);
+    fillModeColorStroke = Colors[RNDarrayIndex];
+    RNDarrayIndex = (int)random(ColorsArrayLength);
+    // TO DO: a dirty hack to make the background very slightly darker in case it happens to be a randomly selected duplicate of a fill color? : substract 5 from all color channels:
+    // assigning to a global here:
+    RNDarrayIndex = (int)random(ColorsArrayLength);
+    backgroundColor = Colors[RNDarrayIndex];
   }
 
   // set erase drawing colors
@@ -141,7 +167,7 @@ class IrregularGeometryGenerator {
   }
 
   // gets and returns a random X and Y translate coordinate pair (in an int[] array),
-  // the values of which are may be used by the translate() function:
+  // the values of which may be used by the translate() function:
   int[] getRNDtranslateJitter(int X, int Y) {
     int localX = (int) random(1, X * translationJitter);
     int localY = (int) random(1, Y * translationJitter);
@@ -151,7 +177,7 @@ class IrregularGeometryGenerator {
     int[] localXY = {localX, localY};
     return localXY;
   }
-  
+
   // expects String with one of the values you see in the first switch case here
   int getRNDrotate(String mode) {
     int angle = 0;
@@ -246,11 +272,16 @@ class IrregularGeometryGenerator {
     int[] sizeXY = {X, Y};
     return sizeXY;
   }
-  
+
   void makeIrregularGeometry() {
+    if (RNDcolorMode == true) {
+      setColorPalette();
+      setRNDcolors();
+    }
+
     background(backgroundColor);
-	noFill(); // will be overriden by toggleEraseMode() if useEraseMode is true
-    
+    noFill(); // will be overriden by toggleEraseMode() if useEraseMode is true
+
     // back up defaults that will be modified in the following for loop:
     float transBackup = RNDtranslateMultiplier;
     float shapeLenBackup = RNDshapeLenMult;
@@ -262,7 +293,7 @@ class IrregularGeometryGenerator {
     translate(width/2, height/2);
     int RNDrotateDegree = getRNDrotate("cardinal");
     rotate(radians(RNDrotateDegree));
-    
+
     // (set erase or draw mode and) draw (and record size of shape for move to edge of shape reference)
 // TO DO: figure out why this first call breaks things (if toggleEraseMode(); on the next line is uncommented):
     toggleEraseMode();	// see comments near that function
@@ -286,7 +317,7 @@ class IrregularGeometryGenerator {
 // YES AND REDUCE AGAIN?
     // RNDtranslateMultiplier *= RNDtranslateReduceMultiplier;
     // RNDshapeLenMult *= RNDshapeLenReduceMultiplier;
-    
+
     // move back from jitter
     translate(transJitterXY[0] * (-1), transJitterXY[1] * (-1));
     // move back from edge of next-to-last drawn shape
@@ -311,7 +342,7 @@ class IrregularGeometryGenerator {
     // (translate corner back to center again)
     translate(width/2, height/2);
     }
-    
+
     // restore backed up defaults and set prior defaults (for erase mode, conditionally) :
     RNDtranslateMultiplier = transBackup;
     RNDshapeLenMult = shapeLenBackup;
@@ -330,7 +361,7 @@ String rndString() {
   return florf;
 }
 
-
+int ColorsArrayLength;
 void setup()
 {
   size(1056, 816);    // use full display size--why these !same as width and height above, I don't know.
