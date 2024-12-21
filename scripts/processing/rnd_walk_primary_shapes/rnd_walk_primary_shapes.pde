@@ -48,10 +48,10 @@ class Walker {
 
   // constructor
   Walker() {
-    spacingSizeX = 128;
-    spacingSizeY = 128;
-    tileSizeX = 80;
-    tileSizeY = 80;
+    spacingSizeX = 256;
+    spacingSizeY = 256;
+    tileSizeX = 160;
+    tileSizeY = 160;
     canvasSetX = displayWidth; canvasSetY = displayHeight;
     // if you'd rather override that canvas size, uncomment the next line; also uncomment the size override further below in code:
     //canvasSetX = 1280; canvasSetY = 720;
@@ -150,7 +150,7 @@ void draw() {
   // Run the walker objects
   walkerOne.step(); walkerTwo.step(); walkerThree.step(); walkerFour.step();
   walkerOne.render(); walkerTwo.render(); walkerThree.render(); walkerFour.render();
-  delay(86);  // this delay makes the render rate slightly less than insane
+  delay(360);  // this delay makes the render rate slightly less than insane
   //saveFrame();
 
       //OPTIONAL CODE BLOCK: terminate sketch after N renders:
