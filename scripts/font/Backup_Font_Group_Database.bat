@@ -17,6 +17,7 @@
 :: - Parameterize the directories? Was this run from the same dir as the database? I'd rather run it from anywhere.
 
 :: color 2A
-for /f "tokens=2-7 delims=/:. " %%a in ("%date% %time%") do (set DateTime=%%c-%%a-%%b__%%d.%%e.%%f)
-copy %username%_fontdbase_backup.rar Previous_fontdbase_backups\%DateTime%__%username%_fontdbase_backup.rar
+set datestamp=%date:~-4%_%date:~-10,-8%_%date:~-7,-5%__%time:~0,2%_%time:~3,2%_%time:~6,2%
+
+copy %username%_fontdbase_backup.rar Previous_fontdbase_backups\%datestamp%__%username%_fontdbase_backup.rar
 "C:\Program Files\WinRAR\WinRar" -ep1 -as -r U -o+ %username%_fontdbase_backup.rar "C:\Program Files\Corel\CorelDRAW Graphics Suite 13\FontNav\*"
