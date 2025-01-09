@@ -14,4 +14,5 @@
 
 # CODE
 # re: https://userbase.kde.org/Krita/Manual/CommandLine (it is actually enabled, apparently, on Windows) :
-krita $1 --export --export-filename $1.$2
+fileNameNoExt=${1%.*}
+krita $1 --export --export-filename $fileNameNoExt.$2
