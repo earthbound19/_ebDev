@@ -25,8 +25,10 @@
 #    sortSRGBhexColorsColoraide.py -i colors.hexplt -c ok
 # To keep any duplicate colors, use -k:
 #    sortSRGBhexColorsColoraide.py -i colors.hexplt -k
-# To record the result to a file, redirect stdout:
+# To record the result to a new file, redirect stdout:
 #    sortSRGBhexColorsColoraide.py -i colors.hexplt -k > output.hexplt
+# To do the same thing only overwrite the original file, run:
+#    sortSRGBhexColorsColoraide.py -i colors.hexplt -k -w
 
 
 # CODE
