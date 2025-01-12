@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Sorts sRGB hex colors in file $1 by next nearest color within the palette, starting on color $2 (optional; default first color in list), in HCT color space, printing to stdout. Can be overriden with other sort options; see URL in USAGE
+# Sorts sRGB hex colors in an input file by next nearest color within the palette, starting on either the first color in the palette (default) or any optional, arbtirary color. Sorting is done by default in HCT color space; other color spaces available (see URL in USAGE). Prints by default to stdout, can optionally overwrite source file with new sort. See USAGE for examples and additional options.
 
 # DEPENDENCIES
 # Python with coloraide_extras library installed (which I believe in turn installs coloraide as a dependency)
@@ -65,15 +65,16 @@ def parse_arguments():
     )
     return parser.parse_args()
 
-# Function to load colors from the input file
-def load_colors(filename):
-    pattern = r"#[0-9a-fA-F]{6}"
-    colors = []
+# Function to load colors and metadata from the input file
+def load_colors_with_metadata(filename):
+    pattern = r"(#[0-9a-fA-F]{6})(.*?)(?=#[0-9a-fA-F]{6}|$)"
+    colors_with_metadata = []
     with open(filename, "r") as file_list:
         for line in file_list:
-            matches = re.findall(pattern, line)  # Find all matches on the line
-            colors.extend(match.lower() for match in matches)  # Add matches to the list
-    return colors
+            matches = re.findall(pattern, line)
+            for hex_code, metadata in matches:
+                colors_with_metadata.append({"hex": hex_code.lower(), "metadata": metadata.strip()})
+    return colors_with_metadata
 
 # Function to validate and normalize the start color
 def get_start_color(start_color, colors):
@@ -82,19 +83,20 @@ def get_start_color(start_color, colors):
         if not found:
             raise ValueError(f"Invalid start color: {start_color}")
         return f"#{found.group(0).lower()}"
-    return colors[0]
+    return colors[0]["hex"]
 
 # Function to sort colors
 def sort_colors(colors, start_color, colorspace):
     final_list = []
-    if start_color in colors:
-        final_list.append(start_color)
-        colors.remove(start_color)
+    if any(color["hex"] == start_color for color in colors):
+        final_list.append(next(color for color in colors if color["hex"] == start_color))
+        colors = [color for color in colors if color["hex"] != start_color]
 
     while colors:
-        nearest = Color(start_color).closest(colors, method=colorspace).to_string(hex=True)
-        final_list.append(nearest)
-        colors.remove(nearest)
+        nearest = Color(start_color).closest([color["hex"] for color in colors], method=colorspace).to_string(hex=True)
+        matched_color = next(color for color in colors if color["hex"] == nearest)
+        final_list.append(matched_color)
+        colors = [color for color in colors if color["hex"] != nearest]
         start_color = nearest
 
     return final_list
@@ -102,9 +104,9 @@ def sort_colors(colors, start_color, colorspace):
 # Parse arguments
 args = parse_arguments()
 
-# Load colors from file
+# Load colors and metadata from file
 try:
-    colors = load_colors(args.inputfile)
+    colors_with_metadata = load_colors_with_metadata(args.inputfile)
 except FileNotFoundError:
     print(f"Error: File {args.inputfile} not found.")
     sys.exit(1)
@@ -112,37 +114,39 @@ except Exception as e:
     print(f"Error reading file: {e}")
     sys.exit(1)
 
-if not colors:
+if not colors_with_metadata:
     print("Error: No valid colors found in the file.")
     sys.exit(1)
 
 # Get start color
 try:
-    start_color = get_start_color(args.startcolor, colors)
+    start_color = get_start_color(args.startcolor, colors_with_metadata)
 except ValueError as e:
     print(e)
     sys.exit(2)
 
 # Sort colors
 try:
-    sorted_colors = sort_colors(colors, start_color, args.colorspace)
+    sorted_colors = sort_colors(colors_with_metadata, start_color, args.colorspace)
 except Exception as e:
     print(f"Error during sorting: {e}")
     sys.exit(3)
 
 # Remove duplicates if not keeping them
 if not args.keepduplicatecolors:
-    sorted_colors = list(unique_everseen(sorted_colors))
+    seen = set()
+    sorted_colors = [color for color in sorted_colors if color["hex"] not in seen and not seen.add(color["hex"])]
 
 # Output result
 if args.overwritesourcefile:
     try:
         with open(args.inputfile, "w") as file:
-            file.writelines(f"{color}\n" for color in sorted_colors)
+            for color in sorted_colors:
+                file.write(f"{color['hex']} {color['metadata']}\n")
         print(f"File {args.inputfile} successfully overwritten.")
     except Exception as e:
         print(f"Error writing to file: {e}")
         sys.exit(4)
 else:
     for color in sorted_colors:
-        print(color)
+        print(f"{color['hex']} {color['metadata']}")
