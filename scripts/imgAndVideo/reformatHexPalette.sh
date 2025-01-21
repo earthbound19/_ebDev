@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Reformats a .hexplt file (a list of sRGB colors in hex format) to remove all comments and arrange colors on an $1 column by $2 rows grid, then add back a comment that tells the grid dimension (appended to the first row).
+# Reformats a .hexplt file (a list of sRGB colors in hex format) to remove all markup and comments and arrange colors on a $1 column by $2 rows grid, then optionally add back a markup comment of the grid dimension (appended to the first row).
 
 # USAGE
 function print_halp {
@@ -9,7 +9,7 @@ Options:
     -c<integer or keyword>, --columns=<integer or keyword> OPTIONAL number of columns. If omitted, defaults to 1.
     -a, --all-columns OPTIONAL flag to set number of columns to all colors. Overrides any value of -c, --columns.
     -n, --no-comment OPTIONAL flag: No \"columns: <n> rows: <n>\" comment in reformatted file. Default set true.
-    -p, --print-to-stdout OPTIONAL flag: Do not overwrite palette file, only print reformatting result to stdtout (with none of the other progress print otherwise done without -p)
+    -p, --print-to-stdout OPTIONAL flag: Do not overwrite palette file, only print reformatted result to stdtout, with none of the other progress print otherwise done without -p
 For example, to reformat a .hexplt file with defaults, run:
     reformatHexPalette.sh -i hobby_art_0001-0003.hexplt
 "
@@ -17,13 +17,12 @@ For example, to reformat a .hexplt file with defaults, run:
 
 
 # CODE
-# START PARAMETER PARSING AND GLOBALS SETUP
+# -- START PARAMETER PARSING AND GLOBALS SETUP --
 if [ ${#@} == 0 ]; then print_halp; exit 1; fi
 PROGNAME=$(basename $0)
-OPTS=`getopt -o hi:c::anp --long help,input-file:,columns::,all-columns,no-comment,--print-to-stdout -n $PROGNAME -- "$@"`
+OPTS=$(getopt -o hi:c::anp --long help,input-file:,columns::,all-columns,no-comment,--print-to-stdout -n $PROGNAME -- "$@")
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 eval set -- "$OPTS"
-# --- END PARSING STUFF ---
 
 # Global function takes number of specified columns and calculates number of rows to fit all colors: ASSUMES AND OPERATES ON GLOBAL VARIABLES:
 calculateRowsToFitColors() {
@@ -60,7 +59,7 @@ colorsArray=( $(grep -i -o '#[0-9a-f]\{6\}' $srcHexplt) )
 # Get number of colors (from array):
 howManyColors=${#colorsArray[@]}
 
-# WHOPAS; you have to create a new flag for this case; do -a --allcolumns:
+# if -c --columns was passed, this overrides the default value (set earlier) of 1 for $columns:
 if [ "$columnForEveryColor" ]; then columns=$howManyColors; fi
 
 # Function call:
