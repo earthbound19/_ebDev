@@ -31,7 +31,7 @@ function sort_all_palettes_by_custom_space() {
 	if [ ! -d $sort_folder ]; then mkdir $sort_folder; fi
 	for palette in ${palettes[@]}
 	do
-		cat $palette | grep -i -o '#[0-9a-f]\{6\}' > ./$sort_folder/$palette
+		cp $palette ./$sort_folder/$palette
 	done
 	cd $sort_folder
 	sortAllHexPalettesColoraide.sh "-s $1 -w -c $2"
