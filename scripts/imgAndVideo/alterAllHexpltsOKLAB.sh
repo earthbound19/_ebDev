@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates tweaked copies of all hexplt files in the current directory, with the possible changes including chroma (c), and/or hue (h), and/or lightness (l). Accomplishes this via repeat calls and capture of output from print_altered_hexplt_OKLAB.js. Modded hexplt files are named after the original, but adding _mod to the file name. If a source file name has the substring "_mod" in it, it will skip modifying it. If a render target file name already exists, it will skip render. In both cases it notifies.
+# Creates tweaked copies of all hexplt files in the current directory, with the possible changes including lightness (L), chroma (C), and/or hue (H) via the okLCH color space (based on oklab). (Both scripts really should be named ~OKLCH.) Accomplishes this via repeat calls and capture of output from print_altered_hexplt_OKLAB.js. Modded hexplt files are named after the original, but adding _mod to the file name. If a source file name has the substring "_mod" in it, it will skip modifying it. If a render target file name already exists, it will skip render. In both cases it notifies.
 
 # DEPENDENCIES
 # A bash or bash-like environment, nodejs, and print_altered_hexplt_OKLAB.js and the node librarires it requires.
