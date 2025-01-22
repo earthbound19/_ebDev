@@ -1,8 +1,8 @@
 # DESCRIPTION
 # Takes a list of RGB colors expressed in hex (one per line) and sorts them 
-# using an advanced color appearance model: CIECAM02.
+# using an advanced color appearance model: CIECAM02 / JCh.
 # If you're sorting very different colors, YOU MAY WISH to use
-# RGBhexColorSortinCAM16-UCS.py instead (see). This uses the colorspacious library; that uses colour-science. HOWEVER, rgbHexColorSortInOkLab.js is blazing fast compared to both of them, and may produce better results than both. It's a subjective call.
+# sortSRGBhexColorsColoraide.py sorting in cam16 or various other color spaces instead (see). This uses the colorspacious library; that uses coloraide. rgbHexColorSortInOkLab.js may be blazing fast if you prefer oklab space (which coloraide can also use).
 
 # DEPENDENCIES
 # Python (probably Python 3.5), various python packages (see import list at start of code) which you may install with easy_install or pip.
@@ -23,6 +23,7 @@
 # NOTES
 # - This will delete duplicate colors in the list.
 # - The same input always produces the same output, though if you change the order of colors in the list, the results may change. This is because the script uses the first color in the list to begin its comparisons (but you may override that with parameter 3). You therefore may wish to decide which color you want first in the list for those comparison purposes, or pass an arbitrary color via parameter 3.
+# - There are more color distance calculations than in JCh which this is hard-coded to. See comments in hex_to_CIECAM02_JCh() function.
 
 
 # CODE
@@ -142,6 +143,9 @@ for i in range(len(colors_list)):
         # print(colors_list[i], colors_list[j])
         CIECAM02_comp_one, SPACE = hex_to_CIECAM02_JCh(colors_list[i])
         CIECAM02_comp_two, SPACE = hex_to_CIECAM02_JCh(colors_list[j])
+        # EDIT years later: if this libary used to default to color distance calculations
+        # in JCh, (re an above link), it now defaults to CAM02-UCS? re
+        # https://colorspacious.readthedocs.io/en/latest/reference.html#color-difference-computation
         distance = deltaE(CIECAM02_comp_one, CIECAM02_comp_two, input_space = SPACE)
         pair_deltaEs.append([distance, colors_list[i], colors_list[j]])
 
