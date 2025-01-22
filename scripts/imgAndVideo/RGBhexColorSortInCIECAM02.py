@@ -92,15 +92,6 @@ def hex_to_CIECAM02_JCh(in_string):
         # 
         # The documentation (defaults to? and) recommends sort by "JCh".
         # Possible sorts are [h/H/][M/s/C][J/Q]
-        #
-        # permutations of 'J', 'C', 'h':
-        # ('J', 'C', 'h')
-        # ('J', 'h', 'C')
-        # ('C', 'J', 'h')
-        # ('C', 'h', 'J')
-        # ('h', 'J', 'C')
-        # ('h', 'C', 'J')
-        #
         # I would suggest you maybe try "hQC", "hCQ", "HsQ", "ChJ", "Jhs", IF THE
         # RESULTS DIFFERED. In early development I thought they did, but that was
         # because my script's intended functionality was broken (same input didn't
