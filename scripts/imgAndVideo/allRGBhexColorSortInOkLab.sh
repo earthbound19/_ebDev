@@ -37,7 +37,11 @@ do
 	echo "Running comparisons for file $element . . ."
 	echo will run
 	echo node $FullPathToScript -i $element $additionalParametersToScript
+	# janky field separator hack to avoid breaking array elements to newlines over spaces, part 1 and 2:
+	OIFS="$IFS"; IFS=$'\n'
 	results=($(node $FullPathToScript -i $element $additionalParametersToScript))
+	# end janky field separator hack to avoid breaking array elements to newlines over spaces, part 3:
+	IFS="$OIFS"
 	# print array re: https://stackoverflow.com/a/15692004/1397555
 	printf '%s\n' "${results[@]}" | tr -d '\15\32' > $element
 	echo "DONE and result written back over file $element."
