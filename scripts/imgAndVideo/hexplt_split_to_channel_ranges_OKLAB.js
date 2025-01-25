@@ -1,8 +1,5 @@
 // DESCRIPTION
-// Groups colors in a .hexplt palette to nearest match of -n discrete ranges from Hue value 0 to 360, in okLab space. Writes resultant groups to new .hexplt files named after the original file plus additional range match information.
-
-// KNOWN ISSUES
-// It may be that this can drop colors, such as grays, that it does not "see" as fitting into any of the defined hue ranges. In other words, if you collect all the colors this splits into different palettes back into one palette, it may be that some colors from the original palette are lost. If you use this script from other scripts for sorting/organizing, you may need to check for colors that literally get lost in the shuffle, and add them back.
+// Groups colors in a .hexplt palette to nearest match of -n discrete ranges from Hue value 0 to 360, in oklch space. Writes resultant groups to new .hexplt files named after the original file plus additional range match information. Also, writes colors found to have no chroma (grays) to a separate file.
 
 // DEPENDENCIES
 // - nodejs, with a version of the `culori` module greater than `culori@0.20.1` (I think?), as this uses the CommonJS export of culori at `'culori/require'`.
@@ -80,11 +77,13 @@ let oklab = culori.converter('oklch');
 let pmCHK = divisor / 2;
 // declare array for inner loop adds of color to list:
 let intervalAlignedColors = []
+const noChromaColors = []
 for (const interval of intervalValues) {
 	// console.log("----- interval: " + interval + " -----")
 	for (const sRGBcolor of sourceColorsArray) {
 		// console.log("CHECK: " + sRGBcolor)
 		let parsed = oklab(sRGBcolor);
+// console.log("parsed from ", sRGBcolor, " color is:", parsed)
 		// dev test that will print the resultant converted objects:
 		// console.log(parsed);
 		// dev test that will print the object components, or channels:
@@ -99,6 +98,11 @@ for (const interval of intervalValues) {
 		if (pmCHKL >= 0 && pmCHKL <= pmCHK) {
 			// console.log("\t (interval - parsed.h)     : " + pmCHKL)
 			intervalAlignedColors.push(sRGBcolor)
+		}
+		if (parsed.c === 0) {
+			if (!noChromaColors.includes(sRGBcolor)) {
+				noChromaColors.push(sRGBcolor);
+			}
 		}
 	}
 	if (intervalAlignedColors.length > 0) {
@@ -124,3 +128,8 @@ for (const interval of intervalValues) {
 	// empty that array for next run of inner loop:
 	intervalAlignedColors = []
 }
+
+const noChromaWriteFileName = inputFileBasename + "_oklabLCH_C0_noChroma__gray__colors.hexplt"
+fs.writeFileSync(noChromaWriteFileName, noChromaColors.join('\n'));
+
+console.log("\nDONE. Results written to files named after source file (" + inputFileBasename + "), with additional information about color alignment to oklab LCH space (see information above).")
