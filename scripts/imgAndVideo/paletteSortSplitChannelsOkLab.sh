@@ -19,7 +19,7 @@ destinationFileName=${sourceFile%.*}_sortSplitChannelsOkLab.${sourceFile##*.}
 fullPathToScript=$(getFullPathToFile.sh hexplt_split_to_channel_ranges_OKLAB.js)
 
 # make and copy source file into temp dir; wipe previously existing temp dir if it's there:
-tmpDir=_palette_sort_tmp_6KZUzvjwt
+tmpDir=${sourceFile%.*}_sortSplitChannelsOkLab
 if [ -d $tmpDir ]; then rm -rf $tmpDir; fi
 mkdir $tmpDir
 
@@ -30,8 +30,9 @@ rm $sourceFile
 
 parametricHairball="-s $startSortColor"
 allRGBhexColorSortInOkLab.sh "$parametricHairball"
+renderAllHexPalettes.sh
 cat *.hexplt > ../$destinationFileName
 cd ..
-rm -rf $tmpDir
+# rm -rf $tmpDir
 
-printf "\nDONE. Result file is $destinationFileName."
+printf "DONE. Result file is $destinationFileName. Intermediary files (which you might find more useful) are in $tmpDir."
