@@ -46,7 +46,8 @@ catch(err) {
 // get a string which is the input filename minus extension, considering any string combined with dots to be the extension; an earlier version of this was inputFileString.replace(/[.*]*\..*/, ""), but I actually don't know why that works, haha, and the following works by making capture groups and explicitly replacing (keeping) only the 1st group:
 var inputFileBasename = inputFileString.replace(/([^.*]*)(\..*)/, "$1");
 
-const regexp = /#[a-fA-F0-9]{6}/g;
+// Match hex color codes and their comments
+const regexp = /#[a-fA-F0-9]{6}.*?(?=#[a-fA-F0-9]{6}|$)/gs;
 const searchResults = [...inputFileContent.matchAll(regexp)];
 // init array of colors from file + regex search result:
 var sourceColorsArray = [];
@@ -80,10 +81,11 @@ let intervalAlignedColors = []
 const noChromaColors = []
 for (const interval of intervalValues) {
 	// console.log("----- interval: " + interval + " -----")
-	for (const sRGBcolor of sourceColorsArray) {
-		// console.log("CHECK: " + sRGBcolor)
-		let parsed = oklab(sRGBcolor);
-// console.log("parsed from ", sRGBcolor, " color is:", parsed)
+	for (const element of sourceColorsArray) {
+		// console.log("CHECK: " + element)
+		let hexColor = element.match(/#[a-fA-F0-9]{6}/g)[0];
+		let parsed = oklab(hexColor);
+// console.log("parsed from ", element, " color is:", parsed)
 		// dev test that will print the resultant converted objects:
 		// console.log(parsed);
 		// dev test that will print the object components, or channels:
@@ -92,16 +94,16 @@ for (const interval of intervalValues) {
 		let pmCHKH = (interval - parsed.h) * -1
 		if (pmCHKH >= 0 && pmCHKH <= pmCHK) {
 			// console.log("\t (interval - parsed.h) * -1: " + pmCHKH)
-			intervalAlignedColors.push(sRGBcolor)
+			intervalAlignedColors.push(element)
 		}
 		let pmCHKL = (interval - parsed.h)
 		if (pmCHKL >= 0 && pmCHKL <= pmCHK) {
 			// console.log("\t (interval - parsed.h)     : " + pmCHKL)
-			intervalAlignedColors.push(sRGBcolor)
+			intervalAlignedColors.push(element)
 		}
 		if (parsed.c === 0) {
-			if (!noChromaColors.includes(sRGBcolor)) {
-				noChromaColors.push(sRGBcolor);
+			if (!noChromaColors.includes(element)) {
+				noChromaColors.push(element);
 			}
 		}
 	}
@@ -122,7 +124,7 @@ for (const interval of intervalValues) {
 		console.log("Writing colors for interval " + alignmentChannel + "~" + abridgedInterval + " to " + writeFileName + ". . .")
 		var file = fs.createWriteStream(writeFileName);
 		for (const color of intervalAlignedColors) {
-			file.write(color + "\n")
+			file.write(color)
 		}
 	}
 	// empty that array for next run of inner loop:
@@ -130,6 +132,6 @@ for (const interval of intervalValues) {
 }
 
 const noChromaWriteFileName = inputFileBasename + "_oklabLCH_C0_noChroma__gray__colors.hexplt"
-fs.writeFileSync(noChromaWriteFileName, noChromaColors.join('\n'));
+fs.writeFileSync(noChromaWriteFileName, noChromaColors.join(''));
 
 console.log("\nDONE. Results written to files named after source file (" + inputFileBasename + "), with additional information about color alignment to oklab LCH space (see information above).")
