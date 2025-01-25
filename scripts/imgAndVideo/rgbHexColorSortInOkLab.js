@@ -67,11 +67,12 @@ for (const element of searchResults) {
 
 // If there is not a -k switch instructing to keep duplicate colors, remove duplicates from original list, but maintain order (keep all unique in the same order), re: https://stackoverflow.com/a/15868720/1397555
 if(typeof options.keepDuplicateColors == 'undefined') {
-comparisonColorsArray = [ ... new Set(comparisonColorsArray) ];
+  comparisonColorsArray = [ ... new Set(comparisonColorsArray) ];
 }
+
 // if the value of arbitraryStartCompareColor was changed from default empty string (''), because a valid sRGB hex color value for the -s option was passed to the script, add it to the start of the list; colors will therefore be sorted by first comparing to it; will remove it afterward:
 if (arbitraryStartCompareColor != '') {
-	comparisonColorsArray.unshift(arbitraryStartCompareColor);
+  comparisonColorsArray.unshift(arbitraryStartCompareColor);
 }
 
 const comparisonColorsArrayLength = comparisonColorsArray.length
@@ -83,7 +84,6 @@ let okLCHconverter = culori.converter('oklch');
 okLCHdistance = culori.differenceEuclidean(mode = 'oklch', weights = [1, 1, 1]);
 // END OPTIONS PARSING AND CHECKING
 
-
 // MAIN LOGIC
 // Using measure of okLCH components (as it should "just work," per design of the perceptually uniform color space, re https://en.wikipedia.org/wiki/Color_difference#Uniform_color_spaces
 // Testing this out demonstrates that it works: if sRGB hex #000000 and #ffffff are the first two in the list, their distance is calculated at 0.9999999934735462 (practically 1) and if the first two are both #000000, their distance is calculated at 0:
@@ -94,39 +94,63 @@ finalSortedList = [];
 finalSortedList.push(comparisonColorsArray[0]);
 
 while (finalSortedList.length < comparisonColorsArrayLength) {
-	var sRGB_hex_A = comparisonColorsArray[0];
-	var sRGB_hex_B;
-	var okLCHval_A = okLCHconverter(comparisonColorsArray[0]);
-	var okLCHval_B;
-	var okDist = 58848;								// way beyond any distance that will be found.
-	var lowestFoundDistanceForThisPair = 58849;		// "
-	var nearestFoundColorHEX;
-	// figuring out this i = 1 (not zero) was the final thing that finished this script:
-	for (var i = 1; i < comparisonColorsArray.length; i++) {
-		sRGB_hex_B = comparisonColorsArray[i]
-		okLCHval_B = okLCHconverter(comparisonColorsArray[i]);
-		okDist = okLCHdistance(okLCHval_A, okLCHval_B);
-		if (okDist < lowestFoundDistanceForThisPair) {
-			lowestFoundDistanceForThisPair = okDist;
-			nearestFoundColorHEX = comparisonColorsArray[i];
-		}
-	}
-	finalSortedList.push(nearestFoundColorHEX);
-	// recreate comparisonColorsArray with sRGB_hex_A removed and nearestFoundColorHEX moved to start:
-	// remove sRGB_hex_A; re this horror: https://stackoverflow.com/a/20690490/1397555 :
-	comparisonColorsArray = comparisonColorsArray.filter(item => item !== sRGB_hex_A);
-	// remove nearestFoundColorHEX:
-	comparisonColorsArray = comparisonColorsArray.filter(item => item !== nearestFoundColorHEX);
-	// add nearestFoundColorHEX to start:
-	comparisonColorsArray.unshift(nearestFoundColorHEX);
+  var sRGB_hex_A = comparisonColorsArray[0];
+  var sRGB_hex_B;
+  var okLCHval_A = okLCHconverter(comparisonColorsArray[0]);
+  var okLCHval_B;
+  var okDist = 58848;								// way beyond any distance that will be found.
+  var lowestFoundDistanceForThisPair = 58849;		// "
+  var nearestFoundColorHEX;
+  // figuring out this i = 1 (not zero) was the final thing that finished this script:
+  for (var i = 1; i < comparisonColorsArray.length; i++) {
+    sRGB_hex_B = comparisonColorsArray[i]
+    okLCHval_B = okLCHconverter(comparisonColorsArray[i]);
+    okDist = okLCHdistance(okLCHval_A, okLCHval_B);
+    if (okDist < lowestFoundDistanceForThisPair) {
+      lowestFoundDistanceForThisPair = okDist;
+      nearestFoundColorHEX = comparisonColorsArray[i];
+    }
+  }
+  finalSortedList.push(nearestFoundColorHEX);
+  // recreate comparisonColorsArray with sRGB_hex_A removed and nearestFoundColorHEX moved to start:
+  // remove sRGB_hex_A; re this horror: https://stackoverflow.com/a/20690490/1397555 :
+  comparisonColorsArray = comparisonColorsArray.filter(item => item !== sRGB_hex_A);
+  // remove nearestFoundColorHEX:
+  comparisonColorsArray = comparisonColorsArray.filter(item => item !== nearestFoundColorHEX);
+  // add nearestFoundColorHEX to start:
+  comparisonColorsArray.unshift(nearestFoundColorHEX);
 }
 
 // if the value of arbitraryStartCompareColor was changed from default empty string (''), because a valid sRGB hex color value for the -s option was passed to the script, we earlier added arbitraryStartCompareColor to the list; in that case remove it now from the final list (it will be the first item in the list):
 if (arbitraryStartCompareColor != '') {
-	finalSortedList.shift();
+  finalSortedList.shift();
 }
 
-// print final perceptually sorted color list:
-for (idx in finalSortedList) {
-	console.log(finalSortedList[idx]);
+// If the -k switch is used, ensure duplicates are preserved in the final sorted list
+if (typeof options.keepDuplicateColors !== 'undefined') {
+  const originalColorsArray = [...inputFileContent.matchAll(regexp)].map(match => match[0]);
+  const finalSortedListWithDuplicates = [];
+  const colorCountMap = {};
+
+  // Create a map to count occurrences of each color in the original list
+  originalColorsArray.forEach(color => {
+    if (colorCountMap[color]) {
+      colorCountMap[color]++;
+    } else {
+      colorCountMap[color] = 1;
+    }
+  });
+
+  // Add colors to the final list with duplicates preserved
+  finalSortedList.forEach(color => {
+    const count = colorCountMap[color];
+    for (let i = 0; i < count; i++) {
+      finalSortedListWithDuplicates.push(color);
+    }
+    delete colorCountMap[color]; // Remove the color from the map once processed
+  });
+
+  finalSortedListWithDuplicates.forEach(color => console.log(color));
+} else {
+  finalSortedList.forEach(color => console.log(color));
 }
