@@ -11,21 +11,21 @@
 # Run with these parameters:
 # - $1 search string
 # - $2 replace string. If provided as the syntax-phrase combination "-_-SNIP-_-" (with or without quote marks), the search string will be deleted from all found files; or in other words it will be replaced with nothing, or that word or phrase will be deleted from the file name.
-# - $3 the word YOINK
-# - $4 OPTIONAL. Any additional switches that will work with es (Everything Search Engine CLI), surrounded by single or double quote marks. As an example, to restrict Everything Search to only files and subfolders within a given folder (or path) F:\testFiles, you could pass "-path 'F:\testFiles'" for $4. The single quote marks around 'F:\testFiles' aren't strictly necessary there, but they would be if the path had a space in the name such as 'F:\test files'. The double quote marks are necessary for parsing to treat everything including the spaces between the double quote marks as part of the same parameter $4. (The effect of restricting search to only files and subfolders within a given folder that way would be that renames resulting from this script are also only happen to files in that folder and subfolders.) As another example, to make search case-sensitive, pass "-i" for $4.
+# - $3 OPTIONAL. Any additional switches that will work with es (Everything Search Engine CLI), surrounded by single or double quote marks. As an example, to restrict Everything Search to only files and subfolders within a given folder (or path) F:\testFiles, you could pass "-path 'F:\testFiles'" for $3. The single quote marks around 'F:\testFiles' aren't strictly necessary there, but they would be if the path had a space in the name such as 'F:\test files'. The double quote marks are necessary for parsing to treat everything including the spaces between the double quote marks as part of the same parameter $3. (The effect of restricting search to only files and subfolders within a given folder that way would be that renames resulting from this script are also only happen to files in that folder and subfolders.) As another example, to make search case-sensitive, pass "-i" for $3. As you must use $4 (see next), if you don't want any custom switches, pass '' for $3.
+# - $4 the word YOINK. Without this, this script will print previews of what will be done, and preview logs (which don't even tell you they're previews, so don't let them fool you). To use this as required but not $3, pass '' for $3.
 # Example that will replace the string "dGSUyfhH" with "Murky_Forest" in all files:
 #    everythingRename.sh dGSUyfhH Murky_Forest YOINK
 # Example that will delete the string SNAIRFU from all found files:
-#    everythingRename.sh SNAIRFU -_-SNIP-_- YOINK
+#    everythingRename.sh SNAIRFU -_-SNIP-_- '' YOINK
 # Example that will change the string "_Palette." (including that period ".") to just "." (a period only), effectively removing the string "_Palette" but keeping the period after it, and only for files within the folder and subfolders of "F:\_ebPalettes\":
-#    everythingRename.sh _Palette. . "-path 'F:\_ebPalettes\'"
-# ~ ONLY USE THIS SCRIPT IF:
+#    everythingRename.sh _Palette. . "-path 'F:\_ebPalettes\'" YOINK
+# ~ ONLY USE THIS SCRIPT WITH THE $4 YOINK PARAMETER IF:
 # - You're very sure you know what you're doing
 # - You've tested it on disposable files with radically long and complex (will not be any duplicate filenames!) first
 # - You're also looking at files found from a search string using Everything, to verify renames and to be able to undo any breaks.
 # - You know and can see that there's no funky crap (like terminal-unfriendly characters) in file and folder names you operate on which would cause problems.
 # NOTES
-# - Renames are logged to a text file named after the date and time the renames were done.
+# - Renames are logged to a text file named after the date and time the renames were done. If you don't use parameter $4 YOINK, this rename log is speculative.
 # - Spaces in file names are supported; surround the appropriate parameter with single or double quotes to use spaces.
 # - It may rename folders first, which could change the path to any found files that match the search string, causing rename of those files to fail (as the path has changed and the rename command won't find them). In that case, re-running this script with the same search and replace parameters will find them in the new path and rename them.
 
@@ -34,8 +34,7 @@
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (search string) passed to script. Exit."; exit 1; else srcString=$1; fi
 if [ ! "$2" ]; then printf "\nNo parameter \$2 (replace string) passed to script. Exit."; exit 2; else destString=$2; fi
 	if [ "$destString" == "-_-SNIP-_-" ]; then destString=""; fi
-if [ ! "$3" == "YOINK" ]; then printf "\nParameter 3 incorrect. See USAGE comments in script."; exit 3; fi
-if [ "$4" ]; then extraSwitches=$4; fi
+if [ "$3" ]; then extraSwitches=$3; fi
 
 # build array of file names from search output from everything search ("es" is everything search) :
 
@@ -72,7 +71,11 @@ do
 	printf "\nWorking on file $counter of $foundPathsArrayLength . . ."
 	nixyPath=$(cygpath "$path")
 	renameTarget=$(echo "$nixyPath" | sed "s/$srcString/$destString/g")
-	mv "$nixyPath" "$renameTarget"
+	# only perform actual rename is parameter $4 was passed correctly:
+	if [ "$4" == "YOINK" ]
+	then
+		mv "$nixyPath" "$renameTarget"
+	fi
 	
 	# capture error level and report rename success or fail, depending:
 	errorLevelCapture=$(echo $?)
@@ -89,3 +92,8 @@ done
 IFS="$OIFS"
 
 printf "\nDONE with everythingRename.sh run. Logged in file $renameLog."
+# additional feedback print if things were done in preview mode (no $4 YOINK parameter) :
+if [ ! "$4" == "YOINK" ]
+then
+	printf '\nParameter 4 was incorrect. "Renames" performed were a preview of what could be done, and were in logs also. See USAGE comments in script.'
+fi
