@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Uses other scripts to make many rows of various numbers of vertical color stripes from a randomly chosen palette (from _ebPalettes). Alternately can use a specified palette name ($1). It does these things admittedly relatively extremely inefficiently.
+# Uses other scripts to make many rows of various numbers of vertical color stripes from a randomly chosen palette (from _ebPalettes). Alternately can use a specified palette name. That and many other switches are available; try running the script without any parameters. This script does its work admittedly relatively extremely inefficiently.
 
 # DEPENDENCIES
 # `findPalette.sh`, `getRandomPaletteFileName.sh`, `printAllPaletteFileNames.sh`, `randomVerticalColorStripes.sh`, `imgs2imgsNN.sh`, `renumberFiles.sh`, everything they may rely on, and 7z CLI to archive source .ppm files. Also bc command line calculator if you use the [-o|--variantminstripes] and/or [-s|--variantrows] and [-p|--variantmaxstripes] options.
