@@ -53,14 +53,13 @@ do
 	fi
 	# Losslessly transcode and embed rating in metadata only if target file does not already exist:
 	# if the destination file does not exist, do stuff:
-	if [ ! -e "$sheep_transcodedDestPath\\$localFileNoEXT.mp4" ]
+	if [ ! -f "$sheep_transcodedDestPath""/""$localFileNoPathOrEXT"".mp4" ]
 	then
-		# DOSlocalFilePath=`cygpath -w $sheep_avis_local_path`
+		echo Target transcoded file does not exist\; will create . . .
+		DOSlocalFilePath=`cygpath -w $sheep_avis_local_path`
 		ffmpeg -y -i $DOSlocalFilePath""$localFileNoEXT"".avi -vcodec copy $sheep_transcodedDestPath""/""$localFileNoPathOrEXT"".mp4
-#		echo Target transcoded file does not exist\; will create . . .
-		$FFMPEGcommand
 		exiftool -overwrite_original -MWG:Rating="$rating" "$sheep_transcodedDestPath""/""$localFileNoPathOrEXT"".mp4"
-#		echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+		echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 	fi
 done
 
