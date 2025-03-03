@@ -56,8 +56,6 @@ then
 			file_checksums["$file"]="$checksum"
 		fi
 	done
-else
-	echo part 1 skipped
 fi
 # END large language model writing
 
@@ -65,35 +63,50 @@ fi
 # https://exiftool.org/forum/index.php?topic=6519.msg32511#msg32511 -- but adding an -else clause:
 exiftool -if "defined $CreateDate" -v -overwrite_original '-Filename<CreateDate' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" -else -v -overwrite_original '-Filename<DateTimeOriginal' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" *.*
 
+# Create an array of all files in the directory
+all_files=($(ls))
+
+# Create an array to track renamed files
+renamed_files=()
+
 # use collected checksums to do sidecar etc. renaming if no paramter $2 was passed
 if [ ! "$2" ]
+# construct log file name including date and time
+logFileName=$(date +"%Y%m%d_%H%M%S.%N_renameByMetadataLog.txt")
 then
-	echo "identifying sidecar etc. files by comparing sha256sum of renamed file and renaming files with a basename matching the original file's basename.."
-	# THIS PART mostly written by a large language model! (DeepSeek)
-	# Identify renamed files and update associated sidecar etc. files that have the same basename as the file before it was renamed:
+    echo "identifying sidecar etc. files by comparing sha256sum of renamed file and renaming files with a basename matching the original file's basename.."
+    # THIS PART mostly written by a large language model! (DeepSeek)
+    # Identify renamed files and update associated sidecar etc. files that have the same basename as the file before it was renamed:
 	for old_file in "${!file_checksums[@]}"; do
 		old_checksum="${file_checksums[$old_file]}"
-		for new_file in *; do
+		
+		# Iterate over only the files that haven't been renamed yet
+		for new_file in "${all_files[@]}"; do
 			if [ -f "$new_file" ]; then
 				new_checksum=$(sha256sum "$new_file" | awk '{print $1}')
 				if [ "$new_checksum" == "$old_checksum" ] && [ "$new_file" != "$old_file" ]; then
 					# Extract the base names (without extension)
 					old_base=$(basename "$old_file" | cut -d. -f1)
 					new_base=$(basename "$new_file" | cut -d. -f1)
-
-					# Rename associated sidecar or similarly associated files
+					
+                    # Rename associated sidecar or similarly associated files
 					for sidecar_file in *; do
 						if [ -f "$sidecar_file" ] && [[ "$sidecar_file" == "$old_base".* ]]; then
 							new_sidecar_name="${sidecar_file/$old_base/$new_base}"
 							mv "$sidecar_file" "$new_sidecar_name"
-							echo "Renamed sidecar etc. file: $sidecar_file -> $new_sidecar_name"
+                            echo "Renamed sidecar etc. file: $sidecar_file -> $new_sidecar_name"
+							echo "Renamed sidecar etc. file: $sidecar_file -> $new_sidecar_name" >> $logFileName
 						fi
 					done
+
+					# Add the renamed file to the renamed_files array
+					renamed_files+=("$new_file")
 				fi
 			fi
 		done
+
+		# Remove renamed files from the all_files array
+		all_files=($(printf "%s\n" "${all_files[@]}" | grep -vFxf <(printf "%s\n" "${renamed_files[@]}")))
 	done
-else
-	echo part 2 skipped
 fi
 # END large language model writing
