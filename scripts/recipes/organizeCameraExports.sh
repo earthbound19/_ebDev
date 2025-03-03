@@ -14,6 +14,8 @@
 # USAGE
 # From a folder with such files to organize (and no other files!), run without any parameters:
 #    organizeCameraExports.sh
+# To skip sidecar etc. scanning for renameByMetadata.sh, pass a parameter $1 to the script, which can be anything, e.g.:
+#    organizeCameraExports.sh NORTHERP
 # See the various comments with "uncomment" instructions for the optional features.
 
 # CODE
@@ -52,8 +54,8 @@ do
 done
 
 cd tmp_renames_2ydTVzqG/
-# Do the actual rename:
-renameByMetadata.sh NORTHERP
+# Do the actual rename; this passes $1, which if it was passed to the script will be any string or whatever, and if not, it will be empty; that flag and the word NORTHERP control things in renameByMetadata.sh (see documentation in it) :
+renameByMetadata.sh NORTHERP $1
 # Move those up a folder, move back to that folder, and destroy the temp folder:
 mv -i * ..
 cd ..
