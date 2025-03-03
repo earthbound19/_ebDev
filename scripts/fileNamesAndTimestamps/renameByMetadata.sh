@@ -1,14 +1,16 @@
 # DESCRIPTION
-# Renames many image, sound and video files (of many supported types, and in the current directory) after dateTimeOriginal and createDate metadata. As this is an irreversible process (unless you keep backups), it asks you to enter a password, which it presents to you, to continue.
+# Renames many image, sound and video files (of many supported types, and in the current directory) after dateTimeOriginal and createDate metadata. As this is an irreversible process (unless you keep backups), it asks you to enter a password, which it presents to you, to continue. Identifies associated file names that have the same base name as a file after renaming (by using sha256sums to identify renamed files, remembering the previous file name), and rename them to the same new base file name.
 
 # DEPENDENCIES
-# ExifTool
+# ExifTool, awk, sha256sum
 
 # USAGE
 # Run from a directory with media files you wish to so rename, e.g.:
 #    renameByMetadata.sh
-# OR OPTIONALLY, to bypass the password check and rename all files by metadata without warning, run with one parameter, which is the word NORTHERP:
+# OR OPTIONALLY, to bypass the password check and rename all files by metadata without warning, run with one parameter $1, which is the word NORTHERP:
 #    renameByMetadata.sh NORTHERP
+# MOREOVER, to bypass attempt to rename any matching sidecards (as it can take a long time to identify the checksum of all files, and this is a waste of time if you know there are no sidecars), pass an optional third parameter $3, which can be anything, for example the word THANTHURB:
+#    renameByMetadata.sh NORTHERP THANTHURB
 # NOTES
 # - You can view all timestamp metadata in a file with this command; you would replace `<inputFileName.file>` with an actual source file name you want to get the metadata for:
 #    exiftool -time:all -g1 -a -s <inputFileName.file>
@@ -40,9 +42,58 @@ then
 	fi
 fi
 
+# THIS PART mostly written by a large language model! (DeepSeek)
+# Create an array to store the SHA256 checksums and filenames
+declare -A file_checksums
+
+# get checksums if no paramter $2 was passed
+if [ ! "$2" ]
+then
+	# Get the SHA256 checksums for all files in the current directory
+	for file in *; do
+		if [ -f "$file" ]; then
+			checksum=$(sha256sum "$file" | awk '{print $1}')
+			file_checksums["$file"]="$checksum"
+		fi
+	done
+else
+	echo part 1 skipped
+fi
+# END large language model writing
+
 # renames all image formats in current directory which exiftool can; the %%-c does some magic that renames with a -<number> in case of duplicate file names. Can't seem to get it to format that way with anything other than a dash; uses a conditional like is given in this post: 
 # https://exiftool.org/forum/index.php?topic=6519.msg32511#msg32511 -- but adding an -else clause:
 exiftool -if "defined $CreateDate" -v -overwrite_original '-Filename<CreateDate' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" -else -v -overwrite_original '-Filename<DateTimeOriginal' -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" *.*
 
-# DEV NOODLING: attempt to rename sidecars and other files with the same base filename when you rename a master such as a raw (e.g. cr2) file: re: https://exiftool.org/forum/index.php?topic=9423.0 -- this command works IF there's metadata in both files (source raw and xmp sidecar) identifying them as a pair! :
-# exiftool -V -d "%Y_%m_%d__%H_%M_%S%%-c.%%e" '-FileName<${DateTimeOriginal}' .
+# use collected checksums to do sidecar etc. renaming if no paramter $2 was passed
+if [ ! "$2" ]
+then
+	echo "identifying sidecar etc. files by comparing sha256sum of renamed file and renaming files with a basename matching the original file's basename.."
+	# THIS PART mostly written by a large language model! (DeepSeek)
+	# Identify renamed files and update associated sidecar etc. files that have the same basename as the file before it was renamed:
+	for old_file in "${!file_checksums[@]}"; do
+		old_checksum="${file_checksums[$old_file]}"
+		for new_file in *; do
+			if [ -f "$new_file" ]; then
+				new_checksum=$(sha256sum "$new_file" | awk '{print $1}')
+				if [ "$new_checksum" == "$old_checksum" ] && [ "$new_file" != "$old_file" ]; then
+					# Extract the base names (without extension)
+					old_base=$(basename "$old_file" | cut -d. -f1)
+					new_base=$(basename "$new_file" | cut -d. -f1)
+
+					# Rename associated sidecar or similarly associated files
+					for sidecar_file in *; do
+						if [ -f "$sidecar_file" ] && [[ "$sidecar_file" == "$old_base".* ]]; then
+							new_sidecar_name="${sidecar_file/$old_base/$new_base}"
+							mv "$sidecar_file" "$new_sidecar_name"
+							echo "Renamed sidecar etc. file: $sidecar_file -> $new_sidecar_name"
+						fi
+					done
+				fi
+			fi
+		done
+	done
+else
+	echo part 2 skipped
+fi
+# END large language model writing
