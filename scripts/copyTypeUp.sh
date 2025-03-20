@@ -24,7 +24,7 @@
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (type of file to search for in subdirectories) passed to script. Exit."; exit 1; else searchFileType=$1; fi
 
 if [ ! "$2" ] || [ "$2" == "NULL" ]; then subDirSearchParam='-maxdepth 1'; fi
-echo subDirSearchParam is $subDirSearchParam
+# echo subDirSearchParam is $subDirSearchParam
 
 originalDirectory=$(pwd)
 directoriesList=( $(find . $subDirSearchParam -type d -printf "%P\n") )
