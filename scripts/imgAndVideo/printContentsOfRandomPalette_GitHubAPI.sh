@@ -30,6 +30,8 @@
 
 
 # CODE
+# NOT TO DO?
+# Does my private PHP implementation random_ebPalettes_palette_API dynamically retrieve the hash for the palettes subdirectory? Do that here also? Maybe optionally? Because it's faster to find files if you already have that hash, as this script expects.
 # Uncomment the following to override the global (expected to have exported from .bashrc into the environment of this script); for example for testing: a subfolder with fewer palettes and another subfolder in it:
 # EBPALETTES_PLT_DIR_SHA_TREE=df2fcfd22e637da93f34d4bc33eaa7124e0fca66
 

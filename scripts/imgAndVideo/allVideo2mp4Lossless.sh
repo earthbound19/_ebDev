@@ -26,7 +26,13 @@ do
 		fi
 	echo "Converting $fileName to mp4 container as $fileNameNoExt.mp4 . . ."
 	renderTarget=$fileNameNoExt.mp4
-	ffmpeg -y -i $fileName -c copy $renderTarget
-	# copy metadata from source file to render target; the script also updates target timestamp to match metadata media creation date:
-	copyMetadataFromSourceFileToTarget.sh $fileName $renderTarget FNEORN
+	# convert only if render target does not already exist; otherwise skip:
+	if [ ! -f $renderTarget ]
+	then
+		ffmpeg -y -i $fileName -c copy $renderTarget
+		# copy metadata from source file to render target; the script also updates target timestamp to match metadata media creation date:
+		copyMetadataFromSourceFileToTarget.sh $fileName $renderTarget FNEORN
+	else
+		echo "SKIPPING RENDER TARGET $renderTarget, as it already exists."
+	fi
 done

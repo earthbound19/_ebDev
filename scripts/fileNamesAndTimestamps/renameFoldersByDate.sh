@@ -53,7 +53,7 @@ then
 		pushd . >/dev/null
 		cd $directory_name
 		echo "Working in directory: $directory_name . . ."
-		# find last modified file and format date stamp from it; IN PROGRESS:
+		# find last modified file and format date stamp from it:
 		dateSTR=$(find . -maxdepth 1 -type f -printf "%T+\n" | sort | tail -n 1 | tr '-' '_')
 		# filter that to end at hours, minutes and second:
 		dateSTR=$(echo $dateSTR | sed 's/\([0-9_]\{1,\}\)+\([^\.]\{1,\}\).*/\1__\2/g')

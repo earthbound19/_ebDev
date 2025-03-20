@@ -49,7 +49,7 @@ then
 	echo "!---------------------------------------------------------------!"
 	exit 1
 fi
-echo "File name $paletteFile found at $hexColorSrcFullPath! PROCEEDING. IN ALL CAPS."
+echo "Source file name $paletteFile found at $hexColorSrcFullPath!"
 
 if [ -f ./$PNGrenderTarget ]
 then
