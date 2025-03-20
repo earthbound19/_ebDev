@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Takes an .svg file and fills all regions of one color (default ffffff, white) with randomly generated colors (not recommended -- random colors can be garish), OR from colors randomly selected from a .hexplt color list (recommended, optional).
+# Takes an .svg file and fills all regions of one color (default ffffff, white) with randomly generated colors (not recommended -- random colors can be garish), OR from colors randomly selected from a .hexplt color list (recommended, optional). SEE ALSO SVGrandomColorReplaceCopies.sh AND SVGsRandomColorReplace.sh.
 
 # WARNING
 # Changes (overwrites) input svg file without warning. You may wish to only operate on a copy of the svg file, or make many copies and alter them by calling this script from another script, such as `SVGrandomColorReplaceCopies.sh`.
@@ -10,7 +10,7 @@
 # USAGE
 # Run with these parameters:
 # - $1 REQUIRED. The file name of an .svg file in the current directory, which this script will directly modify (overwrite with changes).
-# - $2 REQUIRED. A flat text file list of hexadecimal RGB color codes, one per line, from which to choose random colors for this fill. NOTE: each hex color must be preceded by #.
+# - $2 REQUIRED. A flat text file list of hexadecimal RGB color codes, one per line, from which to choose random colors for this fill. NOTE: each hex color in the file must be preceded by #.
 # - $3 OPTIONAL. RGB hex color code in format f800fc (six hex digits, no starting # symbol) to search and replace with random colors from $2. If omitted, defaults to ffffff. If you use this parameter, you must use $2.
 # Example that will replace every color fill of ffffff (white) in input.svg with randomly generated sRGB colors:
 #    SVGrandomColorReplace.sh input.svg
