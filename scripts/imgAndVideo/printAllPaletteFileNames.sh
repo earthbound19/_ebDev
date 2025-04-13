@@ -1,8 +1,6 @@
 # DESCRIPTION
 # Retrieves and prints _all_ palette file names from the /palettes subdirectory (and all directories below it) in the _ebPalettes repository. Optionally copies all of them to the current directory as well. Also optionally prints the full path of each palette (by default only prints the file name).
 
-# TO DO: the same from a GitHub API call against the remote _ebPalettes repository, see `printContentsOfRandomPalette_GitHubAPI.sh`. If it can't find the palette directory, it doesn't say so, and prints nothing.
-
 # DEPENDENCIES
 # An environment variable export of EB_PALETTES_ROOT_DIR set in `~/.bashrc` (in your home folder) which contains one line, set with a Unix-style path to the folder where you keep hex palette (`.hexplt`) files (for example /some_path/_ebPalettes/palettes). See _ebPalettes/setEBpalettesEnvVars.sh.
 
@@ -27,6 +25,7 @@
 
 
 # CODE
+# TO DO: the same from a GitHub API call against the remote _ebPalettes repository, see `printContentsOfRandomPalette_GitHubAPI.sh`. If it can't find the palette directory, it doesn't say so, and prints nothing.
 PROGNAME=$(basename $0)
 OPTS=`getopt -o cf --long copy,fullpaths -n $PROGNAME -- "$@"`
 eval set -- "$OPTS"

@@ -17,12 +17,12 @@
 #    listMatchedFileNamesOfType.sh hexplt
 # To run for every hexplt file in mode 2, run:
 #    listMatchedFileNamesOfType.sh hexplt mode=2
-# TO DO
-# - update the script to use getops to set options
-# - after getopts update, add option to pass subdir search parameter to the called script
 
 
 # CODE
+# TO DO
+# - update the script to use getops to set options
+# - after getopts update, add option to pass subdir search parameter to the called script
 if ! [ "$1" ]
 then
 	echo "No parameter \$1 passed to script (file extension (or type) to call listMatchedFileNames.sh for every one of). Exit."
