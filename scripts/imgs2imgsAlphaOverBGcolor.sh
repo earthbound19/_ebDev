@@ -38,7 +38,8 @@ filesList=( $(find . $subDirSearchParam -type f -iname "*.$searchFileType" -prin
 # iterates over files list, creating a new image for each layering it with transparency over the background color to a new file:
 for file in ${filesList[@]}
 do
-	echo calling script img2imgAlphaOverBGcolor.sh with positional parameters $backgroundColor $file . .
+	echo "calling script with positional parameters:"
+	echo "img2imgAlphaOverBGcolor.sh $backgroundColor $file . ."
 	img2imgAlphaOverBGcolor.sh $backgroundColor $file 
 done
 
