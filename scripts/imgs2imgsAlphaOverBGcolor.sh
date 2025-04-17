@@ -6,26 +6,28 @@
 
 # USAGE
 # Run with these parameters:
-# - $1 OPTIONAL. File types to operate on. Defaults to "png" if omitted.
-# - $2 OPTIONAL. Background color to overly on in sRGB hex color code, for example ffffff for white or ff0596 for a magenta-red (rose).
-# - $2 OPTIONAL. Anything, for example the word HEIRNSH, which will cause the script to operate on all files of type $1 recursively (in subfolders). If omitted, default off (will only operate on files in the current directory).
-# For example, to override the default png with tga and keep all other defaults, run:
-#    imgs2imgsAlphaOverBGcolor.sh tga
-# Or to override the default ffffff background color with rose, run:
-#    imgs2imgsAlphaOverBGcolor.sh tga ff0596
+# - $1 OPTIONAL. Background color to overly on in sRGB hex color code, for example ffffff for white or ff0596 for a magenta-red (rose).
+# - $2 OPTIONAL. File types to operate on. Defaults to "png" if omitted.
+# - $3 OPTIONAL. Anything, for example the word HEIRNSH, which will cause the script to operate on all files of type $1 recursively (in subfolders). If omitted, default off (will only operate on files in the current directory).
+# For example, to override the default ffffff background color with rose ($ff0596), run:
+#    imgs2imgsAlphaOverBGcolor.sh ff0596
+# To override the default png with tga and keep all other defaults, run:
+#    imgs2imgsAlphaOverBGcolor.sh ff0596 tga
+# (If you use $2, for the file type, you must use $1, for the color.)
 # To do the same but with png files (not tga) and do so in all png files in the current folder and all subfolders, run:
-#    imgs2imgsAlphaOverBGcolor.sh png ff0596 HERNSHBLAUR
+#    imgs2imgsAlphaOverBGcolor.sh ff0596 png HERNSHBLAUR
+# (Likewise if you use $3, to operate in all subdirectories, you must use $2, for the file type.)
 # NOTE
-# This was only tested with png images but could potentially work with all image types that support alpha which graphicsmagick can work with.
+# This was only tested with png images but could potentially work with all image types that support alpha and which graphicsmagick can work with.
 
 
 # CODE
-if [ "$1" ]; then searchFileType=$1; else echo "No parameter \$1 (file type to work on e.g. png) passed to script; defaulting to png."; searchFileType="png"; fi
+if [ "$1" ]; then backgroundColor=$1; else echo "No parameter \$1 (background color to layer source images with transparency over, in sRGB hex color code format e.g. ffffff; defaulting to ffffff."; backgroundColor="ffffff"; fi
 
-if [ "$2" ]; then backgroundColor=$2; else echo "No parameter \$2 (background color to layer source images with transparency over, in sRGB hex color code format e.g. ffffff; defaulting to ffffff."; backgroundColor="ffffff"; fi
+if [ "$2" ]; then searchFileType=$2; else echo "No parameter \$2 (file type to work on e.g. png) passed to script; defaulting to png."; searchFileType="png"; fi
 
-echo searchFileType is $searchFileType
-echo backgroundColor is $backgroundColor
+# echo backgroundColor is $backgroundColor
+# echo searchFileType is $searchFileType
 
 # if no parameter is passed for $3, default to nothing (which searches all subdirectories):
 if [ ! "$3" ]; then subDirSearchParam="-maxdepth 1"; fi
