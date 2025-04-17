@@ -11,14 +11,12 @@
 # - $3 OPTIONAL. Anything, for example the word HEIRNSH, which will cause the script to operate on all files of type $1 recursively (in subfolders). If omitted, default off (will only operate on files in the current directory).
 # For example, to override the default ffffff background color with rose ($ff0596), and operate on all files of the default type (png), run:
 #    imgs2imgsAlphaOverBGcolor.sh ff0596
-# To override the default png with tga and keep all other defaults, run:
+# To override the default png with tga, run:
 #    imgs2imgsAlphaOverBGcolor.sh ff0596 tga
 # (If you use $2, for the file type, you must use $1, for the color.)
 # To do the same but with png files (not tga) and do so in all png files in the current folder and all subfolders, run:
 #    imgs2imgsAlphaOverBGcolor.sh ff0596 png HERNSHBLAUR
 # (Likewise if you use $3, to operate in all subdirectories, you must use $2, for the file type.)
-# NOTE
-# This was only tested with png images but could potentially work with all image types that support alpha and which graphicsmagick can work with.
 
 
 # CODE
@@ -39,7 +37,6 @@ for file in ${filesList[@]}
 do
 	echo calling script img2imgAlphaOverBGcolor.sh with positional parameters $backgroundColor $file . .
 	img2imgAlphaOverBGcolor.sh $backgroundColor $file 
-	# gm convert "$file" -background "#$backgroundColor" -flatten "${file%.*}_bg_$backgroundColor.${file##*.}"
 done
 
 
