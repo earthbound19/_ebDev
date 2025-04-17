@@ -17,6 +17,9 @@
 # To do the same but with png files (not tga) and do so in all png files in the current folder and all subfolders, run:
 #    imgs2imgsAlphaOverBGcolor.sh ff0596 png HERNSHBLAUR
 # (Likewise if you use $3, to operate in all subdirectories, you must use $2, for the file type.)
+# WARNINGS
+# - No verification of parameters beyond $1 is done; ensure you have correct additional parameters if you use them.
+# - If you run this script in a folder with already converted output files of the same format as the input, you'll get pointless redundant convert attempts resulting only in duplicate images (as the background was already filled and can't be again).
 
 
 # CODE
