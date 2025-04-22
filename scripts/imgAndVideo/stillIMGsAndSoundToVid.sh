@@ -34,11 +34,12 @@ targetVideoClipName=${inputSoundFile%.*}_animation.mp4
 framerate=$(echo "$total_frames / $soundClipDuraton" | bc -l)
 # printf "total_frames is $total_frames and framerate is $framerate"
 
+# TO PAD to black e.g. 1920x1080, insert this line after the -i input switche's line:
+# -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2" \
 ffmpeg -y \
   -framerate "$framerate" \
   -i %0"$digitsPadCount"d.$inFileType \
   -i "$inputSoundFile" \
-  -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2" \
   -c:v libx264 -crf 18 -preset ultrafast \
   -shortest -c:a copy \
   "$targetVideoClipName"
