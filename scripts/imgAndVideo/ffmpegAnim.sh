@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates an mp4 video (AVC) from a series of numbered input images. Automatically detects the number of digits in the input frames. Expects *only* digits in the input filenames. Will automatically use the lowest found number for start frame number. Creates the animation at _out.mp4. NOTE: you may want to use x264anim.sh instead.
+# Creates an mp4 video (AVC) from a series of numbered input images. Automatically detects the number of digits in the input frames. Expects *only* digits in the input filenames. Will automatically use the lowest found number for start frame number. Creates the animation at _out.mp4. NOTE: you may want to use x264anim.sh instead. See also stillIMGsAndSoundToVid.sh for video animation dubbing (matching the frame rate of source images to a the duration of a source sound).
 
 # WARNING
 # This script overwrites _out.mp4 if it already exists.
@@ -73,7 +73,7 @@ first_frame_from_filename=${array[0]%.*}
 lastFoundFileType=${array[-1]}
 digitsPadCount=${#first_frame_from_filename}
 
-# ex commands to fetch and parse src pix dimensions is in getDoesIMGinstagram.sh.
+# example commands to fetch and parse src pix dimensions is in getDoesIMGinstagram.sh.
 # also could do bc math e.g: echo "scale=5; 3298 / 1296" | bc
 # constructing an additionalParams arg via piping and read?! :
 # echo "-filter:v \"crop=1920:1080\"" > tmp_blaheryeag_nbD9X44rCJev.txt && additionalParams=$(<tmp_blaheryeag_nbD9X44rCJev.txt) && rm tmp_blaheryeag_nbD9X44rCJev.txt
