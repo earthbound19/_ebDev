@@ -16,6 +16,8 @@
 #    imgs2imgsAlphaOverBGcolor_from_palette.sh EB_Favorites_v2_Alt_2.hexplt tga
 # To moreoever operate on file type $2 in every subfolder, run:
 #    imgs2imgsAlphaOverBGcolor_from_palette.sh EB_Favorites_v2_Alt_2.hexplt tga HERNSHBLAUR
+# You could obtain and use a randomly chosen paltte file name for $1 by calling another script, this way:
+#    imgs2imgsAlphaOverBGcolor_from_palette.sh $(getRandomPaletteFileName.sh)
 # NOTES
 # Parameter $1 for this script is a palette file name, and for every color in that palette, it passes that color as $1 in a call (one call for every color, respectively) to img2imgAlphaOverBGcolor.sh. It also passes on $2 and $3 for each call.
 # WARNINGS
