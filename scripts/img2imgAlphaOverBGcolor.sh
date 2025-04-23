@@ -19,6 +19,13 @@ if [ "$1" ]; then backgroundColor=$1; else echo "No parameter \$1 (background co
 
 if [ "$2" ]; then sourceFile=$2; else echo "No parameter \$2 (source file name to work on e.g. image.png) passed to script; defaulting to png."; searchFileType="png"; fi
 
+# check if the source file has the file name patteren _bg_<six hex digits>.<file type> (e.g. watercolor_abstraction_bg_ffd86e.png) and if so, exit with a note:
+grep '_bg_[0-9a-f]\{6\}' <<< $sourceFile
+if [ $? -eq 0 ]
+then
+	echo "POTENTIAL PROBLEM: source file name $sourceFile contains the string format _bg_<six hex digits>, which may indicate it is a product of this script. If so, running this script would do redundant (and effectiely no) work. If you intend to create a background color behind that image file via this script, please rename it and try again. Skipping render."
+	exit 1
+fi
 targetFileName="${sourceFile%.*}_bg_$backgroundColor.${sourceFile##*.}"
 if [ ! -f $targetFileName ]
 then
