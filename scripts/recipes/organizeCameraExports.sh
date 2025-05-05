@@ -67,7 +67,7 @@ rm -rf tmp_renames_2ydTVzqG
 # re https://stackoverflow.com/a/45703829, rename all .jpeg to .jpg:
 for x in *.jpeg; do mv -i "$x" "${x%.jpeg}.jpg"; done
 
-# LOSSLESLLY RECONTAIN ALL .mov FILES TO .mp4, and copy metadata and timestamp from the original to the target mp4; uncomment the next line:
+# LOSSLESSLY RECONTAIN ALL .mov FILES TO .mp4, and copy metadata and timestamp from the original to the target mp4; uncomment the next line:
 # allVideo2mp4Lossless.sh
 
 # MOVE ALL FILES OF GIVEN EXTENSIONS (that this script operates on) INTO SUBFOLDERS; uncomment the next four lines of code:
