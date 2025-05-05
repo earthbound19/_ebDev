@@ -72,7 +72,7 @@ renamed_files=()
 # use collected checksums to do sidecar etc. renaming if no paramter $2 was passed
 if [ ! "$2" ]
 # construct log file name including date and time
-logFileName=$(date +"%Y%m%d_%H%M%S.%N_renameByMetadataLog.txt")
+logFileName=$(date +"%Y-%m-%d_%H-%M-%S.%N_renameByMetadataLog.txt")
 then
     echo "identifying sidecar etc. files by comparing sha256sum of renamed file and renaming files with a basename matching the original file's basename.."
     # THIS PART mostly written by a large language model! (DeepSeek)
