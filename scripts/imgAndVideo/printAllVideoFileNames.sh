@@ -57,7 +57,7 @@ mpe
 mpeg
 mpg
 mpv2
-mpv4﻿﻿
+mpv4
 mqv
 mts
 mxf
@@ -81,14 +81,25 @@ wmv
 xvid
 )
 
-# build string listing lowercase and also uppercase extensions list section for `find` command:
-fileTypesWithAlsoUppercase=
+# DEPRECATED when developing this improved approach: append uppercase versions of all of those to the same array: NO NEED TO DO THIS because I search with the case-insensitive flag -iname (with the find command) :
+# for type in ${filetypes[@]}
+# do
+	# filetypes+=(${type^^})
+# done
+
+allFoundVideoFiles=$()
+# for every file type in the file types array, run a search command and add the result to the array:
+#    working template search command:
+#    find ./ $maxdepthParameter -type f -iname \*.mp4 -printf "%P\n"
 for type in ${filetypes[@]}
 do
-	typesParam+="-o -iname \*.$type -o -iname \*.${type^^} "
+	theseFoundVideoTypes=($(find ./ $maxdepthParameter -type f -iname \*.$type -printf "%P\n"))
+	# append those findings (that array) to allFoundVideoFiles:
+	allFoundVideoFiles=("${allFoundVideoFiles[@]}" "${theseFoundVideoTypes[@]}")
 done
 
-# I'm only getting this to work in a temp script that I create, write the command to, executed and then delete. By itself with whatever escaping I find, or in a variable expanded to a command, it breaks; CHORFL is just to meet a requirement of starting the list withuot -o:
-echo "find ./ $maxdepthParameter -type f \( -iname \*.CHORFL $typesParam \) -printf \"%P\n\"" > tmpScript_SRNdxAqJt.sh
-./tmpScript_SRNdxAqJt.sh
-rm ./tmpScript_SRNdxAqJt.sh
+# print them all
+for file in ${allFoundVideoFiles[@]}
+do
+	echo $file
+done
