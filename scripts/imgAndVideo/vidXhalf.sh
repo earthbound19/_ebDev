@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Re-encodes input video $1 at half resolution.
+# Re-encodes video stream of input file $1 at half resolution and copies (losslessly preserves) the audio stream into a new file named "$1"_half_resolution.mp4.
 
 # USAGE
 # Run with one parameter, which is the file name of the input video to make a half-resolution copy of:
@@ -14,5 +14,5 @@
 
 pixelFormat="-pix_fmt yuv420p"
 
-ffmpeg -y -i $1 -vf scale=iw/2:-1 -crf 13 $pixelFormat "$1"_half_resolution.mp4
+ffmpeg -y -i "$1" -vf scale=iw/2:-1 -crf 13 -c:a copy $pixelFormat "${1}_half_resolution.mp4"
 
