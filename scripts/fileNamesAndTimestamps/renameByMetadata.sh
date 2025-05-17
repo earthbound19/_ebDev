@@ -18,6 +18,7 @@
 
 # CODE
 # TO DO
+# - Try first to rename sidecars by matching DateTimeOriginal or DateTimeDigitized metadata from xmp sidecar files? Or just finding matching names to begin with in an array? Rework this as a python script because it's pushing "easy" limits of bash arrays and loops?
 # - Update all dateTimeOriginal metadata which lacks milliseconds by adding random milliseconds before the next line of code which appears later? As in:
 	# exiftool '-dateTimeOriginal<fileCreateDate' -if '(($dateTimeOriginal)) and ($filetype eq "JPEG")' .
 # REFERENCE
@@ -46,7 +47,7 @@ fi
 # Create an array to store the SHA256 checksums and filenames
 declare -A file_checksums
 
-# get checksums if no paramter $2 was passed
+# get checksums if no parameter $2 was passed
 if [ ! "$2" ]
 then
 	# Get the SHA256 checksums for all files in the current directory
