@@ -14,12 +14,14 @@
 # USAGE
 # From a folder with such files to organize (and no other files!), run without any parameters:
 #    organizeCameraExports.sh
+# TEMPORARILY DEPRECATED and this script hacked to skip it: sidecar scanning and renaming (as follows), owing to this bug: in some setting (or all settings?) renamed files in a subfolder are not being matched to sidecards etc. nor sidecars renamed.
 # To skip sidecar etc. scanning for renameByMetadata.sh, pass a parameter $1 to the script, which can be anything, e.g.:
 #    organizeCameraExports.sh NORTHERP
 # See the various comments with "uncomment" instructions for the optional features.
 
 # CODE
 # TO DO
+# - FIX BUG detailed above in TEMPORARILY DEPRECATED comment
 # - parameterize optional features?
 
 # ADD AN EXTENSION to this list if you need it operated on with this script:
@@ -55,7 +57,9 @@ done
 
 cd tmp_renames_2ydTVzqG/
 # Do the actual rename; this passes $1, which if it was passed to the script will be any string or whatever, and if not, it will be empty; that flag and the word NORTHERP control things in renameByMetadata.sh (see documentation in it) :
-renameByMetadata.sh NORTHERP $1
+# TO DO: fix the issue mentioned above under the TEMPORARILY DEPRECATED comment (I think the issue is that renamed files are moved away from the same directory as the would-be sidecar matches to find), then uncomment the next line and delete the one after it:
+# renameByMetadata.sh NORTHERP $1
+renameByMetadata.sh NORTHERP SKIP_SIDECAR_CHECKING
 # Move those up a folder, move back to that folder, and destroy the temp folder:
 mv -i * ..
 cd ..
