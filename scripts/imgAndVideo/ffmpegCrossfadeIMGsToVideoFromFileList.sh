@@ -7,10 +7,10 @@
 
 # USAGE
 # Ensure you have DEPENDENCIES (see) in place. Then run with these parameters:
-# - $1 OPTIONAL. Duration of crossfade, in decimal seconds, e.g. 2.5. If omitted, the script this calls uses a default.
-# - $1 OPTIONAL. Duration of still image pad between crossfades, in decimal seconds, e.g. 0.7. If omitted, the script this calls uses a default.
-# For example, to create 
-#    ffmpegCrossfadeIMGsToVideoFromFileList.sh
+# - $1 Duration of crossfade, in decimal seconds, e.g. 2.5. If omitted, the script this calls uses a default.
+# - $2 Duration of still image pad between crossfades, in decimal seconds, e.g. 1.1. If omitted, the script this calls uses a default.
+# For example, to create an animation with crossfades of 2.5 seconds and still images of 1.1 seconds, run:
+#    ffmpegCrossfadeIMGsToVideoFromFileList.sh 2.5 1.1
 
 # RECIPE
 # For a recipe that uses this script, see `next_most_similar_image_crossfade_anim.sh`.
@@ -21,8 +21,8 @@
 # - Parameterize source image extension.
 # - Interrupted run handling / resume? What to do with fadeSRCvideosList.txt in that case?
 # - Figure out why its not allowing less than one second of padding; I thought it did before?
-if [ "$1" ]; then crossFadeDuration=$1; fi
-if [ "$2" ]; then padding=$2; fi
+if [ "$1" ]; then crossFadeDuration=$1; else printf "\nNo parameter \$1 (crossfade duration) passed to script. Exit"; exit 1; fi
+if [ "$2" ]; then padding=$2; else printf "\nNo parameter \$2 (padding time of still image between crossfades) passed to script. Exit."; exit 2; fi
 
 echo ~~~~
 echo Creating image crossfade pairs list . . .

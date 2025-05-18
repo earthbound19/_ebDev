@@ -11,8 +11,8 @@
 
 
 # CODE
-if [ "$1" ]; then crossFadeDuration=$1; fi
-if [ "$2" ]; then padding=$2; fi
+if [ "$1" ]; then crossFadeDuration=$1; else crossFadeDuration=2.7; printf "\nNo parameter \$1 (crossfade duration) passed to script. Setting to default $crossFadeDuration"; fi
+if [ "$2" ]; then padding=$2; else padding=1.2; printf "\nNo parameter \$2 (padding time of still image between crossfades) passed to script. Setting to default $padding"; fi
 
 pixelFormat="-pix_fmt yuv420p"
 	# All images you operate on must be pngs for this to work:
