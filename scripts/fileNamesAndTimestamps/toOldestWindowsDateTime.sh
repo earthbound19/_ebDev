@@ -39,9 +39,11 @@ rm tmp_E8eK.txt tmp2_E8eK5t4aw.txt
 # exiftool -overwrite_original -FileCreateDate=\""$createAdjustmentDateStamp"\" $1 &>/dev/null
 # exiftool -overwrite_original -FileModifyDate=\""$modifyAdjustmentDateStamp"\" $1 &>/dev/null
 # ---- END EXIFTOOL OPTION
-exit
+
 # ---- START BINAREZ_TOUCH OPTION--PREFERRED: this will update time stamps for files that exiftool won't; ex. call binarez_touch 027_cover.jpg -acxv -d 2019-01-18T05:15:32;
-# redirect output of these commands to /dev/null also:
-binarez_touch $1 -cxv -d $createAdjustmentDateStamp &>/dev/null
-binarez_touch $1 -cmv -d $modifyAdjustmentDateStamp &>/dev/null
+# At this writing, the binarez_touch web site seems to have vanished into the aether :( with any reliable source for an executable also; relying on my sole local copy of it in _ebSuperBin. Maybe some equivalent tool that may be around longer is findable.
+	# echo createAdjustmentDateStamp is $createAdjustmentDateStamp
+binarez_touch $1 -cxv -d $createAdjustmentDateStamp
+	# echo modifyAdjustmentDateStamp is $modifyAdjustmentDateStamp
+binarez_touch $1 -cmv -d $modifyAdjustmentDateStamp
 # ---- END BINAREZ_TOUCH OPTION
