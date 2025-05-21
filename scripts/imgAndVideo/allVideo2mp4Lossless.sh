@@ -2,7 +2,7 @@
 # Converts all of many video media container (file) types in the current directory to mp4 containers, losslessly; there is no recompression: it directly copies the video streams into a new container. It also copies the file timestamps (including Windows-unique ones) and relevant metadata from the original file to the converted target file, via another script. For options for lossless video but lossy sound, see NOTES.
 
 # DEPENDENCIES
-# ffmpeg, GNU touch, copyMetadataFromSourceFileToTarget.sh 
+# ffmpeg, GNU touch, copyMetadataFromSourceFileToTarget.sh, toOldestWindowsDateTime.sh
 
 # USAGE
 # Run without any parameters:
@@ -32,6 +32,8 @@ do
 		ffmpeg -y -i $fileName -c copy $renderTarget
 		# copy metadata from source file to render target; the script also updates target timestamp to match metadata media creation date:
 		copyMetadataFromSourceFileToTarget.sh $fileName $renderTarget FNEORN
+		# update created date in windows to match (now probably) older "modified" date (it was modified before it was created?! -- great scott! :
+		toOldestWindowsDateTime.sh $renderTarget
 	else
 		echo "SKIPPING RENDER TARGET $renderTarget, as it already exists."
 	fi
