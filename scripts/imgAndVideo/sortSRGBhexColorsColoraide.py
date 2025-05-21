@@ -144,7 +144,11 @@ if args.overwritesourcefile:
     try:
         with open(args.inputfile, "w") as file:
             for color in sorted_colors:
-                file.write(f"{color['hex']} {color['metadata']}\n")
+                # if there is metadata, print it after the color and a space, otherwise print nothing after the color. (Without this check, if there was no metadata, it printed a needless space after the color.)
+                if color["metadata"]:
+                    file.write(f"{color['hex']} {color['metadata']}\n")
+                else:
+                    file.write(f"{color['hex']}\n")
         print(f"File {args.inputfile} successfully overwritten.")
     except Exception as e:
         print(f"Error writing to file: {e}")
