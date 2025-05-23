@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Calls imgs2imgsAlphaOverBGcolor.sh repeatedly, supplying a (next) color from palette file $1 for every call. Obtains the palette file path via findPalette.sh. Useful to preview all colors from a palette behind (adapted copies of) an image.
+# Calls imgs2imgsAlphaOverBGcolor.sh repeatedly for every color in a palette. Obtains the palette file path via findPalette.sh. Useful to see all colors from a palette as a background for an image.
 
 # DEPENDENCIES
 # img2imgAlphaOverBGcolor.sh, findPalette.sh, and their dependencies.
@@ -19,7 +19,9 @@
 # You could obtain and use a randomly chosen paltte file name for $1 by calling another script, this way:
 #    imgs2imgsAlphaOverBGcolor_from_palette.sh $(getRandomPaletteFileName.sh)
 # NOTES
-# Parameter $1 for this script is a palette file name, and for every color in that palette, it passes that color as $1 in a call (one call for every color, respectively) to img2imgAlphaOverBGcolor.sh. It also passes on $2 and $3 for each call.
+# - Parameter $1 for this script is a palette file name, and for every color in that palette, it passes that color as $1 in call to img2imgAlphaOverBGcolor.sh (one call for each color). It also passes on $2 and $3 for each call.
+# - To randomly select and use a palette with this script, run these two commands:
+#    rndPalette=$(getRandomPaletteFileName.sh); imgs2imgsAlphaOverBGcolor_from_palette.sh $rndPalette
 # WARNINGS
 # - No verification of parameters beyond $1 is done; ensure you have correct additional parameters if you use them.
 # - If you run this script in a folder with already converted output files of the same format as the input, you'll get pointless redundant convert attempts resulting only in duplicate images (as the background was already filled and can't be again).
