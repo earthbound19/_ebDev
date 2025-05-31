@@ -14,7 +14,9 @@
 
 
 # CODE
-# TO DO: adapt this script to actually use mixbox :)
+# TO DO:
+# - adapt this script to use mixbox instead? OR scrap it and use spectral.js v3+ https://github.com/rvanwijnen/spectral.js (and node + a .js file or whatever)?
+# - stop pushing dev scripts to main branch, use a dev branch instead? How did I justify calling this v1 if it's in development and not any MVP (apparently) - or why did I hack this to print that it's in a dev state and exit?
 # START IMPORTS AND GLOBALS
 ThisScriptVersionString = '1.0.0'
 import argparse, sys
