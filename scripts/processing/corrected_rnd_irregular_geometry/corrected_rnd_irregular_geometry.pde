@@ -1,6 +1,11 @@
-
 // DESCRIPTION
 // Modified to include JSON-based color retrieval, separate save functionality, and triggered random geometry creation.
+// BUT IT'S IN AN UKNOWN DEV STATE, sorry.
+
+// CODE
+// TO DO:
+// - what even was I doing this and why is it "corrected?" it seems not so. And was pushed in the same commit with two other file changes that needed to be in a dev branch, no main.
+// - compare to rnd_irregular_geometry.pde? Update / fix that / this? Update and complete one or the other from the one?
 
 // Global variables
 boolean RNDcolorMode = true;
