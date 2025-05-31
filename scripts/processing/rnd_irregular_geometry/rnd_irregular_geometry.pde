@@ -14,6 +14,8 @@
 // by Richard Alexander Hall, Copyright 2019
 // Inspired by Daniel Bartholomew's "Abstractoons."
 // TO DO:
+// - when I open output SVGs from this in an SVG editor it shows multiple objects I didn't know about, out of the viewing area?! Fix??
+// - figure out what I was trying to "fix" in corrected_rnd_irregular_geometry.pde (I think not this issue?!) and fix that and patch it into this?
 // - N random generations for every random palette (from API) retrieval, instead of a new palette retrieval for every generation?
 // - parameter control of iterations
 // - equilateral properly center-reference drawn triangle option (unpredictable triangle option commented out for now)
