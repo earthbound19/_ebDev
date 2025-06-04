@@ -30,7 +30,7 @@ else	# if variable $EB_PALETTES_ROOT_DIR is set, search for specified palette fi
 	then
 		if [ -e $EB_PALETTES_ROOT_DIR ]
 		then
-			hexColorSrcFullPath=$(find $EB_PALETTES_ROOT_DIR -name "$paletteFileName")
+			hexColorSrcFullPath=$(find $EB_PALETTES_ROOT_DIR -iname "$paletteFileName")
 			if [ "$hexColorSrcFullPath" != "" ]
 			then
 				printf "$hexColorSrcFullPath"
