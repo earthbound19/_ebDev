@@ -41,12 +41,12 @@ else
 		echo "!---------------------------------------------------------------!"
 		echo "No file of name $2 found. Consult findPalette.sh. Exit."
 		echo "!---------------------------------------------------------------!"
-		exit 1
+		exit 2
 	fi
 	echo "File name $paletteFile found! PROCEEDING. IN ALL CAPS."
-	rndHexColors=( $(grep -i -o '#[0-9a-f]\{6\}' $paletteFile) )
-	# assign retrievedPaletteFileName with just the file name of without the path:
+	# assign retrievedPaletteFileName with just the file name (no path) :
 	retrievedPaletteFileName="${paletteFile##*/}"
+	rndHexColors=( $(grep -i -o '#[0-9a-f]\{6\}' $paletteFile) )
 fi
 
 # Set a default that will be overriden in the next check if $3 was passed to script:
@@ -63,7 +63,7 @@ then
 		echo "Will attempt to replace color $replaceThisHexColor in copies of $svgFileName."
 	else
 		echo "PROBLEM: parameter \$3 nonconformant to sRGB hex color code format. Exit."
-		exit 2
+		exit 3
 	fi
 fi
 # END PARAMETER CHECKING AND GLOBALS SETTING
