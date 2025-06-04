@@ -9,6 +9,8 @@
 
 
 # CODE
+# TO DO
+# implement the better color replacement sed regex used in SVGcolorReplaceCopiesByPalette.sh?
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (SVG file name) passed to script. Exit."; exit 1; else srcSVG=$1; fi
 # If no parameter two, maxdepthParameter will be left at default, which causes find to search only the current directory:
 maxdepthParameter='-maxdepth 1'

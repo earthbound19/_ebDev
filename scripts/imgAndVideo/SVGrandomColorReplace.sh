@@ -26,7 +26,8 @@
 
 # CODE
 # TO DO:
-# ? - implement an optional buffer memory of the last three colors used, and if the current picked color is among them, pick another color until it is not among them.
+# - implement the better color replacement sed regex used in SVGcolorReplaceCopiesByPalette.sh?
+# - implement an optional buffer memory of the last three colors used, and if the current picked color is among them, pick another color until it is not among them?
 
 # START PARAMETER CHECKING AND GLOBALS SETTING
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source SVG file name) passed to script. Exit."; exit 1; else svgFileName=$1; fi
