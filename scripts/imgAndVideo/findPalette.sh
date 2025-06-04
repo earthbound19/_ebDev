@@ -24,6 +24,7 @@ if [ ! "$1" ]; then printf "\nNo parameter \$1 (file name of palette to find the
 # Search current path for $1; if it exists set hexColorSrcFullPath to just $1 (we don't need the full path and will use a relative one). If it doesn't exist in the local path, search the path in $EB_PALETTES_ROOT_DIR and make decisions based on that result:
 if [ -e ./$paletteFileName ]
 then
+# TO DO: ascertain if this ever breaks anything as I think it has no path? :
 	echo $paletteFileName
 else	# if variable $EB_PALETTES_ROOT_DIR is set, search for specified palette file in $EB_PALETTES_ROOT_DIR if that dir exists; if it doesn't, do nothing:
 	if [ "$EB_PALETTES_ROOT_DIR" ]
