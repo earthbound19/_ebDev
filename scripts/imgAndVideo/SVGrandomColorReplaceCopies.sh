@@ -23,14 +23,7 @@ if [ ! "$2" ]; then printf "\nNo parameter \$2 (how many copies of the svg to ma
 if [ ! "$3" ] || [ "$3" == "RANDOM" ]
 then
 	echo "no parameter \$3 passed to script, OR passed as RANDOM; selecting random production palette from _ebPalettes  . . ."
-	# calling this with `source` because that script sets a variable retrievedPaletteFileName with just that:
-	# using a temp file for memory because if I do command substitution with source, I lose the assignment to retrievedPaletteFileName in the discared subshell:
-	source printContentsOfRandomPalette_ls.sh > tmpFile_75JbuqBTN.txt
-	rndHexColors=( $(<tmpFile_75JbuqBTN.txt) )
-	rm tmpFile_75JbuqBTN.txt
-	# modify $retrievedPaletteFileName to just the file name without the path:
-	retrievedPaletteFileName="${retrievedPaletteFileName##*/}"
-	paletteFile=$retrievedPaletteFileName
+	paletteFile=$(getRandomPaletteFileName.sh)
 else
 	paletteFile=$3
 fi
