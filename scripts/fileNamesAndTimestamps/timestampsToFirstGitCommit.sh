@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Finds the oldest commit date for every file in this directory and all subdirectories, and sets the modification date of the file to the date and time of that earliest commit.
+# Finds the oldest commit date for every file in this directory and all subdirectories, and sets the modification date of the file to the date and time of that earliest commit. SEE ALSO gitDumpAllFileVersions.sh, which for data archeology purposes around timestampe for a specific file (e.g. finding out the last time a file was commit in git, where the system's timestampe for a cloned or copied repo may differ), may be more efficient.
 
 # DEPENDENCIES
 # Git, and for Windows, ExifTool. For Unix-like environments, GNU coreutils that come with most of them, including touch.
