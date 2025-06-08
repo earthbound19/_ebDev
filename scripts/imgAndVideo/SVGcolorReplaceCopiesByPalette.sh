@@ -14,6 +14,9 @@
 # CODE
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (svg file to make color-replaced copies of) passed to script. Exit."; exit 1; else svgFileName=$1; fi
 
+# Throw an error and exit if the input file doesn't exist.
+if [ ! -e $svgFileName ]; then echo "ERROR: input file $svgFileName does not exist. Exit."; exit 2; fi
+
 # Set a default that will be overriden in the next check if $3 was passed to script:
 replaceThisHexColor='ffffff'
 if [ "$2" ]
@@ -28,7 +31,7 @@ then
 		echo "Will attempt to replace color $replaceThisHexColor in copies of $svgFileName."
 	else
 		echo "PROBLEM: parameter \$2 nonconformant to sRGB hex color code format. Exit."
-		exit 2
+		exit 3
 	fi
 fi
 
@@ -44,9 +47,9 @@ else
 	if [ "$paletteFile" == "" ]
 	then
 		echo "!---------------------------------------------------------------!"
-		echo "No file of name $3 found. Consult findPalette.sh. Exit."
+		echo "No palette file of name $3 found. Consult findPalette.sh. Exit."
 		echo "!---------------------------------------------------------------!"
-		exit 3
+		exit 4
 	fi
 fi
 echo "File name $paletteFile found or randomly retrieved! PROCEEDING. IN ALL CAPS."
@@ -74,7 +77,8 @@ do
 	echo Generating variant $i of $numHexColors . . .
 	# IF we wanted to strip any leading # :
 	# color="${color: -6}"
-	tmpRenderFileName="$countString"__"${svgFileName%.*}"__"$fileNameNoExt"_"$color".svg
+	colorForFileName="${color: -6}"
+	tmpRenderFileName="$countString"__"${svgFileName%.*}"__"$fileNameNoExt"_"$colorForFileName".svg
 	moveToFileAfterRender="$subDirForRenders"/"$tmpRenderFileName"
 	cp $svgFileName $tmpRenderFileName
 echo ----------------------------------
@@ -89,4 +93,4 @@ echo ----------------------------------
 done
 
 echo ""
-echo "CREATED $numHexColors copies of $svgFileName, in subdirectory $subDirForRenders, replacing color $replaceThisHexColor with in each with respective colors from palette $paletteFile.
+echo "CREATED $numHexColors copies of $svgFileName, in subdirectory $subDirForRenders, replacing color $replaceThisHexColor with in each with respective colors from palette $paletteFile."
