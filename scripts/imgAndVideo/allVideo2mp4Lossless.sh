@@ -1,31 +1,40 @@
 # DESCRIPTION
-# Converts all of many video media container (file) types in the current directory to mp4 containers, losslessly; there is no recompression: it directly copies the video streams into a new container. It also copies the file timestamps (including Windows-unique ones) and relevant metadata from the original file to the converted target file, via another script. For options for lossless video but lossy sound, see NOTES.
+# Converts all of many video media container (file) types in the current directory to a new container format, losslessly; there is no recompression: it directly copies the video streams into a new container. It also copies the file timestamps (including Windows-unique ones) and relevant metadata from the original file to the converted target file, via another script. Defaults to mkv (Motroska) containers, losslessly. Container format can be changed with parameter (see USAGE). For options for lossless video but lossy sound, see NOTES.
 
 # DEPENDENCIES
 # ffmpeg, GNU touch, copyMetadataFromSourceFileToTarget.sh, toOldestWindowsDateTime.sh
 
 # USAGE
-# Run without any parameters:
+# Run with these parameters:
+# - $1 OPTIONAL. A format container extension without a preceding period, e.g. 'mp4', to specify the output container. If omitted defaults to 'mkv' (Motroska).
+# For example to use the default mkv container, run without any parameter:
 #    allVideo2mp4Lossless.sh
+# Or to override to an mp4 extension / container, run:
+#    allVideo2VideoLossless.sh mp4
 # NOTES
-# If you have a .mov container as source with PCM sound, you may get an error copying (maybe mp4 files can't have PCM audio??). In that case try `copyVidLosslessEncodeSound.sh` or `copyVidLosslessEncodeSoundAllType.sh`
+# If you have a .mov container as source with PCM sound and attempt to copy the streams to target mp4 format, you may get an error copying (maybe mp4 files can't have PCM audio, it seems). In that case try `copyVidLosslessEncodeSound.sh` or `copyVidLosslessEncodeSoundAllType.sh`, or try an mk4 container.
 
 
 # CODE
+if [ "$1" ]; then containerFormat=$1; else containerFormat='mkv'; echo "No container format parameter \$1 passed; defaulting to "$containerFormat"."; fi
+
 mediaList=$(printAllVideoFileNames.sh)
 
 for fileName in ${mediaList[@]}
 do
 	fileNameNoExt=${fileName%.*}
 	fileExt=${fileName##*.}
-# SKIP if the file extension is mp4:
-		if [ "$fileExt" == "mp4" ]
-		then
-			echo "~ SKIPPING conversion of $fileName to mp4 because it already is . . ."
-			continue
-		fi
-	echo "Converting $fileName to mp4 container as $fileNameNoExt.mp4 . . ."
-	renderTarget=$fileNameNoExt.mp4
+
+	# SKIP if the file extension of source is the same as dest:
+	if [ "$fileExt" == "$containerFormat" ]
+	then
+		echo "~ SKIPPING conversion of $fileName to $containerFormat because it already is . . ."
+		continue
+	fi
+
+	echo "Converting $fileName to $containerFormat container as $fileNameNoExt.$containerFormat . . ."
+	renderTarget=$fileNameNoExt.$containerFormat
+
 	# convert only if render target does not already exist; otherwise skip:
 	if [ ! -f $renderTarget ]
 	then
