@@ -72,7 +72,7 @@ rm -rf tmp_renames_2ydTVzqG
 for x in *.jpeg; do mv -i "$x" "${x%.jpeg}.jpg"; done
 
 # LOSSLESSLY RECONTAIN ALL .mov FILES TO .mp4, and copy metadata and timestamp from the original to the target mp4; uncomment the next line:
-# allVideo2mp4Lossless.sh
+# allVideo2VideoLossless.sh
 
 # MOVE ALL FILES OF GIVEN EXTENSIONS (that this script operates on) INTO SUBFOLDERS; uncomment the next four lines of code:
 # for lowerCaseExt in ${lowerCaseExtensions[@]}
