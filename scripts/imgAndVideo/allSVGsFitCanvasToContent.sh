@@ -1,6 +1,9 @@
 # DESCRIPTION
 # Resaves all SVGs in a directory (and optionally subdirectories) so that the view canvas shows everything. Useful for example for adjusting auto-exported glyphs from fonts where the canvas crops out things below the letter baseline. In detail: for every vector file of a given type (default SVG) in the current directory (and optionally all subdirectories), selects all, resizes the canvas to fit the selection, and exports a plain (if possible?) format version of that file over itself.
 
+# DEPENDENCIES
+# inkscape with CLI capability installed and in your PATH.
+
 # USAGE
 # Run with these parameters:
 # - $1 OPTIONAL. File format to work on; all files of this type in the current directory will be worked on.
