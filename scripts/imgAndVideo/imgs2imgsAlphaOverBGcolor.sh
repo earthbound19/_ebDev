@@ -1,12 +1,12 @@
 # DESCRIPTION
-# Takes all images of type $1 in the current directory and overlays them with any transparency in them (e.g. if PNG or TGA type) over background color $2, saving to a file named after the source image and indicating the background color in the file name. Destination file will be the same as the source file. Optionally does this for all files of type $1 in all subfolders also. Accomplished by repeated calls to the script img2imgAlphaOverBGcolor.sh.
+# Takes all images of type $1 in the current directory and overlays them with any transparency in them (e.g. if PNG or TGA type) over background color $2, saving to a file named after the source image and indicating the background color in the file name. Destination file will be the same as the source file. Optionally does this for all files of type $1 in all subfolders also. Accomplished by repeated calls to the script img2imgAlphaOverBGcolor.sh. SEE ALSO imgs2imgsAlphaOver_RND_bgColor_from_palette.sh, which applies any one randomly chosen color from a palette to all images. This applies one color to all images.
 
 # DEPENDENCIES
 # Graphicsmagick, img2imgAlphaOverBGcolor.sh.
 
 # USAGE
 # Run with these parameters:
-# - $1 OPTIONAL. Background color to overly on in sRGB hex color code, for example ffffff for white or ff0596 for a magenta-red (rose). If omitted, a default is used (at this writing white ffffff).
+# - $1 OPTIONAL. Background color to overlay on; an sRGB hex color code, for example ffffff for white or ff0596 for a magenta-red (rose). If omitted, a default is used (at this writing white ffffff).
 # - $2 OPTIONAL. File types to operate on. Defaults to "png" if omitted.
 # - $3 OPTIONAL. Anything, for example the word HEIRNSH, which will cause the script to operate on all files of type $1 recursively (in subfolders). If omitted, default off (will only operate on files in the current directory).
 # For example, to override the default ffffff background color with rose ($ff0596), and operate on all files of the default type (png), run:
