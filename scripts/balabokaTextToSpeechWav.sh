@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Wrapper that renders any text within quote marks to a .wav audio file, with the text incorporated in the file name, and then starts the .wav file with the default player or handler. Windows-only. For MacOS, you can run this:
+# Wrapper that renders the text within a source file to a .wav audio file via balcon text to speech, with the text incorporated in the file name, and then starts the .wav file with the default player or handler. Windows-only. For MacOS, instead of this script, you can run this:
 #    say "blorf blefl horple"
 # OR
 #    cat inputFile.txt | say
@@ -10,8 +10,10 @@
 # Balaboka CLI (balcon.exe) / (windows text-to-speech engine tool) installed and in your PATH and MSYS2 or other 'nix environment on Windows.
 
 # USAGE
-# Run this script with one parameter, which is any text to render to a .wav file (text encased in "quote marks"); e.g.:
-#    balabokaTextToSpeechWav.sh "blarpnoi hoi hoi"
+# Run this script with one parameter, which is the name of any text file to render to a .wav file, e.g.:
+#    balabokaTextToSpeechWav.sh gib.txt
+# -- where gib.txt for example contains the text:
+#    fneur horf leuf garb sniffle puddle plop fnur falch!
 # SUGGESTION
 # These commands don't use this script, they are reference:
 # Grab a fake artist statement from the "Gibberish Artist Statement Dispenser" and say it out loud:
