@@ -12,6 +12,7 @@ firstGitCommitTimeStamps.txt
 BabelStoneShapes.ttf
 bitBlocks.ttf
 build/
+*.code-workspace
   # START SVG AND PNG HANDLING
   # exclude all .svg and .png files:
 *.svg
