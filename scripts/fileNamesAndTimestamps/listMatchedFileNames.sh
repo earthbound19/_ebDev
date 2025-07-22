@@ -1,5 +1,5 @@
 # DESCRIPTION
-# For file $1 (parameter to script), prints all other files _and directories_ in the current directory which have the basename of $1 as part of their file name. Optionally recursive, also. For example, if $1 is `fBnhR9Ar.hexplt`, this script will list all other files and/or folders that contain the string `fBnhR9Ar`. May be used for example to identify whether render configuration or source files have matched targets derived of their file name (if your process makes render targets have file names that indicate their source). If this script prints anything, there is a match. If it doesn't print anything, there is no match.
+# For file $1 (parameter to script), prints all other files in the current directory which have the basename of $1 as part of their file name. Optionally prints files in all subdirectories also. For example, if $1 is `fBnhR9Ar.hexplt`, this script will list all other files and/or folders that contain the string `fBnhR9Ar`. May be used for example to identify whether render configuration or source files have matched targets derived of their file name (if your process makes render targets have file names that indicate their source). If this script prints anything, there is a match. If it doesn't print anything, there is no match.
 
 # USAGE
 # Run with these parameters:
