@@ -38,7 +38,7 @@ then
 		# modify that to file name only, no path:
 		RNDpaletteFileNameNoPath="${RNDpaletteFileName##*/}"
 		# print that palette file name:
-		printf $RNDpaletteFileNameNoPath
+		printf "$RNDpaletteFileNameNoPath\n"
 		# dev reference print of path to file:
 		retrievedPaletteFileName=$RNDpaletteFileName
 	fi
