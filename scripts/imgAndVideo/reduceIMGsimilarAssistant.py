@@ -69,15 +69,23 @@ current_index = 0  # Current index of the displayed image
 def display_image(index):
     global current_index
     image_files_len = len(image_files)
-    if 0 <= index < len(image_files):
-        current_index = index
-        print_index = str(current_index + 1)
-        image_file = image_files[current_index]
-        file_label.config(text=image_file + "\t(" + print_index + " of " + str(image_files_len) + ")")
-        image = tk.PhotoImage(file=image_file)
-        image_label.config(image=image)
-        image_label.photo = image
-        image_label.update_idletasks()
+    while True:
+        if 0 <= index < len(image_files):
+            current_index = index
+            print_index = str(current_index + 1)
+            image_file = image_files[current_index]
+            if os.path.isfile(image_file):
+                file_label.config(text=image_file + "\t(" + print_index + " of " + str(image_files_len) + ")")
+                image = tk.PhotoImage(file=image_file)
+                image_label.config(image=image)
+                image_label.photo = image
+                image_label.update_idletasks()
+                break
+        index += 1
+        if index >= len(image_files):
+            print("No valid images found.")
+            break
+
 
 # Function to navigate to the next image
 def next_image():
