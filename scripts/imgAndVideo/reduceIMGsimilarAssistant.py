@@ -81,6 +81,9 @@ def display_image(index):
                 image_label.photo = image
                 image_label.update_idletasks()
                 break
+            else:
+                image_files.remove(image_file)
+                image_files_len = len(image_files)
         index += 1
         if index >= len(image_files):
             print("No valid images found.")
