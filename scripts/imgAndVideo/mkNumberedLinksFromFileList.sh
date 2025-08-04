@@ -63,7 +63,7 @@ do
 	counter=$((counter + 1))
 			# ex. to pad numbers to number of digits in %0n:
 			# var=`printf "%05d\n" $element`
-	paddedNum=`printf "%0"$digitsCount"d\n" $counter`
+	paddedNum=$(printf "%0"$digitsCount"d\n" $counter)
 	echo "executing command: link ./$element ./_temp_numbered/$paddedNum.$fileNameExt"
 	link ./$element ./_temp_numbered/$paddedNum.$fileNameExt
 	# Because Cygwin can be silly with permissions (I can't use the .png images afterward without special access!) :
