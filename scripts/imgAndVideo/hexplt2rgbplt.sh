@@ -9,11 +9,6 @@
 
 
 # CODE
-# DEV NOTE
-# Much of the code in this was adapted from hexplt2ppm.sh; see the file for revelation on what all this convoluted mess is.
-# Use Python instead? But then I'd have to fuss with getting Python the full path to the script.. But, re: https://stackoverflow.com/questions/9210525/how-do-i-convert-hex-to-decimal-in-python
-# =============
-# BEGIN SETUP GLOBAL VARIABLES
 if [ ! "$1" ]; then printf "No .hexplt file name passed to script. Expected as parameter \$1."; exit 1; else paletteFile=$1; fi
 renderTargetFile=${paletteFile%.*}.rgbplt
 
@@ -28,19 +23,13 @@ then
 fi
 echo "File name $paletteFile found at $hexColorSrcFullPath! PROCEEDING. IN ALL CAPS."
 
-sed -n -e "s/^\s\{1,\}//g" -n -e "s/#\([0-9a-fA-F]\{6\}\).*/\L\1/p" $hexColorSrcFullPath > tmp_d44WYq2HHQ.hexplt
-hexColorSrcTMPpath=tmp_d44WYq2HHQ.hexplt
-ppmBodyValues=$(tr -d '\n' < $hexColorSrcTMPpath)
-rm tmp_d44WYq2HHQ.hexplt
-ppmBodyValues=$(echo $ppmBodyValues | sed 's/../& /g' | tr -d '\15\32')
-ppmBodyValues=$(echo $ppmBodyValues | sed 's/[a-zA-Z0-9]\{2\}/$((16#&))/g' | tr -d '\15\32')
-printf "echo $ppmBodyValues" > tmp_hsmwzuF64fEWmcZ2.sh
-chmod +x tmp_hsmwzuF64fEWmcZ2.sh
-ppmBodyValues=$(./tmp_hsmwzuF64fEWmcZ2.sh)
-rm tmp_hsmwzuF64fEWmcZ2.sh
-# echo $ppmBodyValues > tmp_ykSp296krZ6X.txt
-echo $ppmBodyValues | sed "s/\( \{0,1\}[0-9]\{1,\}\)\{3\}/&\n/g" > tmp_ykSp296krZ6X.txt
-sed -i 's/^ \(.*\)/\1/g' tmp_ykSp296krZ6X.txt
-# removes any resulting trailing double-newlines:
-sed '/^$/d' tmp_ykSp296krZ6X.txt > $renderTargetFile
-rm tmp_ykSp296krZ6X.txt
+# get array of colors from file by extracting all matches of a pattern of six hex digits preceded by a #:
+colorsArray=( $(grep -i -o '#[0-9a-f]\{6\}' $hexColorSrcFullPath | tr -d '#') )		# tr command removes pound symbol, and surrounding () makes it an actual array
+
+# wipe / create target file before printing to:
+printf "" > $renderTargetFile
+for color in ${colorsArray[@]}
+do
+	# nesting hex conversion echo 0x<value> with substring ${variable:startcolumn:endcolumn} :
+	echo $((0x${color:0:2})) $((0x${color:2:2})) $((0x${color:4:2})) >> $renderTargetFile
+done
