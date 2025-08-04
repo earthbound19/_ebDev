@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Converts an .rgbplt format palette (a list of RGB values, in decimal) to a list of RGB colors in hex format. This script adapted from hexplt2rgbplt.sh (see also).
+# Converts an .rgbplt format palette (a list of RGB values, in decimal) to a list of RGB colors in hex format. See also hexplt2rgbplt.sh.
 
 # USAGE
 # Run this script with one parameter, which is the .rgbplt format file to convert, e.g.:
@@ -24,7 +24,7 @@ then
 fi
 echo "File name $paletteFile found at $hexColorSrcFullPath! PROCEEDING. IN ALL CAPS."
 
-paletteFileLines=$(tr ' ' ',' < $rgbColorSrcFullPath)		# replace spaces with commas on add to array to bypass IFS confusion of space/newline as separator..
+paletteFileLines=( $(tr ' ' ',' < $rgbColorSrcFullPath) )		# replace spaces with commas on add to array to bypass IFS confusion of space/newline as separator..
 for line in ${paletteFileLines[@]}
 do
 	# .. and replace it with a space here:
