@@ -6,6 +6,7 @@
 #    python /path/to_this_script/RGBhexColorSortToDarksAndLightsIn2CIECAM02.py inputColors.hexplt
 # It will print the results to new files named darks.hexplt and lights.hexplt. You may sort those results by next nearest color via e.g. RGBhexColorSortInCIECAM02.py.
 # NOTES
+# - You may find it useful to hack the values of white_comp and black_comp to other shades of gray to split palettes into groups of colors nearer, say, to a medium-dark gray vs. a light gray.
 # - This script expects perfect data. If there's a blank line anywhere in the input file, or any other unexpected data, it may stop with an unhelpful error.
 # - This script will eliminate duplicates in the input list.
 
