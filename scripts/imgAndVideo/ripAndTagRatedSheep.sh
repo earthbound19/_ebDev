@@ -7,6 +7,7 @@
 # USAGE
 # Set the variables at the start of the script per the locations of various files in your Electric Sheep screensaver install, and run the script without any parameter:
 #    ripAndTagRatedSheep.sh
+# NOTE: at this writing list_none.xml has the newest generation and rated sheep.
 
 
 # CODE
@@ -19,9 +20,9 @@ sheep_transcodedDestPath='/c/ratedSheep'
 
 # check paths and if any does not exist, error out.
 # I wanted to hide any error print with &>/dev/null but it's not liking that in the command substitution $() :
-if [[ ! $(ls "$sheep_content_XML_path") ]]; then printf "\nERROR: path \$sheep_content_XML_path does not exist: $sheep_content_XML_path -- exit."; exit 1; fi
-if [[ ! $(ls $sheep_avis_local_path) ]]; then printf "\nERROR: path \$sheep_avis_local_path does not exist: $sheep_avis_local_path -- exit."; exit 1; fi
-if [[ ! $(ls $sheep_transcodedDestPath) ]]; then printf "\nERROR: path \$sheep_transcodedDestPath does not exist: $sheep_transcodedDestPath -- exit."; exit 1; fi
+if [ ! -f "$sheep_content_XML_path" ]; then printf "\nERROR: path \$sheep_content_XML_path does not exist: $sheep_content_XML_path -- exit."; exit 1; fi
+if [ ! -d $sheep_avis_local_path ]; then printf "\nERROR: path \$sheep_avis_local_path does not exist: $sheep_avis_local_path -- exit."; exit 2; fi
+if [ ! -d "$sheep_transcodedDestPath" ]; then printf "\nERROR: path \$sheep_transcodedDestPath does not exist: $sheep_transcodedDestPath -- exit."; exit 3; fi
 
 OIFS="$IFS"
 IFS=$'\n'
@@ -30,22 +31,24 @@ sheepses=( $(sed -n 's/.*rating=\"\([0-9]\{1,\}\)\".*url=\"\(.*\)\".*/\1 \2/p' $
 
 for element in "${sheepses[@]}"
 do
+echo
 	# get rating:
-	rating=`echo $element | sed 's/^\([0-9]\{1,\}\) .*/\1/g'`
+	rating=$(echo $element | sed 's/^\([0-9]\{1,\}\) .*/\1/g')
 		# echo rating is\: $rating
 	# get URL:
-	URL=`echo $element | sed 's/^[0-9]\{1,\} \(.*\)/\1/g'`
+	URL=$(echo $element | sed 's/^[0-9]\{1,\} \(.*\)/\1/g')
 		# echo URL is\: $URL
-	localFile=`echo $URL | sed 's/.*\/\(.*\)/\1/g'`
+	localFile=$(echo $URL | sed 's/.*\/\(.*\)/\1/g')
 	localFile="$sheep_avis_local_path/$localFile"
 		# echo local file name is\: $localFile
-	localFileNoEXT=${localFile%.*}
-		# echo local file name without extension is\: $localFileNoEXT
-	localFileNoPathOrEXT="${localFileNoEXT##*/}"
-		# echo local file name without path OR extension is\: $localFileNoPath	
+	localFileNoPath="${localFile##*/}"
+	localFileNoPathOrEXT=${localFileNoPath%.*}
+		# echo local file name without path or extension is\: $localFileNoPathOrEXT
 	# if the source file does not exist, attempt to retrieve it from archive.org:
-	if [[ ! -f $localFile ]]
+	if [[ -f $localFile ]]
 	then
+		echo " ! -- File apparently already downloaded to $localFile; skipping download."
+	else
 		# download, writing to missing local path, redirecting stdout print to null:
 		wget --no-check-certificate -O $localFile $URL &>/dev/null
 		# check if there was a download error via errorlevel; if there is, skip this loop iteration as conversion will not be possible:
@@ -53,15 +56,22 @@ do
 	fi
 	# Losslessly transcode and embed rating in metadata only if target file does not already exist:
 	# if the destination file does not exist, do stuff:
-	if [ ! -f "$sheep_transcodedDestPath""/""$localFileNoPathOrEXT"".mp4" ]
+	if [ -f "$sheep_transcodedDestPath""/""$localFileNoPathOrEXT"".mp4" ]
 	then
+		echo "! -- Target transcoded file apparently already exists; skipping transcode."
+	else
 		echo Target transcoded file does not exist\; will create . . .
-		DOSlocalFilePath=`cygpath -w $sheep_avis_local_path`
-		ffmpeg -y -i $DOSlocalFilePath""$localFileNoEXT"".avi -vcodec copy $sheep_transcodedDestPath""/""$localFileNoPathOrEXT"".mp4
-		exiftool -overwrite_original -MWG:Rating="$rating" "$sheep_transcodedDestPath""/""$localFileNoPathOrEXT"".mp4"
+		DOSlocalFilePath=$(cygpath -w $sheep_avis_local_path)
+		inpath=$(cygpath -w $localFile)
+		# echo will read from $inpath
+		outpath=$sheep_transcodedDestPath""/""$localFileNoPathOrEXT"".mp4
+		outpath=$(cygpath -w $outpath)
+		# echo will transcode to $outpath
+		ffmpeg -y -i $inpath -vcodec copy $outpath
+		exiftool -overwrite_original -MWG:Rating="$rating" $outpath
 		echo -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 	fi
 done
 
 IFS="$OIFS"
-echo Attempted to losslessly transcode and update metadata for ${#sheepses[@]} animated fractal flames.
+echo "Attempted to losslessly transcode and (if transcode was done) update metadata for ${#sheepses[@]} animated fractal flames."
