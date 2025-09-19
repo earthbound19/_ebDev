@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Creates a looped video in which all images of type $1 in the current directory are crossfaded one after another, and then the final image crossfades back to the first. Accomplishd by custom logic in this script and runs of `ffmpegCrossFadeVideos.sh` and `concatVideos.sh`. Result video renamed after this directory.
+# Creates a looped video in which all images of type $1 in the current directory are crossfaded one after another, and then the final image crossfades back to the first. Accomplished by custom logic in this script and runs of `ffmpegCrossFadeVideos.sh` and `concatVideos.sh`. Result video renamed after this directory.
 
 # WARNING
 # Intermediate videos are lossless though compressed (utvideo codec) avis, and they are much larger compared to mp4s. This script does not delete those files, as you may wish to keep any of them for archiving or resource combination purposes. If you don't want those large files, you may want to delete them afterward.
