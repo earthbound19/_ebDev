@@ -65,29 +65,60 @@ with open(file_list, "r") as file_list:
 
 current_index = 0  # Current index of the displayed image
 
+import os
+import tkinter as tk
+from PIL import Image, ImageTk  # Import Pillow for image handling
+
 # Function to display the current image
 def display_image(index):
-    global current_index
-    image_files_len = len(image_files)
-    while True:
-        if 0 <= index < len(image_files):
-            current_index = index
-            print_index = str(current_index + 1)
-            image_file = image_files[current_index]
-            if os.path.isfile(image_file):
-                file_label.config(text=image_file + "\t(" + print_index + " of " + str(image_files_len) + ")")
-                image = tk.PhotoImage(file=image_file)
-                image_label.config(image=image)
-                image_label.photo = image
-                image_label.update_idletasks()
-                break
-            else:
-                image_files.remove(image_file)
-                image_files_len = len(image_files)
-        index += 1
-        if index >= len(image_files):
-            print("No valid images found.")
-            break
+   global current_index
+   image_files_len = len(image_files)
+   while True:
+       if 0 <= index < len(image_files):
+           current_index = index
+           print_index = str(current_index + 1)
+           image_file = image_files[current_index]
+           if os.path.isfile(image_file):
+               file_label.config(text=image_file + "\t(" + print_index + " of " + str(image_files_len) + ")")
+               
+               # Open the image using Pillow
+               pil_image = Image.open(image_file)
+               width, height = pil_image.size
+               screen_width = image_label.winfo_screenwidth()
+               screen_height = image_label.winfo_screenheight()
+               
+               # Maintain aspect ratio and fit to nearly the greatest available display dimension
+               downscale_factor = 0.9
+               if width > screen_width or height > screen_height:
+                   if width > screen_width:
+                       new_width = int(screen_width * downscale_factor)
+                       new_height = int(new_width * (height / width) * downscale_factor)
+                   else:
+                       new_height = int(screen_height * downscale_factor)
+                       new_width = int(screen_height * (width / height) * downscale_factor)
+               else:
+                   new_width, new_height = width, height
+               
+               # Resize the image using Pillow without antialiasing
+               resized_image = pil_image.resize((new_width, new_height))
+               
+               # Convert the PIL image to a Tkinter-compatible format
+               tk_image = ImageTk.PhotoImage(resized_image)
+               
+               # Update the image label with the resized image
+               image_label.config(image=tk_image)
+               image_label.photo = tk_image
+               image_label.update_idletasks()
+               break
+           else:
+               image_files.remove(image_file)
+               image_files_len = len(image_files)
+       index += 1
+       if index >= len(image_files):
+           print("No valid images found.")
+           break
+
+
 
 
 # Function to navigate to the next image
