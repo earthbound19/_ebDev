@@ -9,9 +9,11 @@
 : Sets date and time stamp with 24Hr time down to the second
 
 @ECHO OFF
-set datestamp=%date:~-4%_%date:~-10,-8%_%date:~-7,-5%__%time:~0,2%_%time:~3,2%_%time:~6,2%
+set datestamp=%date%__%time:~0,2%_%time:~3,2%_%time:~6,2%
 
 wia-cmd-scanner /w 215.9 /h 279.4 /dpi 100 /color GRAY /format PNG /output ".\SCAN_%datestamp%.png"
+; OR e.g. for a 300 dpi color scan:
+; wia-cmd-scanner /w 215.9 /h 279.4 /dpi 300 /color RGB /format PNG /output ".\SCAN_%datestamp%.png"
 
 : OR to modify this to scan a color image at 600 dpi:
 : wia-cmd-scanner /w 213.87 /h 294.89 /dpi 600 /color RGB /format PNG /output ".\SCAN_%datestamp%.png"
