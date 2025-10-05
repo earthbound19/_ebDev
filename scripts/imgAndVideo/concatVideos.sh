@@ -41,8 +41,8 @@ fi
 
 rndString=$(randomString.sh 1 14)
 concatenatedVideoFileName=_"$vidExt"sConcatenated_"$rndString"\.$vidExt
-ffmpeg -f concat -i $srcFileList -c copy $concatenatedVideoFileName
+ffmpeg -f concat -safe 0 -i $srcFileList -c copy $concatenatedVideoFileName
 
-rm $srcFileList
+# rm $srcFileList
 
 echo "DONE. See result file $concatenatedVideoFileName and move or copy it where you will. NOTE: If you got an error about not finding all_mp4.txt (or similar), it may be that you're in a folder path and/or you have file names that are far to long, and you need to shorten them and move the folder to the root of a drive and try again."
