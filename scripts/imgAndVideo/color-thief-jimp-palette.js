@@ -1,5 +1,8 @@
 // DESCRIPTION
-// Intended for CLI use. Extracts dominant color and a palette of an arbitrary number of colors from an image, printing to stdout.
+// Intended for CLI use. Extracts dominant color and a palette of an arbitrary number of colors from an image, as sRGB hex color codes, printing to stdout.
+
+// DEPENDENCIES
+// nodejs and the "color thief jimp" library.
 
 // USAGE
 // Run from the same directory with the image you wish to obtain a palette, using these parameters:
@@ -10,6 +13,8 @@
 // NOTES
 // - it will error out if you try to extract only 1 color.
 // - it doesn't seem to return the requested number of colors consistently if you request 4 or fewer; you may get 3 or 4 colors on requesting 2, for example.
+// - may be able to extract colors from images at remote locations (web URLs). see comments in code.
+
 
 // CODE
 var ColorThief = require('color-thief-jimp');
@@ -23,6 +28,12 @@ Jimp.read('./' + process.argv[2], (err, sourceImage) => {
     // TO GET dominant color:
     // var dominantColor = ColorThief.getColorHex(sourceImage);
     // console.log('dominant color found is [HEX]:\n' + dominantColor);
+	// TO GET binary sRGB triplets?
+	// const { getPaletteFromURL } = require('color-thief-node');
+	// TO GET dominant color from an image at a URL? :
+	// (async () => {const dominantColor = await getColorFromURL(process.argv[2]);})();
+	// TO GET a palette from an image at a URL? :
+	// (async () => {const colorPallete = await getPaletteFromURL(process.argv[2], 6);})();
   var palette = ColorThief.getPaletteHex(sourceImage, process.argv[3]);
     // console.log('color palette extracted is [HEX]:');
   for (const idx in palette) {
@@ -30,15 +41,4 @@ Jimp.read('./' + process.argv[2], (err, sourceImage) => {
   }
 });
 
-// ALTERNATE LIBRARY OPTION; is binary RGB triplets that I would want to convert to hex:
-// const { getPaletteFromURL } = require('color-thief-node');
-
-// (async () => {
-    // const dominantColor = await getColorFromURL(process.argv[2]);
-// })();
-
-// (async () => {
-    // const colorPallete = await getPaletteFromURL(process.argv[2], 6);
-	// console.log(colorPallete);
-// })();
 
