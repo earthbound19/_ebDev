@@ -55,7 +55,6 @@ then
 else
 	imageType=$1
 fi
-
 if ! [ "$2" ] || [ "$2" == "AUTO" ]
 then
 	echo ""
@@ -68,13 +67,12 @@ else
 	echo ""
 	echo "Will tile montage $tilesAcross tiles across."
 fi
-
     # Get dimensions of first image of type $1 found.
     # -printf '%f\n' chops off the ./ at the start which we don't want:
-firstImage=$(find . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | head -n 1)
+firstImage=$(find . -maxdepth 1 -type f -name "*.$imageType" -printf '%f\n' | head -n 1)
 originalIMGwidth=$(gm identify -format "%w" $firstImage)
 originalIMGheight=$(gm identify -format "%h" $firstImage)
-numImagesFound=$(find . -maxdepth 1 -type f -name "*.png" -printf '%f\n' | wc -l)
+numImagesFound=$(find . -maxdepth 1 -type f -name "*.$imageType" -printf '%f\n' | wc -l)
 SQRTofNumImagesFound=$(echo "scale=0; sqrt($numImagesFound) + 1" | bc)
 
 if [ "$3" ]
