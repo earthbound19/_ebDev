@@ -101,3 +101,5 @@ with open(concatenation_list_filename, 'w') as concat_file:
             next_file = files.pop(0)
             # add the used file to the used_files list
             used_files.add(next_file)
+
+print(f'\nDONE. New list file name is {concatenation_list_filename}. You may use e.g. this script and command to make an animation from them:\n\n    concatVideos.sh mp4 {concatenation_list_filename}\n')
