@@ -12,7 +12,8 @@
 # Or to override to an mp4 extension / container, run:
 #    allVideo2VideoLossless.sh mp4
 # NOTES
-# If you have a .mov container as source with PCM sound and attempt to copy the streams to target mp4 format, you may get an error copying (maybe mp4 files can't have PCM audio, it seems). In that case try `copyVidLosslessEncodeSound.sh` or `copyVidLosslessEncodeSoundAllType.sh`, or try an mk4 container.
+# - if you have a .mov container as source with PCM sound and attempt to copy the streams to target mp4 format, you may get an error copying (maybe mp4 files can't have PCM audio, it seems). In that case try `copyVidLosslessEncodeSound.sh` or `copyVidLosslessEncodeSoundAllType.sh`, or try an mk4 container.
+# - conversion from .mov to .mkv may not maintain image rotation flags, and conversion from .mov to .mk4 may.
 
 
 # CODE
@@ -38,6 +39,7 @@ do
 	# convert only if render target does not already exist; otherwise skip:
 	if [ ! -f $renderTarget ]
 	then
+		# something that might be tried here that may preclude metadata copy in the step after is adding metadata copy flags: ffmpeg -y -i $fileName -c copy -movflags use_metadata_tags $renderTarget
 		ffmpeg -y -i $fileName -c copy $renderTarget
 		# copy metadata from source file to render target; the script also updates target timestamp to match metadata media creation date:
 		copyMetadataFromSourceFileToTarget.sh $fileName $renderTarget FNEORN
