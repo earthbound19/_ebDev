@@ -21,3 +21,9 @@ build/
 !/scripts/processing/color_permutations_on_field/*.svg
 !/scripts/processing/glyph_combinatronics/*.svg
   # END SVG AND PNG HANDLING
+  # start text filtering excludes
+A.txt
+B.txt
+C.txt
+removed_from_B.txt
+  # end text filtering excludes
