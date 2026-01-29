@@ -2,6 +2,14 @@
 // Has function and simple-ish demo functionality to retrieve color palette from an API and use it in very simple generative art.
 
 // Global variables
+String scriptVersion = "1.7.0";
+
+int numberOfRandomShapesToDraw = 5;
+int countOfDrawnShapes = 0;
+
+// if set to true, sets of random shapes of count numberOfRandomShapesToDraw will be made, saved, the canvas cleared, and another made and saved, until the program is terminated:
+boolean generateAndSaveInfiniteVariants = true;
+
 boolean RNDcolorMode = true;
 color[] Colors;
 color[] Prismacolors = {
@@ -30,14 +38,35 @@ PShape currentShape;
 
 // Set up the canvas
 void setup() {
+  pixelDensity(1);
   size(800, 800); // Example size, adjust as needed
   setRNDcolors(); // Initialize colors
-  generateRandomGeometry(); // Generate initial geometry
+  // background(255);
+  background(Colors[int(random(Colors.length))]);
 }
 
 // Main draw loop
 void draw() {
-  background(255);
+  if (countOfDrawnShapes < numberOfRandomShapesToDraw) {
+    generateRandomGeometry();
+    countOfDrawnShapes += 1;
+  } else {
+    saveCurrentComposition();
+    if (generateAndSaveInfiniteVariants == true && countOfDrawnShapes == numberOfRandomShapesToDraw) {
+      currentShape = createShape();   // else a straggling shape render in a next intended shape
+      setRNDcolors();
+      // pick a random color for the background and, perhaps erroneously assuming it is non-gray, "dim" / barely shift the color's HSL (according to built-in HSL color math) a bit so that if by chance the program would randomly draw a foreground shape the same color as the background, the background might be different:
+      color rndBGcolor = Colors[int(random(Colors.length))];
+      float hVal = hue(rndBGcolor);
+      float sVal = saturation(rndBGcolor);
+      float bVal = brightness(rndBGcolor);
+      colorMode(HSB, 100);  // Use HSB with scale of 0-100
+      rndBGcolor = color(hVal - 3, sVal - 11, bVal - 7);
+      fill(rndBGcolor,255);
+      rect(0,0,width,height); 
+      countOfDrawnShapes = 0;
+    }
+  }
   if (currentShape != null) {
     shape(currentShape, 0, 0);
   }
@@ -56,28 +85,27 @@ void keyPressed() {
 void saveCurrentComposition() {
   if (currentShape != null) {
     String timestamp = str(year()) + nf(month(), 2) + nf(day(), 2) + "_" + nf(hour(), 2) + nf(minute(), 2) + nf(second(), 2);
-    saveFrame("output_" + timestamp + ".png");
-    PShapeSVG svg = (PShapeSVG) currentShape;
-    // svg.save("output_" + timestamp + ".svg");
+    saveFrame(timestamp + "__colorsFrom_ebPaletteAPI_" + scriptVersion + ".png");
+    // TO DO: svg save
   }
 }
 
 // Function to generate random geometry
 void generateRandomGeometry() {
+  noStroke();
   currentShape = createShape();
+  if (Colors != null && Colors.length > 0) {
+    currentShape.setFill(Colors[int(random(Colors.length))]);
+  }
+
   currentShape.beginShape();
-  int vertexCount = int(random(3, 10)); // Example random geometry
+  int vertexCount = int(random(3, 7));
   for (int i = 0; i < vertexCount; i++) {
     float x = random(width);
     float y = random(height);
     currentShape.vertex(x, y);
   }
   currentShape.endShape(CLOSE);
-
-  // Randomly color the shape
-  if (Colors != null && Colors.length > 0) {
-    currentShape.setFill(Colors[int(random(Colors.length))]);
-  }
 }
 
 // Function to set colors, retrieving from API or using fallback
