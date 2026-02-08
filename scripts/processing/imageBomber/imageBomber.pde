@@ -1,6 +1,5 @@
 // DESCRIPTION
-// rnd images processing
-// Supply images which are all the same dimensions in a subfolder (see USAGE), and this Processing script will randomly position, rotate, and scale them, one after another, as rapidly as you instruct it to, into a new image. It will optionally save animation images of the process, or interactively save any still which you tell it to.
+// Supply images which are all the same dimensions in a subfolder (see USAGE), and this Image Bomber Processing script will randomly position, rotate, and scale them, one after another, as rapidly as you instruct it to, into a new image. Definition sets of images to bomb may be configured in layers. It will optionally save animation images of the process, or interactively save any still which you tell it to.
 
 // NO COPYRIGHT
 // This is my original code and I dedicate it to the Public Domain. 2026-02-06 Richard Alexander Hall
@@ -11,20 +10,19 @@
 // - On run of script, you may press the space bar or a mouse button to save a still of what is displayed. The still is named like this: _rnd_images_processing_v1-0-0__anim_run__seed_1409989632_fr_0000000315.png. You might think that file name has too much information. It doesn't. It is all the information required to reproduce exactly the same image again should you want to (provided the same script version, seed, and source image set).
 
 
-
 // CODE
-// BEGIN GLOBAL VARIABLES WHICH YOU MAY ALTER PER YOUR PREFERENCE
-String imageBomberSetsBaseFolderName = "image_bomber_sets";  // main folder in which subfolders of image bomber sets are. Expected to contain subfolders. Must be in the same folder as this script. All images must be in png format with a lowercase extension. All images must also be the same dimensions. PNG transparency is supported.
-String imagesSubfolderName; // MUST BE SET MANUALLY at least once in setup(); name of folder in which images are available, and expected to be appended to the previous variable like: imageBomberSetsBaseFolderName + "/(subfolder_name)".
+// BEGIN GLOBAL VARIABLES AND CLASSES WHICH YOU SHOULD NOT ALTER unless you are me or you know what you might break if you alter them:
+String JSONconfigFileName = "imageBomberDefaultConfig.json";
+JSONObject globalConfigJSON;
+JSONArray gridConfigsJSON;
+
 // TO DO:
 // - optional random palette retrieval and recoloring of colorizable source rasters (or SVGs??)
-float minimumScaleMultiplier = 0.19;    // minimum amount to randomly scale images down to. It's a multiplier; for example if the source image width is 600, then 600 * 0.27 = 162 px minimum width. Suggested values: 0.15 to 0.27. If smaller max like 0.27, suggest this at 0.081.
-float maximumScaleMultiplier = 1;   // maximum amount to randomly scale images up to. Can constrain larger images to a smaller maximum. Not recommended to exceed 1, unless you anticipate images looking good scaled up.
-float minimumSquishMultiplier = 0.87;
-float maximumSquishMultiplier = 1.13;   // If you want a range that's stretched (or squished) and admitting normal, set this to 1. You can also set this to more than one to have "squished" to "stretch" range.
-boolean squishImages = true;    // if set to true, after image size is randomly proportionally scaled down, image widths and heights are further randomly altered without respect for maintaining aspect (a square may be squished or stretched to a rectangle), within constraints of minimumSquishMultiplier (minimum) to maximumSquishMultiplier (maximum). If set to false, no squishing will occur and images will remain at original proportion. Note that you may set a maximumSquishMultiplier below 1 for images to always be squished at least to some amount.
-color backgroundColor = color(144,145,145);   // alter the three integer RGB values in that to customize. For neutral (as perceived by humans) gray, set all three values to 156. (To set them all to one value, use e.g. color(156); )
-boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly.
+// - don't exit the program, just skip draw if non-negative stopAtFrame is reached? BUT THEN also how to handle that if:
+// - have a mode to make variations infinitely until program termination
+// - randomRotationDegrees in config
+// - global variables init from global_settings object in imported JSON
+boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly. A dedicated seed will result in the same pseudo-randomness and result image every time, given the same image resources and grid configurations.
 int overrideSeed = -289762560;  // seed of first feature complete version demo output is -289762560. Another early used seed: 936942080
 boolean saveFrames = false;    // set to true to save animation frames (images)
 int frameRate = 60;  // how many frames per second to display changes to art. But if saveFrames is set to true, this is not used: Processing built-in frameRate function will not be called, and therefore the default no max or no throttle framerate will be used.
@@ -33,14 +31,11 @@ boolean useCustomCanvasSize = true;    // if set to true, the next values will b
 int customCanvasWidth = 1920;  // set to any arbitrary height you want for the complete, composite image. for 1.33 aspect, suggest 1280
 int customCanvasHeight = 1080;  // set to any arbitrary width you want for ". for 1.33 aspect, suggest 960
 int stopAtFrame = -1;   // Processing program will exit after this many animation frames. If set to a negative number, the program runs forever until you manually stop it. If set to 0 it makes 1 frame regardless, because of the way the draw() and exit() functions work: exit() waits for draw() to finish. 764 may be a good number for this if you use a positive value. NOTES: intended use with this value and a gridIterator class is that the gridIterator keeps making images over cell areas of nested finer grids until stopAtFrame is reached. If stopAtFrame is -1 then a gridIterator will not be used.
-int nextCellAtElementCount = 8;    // when this count is reached, nextCell() is called
-int drawnCellElements = 0;    // for counting drawn elements to check against nextCellAtElementCount
 // DERIVED GLOBALS
 int seed = overrideSeed;  // this will be changed if booleanOverrideSeed is set to false
-// END GLOBAL VARIABLES WHICH YOU MAY ALTER PER YOUR PREFERENCE
 
+color backgroundColor = color(144,145,145);   // alter the three integer RGB values in that to customize. For neutral (as perceived by humans) gray, set all three values to 156. (To set them all to one value, use e.g. color(156); )
 
-// BEGIN GLOBAL VARIABLES AND CLASSES WHICH YOU SHOULD NOT ALTER unless you are me or you know what you might break if you alter them:
 String scriptVersionString = "1-1-3";
 
 String animFramesSaveDir;
@@ -51,6 +46,15 @@ class GridIterator {
   // Grid dimensions
   int cols, rows;
   
+  float minimumScaleMultiplier;     // minimum amount to randomly scale images down to. It's a multiplier; for example if the source image width is 600, then 600 * 0.27 = 162 px minimum width. Suggested values: 0.15 to 0.27. If smaller max like 0.27, suggest this at 0.081.
+  float maximumScaleMultiplier;     // maximum amount to randomly scale images up to. Can constrain larger images to a smaller maximum. Not recommended to exceed 1, unless you anticipate images looking good scaled up.
+  float minimumSquishMultiplier;
+  float maximumSquishMultiplier;    // If you want a range that's stretched (or squished) and admitting normal, set this to 1. You can also set this to more than one to have "squished" to "stretch" range.
+  boolean squishImagesBool;             // if set to true, after image size is randomly proportionally scaled down, image widths and heights are further randomly altered without respect for maintaining aspect (a square may be squished or stretched to a rectangle), within constraints of minimumSquishMultiplier (minimum) to maximumSquishMultiplier (maximum). If set to false, no squishing will occur and images will remain at original proportion. Note that you may set a maximumSquishMultiplier below 1 for images to always be squished at least to some amount.
+  
+  int elementsPerCell;   // when this count is reached, nextCell() is called
+  int drawnCellElements;        // for counting drawn elements to check against elementsPerCell
+
   // Current cell position
   int currentCol, currentRow;
   
@@ -60,6 +64,8 @@ class GridIterator {
   // Grid total boundaries; gridX1 and gridY1 are the coordinate of the upper left corner of the grid.
   int gridX1, gridY1, gridX2, gridY2;
   
+  String imagesPath;
+
   // Cell dimensions
   int cellWidth, cellHeight;
 
@@ -72,18 +78,26 @@ class GridIterator {
   int widthOfImagesInArrayList;
   int heightOfImagesInArrayList;
 
-  GridIterator(int gridX1, int gridY1, int gridX2, int gridY2, int cols, int rows, String imagesSubfolderName) {
-    this.gridX1 = gridX1;
-    this.gridY1 = gridY1;
-    this.gridX2 = gridX2;
-    this.gridY2 = gridY2;
-    this.cols = cols;
-    this.rows = rows;
-    
+  // initialized with a JSON object imported from (by default) imageBomberDefaultConfig.json or any other JSON
+  GridIterator(JSONObject gridJSON) {
+    this.gridX1 = gridJSON.getInt("gridX1");
+    this.gridY1 = gridJSON.getInt("gridY1");
+    this.gridX2 = gridJSON.getInt("gridX2");
+    this.gridY2 = gridJSON.getInt("gridY2");
+    this.cols = gridJSON.getInt("cols");
+    this.rows = gridJSON.getInt("rows");
     // Calculate cell dimensions
     cellWidth = gridX2 / cols;
     cellHeight = gridY2 / rows;
-    
+    this.minimumScaleMultiplier = gridJSON.getFloat("minScale");
+    this.maximumScaleMultiplier = gridJSON.getFloat("maxScale");
+    this.minimumSquishMultiplier = gridJSON.getFloat("minSquish");
+    this.maximumSquishMultiplier = gridJSON.getFloat("maxSquish");
+    this.squishImagesBool = gridJSON.getBoolean("squishImagesBool");
+    this.imagesPath = gridJSON.getString("imagesPath");
+    this.elementsPerCell = gridJSON.getInt("elementsPerCell");
+    this.drawnCellElements = 0;
+
     // Start at first cell (column 0, row 0)
     reset();
     updateCellBounds();
@@ -93,7 +107,8 @@ class GridIterator {
     allImagesList = new ArrayList<PImage>();
     
     // logic to create array of png file names from subfolder /source_files:
-    String path = sketchPath() + "/" + imagesSubfolderName;
+    String path = sketchPath() + "/" + imagesPath;
+
     ArrayList<File> allFiles = listFilesRecursive(path);
     
     // Filter that list to only the image files we want, and add them to the image array:
@@ -109,13 +124,9 @@ class GridIterator {
       }
     }
 
-    // INITIALIZE DERIVED GLOBALS
     imagesArrayListLength = allImagesList.size() - 1;   // -1 because it will be used with zero-based indexing
     widthOfImagesInArrayList = allImagesList.get(0).width;
     heightOfImagesInArrayList = allImagesList.get(0).height;
-    // print("imagesArrayListLength: " + imagesArrayListLength + "\n");
-    // print("widthOfImagesInArrayList: " + widthOfImagesInArrayList + "\n");
-    // print("heightOfImagesInArrayList: " + heightOfImagesInArrayList + "\n");
   }
   
   // Reset to first cell (column 0, row 0)
@@ -153,7 +164,7 @@ class GridIterator {
         currentRow = 0;
         print("currentRow was updated to: " + currentRow + "\n");
         wrappedPastLastRow = true;
-        print("set wrappedPastLastRow to true, as currentRow wrapped and was reset to zero.");
+        print("set wrappedPastLastRow to true, as currentRow wrapped and was reset to zero.\n");
       }
     }
     
@@ -187,21 +198,28 @@ class GridIterator {
     float scaled_height = (int) heightOfImagesInArrayList * width_and_height_scalar;
 
     // if boolean instructs to do so, alter dimensions to random squish:
-    if (squishImages == true) {
+    if (squishImagesBool == true) {
       float widthSquishMultiplier = random(minimumSquishMultiplier, maximumSquishMultiplier);
       scaled_width = (int) scaled_width * widthSquishMultiplier;
     }
 
     image(allImagesList.get(rnd_imagesArray_idx), xCenter, yCenter, scaled_width, scaled_height);
+
+    drawnCellElements += 1;
+    // FIX: using == here leads to unentended result of wrappedPastLastRow set to true; using >= avoids that:
+    if (drawnCellElements >= elementsPerCell) {
+      nextCell();
+      drawnCellElements = 0;
+    }
     //popMatrix();  // you need to uncomment this if you animate things. If you don't animate things, it isn't necessary. I think.
   }
-
 }
 
 // OUTSIDE SETUP, DECLARE ArrayList of GridIterators:
 GridIterator grid_iterator;   // main instance of class to which instances in the following array will be assigned by reference for convenience
 ArrayList<GridIterator> grid_iterators;    // grid_iterators to be used in succession per previous comment
 // END GLOBAL VARIABLES AND CLASSES WHICH YOU SHOULD NOT ALTER
+
 
 // Function that handles values etc. for new animated variation to be displayed:
 void prepareNextVariation() {
@@ -223,7 +241,6 @@ void prepareNextVariation() {
       animFramesSaveDir = "_rnd_images_processing__anim_run__v" + scriptVersionString + "_seed__" + seed;
     	print("animFramesSaveDir value: " + animFramesSaveDir + "\n");
     }
-    
 }
 
 
@@ -249,6 +266,61 @@ ArrayList<File> listFilesRecursive(String dir) {
   return fileList;
 }
 
+// loads external config file to initialize globals and grid iterators:
+void loadConfiguration() {
+  // attempt external JSON config file load
+  try {
+    globalConfigJSON = loadJSONObject(JSONconfigFileName);
+    // if load config failed, exit with print of error
+  } catch (Exception e) {
+    print("ERROR: Could not load " + JSONconfigFileName + ". Message: " + e);
+    print("Please create that file or examine it for validity.");
+    exit();
+  }
+
+  try {
+    gridConfigsJSON = globalConfigJSON.getJSONArray("grid_configs");
+    print("Configuration file " + JSONconfigFileName + " loaded successfully. Found " + gridConfigsJSON.size() + " grid configs.");
+  // if assignment failed, exit with print of error
+  } catch (Exception e) {
+    print("ERROR: Could not initialize grid configuration from in-memory JSON object. Message: " + e);
+    print("Please check the source JSON grid configuration (\"grid_configs\" array).");
+    exit();
+  }
+
+  try {
+    globalConfigJSON = globalConfigJSON.getJSONObject("global_settings");
+    print("Global settings in-memory JSON object loaded successfully.");
+  // if assignment failed, exit with print of error
+  } catch (Exception e) {
+    print("ERROR: Could not initialize global settings from in-memory JSON object. Message: " + e);
+    print("Please check the source JSON global configuration (\"global_settings\" object).");
+    exit();
+  }
+  
+  // TO DO: attempt global variables (re)init from JSON
+
+  // attempt grid_iterator object init from JSON config
+  grid_iterators = new ArrayList<GridIterator>();
+  
+  for (int i = 0; i < gridConfigsJSON.size(); i++) {
+    try {
+      JSONObject gridJSON = gridConfigsJSON.getJSONObject(i);
+      GridIterator grid = new GridIterator(gridJSON);
+      grid_iterators.add(grid);
+      println("Created grid: " + gridJSON.getString("name"));
+      
+    } catch (Exception e) {
+      println("ERROR creating grid iterator from config " + i + ": " + e);
+      println("Skipping this grid configuration.");
+    }
+  }
+  
+  if (grid_iterators.isEmpty()) {
+    println("FATAL: No valid grid iterators created.");
+    exit();
+  }
+}
 
 void settings() {
   pixelDensity(1);    // or (2) for high def/dotpitch screens?
@@ -263,27 +335,9 @@ void settings() {
 void setup() {
   imageMode(CENTER);   // default is (CENTER)
   background(backgroundColor);
-  
-  grid_iterators = new ArrayList<GridIterator>();
-
-  // class constructor reference: GridIterator(int gridX1, int gridY1, int gridX2, int gridY2, int cols, int rows, String imagesSubfolderName)
-  imagesSubfolderName = imageBomberSetsBaseFolderName + "/25_shades_of_gray_circles";
-  // imagesSubfolderName = imageBomberSetsBaseFolderName + "/palette_swatches_cherry_plum_tree_bloom_03";
-  GridIterator tempGrid = new GridIterator(0, 0, width, height, 6, 3, imagesSubfolderName);
-  grid_iterators.add(tempGrid);
-
-  imagesSubfolderName = imageBomberSetsBaseFolderName + "/16_max_chroma_med_light_hues_reg_intervals_circles";
-  // imagesSubfolderName = imageBomberSetsBaseFolderName + "/rainbow_paint_daubs_2.0";
-  tempGrid = new GridIterator(0, 0, width, height, 10, 6, imagesSubfolderName);
-  grid_iterators.add(tempGrid);
-  
-  imagesSubfolderName = imageBomberSetsBaseFolderName + "/25_shades_of_gray_circles";
-  tempGrid = new GridIterator(0, 0, width, height, 14, 8, imagesSubfolderName);
-  grid_iterators.add(tempGrid);
-
-  grid_iterator = grid_iterators.get(0);
-
   prepareNextVariation();
+  loadConfiguration();
+  grid_iterator = grid_iterators.get(0);
 }
 
 
@@ -296,12 +350,6 @@ if (grid_iterators.size() > 0) {
     // to draw an element at any randomly selected place on the canvas in a range:
     // drawRNDelement(int xMin, int xMax, int yMin, int yMax)
     grid_iterator.drawRNDelement();
-    drawnCellElements += 1;
-    // FIX: using == here leads to unentended result of wrappedPastLastRow set to true; using >= avoids that:
-    if (drawnCellElements >= nextCellAtElementCount) {
-      grid_iterator.nextCell();
-      drawnCellElements = 0;
-    }
 
     if (grid_iterator.wrappedPastLastRow == true) {
       print("------------------------------ WRAPPED AROUND FROM LAST ROW of grid_iterator! ------------------------------\n");
@@ -309,12 +357,6 @@ if (grid_iterators.size() > 0) {
       if (grid_iterators.size() > 0) {
         // assign the next grid_iterator if there is any left, then do other relevant things:
         grid_iterator = grid_iterators.get(0);
-        // TO DO: move these values into grid_iterator for desired scale regardless; this is inline / hacky / hard to measure:
-        nextCellAtElementCount = int(nextCellAtElementCount * 0.38);
-        // FIX: Ensure at least 1, else unentended result is wrappedPastLastRow set to true:
-        if (nextCellAtElementCount < 1) {nextCellAtElementCount = 1;}
-        minimumScaleMultiplier = minimumScaleMultiplier * 0.21;
-        maximumScaleMultiplier = maximumScaleMultiplier * 0.54;
       }
     }
 
