@@ -13,17 +13,17 @@
 // CODE
 // BEGIN GLOBAL VARIABLES AND CLASSES WHICH YOU SHOULD NOT ALTER unless you are me or you know what you might break if you alter them:
 String JSONconfigFileName = "imageBomberDefaultConfig.json";
-JSONObject globalConfigJSON;
-JSONArray gridConfigsJSON;
+JSONObject allImportedJSON;       // intended to store everything imported from JSONconfigFileName 
+JSONObject globalsConfigJSON;     // stores JSON global value overrides object extracted from allImportedJSON
+JSONArray gridConfigsJSON;        // stores JSON grid config values extracted from allImportedJSON
 
 // TO DO:
 // - optional random palette retrieval and recoloring of colorizable source rasters (or SVGs??)
 // - don't exit the program, just skip draw if non-negative stopAtFrame is reached? BUT THEN also how to handle that if:
 // - have a mode to make variations infinitely until program termination
 // - randomRotationDegrees in config
-// - global variables init from global_settings object in imported JSON
-boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly. A dedicated seed will result in the same pseudo-randomness and result image every time, given the same image resources and grid configurations.
-int overrideSeed = -289762560;  // seed of first feature complete version demo output is -289762560. Another early used seed: 936942080
+boolean booleanOverrideSeed = false;    // if set to true, intOverrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly. A dedicated seed will result in the same pseudo-randomness and result image every time, given the same image resources and grid configurations.
+int intOverrideSeed = -289762560;  // seed of first feature complete version demo output is -289762560. Another early used seed: 936942080
 boolean saveFrames = false;    // set to true to save animation frames (images)
 int frameRate = 60;  // how many frames per second to display changes to art. But if saveFrames is set to true, this is not used: Processing built-in frameRate function will not be called, and therefore the default no max or no throttle framerate will be used.
 boolean useFrameRate = false;  // if set to true, frameRate value will be used via call of Processing built-in function frameRate(n). But if saveFrames is set to true, behavior overrides so that frameRate value will not be used (as noted on previous line).
@@ -32,11 +32,11 @@ int customCanvasWidth = 1920;  // set to any arbitrary height you want for the c
 int customCanvasHeight = 1080;  // set to any arbitrary width you want for ". for 1.33 aspect, suggest 960
 int stopAtFrame = -1;   // Processing program will exit after this many animation frames. If set to a negative number, the program runs forever until you manually stop it. If set to 0 it makes 1 frame regardless, because of the way the draw() and exit() functions work: exit() waits for draw() to finish. 764 may be a good number for this if you use a positive value. NOTES: intended use with this value and a gridIterator class is that the gridIterator keeps making images over cell areas of nested finer grids until stopAtFrame is reached. If stopAtFrame is -1 then a gridIterator will not be used.
 // DERIVED GLOBALS
-int seed = overrideSeed;  // this will be changed if booleanOverrideSeed is set to false
+int seed = intOverrideSeed;  // this will be overwritten with a random seed if booleanOverrideSeed is set to false
 
-color backgroundColor = color(144,145,145);   // alter the three integer RGB values in that to customize. For neutral (as perceived by humans) gray, set all three values to 156. (To set them all to one value, use e.g. color(156); )
+color backgroundColorWithAlpha = color(144,145,145,255);   // alter the three integer RGB values and alpha in that to customize. For neutral (as perceived by humans) gray, set all three RGB values to 145.
 
-String scriptVersionString = "1-1-3";
+String scriptVersionString = "2-16-0";
 
 String animFramesSaveDir;
 int countedFrames = 0;
@@ -220,11 +220,10 @@ GridIterator grid_iterator;   // main instance of class to which instances in th
 ArrayList<GridIterator> grid_iterators;    // grid_iterators to be used in succession per previous comment
 // END GLOBAL VARIABLES AND CLASSES WHICH YOU SHOULD NOT ALTER
 
-
 // Function that handles values etc. for new animated variation to be displayed:
 void prepareNextVariation() {
   if (booleanOverrideSeed == true) {
-    seed = overrideSeed;
+    seed = intOverrideSeed;
     booleanOverrideSeed = false;
   } else {
     seed = (int) random(-2147483648, 2147483647);
@@ -242,7 +241,6 @@ void prepareNextVariation() {
     	print("animFramesSaveDir value: " + animFramesSaveDir + "\n");
     }
 }
-
 
 // I here adapt a function by Daniel Shiffman which recursively traverses subdirectories; the "ArrayList<File> a" is passed by reference (directly modifies the Arraylist), I think:
 void recurseDir(ArrayList<File> a, String dir) {
@@ -266,20 +264,69 @@ ArrayList<File> listFilesRecursive(String dir) {
   return fileList;
 }
 
-// loads external config file to initialize globals and grid iterators:
-void loadConfiguration() {
+// loads external config file to initialize globals and grid iterators. Call before initGrids() or overrideGlobals(), but they are coded to call this if globalsConfigJSON is null:
+void loadConfigurationJSON() {
   // attempt external JSON config file load
   try {
-    globalConfigJSON = loadJSONObject(JSONconfigFileName);
+    allImportedJSON = loadJSONObject(JSONconfigFileName);
     // if load config failed, exit with print of error
   } catch (Exception e) {
     print("ERROR: Could not load " + JSONconfigFileName + ". Message: " + e);
     print("Please create that file or examine it for validity.");
     exit();
   }
+}
 
+// obtains JSON values from "global_settings" object and, for any of them which do not have a null value, overiddes hard-coded globals in this script with their value from the corresponding JSON object's field; e.g. if the "boolanSaveFrames" field is "true" or "false" instead of null, it uses that "true" or "false" value:
+void overrideGlobals() {
   try {
-    gridConfigsJSON = globalConfigJSON.getJSONArray("grid_configs");
+    if (allImportedJSON == null) {loadConfigurationJSON();}
+    globalsConfigJSON = allImportedJSON.getJSONObject("global_settings");
+    print("Global settings in-memory JSON object loaded successfully.");
+    // Check if a key exists and is not null; assign value from it if so; this is cumbersome but eh?
+    if (globalsConfigJSON.hasKey("booleanOverrideSeed") && !globalsConfigJSON.isNull("booleanOverrideSeed")) {
+      booleanOverrideSeed = globalsConfigJSON.getBoolean("booleanOverrideSeed");
+    }
+    if (globalsConfigJSON.hasKey("intOverrideSeed") && !globalsConfigJSON.isNull("intOverrideSeed")) {
+      intOverrideSeed = globalsConfigJSON.getInt("intOverrideSeed");
+    }
+    if (globalsConfigJSON.hasKey("boolanSaveFrames") && !globalsConfigJSON.isNull("boolanSaveFrames")) {
+      saveFrames = globalsConfigJSON.getBoolean("boolanSaveFrames");
+    }
+    if (globalsConfigJSON.hasKey("intFrameRate") && !globalsConfigJSON.isNull("intFrameRate")) {
+      frameRate = globalsConfigJSON.getInt("intFrameRate");
+    }
+    if (globalsConfigJSON.hasKey("booleanUseFrameRate") && !globalsConfigJSON.isNull("booleanUseFrameRate")) {
+      useFrameRate = globalsConfigJSON.getBoolean("booleanUseFrameRate");
+    }
+    if (globalsConfigJSON.hasKey("booleanUseCustomCanvasSize") && !globalsConfigJSON.isNull("booleanUseCustomCanvasSize")) {
+      useCustomCanvasSize = globalsConfigJSON.getBoolean("booleanUseCustomCanvasSize");
+    }
+    if (globalsConfigJSON.hasKey("intCustomCanvasWidth") && !globalsConfigJSON.isNull("intCustomCanvasWidth")) {
+      customCanvasWidth = globalsConfigJSON.getInt("intCustomCanvasWidth");
+    }
+    if (globalsConfigJSON.hasKey("intCustomCanvasHeight") && !globalsConfigJSON.isNull("intCustomCanvasHeight")) {
+      customCanvasHeight = globalsConfigJSON.getInt("intCustomCanvasHeight");
+    }
+    if (globalsConfigJSON.hasKey("intStopAtFrame") && !globalsConfigJSON.isNull("intStopAtFrame")) {
+      stopAtFrame = globalsConfigJSON.getInt("intStopAtFrame");
+    }
+    if (globalsConfigJSON.hasKey("backGroundColorWithAlpha") && !globalsConfigJSON.isNull("backGroundColorWithAlpha")) {
+      JSONArray bgColorArray = globalsConfigJSON.getJSONArray("backGroundColorWithAlpha");
+      backgroundColorWithAlpha = color(bgColorArray.getInt(0), bgColorArray.getInt(1), bgColorArray.getInt(2));
+    }
+    // if assignment failed, exit with print of error
+  } catch (Exception e) {
+    print("ERROR: Could not initialize global settings from in-memory JSON object. Message: " + e);
+    print("Please check the source JSON global configuration (\"global_settings\" object).");
+    exit();
+  }
+}
+
+void initGrids() {
+  try {
+    if (allImportedJSON == null) {loadConfigurationJSON();}
+    gridConfigsJSON = allImportedJSON.getJSONArray("grid_configs");
     print("Configuration file " + JSONconfigFileName + " loaded successfully. Found " + gridConfigsJSON.size() + " grid configs.");
   // if assignment failed, exit with print of error
   } catch (Exception e) {
@@ -287,18 +334,6 @@ void loadConfiguration() {
     print("Please check the source JSON grid configuration (\"grid_configs\" array).");
     exit();
   }
-
-  try {
-    globalConfigJSON = globalConfigJSON.getJSONObject("global_settings");
-    print("Global settings in-memory JSON object loaded successfully.");
-  // if assignment failed, exit with print of error
-  } catch (Exception e) {
-    print("ERROR: Could not initialize global settings from in-memory JSON object. Message: " + e);
-    print("Please check the source JSON global configuration (\"global_settings\" object).");
-    exit();
-  }
-  
-  // TO DO: attempt global variables (re)init from JSON
 
   // attempt grid_iterator object init from JSON config
   grid_iterators = new ArrayList<GridIterator>();
@@ -324,6 +359,9 @@ void loadConfiguration() {
 
 void settings() {
   pixelDensity(1);    // or (2) for high def/dotpitch screens?
+  // obtains any non-null values from imported JSON config and overrides corresponding globals from them;
+  // NOTE that this way, you can for example specify a temporarily used custom canvas size in the JSON config, instead of hard-coding it in this file! :
+  overrideGlobals();
   if (useCustomCanvasSize == true) {
     size(customCanvasWidth, customCanvasHeight);
   } else {
@@ -331,15 +369,14 @@ void settings() {
   }
 }
 
-
 void setup() {
   imageMode(CENTER);   // default is (CENTER)
-  background(backgroundColor);
+  background(backgroundColorWithAlpha);
   prepareNextVariation();
-  loadConfiguration();
+  // loadConfigurationJSON();
+  initGrids();
   grid_iterator = grid_iterators.get(0);
 }
-
 
 void draw() {
 // some of the organization / drawing logic:

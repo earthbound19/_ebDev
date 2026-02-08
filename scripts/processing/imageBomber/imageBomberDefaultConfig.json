@@ -1,12 +1,16 @@
 {
-"_comment": "The following global_settings object is unused at this writing. Coming soon, hopefully!",
+"_comment": "The following global_settings object here lists fields which are all optional. The field descripters indicate the type, e.g. boolean or int. Fields with a null value will be ignored. Fields with a non-null value (such as a number or string) will override any values for the corresponding global variables in the source imageBomber.pde. Note the field names are slightly different; e.g. booleanOverrideSeed here corresponds to overrideSeed there. To learn their purpose and use, see comments for corresponding variables in the source.",
 "global_settings": {
-  "fee": 0.19,
-  "fi": 1.0,
-  "fo": 0.87,
-  "fum": 1.13,
-  "backgroundColor": [144, 145, 145],
-  "initialNextCellCount": 8,
+  "booleanOverrideSeed": false,
+  "intOverrideSeed": null,
+  "boolanSaveFrames": null,
+  "intFrameRate": null,
+  "booleanUseFrameRate": null,
+  "booleanUseCustomCanvasSize": null,
+  "intCustomCanvasWidth": null,
+  "intCustomCanvasHeight": null,
+  "intStopAtFrame": null,
+  "backGroundColorWithAlpha": [144, 145, 145, 255]
 },
 "grid_configs": [
     {
