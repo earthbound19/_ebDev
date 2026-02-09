@@ -12,12 +12,15 @@
 
 // CODE
 // BEGIN GLOBAL VARIABLES AND CLASSES WHICH YOU SHOULD NOT ALTER unless you are me or you know what you might break if you alter them:
-String JSONconfigFileName = "imageBomberDefaultConfig.json";
+// String JSONconfigFileName = "imageBomberDefaultConfig.json";
+// String JSONconfigFileName = "rainbowPaintDaubs.json";
+String JSONconfigFileName = "25shadesOfGrayCircles.json";
 JSONObject allImportedJSON;       // intended to store everything imported from JSONconfigFileName 
 JSONObject globalsConfigJSON;     // stores JSON global value overrides object extracted from allImportedJSON
 JSONArray gridConfigsJSON;        // stores JSON grid config values extracted from allImportedJSON
 
 // TO DO:
+// - implement makeInfiniteVariantsMode (when a render of a grid config is done, clear the canvas and start a new random one)
 // - optional random palette retrieval and recoloring of colorizable source rasters (or SVGs??)
 // - don't exit the program, just skip draw if non-negative stopAtFrame is reached? BUT THEN also how to handle that if:
 // - have a mode to make variations infinitely until program termination
@@ -31,12 +34,18 @@ boolean useCustomCanvasSize = true;    // if set to true, the next values will b
 int customCanvasWidth = 1920;  // set to any arbitrary height you want for the complete, composite image. for 1.33 aspect, suggest 1280
 int customCanvasHeight = 1080;  // set to any arbitrary width you want for ". for 1.33 aspect, suggest 960
 int stopAtFrame = -1;   // Processing program will exit after this many animation frames. If set to a negative number, the program runs forever until you manually stop it. If set to 0 it makes 1 frame regardless, because of the way the draw() and exit() functions work: exit() waits for draw() to finish. 764 may be a good number for this if you use a positive value. NOTES: intended use with this value and a gridIterator class is that the gridIterator keeps making images over cell areas of nested finer grids until stopAtFrame is reached. If stopAtFrame is -1 then a gridIterator will not be used.
+boolean exitOnRenderComplete = false;
+boolean makeInfiniteVariantsMode = false;   // AS YET not implemented
+
 // DERIVED GLOBALS
 int seed = intOverrideSeed;  // this will be overwritten with a random seed if booleanOverrideSeed is set to false
 
 color backgroundColorWithAlpha = color(144,145,145,255);   // alter the three integer RGB values and alpha in that to customize. For neutral (as perceived by humans) gray, set all three RGB values to 145.
 
-String scriptVersionString = "2-16-0";
+String scriptVersionString = "2-17-8";
+
+// booleans controlling selective skip of save frame and print feedback when rendering is complete:
+boolean allGridsRenderedFeedbackPrinted = false;   // when the size of the grid_iterators array becomes zero, a message is printed in the draw() loop, if this boolean is false, a message is printed that rendering is done. Then the boolean is immediately set to true so the message is never reprinted.
 
 String animFramesSaveDir;
 int countedFrames = 0;
@@ -78,6 +87,9 @@ class GridIterator {
   int widthOfImagesInArrayList;
   int heightOfImagesInArrayList;
 
+  float skipCellChance;           // if nonzero there is a chance that when nextCell() is called it will skip the next cell (advance two cells)
+  float skipDrawElementChance;    // if nonzero there is a chance that when drawRNDelement() is called it will skip drawing an element
+
   // initialized with a JSON object imported from (by default) imageBomberDefaultConfig.json or any other JSON
   GridIterator(JSONObject gridJSON) {
     this.gridX1 = gridJSON.getInt("gridX1");
@@ -96,6 +108,8 @@ class GridIterator {
     this.squishImagesBool = gridJSON.getBoolean("squishImagesBool");
     this.imagesPath = gridJSON.getString("imagesPath");
     this.elementsPerCell = gridJSON.getInt("elementsPerCell");
+    this.skipCellChance = gridJSON.getFloat("skipCellChance");
+    this.skipDrawElementChance = gridJSON.getFloat("skipDrawElementChance");
     this.drawnCellElements = 0;
 
     // Start at first cell (column 0, row 0)
@@ -145,10 +159,9 @@ class GridIterator {
     // print("xMin, xMax, yMin, yMax AFTER update: " + xMin + ", " + xMax, ", " + yMin + ", " + yMax + "\n");
   }
   
-  // Move to the next cell (left to right, top to bottom)
-  void nextCell() {
+  // avoids duplicate logic but hard for hooman to math :)
+  void nextCellHelper() {
     print("currentCol and currentRow are: " + currentCol + ", " + currentRow + "\n");
-    // Move to next column
     currentCol++;
 
     // If we've passed the last column, wrap to the first column
@@ -157,7 +170,7 @@ class GridIterator {
       currentCol = 0;
       currentRow++;
       print("currentCol and currentRow are now: " + currentCol + ", " + currentRow + "\n");
-      
+
       // If we've passed the last row, wrap to the first row
       if (currentRow >= rows) {
         print("currentRow >= rows (" + rows + "); will update.\n");
@@ -167,22 +180,35 @@ class GridIterator {
         print("set wrappedPastLastRow to true, as currentRow wrapped and was reset to zero.\n");
       }
     }
-    
     print("currentCol and currentRow ARE NOW: " + currentCol + ", " + currentRow + "\n");
-    // Update the cell boundaries (needed after nextCell)
+  }
+
+  // Move to the next cell (left to right, top to bottom)
+  void nextCell() {
+    // randomly skip a cell if we draw a random number less than skipCellChance
+    if (random(1) < skipCellChance) {
+      print("SKIPPING CELL because of random draw of number less than skipCellChance, " + skipCellChance + "!\n");
+      nextCellHelper();
+      nextCellHelper();   // do this TWICE to effectively skip a cell
+      updateCellBounds();
+      return; // Skip normal cell advance logic
+    }
+
+    // if we didn't draw a random number less than skipCellChance in that logic block, advance a cell:
+    nextCellHelper();
     updateCellBounds();
   }
-  
-  // Jump to specific cell (0-based index)
-  // void gotoCell(int col, int row) {
-  //   currentCol = constrain(col, 0, cols);
-  //   currentRow = constrain(row, 0, rows);
-  //   updateCellBounds();
-  // }
 
   // draws an element in current cell boundaries with scale, squish, and location randomization constraints:
   void drawRNDelement() {
     // pushMatrix();  // you need to uncomment this if you animate things. If you don't animate things, it isn't necessary. I think.
+
+    // if we randomly draw a number within range skipDrawElementChance, skip drawing any element. (This will never happen if skipDrawElementChance is 0.)
+    if (random(1) < skipDrawElementChance) {
+      print("SKIPPING ELEMENT DRAW because of random draw of number less than skipDrawElementChance, " + skipDrawElementChance + "!\n");
+      return;   // we just return without drawing anything; no element drawn
+    }
+    
     int xCenter = (int) random(xMin, xMax);
     int yCenter = (int) random(yMin, yMax);
     translate(xCenter, yCenter);
@@ -205,7 +231,13 @@ class GridIterator {
 
     image(allImagesList.get(rnd_imagesArray_idx), xCenter, yCenter, scaled_width, scaled_height);
 
+    // if told to save an animation frame, do so:
+    if (saveFrames == true) {
+      saveFrame(animFramesSaveDir + "/######.png");
+    }
+
     drawnCellElements += 1;
+
     // FIX: using == here leads to unentended result of wrappedPastLastRow set to true; using >= avoids that:
     if (drawnCellElements >= elementsPerCell) {
       nextCell();
@@ -259,6 +291,20 @@ void recurseDir(ArrayList<File> a, String dir) {
 
 // I here adapt a function by Daniel Shiffman to get a list of all files in a directory and all subdirectories:
 ArrayList<File> listFilesRecursive(String dir) {
+  // Validate directory exists and is not a file before proceeding; throw and exit if it is either:
+  File dirFile = new File(dir);
+  if (!dirFile.exists()) {
+    println("ERROR: Directory does not exist: " + dir);
+    println("Full path: " + dirFile.getAbsolutePath());
+    exit();
+  }
+
+  if (!dirFile.isDirectory()) {
+    println("ERROR: Path is not a directory: " + dir);
+    exit();
+  }
+
+  // If neither of those threw, it will proceed:
   ArrayList<File> fileList = new ArrayList<File>();
   recurseDir(fileList, dir);
   return fileList;
@@ -314,6 +360,12 @@ void overrideGlobals() {
     if (globalsConfigJSON.hasKey("backGroundColorWithAlpha") && !globalsConfigJSON.isNull("backGroundColorWithAlpha")) {
       JSONArray bgColorArray = globalsConfigJSON.getJSONArray("backGroundColorWithAlpha");
       backgroundColorWithAlpha = color(bgColorArray.getInt(0), bgColorArray.getInt(1), bgColorArray.getInt(2));
+    }
+    if (globalsConfigJSON.hasKey("exitOnRenderComplete") && !globalsConfigJSON.isNull("exitOnRenderComplete")) {
+      exitOnRenderComplete = globalsConfigJSON.getBoolean("exitOnRenderComplete");
+    }
+    if (globalsConfigJSON.hasKey("makeInfiniteVariantsMode") && !globalsConfigJSON.isNull("makeInfiniteVariantsMode")) {
+      makeInfiniteVariantsMode = globalsConfigJSON.getBoolean("makeInfiniteVariantsMode");
     }
     // if assignment failed, exit with print of error
   } catch (Exception e) {
@@ -397,10 +449,6 @@ if (grid_iterators.size() > 0) {
       }
     }
 
-    if (saveFrames == true) {
-      saveFrame(animFramesSaveDir + "/######.png");
-    }
-
     // conditional program run end (or never end unless the user manually terminates the program run):
     if (stopAtFrame > -1) {
       countedFrames += 1;
@@ -408,20 +456,38 @@ if (grid_iterators.size() > 0) {
         exit();
       }
     }
+  // the folowing else block is executed when grid_iterators.size is 0; see start of preceding congrol block:
+  } else {
+              // notify that program will conditionally exit if so; but I want the information after this printed last so I'm checking exitOnRenderComplete twice:
+              if (exitOnRenderComplete == true) {print("exitOnRenderComplete boolean set to true; program will exit.\n");}
+    if (allGridsRenderedFeedbackPrinted == false) {
+      print("RENDERING COMPLETE (grid_iterators.size == 0).\n");
+      allGridsRenderedFeedbackPrinted = true;
+      if (saveFrames == true) {
+        print("Animation save frames are in the directory:\n  " + animFramesSaveDir + "\n");
+      }
+    }
+              // conditionally exit program as earlier notified will happen:
+              if (exitOnRenderComplete == true) {exit();}
   }
 }
 
-// save frame function (save png)
-void saveStill() {
-  saveFrame("_rnd_images_processing_" + "v" + scriptVersionString + "__anim_run__seed_" + seed + "_fr_##########.png");
-}
-// if the below is uncommented, save frame on mouse press
+// if the below is uncommented, save frame on mouse press, with file name indicating manual save
 void mousePressed() {
-  saveStill();
+  saveFrame("_manual_save__rnd_images_processing_" + "v" + scriptVersionString + "__anim_run__seed_" + seed + "_fr_##########.png");
 }
-// if the below is uncommented, advance grid on SPACEBAR key press
+
+// on keypress of p | P, start / stop the main loop (pause / unpause rendering)
 void keyPressed() {
-  if (keyCode == ' ') {
-    grid_iterator.nextCell();
+  if (key == 'p' || key == 'P') {
+    if (looping) {
+      noLoop();  // Pause the sketch
+      println("|| PAUSED");
+      println("Press 'p' again to resume");
+    } else {
+      loop();    // Resume the sketch  
+      println("|> RESUMED");
+      println("Press 'p' again to pause");
+    }
   }
 }
