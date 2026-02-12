@@ -6,73 +6,77 @@
 
 // USAGE
 // - NOTE that no images are provided with this script "shipped." You must provide a subfolder of images, and set the variable instructing the script what that folder name is, in the global variable. Examine comments provided in the "GLOBAL VARIABLES WHICH YOU MAY ALTER" section for instructions.
-// - Examine other comments in that same comment section for instructions on all the global variables which you may alter for your preferences.
-// - On run of script, you may press the space bar or a mouse button to save a still of what is displayed. The still is named like this: _rnd_images_processing_v1-0-0__anim_run__seed_1409989632_fr_0000000315.png. You might think that file name has too much information. It doesn't. It is all the information required to reproduce exactly the same image again should you want to (provided the same script version, seed, and source image set).
+// - Examine other comments in that same comment section for instructions on all the global variables which you may alter for your preferences, including by defining global preferences and/or a grid in a JSON configuration file.
+// - On run of script, you may:
+//  - press the space bar or a mouse button to save a still of what is displayed. The still is named like this: _rnd_images_processing_v1-0-0__anim_run__seed_1409989632_fr_0000000315.png. You might think that file name has too much information. It doesn't. It is all the information required to reproduce exactly the same image again should you want to (provided the same script version, seed, and source image set).
+//  - type the letter 'p'(ause) to pause or resume rendering of elements in the grid
+//  - type the letter 'v'(ariant) to stop rendering the current variant and start a new one
+// See comments in the modifiable GLOBAL VARIANTS area to learn what else this script can do.
 
 
 // CODE
-// BEGIN GLOBAL VARIABLES AND CLASSES WHICH YOU SHOULD NOT ALTER unless you are me or you know what you might break if you alter them:
-// String JSONconfigFileName = "imageBomberDefaultConfig.json";
-// String JSONconfigFileName = "rainbowPaintDaubs.json";
-String JSONconfigFileName = "25shadesOfGrayCircles.json";
-JSONObject allImportedJSON;       // intended to store everything imported from JSONconfigFileName 
+// TO DO:
+// - cache image resources (in memory?) to avoid reloading them on reinit of grid
+// - persist global config after JSON config load and also don't reload JSON config
+// - optional random palette retrieval and recoloring of colorizable source rasters (or SVGs??)
+// - randomRotationDegrees implementation and in config
+
+// BEGIN GLOBAL VARIABLES which you may alter if you know what you're doing:
+JSONObject allImportedJSON;       // intended to store everything imported from JSONconfigFileName
 JSONObject globalsConfigJSON;     // stores JSON global value overrides object extracted from allImportedJSON
 JSONArray gridConfigsJSON;        // stores JSON grid config values extracted from allImportedJSON
 
-// TO DO:
-// - implement makeInfiniteVariantsMode (when a render of a grid config is done, clear the canvas and start a new random one)
-// - optional random palette retrieval and recoloring of colorizable source rasters (or SVGs??)
-// - don't exit the program, just skip draw if non-negative stopAtFrame is reached? BUT THEN also how to handle that if:
-// - have a mode to make variations infinitely until program termination
-// - randomRotationDegrees in config
-boolean booleanOverrideSeed = false;    // if set to true, intOverrideSeed will be used as the random seed for the first displayed variant. If false, a seed will be chosen randomly. A dedicated seed will result in the same pseudo-randomness and result image every time, given the same image resources and grid configurations.
-int intOverrideSeed = -289762560;  // seed of first feature complete version demo output is -289762560. Another early used seed: 936942080
-boolean saveFrames = false;    // set to true to save animation frames (images)
-int frameRate = 60;  // how many frames per second to display changes to art. But if saveFrames is set to true, this is not used: Processing built-in frameRate function will not be called, and therefore the default no max or no throttle framerate will be used.
-boolean useFrameRate = false;  // if set to true, frameRate value will be used via call of Processing built-in function frameRate(n). But if saveFrames is set to true, behavior overrides so that frameRate value will not be used (as noted on previous line).
-boolean useCustomCanvasSize = true;    // if set to true, the next values will be used. if set to false, the full screen size will be detected and used.
-int customCanvasWidth = 1920;  // set to any arbitrary height you want for the complete, composite image. for 1.33 aspect, suggest 1280
-int customCanvasHeight = 1080;  // set to any arbitrary width you want for ". for 1.33 aspect, suggest 960
-int stopAtFrame = -1;   // Processing program will exit after this many animation frames. If set to a negative number, the program runs forever until you manually stop it. If set to 0 it makes 1 frame regardless, because of the way the draw() and exit() functions work: exit() waits for draw() to finish. 764 may be a good number for this if you use a positive value. NOTES: intended use with this value and a gridIterator class is that the gridIterator keeps making images over cell areas of nested finer grids until stopAtFrame is reached. If stopAtFrame is -1 then a gridIterator will not be used.
-boolean exitOnRenderComplete = false;
-boolean makeInfiniteVariantsMode = false;   // AS YET not implemented
+// json configuration to load; see the sibling file imageBomberDefaultConfig.json for a complete example of options. Read on for config options and JSON config usage.
+String JSONconfigFileName = "imageBomberDefaultConfig.json";
+// NOTE that all of these below globals have counterpart values you can set in the .json file name assigned to the JSONconfigFileName (and parsed for usage after that). Any variables in that file which are assigned a null value will not have that value used, and the correspoding value assigned below will instead be used. (You must have useful values hard-coded to all the below globals; they function as defaults.) Any variables in the .json config file which are assigned a non-null value (such as an integer or float) will *override* any corresponding values below:
+boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. Any variants after that -- see renderVariantsInfinitely -- will have a random seed assigned. If booleanOverrideSeed is set to false, a seed will be chosen randomly for the first variant, and also all variants after. Setting booleanOverrideSeed to true with a dedicated value for overrideSeed will result in the same pseudo-randomness and result image for the first variant every time, given the same image resources and grid configurations.
+int overrideSeed = 936942080;   // see notes for booleanOverrideSeed. The seed of the first feature complete version demo output was -289762560. Another early used seed: 936942080
+boolean saveFrames = false;    // set to true to save animation frames (images), false to not save them.
+int frameRate = 60;   // how many frames per second to display changes to art. But if saveFrames is set to true, this is not used: Processing built-in frameRate function will not be called, and therefore the default no max or no throttle framerate will be used.
+boolean useFrameRate = false;  // if set to true, frameRate value will be used via call of Processing built-in function frameRate(n). See also comment for saveFrames.
+boolean useCustomCanvasSize = true;    // if set to true, customCanvasWidth and customCanvasHeight will define the canvas dimensions. Ff set to false, the full screen size will be detected and used.
+int customCanvasWidth = 1920;  // set to any arbitrary width you want for the complete, composite image. for 1.33 aspect, I suggest 1280.
+int customCanvasHeight = 1080;  // set to any arbitrary height you want for ". for 1.33 aspect, I suggest 960.
+int stopAtFrame = -1;   // Processing program will exit after this many animation frames. If set to a negative number, the program runs forever until you manually stop it. If set to 0 it makes 1 frame regardless, because of the way the draw() and exit() functions work: exit() waits for draw() to finish. 764 may be a good number for this if you use a positive value. NOTES: intended use with this value and a gridIterator class is that the gridIterator keeps making images over cell areas of nested finer grids until stopAtFrame is reached. If stopAtFrame is -1 then a gridIterator will be used until all intended elements in the grid are rendered. After a render completes, other globals control what happens: see notes for exitOnRenderComplete and renderVariantsInfinitely.
+boolean exitOnRenderComplete = false;   // causes program to terminate after completion of first variant render, even if renderVariantsInfinitely is set to true
+boolean renderVariantsInfinitely = false;   // causes program to render a new variant after the first one completes, and another after that, ad infinitum.
+color backgroundColorWithAlpha = color(144,145,145,255);   // alter the three integer RGB values and alpha in that to set the background color. For neutral (as perceived by humans) gray, set all three RGB values to 145.
+// END GLOBAL VARIABLES which you may alter
 
-// DERIVED GLOBALS
-int seed = intOverrideSeed;  // this will be overwritten with a random seed if booleanOverrideSeed is set to false
-
-color backgroundColorWithAlpha = color(144,145,145,255);   // alter the three integer RGB values and alpha in that to customize. For neutral (as perceived by humans) gray, set all three RGB values to 145.
-
-String scriptVersionString = "2-17-8";
-
-// booleans controlling selective skip of save frame and print feedback when rendering is complete:
-boolean allGridsRenderedFeedbackPrinted = false;   // when the size of the grid_iterators array becomes zero, a message is printed in the draw() loop, if this boolean is false, a message is printed that rendering is done. Then the boolean is immediately set to true so the message is never reprinted.
+// GLOBALS NOT TO CHANGE HERE; program logic or the developer may change them in program runs or updates:
+String scriptVersionString = "2-18-12";
 
 String animFramesSaveDir;
 int countedFrames = 0;
+int seed;
+
+// controls feedback print:
+boolean allGridsRenderedFeedbackPrinted = false;   // when the size of the grid_iterators array becomes zero, a message is printed in the draw() loop, if this boolean is false, a message is printed that rendering is done. Then the boolean is immediately set to true so the message is never reprinted.
+
 
 // has functions that iterate cell position with related coordinates on a grid. See internal class initializer.
 class GridIterator {
   // Grid dimensions
   int cols, rows;
-  
+
   float minimumScaleMultiplier;     // minimum amount to randomly scale images down to. It's a multiplier; for example if the source image width is 600, then 600 * 0.27 = 162 px minimum width. Suggested values: 0.15 to 0.27. If smaller max like 0.27, suggest this at 0.081.
   float maximumScaleMultiplier;     // maximum amount to randomly scale images up to. Can constrain larger images to a smaller maximum. Not recommended to exceed 1, unless you anticipate images looking good scaled up.
   float minimumSquishMultiplier;
   float maximumSquishMultiplier;    // If you want a range that's stretched (or squished) and admitting normal, set this to 1. You can also set this to more than one to have "squished" to "stretch" range.
   boolean squishImagesBool;             // if set to true, after image size is randomly proportionally scaled down, image widths and heights are further randomly altered without respect for maintaining aspect (a square may be squished or stretched to a rectangle), within constraints of minimumSquishMultiplier (minimum) to maximumSquishMultiplier (maximum). If set to false, no squishing will occur and images will remain at original proportion. Note that you may set a maximumSquishMultiplier below 1 for images to always be squished at least to some amount.
-  
+
   int elementsPerCell;   // when this count is reached, nextCell() is called
   int drawnCellElements;        // for counting drawn elements to check against elementsPerCell
 
   // Current cell position
   int currentCol, currentRow;
-  
+
   // Cell boundaries
   int xMin, xMax, yMin, yMax;
-  
+
   // Grid total boundaries; gridX1 and gridY1 are the coordinate of the upper left corner of the grid.
   int gridX1, gridY1, gridX2, gridY2;
-  
+
   String imagesPath;
 
   // Cell dimensions
@@ -119,12 +123,12 @@ class GridIterator {
     this.wrappedPastLastRow = false;
 
     allImagesList = new ArrayList<PImage>();
-    
+
     // logic to create array of png file names from subfolder /source_files:
     String path = sketchPath() + "/" + imagesPath;
 
     ArrayList<File> allFiles = listFilesRecursive(path);
-    
+
     // Filter that list to only the image files we want, and add them to the image array:
     for (File f : allFiles) {
       if (f.isDirectory() == false) {
@@ -142,52 +146,52 @@ class GridIterator {
     widthOfImagesInArrayList = allImagesList.get(0).width;
     heightOfImagesInArrayList = allImagesList.get(0).height;
   }
-  
+
   // Reset to first cell (column 0, row 0)
   void reset() {
     currentCol = 0;   // Using 0-based indexing
     currentRow = 0;
   }
-  
+
   // Update the cell boundaries based on current position
   void updateCellBounds() {
-    // print("xMin, xMax, yMin, yMax before update: " + xMin + ", " + xMax, ", " + yMin + ", " + yMax + "\n");
+    // println("xMin, xMax, yMin, yMax before update: " + xMin + ", " + xMax, ", " + yMin + ", " + yMax);
     xMin = gridX1 + currentCol * cellWidth;    // when currentCol is 0, via order of operations (currentCol * cellWidth) will be 0, which is correct
     xMax = xMin + cellWidth;
     yMin = gridY1 + currentRow * cellHeight;   // same calculation as for xMin = 0 if currentRow is 0 applies here.
     yMax = yMin + cellHeight;
-    // print("xMin, xMax, yMin, yMax AFTER update: " + xMin + ", " + xMax, ", " + yMin + ", " + yMax + "\n");
+    // println("xMin, xMax, yMin, yMax AFTER update: " + xMin + ", " + xMax, ", " + yMin + ", " + yMax);
   }
-  
+
   // avoids duplicate logic but hard for hooman to math :)
   void nextCellHelper() {
-    print("currentCol and currentRow are: " + currentCol + ", " + currentRow + "\n");
+    println("currentCol and currentRow are: " + currentCol + ", " + currentRow);
     currentCol++;
 
     // If we've passed the last column, wrap to the first column
     if (currentCol >= cols) {
-      print("currentCol is >= cols (" + cols + "); will update.\n");
+      println("currentCol is >= cols (" + cols + "); will update.");
       currentCol = 0;
       currentRow++;
-      print("currentCol and currentRow are now: " + currentCol + ", " + currentRow + "\n");
+      println("currentCol and currentRow are now: " + currentCol + ", " + currentRow);
 
       // If we've passed the last row, wrap to the first row
       if (currentRow >= rows) {
-        print("currentRow >= rows (" + rows + "); will update.\n");
+        println("currentRow >= rows (" + rows + "); will update.");
         currentRow = 0;
-        print("currentRow was updated to: " + currentRow + "\n");
+        println("currentRow was updated to: " + currentRow);
         wrappedPastLastRow = true;
-        print("set wrappedPastLastRow to true, as currentRow wrapped and was reset to zero.\n");
+        println("set wrappedPastLastRow to true, as currentRow wrapped and was reset to zero.");
       }
     }
-    print("currentCol and currentRow ARE NOW: " + currentCol + ", " + currentRow + "\n");
+    println("currentCol and currentRow ARE NOW: " + currentCol + ", " + currentRow);
   }
 
   // Move to the next cell (left to right, top to bottom)
   void nextCell() {
     // randomly skip a cell if we draw a random number less than skipCellChance
     if (random(1) < skipCellChance) {
-      print("SKIPPING CELL because of random draw of number less than skipCellChance, " + skipCellChance + "!\n");
+      println("SKIPPING CELL because of random draw of number less than skipCellChance, " + skipCellChance + "!");
       nextCellHelper();
       nextCellHelper();   // do this TWICE to effectively skip a cell
       updateCellBounds();
@@ -205,10 +209,10 @@ class GridIterator {
 
     // if we randomly draw a number within range skipDrawElementChance, skip drawing any element. (This will never happen if skipDrawElementChance is 0.)
     if (random(1) < skipDrawElementChance) {
-      print("SKIPPING ELEMENT DRAW because of random draw of number less than skipDrawElementChance, " + skipDrawElementChance + "!\n");
+      println("SKIPPING ELEMENT DRAW because of random draw of number less than skipDrawElementChance, " + skipDrawElementChance + "!");
       return;   // we just return without drawing anything; no element drawn
     }
-    
+
     int xCenter = (int) random(xMin, xMax);
     int yCenter = (int) random(yMin, yMax);
     translate(xCenter, yCenter);
@@ -231,11 +235,16 @@ class GridIterator {
 
     image(allImagesList.get(rnd_imagesArray_idx), xCenter, yCenter, scaled_width, scaled_height);
 
+    // THIS GLOBAL iterated here immediately after we render any element; strictly the program may render many more frames than this, but we only want to reference frames that we "count" and which are in the numbered animation sequence:
+    countedFrames += 1;
+
     // if told to save an animation frame, do so:
     if (saveFrames == true) {
-      saveFrame(animFramesSaveDir + "/######.png");
+      String paddedFrameNumber = String.format("%06d", countedFrames);
+      saveFrame(animFramesSaveDir + "/" + paddedFrameNumber + ".png");
     }
 
+    // iterate grid config internal value:
     drawnCellElements += 1;
 
     // FIX: using == here leads to unentended result of wrappedPastLastRow set to true; using >= avoids that:
@@ -249,30 +258,43 @@ class GridIterator {
 
 // OUTSIDE SETUP, DECLARE ArrayList of GridIterators:
 GridIterator grid_iterator;   // main instance of class to which instances in the following array will be assigned by reference for convenience
-ArrayList<GridIterator> grid_iterators;    // grid_iterators to be used in succession per previous comment
-// END GLOBAL VARIABLES AND CLASSES WHICH YOU SHOULD NOT ALTER
+ArrayList<GridIterator> grid_iterators;    // grid_iterators to be used in succession
+// END GLOBAL VARIABLES AND CLASSES to not alter
 
-// Function that handles values etc. for new animated variation to be displayed:
-void prepareNextVariation() {
-  if (booleanOverrideSeed == true) {
-    seed = intOverrideSeed;
+
+// Function that handles values etc. for new animated variant to be displayed:
+void prepareNextVariant() {
+  if (booleanOverrideSeed == true) {   // this will only be the case the first time we check booleanOverrideSeed if it is initially set to true; after we set it false this will always be false:
+    println("booleanOverrideSeed true; overrideSeed value " + overrideSeed + " will be used to seed pseudorandom number generator.");
+    seed = overrideSeed;
+    // set this false so that the above only happens once, because for renderVariantsInfinitely (if set true) we want a new random seed for every variant after the first one:
     booleanOverrideSeed = false;
   } else {
     seed = (int) random(-2147483648, 2147483647);
   }
-  randomSeed(seed);
-  print("Value of booleanOverrideSeed: " + booleanOverrideSeed + "\n");
-  print("Seed value: " + seed + "\n");
 
-    // Only call frameRate if saveFrames is false, because if we're saving animation frames we (or I--deciding for the user!) don't want any other slowdown; saving frames is slower already.
-    if (saveFrames == false) {
+  // reset / reinitialize globals and objects:
+  randomSeed(seed);
+  initGrids();
+  grid_iterator = grid_iterators.get(0);
+  background(backgroundColorWithAlpha);     // clear canvas
+  countedFrames = 0;
+  allGridsRenderedFeedbackPrinted = false;
+
+  // Only call frameRate if saveFrames is false, because if we're saving animation frames we (or I--deciding for the user!) don't want any other slowdown; saving frames is slower already.
+  if (saveFrames == false) {
+    if (useFrameRate == true) {
       frameRate(frameRate);
-    } else {
-// ALTERS A GLOBAL:
-      animFramesSaveDir = "_rnd_images_processing__anim_run__v" + scriptVersionString + "_seed__" + seed;
-    	print("animFramesSaveDir value: " + animFramesSaveDir + "\n");
     }
+  } else {
+  // ALTERS A GLOBAL:
+    animFramesSaveDir = "_rnd_images_processing__anim_run__v" + scriptVersionString + "_seed__" + seed;
+    println("animFramesSaveDir value: " + animFramesSaveDir);
+  }
+
+  println(">> New variant prepared. Seed: " + seed);
 }
+
 
 // I here adapt a function by Daniel Shiffman which recursively traverses subdirectories; the "ArrayList<File> a" is passed by reference (directly modifies the Arraylist), I think:
 void recurseDir(ArrayList<File> a, String dir) {
@@ -288,6 +310,7 @@ void recurseDir(ArrayList<File> a, String dir) {
     a.add(file);
   }
 }
+
 
 // I here adapt a function by Daniel Shiffman to get a list of all files in a directory and all subdirectories:
 ArrayList<File> listFilesRecursive(String dir) {
@@ -310,6 +333,7 @@ ArrayList<File> listFilesRecursive(String dir) {
   return fileList;
 }
 
+
 // loads external config file to initialize globals and grid iterators. Call before initGrids() or overrideGlobals(), but they are coded to call this if globalsConfigJSON is null:
 void loadConfigurationJSON() {
   // attempt external JSON config file load
@@ -317,97 +341,100 @@ void loadConfigurationJSON() {
     allImportedJSON = loadJSONObject(JSONconfigFileName);
     // if load config failed, exit with print of error
   } catch (Exception e) {
-    print("ERROR: Could not load " + JSONconfigFileName + ". Message: " + e);
-    print("Please create that file or examine it for validity.");
+    println("ERROR: Could not load " + JSONconfigFileName + ". Message: " + e);
+    println("Please create that file or examine it for validity.");
     exit();
   }
 }
+
+
+// returns an acquired boolean value if an investigated JSON field is non-null; otherwise returns the original value passed:
+boolean setBooleanFromJSON(boolean booleanToSet, JSONObject configJSON, String fieldName) {
+  if (configJSON.hasKey(fieldName) && !configJSON.isNull(fieldName)) {
+    return configJSON.getBoolean(fieldName);
+  } else {
+    return booleanToSet;
+  }
+}
+
+
+// returns acquired int value if an investigated JSON field is non-null; otherwise returns the original value passed:
+int setIntFromJSON(int intToSet, JSONObject configJSON, String fieldName) {
+  if (configJSON.hasKey(fieldName) && !configJSON.isNull(fieldName)) {
+    return configJSON.getInt(fieldName);
+  } else {
+    return intToSet;
+  }
+}
+
 
 // obtains JSON values from "global_settings" object and, for any of them which do not have a null value, overiddes hard-coded globals in this script with their value from the corresponding JSON object's field; e.g. if the "boolanSaveFrames" field is "true" or "false" instead of null, it uses that "true" or "false" value:
 void overrideGlobals() {
   try {
     if (allImportedJSON == null) {loadConfigurationJSON();}
     globalsConfigJSON = allImportedJSON.getJSONObject("global_settings");
-    print("Global settings in-memory JSON object loaded successfully.");
-    // Check if a key exists and is not null; assign value from it if so; this is cumbersome but eh?
-    if (globalsConfigJSON.hasKey("booleanOverrideSeed") && !globalsConfigJSON.isNull("booleanOverrideSeed")) {
-      booleanOverrideSeed = globalsConfigJSON.getBoolean("booleanOverrideSeed");
-    }
-    if (globalsConfigJSON.hasKey("intOverrideSeed") && !globalsConfigJSON.isNull("intOverrideSeed")) {
-      intOverrideSeed = globalsConfigJSON.getInt("intOverrideSeed");
-    }
-    if (globalsConfigJSON.hasKey("boolanSaveFrames") && !globalsConfigJSON.isNull("boolanSaveFrames")) {
-      saveFrames = globalsConfigJSON.getBoolean("boolanSaveFrames");
-    }
-    if (globalsConfigJSON.hasKey("intFrameRate") && !globalsConfigJSON.isNull("intFrameRate")) {
-      frameRate = globalsConfigJSON.getInt("intFrameRate");
-    }
-    if (globalsConfigJSON.hasKey("booleanUseFrameRate") && !globalsConfigJSON.isNull("booleanUseFrameRate")) {
-      useFrameRate = globalsConfigJSON.getBoolean("booleanUseFrameRate");
-    }
-    if (globalsConfigJSON.hasKey("booleanUseCustomCanvasSize") && !globalsConfigJSON.isNull("booleanUseCustomCanvasSize")) {
-      useCustomCanvasSize = globalsConfigJSON.getBoolean("booleanUseCustomCanvasSize");
-    }
-    if (globalsConfigJSON.hasKey("intCustomCanvasWidth") && !globalsConfigJSON.isNull("intCustomCanvasWidth")) {
-      customCanvasWidth = globalsConfigJSON.getInt("intCustomCanvasWidth");
-    }
-    if (globalsConfigJSON.hasKey("intCustomCanvasHeight") && !globalsConfigJSON.isNull("intCustomCanvasHeight")) {
-      customCanvasHeight = globalsConfigJSON.getInt("intCustomCanvasHeight");
-    }
-    if (globalsConfigJSON.hasKey("intStopAtFrame") && !globalsConfigJSON.isNull("intStopAtFrame")) {
-      stopAtFrame = globalsConfigJSON.getInt("intStopAtFrame");
-    }
+    println("Global settings in-memory JSON object loaded successfully.");
+    // Check if various keys (intended globals) exist and are not null; assign value from them if so:
+    // fields for set~JSON functions:        boolean booleanToSet/int intToSet, JSONObject configJSON, String fieldName
+    booleanOverrideSeed =       setBooleanFromJSON(booleanOverrideSeed, globalsConfigJSON, "booleanOverrideSeed");
+    overrideSeed =              setIntFromJSON(overrideSeed, globalsConfigJSON, "intOverrideSeed");
+    saveFrames =                setBooleanFromJSON(saveFrames, globalsConfigJSON, "boolanSaveFrames");
+    useFrameRate =              setBooleanFromJSON(useFrameRate, globalsConfigJSON, "booleanUseFrameRate");
+    useCustomCanvasSize =       setBooleanFromJSON(useCustomCanvasSize, globalsConfigJSON, "booleanUseCustomCanvasSize");
+    exitOnRenderComplete =      setBooleanFromJSON(exitOnRenderComplete, globalsConfigJSON, "booleanExitOnRenderComplete");
+    renderVariantsInfinitely =  setBooleanFromJSON(renderVariantsInfinitely, globalsConfigJSON, "booleanRenderVariantsInfinitely");
+    frameRate =                 setIntFromJSON(frameRate, globalsConfigJSON, "intFrameRate");
+    customCanvasWidth =         setIntFromJSON(customCanvasWidth, globalsConfigJSON, "intCustomCanvasWidth");
+    customCanvasHeight =        setIntFromJSON(customCanvasHeight, globalsConfigJSON, "intCustomCanvasHeight");
+    stopAtFrame =               setIntFromJSON(stopAtFrame, globalsConfigJSON, "intStopAtFrame");
+    // color
     if (globalsConfigJSON.hasKey("backGroundColorWithAlpha") && !globalsConfigJSON.isNull("backGroundColorWithAlpha")) {
       JSONArray bgColorArray = globalsConfigJSON.getJSONArray("backGroundColorWithAlpha");
       backgroundColorWithAlpha = color(bgColorArray.getInt(0), bgColorArray.getInt(1), bgColorArray.getInt(2));
     }
-    if (globalsConfigJSON.hasKey("exitOnRenderComplete") && !globalsConfigJSON.isNull("exitOnRenderComplete")) {
-      exitOnRenderComplete = globalsConfigJSON.getBoolean("exitOnRenderComplete");
-    }
-    if (globalsConfigJSON.hasKey("makeInfiniteVariantsMode") && !globalsConfigJSON.isNull("makeInfiniteVariantsMode")) {
-      makeInfiniteVariantsMode = globalsConfigJSON.getBoolean("makeInfiniteVariantsMode");
-    }
     // if assignment failed, exit with print of error
   } catch (Exception e) {
-    print("ERROR: Could not initialize global settings from in-memory JSON object. Message: " + e);
-    print("Please check the source JSON global configuration (\"global_settings\" object).");
+    println("ERROR: Could not initialize global settings from in-memory JSON object. Message: " + e);
+    println("Please check the source JSON global configuration (\"global_settings\" object).");
     exit();
   }
 }
+
 
 void initGrids() {
   try {
     if (allImportedJSON == null) {loadConfigurationJSON();}
     gridConfigsJSON = allImportedJSON.getJSONArray("grid_configs");
-    print("Configuration file " + JSONconfigFileName + " loaded successfully. Found " + gridConfigsJSON.size() + " grid configs.");
+    println("Configuration file " + JSONconfigFileName + " loaded successfully. Found " + gridConfigsJSON.size() + " grid configs.");
   // if assignment failed, exit with print of error
   } catch (Exception e) {
-    print("ERROR: Could not initialize grid configuration from in-memory JSON object. Message: " + e);
-    print("Please check the source JSON grid configuration (\"grid_configs\" array).");
+    println("ERROR: Could not initialize grid configuration from in-memory JSON object. Message: " + e);
+    println("Please check the source JSON grid configuration (\"grid_configs\" array).");
     exit();
   }
 
   // attempt grid_iterator object init from JSON config
   grid_iterators = new ArrayList<GridIterator>();
-  
+
   for (int i = 0; i < gridConfigsJSON.size(); i++) {
     try {
       JSONObject gridJSON = gridConfigsJSON.getJSONObject(i);
       GridIterator grid = new GridIterator(gridJSON);
       grid_iterators.add(grid);
       println("Created grid: " + gridJSON.getString("name"));
-      
+
     } catch (Exception e) {
       println("ERROR creating grid iterator from config " + i + ": " + e);
       println("Skipping this grid configuration.");
     }
   }
-  
+
   if (grid_iterators.isEmpty()) {
     println("FATAL: No valid grid iterators created.");
     exit();
   }
 }
+
 
 void settings() {
   pixelDensity(1);    // or (2) for high def/dotpitch screens?
@@ -421,14 +448,28 @@ void settings() {
   }
 }
 
+
 void setup() {
-  imageMode(CENTER);   // default is (CENTER)
-  background(backgroundColorWithAlpha);
-  prepareNextVariation();
-  // loadConfigurationJSON();
-  initGrids();
-  grid_iterator = grid_iterators.get(0);
+  imageMode(CENTER);
+  prepareNextVariant();
 }
+
+
+// intended only to be called at the moment we know a render of a variant is complete:
+void printRenderCompleteFeedbackAndMaybeExit() {
+  // notify that program will conditionally exit if so; but I want the information after this printed last so I'm checking exitOnRenderComplete twice:
+  if (exitOnRenderComplete == true) {println("exitOnRenderComplete boolean set to true; program will exit.");}
+  if (allGridsRenderedFeedbackPrinted == false) {
+    println("RENDERING COMPLETE (grid_iterators.size == 0).");
+    allGridsRenderedFeedbackPrinted = true;
+    if (saveFrames == true) {
+      println("Animation save frames are in the directory:\n  " + animFramesSaveDir);
+    }
+  }
+  // conditionally exit program as earlier notified will happen:
+  if (exitOnRenderComplete == true) {exit();}
+}
+
 
 void draw() {
 // some of the organization / drawing logic:
@@ -441,43 +482,49 @@ if (grid_iterators.size() > 0) {
     grid_iterator.drawRNDelement();
 
     if (grid_iterator.wrappedPastLastRow == true) {
-      print("------------------------------ WRAPPED AROUND FROM LAST ROW of grid_iterator! ------------------------------\n");
+      println("------------------------------ WRAPPED AROUND FROM LAST ROW of grid_iterator! ------------------------------");
       grid_iterators.remove(0);
       if (grid_iterators.size() > 0) {
         // assign the next grid_iterator if there is any left, then do other relevant things:
         grid_iterator = grid_iterators.get(0);
       }
     }
-
     // conditional program run end (or never end unless the user manually terminates the program run):
-    if (stopAtFrame > -1) {
-      countedFrames += 1;
-      if (countedFrames >= stopAtFrame) {
-        exit();
+    if (stopAtFrame > -1 && countedFrames >= stopAtFrame) {
+      // this called function terminates the program if exitOnRenderComplete == true:
+      printRenderCompleteFeedbackAndMaybeExit();
+      if (renderVariantsInfinitely == true) {
+        prepareNextVariant();
+      } else {
+        noLoop();
       }
     }
-  // the folowing else block is executed when grid_iterators.size is 0; see start of preceding congrol block:
+  // the following else block is executed when grid_iterators.size is 0; see start of preceding congrol block:
   } else {
-              // notify that program will conditionally exit if so; but I want the information after this printed last so I'm checking exitOnRenderComplete twice:
-              if (exitOnRenderComplete == true) {print("exitOnRenderComplete boolean set to true; program will exit.\n");}
-    if (allGridsRenderedFeedbackPrinted == false) {
-      print("RENDERING COMPLETE (grid_iterators.size == 0).\n");
-      allGridsRenderedFeedbackPrinted = true;
-      if (saveFrames == true) {
-        print("Animation save frames are in the directory:\n  " + animFramesSaveDir + "\n");
-      }
+    // this called function terminates the program if exitOnRenderComplete == true:
+    printRenderCompleteFeedbackAndMaybeExit();
+    if (renderVariantsInfinitely == true) {
+      prepareNextVariant();
     }
-              // conditionally exit program as earlier notified will happen:
-              if (exitOnRenderComplete == true) {exit();}
   }
 }
 
-// if the below is uncommented, save frame on mouse press, with file name indicating manual save
-void mousePressed() {
-  saveFrame("_manual_save__rnd_images_processing_" + "v" + scriptVersionString + "__anim_run__seed_" + seed + "_fr_##########.png");
+
+void manualSaveFrame() {
+  String paddedFrameNumber = String.format("%06d", countedFrames);
+  String saveFileName = "_manual_save__rnd_images_processing_" + "v" + scriptVersionString + "__anim_run__seed_" + seed + "_fr_" + paddedFrameNumber + ".png";
+  saveFrame(saveFileName);
+  println("image of current canvas saved to " + saveFileName);
 }
 
-// on keypress of p | P, start / stop the main loop (pause / unpause rendering)
+
+// save image frame on mouse press, with file name indicating manual save
+void mousePressed() {
+  manualSaveFrame();
+}
+
+
+// hotkeys for various things
 void keyPressed() {
   if (key == 'p' || key == 'P') {
     if (looping) {
@@ -485,9 +532,16 @@ void keyPressed() {
       println("|| PAUSED");
       println("Press 'p' again to resume");
     } else {
-      loop();    // Resume the sketch  
+      loop();    // Resume the sketch
       println("|> RESUMED");
       println("Press 'p' again to pause");
     }
+  }
+  if (key == ' ') {
+    manualSaveFrame();
+  }
+  if (key == 'v' || key == 'V') {
+    println("Keypress of 'n' detected; ending current variant render and starting a new one . . .");
+    prepareNextVariant();
   }
 }

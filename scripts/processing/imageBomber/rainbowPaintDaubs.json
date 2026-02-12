@@ -1,8 +1,8 @@
 {
     "_comment": "The following global_settings object here lists fields which are all optional. The field descripters indicate the type, e.g. boolean or int. Fields with a null value will be ignored. Fields with a non-null value (such as a number or string) will override any values for the corresponding global variables in the source imageBomber.pde. Note the field names are slightly different; e.g. booleanOverrideSeed here corresponds to overrideSeed there. To learn their purpose and use, see comments for corresponding variables in the source.",
     "global_settings": {
-        "booleanOverrideSeed": true,
-        "intOverrideSeed": 7,
+        "booleanOverrideSeed": null,
+        "intOverrideSeed": null,
         "boolanSaveFrames": null,
         "intFrameRate": null,
         "booleanUseFrameRate": null,
@@ -11,8 +11,8 @@
         "intCustomCanvasHeight": null,
         "intStopAtFrame": null,
         "backGroundColorWithAlpha": [255, 255, 129, 255],
-        "exitOnRenderComplete": null,
-        "makeInfiniteVariantsMode": false
+        "booleanExitOnRenderComplete": null,
+        "booleanRenderVariantsInfinitely": null
     },
     "grid_configs": [
         {
