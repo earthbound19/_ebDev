@@ -16,8 +16,6 @@
 
 // CODE
 // TO DO:
-// - cache image resources (in memory?) to avoid reloading them on reinit of grid
-// - persist global config after JSON config load and also don't reload JSON config
 // - optional random palette retrieval and recoloring of colorizable source rasters (or SVGs??)
 // - randomRotationDegrees implementation and in config
 
@@ -45,7 +43,7 @@ color backgroundColorWithAlpha = color(144,145,145,255);   // alter the three in
 // END GLOBAL VARIABLES which you may alter
 
 // GLOBALS NOT TO CHANGE HERE; program logic or the developer may change them in program runs or updates:
-String scriptVersionString = "2-18-13";
+String scriptVersionString = "2-19-5";
 
 String animFramesSaveDir;
 int countedFrames = 0;
@@ -97,31 +95,27 @@ class GridIterator {
 
   // initialized with a JSON object imported from (by default) imageBomberDefaultConfig.json or any other JSON
   GridIterator(JSONObject gridJSON) {
-    this.gridX1 = gridJSON.getInt("gridX1");
-    this.gridY1 = gridJSON.getInt("gridY1");
-    this.gridX2 = gridJSON.getInt("gridX2");
-    this.gridY2 = gridJSON.getInt("gridY2");
-    this.cols = gridJSON.getInt("cols");
-    this.rows = gridJSON.getInt("rows");
+    gridX1 = gridJSON.getInt("gridX1");
+    gridY1 = gridJSON.getInt("gridY1");
+    gridX2 = gridJSON.getInt("gridX2");
+    gridY2 = gridJSON.getInt("gridY2");
+    cols = gridJSON.getInt("cols");
+    rows = gridJSON.getInt("rows");
     // Calculate cell dimensions
     cellWidth = gridX2 / cols;
     cellHeight = gridY2 / rows;
-    this.minimumScaleMultiplier = gridJSON.getFloat("minScale");
-    this.maximumScaleMultiplier = gridJSON.getFloat("maxScale");
-    this.minimumSquishMultiplier = gridJSON.getFloat("minSquish");
-    this.maximumSquishMultiplier = gridJSON.getFloat("maxSquish");
-    this.squishImagesBool = gridJSON.getBoolean("squishImagesBool");
-    this.imagesPath = gridJSON.getString("imagesPath");
-    this.elementsPerCell = gridJSON.getInt("elementsPerCell");
-    this.skipCellChance = gridJSON.getFloat("skipCellChance");
-    this.skipDrawElementChance = gridJSON.getFloat("skipDrawElementChance");
-    this.drawnCellElements = 0;
-
-    // Start at first cell (column 0, row 0)
+    minimumScaleMultiplier = gridJSON.getFloat("minScale");
+    maximumScaleMultiplier = gridJSON.getFloat("maxScale");
+    minimumSquishMultiplier = gridJSON.getFloat("minSquish");
+    maximumSquishMultiplier = gridJSON.getFloat("maxSquish");
+    squishImagesBool = gridJSON.getBoolean("squishImagesBool");
+    imagesPath = gridJSON.getString("imagesPath");
+    elementsPerCell = gridJSON.getInt("elementsPerCell");
+    skipCellChance = gridJSON.getFloat("skipCellChance");
+    skipDrawElementChance = gridJSON.getFloat("skipDrawElementChance");
+    
+    // initializes members to default, ready-to-start-render state:
     reset();
-    updateCellBounds();
-
-    this.wrappedPastLastRow = false;
 
     allImagesList = new ArrayList<PImage>();
 
@@ -146,12 +140,6 @@ class GridIterator {
     imagesArrayListLength = allImagesList.size() - 1;   // -1 because it will be used with zero-based indexing
     widthOfImagesInArrayList = allImagesList.get(0).width;
     heightOfImagesInArrayList = allImagesList.get(0).height;
-  }
-
-  // Reset to first cell (column 0, row 0)
-  void reset() {
-    currentCol = 0;   // Using 0-based indexing
-    currentRow = 0;
   }
 
   // Update the cell boundaries based on current position
@@ -255,6 +243,20 @@ class GridIterator {
     }
     //popMatrix();  // you need to uncomment this if you animate things. If you don't animate things, it isn't necessary. I think.
   }
+
+  boolean isComplete() {
+    return wrappedPastLastRow;    // set to true in a Class function when we've gone through all cells
+  }
+
+  // to reset class members which will allow us to start a new variant for renderVariantsInfinitely mode, OR to initialize a GridIterator from the constructor:
+  void reset() {
+    drawnCellElements = 0;
+    // Start at first cell (column 0, row 0)
+    currentCol = 0;   // Using 0-based indexing
+    currentRow = 0;
+    wrappedPastLastRow = false;
+    updateCellBounds();
+  }
 }
 
 // OUTSIDE SETUP, DECLARE ArrayList of GridIterators:
@@ -263,8 +265,29 @@ ArrayList<GridIterator> grid_iterators;    // grid_iterators to be used in succe
 // END GLOBAL VARIABLES AND CLASSES to not alter
 
 
-// Function that handles values etc. for new animated variant to be displayed:
+// Function that handles values etc. for new animated variant to be displayed;
+// intended only to be called at the moment we know a render of a variant is complete:
 void prepareNextVariant() {
+  // notify that program will conditionally exit if so; but I want the information after this printed last so I'm checking exitOnRenderComplete twice:
+  if (exitOnRenderComplete == true) {println("exitOnRenderComplete boolean set to true; program will exit.");}
+
+  // handle variant render complete feedback print
+  if (allGridsRenderedFeedbackPrinted == false) {
+    println("RENDERING COMPLETE (grid_iterators.size == 0).");
+    allGridsRenderedFeedbackPrinted = true;
+    if (saveFrames == true) {
+      println("Animation save frames are in the directory:\n  " + animFramesSaveDir);
+    }
+  }
+
+  // conditionally save the last frame of the variant if a boolean says so:
+  if (saveLastFrameOfEveryVariant == true) {manualSaveFrame();}
+  // conditionally exit program as earlier notified will happen:
+  if (exitOnRenderComplete == true) {
+    exit();
+  }
+
+  // handle setting up next variant if we haven't exited the program
   if (booleanOverrideSeed == true) {   // this will only be the case the first time we check booleanOverrideSeed if it is initially set to true; after we set it false this will always be false:
     println("booleanOverrideSeed true; overrideSeed value " + overrideSeed + " will be used to seed pseudorandom number generator.");
     seed = overrideSeed;
@@ -276,9 +299,23 @@ void prepareNextVariant() {
 
   // reset / reinitialize globals and objects:
   randomSeed(seed);
-  initGrids();
+
+  // if we haven't added anything to the grid_iterators ArrayList (if it is null), add to it via initGrids(); if we have (if it is not null), reset them. The whole reason of this is avoiding reload of image paths / resources when we can reuse them for a new variant, but still change other things in the list of grid iterators to a default / reset state to render a new variant:
+  if (grid_iterators == null) {
+    initGrids();    // intended for first time, creates everything
+  } else {
+    // subsequent variants - just reset existing grids:
+    for (GridIterator g : grid_iterators) {
+      g.reset();
+    }
+  }
+  
+  grid_iterator = null;   // will be reassigned on next draw
   grid_iterator = grid_iterators.get(0);
-  background(backgroundColorWithAlpha);     // clear canvas
+  clearTheCanvas = true;
+
+  // DEPRECATED; moved to draw() loop which is really where it goes:
+  // background(backgroundColorWithAlpha);     // clear canvas
   countedFrames = 0;
   allGridsRenderedFeedbackPrinted = false;
 
@@ -457,70 +494,69 @@ void setup() {
 }
 
 
-// intended only to be called at the moment we know a render of a variant is complete:
-void printRenderCompleteFeedbackAndMaybeExit() {
-  // notify that program will conditionally exit if so; but I want the information after this printed last so I'm checking exitOnRenderComplete twice:
-  if (exitOnRenderComplete == true) {println("exitOnRenderComplete boolean set to true; program will exit.");}
-  if (allGridsRenderedFeedbackPrinted == false) {
-    println("RENDERING COMPLETE (grid_iterators.size == 0).");
-    allGridsRenderedFeedbackPrinted = true;
-    if (saveFrames == true) {
-      println("Animation save frames are in the directory:\n  " + animFramesSaveDir);
-    }
-  }
-  // conditionally save the last frame of the variant if a boolean says so:
-  if (saveLastFrameOfEveryVariant == true) {manualSaveFrame();}
-  // conditionally exit program as earlier notified will happen:
-  if (exitOnRenderComplete == true) {
-    exit();
-  }
-}
-
-
+boolean clearTheCanvas = true;
 void draw() {
-// some of the organization / drawing logic:
-// - if we still have any grid iterators (if the size of the arrayList of them is greater then 0):
-// - draw the next random element for that grid.
-// - if everything for a grid_iterator has been drawn (grid_iterator[0].wrappedPastLastRow == true), remove that first grid iterator from the arrayList so that we operate on the next grid if we operate on index 0 in the arrayList of them.
-if (grid_iterators.size() > 0) {
-    // to draw an element at any randomly selected place on the canvas in a range:
-    // drawRNDelement(int xMin, int xMax, int yMin, int yMax)
-    grid_iterator.drawRNDelement();
-
-    if (grid_iterator.wrappedPastLastRow == true) {
-      println("------------------------------ WRAPPED AROUND FROM LAST ROW of grid_iterator! ------------------------------");
-      grid_iterators.remove(0);
-      if (grid_iterators.size() > 0) {
-        // assign the next grid_iterator if there is any left, then do other relevant things:
-        grid_iterator = grid_iterators.get(0);
+  // clear canvas at start of new variant
+  if (clearTheCanvas) {
+    background(backgroundColorWithAlpha);
+    clearTheCanvas = false;
+  }
+  
+  if (grid_iterators != null && grid_iterators.size() > 0) {
+    // find first incomplete grid
+    GridIterator currentGrid = null;
+    for (GridIterator g : grid_iterators) {
+      if (!g.isComplete()) {
+        currentGrid = g;
+        break;
       }
     }
-    // conditional program run end (or never end unless the user manually terminates the program run):
+    
+    if (currentGrid != null) {
+      currentGrid.drawRNDelement();
+    } else {
+      // all grids complete!
+      if (renderVariantsInfinitely) {
+        // reset all grids for next variant
+        for (GridIterator g : grid_iterators) {
+          g.reset();
+        }
+        clearTheCanvas = true;
+        prepareNextVariant();
+      } else {
+        noLoop();  // Stop rendering if not infinite
+      }
+    }
+    
+    // stop condition - frame count limit reached
     if (stopAtFrame > -1 && countedFrames >= stopAtFrame) {
-      // this called function terminates the program if exitOnRenderComplete == true:
-      printRenderCompleteFeedbackAndMaybeExit();
-      if (renderVariantsInfinitely == true) {
+      if (renderVariantsInfinitely) {
+        // reset all grids for next variant
+        for (GridIterator g : grid_iterators) {
+          g.reset();
+        }
+        clearTheCanvas = true;
         prepareNextVariant();
       } else {
         noLoop();
       }
     }
-  // the following else block is executed when grid_iterators.size is 0; see start of preceding congrol block:
+    
   } else {
-    // this called function terminates the program if exitOnRenderComplete == true:
-    printRenderCompleteFeedbackAndMaybeExit();
-    if (renderVariantsInfinitely == true) {
-      prepareNextVariant();
-    }
+    // no grids exist yet (first run) - shouldn't happen after initGrids()
+    println("ERROR: No grid iterators available.");
+    noLoop();
   }
 }
 
 
 void manualSaveFrame() {
-  String paddedFrameNumber = String.format("%06d", countedFrames);
-  String saveFileName = "_manual_save__rnd_images_processing_" + "v" + scriptVersionString + "__anim_run__seed_" + seed + "_fr_" + paddedFrameNumber + ".png";
-  saveFrame(saveFileName);
-  println("image of current canvas saved to " + saveFileName);
+  if (countedFrames != 0) {   // I don't like this bandaid but it's a simple ouchie fix
+    String paddedFrameNumber = String.format("%06d", countedFrames);
+    String saveFileName = "_manual_save__rnd_images_processing_" + "v" + scriptVersionString + "__anim_run__seed_" + seed + "_fr_" + paddedFrameNumber + ".png";
+    saveFrame(saveFileName);
+    println("image of current canvas saved to " + saveFileName);
+  }
 }
 
 
