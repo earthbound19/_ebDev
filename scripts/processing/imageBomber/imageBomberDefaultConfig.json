@@ -6,13 +6,14 @@
         "boolanSaveFrames": null,
         "booleanUseFrameRate": null,
         "intFrameRate": null,
-        "booleanUseCustomCanvasSize": true,
-        "intCustomCanvasWidth": 1920,
-        "intCustomCanvasHeight": 1080,
+        "booleanUseCustomCanvasSize": null,
+        "intCustomCanvasWidth": null,
+        "intCustomCanvasHeight": null,
         "intStopAtFrame": null,
-        "backGroundColorWithAlpha": [144, 145, 145, 255],
         "booleanExitOnRenderComplete": null,
-        "booleanRenderVariantsInfinitely": null
+        "booleanRenderVariantsInfinitely": null,
+        "booleanSaveLastFrameOfEveryVariant": null,
+        "backGroundColorWithAlpha": [144, 145, 145, 255]
     },
     "grid_configs": [
         {

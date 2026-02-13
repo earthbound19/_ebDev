@@ -10,9 +10,10 @@
         "intCustomCanvasWidth": null,
         "intCustomCanvasHeight": null,
         "intStopAtFrame": null,
-        "backGroundColorWithAlpha": [255, 255, 129, 255],
         "booleanExitOnRenderComplete": null,
-        "booleanRenderVariantsInfinitely": null
+        "booleanRenderVariantsInfinitely": null,
+        "booleanSaveLastFrameOfEveryVariant": null,
+        "backGroundColorWithAlpha": [255, 255, 129, 255]
     },
     "grid_configs": [
         {
