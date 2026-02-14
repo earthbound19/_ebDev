@@ -20,9 +20,11 @@
             "name": "coarse_grid",
             "minScale": 1.6,
             "maxScale": 3.1,
+            "minRotation": 0,
+            "maxRotation": 360,
             "minSquish": 0.91,
             "maxSquish": 1.18,
-            "squishImagesBool": true,
+            "booleanSquishImages": true,
             "cols": 5,
             "rows": 2,
             "imagesPath": "image_bomber_sets/rainbow_paint_daubs_2",
@@ -32,15 +34,18 @@
             "gridY2": 1080,
             "elementsPerCell": 2,
             "skipCellChance": 0.37,
-            "skipDrawElementChance": 0.37
+            "skipDrawElementChance": 0.37,
+            "booleanCirclesOverride": false
         },
         {
             "name": "coarse_grid_two",
             "minScale": 0.41,
             "maxScale": 1.4,
+            "minRotation": 0,
+            "maxRotation": 360,
             "minSquish": 0.77,
             "maxSquish": 1.23,
-            "squishImagesBool": true,
+            "booleanSquishImages": true,
             "cols": 7,
             "rows": 4,
             "imagesPath": "image_bomber_sets/rainbow_paint_daubs_2",
@@ -50,15 +55,18 @@
             "gridY2": 1080,
             "elementsPerCell": 4,
             "skipCellChance": 0.215,
-            "skipDrawElementChance": 0.296
+            "skipDrawElementChance": 0.296,
+            "booleanCirclesOverride": false
         },
         {
             "name": "fine_midground_grid",
             "minScale": 0.156,
             "maxScale": 0.41,
+            "minRotation": 0,
+            "maxRotation": 360,
             "minSquish": 0.726,
             "maxSquish": 1.38,
-            "squishImagesBool": true,
+            "booleanSquishImages": true,
             "cols": 11,
             "rows": 5,
             "imagesPath": "image_bomber_sets/rainbow_paint_daubs_2",
@@ -68,15 +76,18 @@
             "gridY2": 1080,
             "elementsPerCell": 3,
             "skipCellChance": 0.73,
-            "skipDrawElementChance": 0.29
+            "skipDrawElementChance": 0.29,
+            "booleanCirclesOverride": false
         },
         {
             "name": "medium_grid",
             "minScale": 0.276,
             "maxScale": 0.81,
+            "minRotation": 0,
+            "maxRotation": 360,
             "minSquish": 0.87,
             "maxSquish": 1.13,
-            "squishImagesBool": true,
+            "booleanSquishImages": true,
             "cols": 12,
             "rows": 5,
             "imagesPath": "image_bomber_sets/rainbow_paint_daubs_2",
@@ -86,15 +97,18 @@
             "gridY2": 1080,
             "elementsPerCell": 4,
             "skipCellChance": 0.69,
-            "skipDrawElementChance": 0.61
+            "skipDrawElementChance": 0.61,
+            "booleanCirclesOverride": false
         },
         {
             "name": "fine_foreground_grid",
             "minScale": 0.2,
             "maxScale": 0.375,
+            "minRotation": 0,
+            "maxRotation": 360,
             "minSquish": 0.77,
             "maxSquish": 1.264,
-            "squishImagesBool": true,
+            "booleanSquishImages": true,
             "cols": 11,
             "rows": 5,
             "imagesPath": "image_bomber_sets/rainbow_paint_daubs_2",
@@ -104,7 +118,8 @@
             "gridY2": 1080,
             "elementsPerCell": 2,
             "skipCellChance": 0.9,
-            "skipDrawElementChance": 0.84
+            "skipDrawElementChance": 0.84,
+            "booleanCirclesOverride": false
         }
     ]
 }

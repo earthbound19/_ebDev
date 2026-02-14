@@ -1,5 +1,5 @@
 // DESCRIPTION
-// Supply images which are all the same dimensions in a subfolder (see USAGE), and this Image Bomber Processing script will randomly position, rotate, and scale them, one after another, as rapidly as you instruct it to, into a new image. Definition sets of images to bomb may be configured in layers. It will optionally save animation images of the process, or interactively save any still which you tell it to.
+// Supply images which are all the same dimensions in a subfolder (see USAGE), and this Image Bomber Processing script will randomly position, rotate, and scale them, one after another, as rapidly as you instruct it to, into a new image. Definition sets of images to bomb may be configured in layers. It will optionally save animation images of the process, or interactively save any still which you tell it to, and more. See USAGE.
 
 // NO COPYRIGHT
 // This is my original code and I dedicate it to the Public Domain. 2026-02-06 Richard Alexander Hall
@@ -9,6 +9,7 @@
 // - Examine other comments in that same comment section for instructions on all the global variables which you may alter for your preferences, including by defining global preferences and/or a grid in a JSON configuration file.
 // - On run of script, you may:
 //  - press the space bar or a mouse button to save a still of what is displayed. The still is named like this: _rnd_images_processing_v1-0-0__anim_run__seed_1409989632_fr_0000000315.png. You might think that file name has too much information. It doesn't. It is all the information required to reproduce exactly the same image again should you want to (provided the same script version, seed, and source image set).
+//  - click the canvas or press the spacebar to save the current display to an image
 //  - type the letter 'p'(ause) to pause or resume rendering of elements in the grid
 //  - type the letter 'v'(ariant) to stop rendering the current variant and start a new one
 // See comments in the modifiable GLOBAL VARIANTS area to learn what else this script can do.
@@ -40,10 +41,16 @@ boolean exitOnRenderComplete = false;   // causes program to terminate after com
 boolean renderVariantsInfinitely = false;   // causes program to render a new variant after the first one completes, and another after that, ad infinitum.
 boolean saveLastFrameOfEveryVariant = false;    // causes program to use manualSaveFrame(); for the final frame of every variant. Useful for finding a favorite among many variants. (Including if stopAtFrame causes an early variant render stop.)
 color backgroundColorWithAlpha = color(144,145,145,255);   // alter the three integer RGB values and alpha in that to set the background color. For neutral (as perceived by humans) gray, set all three RGB values to 145.
+
+// color array to randomly select from for fallback vector circles, OR for vector mode:
+color[] colorsArray = {
+  #FFFFFF, #EDEDED, #DBDCDC, #C9CACA, #B7B7B8, #A3A4A5, #909191,
+  #7B7C7D, #656767, #4E5051, #353838, #191B1C,#000000
+};
 // END GLOBAL VARIABLES which you may alter
 
 // GLOBALS NOT TO CHANGE HERE; program logic or the developer may change them in program runs or updates:
-String scriptVersionString = "2-19-5";
+String scriptVersionString = "2-20-7";
 
 String animFramesSaveDir;
 int countedFrames = 0;
@@ -58,42 +65,46 @@ class GridIterator {
   // Grid dimensions
   int cols, rows;
 
-  float minimumScaleMultiplier;     // minimum amount to randomly scale images down to. It's a multiplier; for example if the source image width is 600, then 600 * 0.27 = 162 px minimum width. Suggested values: 0.15 to 0.27. If smaller max like 0.27, suggest this at 0.081.
-  float maximumScaleMultiplier;     // maximum amount to randomly scale images up to. Can constrain larger images to a smaller maximum. Not recommended to exceed 1, unless you anticipate images looking good scaled up.
-  float minimumSquishMultiplier;
-  float maximumSquishMultiplier;    // If you want a range that's stretched (or squished) and admitting normal, set this to 1. You can also set this to more than one to have "squished" to "stretch" range.
-  boolean squishImagesBool;             // if set to true, after image size is randomly proportionally scaled down, image widths and heights are further randomly altered without respect for maintaining aspect (a square may be squished or stretched to a rectangle), within constraints of minimumSquishMultiplier (minimum) to maximumSquishMultiplier (maximum). If set to false, no squishing will occur and images will remain at original proportion. Note that you may set a maximumSquishMultiplier below 1 for images to always be squished at least to some amount.
+  float minScaleMultiplier;     // minimum amount to randomly scale images down to. It's a multiplier; for example if the source image width is 600, then 600 * 0.27 = 162 px minimum width. Suggested values: 0.15 to 0.27. If smaller max like 0.27, suggest this at 0.081.
+  float maxScaleMultiplier;     // maximum amount to randomly scale images up to. Can constrain larger images to a smaller maximum. Not recommended to exceed 1, unless you anticipate images looking good scaled up.
+  float minRotation;            // minimum random rotation range in degrees. May be negative or positive.
+  float maxRotation;            // maximum random rotation range in degrees. May be negative or positive.
+  float minSquishMultiplier;
+  float maxSquishMultiplier;    // If you want a range that's stretched (or squished) and admitting normal, set this to 1. You can also set this to more than one to have "squished" to "stretch" range.
+  boolean squishImagesBool;             // if set to true, after image size is randomly proportionally scaled down, image widths and heights are further randomly altered without respect for maintaining aspect (a square may be squished or stretched to a rectangle), within constraints of minSquishMultiplier (minimum) to maxSquishMultiplier (maximum). If set to false, no squishing will occur and images will remain at original proportion. Note that you may set a maxSquishMultiplier below 1 for images to always be squished at least to some amount.
 
-  int elementsPerCell;   // when this count is reached, nextCell() is called
-  int drawnCellElements;        // for counting drawn elements to check against elementsPerCell
-
+  int elementsPerCell;      // when this count is reached, nextCell() is called
+  int drawnCellElements;    // for counting drawn elements to check against elementsPerCell
+    
   // Current cell position
   int currentCol, currentRow;
-
+  
   // Cell boundaries
   int xMin, xMax, yMin, yMax;
-
+  
   // Grid total boundaries; gridX1 and gridY1 are the coordinate of the upper left corner of the grid.
   int gridX1, gridY1, gridX2, gridY2;
-
+  
   String imagesPath;
-
+  
   // Cell dimensions
   int cellWidth, cellHeight;
-
+  
   // Boolean info of whether last row was surpassed and wrapped around to first;
   // by design this will be checked and if necessary changed from outside an instance of GridIterator:
   boolean wrappedPastLastRow;
-
+  
   ArrayList<PImage> allImagesList;
   int imagesArrayListLength;
   int widthOfImagesInArrayList;
   int heightOfImagesInArrayList;
-
+    
   float skipCellChance;           // if nonzero there is a chance that when nextCell() is called it will skip the next cell (advance two cells)
   float skipDrawElementChance;    // if nonzero there is a chance that when drawRNDelement() is called it will skip drawing an element
 
-  // initialized with a JSON object imported from (by default) imageBomberDefaultConfig.json or any other JSON
+  boolean circlesOverride;       // flag to use vector circles instead of images. Overridden to true if images load fails.
+
+  // a class instance is initialized with a JSON object imported from (by default) imageBomberDefaultConfig.json or any other JSON
   GridIterator(JSONObject gridJSON) {
     gridX1 = gridJSON.getInt("gridX1");
     gridY1 = gridJSON.getInt("gridY1");
@@ -104,15 +115,18 @@ class GridIterator {
     // Calculate cell dimensions
     cellWidth = gridX2 / cols;
     cellHeight = gridY2 / rows;
-    minimumScaleMultiplier = gridJSON.getFloat("minScale");
-    maximumScaleMultiplier = gridJSON.getFloat("maxScale");
-    minimumSquishMultiplier = gridJSON.getFloat("minSquish");
-    maximumSquishMultiplier = gridJSON.getFloat("maxSquish");
-    squishImagesBool = gridJSON.getBoolean("squishImagesBool");
+    minScaleMultiplier = gridJSON.getFloat("minScale");
+    maxScaleMultiplier = gridJSON.getFloat("maxScale");
+    minRotation = gridJSON.getFloat("minRotation");
+    maxRotation = gridJSON.getFloat("maxRotation");
+    minSquishMultiplier = gridJSON.getFloat("minSquish");
+    maxSquishMultiplier = gridJSON.getFloat("maxSquish");
+    squishImagesBool = gridJSON.getBoolean("booleanSquishImages");
     imagesPath = gridJSON.getString("imagesPath");
     elementsPerCell = gridJSON.getInt("elementsPerCell");
     skipCellChance = gridJSON.getFloat("skipCellChance");
     skipDrawElementChance = gridJSON.getFloat("skipDrawElementChance");
+    circlesOverride = gridJSON.getBoolean("booleanCirclesOverride");
     
     // initializes members to default, ready-to-start-render state:
     reset();
@@ -129,17 +143,32 @@ class GridIterator {
       if (f.isDirectory() == false) {
         String fullPathToFile = f.getAbsolutePath();
         // only add file names that end with .png:
-        if (fullPathToFile.matches("(.*).png") == true) {
+        if (fullPathToFile.matches("(.*).png")) {
           println("Adding file " + fullPathToFile + " to images ArrayList . . .");
           PImage tmpImage = loadImage(fullPathToFile);
-          allImagesList.add(tmpImage);
+          // add image to list if valid, otherwise skip add, and warn
+          if (tmpImage != null) {allImagesList.add(tmpImage);}
+          else {println("WARNING: Could not load image: " + fullPathToFile);}
         }
       }
     }
 
-    imagesArrayListLength = allImagesList.size() - 1;   // -1 because it will be used with zero-based indexing
-    widthOfImagesInArrayList = allImagesList.get(0).width;
-    heightOfImagesInArrayList = allImagesList.get(0).height;
+    // check if images list empty; if so, create dummy values and rend drawRNDelement() will fallback to circle vectors
+    if (allImagesList.isEmpty()) {
+      println("WARNING: No valid images found in " + imagesPath + ". Will use fallback circles.");
+      circlesOverride = true;
+      // Set these to dummy / default values since we won't be using actual images
+      imagesArrayListLength = colorsArray.length - 1;    // -1 because it will be used with zero-based indexing
+      // println("Set imagesArrayListLength to " + imagesArrayListLength + " (colorsArray length: " + colorsArray.length + ")");
+      widthOfImagesInArrayList = 450;     // max diameter for fallback circles
+      heightOfImagesInArrayList = 450;
+    } else {    //  otherwise set values derived from images:
+      imagesArrayListLength = allImagesList.size() - 1;   // -1 because it will be used with zero-based indexing
+      widthOfImagesInArrayList = allImagesList.get(0).width;
+      heightOfImagesInArrayList = allImagesList.get(0).height;
+      // println("Using images. imagesArrayListLength: " + imagesArrayListLength);
+    }
+
   }
 
   // Update the cell boundaries based on current position
@@ -194,8 +223,6 @@ class GridIterator {
 
   // draws an element in current cell boundaries with scale, squish, and location randomization constraints:
   void drawRNDelement() {
-    // pushMatrix();  // you need to uncomment this if you animate things. If you don't animate things, it isn't necessary. I think.
-
     // if we randomly draw a number within range skipDrawElementChance, skip drawing any element. (This will never happen if skipDrawElementChance is 0.)
     if (random(1) < skipDrawElementChance) {
       println("SKIPPING ELEMENT DRAW because of random draw of number less than skipDrawElementChance, " + skipDrawElementChance + "!");
@@ -204,25 +231,38 @@ class GridIterator {
 
     int xCenter = (int) random(xMin, xMax);
     int yCenter = (int) random(yMin, yMax);
+
+    pushMatrix();
     translate(xCenter, yCenter);
-    float randomRotateDegree = random(0, 360);
+    float randomRotateDegree = random(minRotation, maxRotation);
     rotate(radians(randomRotateDegree));
-    translate(xCenter * -1, yCenter * -1);
-    // get random index for an image in the array:
-    int rnd_imagesArray_idx = (int) random(0, imagesArrayListLength + 1);    // + 1 bcse random max range is not included in range
+
     // set random height and width to scale image to (within constraints):
     // randomize width and height within scale range, and maintain aspect (will alter aspect after this if told to) :
-    float width_and_height_scalar = random(minimumScaleMultiplier, maximumScaleMultiplier);
-    float scaled_width = (int) widthOfImagesInArrayList * width_and_height_scalar;
-    float scaled_height = (int) heightOfImagesInArrayList * width_and_height_scalar;
-
+    float width_and_height_scalar = random(minScaleMultiplier, maxScaleMultiplier);
+    float scaled_width = widthOfImagesInArrayList * width_and_height_scalar;
+    float scaled_height = heightOfImagesInArrayList * width_and_height_scalar;
+    
     // if boolean instructs to do so, alter dimensions to random squish:
-    if (squishImagesBool == true) {
-      float widthSquishMultiplier = random(minimumSquishMultiplier, maximumSquishMultiplier);
-      scaled_width = (int) scaled_width * widthSquishMultiplier;
+    if (squishImagesBool) {
+      float widthSquishMultiplier = random(minSquishMultiplier, maxSquishMultiplier);
+      scaled_width *= widthSquishMultiplier;
     }
-
-    image(allImagesList.get(rnd_imagesArray_idx), xCenter, yCenter, scaled_width, scaled_height);
+    
+    if (!circlesOverride) {
+      // we have images to use; get random index for an image in the array:
+      int rnd_imagesArray_idx = (int) random(0, imagesArrayListLength + 1);    // + 1 bcse random max range is not included in range
+      // if we don't do pushMatrix() and popMatrix(), xCenter and yCenter should be specied as nonzero; otherwise we translate() to those coordinates and they are 0, 0
+      // image(allImagesList.get(rnd_imagesArray_idx), xCenter, yCenter, scaled_width, scaled_height);    // use xCenter and yCenter if we don't push and pop matrix, use 0 otherwise?
+      image(allImagesList.get(rnd_imagesArray_idx), 0, 0, scaled_width, scaled_height);
+    } else {
+      int colorIndex = (int) random(0, colorsArray.length);
+      fill(colorsArray[colorIndex]);
+      noStroke();
+      // no images available -- use fallback circles:
+      ellipse(0, 0, scaled_width, scaled_height);  // Draw at translated origin
+    }
+    popMatrix();
 
     // THIS GLOBAL iterated here immediately after we render any element; strictly the program may render many more frames than this, but we only want to reference frames that we "count" and which are in the numbered animation sequence:
     countedFrames += 1;
@@ -331,6 +371,11 @@ void prepareNextVariant() {
   }
 
   println(">> New variant prepared. Seed: " + seed);
+
+  // Restart the draw loop if it was stopped
+  if (!looping) {
+    loop();
+  }
 }
 
 
@@ -355,14 +400,12 @@ ArrayList<File> listFilesRecursive(String dir) {
   // Validate directory exists and is not a file before proceeding; throw and exit if it is either:
   File dirFile = new File(dir);
   if (!dirFile.exists()) {
-    println("ERROR: Directory does not exist: " + dir);
+    println("WARNING: Directory does not exist: " + dir);
     println("Full path: " + dirFile.getAbsolutePath());
-    exit();
   }
 
   if (!dirFile.isDirectory()) {
-    println("ERROR: Path is not a directory: " + dir);
-    exit();
+    println("WARNING: Path is not a directory: " + dir);
   }
 
   // If neither of those threw, it will proceed:
@@ -551,7 +594,7 @@ void draw() {
 
 
 void manualSaveFrame() {
-  if (countedFrames != 0) {   // I don't like this bandaid but it's a simple ouchie fix
+  if (countedFrames != 0) {   // I don't like this bandaid but it's a simple ouchie fix; it prevents saving a frame when there's only a blank canvas (no elements rendered)
     String paddedFrameNumber = String.format("%06d", countedFrames);
     String saveFileName = "_manual_save__rnd_images_processing_" + "v" + scriptVersionString + "__anim_run__seed_" + seed + "_fr_" + paddedFrameNumber + ".png";
     saveFrame(saveFileName);

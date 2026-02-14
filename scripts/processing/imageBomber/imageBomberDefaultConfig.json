@@ -20,9 +20,11 @@
             "name": "coarse_grid_with_canvas_overshoot",
             "minScale": 0.7,
             "maxScale": 1.1,
+            "minRotation": 0,
+            "maxRotation": 360,
             "minSquish": 0.91,
             "maxSquish": 1.18,
-            "squishImagesBool": true,
+            "booleanSquishImages": true,
             "cols": 6,
             "rows": 3,
             "imagesPath": "image_bomber_sets/13_shades_of_gray_circles",
@@ -32,15 +34,18 @@
             "gridY2": 1238,
             "elementsPerCell": 2,
             "skipCellChance": 0,
-            "skipDrawElementChance": 0
+            "skipDrawElementChance": 0,
+            "booleanCirclesOverride": false
         },
         {
             "name": "coarse_grid_two_with_canvas_overshoot",
             "minScale": 0.42,
             "maxScale": 0.66,
+            "minRotation": 0,
+            "maxRotation": 360,
             "minSquish": 0.96,
             "maxSquish": 1.04,
-            "squishImagesBool": true,
+            "booleanSquishImages": true,
             "cols": 8,
             "rows": 5,
             "imagesPath": "image_bomber_sets/13_shades_of_gray_circles",
@@ -50,15 +55,18 @@
             "gridY2": 1174,
             "elementsPerCell": 3,
             "skipCellChance": 0.8,
-            "skipDrawElementChance": 0.6
+            "skipDrawElementChance": 0.6,
+            "booleanCirclesOverride": false
         },
         {
             "name": "fine_midground_grid",
             "minScale": 0.13,
             "maxScale": 0.396,
+            "minRotation": 0,
+            "maxRotation": 360,
             "minSquish": 0.96,
             "maxSquish": 1.04,
-            "squishImagesBool": true,
+            "booleanSquishImages": true,
             "cols": 11,
             "rows": 5,
             "imagesPath": "image_bomber_sets/13_shades_of_gray_circles",
@@ -68,15 +76,18 @@
             "gridY2": 1110,
             "elementsPerCell": 3,
             "skipCellChance": 0.87,
-            "skipDrawElementChance": 0.79
+            "skipDrawElementChance": 0.79,
+            "booleanCirclesOverride": false
         },
         {
             "name": "medium_grid_sparse",
             "minScale": 0.49,
             "maxScale": 0.77,
+            "minRotation": 0,
+            "maxRotation": 360,
             "minSquish": 0.92,
             "maxSquish": 1.08,
-            "squishImagesBool": true,
+            "booleanSquishImages": true,
             "cols": 9,
             "rows": 3,
             "imagesPath": "image_bomber_sets/13_shades_of_gray_circles",
@@ -86,15 +97,18 @@
             "gridY2": 1190,
             "elementsPerCell": 1,
             "skipCellChance": 0.92,
-            "skipDrawElementChance": 0.88
+            "skipDrawElementChance": 0.88,
+            "booleanCirclesOverride": false
         },
         {
             "name": "fine_foreground_grid",
             "minScale": 0.07,
             "maxScale": 0.42,
+            "minRotation": 0,
+            "maxRotation": 360,
             "minSquish": 0.98,
             "maxSquish": 1.02,
-            "squishImagesBool": true,
+            "booleanSquishImages": true,
             "cols": 10,
             "rows": 4,
             "imagesPath": "image_bomber_sets/13_shades_of_gray_circles",
@@ -104,7 +118,8 @@
             "gridY2": 1096,
             "elementsPerCell": 1,
             "skipCellChance": 0.86,
-            "skipDrawElementChance": 0.81
+            "skipDrawElementChance": 0.81,
+            "booleanCirclesOverride": false
         }
     ]
 }
