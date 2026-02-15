@@ -18,7 +18,10 @@
 
 # CODE
 if [ "$1" ]; then srcHexpltFile=$1; else printf "\nNo parameter \$1 (input .hexplt file) passed to script. Exit."; exit 1; fi
-if [ "$1" ]; then imageResolution=$2; fi
+
+# this may be overriden by logic on the line after it:
+imageResolution=250x250
+if [ "$2" ] && [ "$2" != "DEFAULT" ]; then imageResolution=$2; fi
 
 pathToSourcePalette=$(findPalette.sh $srcHexpltFile)
 if [ "$pathToSourcePalette" == "" ]; then echo "ERROR: source palette file $srcHexpltFile not found. Exit."; exit 1; fi
