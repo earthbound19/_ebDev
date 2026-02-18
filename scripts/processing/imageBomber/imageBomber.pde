@@ -51,7 +51,7 @@ color[] colorsArray = {
 // END GLOBAL VARIABLES which you may alter
 
 // GLOBALS NOT TO CHANGE HERE; program logic or the developer may change them in program runs or updates:
-String scriptVersionString = "2-22-2";
+String scriptVersionString = "2-22-3";
 
 String animFramesSaveDir;
 int countedFrames = 0;
@@ -82,30 +82,30 @@ class GridIterator {
 
   int elementsPerCell;      // when this count is reached, nextCell() is called
   int drawnCellElements;    // for counting drawn elements to check against elementsPerCell
-    
+
   // Current cell position
   int currentCol, currentRow;
-  
+
   // Cell boundaries
   int xMin, xMax, yMin, yMax;
-  
+
   // Grid total boundaries; gridX1 and gridY1 are the coordinate of the upper left corner of the grid.
   int gridX1, gridY1, gridX2, gridY2;
-  
+
   String imagesPath;
-  
+
   // Cell dimensions
   int cellWidth, cellHeight;
-  
+
   // Boolean info of whether last row was surpassed and wrapped around to first;
   // by design this will be checked and if necessary changed from outside an instance of GridIterator:
   boolean wrappedPastLastRow;
-  
+
   ArrayList<PImage> allImagesList;
   int imagesArrayListLength;
   int widthOfImagesInArrayList;
   int heightOfImagesInArrayList;
-    
+
   float skipCellChance;           // if nonzero there is a chance that when nextCell() is called it will skip the next cell (advance two cells)
   float skipDrawElementChance;    // if nonzero there is a chance that when drawRNDelement() is called it will skip drawing an element
 
@@ -134,7 +134,7 @@ class GridIterator {
     skipCellChance = gridJSON.getFloat("skipCellChance");
     skipDrawElementChance = gridJSON.getFloat("skipDrawElementChance");
     circlesOverride = gridJSON.getBoolean("booleanCirclesOverride");
-    
+
     // initializes members to default, ready-to-start-render state:
     reset();
 
@@ -249,13 +249,13 @@ class GridIterator {
     float width_and_height_scalar = random(minScaleMultiplier, maxScaleMultiplier);
     float scaled_width = widthOfImagesInArrayList * width_and_height_scalar;
     float scaled_height = heightOfImagesInArrayList * width_and_height_scalar;
-    
+
     // if boolean instructs to do so, alter dimensions to random squish:
     if (squishImagesBool) {
       float widthSquishMultiplier = random(minSquishMultiplier, maxSquishMultiplier);
       scaled_width *= widthSquishMultiplier;
     }
-    
+
     if (!circlesOverride) {
       // we have images to use; get random index for an image in the array:
       int rnd_imagesArray_idx = (int) random(0, imagesArrayListLength + 1);    // + 1 bcse random max range is not included in range
@@ -356,7 +356,7 @@ void prepareNextVariant() {
       g.reset();
     }
   }
-  
+
   grid_iterator = null;   // will be reassigned on next draw
   grid_iterator = grid_iterators.get(0);
   clearTheCanvas = true;
@@ -524,7 +524,7 @@ void initGrids() {
 }
 
 
-// checks for and auto-downloads image resources which this script uses, if target dir does not exist and boolean says to and 
+// checks for and auto-downloads image resources which this script uses, if target dir does not exist and boolean says to and
 void downloadAndExtractImages() {
   // this creates a file object in memory and does nothing on disk; we can use that object to check if a disk object of the same path exists:
   File dir = new File(sketchPath() + "/" + extractToFolder);
@@ -537,7 +537,7 @@ void downloadAndExtractImages() {
       // Download the archive
       String archivePath = sketchPath() + "/" + archiveFilename;
       println("Downloading from: " + imageArchiveUrl);
-      
+
       // Download inline
       byte[] data = loadBytes(imageArchiveUrl);
       if (data == null) {
@@ -549,16 +549,16 @@ void downloadAndExtractImages() {
 
       // Extract it inline
       println("Extracting to: " + extractToFolder);
-      
+
       // Simple ZIP extraction using Java's ZipInputStream
       java.util.zip.ZipInputStream zis = new java.util.zip.ZipInputStream(new java.io.FileInputStream(archivePath));
       java.util.zip.ZipEntry zipEntry;
       byte[] buffer = new byte[1024];
-      
+
       while ((zipEntry = zis.getNextEntry()) != null) {
         String entryName = zipEntry.getName();
         java.io.File newFile = new java.io.File(sketchPath() + "/" + extractToFolder + "/" + entryName);
-        
+
         if (zipEntry.isDirectory()) {
           newFile.mkdirs();
         } else {
@@ -573,7 +573,7 @@ void downloadAndExtractImages() {
       }
       zis.closeEntry();
       zis.close();
-      
+
       println("Extraction complete.");
 
       // Clean up the archive if desired
@@ -585,7 +585,7 @@ void downloadAndExtractImages() {
         grid_iterators = null;
         prepareNextVariant();
       }
-          
+
     } catch (Exception e) {
       println("ERROR during download/extraction: " + e.getMessage());
       e.printStackTrace();
@@ -621,7 +621,7 @@ void draw() {
     background(backgroundColorWithAlpha);
     clearTheCanvas = false;
   }
-  
+
   if (grid_iterators != null && grid_iterators.size() > 0) {
     // find first incomplete grid
     GridIterator currentGrid = null;
@@ -631,7 +631,7 @@ void draw() {
         break;
       }
     }
-    
+
     if (currentGrid != null) {
       currentGrid.drawRNDelement();
     } else {
@@ -647,7 +647,7 @@ void draw() {
         noLoop();  // Stop rendering if not infinite
       }
     }
-    
+
     // stop condition - frame count limit reached
     if (stopAtFrame > -1 && countedFrames >= stopAtFrame) {
       if (renderVariantsInfinitely) {
@@ -661,7 +661,7 @@ void draw() {
         noLoop();
       }
     }
-    
+
   } else {
     // no grids exist yet (first run) - shouldn't happen after initGrids()
     println("ERROR: No grid iterators available.");
