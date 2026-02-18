@@ -26,7 +26,8 @@ JSONObject globalsConfigJSON;     // stores JSON global value overrides object e
 JSONArray gridConfigsJSON;        // stores JSON grid config values extracted from allImportedJSON
 
 // json configuration to load; see the sibling file imageBomberDefaultConfig.json for a complete example of options. Read on for config options and JSON config usage.
-String JSONconfigFileName = "imageBomberDefaultConfig.json";
+// String JSONconfigFileName = "imageBomberDefaultConfig.json";
+String JSONconfigFileName = "image_bomber_configs/32_Max_Chroma_Medium_Light_Depth_by_Hue.json";
 // NOTE that all of these below globals have counterpart values you can set in the .json file name assigned to the JSONconfigFileName (and parsed for usage after that). Any variables in that file which are assigned a null value will not have that value used, and the correspoding value assigned below will instead be used. (You must have useful values hard-coded to all the below globals; they function as defaults.) Any variables in the .json config file which are assigned a non-null value (such as an integer or float) will *override* any corresponding values below:
 boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. Any variants after that -- see renderVariantsInfinitely -- will have a random seed assigned. If booleanOverrideSeed is set to false, a seed will be chosen randomly for the first variant, and also all variants after. Setting booleanOverrideSeed to true with a dedicated value for overrideSeed will result in the same pseudo-randomness and result image for the first variant every time, given the same image resources and grid configurations.
 int overrideSeed = 936942080;   // see notes for booleanOverrideSeed. The seed of the first feature complete version demo output was -289762560. Another early used seed: 936942080
@@ -50,7 +51,7 @@ color[] colorsArray = {
 // END GLOBAL VARIABLES which you may alter
 
 // GLOBALS NOT TO CHANGE HERE; program logic or the developer may change them in program runs or updates:
-String scriptVersionString = "2-20-7";
+String scriptVersionString = "2-22-2";
 
 String animFramesSaveDir;
 int countedFrames = 0;
@@ -58,6 +59,12 @@ int seed;
 
 // controls feedback print:
 boolean allGridsRenderedFeedbackPrinted = false;   // when the size of the grid_iterators array becomes zero, a message is printed in the draw() loop, if this boolean is false, a message is printed that rendering is done. Then the boolean is immediately set to true so the message is never reprinted.
+
+// related to automatic download of image bomber images sets subfolders:
+boolean enableAutoDownload = true;
+String imageArchiveUrl = "http://earthbound.io/data/dist/image_bomber_sets_subfolders.zip";
+String archiveFilename = "image_bomber_sets_subfolders.zip";
+String extractToFolder = "image_bomber_sets";
 
 
 // has functions that iterate cell position with related coordinates on a grid. See internal class initializer.
@@ -183,33 +190,33 @@ class GridIterator {
 
   // avoids duplicate logic but hard for hooman to math :)
   void nextCellHelper() {
-    println("currentCol and currentRow are: " + currentCol + ", " + currentRow);
+    // println("currentCol and currentRow are: " + currentCol + ", " + currentRow);
     currentCol++;
 
     // If we've passed the last column, wrap to the first column
     if (currentCol >= cols) {
-      println("currentCol is >= cols (" + cols + "); will update.");
+      // println("currentCol is >= cols (" + cols + "); will update.");
       currentCol = 0;
       currentRow++;
-      println("currentCol and currentRow are now: " + currentCol + ", " + currentRow);
+      // println("currentCol and currentRow are now: " + currentCol + ", " + currentRow);
 
       // If we've passed the last row, wrap to the first row
       if (currentRow >= rows) {
-        println("currentRow >= rows (" + rows + "); will update.");
+        // println("currentRow >= rows (" + rows + "); will update.");
         currentRow = 0;
-        println("currentRow was updated to: " + currentRow);
+        // println("currentRow was updated to: " + currentRow);
         wrappedPastLastRow = true;
-        println("set wrappedPastLastRow to true, as currentRow wrapped and was reset to zero.");
+        // println("set wrappedPastLastRow to true, as currentRow wrapped and was reset to zero.");
       }
     }
-    println("currentCol and currentRow ARE NOW: " + currentCol + ", " + currentRow);
+    // println("currentCol and currentRow ARE NOW: " + currentCol + ", " + currentRow);
   }
 
   // Move to the next cell (left to right, top to bottom)
   void nextCell() {
     // randomly skip a cell if we draw a random number less than skipCellChance
     if (random(1) < skipCellChance) {
-      println("SKIPPING CELL because of random draw of number less than skipCellChance, " + skipCellChance + "!");
+      // println("SKIPPING CELL because of random draw of number less than skipCellChance, " + skipCellChance + "!");
       nextCellHelper();
       nextCellHelper();   // do this TWICE to effectively skip a cell
       updateCellBounds();
@@ -225,7 +232,7 @@ class GridIterator {
   void drawRNDelement() {
     // if we randomly draw a number within range skipDrawElementChance, skip drawing any element. (This will never happen if skipDrawElementChance is 0.)
     if (random(1) < skipDrawElementChance) {
-      println("SKIPPING ELEMENT DRAW because of random draw of number less than skipDrawElementChance, " + skipDrawElementChance + "!");
+      // println("SKIPPING ELEMENT DRAW because of random draw of number less than skipDrawElementChance, " + skipDrawElementChance + "!");
       return;   // we just return without drawing anything; no element drawn
     }
 
@@ -367,7 +374,6 @@ void prepareNextVariant() {
   } else {
   // ALTERS A GLOBAL:
     animFramesSaveDir = "_rnd_images_processing__anim_run__v" + scriptVersionString + "_seed__" + seed;
-    println("animFramesSaveDir value: " + animFramesSaveDir);
   }
 
   println(">> New variant prepared. Seed: " + seed);
@@ -518,6 +524,76 @@ void initGrids() {
 }
 
 
+// checks for and auto-downloads image resources which this script uses, if target dir does not exist and boolean says to and 
+void downloadAndExtractImages() {
+  // this creates a file object in memory and does nothing on disk; we can use that object to check if a disk object of the same path exists:
+  File dir = new File(sketchPath() + "/" + extractToFolder);
+  if (enableAutoDownload && !dir.exists() && !dir.isDirectory()) {
+    println("Image bomber resources directory " + extractToFolder + " Not found. Starting automatic images archive download...");
+    try {
+      // Create directories if needed
+      java.nio.file.Files.createDirectories(java.nio.file.Paths.get(extractToFolder));
+
+      // Download the archive
+      String archivePath = sketchPath() + "/" + archiveFilename;
+      println("Downloading from: " + imageArchiveUrl);
+      
+      // Download inline
+      byte[] data = loadBytes(imageArchiveUrl);
+      if (data == null) {
+        println("ERROR: Failed to download " + imageArchiveUrl);
+        return;
+      }
+      saveBytes(archivePath, data);
+      println("Download complete.");
+
+      // Extract it inline
+      println("Extracting to: " + extractToFolder);
+      
+      // Simple ZIP extraction using Java's ZipInputStream
+      java.util.zip.ZipInputStream zis = new java.util.zip.ZipInputStream(new java.io.FileInputStream(archivePath));
+      java.util.zip.ZipEntry zipEntry;
+      byte[] buffer = new byte[1024];
+      
+      while ((zipEntry = zis.getNextEntry()) != null) {
+        String entryName = zipEntry.getName();
+        java.io.File newFile = new java.io.File(sketchPath() + "/" + extractToFolder + "/" + entryName);
+        
+        if (zipEntry.isDirectory()) {
+          newFile.mkdirs();
+        } else {
+          newFile.getParentFile().mkdirs();
+          java.io.FileOutputStream fos = new java.io.FileOutputStream(newFile);
+          int len;
+          while ((len = zis.read(buffer)) > 0) {
+            fos.write(buffer, 0, len);
+          }
+          fos.close();
+        }
+      }
+      zis.closeEntry();
+      zis.close();
+      
+      println("Extraction complete.");
+
+      // Clean up the archive if desired
+      java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(archivePath));
+
+      // Trigger a new variant with the new resources
+      if (grid_iterators != null) {
+        // Force reload of grids to pick up new images
+        grid_iterators = null;
+        prepareNextVariant();
+      }
+          
+    } catch (Exception e) {
+      println("ERROR during download/extraction: " + e.getMessage());
+      e.printStackTrace();
+    }
+  }
+}
+
+
 void settings() {
   pixelDensity(1);    // or (2) for high def/dotpitch screens?
   // obtains any non-null values from imported JSON config and overrides corresponding globals from them;
@@ -532,6 +608,7 @@ void settings() {
 
 
 void setup() {
+  downloadAndExtractImages();
   imageMode(CENTER);
   prepareNextVariant();
 }
