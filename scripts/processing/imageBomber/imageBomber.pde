@@ -31,7 +31,7 @@ String JSONconfigFileName = "image_bomber_configs/32_Max_Chroma_Medium_Light_Dep
 // NOTE that all of these below globals have counterpart values you can set in the .json file name assigned to the JSONconfigFileName (and parsed for usage after that). Any variables in that file which are assigned a null value will not have that value used, and the correspoding value assigned below will instead be used. (You must have useful values hard-coded to all the below globals; they function as defaults.) Any variables in the .json config file which are assigned a non-null value (such as an integer or float) will *override* any corresponding values below:
 boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. Any variants after that -- see renderVariantsInfinitely -- will have a random seed assigned. If booleanOverrideSeed is set to false, a seed will be chosen randomly for the first variant, and also all variants after. Setting booleanOverrideSeed to true with a dedicated value for overrideSeed will result in the same pseudo-randomness and result image for the first variant every time, given the same image resources and grid configurations.
 int overrideSeed = 936942080;   // see notes for booleanOverrideSeed. The seed of the first feature complete version demo output was -289762560. Another early used seed: 936942080
-boolean saveFrames = false;    // set to true to save animation frames (images), false to not save them.
+boolean saveFrames = true;    // set to true to save animation frames (images), false to not save them.
 int frameRate = 60;   // how many frames per second to display changes to art. But if saveFrames is set to true, this is not used: Processing built-in frameRate function will not be called, and therefore the default no max or no throttle framerate will be used.
 boolean useFrameRate = false;  // if set to true, frameRate value will be used via call of Processing built-in function frameRate(n). See also comment for saveFrames.
 boolean useCustomCanvasSize = true;    // if set to true, customCanvasWidth and customCanvasHeight will define the canvas dimensions. Ff set to false, the full screen size will be detected and used.
@@ -43,6 +43,10 @@ boolean renderVariantsInfinitely = false;   // causes program to render a new va
 boolean saveLastFrameOfEveryVariant = false;    // causes program to use manualSaveFrame(); for the final frame of every variant. Useful for finding a favorite among many variants. (Including if stopAtFrame causes an early variant render stop.)
 color backgroundColorWithAlpha = color(144,145,145,255);   // alter the three integer RGB values and alpha in that to set the background color. For neutral (as perceived by humans) gray, set all three RGB values to 145.
 
+// NEW: Layer rendering mode - saves each grid as a separate transparent layer
+boolean renderAndSaveLayers = false;    // set to true to enable layer rendering mode
+String layersOutputDir = "";           // will be set automatically with timestamp
+
 // color array to randomly select from for fallback vector circles, OR for vector mode:
 color[] colorsArray = {
   #FFFFFF, #EDEDED, #DBDCDC, #C9CACA, #B7B7B8, #A3A4A5, #909191,
@@ -51,7 +55,7 @@ color[] colorsArray = {
 // END GLOBAL VARIABLES which you may alter
 
 // GLOBALS NOT TO CHANGE HERE; program logic or the developer may change them in program runs or updates:
-String scriptVersionString = "2-22-3";
+String scriptVersionString = "2-21-13";
 
 String animFramesSaveDir;
 int countedFrames = 0;
@@ -66,6 +70,12 @@ String imageArchiveUrl = "http://earthbound.io/data/dist/image_bomber_sets_subfo
 String archiveFilename = "image_bomber_sets_subfolders.zip";
 String extractToFolder = "image_bomber_sets";
 
+// NEW: Layer rendering globals
+PGraphics[] layerBuffers;              // array to store each rendered layer (including background at index 0)
+int currentGridIndex = 0;              // track which grid we're rendering
+boolean layerRenderingComplete = false; // flag for when all layers are done
+String layerTimestamp = "";             // timestamp for this layer set
+int totalLayersWithBackground;          // total layers including background (grids count + 1)
 
 // has functions that iterate cell position with related coordinates on a grid. See internal class initializer.
 class GridIterator {
@@ -357,6 +367,11 @@ void prepareNextVariant() {
     }
   }
 
+  // NEW: Initialize layer rendering if enabled
+  if (renderAndSaveLayers) {
+    initLayerRendering();
+  }
+
   grid_iterator = null;   // will be reassigned on next draw
   grid_iterator = grid_iterators.get(0);
   clearTheCanvas = true;
@@ -384,6 +399,67 @@ void prepareNextVariant() {
   }
 }
 
+// NEW: Initialize layer rendering buffers and directories
+void initLayerRendering() {
+  // Create timestamp for this layer set
+  int d = day();
+  int m = month();
+  int y = year();
+  int h = hour();
+  int min = minute();
+  int s = second();
+  layerTimestamp = String.format("%04d-%02d-%02d_%02d-%02d-%02d", y, m, d, h, min, s);
+
+  // Create output directory
+  layersOutputDir = sketchPath() + "/" + "layers_" + layerTimestamp + "_seed_" + seed;
+  java.io.File dir = new java.io.File(layersOutputDir);
+  if (!dir.exists()) {
+    dir.mkdirs();
+  }
+
+  // Calculate total layers including background (grids + background at index 0)
+  totalLayersWithBackground = grid_iterators.size() + 1;
+
+  // Initialize layer buffers array (including space for background layer at index 0)
+  layerBuffers = new PGraphics[totalLayersWithBackground];
+
+  // Create and save background layer (index 0)
+  layerBuffers[0] = createGraphics(width, height);
+  layerBuffers[0].beginDraw();
+  layerBuffers[0].background(backgroundColorWithAlpha);
+  layerBuffers[0].endDraw();
+
+  // Save background layer immediately
+  String bgFilename = layersOutputDir + "/layer_00_background.png";
+  layerBuffers[0].save(bgFilename);
+  println("Saved background layer to: " + bgFilename);
+
+  // Reset grid index and completion flag
+  // Note: currentGridIndex of 1 means we're starting with first actual grid (index 1 in buffers array)
+  currentGridIndex = 1;
+  layerRenderingComplete = false;
+
+  println("Layer rendering mode enabled. Output directory: " + layersOutputDir);
+  println("Total layers (including background): " + totalLayersWithBackground);
+  println("Will render " + grid_iterators.size() + " content layers.");
+}
+
+// NEW: Save current layer buffer to file (adjusted for background at index 0)
+void saveCurrentLayer(int bufferIndex) {
+  if (bufferIndex < layerBuffers.length && layerBuffers[bufferIndex] != null) {
+    String layerFilename;
+    if (bufferIndex == 0) {
+      layerFilename = layersOutputDir + "/layer_00_background.png";
+    } else {
+      // bufferIndex-1 to get the correct grid config (since grids start at index 1 in buffers)
+      int gridConfigIndex = bufferIndex - 1;
+      layerFilename = layersOutputDir + "/layer_" + String.format("%02d", bufferIndex) + "_" +
+                     gridConfigsJSON.getJSONObject(gridConfigIndex).getString("name", "unnamed") + ".png";
+    }
+    layerBuffers[bufferIndex].save(layerFilename);
+    println("Saved layer " + bufferIndex + " to: " + layerFilename);
+  }
+}
 
 // I here adapt a function by Daniel Shiffman which recursively traverses subdirectories; the "ArrayList<File> a" is passed by reference (directly modifies the Arraylist), I think:
 void recurseDir(ArrayList<File> a, String dir) {
@@ -475,6 +551,8 @@ void overrideGlobals() {
     exitOnRenderComplete =      setBooleanFromJSON(exitOnRenderComplete, globalsConfigJSON, "booleanExitOnRenderComplete");
     renderVariantsInfinitely =  setBooleanFromJSON(renderVariantsInfinitely, globalsConfigJSON, "booleanRenderVariantsInfinitely");
     saveLastFrameOfEveryVariant = setBooleanFromJSON(saveLastFrameOfEveryVariant, globalsConfigJSON, "booleanSaveLastFrameOfEveryVariant");
+    // NEW: Add layer rendering boolean to JSON overrides
+    renderAndSaveLayers =       setBooleanFromJSON(renderAndSaveLayers, globalsConfigJSON, "booleanRenderAndSaveLayers");
     // color
     if (globalsConfigJSON.hasKey("backGroundColorWithAlpha") && !globalsConfigJSON.isNull("backGroundColorWithAlpha")) {
       JSONArray bgColorArray = globalsConfigJSON.getJSONArray("backGroundColorWithAlpha");
@@ -625,18 +703,139 @@ void draw() {
   if (grid_iterators != null && grid_iterators.size() > 0) {
     // find first incomplete grid
     GridIterator currentGrid = null;
-    for (GridIterator g : grid_iterators) {
-      if (!g.isComplete()) {
-        currentGrid = g;
+    int gridIndex = -1;
+
+    for (int i = 0; i < grid_iterators.size(); i++) {
+      if (!grid_iterators.get(i).isComplete()) {
+        currentGrid = grid_iterators.get(i);
+        gridIndex = i;
         break;
       }
     }
 
     if (currentGrid != null) {
-      currentGrid.drawRNDelement();
+      // NEW: Layer rendering mode handling
+      if (renderAndSaveLayers) {
+        // Check if we've moved to a new grid
+        // Note: gridIndex 0 corresponds to buffer index 1 (since buffer[0] is background)
+        int bufferIndex = gridIndex + 1;
+
+        if (bufferIndex > currentGridIndex) {
+          // Save previous layer (which now contains all elements for that grid)
+          if (currentGridIndex < layerBuffers.length && layerBuffers[currentGridIndex] != null) {
+            saveCurrentLayer(currentGridIndex);
+          }
+          currentGridIndex = bufferIndex;
+
+          // Clear canvas for new layer display
+          clearTheCanvas = true;
+          background(0, 0, 0, 0); // Transparent background for display
+        }
+
+        // Create PGraphics buffer for this layer if it doesn't exist
+        if (layerBuffers[bufferIndex] == null) {
+          layerBuffers[bufferIndex] = createGraphics(width, height);
+          layerBuffers[bufferIndex].beginDraw();
+          layerBuffers[bufferIndex].imageMode(CENTER);
+          layerBuffers[bufferIndex].smooth(); // Enable anti-aliasing
+
+          // All content layers start with transparent background
+          layerBuffers[bufferIndex].background(0, 0, 0, 0); // Transparent
+          layerBuffers[bufferIndex].endDraw();
+        }
+
+        // Draw directly to the buffer (accumulate)
+        layerBuffers[bufferIndex].beginDraw();
+
+        // Get element parameters from currentGrid
+        int xCenter = (int) random(currentGrid.xMin, currentGrid.xMax);
+        int yCenter = (int) random(currentGrid.yMin, currentGrid.yMax);
+
+        layerBuffers[bufferIndex].pushMatrix();
+        layerBuffers[bufferIndex].translate(xCenter, yCenter);
+        float randomRotateDegree = random(currentGrid.minRotation, currentGrid.maxRotation);
+        layerBuffers[bufferIndex].rotate(radians(randomRotateDegree));
+
+        float width_and_height_scalar = random(currentGrid.minScaleMultiplier, currentGrid.maxScaleMultiplier);
+        float scaled_width = currentGrid.widthOfImagesInArrayList * width_and_height_scalar;
+        float scaled_height = currentGrid.heightOfImagesInArrayList * width_and_height_scalar;
+
+        if (currentGrid.squishImagesBool) {
+          float widthSquishMultiplier = random(currentGrid.minSquishMultiplier, currentGrid.maxSquishMultiplier);
+          scaled_width *= widthSquishMultiplier;
+        }
+
+        if (!currentGrid.circlesOverride) {
+          int rnd_imagesArray_idx = (int) random(0, currentGrid.imagesArrayListLength + 1);
+          layerBuffers[bufferIndex].image(currentGrid.allImagesList.get(rnd_imagesArray_idx), 0, 0, scaled_width, scaled_height);
+        } else {
+          int colorIndex = (int) random(0, colorsArray.length);
+          layerBuffers[bufferIndex].fill(colorsArray[colorIndex]);
+          layerBuffers[bufferIndex].noStroke();
+          layerBuffers[bufferIndex].ellipse(0, 0, scaled_width, scaled_height);
+        }
+
+        layerBuffers[bufferIndex].popMatrix();
+        layerBuffers[bufferIndex].endDraw();
+
+        // Display the accumulated buffer on top of background for preview
+        // First show background
+        image(layerBuffers[0], width/2, height/2);
+        // Then show all layers up to current
+        for (int i = 1; i <= bufferIndex; i++) {
+          if (layerBuffers[i] != null) {
+            image(layerBuffers[i], width/2, height/2);
+          }
+        }
+
+        // Update grid state
+        currentGrid.drawnCellElements += 1;
+
+        // THIS GLOBAL iterated here immediately after we render any element
+        countedFrames += 1;
+
+        // if told to save an animation frame, do so (only if not in layer mode to avoid confusion)
+        if (saveFrames == true && !renderAndSaveLayers) {
+          String paddedFrameNumber = String.format("%06d", countedFrames);
+          saveFrame(animFramesSaveDir + "/" + paddedFrameNumber + ".png");
+        }
+
+        if (currentGrid.drawnCellElements >= currentGrid.elementsPerCell) {
+          currentGrid.nextCell();
+          currentGrid.drawnCellElements = 0;
+        }
+
+        // Check if this grid is complete after drawing
+        if (currentGrid.isComplete()) {
+          println("Grid " + (gridIndex + 1) + " complete");
+        }
+      } else {
+        // Original rendering mode
+        currentGrid.drawRNDelement();
+      }
     } else {
       // all grids complete!
-      if (renderVariantsInfinitely) {
+      if (renderAndSaveLayers && !layerRenderingComplete) {
+        // Save the last layer if not already saved
+        if (currentGridIndex < layerBuffers.length && layerBuffers[currentGridIndex] != null) {
+          saveCurrentLayer(currentGridIndex);
+        }
+
+        layerRenderingComplete = true;
+        println("All layers saved to: " + layersOutputDir);
+
+        // Now handle next variant or exit
+        if (renderVariantsInfinitely) {
+          // reset all grids for next variant
+          for (GridIterator g : grid_iterators) {
+            g.reset();
+          }
+          clearTheCanvas = true;
+          prepareNextVariant();
+        } else {
+          noLoop();  // Stop rendering if not infinite
+        }
+      } else if (renderVariantsInfinitely) {
         // reset all grids for next variant
         for (GridIterator g : grid_iterators) {
           g.reset();
@@ -648,8 +847,8 @@ void draw() {
       }
     }
 
-    // stop condition - frame count limit reached
-    if (stopAtFrame > -1 && countedFrames >= stopAtFrame) {
+    // stop condition - frame count limit reached (only apply if not in layer mode)
+    if (!renderAndSaveLayers && stopAtFrame > -1 && countedFrames >= stopAtFrame) {
       if (renderVariantsInfinitely) {
         // reset all grids for next variant
         for (GridIterator g : grid_iterators) {
@@ -669,22 +868,55 @@ void draw() {
   }
 }
 
-
+// Updated manualSaveFrame to save composite ONLY to sketch folder (no redundant saves in layer folder)
 void manualSaveFrame() {
-  if (countedFrames != 0) {   // I don't like this bandaid but it's a simple ouchie fix; it prevents saving a frame when there's only a blank canvas (no elements rendered)
-    String paddedFrameNumber = String.format("%06d", countedFrames);
-    String saveFileName = "_manual_save__rnd_images_processing_" + "v" + scriptVersionString + "__anim_run__seed_" + seed + "_fr_" + paddedFrameNumber + ".png";
-    saveFrame(saveFileName);
-    println("image of current canvas saved to " + saveFileName);
+  if (renderAndSaveLayers) {
+    // In layer mode, save composite image of all layers
+    if (layerBuffers != null && layerBuffers.length > 0) {
+      println("Layer mode active - saving composite image of all layers...");
+
+      // Create composite from all layers
+      PGraphics composite = createGraphics(width, height);
+      composite.beginDraw();
+      composite.imageMode(CENTER);
+      composite.background(backgroundColorWithAlpha); // Start with background color
+
+      // Render all layers in order (including background at 0, then content layers)
+      for (int i = 0; i < layerBuffers.length; i++) {
+        if (layerBuffers[i] != null) {
+          composite.image(layerBuffers[i], width/2, height/2);
+          println("  Added layer " + i + " to composite");
+        }
+      }
+
+      composite.endDraw();
+
+      // Save the composite with manual save naming (ONLY to sketch folder)
+      String paddedFrameNumber = String.format("%06d", countedFrames);
+      String saveFileName = "v" + scriptVersionString + "__seed_" + seed + "_fr_" + paddedFrameNumber + ".png";
+      composite.save(sketchPath() + "/" + saveFileName);
+      println("Composite image saved to: " + saveFileName);
+
+      // Display the composite briefly
+      image(composite, width/2, height/2);
+    } else {
+      println("No layers available to composite yet.");
+    }
+  } else {
+    // Original behavior for non-layer mode
+    if (countedFrames != 0) {
+      String paddedFrameNumber = String.format("%06d", countedFrames);
+      String saveFileName = "v" + scriptVersionString + "__seed_" + seed + "_fr_" + paddedFrameNumber + ".png";
+      saveFrame(saveFileName);
+      println("Image of current canvas saved to " + saveFileName);
+    }
   }
 }
-
 
 // save image frame on mouse press, with file name indicating manual save
 void mousePressed() {
   manualSaveFrame();
 }
-
 
 // hotkeys for various things
 void keyPressed() {
@@ -703,7 +935,7 @@ void keyPressed() {
     manualSaveFrame();
   }
   if (key == 'v' || key == 'V') {
-    println("Keypress of 'n' detected; ending current variant render and starting a new one . . .");
+    println("Keypress of 'v' detected; ending current variant render and starting a new one . . .");
     prepareNextVariant();
   }
 }
