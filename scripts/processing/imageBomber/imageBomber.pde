@@ -23,14 +23,14 @@
 // BEGIN GLOBAL VARIABLES which you may alter if you know what you're doing:
 JSONObject allImportedJSON;       // intended to store everything imported from JSONconfigFileName
 JSONObject globalsConfigJSON;     // stores JSON global value overrides object extracted from allImportedJSON
-JSONArray gridConfigsJSON;        // stores JSON grid config values extracted from allImportedJSON
+JSONArray gridConfigsJSON;        // stores JSON grid config values extracted from allImportedJSONx
 
 // json configuration to load; see the sibling file imageBomberDefaultConfig.json for a complete example of options. Read on for config options and JSON config usage.
 // String JSONconfigFileName = "imageBomberDefaultConfig.json";
-String JSONconfigFileName = "image_bomber_configs/32_Max_Chroma_Medium_Light_Depth_by_Hue.json";
+String JSONconfigFileName = "image_bomber_configs/test.json";
 // NOTE that all of these below globals have counterpart values you can set in the .json file name assigned to the JSONconfigFileName (and parsed for usage after that). Any variables in that file which are assigned a null value will not have that value used, and the correspoding value assigned below will instead be used. (You must have useful values hard-coded to all the below globals; they function as defaults.) Any variables in the .json config file which are assigned a non-null value (such as an integer or float) will *override* any corresponding values below:
-boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. Any variants after that -- see renderVariantsInfinitely -- will have a random seed assigned. If booleanOverrideSeed is set to false, a seed will be chosen randomly for the first variant, and also all variants after. Setting booleanOverrideSeed to true with a dedicated value for overrideSeed will result in the same pseudo-randomness and result image for the first variant every time, given the same image resources and grid configurations.
-int overrideSeed = 936942080;   // see notes for booleanOverrideSeed. The seed of the first feature complete version demo output was -289762560. Another early used seed: 936942080
+boolean doSeedOverride = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. Any variants after that -- see renderVariantsInfinitely -- will have a random seed assigned. If doSeedOverride is set to false, a seed will be chosen randomly for the first variant, and also all variants after. Setting doSeedOverride to true with a dedicated value for overrideSeed will result in the same pseudo-randomness and result image for the first variant every time, given the same image resources and grid configurations.
+int overrideSeed = 936942080;   // see notes for doSeedOverride. The seed of the first feature complete version demo output was -289762560. Another early used seed: 936942080
 boolean saveFrames = true;    // set to true to save animation frames (images), false to not save them.
 int frameRate = 60;   // how many frames per second to display changes to art. But if saveFrames is set to true, this is not used: Processing built-in frameRate function will not be called, and therefore the default no max or no throttle framerate will be used.
 boolean useFrameRate = false;  // if set to true, frameRate value will be used via call of Processing built-in function frameRate(n). See also comment for saveFrames.
@@ -44,7 +44,7 @@ boolean saveLastFrameOfEveryVariant = false;    // causes program to use manualS
 color backgroundColorWithAlpha = color(144,145,145,255);   // alter the three integer RGB values and alpha in that to set the background color. For neutral (as perceived by humans) gray, set all three RGB values to 145.
 
 // NEW: Layer rendering mode - saves each grid as a separate transparent layer
-boolean renderAndSaveLayers = false;    // set to true to enable layer rendering mode
+boolean saveLayers = true;    // set to true to enable layer rendering mode
 String layersOutputDir = "";           // will be set automatically with timestamp
 
 // color array to randomly select from for fallback vector circles, OR for vector mode:
@@ -55,7 +55,7 @@ color[] colorsArray = {
 // END GLOBAL VARIABLES which you may alter
 
 // GLOBALS NOT TO CHANGE HERE; program logic or the developer may change them in program runs or updates:
-String scriptVersionString = "2-21-13";
+String scriptVersionString = "2-26-35";
 
 String animFramesSaveDir;
 int countedFrames = 0;
@@ -345,11 +345,11 @@ void prepareNextVariant() {
   }
 
   // handle setting up next variant if we haven't exited the program
-  if (booleanOverrideSeed == true) {   // this will only be the case the first time we check booleanOverrideSeed if it is initially set to true; after we set it false this will always be false:
-    println("booleanOverrideSeed true; overrideSeed value " + overrideSeed + " will be used to seed pseudorandom number generator.");
+  if (doSeedOverride == true) {   // this will only be the case the first time we check doSeedOverride if it is initially set to true; after we set it false this will always be false:
+    println("doSeedOverride true; overrideSeed value " + overrideSeed + " will be used to seed pseudorandom number generator.");
     seed = overrideSeed;
     // set this false so that the above only happens once, because for renderVariantsInfinitely (if set true) we want a new random seed for every variant after the first one:
-    booleanOverrideSeed = false;
+    doSeedOverride = false;
   } else {
     seed = (int) random(-2147483648, 2147483647);
   }
@@ -368,7 +368,7 @@ void prepareNextVariant() {
   }
 
   // NEW: Initialize layer rendering if enabled
-  if (renderAndSaveLayers) {
+  if (saveLayers) {
     initLayerRendering();
   }
 
@@ -531,7 +531,7 @@ int setIntFromJSON(int intToSet, JSONObject configJSON, String fieldName) {
 }
 
 
-// obtains JSON values from "global_settings" object and, for any of them which do not have a null value, overiddes hard-coded globals in this script with their value from the corresponding JSON object's field; e.g. if the "boolanSaveFrames" field is "true" or "false" instead of null, it uses that "true" or "false" value:
+// obtains JSON values from "global_settings" object and, for any of them which do not have a null value, overiddes hard-coded globals in this script with their value from the corresponding JSON object's field; e.g. if the "saveFrames" field is "true" or "false" instead of null, it uses that "true" or "false" value:
 void overrideGlobals() {
   try {
     if (allImportedJSON == null) {loadConfigurationJSON();}
@@ -539,20 +539,20 @@ void overrideGlobals() {
     println("Global settings in-memory JSON object loaded successfully.");
     // Check if various keys (intended globals) exist and are not null; assign value from them if so:
     // fields for set~JSON functions:        boolean booleanToSet/int intToSet, JSONObject configJSON, String fieldName
-    booleanOverrideSeed =       setBooleanFromJSON(booleanOverrideSeed, globalsConfigJSON, "booleanOverrideSeed");
-    overrideSeed =              setIntFromJSON(overrideSeed, globalsConfigJSON, "intOverrideSeed");
-    saveFrames =                setBooleanFromJSON(saveFrames, globalsConfigJSON, "boolanSaveFrames");
-    useFrameRate =              setBooleanFromJSON(useFrameRate, globalsConfigJSON, "booleanUseFrameRate");
-    frameRate =                 setIntFromJSON(frameRate, globalsConfigJSON, "intFrameRate");
-    useCustomCanvasSize =       setBooleanFromJSON(useCustomCanvasSize, globalsConfigJSON, "booleanUseCustomCanvasSize");
-    customCanvasWidth =         setIntFromJSON(customCanvasWidth, globalsConfigJSON, "intCustomCanvasWidth");
-    customCanvasHeight =        setIntFromJSON(customCanvasHeight, globalsConfigJSON, "intCustomCanvasHeight");
-    stopAtFrame =               setIntFromJSON(stopAtFrame, globalsConfigJSON, "intStopAtFrame");
-    exitOnRenderComplete =      setBooleanFromJSON(exitOnRenderComplete, globalsConfigJSON, "booleanExitOnRenderComplete");
-    renderVariantsInfinitely =  setBooleanFromJSON(renderVariantsInfinitely, globalsConfigJSON, "booleanRenderVariantsInfinitely");
-    saveLastFrameOfEveryVariant = setBooleanFromJSON(saveLastFrameOfEveryVariant, globalsConfigJSON, "booleanSaveLastFrameOfEveryVariant");
+    doSeedOverride =       setBooleanFromJSON(doSeedOverride, globalsConfigJSON, "doSeedOverride");
+    overrideSeed =              setIntFromJSON(overrideSeed, globalsConfigJSON, "overrideSeed");
+    saveFrames =                setBooleanFromJSON(saveFrames, globalsConfigJSON, "saveFrames");
+    useFrameRate =              setBooleanFromJSON(useFrameRate, globalsConfigJSON, "useFrameRate");
+    frameRate =                 setIntFromJSON(frameRate, globalsConfigJSON, "frameRate");
+    useCustomCanvasSize =       setBooleanFromJSON(useCustomCanvasSize, globalsConfigJSON, "useCustomCanvasSize");
+    customCanvasWidth =         setIntFromJSON(customCanvasWidth, globalsConfigJSON, "customCanvasWidth");
+    customCanvasHeight =        setIntFromJSON(customCanvasHeight, globalsConfigJSON, "customCanvasHeight");
+    stopAtFrame =               setIntFromJSON(stopAtFrame, globalsConfigJSON, "stopAtFrame");
+    exitOnRenderComplete =      setBooleanFromJSON(exitOnRenderComplete, globalsConfigJSON, "exitOnRenderComplete");
+    renderVariantsInfinitely =  setBooleanFromJSON(renderVariantsInfinitely, globalsConfigJSON, "renderVariantsInfinitely");
+    saveLastFrameOfEveryVariant = setBooleanFromJSON(saveLastFrameOfEveryVariant, globalsConfigJSON, "saveLastFrameEveryVariant");
     // NEW: Add layer rendering boolean to JSON overrides
-    renderAndSaveLayers =       setBooleanFromJSON(renderAndSaveLayers, globalsConfigJSON, "booleanRenderAndSaveLayers");
+    saveLayers =       setBooleanFromJSON(saveLayers, globalsConfigJSON, "booleansaveLayers");
     // color
     if (globalsConfigJSON.hasKey("backGroundColorWithAlpha") && !globalsConfigJSON.isNull("backGroundColorWithAlpha")) {
       JSONArray bgColorArray = globalsConfigJSON.getJSONArray("backGroundColorWithAlpha");
@@ -715,7 +715,7 @@ void draw() {
 
     if (currentGrid != null) {
       // NEW: Layer rendering mode handling
-      if (renderAndSaveLayers) {
+      if (saveLayers) {
         // Check if we've moved to a new grid
         // Note: gridIndex 0 corresponds to buffer index 1 (since buffer[0] is background)
         int bufferIndex = gridIndex + 1;
@@ -795,7 +795,7 @@ void draw() {
         countedFrames += 1;
 
         // if told to save an animation frame, do so (only if not in layer mode to avoid confusion)
-        if (saveFrames == true && !renderAndSaveLayers) {
+        if (saveFrames == true && !saveLayers) {
           String paddedFrameNumber = String.format("%06d", countedFrames);
           saveFrame(animFramesSaveDir + "/" + paddedFrameNumber + ".png");
         }
@@ -815,7 +815,7 @@ void draw() {
       }
     } else {
       // all grids complete!
-      if (renderAndSaveLayers && !layerRenderingComplete) {
+      if (saveLayers && !layerRenderingComplete) {
         // Save the last layer if not already saved
         if (currentGridIndex < layerBuffers.length && layerBuffers[currentGridIndex] != null) {
           saveCurrentLayer(currentGridIndex);
@@ -848,7 +848,7 @@ void draw() {
     }
 
     // stop condition - frame count limit reached (only apply if not in layer mode)
-    if (!renderAndSaveLayers && stopAtFrame > -1 && countedFrames >= stopAtFrame) {
+    if (!saveLayers && stopAtFrame > -1 && countedFrames >= stopAtFrame) {
       if (renderVariantsInfinitely) {
         // reset all grids for next variant
         for (GridIterator g : grid_iterators) {
@@ -870,7 +870,7 @@ void draw() {
 
 // Updated manualSaveFrame to save composite ONLY to sketch folder (no redundant saves in layer folder)
 void manualSaveFrame() {
-  if (renderAndSaveLayers) {
+  if (saveLayers) {
     // In layer mode, save composite image of all layers
     if (layerBuffers != null && layerBuffers.length > 0) {
       println("Layer mode active - saving composite image of all layers...");
