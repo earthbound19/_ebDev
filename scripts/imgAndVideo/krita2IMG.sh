@@ -1,5 +1,5 @@
 # DESCRIPTION
-# krita CLI wrapper to convert from a krita source image to another destination image format (you might call this e.g. effectively kra2png).
+# krita CLI wrapper to convert from a krita source image to another destination image format (you might call this e.g. effectively kra2png). SEE ALSO allIMGtypeToLayeredIMG.sh for example to assemble various images into one .kra layered image file.
 
 # DEPENDENCY
 # An install of krita http://krita.org in your PATH.
