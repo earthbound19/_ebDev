@@ -9,10 +9,10 @@
         "useCustomCanvasSize": true,
         "customCanvasWidth": 800,
         "customCanvasHeight": 600,
-        "stopAtFrame": 12,
+        "stopAtFrame": 65,
         "exitOnRenderComplete": true,
         "renderVariantsInfinitely": true,
-        "booleanSaveLastFrame": null,
+        "saveLastFrameEveryVariant": true,
         "backGroundColorWithAlpha": [
             144,
             184,

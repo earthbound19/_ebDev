@@ -40,7 +40,7 @@ int customCanvasHeight = 1080;  // set to any arbitrary height you want for ". f
 int stopAtFrame = -1;   // Processing program will exit after this many animation frames. If set to a negative number, the program runs forever until you manually stop it. If set to 0 it makes 1 frame regardless, because of the way the draw() and exit() functions work: exit() waits for draw() to finish. 764 may be a good number for this if you use a positive value. NOTES: intended use with this value and a gridIterator class is that the gridIterator keeps making images over cell areas of nested finer grids until stopAtFrame is reached. If stopAtFrame is -1 then a gridIterator will be used until all intended elements in the grid are rendered. After a render completes, other globals control what happens: see notes for exitOnRenderComplete and renderVariantsInfinitely.
 boolean exitOnRenderComplete = false;   // causes program to terminate after completion of first variant render, even if renderVariantsInfinitely is set to true
 boolean renderVariantsInfinitely = false;   // causes program to render a new variant after the first one completes, and another after that, ad infinitum.
-boolean saveLastFrameOfEveryVariant = false;    // causes program to use manualSaveFrame(); for the final frame of every variant. Useful for finding a favorite among many variants. (Including if stopAtFrame causes an early variant render stop.)
+boolean saveLastFrameEveryVariant = false;    // causes program to use manualSaveFrame(); for the final frame of every variant. Useful for finding a favorite among many variants. (Including if stopAtFrame causes an early variant render stop.)
 color backgroundColorWithAlpha = color(144,145,145,255);   // alter the three integer RGB values and alpha in that to set the background color. For neutral (as perceived by humans) gray, set all three RGB values to 145.
 
 // NEW: Layer rendering mode - saves each grid as a separate transparent layer
@@ -55,7 +55,7 @@ color[] colorsArray = {
 // END GLOBAL VARIABLES which you may alter
 
 // GLOBALS NOT TO CHANGE HERE; program logic or the developer may change them in program runs or updates:
-String scriptVersionString = "2-26-35";
+String scriptVersionString = "2-26-40";
 
 String animFramesSaveDir;
 int countedFrames = 0;
@@ -325,30 +325,14 @@ ArrayList<GridIterator> grid_iterators;    // grid_iterators to be used in succe
 // Function that handles values etc. for new animated variant to be displayed;
 // intended only to be called at the moment we know a render of a variant is complete:
 void prepareNextVariant() {
-  // notify that program will conditionally exit if so; but I want the information after this printed last so I'm checking exitOnRenderComplete twice:
-  if (exitOnRenderComplete == true) {println("exitOnRenderComplete boolean set to true; program will exit.");}
+  // DO NOT print completion messages here - this is for STARTING a variant, not completing one
+  // The completion messages should only come from draw() when rendering actually finishes
 
-  // handle variant render complete feedback print
-  if (allGridsRenderedFeedbackPrinted == false) {
-    println("RENDERING COMPLETE (grid_iterators.size == 0).");
-    allGridsRenderedFeedbackPrinted = true;
-    if (saveFrames == true) {
-      println("Animation save frames are in the directory:\n  " + animFramesSaveDir);
-    }
-  }
-
-  // conditionally save the last frame of the variant if a boolean says so:
-  if (saveLastFrameOfEveryVariant == true) {manualSaveFrame();}
-  // conditionally exit program as earlier notified will happen:
-  if (exitOnRenderComplete == true) {
-    exit();
-  }
-
-  // handle setting up next variant if we haven't exited the program
-  if (doSeedOverride == true) {   // this will only be the case the first time we check doSeedOverride if it is initially set to true; after we set it false this will always be false:
+  // handle setting up next variant
+  if (doSeedOverride == true) {
     println("doSeedOverride true; overrideSeed value " + overrideSeed + " will be used to seed pseudorandom number generator.");
     seed = overrideSeed;
-    // set this false so that the above only happens once, because for renderVariantsInfinitely (if set true) we want a new random seed for every variant after the first one:
+    // set this false so that the above only happens once
     doSeedOverride = false;
   } else {
     seed = (int) random(-2147483648, 2147483647);
@@ -357,7 +341,7 @@ void prepareNextVariant() {
   // reset / reinitialize globals and objects:
   randomSeed(seed);
 
-  // if we haven't added anything to the grid_iterators ArrayList (if it is null), add to it via initGrids(); if we have (if it is not null), reset them. The whole reason of this is avoiding reload of image paths / resources when we can reuse them for a new variant, but still change other things in the list of grid iterators to a default / reset state to render a new variant:
+  // Initialize grids if needed
   if (grid_iterators == null) {
     initGrids();    // intended for first time, creates everything
   } else {
@@ -367,27 +351,30 @@ void prepareNextVariant() {
     }
   }
 
-  // NEW: Initialize layer rendering if enabled
+  // Initialize layer rendering if enabled
   if (saveLayers) {
     initLayerRendering();
+  } else {
+    // Reset layer rendering state for non-layer mode
+    layerBuffers = null;
+    currentGridIndex = 0;
+    layerRenderingComplete = false;
   }
 
-  grid_iterator = null;   // will be reassigned on next draw
-  grid_iterator = grid_iterators.get(0);
+  grid_iterator = null;
+  if (grid_iterators != null && grid_iterators.size() > 0) {
+    grid_iterator = grid_iterators.get(0);
+  }
   clearTheCanvas = true;
-
-  // DEPRECATED; moved to draw() loop which is really where it goes:
-  // background(backgroundColorWithAlpha);     // clear canvas
   countedFrames = 0;
-  allGridsRenderedFeedbackPrinted = false;
+  allGridsRenderedFeedbackPrinted = false;  // Reset this for the new variant
 
-  // Only call frameRate if saveFrames is false, because if we're saving animation frames we (or I--deciding for the user!) don't want any other slowdown; saving frames is slower already.
+  // Only call frameRate if saveFrames is false
   if (saveFrames == false) {
     if (useFrameRate == true) {
       frameRate(frameRate);
     }
   } else {
-  // ALTERS A GLOBAL:
     animFramesSaveDir = "_rnd_images_processing__anim_run__v" + scriptVersionString + "_seed__" + seed;
   }
 
@@ -550,9 +537,9 @@ void overrideGlobals() {
     stopAtFrame =               setIntFromJSON(stopAtFrame, globalsConfigJSON, "stopAtFrame");
     exitOnRenderComplete =      setBooleanFromJSON(exitOnRenderComplete, globalsConfigJSON, "exitOnRenderComplete");
     renderVariantsInfinitely =  setBooleanFromJSON(renderVariantsInfinitely, globalsConfigJSON, "renderVariantsInfinitely");
-    saveLastFrameOfEveryVariant = setBooleanFromJSON(saveLastFrameOfEveryVariant, globalsConfigJSON, "saveLastFrameEveryVariant");
+    saveLastFrameEveryVariant = setBooleanFromJSON(saveLastFrameEveryVariant, globalsConfigJSON, "saveLastFrameEveryVariant");
     // NEW: Add layer rendering boolean to JSON overrides
-    saveLayers =       setBooleanFromJSON(saveLayers, globalsConfigJSON, "booleansaveLayers");
+    saveLayers =       setBooleanFromJSON(saveLayers, globalsConfigJSON, "saveLayers");
     // color
     if (globalsConfigJSON.hasKey("backGroundColorWithAlpha") && !globalsConfigJSON.isNull("backGroundColorWithAlpha")) {
       JSONArray bgColorArray = globalsConfigJSON.getJSONArray("backGroundColorWithAlpha");
@@ -693,180 +680,221 @@ void setup() {
 
 
 boolean clearTheCanvas = true;
+
+
 void draw() {
   // clear canvas at start of new variant
   if (clearTheCanvas) {
     background(backgroundColorWithAlpha);
     clearTheCanvas = false;
+    println("DEBUG: Canvas cleared");
   }
 
-  if (grid_iterators != null && grid_iterators.size() > 0) {
-    // find first incomplete grid
-    GridIterator currentGrid = null;
-    int gridIndex = -1;
-
-    for (int i = 0; i < grid_iterators.size(); i++) {
-      if (!grid_iterators.get(i).isComplete()) {
-        currentGrid = grid_iterators.get(i);
-        gridIndex = i;
-        break;
-      }
-    }
-
-    if (currentGrid != null) {
-      // NEW: Layer rendering mode handling
-      if (saveLayers) {
-        // Check if we've moved to a new grid
-        // Note: gridIndex 0 corresponds to buffer index 1 (since buffer[0] is background)
-        int bufferIndex = gridIndex + 1;
-
-        if (bufferIndex > currentGridIndex) {
-          // Save previous layer (which now contains all elements for that grid)
-          if (currentGridIndex < layerBuffers.length && layerBuffers[currentGridIndex] != null) {
-            saveCurrentLayer(currentGridIndex);
-          }
-          currentGridIndex = bufferIndex;
-
-          // Clear canvas for new layer display
-          clearTheCanvas = true;
-          background(0, 0, 0, 0); // Transparent background for display
-        }
-
-        // Create PGraphics buffer for this layer if it doesn't exist
-        if (layerBuffers[bufferIndex] == null) {
-          layerBuffers[bufferIndex] = createGraphics(width, height);
-          layerBuffers[bufferIndex].beginDraw();
-          layerBuffers[bufferIndex].imageMode(CENTER);
-          layerBuffers[bufferIndex].smooth(); // Enable anti-aliasing
-
-          // All content layers start with transparent background
-          layerBuffers[bufferIndex].background(0, 0, 0, 0); // Transparent
-          layerBuffers[bufferIndex].endDraw();
-        }
-
-        // Draw directly to the buffer (accumulate)
-        layerBuffers[bufferIndex].beginDraw();
-
-        // Get element parameters from currentGrid
-        int xCenter = (int) random(currentGrid.xMin, currentGrid.xMax);
-        int yCenter = (int) random(currentGrid.yMin, currentGrid.yMax);
-
-        layerBuffers[bufferIndex].pushMatrix();
-        layerBuffers[bufferIndex].translate(xCenter, yCenter);
-        float randomRotateDegree = random(currentGrid.minRotation, currentGrid.maxRotation);
-        layerBuffers[bufferIndex].rotate(radians(randomRotateDegree));
-
-        float width_and_height_scalar = random(currentGrid.minScaleMultiplier, currentGrid.maxScaleMultiplier);
-        float scaled_width = currentGrid.widthOfImagesInArrayList * width_and_height_scalar;
-        float scaled_height = currentGrid.heightOfImagesInArrayList * width_and_height_scalar;
-
-        if (currentGrid.squishImagesBool) {
-          float widthSquishMultiplier = random(currentGrid.minSquishMultiplier, currentGrid.maxSquishMultiplier);
-          scaled_width *= widthSquishMultiplier;
-        }
-
-        if (!currentGrid.circlesOverride) {
-          int rnd_imagesArray_idx = (int) random(0, currentGrid.imagesArrayListLength + 1);
-          layerBuffers[bufferIndex].image(currentGrid.allImagesList.get(rnd_imagesArray_idx), 0, 0, scaled_width, scaled_height);
-        } else {
-          int colorIndex = (int) random(0, colorsArray.length);
-          layerBuffers[bufferIndex].fill(colorsArray[colorIndex]);
-          layerBuffers[bufferIndex].noStroke();
-          layerBuffers[bufferIndex].ellipse(0, 0, scaled_width, scaled_height);
-        }
-
-        layerBuffers[bufferIndex].popMatrix();
-        layerBuffers[bufferIndex].endDraw();
-
-        // Display the accumulated buffer on top of background for preview
-        // First show background
-        image(layerBuffers[0], width/2, height/2);
-        // Then show all layers up to current
-        for (int i = 1; i <= bufferIndex; i++) {
-          if (layerBuffers[i] != null) {
-            image(layerBuffers[i], width/2, height/2);
-          }
-        }
-
-        // Update grid state
-        currentGrid.drawnCellElements += 1;
-
-        // THIS GLOBAL iterated here immediately after we render any element
-        countedFrames += 1;
-
-        // if told to save an animation frame, do so (only if not in layer mode to avoid confusion)
-        if (saveFrames == true && !saveLayers) {
-          String paddedFrameNumber = String.format("%06d", countedFrames);
-          saveFrame(animFramesSaveDir + "/" + paddedFrameNumber + ".png");
-        }
-
-        if (currentGrid.drawnCellElements >= currentGrid.elementsPerCell) {
-          currentGrid.nextCell();
-          currentGrid.drawnCellElements = 0;
-        }
-
-        // Check if this grid is complete after drawing
-        if (currentGrid.isComplete()) {
-          println("Grid " + (gridIndex + 1) + " complete");
-        }
-      } else {
-        // Original rendering mode
-        currentGrid.drawRNDelement();
-      }
-    } else {
-      // all grids complete!
-      if (saveLayers && !layerRenderingComplete) {
-        // Save the last layer if not already saved
-        if (currentGridIndex < layerBuffers.length && layerBuffers[currentGridIndex] != null) {
-          saveCurrentLayer(currentGridIndex);
-        }
-
-        layerRenderingComplete = true;
-        println("All layers saved to: " + layersOutputDir);
-
-        // Now handle next variant or exit
-        if (renderVariantsInfinitely) {
-          // reset all grids for next variant
-          for (GridIterator g : grid_iterators) {
-            g.reset();
-          }
-          clearTheCanvas = true;
-          prepareNextVariant();
-        } else {
-          noLoop();  // Stop rendering if not infinite
-        }
-      } else if (renderVariantsInfinitely) {
-        // reset all grids for next variant
-        for (GridIterator g : grid_iterators) {
-          g.reset();
-        }
-        clearTheCanvas = true;
-        prepareNextVariant();
-      } else {
-        noLoop();  // Stop rendering if not infinite
-      }
-    }
-
-    // stop condition - frame count limit reached (only apply if not in layer mode)
-    if (!saveLayers && stopAtFrame > -1 && countedFrames >= stopAtFrame) {
-      if (renderVariantsInfinitely) {
-        // reset all grids for next variant
-        for (GridIterator g : grid_iterators) {
-          g.reset();
-        }
-        clearTheCanvas = true;
-        prepareNextVariant();
-      } else {
-        noLoop();
-      }
-    }
-
-  } else {
-    // no grids exist yet (first run) - shouldn't happen after initGrids()
+  if (grid_iterators == null || grid_iterators.size() == 0) {
     println("ERROR: No grid iterators available.");
+    noLoop();
+    return;
+  }
+
+  // Find first incomplete grid
+  GridIterator currentGrid = null;
+  int gridIndex = -1;
+  
+  for (int i = 0; i < grid_iterators.size(); i++) {
+    if (!grid_iterators.get(i).isComplete()) {
+      currentGrid = grid_iterators.get(i);
+      gridIndex = i;
+      break;
+    }
+  }
+
+  // If all grids are complete, handle variant completion
+  if (currentGrid == null) {
+    println("DEBUG: All grids complete, handling completion");
+    handleVariantCompletion();
+    return;
+  }
+
+  // Check stop condition - only if we have a grid to render
+  if (stopAtFrame > -1 && countedFrames >= stopAtFrame) {
+    println("DEBUG: Stop at frame " + stopAtFrame + " reached (countedFrames=" + countedFrames + ")");
+    handleVariantCompletion();
+    return;
+  }
+
+  // At this point we have a valid currentGrid to render
+  println("DEBUG: Rendering element for grid " + gridIndex + ", frame " + countedFrames);
+  
+  // LAYER MODE RENDERING
+  if (saveLayers) {
+    int bufferIndex = gridIndex + 1; // +1 because buffer[0] is background
+
+    // Handle layer transition
+    if (bufferIndex > currentGridIndex) {
+      println("DEBUG: Transitioning to layer " + bufferIndex + " (was " + currentGridIndex + ")");
+      
+      // Save previous layer
+      if (currentGridIndex < layerBuffers.length && layerBuffers[currentGridIndex] != null) {
+        saveCurrentLayer(currentGridIndex);
+      }
+      currentGridIndex = bufferIndex;
+
+      // Clear canvas for new layer display (with transparent background)
+      clearTheCanvas = true;
+      background(0, 0, 0, 0);
+    }
+
+    // Create layer buffer if needed
+    if (layerBuffers[bufferIndex] == null) {
+      println("DEBUG: Creating buffer for layer " + bufferIndex);
+      layerBuffers[bufferIndex] = createGraphics(width, height);
+      layerBuffers[bufferIndex].beginDraw();
+      layerBuffers[bufferIndex].imageMode(CENTER);
+      layerBuffers[bufferIndex].smooth();
+      layerBuffers[bufferIndex].background(0, 0, 0, 0); // Transparent
+      layerBuffers[bufferIndex].endDraw();
+    }
+
+    // Draw element to layer buffer
+    layerBuffers[bufferIndex].beginDraw();
+    
+    // Get random position within current cell bounds
+    int xCenter = (int) random(currentGrid.xMin, currentGrid.xMax);
+    int yCenter = (int) random(currentGrid.yMin, currentGrid.yMax);
+
+    // Apply transformations to the buffer
+    layerBuffers[bufferIndex].pushMatrix();
+    
+    // Translate to the random position within the cell
+    layerBuffers[bufferIndex].translate(xCenter, yCenter);
+    
+    // Apply rotation
+    float randomRotateDegree = random(currentGrid.minRotation, currentGrid.maxRotation);
+    layerBuffers[bufferIndex].rotate(radians(randomRotateDegree));
+
+    // Calculate scaled dimensions
+    float width_and_height_scalar = random(currentGrid.minScaleMultiplier, currentGrid.maxScaleMultiplier);
+    float scaled_width = currentGrid.widthOfImagesInArrayList * width_and_height_scalar;
+    float scaled_height = currentGrid.heightOfImagesInArrayList * width_and_height_scalar;
+
+    // Apply squish if enabled
+    if (currentGrid.squishImagesBool) {
+      float widthSquishMultiplier = random(currentGrid.minSquishMultiplier, currentGrid.maxSquishMultiplier);
+      scaled_width *= widthSquishMultiplier;
+    }
+
+    // Draw the element (image or circle)
+    if (!currentGrid.circlesOverride) {
+      int rnd_imagesArray_idx = (int) random(0, currentGrid.imagesArrayListLength + 1);
+      // Draw at 0,0 relative to the translated coordinate system
+      layerBuffers[bufferIndex].image(currentGrid.allImagesList.get(rnd_imagesArray_idx), 0, 0, scaled_width, scaled_height);
+    } else {
+      int colorIndex = (int) random(0, colorsArray.length);
+      layerBuffers[bufferIndex].fill(colorsArray[colorIndex]);
+      layerBuffers[bufferIndex].noStroke();
+      // Draw at 0,0 relative to the translated coordinate system
+      layerBuffers[bufferIndex].ellipse(0, 0, scaled_width, scaled_height);
+    }
+
+    layerBuffers[bufferIndex].popMatrix();
+    layerBuffers[bufferIndex].endDraw();
+
+    // Display preview: background + all layers up to current
+    // Reset transformation for the main canvas before drawing
+    pushMatrix();
+    resetMatrix();
+    imageMode(CENTER);
+    
+    // Draw background layer
+    image(layerBuffers[0], width/2, height/2);
+    
+    // Draw all content layers up to current
+    for (int i = 1; i <= bufferIndex; i++) {
+      if (layerBuffers[i] != null) {
+        image(layerBuffers[i], width/2, height/2);
+      }
+    }
+    
+    popMatrix();
+
+    // Update grid state
+    currentGrid.drawnCellElements++;
+    
+    // Check if we need to move to next cell
+    if (currentGrid.drawnCellElements >= currentGrid.elementsPerCell) {
+      currentGrid.nextCell();
+      currentGrid.drawnCellElements = 0;
+    }
+    
+    // Check if this grid is now complete
+    if (currentGrid.isComplete()) {
+      println("DEBUG: Grid " + gridIndex + " is now complete");
+    }
+    
+  // NORMAL MODE RENDERING
+  } else {
+    currentGrid.drawRNDelement();
+  }
+
+  // ALWAYS increment frame counter for EVERY element drawn, regardless of mode
+  countedFrames++;
+  println("DEBUG: Frame count now " + countedFrames);
+  
+  // ALWAYS save animation frame if enabled (works in BOTH modes)
+  if (saveFrames) {
+    String paddedFrameNumber = String.format("%06d", countedFrames);
+    saveFrame(animFramesSaveDir + "/" + paddedFrameNumber + ".png");
+    println("DEBUG: Saved animation frame " + countedFrames);
+  }
+}
+
+
+// helper function to handle variant completion consistently
+void handleVariantCompletion() {
+  // Print completion message once
+  if (!allGridsRenderedFeedbackPrinted) {
+    println("RENDERING COMPLETE (all grids done or stopAtFrame reached).");
+    allGridsRenderedFeedbackPrinted = true;
+    if (saveFrames) {
+      println("Animation save frames are in the directory:\n  " + animFramesSaveDir);
+    }
+  }
+
+  // Handle layer mode final saves
+  if (saveLayers && !layerRenderingComplete) {
+    println("DEBUG: Saving final layers...");
+    // Save any unsaved layers
+    for (int i = 0; i < layerBuffers.length; i++) {
+      if (layerBuffers[i] != null) {
+        saveCurrentLayer(i);
+      }
+    }
+    layerRenderingComplete = true;
+    println("All layers saved to: " + layersOutputDir);
+  }
+
+  // Save last frame if enabled (works in BOTH modes)
+  if (saveLastFrameEveryVariant) {
+    println("DEBUG: Saving last frame...");
+    manualSaveFrame();
+  }
+
+  // Check if we should exit
+  if (exitOnRenderComplete) {
+    println("exitOnRenderComplete boolean set to true; program will exit.");
+    exit();
+    return;
+  }
+
+  // Handle next variant if enabled
+  if (renderVariantsInfinitely) {
+    println("Preparing next variant...");
+    prepareNextVariant();
+  } else {
     noLoop();
   }
 }
+
 
 // Updated manualSaveFrame to save composite ONLY to sketch folder (no redundant saves in layer folder)
 void manualSaveFrame() {
