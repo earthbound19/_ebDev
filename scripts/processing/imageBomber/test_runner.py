@@ -17,7 +17,7 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 
 # Configuration
-DEFAULT_TEST_CSV_PATH = "test_cases2.csv"
+DEFAULT_TEST_CSV_PATH = "test_cases.csv"
 DEFAULT_BASE_JSON_PATH = "image_bomber_configs/test.json"
 DEFAULT_RESULTS_LOG_PATH = "test_results.csv"
 PROCESSING_CMD = r'"C:\Program Files\Processing\processing.exe"'

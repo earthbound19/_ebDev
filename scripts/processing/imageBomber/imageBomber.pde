@@ -53,7 +53,7 @@ color[] colorsArray = {
 // END GLOBAL VARIABLES which you may alter
 
 // GLOBALS NOT TO CHANGE HERE; program logic or the developer may change them in program runs or updates:
-String scriptVersionString = "2-26-102";
+String scriptVersionString = "2-27-2";
 
 String animFramesSaveDir;
 int countedFrames = 0;
@@ -119,9 +119,11 @@ class GridIterator {
   int heightOfImagesInArrayList;
 
   float skipCellChance;           // if nonzero there is a chance that when nextCell() is called it will skip the next cell (advance two cells)
-  float skipDrawElementChance;    // if nonzero there is a chance that when drawRNDelement() is called it will skip drawing an element
+  float skipDrawElementChance;    // if nonzero there is a chance that when drawing it will skip drawing an element
 
   boolean circlesOverride;       // flag to use vector circles instead of images. Overridden to true if images load fails. Circle maximum diameter will be diagonal of cells times an overshoot.
+  
+  float elementOvershootMax;     // multiplier for random location range: 1 + overshoot value (converted from JSON input)
 
   // a class instance is initialized with a JSON object imported from (by default) imageBomberDefaultConfig.json or any other JSON
   GridIterator(JSONObject gridJSON) {
@@ -148,6 +150,15 @@ class GridIterator {
     skipCellChance = gridJSON.getFloat("skipCellChance");
     skipDrawElementChance = gridJSON.getFloat("skipDrawElementChance");
     circlesOverride = gridJSON.getBoolean("circlesOverride");
+    
+    // Convert elementOvershootMax from JSON (if present) to 1 + value
+    if (gridJSON.hasKey("elementOvershootMax") && !gridJSON.isNull("elementOvershootMax")) {
+      float overshootValue = gridJSON.getFloat("elementOvershootMax");
+      elementOvershootMax = 1.0 + overshootValue;
+      println("  elementOvershootMax set to " + elementOvershootMax + " (from input " + overshootValue + ")");
+    } else {
+      elementOvershootMax = 1.0; // Default to no overshoot
+    }
 
     // initializes members to default, ready-to-start-render state:
     reset();
@@ -174,17 +185,16 @@ class GridIterator {
       }
     }
 
-    // check if images list empty; if so, create dummy values and rend drawRNDelement() will fallback to circle vectors
+    // check if images list empty; if so, create dummy values and fallback to circle vectors
     if (allImagesList.isEmpty()) {
       println("WARNING: No valid images found in " + imagesPath + ". Will use fallback circles.");
       circlesOverride = true;
       // Set these to dummy / default values since we won't be using actual images
       imagesArrayListLength = colorsArray.length - 1;    // -1 because it will be used with zero-based indexing
-      // println("Set imagesArrayListLength to " + imagesArrayListLength + " (colorsArray length: " + colorsArray.length + ")");
 
       // Set fallback circle dimensions; calculate cell diagonal for circumscribed circle size
       float cellDiagonal = sqrt(cellWidth * cellWidth + cellHeight * cellHeight);
-      float circleDiameter = cellDiagonal * 1.32;   // that multiplier overshoots the diameter tht circumscribes the rectangle
+      float circleDiameter = cellDiagonal * 1.32;   // that multiplier overshoots the diameter that circumscribes the rectangle
       widthOfImagesInArrayList = (int) circleDiameter;
       heightOfImagesInArrayList = (int) circleDiameter;
       println("  Fallback circle size set to " + (int) circleDiameter + " pixels (cell diagonal: " + (int) cellDiagonal + ")");
@@ -192,50 +202,39 @@ class GridIterator {
       imagesArrayListLength = allImagesList.size() - 1;   // -1 because it will be used with zero-based indexing
       widthOfImagesInArrayList = allImagesList.get(0).width;
       heightOfImagesInArrayList = allImagesList.get(0).height;
-      // println("Using images. imagesArrayListLength: " + imagesArrayListLength);
     }
 
   }
 
   // Update the cell boundaries based on current position
   void updateCellBounds() {
-    // println("xMin, xMax, yMin, yMax before update: " + xMin + ", " + xMax, ", " + yMin + ", " + yMax);
-    xMin = gridX1 + currentCol * cellWidth;    // when currentCol is 0, via order of operations (currentCol * cellWidth) will be 0, which is correct
+    xMin = gridX1 + currentCol * cellWidth;
     xMax = xMin + cellWidth;
-    yMin = gridY1 + currentRow * cellHeight;   // same calculation as for xMin = 0 if currentRow is 0 applies here.
+    yMin = gridY1 + currentRow * cellHeight;
     yMax = yMin + cellHeight;
-    // println("xMin, xMax, yMin, yMax AFTER update: " + xMin + ", " + xMax, ", " + yMin + ", " + yMax);
   }
 
   // avoids duplicate logic but hard for hooman to math :)
   void nextCellHelper() {
-    // println("currentCol and currentRow are: " + currentCol + ", " + currentRow);
     currentCol++;
 
     // If we've passed the last column, wrap to the first column
     if (currentCol >= cols) {
-      // println("currentCol is >= cols (" + cols + "); will update.");
       currentCol = 0;
       currentRow++;
-      // println("currentCol and currentRow are now: " + currentCol + ", " + currentRow);
 
       // If we've passed the last row, wrap to the first row
       if (currentRow >= rows) {
-        // println("currentRow >= rows (" + rows + "); will update.");
         currentRow = 0;
-        // println("currentRow was updated to: " + currentRow);
         wrappedPastLastRow = true;
-        // println("set wrappedPastLastRow to true, as currentRow wrapped and was reset to zero.");
       }
     }
-    // println("currentCol and currentRow ARE NOW: " + currentCol + ", " + currentRow);
   }
 
   // Move to the next cell (left to right, top to bottom)
   void nextCell() {
     // randomly skip a cell if we draw a random number less than skipCellChance
     if (random(1) < skipCellChance) {
-      // println("SKIPPING CELL because of random draw of number less than skipCellChance, " + skipCellChance + "!");
       nextCellHelper();
       nextCellHelper();   // do this TWICE to effectively skip a cell
       updateCellBounds();
@@ -247,81 +246,8 @@ class GridIterator {
     updateCellBounds();
   }
 
-  // draws an element in current cell boundaries with scale, squish, and location randomization constraints:
-  void drawRNDelement() {
-    // if we randomly draw a number within range skipDrawElementChance, skip drawing any element. (This will never happen if skipDrawElementChance is 0.)
-    if (random(1) < skipDrawElementChance) {
-      // println("SKIPPING ELEMENT DRAW because of random draw of number less than skipDrawElementChance, " + skipDrawElementChance + "!");
-      return;   // we just return without drawing anything; no element drawn
-    }
-
-    int xCenter = (int) random(xMin * -15, xMax * 15);
-    int yCenter = (int) random(yMin * -15, yMax * 15);
-
-    pushMatrix();
-    translate(xCenter, yCenter);
-    float randomRotateDegree = random(minRotation, maxRotation);
-    rotate(radians(randomRotateDegree));
-
-    // set random height and width to scale image to (within constraints):
-    // randomize width and height within scale range, and maintain aspect (will alter aspect after this if told to) :
-    float width_and_height_scalar = random(minScaleMultiplier, maxScaleMultiplier);
-    float scaled_width = widthOfImagesInArrayList * width_and_height_scalar;
-    float scaled_height = heightOfImagesInArrayList * width_and_height_scalar;
-
-    // if boolean instructs to do so, alter dimensions to random squish:
-    if (squishImages) {
-      float widthSquishMultiplier = random(minSquishMultiplier, maxSquishMultiplier);
-      scaled_width *= widthSquishMultiplier;
-    }
-
-    // set random alpha (if min and max are both the same this is a wasted calculation, but I'd rather avoid yet another boolean that says for example alwaysFullAlpha) :
-    float drawAlpha = random(minAlpha, maxAlpha);
-    println("set drawAlpha to: " + drawAlpha);
-    if (!circlesOverride) {
-      // we have images to use; get random index for an image in the array:
-      int rnd_imagesArray_idx = (int) random(0, imagesArrayListLength + 1);    // + 1 bcse random max range is not included in range
-      // before drawing an image temporarily override alpha via the tint function:
-      tint(255, drawAlpha);
-        // if we don't do pushMatrix() and popMatrix(), xCenter and yCenter should be specied as nonzero; otherwise we translate() to those coordinates and they are 0, 0
-        // image(allImagesList.get(rnd_imagesArray_idx), xCenter, yCenter, scaled_width, scaled_height);    // use xCenter and yCenter if we don't push and pop matrix, use 0 otherwise?
-      image(allImagesList.get(rnd_imagesArray_idx), 0, 0, scaled_width, scaled_height);
-      // reset tint immediately after image draw:
-      noTint();
-    } else {
-      int colorIndex = (int) random(0, colorsArray.length);
-      // get a copy of the color at that index and modify the alpha to whatever RND alpha we picked:
-      color originalColor = colorsArray[colorIndex];
-      color transparentColor = color(red(originalColor), green(originalColor), blue(originalColor), drawAlpha);
-      fill(transparentColor);
-      noStroke();
-      // no images available -- use fallback circles:
-      ellipse(0, 0, scaled_width, scaled_height);  // Draw at translated origin
-    }
-    popMatrix();
-
-    // THIS GLOBAL iterated here immediately after we render any element; strictly the program may render many more frames than this, but we only want to reference frames that we "count" and which are in the numbered animation sequence:
-    countedFrames += 1;
-
-    // if told to save an animation frame, do so:
-    if (saveFrames == true) {
-      String paddedFrameNumber = String.format("%06d", countedFrames);
-      saveFrame(animFramesSaveDir + "/" + paddedFrameNumber + ".png");
-    }
-
-    // iterate grid config internal value:
-    drawnCellElements += 1;
-
-    // FIX: using == here leads to unentended result of wrappedPastLastRow set to true; using >= avoids that:
-    if (drawnCellElements >= elementsPerCell) {
-      nextCell();
-      drawnCellElements = 0;
-    }
-    //popMatrix();  // you need to uncomment this if you animate things. If you don't animate things, it isn't necessary. I think.
-  }
-
   boolean isComplete() {
-    return wrappedPastLastRow;    // set to true in a Class function when we've gone through all cells
+    return wrappedPastLastRow;
   }
 
   // to reset class members which will allow us to start a new variant for renderVariantsInfinitely mode, OR to initialize a GridIterator from the constructor:
@@ -536,6 +462,15 @@ int setIntFromJSON(int intToSet, JSONObject configJSON, String fieldName) {
   }
 }
 
+// returns acquired float value if an investigated JSON field is non-null; otherwise returns the original value passed:
+float setFloatFromJSON(float floatToSet, JSONObject configJSON, String fieldName) {
+  if (configJSON.hasKey(fieldName) && !configJSON.isNull(fieldName)) {
+    return configJSON.getFloat(fieldName);
+  } else {
+    return floatToSet;
+  }
+}
+
 
 // obtains JSON values from "global_settings" object and, for any of them which do not have a null value, overiddes hard-coded globals in this script with their value from the corresponding JSON object's field; e.g. if the "saveFrames" field is "true" or "false" instead of null, it uses that "true" or "false" value:
 void overrideGlobals() {
@@ -699,13 +634,104 @@ void setup() {
 
 boolean clearTheCanvas = true;
 
+// Helper function to check if an element would probably be visible on canvas (doesn't factor any rotation and squish)
+boolean isElementVisible(int xCenter, int yCenter, float elementWidth, float elementHeight) {
+  // Calculate element edges
+  float leftEdge = xCenter - elementWidth/2;
+  float rightEdge = xCenter + elementWidth/2;
+  float topEdge = yCenter - elementHeight/2;
+  float bottomEdge = yCenter + elementHeight/2;
+  
+  // Padding to keep elements slightly inside canvas
+  int pad = 8;
+  
+  // Check if element is completely to the left of canvas + pad
+  if (rightEdge < pad) {return false;}
+
+  // Check if element is completely to the right of canvas - pad
+  if (leftEdge > width - pad) {return false;}
+
+  // Check if element is completely above canvas + pad
+  if (bottomEdge < pad) {return false;}
+
+  // Check if element is completely below canvas - pad
+  if (topEdge > height - pad) {return false;}
+  
+  // If we passed all checks, element is probably at least partially visible
+  return true;
+}
+
+// Unified rendering function that draws to any PGraphics target
+void renderElementToTarget(PGraphics target, GridIterator grid, float drawAlpha) {
+  // Generate random scale first (needed for visibility check)
+  float width_and_height_scalar = random(grid.minScaleMultiplier, grid.maxScaleMultiplier);
+  float scaled_width = grid.widthOfImagesInArrayList * width_and_height_scalar;
+  float scaled_height = grid.heightOfImagesInArrayList * width_and_height_scalar;
+
+  // Apply squish if enabled (affects width only, for visibility check we'll use max dimension for safety)
+  if (grid.squishImages) {
+    float widthSquishMultiplier = random(grid.minSquishMultiplier, grid.maxSquishMultiplier);
+    scaled_width *= widthSquishMultiplier;
+    // Note: height remains unchanged for squish
+  }
+
+  // For visibility check, use the larger dimension to be safe (since rotation could make either dimension matter)
+  float maxElementDimension = max(scaled_width, scaled_height);
+  
+  // Find a visible position with overshoot
+  int xCenter, yCenter;
+  int attempts = 0;
+  int maxAttempts = 100; // Prevent infinite loops
+  
+  do {
+    // Calculate overshoot range
+    int xMinOvershoot = (int) (grid.xMin * grid.elementOvershootMax);
+    int xMaxOvershoot = (int) (grid.xMax * grid.elementOvershootMax);
+    int yMinOvershoot = (int) (grid.yMin * grid.elementOvershootMax);
+    int yMaxOvershoot = (int) (grid.yMax * grid.elementOvershootMax);
+    
+    // Generate random position within overshoot range
+    xCenter = (int) random(xMinOvershoot, xMaxOvershoot);
+    yCenter = (int) random(yMinOvershoot, yMaxOvershoot);
+    
+    attempts++;
+    
+    // If we've tried too many times, just use the position (better to render something than infinite loop)
+    if (attempts >= maxAttempts) {
+      println("Warning: Could not find visible position after " + maxAttempts + " attempts");
+      break;
+    }
+  } while (!isElementVisible(xCenter, yCenter, maxElementDimension, maxElementDimension));
+
+  target.pushMatrix();
+  target.translate(xCenter, yCenter);
+  
+  float randomRotateDegree = random(grid.minRotation, grid.maxRotation);
+  target.rotate(radians(randomRotateDegree));
+
+  // Draw element (image or circle)
+  if (!grid.circlesOverride) {
+    int rnd_imagesArray_idx = (int) random(0, grid.imagesArrayListLength + 1);
+    target.tint(255, drawAlpha);
+    target.image(grid.allImagesList.get(rnd_imagesArray_idx), 0, 0, scaled_width, scaled_height);
+    target.noTint();
+  } else {
+    int colorIndex = (int) random(0, colorsArray.length);
+    color originalColor = colorsArray[colorIndex];
+    color transparentColor = color(red(originalColor), green(originalColor), blue(originalColor), drawAlpha);
+    target.fill(transparentColor);
+    target.noStroke();
+    target.ellipse(0, 0, scaled_width, scaled_height);
+  }
+
+  target.popMatrix();
+}
 
 void draw() {
   // clear canvas at start of new variant
   if (clearTheCanvas) {
     background(backgroundColorWithAlpha);
     clearTheCanvas = false;
-    // println("DEBUG: Canvas cleared");
   }
 
   if (grid_iterators == null || grid_iterators.size() == 0) {
@@ -714,10 +740,10 @@ void draw() {
     return;
   }
 
-  // Find first incomplete grid
   GridIterator currentGrid = null;
   int gridIndex = -1;
   
+  // Find first incomplete grid
   for (int i = 0; i < grid_iterators.size(); i++) {
     if (!grid_iterators.get(i).isComplete()) {
       currentGrid = grid_iterators.get(i);
@@ -728,22 +754,38 @@ void draw() {
 
   // If all grids are complete, handle variant completion
   if (currentGrid == null) {
-    // println("DEBUG: All grids complete, handling completion");
     handleVariantCompletion();
     return;
   }
 
   // Check stop condition - only if we have a grid to render
   if (stopAtFrame > -1 && countedFrames >= stopAtFrame) {
-    // println("DEBUG: Stop at frame " + stopAtFrame + " reached (countedFrames=" + countedFrames + ")");
     handleVariantCompletion();
     return;
   }
 
-  // At this point we have a valid currentGrid to render
-  // println("DEBUG: Rendering element for grid " + gridIndex + ", frame " + countedFrames);
-  
-  // LAYER MODE RENDERING
+  // Check skip draw chance
+  if (random(1) < currentGrid.skipDrawElementChance) {
+    // Skip drawing this element, but still count it for cell progression
+    currentGrid.drawnCellElements++;
+    
+    if (currentGrid.drawnCellElements >= currentGrid.elementsPerCell) {
+      currentGrid.nextCell();
+      currentGrid.drawnCellElements = 0;
+    }
+    
+    // Still increment frame counter for skipped elements? 
+    // No - skipped elements don't produce a frame
+    return;
+  }
+
+  // Generate random alpha once for this element
+  float drawAlpha = random(currentGrid.minAlpha, currentGrid.maxAlpha);
+
+  // ALWAYS render to the main canvas for display
+  renderElementToTarget(g, currentGrid, drawAlpha);
+
+  // ALSO render to layer buffer if in layer mode
   if (saveLayers) {
     int bufferIndex = gridIndex + 1; // +1 because buffer[0] is background
 
@@ -754,10 +796,6 @@ void draw() {
         saveCurrentLayer(currentGridIndex);
       }
       currentGridIndex = bufferIndex;
-
-      // Clear canvas for new layer display (with transparent background)
-      clearTheCanvas = true;
-      background(0, 0, 0, 0);
     }
 
     // Create layer buffer if needed
@@ -770,68 +808,12 @@ void draw() {
       layerBuffers[bufferIndex].endDraw();
     }
 
-    // Draw element to layer buffer
+    // Render to layer buffer
     layerBuffers[bufferIndex].beginDraw();
-    
-    // Get random position within current cell bounds
-    int xCenter = (int) random(currentGrid.xMin, currentGrid.xMax);
-    int yCenter = (int) random(currentGrid.yMin, currentGrid.yMax);
-
-    // Apply transformations to the buffer
-    layerBuffers[bufferIndex].pushMatrix();
-    
-    // Translate to the random position within the cell
-    layerBuffers[bufferIndex].translate(xCenter, yCenter);
-    
-    // Apply rotation
-    float randomRotateDegree = random(currentGrid.minRotation, currentGrid.maxRotation);
-    layerBuffers[bufferIndex].rotate(radians(randomRotateDegree));
-
-    // Calculate scaled dimensions
-    float width_and_height_scalar = random(currentGrid.minScaleMultiplier, currentGrid.maxScaleMultiplier);
-    float scaled_width = currentGrid.widthOfImagesInArrayList * width_and_height_scalar;
-    float scaled_height = currentGrid.heightOfImagesInArrayList * width_and_height_scalar;
-
-    // Apply squish if enabled
-    if (currentGrid.squishImages) {
-      float widthSquishMultiplier = random(currentGrid.minSquishMultiplier, currentGrid.maxSquishMultiplier);
-      scaled_width *= widthSquishMultiplier;
-    }
-
-    // Generate random alpha once for this element
-    float drawAlpha = random(currentGrid.minAlpha, currentGrid.maxAlpha);
-
-    // Draw the element (image or circle) with alpha
-    if (!currentGrid.circlesOverride) {
-      int rnd_imagesArray_idx = (int) random(0, currentGrid.imagesArrayListLength + 1);
-      
-      // Apply alpha transparency to image using tint on the buffer
-      layerBuffers[bufferIndex].tint(255, drawAlpha);
-      
-      // Draw at 0,0 relative to the translated coordinate system
-      layerBuffers[bufferIndex].image(currentGrid.allImagesList.get(rnd_imagesArray_idx), 0, 0, scaled_width, scaled_height);
-      
-      // Reset tint
-      layerBuffers[bufferIndex].noTint();
-      
-    } else {
-      int colorIndex = (int) random(0, colorsArray.length);
-      
-      // Apply alpha transparency to circle
-      color originalColor = colorsArray[colorIndex];
-      color transparentColor = color(red(originalColor), green(originalColor), blue(originalColor), drawAlpha);
-      
-      layerBuffers[bufferIndex].fill(transparentColor);
-      layerBuffers[bufferIndex].noStroke();
-      // Draw at 0,0 relative to the translated coordinate system
-      layerBuffers[bufferIndex].ellipse(0, 0, scaled_width, scaled_height);
-    }
-
-    layerBuffers[bufferIndex].popMatrix();
+    renderElementToTarget(layerBuffers[bufferIndex], currentGrid, drawAlpha);
     layerBuffers[bufferIndex].endDraw();
 
-    // Display preview: background + all layers up to current
-    // Reset transformation for the main canvas before drawing
+    // Display composite preview: background + all layers up to current
     pushMatrix();
     resetMatrix();
     imageMode(CENTER);
@@ -840,42 +822,31 @@ void draw() {
     image(layerBuffers[0], width/2, height/2);
     
     // Draw all content layers up to current
-    for (int i = 1; i <= bufferIndex; i++) {
+    for (int i = 1; i <= currentGridIndex; i++) {
       if (layerBuffers[i] != null) {
         image(layerBuffers[i], width/2, height/2);
       }
     }
     
     popMatrix();
-
-    // Update grid state
-    currentGrid.drawnCellElements++;
-    
-    // Check if we need to move to next cell
-    if (currentGrid.drawnCellElements >= currentGrid.elementsPerCell) {
-      currentGrid.nextCell();
-      currentGrid.drawnCellElements = 0;
-    }
-    
-    // Check if this grid is now complete
-    if (currentGrid.isComplete()) {
-      // println("DEBUG: Grid " + gridIndex + " is now complete");
-    }
-    
-  // NORMAL MODE RENDERING
-  } else {
-    currentGrid.drawRNDelement();
   }
 
-  // ALWAYS increment frame counter for EVERY element drawn, regardless of mode
+  // Update grid state
+  currentGrid.drawnCellElements++;
+  
+  // Check if we need to move to next cell
+  if (currentGrid.drawnCellElements >= currentGrid.elementsPerCell) {
+    currentGrid.nextCell();
+    currentGrid.drawnCellElements = 0;
+  }
+
+  // ALWAYS increment frame counter for EVERY element drawn
   countedFrames++;
-  // println("DEBUG: Frame count now " + countedFrames);
   
   // ALWAYS save animation frame if enabled (works in BOTH modes)
   if (saveFrames) {
     String paddedFrameNumber = String.format("%06d", countedFrames);
     saveFrame(animFramesSaveDir + "/" + paddedFrameNumber + ".png");
-    // println("DEBUG: Saved animation frame " + countedFrames);
   }
 }
 
@@ -893,7 +864,6 @@ void handleVariantCompletion() {
 
   // Handle layer mode final saves
   if (saveLayers && !layerRenderingComplete) {
-    // println("DEBUG: Saving final layers...");
     // Save any unsaved layers
     for (int i = 0; i < layerBuffers.length; i++) {
       if (layerBuffers[i] != null) {
@@ -906,7 +876,6 @@ void handleVariantCompletion() {
 
   // Save last frame if enabled (works in BOTH modes)
   if (saveLastFrameEveryVariant) {
-    // println("DEBUG: Saving last frame...");
     manualSaveFrame();
   }
 
