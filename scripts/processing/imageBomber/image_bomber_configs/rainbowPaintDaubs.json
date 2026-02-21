@@ -1,14 +1,14 @@
 {
-    "_comment": "The following global_settings object here lists fields which are all optional. The field descripters indicate the type, e.g. boolean or int. Fields with a null value will be ignored. Fields with a non-null value (such as a number or string) will override any values for the corresponding global variables in the source imageBomber.pde. Note the field names are slightly different; e.g. booleanOverrideSeed here corresponds to overrideSeed there. To learn their purpose and use, see comments for corresponding variables in the source.",
+    "_comment": "The following global_settings object here lists fields which are all optional. See comments in imageBomber.pde for purposes and expected types (e.g. boolean, float, string). Fields with a null value will be ignored and a default from the script used. Fields with a non-null value (such as true or false for boolean, or something in quotes for a string) will override defaults.",
     "global_settings": {
         "doSeedOverride": null,
         "overrideSeed": null,
         "saveFrames": null,
         "frameRate": null,
         "useFrameRate": null,
-        "useCustomCanvasSize": null,
-        "customCanvasWidth": null,
-        "customCanvasHeight": null,
+        "useCustomCanvasSize": true,
+        "customCanvasWidth": 1920,
+        "customCanvasHeight": 1080,
         "stopAtFrame": null,
         "exitOnRenderComplete": null,
         "renderVariantsInfinitely": null,
@@ -27,7 +27,7 @@
             "maxRotation": 360,
             "minSquish": 0.91,
             "maxSquish": 1.18,
-            "booleanSquishImages": true,
+            "squishImages": true,
             "cols": 5,
             "rows": 2,
             "imagesPath": "image_bomber_sets/rainbow_paint_daubs_2",
@@ -38,7 +38,7 @@
             "elementsPerCell": 2,
             "skipCellChance": 0.37,
             "skipDrawElementChance": 0.37,
-            "booleanCirclesOverride": false
+            "circlesOverride": false
         },
         {
             "name": "coarse_grid_two",
@@ -50,7 +50,7 @@
             "maxRotation": 360,
             "minSquish": 0.77,
             "maxSquish": 1.23,
-            "booleanSquishImages": true,
+            "squishImages": true,
             "cols": 7,
             "rows": 4,
             "imagesPath": "image_bomber_sets/rainbow_paint_daubs_2",
@@ -61,7 +61,7 @@
             "elementsPerCell": 4,
             "skipCellChance": 0.215,
             "skipDrawElementChance": 0.296,
-            "booleanCirclesOverride": false
+            "circlesOverride": false
         },
         {
             "name": "fine_midground_grid",
@@ -73,7 +73,7 @@
             "maxRotation": 360,
             "minSquish": 0.726,
             "maxSquish": 1.38,
-            "booleanSquishImages": true,
+            "squishImages": true,
             "cols": 11,
             "rows": 5,
             "imagesPath": "image_bomber_sets/rainbow_paint_daubs_2",
@@ -84,7 +84,7 @@
             "elementsPerCell": 3,
             "skipCellChance": 0.73,
             "skipDrawElementChance": 0.29,
-            "booleanCirclesOverride": false
+            "circlesOverride": false
         },
         {
             "name": "medium_grid",
@@ -96,7 +96,7 @@
             "maxRotation": 360,
             "minSquish": 0.87,
             "maxSquish": 1.13,
-            "booleanSquishImages": true,
+            "squishImages": true,
             "cols": 12,
             "rows": 5,
             "imagesPath": "image_bomber_sets/rainbow_paint_daubs_2",
@@ -107,7 +107,7 @@
             "elementsPerCell": 4,
             "skipCellChance": 0.69,
             "skipDrawElementChance": 0.61,
-            "booleanCirclesOverride": false
+            "circlesOverride": false
         },
         {
             "name": "fine_foreground_grid",
@@ -119,7 +119,7 @@
             "maxRotation": 360,
             "minSquish": 0.77,
             "maxSquish": 1.264,
-            "booleanSquishImages": true,
+            "squishImages": true,
             "cols": 11,
             "rows": 5,
             "imagesPath": "image_bomber_sets/rainbow_paint_daubs_2",
@@ -130,7 +130,7 @@
             "elementsPerCell": 2,
             "skipCellChance": 0.9,
             "skipDrawElementChance": 0.84,
-            "booleanCirclesOverride": false
+            "circlesOverride": false
         }
     ]
 }

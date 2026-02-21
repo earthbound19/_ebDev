@@ -26,7 +26,7 @@ JSONObject globalsConfigJSON;     // stores JSON global value overrides object e
 JSONArray gridConfigsJSON;        // stores JSON grid config values extracted from allImportedJSONx
 
 // json configuration to load; see the sibling file imageBomberDefaultConfig.json for a complete example of options. Read on for config options and JSON config usage.
-// String JSONconfigFileName = "imageBomberDefaultConfig.json";
+// String JSONconfigFileName = "image_bomber_configs/imageBomberDefaultConfig.json";
 String JSONconfigFileName = "image_bomber_configs/test.json";
 // NOTE that all of these below globals have counterpart values you can set in the .json file name assigned to the JSONconfigFileName (and parsed for usage after that). Any variables in that file which are assigned a null value will not have that value used, and the correspoding value assigned below will instead be used. (You must have useful values hard-coded to all the below globals; they function as defaults.) Any variables in the .json config file which are assigned a non-null value (such as an integer or float) will *override* any corresponding values below:
 boolean doSeedOverride = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. Any variants after that -- see renderVariantsInfinitely -- will have a random seed assigned. If doSeedOverride is set to false, a seed will be chosen randomly for the first variant, and also all variants after. Setting doSeedOverride to true with a dedicated value for overrideSeed will result in the same pseudo-randomness and result image for the first variant every time, given the same image resources and grid configurations.
@@ -53,7 +53,7 @@ color[] colorsArray = {
 // END GLOBAL VARIABLES which you may alter
 
 // GLOBALS NOT TO CHANGE HERE; program logic or the developer may change them in program runs or updates:
-String scriptVersionString = "2-26-97";
+String scriptVersionString = "2-26-102";
 
 String animFramesSaveDir;
 int countedFrames = 0;
@@ -90,7 +90,7 @@ class GridIterator {
   float maxRotation;            // maximum random rotation range in degrees. May be negative or positive.
   float minSquishMultiplier;
   float maxSquishMultiplier;    // If you want a range that's stretched (or squished) and admitting normal, set this to 1. You can also set this to more than one to have "squished" to "stretch" range.
-  boolean squishImagesBool;             // if set to true, after image size is randomly proportionally scaled down, image widths and heights are further randomly altered without respect for maintaining aspect (a square may be squished or stretched to a rectangle), within constraints of minSquishMultiplier (minimum) to maxSquishMultiplier (maximum). If set to false, no squishing will occur and images will remain at original proportion. Note that you may set a maxSquishMultiplier below 1 for images to always be squished at least to some amount.
+  boolean squishImages;             // if set to true, after image size is randomly proportionally scaled down, image widths and heights are further randomly altered without respect for maintaining aspect (a square may be squished or stretched to a rectangle), within constraints of minSquishMultiplier (minimum) to maxSquishMultiplier (maximum). If set to false, no squishing will occur and images will remain at original proportion. Note that you may set a maxSquishMultiplier below 1 for images to always be squished at least to some amount.
 
   int elementsPerCell;      // when this count is reached, nextCell() is called
   int drawnCellElements;    // for counting drawn elements to check against elementsPerCell
@@ -121,7 +121,7 @@ class GridIterator {
   float skipCellChance;           // if nonzero there is a chance that when nextCell() is called it will skip the next cell (advance two cells)
   float skipDrawElementChance;    // if nonzero there is a chance that when drawRNDelement() is called it will skip drawing an element
 
-  boolean circlesOverride;       // flag to use vector circles instead of images. Overridden to true if images load fails.
+  boolean circlesOverride;       // flag to use vector circles instead of images. Overridden to true if images load fails. Circle maximum diameter will be diagonal of cells times an overshoot.
 
   // a class instance is initialized with a JSON object imported from (by default) imageBomberDefaultConfig.json or any other JSON
   GridIterator(JSONObject gridJSON) {
@@ -142,12 +142,12 @@ class GridIterator {
     maxRotation = gridJSON.getFloat("maxRotation");
     minSquishMultiplier = gridJSON.getFloat("minSquish");
     maxSquishMultiplier = gridJSON.getFloat("maxSquish");
-    squishImagesBool = gridJSON.getBoolean("booleanSquishImages");
+    squishImages = gridJSON.getBoolean("squishImages");
     imagesPath = gridJSON.getString("imagesPath");
     elementsPerCell = gridJSON.getInt("elementsPerCell");
     skipCellChance = gridJSON.getFloat("skipCellChance");
     skipDrawElementChance = gridJSON.getFloat("skipDrawElementChance");
-    circlesOverride = gridJSON.getBoolean("booleanCirclesOverride");
+    circlesOverride = gridJSON.getBoolean("circlesOverride");
 
     // initializes members to default, ready-to-start-render state:
     reset();
@@ -181,8 +181,13 @@ class GridIterator {
       // Set these to dummy / default values since we won't be using actual images
       imagesArrayListLength = colorsArray.length - 1;    // -1 because it will be used with zero-based indexing
       // println("Set imagesArrayListLength to " + imagesArrayListLength + " (colorsArray length: " + colorsArray.length + ")");
-      widthOfImagesInArrayList = 450;     // max diameter for fallback circles
-      heightOfImagesInArrayList = 450;
+
+      // Set fallback circle dimensions; calculate cell diagonal for circumscribed circle size
+      float cellDiagonal = sqrt(cellWidth * cellWidth + cellHeight * cellHeight);
+      float circleDiameter = cellDiagonal * 1.32;   // that multiplier overshoots the diameter tht circumscribes the rectangle
+      widthOfImagesInArrayList = (int) circleDiameter;
+      heightOfImagesInArrayList = (int) circleDiameter;
+      println("  Fallback circle size set to " + (int) circleDiameter + " pixels (cell diagonal: " + (int) cellDiagonal + ")");
     } else {    //  otherwise set values derived from images:
       imagesArrayListLength = allImagesList.size() - 1;   // -1 because it will be used with zero-based indexing
       widthOfImagesInArrayList = allImagesList.get(0).width;
@@ -250,8 +255,8 @@ class GridIterator {
       return;   // we just return without drawing anything; no element drawn
     }
 
-    int xCenter = (int) random(xMin, xMax);
-    int yCenter = (int) random(yMin, yMax);
+    int xCenter = (int) random(xMin * -15, xMax * 15);
+    int yCenter = (int) random(yMin * -15, yMax * 15);
 
     pushMatrix();
     translate(xCenter, yCenter);
@@ -265,7 +270,7 @@ class GridIterator {
     float scaled_height = heightOfImagesInArrayList * width_and_height_scalar;
 
     // if boolean instructs to do so, alter dimensions to random squish:
-    if (squishImagesBool) {
+    if (squishImages) {
       float widthSquishMultiplier = random(minSquishMultiplier, maxSquishMultiplier);
       scaled_width *= widthSquishMultiplier;
     }
@@ -744,8 +749,6 @@ void draw() {
 
     // Handle layer transition
     if (bufferIndex > currentGridIndex) {
-      // println("DEBUG: Transitioning to layer " + bufferIndex + " (was " + currentGridIndex + ")");
-      
       // Save previous layer
       if (currentGridIndex < layerBuffers.length && layerBuffers[currentGridIndex] != null) {
         saveCurrentLayer(currentGridIndex);
@@ -759,7 +762,6 @@ void draw() {
 
     // Create layer buffer if needed
     if (layerBuffers[bufferIndex] == null) {
-      // println("DEBUG: Creating buffer for layer " + bufferIndex);
       layerBuffers[bufferIndex] = createGraphics(width, height);
       layerBuffers[bufferIndex].beginDraw();
       layerBuffers[bufferIndex].imageMode(CENTER);
@@ -791,19 +793,35 @@ void draw() {
     float scaled_height = currentGrid.heightOfImagesInArrayList * width_and_height_scalar;
 
     // Apply squish if enabled
-    if (currentGrid.squishImagesBool) {
+    if (currentGrid.squishImages) {
       float widthSquishMultiplier = random(currentGrid.minSquishMultiplier, currentGrid.maxSquishMultiplier);
       scaled_width *= widthSquishMultiplier;
     }
 
-    // Draw the element (image or circle)
+    // Generate random alpha once for this element
+    float drawAlpha = random(currentGrid.minAlpha, currentGrid.maxAlpha);
+
+    // Draw the element (image or circle) with alpha
     if (!currentGrid.circlesOverride) {
       int rnd_imagesArray_idx = (int) random(0, currentGrid.imagesArrayListLength + 1);
+      
+      // Apply alpha transparency to image using tint on the buffer
+      layerBuffers[bufferIndex].tint(255, drawAlpha);
+      
       // Draw at 0,0 relative to the translated coordinate system
       layerBuffers[bufferIndex].image(currentGrid.allImagesList.get(rnd_imagesArray_idx), 0, 0, scaled_width, scaled_height);
+      
+      // Reset tint
+      layerBuffers[bufferIndex].noTint();
+      
     } else {
       int colorIndex = (int) random(0, colorsArray.length);
-      layerBuffers[bufferIndex].fill(colorsArray[colorIndex]);
+      
+      // Apply alpha transparency to circle
+      color originalColor = colorsArray[colorIndex];
+      color transparentColor = color(red(originalColor), green(originalColor), blue(originalColor), drawAlpha);
+      
+      layerBuffers[bufferIndex].fill(transparentColor);
       layerBuffers[bufferIndex].noStroke();
       // Draw at 0,0 relative to the translated coordinate system
       layerBuffers[bufferIndex].ellipse(0, 0, scaled_width, scaled_height);
