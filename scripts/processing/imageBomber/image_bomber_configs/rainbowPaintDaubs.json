@@ -13,11 +13,14 @@
         "exitOnRenderComplete": null,
         "renderVariantsInfinitely": null,
         "saveLastFrameEveryVariant": null,
+        "saveLayers": null,
         "backGroundColorWithAlpha": [255, 255, 129, 255]
     },
     "grid_configs": [
         {
             "name": "coarse_grid",
+            "minAlpha": 204,
+            "maxAlpha": 255,
             "minScale": 1.6,
             "maxScale": 3.1,
             "minRotation": 0,
@@ -39,6 +42,8 @@
         },
         {
             "name": "coarse_grid_two",
+            "minAlpha": 213,
+            "maxAlpha": 255,
             "minScale": 0.41,
             "maxScale": 1.4,
             "minRotation": 0,
@@ -60,6 +65,8 @@
         },
         {
             "name": "fine_midground_grid",
+            "minAlpha": 243,
+            "maxAlpha": 255,
             "minScale": 0.156,
             "maxScale": 0.41,
             "minRotation": 0,
@@ -81,6 +88,8 @@
         },
         {
             "name": "medium_grid",
+            "minAlpha": 237,
+            "maxAlpha": 255,
             "minScale": 0.276,
             "maxScale": 0.81,
             "minRotation": 0,
@@ -102,6 +111,8 @@
         },
         {
             "name": "fine_foreground_grid",
+            "minAlpha": 247,
+            "maxAlpha": 255,
             "minScale": 0.2,
             "maxScale": 0.375,
             "minRotation": 0,
