@@ -1,11 +1,7 @@
 # DESCRIPTION
-# image_adjust_coloraide.py tester script
-# Generates random shifts for every channel in each supported color space and applies
-# them to switches passed to script in subject, to make many random channel-shifted
-# images. Results are descriptive filenames and debug logs.
-
-# Written nearly entirely by a Large Language Model, deepseek, with human guidance in
-# features and fixes.
+# image_adjust_coloraide.py tests
+# Generates random shifts for each supported color space and applies them to N images.
+# Saves results with descriptive filenames, a plain text report, and debug logs.
 
 # DEPENDENCIES
 # pip install Pillow numpy coloraide, and image_adjust_coloraide.py, which is
@@ -295,14 +291,19 @@ Examples:
         print("\nError: --cores must be between 0.0 and 1.0\n", file=sys.stderr)
         sys.exit(1)
 
+    # Convert image path to absolute path
+    image_path = os.path.abspath(args.image)
+    
     # Check if source image exists
-    if not os.path.exists(args.image):
-        print(f"\nError: Image file '{args.image}' not found!\n", file=sys.stderr)
+    if not os.path.exists(image_path):
+        print(f"\nError: Image file '{args.image}' not found!", file=sys.stderr)
+        print(f"Looked for absolute path: {image_path}", file=sys.stderr)
         sys.exit(1)
 
     # Debug info
     print(f"\nTest runner script location: {SCRIPT_DIR}")
     print(f"Looking for target script: {TARGET_SCRIPT}")
+    print(f"Input image: {image_path}")
     
     # Check if the target script exists
     if not os.path.exists(TARGET_SCRIPT):
@@ -310,8 +311,8 @@ Examples:
         print(f"Please ensure image_adjust_coloraide.py is in the same directory as this test runner.\n", file=sys.stderr)
         sys.exit(1)
 
-    # Create output directory
-    output_dir = os.path.join(SCRIPT_DIR, args.output_dir)
+    # Create output directory - relative to current working directory
+    output_dir = os.path.abspath(args.output_dir)
     os.makedirs(output_dir, exist_ok=True)
     print(f"Output directory: {output_dir}")
 
@@ -328,7 +329,7 @@ Examples:
     for color_space in COLORSPACES.keys():
         tests = generate_random_shifts(color_space, args.num_tests, args.seed)
         for shifts in tests:
-            all_tests.append((args.image, output_dir, color_space, shifts, test_count, args.cores))
+            all_tests.append((image_path, output_dir, color_space, shifts, test_count, args.cores))
             test_count += 1
     
     total_tests = len(all_tests)
@@ -360,7 +361,7 @@ Examples:
         f.write("=" * 50 + "\n\n")
         
         f.write(f"Test run: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-        f.write(f"Source image: {args.image}\n")
+        f.write(f"Source image: {image_path}\n")
         f.write(f"Random seed: {args.seed if args.seed else 'None'}\n")
         f.write(f"Tests per space: {args.num_tests}\n")
         f.write(f"CPU cores used: {cores_to_use}/{total_cores}\n")
