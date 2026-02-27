@@ -8,7 +8,7 @@
 // - NOTE that no images are provided with this script "shipped." You must provide a subfolder of images, and set the variable instructing the script what that folder name is, in the global variable. Examine comments provided in the "GLOBAL VARIABLES WHICH YOU MAY ALTER" section for instructions.
 // - Examine other comments in that same comment section for instructions on all the global variables which you may alter for your preferences, including by defining global preferences and/or a grid in a JSON configuration file.
 // - On run of script, you may:
-//  - press the space bar or a mouse button to save a still of what is displayed. The still is named like this: _rnd_images_processing_v1-0-0__anim_run__seed_1409989632_fr_0000000315.png. You might think that file name has too much information. It doesn't. It is all the information required to reproduce exactly the same image again should you want to (provided the same script version, seed, and source image set).
+//  - press the space bar or a mouse button to save a still of what is displayed. The still is named like this: _imageBomber_v1-0-0__anim_run__seed_1409989632_fr_0000000315.png. You might think that file name has too much information. It doesn't. It is all the information required to reproduce exactly the same image again should you want to (provided the same script version, seed, and source image set).
 //  - click the canvas or press the spacebar to save the current display to an image
 //  - type the letter 'p'(ause) to pause or resume rendering of elements in the grid
 //  - type the letter 'v'(ariant) to stop rendering the current variant and start a new one
@@ -19,19 +19,23 @@
 // TO DO:
 // - optional random palette retrieval and recoloring of colorizable source rasters (or SVGs??)
 // - randomRotationDegrees implementation and in config
+// - behavior update: make it so that with this (and other?) configs:
+//   saveFrames: False, stopAtFrame: -1, exitOnRenderComplete: False, renderVariantsInfinitely: False, saveLastFrameEveryVariant: True, saveLayers: False
+//   -- after a render completes and I'm guessing noLoop() was run, I can't click the still canvas to save the current frame. I don't like a potential fix: make an independent keypress scan loop (infinite timer)?? :/
+
 
 // BEGIN GLOBAL VARIABLES which you may alter if you know what you're doing:
 JSONObject allImportedJSON;       // intended to store everything imported from JSONconfigFileName
 JSONObject globalsConfigJSON;     // stores JSON global value overrides object extracted from allImportedJSON
-JSONArray gridConfigsJSON;        // stores JSON grid config values extracted from allImportedJSON
+JSONArray gridConfigsJSON;        // stores JSON grid config values extracted from allImportedJSONx
 
 // json configuration to load; see the sibling file imageBomberDefaultConfig.json for a complete example of options. Read on for config options and JSON config usage.
-// String JSONconfigFileName = "imageBomberDefaultConfig.json";
-String JSONconfigFileName = "image_bomber_configs/32_Max_Chroma_Medium_Light_Depth_by_Hue.json";
+// String JSONconfigFileName = "image_bomber_configs/imageBomberDefaultConfig.json";
+String JSONconfigFileName = "image_bomber_configs/test.json";
 // NOTE that all of these below globals have counterpart values you can set in the .json file name assigned to the JSONconfigFileName (and parsed for usage after that). Any variables in that file which are assigned a null value will not have that value used, and the correspoding value assigned below will instead be used. (You must have useful values hard-coded to all the below globals; they function as defaults.) Any variables in the .json config file which are assigned a non-null value (such as an integer or float) will *override* any corresponding values below:
-boolean booleanOverrideSeed = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. Any variants after that -- see renderVariantsInfinitely -- will have a random seed assigned. If booleanOverrideSeed is set to false, a seed will be chosen randomly for the first variant, and also all variants after. Setting booleanOverrideSeed to true with a dedicated value for overrideSeed will result in the same pseudo-randomness and result image for the first variant every time, given the same image resources and grid configurations.
-int overrideSeed = 936942080;   // see notes for booleanOverrideSeed. The seed of the first feature complete version demo output was -289762560. Another early used seed: 936942080
-boolean saveFrames = false;    // set to true to save animation frames (images), false to not save them.
+boolean doSeedOverride = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. Any variants after that -- see renderVariantsInfinitely -- will have a random seed assigned. If doSeedOverride is set to false, a seed will be chosen randomly for the first variant, and also all variants after. Setting doSeedOverride to true with a dedicated value for overrideSeed will result in the same pseudo-randomness and result image for the first variant every time, given the same image resources and grid configurations.
+int overrideSeed = 936942080;   // see notes for doSeedOverride. The seed of the first feature complete version demo output was -289762560. Another early used seed: 936942080
+boolean saveFrames = true;    // set to true to save animation frames (images), false to not save them.
 int frameRate = 60;   // how many frames per second to display changes to art. But if saveFrames is set to true, this is not used: Processing built-in frameRate function will not be called, and therefore the default no max or no throttle framerate will be used.
 boolean useFrameRate = false;  // if set to true, frameRate value will be used via call of Processing built-in function frameRate(n). See also comment for saveFrames.
 boolean useCustomCanvasSize = true;    // if set to true, customCanvasWidth and customCanvasHeight will define the canvas dimensions. Ff set to false, the full screen size will be detected and used.
@@ -40,7 +44,9 @@ int customCanvasHeight = 1080;  // set to any arbitrary height you want for ". f
 int stopAtFrame = -1;   // Processing program will exit after this many animation frames. If set to a negative number, the program runs forever until you manually stop it. If set to 0 it makes 1 frame regardless, because of the way the draw() and exit() functions work: exit() waits for draw() to finish. 764 may be a good number for this if you use a positive value. NOTES: intended use with this value and a gridIterator class is that the gridIterator keeps making images over cell areas of nested finer grids until stopAtFrame is reached. If stopAtFrame is -1 then a gridIterator will be used until all intended elements in the grid are rendered. After a render completes, other globals control what happens: see notes for exitOnRenderComplete and renderVariantsInfinitely.
 boolean exitOnRenderComplete = false;   // causes program to terminate after completion of first variant render, even if renderVariantsInfinitely is set to true
 boolean renderVariantsInfinitely = false;   // causes program to render a new variant after the first one completes, and another after that, ad infinitum.
-boolean saveLastFrameOfEveryVariant = false;    // causes program to use manualSaveFrame(); for the final frame of every variant. Useful for finding a favorite among many variants. (Including if stopAtFrame causes an early variant render stop.)
+boolean saveLastFrameEveryVariant = false;    // causes program to use manualSaveFrame(); for the final frame of every variant. Useful for finding a favorite among many variants. (Including if stopAtFrame causes an early variant render stop.)
+boolean saveLayers = true;    // set to true to enable layer rendering mode - saves each grid as a separate transparent layer
+String layersOutputDir = "";           // will be set automatically with timestamp
 color backgroundColorWithAlpha = color(144,145,145,255);   // alter the three integer RGB values and alpha in that to set the background color. For neutral (as perceived by humans) gray, set all three RGB values to 145.
 
 // color array to randomly select from for fallback vector circles, OR for vector mode:
@@ -51,7 +57,7 @@ color[] colorsArray = {
 // END GLOBAL VARIABLES which you may alter
 
 // GLOBALS NOT TO CHANGE HERE; program logic or the developer may change them in program runs or updates:
-String scriptVersionString = "2-22-3";
+String scriptVersionString = "4-28-17";
 
 String animFramesSaveDir;
 int countedFrames = 0;
@@ -66,11 +72,21 @@ String imageArchiveUrl = "http://earthbound.io/data/dist/image_bomber_sets_subfo
 String archiveFilename = "image_bomber_sets_subfolders.zip";
 String extractToFolder = "image_bomber_sets";
 
+// layer rendering globals
+PGraphics[] layerBuffers;              // array to store each rendered layer (including background at index 0)
+int currentGridIndex = 0;              // track which grid we're rendering
+boolean layerRenderingComplete = false; // flag for when all layers are done
+String layerTimestamp = "";             // timestamp for this layer set
+int totalLayersWithBackground;          // total layers including background (grids count + 1)
 
 // has functions that iterate cell position with related coordinates on a grid. See internal class initializer.
 class GridIterator {
   // Grid dimensions
   int cols, rows;
+
+  // minimum and maxium random alpha from 0 to 255; 0 is transparent (not visible at all), 255 is opaque (no transparency). For example to lock transparency at 126, set minAlpha and maxAlpha to 126. To have random alpha between 60 and 188, set minAlpha to 60 and 188. To always have an element fully opaque, set minimum and maximum both to 255:
+  float minAlpha;
+  float maxAlpha;
 
   float minScaleMultiplier;     // minimum amount to randomly scale images down to. It's a multiplier; for example if the source image width is 600, then 600 * 0.27 = 162 px minimum width. Suggested values: 0.15 to 0.27. If smaller max like 0.27, suggest this at 0.081.
   float maxScaleMultiplier;     // maximum amount to randomly scale images up to. Can constrain larger images to a smaller maximum. Not recommended to exceed 1, unless you anticipate images looking good scaled up.
@@ -78,7 +94,7 @@ class GridIterator {
   float maxRotation;            // maximum random rotation range in degrees. May be negative or positive.
   float minSquishMultiplier;
   float maxSquishMultiplier;    // If you want a range that's stretched (or squished) and admitting normal, set this to 1. You can also set this to more than one to have "squished" to "stretch" range.
-  boolean squishImagesBool;             // if set to true, after image size is randomly proportionally scaled down, image widths and heights are further randomly altered without respect for maintaining aspect (a square may be squished or stretched to a rectangle), within constraints of minSquishMultiplier (minimum) to maxSquishMultiplier (maximum). If set to false, no squishing will occur and images will remain at original proportion. Note that you may set a maxSquishMultiplier below 1 for images to always be squished at least to some amount.
+  boolean squishImages;             // if set to true, after image size is randomly proportionally scaled down, image widths and heights are further randomly altered without respect for maintaining aspect (a square may be squished or stretched to a rectangle), within constraints of minSquishMultiplier (minimum) to maxSquishMultiplier (maximum). If set to false, no squishing will occur and images will remain at original proportion. Note that you may set a maxSquishMultiplier below 1 for images to always be squished at least to some amount.
 
   int elementsPerCell;      // when this count is reached, nextCell() is called
   int drawnCellElements;    // for counting drawn elements to check against elementsPerCell
@@ -107,9 +123,11 @@ class GridIterator {
   int heightOfImagesInArrayList;
 
   float skipCellChance;           // if nonzero there is a chance that when nextCell() is called it will skip the next cell (advance two cells)
-  float skipDrawElementChance;    // if nonzero there is a chance that when drawRNDelement() is called it will skip drawing an element
+  float skipDrawElementChance;    // if nonzero there is a chance that when drawing it will skip drawing an element
 
-  boolean circlesOverride;       // flag to use vector circles instead of images. Overridden to true if images load fails.
+  boolean circlesOverride;       // flag to use vector circles instead of images. Overridden to true if images load fails. Circle maximum diameter will be diagonal of cells times an overshoot.
+
+  float elementOvershootMax;     // multiplier for random location range: 1 + overshoot value (converted from JSON input)
 
   // a class instance is initialized with a JSON object imported from (by default) imageBomberDefaultConfig.json or any other JSON
   GridIterator(JSONObject gridJSON) {
@@ -122,18 +140,29 @@ class GridIterator {
     // Calculate cell dimensions
     cellWidth = gridX2 / cols;
     cellHeight = gridY2 / rows;
+    minAlpha = gridJSON.getFloat("minAlpha");
+    maxAlpha = gridJSON.getFloat("maxAlpha");
     minScaleMultiplier = gridJSON.getFloat("minScale");
     maxScaleMultiplier = gridJSON.getFloat("maxScale");
     minRotation = gridJSON.getFloat("minRotation");
     maxRotation = gridJSON.getFloat("maxRotation");
     minSquishMultiplier = gridJSON.getFloat("minSquish");
     maxSquishMultiplier = gridJSON.getFloat("maxSquish");
-    squishImagesBool = gridJSON.getBoolean("booleanSquishImages");
+    squishImages = gridJSON.getBoolean("squishImages");
     imagesPath = gridJSON.getString("imagesPath");
     elementsPerCell = gridJSON.getInt("elementsPerCell");
     skipCellChance = gridJSON.getFloat("skipCellChance");
     skipDrawElementChance = gridJSON.getFloat("skipDrawElementChance");
-    circlesOverride = gridJSON.getBoolean("booleanCirclesOverride");
+    circlesOverride = gridJSON.getBoolean("circlesOverride");
+
+    // Convert elementOvershootMax from JSON (if present) to 1 + value
+    if (gridJSON.hasKey("elementOvershootMax") && !gridJSON.isNull("elementOvershootMax")) {
+      float overshootValue = gridJSON.getFloat("elementOvershootMax");
+      elementOvershootMax = 1.0 + overshootValue;
+      println("  elementOvershootMax set to " + elementOvershootMax + " (from input " + overshootValue + ")");
+    } else {
+      elementOvershootMax = 1.0; // Default to no overshoot
+    }
 
     // initializes members to default, ready-to-start-render state:
     reset();
@@ -160,63 +189,56 @@ class GridIterator {
       }
     }
 
-    // check if images list empty; if so, create dummy values and rend drawRNDelement() will fallback to circle vectors
+    // check if images list empty; if so, create dummy values and fallback to circle vectors
     if (allImagesList.isEmpty()) {
       println("WARNING: No valid images found in " + imagesPath + ". Will use fallback circles.");
       circlesOverride = true;
       // Set these to dummy / default values since we won't be using actual images
       imagesArrayListLength = colorsArray.length - 1;    // -1 because it will be used with zero-based indexing
-      // println("Set imagesArrayListLength to " + imagesArrayListLength + " (colorsArray length: " + colorsArray.length + ")");
-      widthOfImagesInArrayList = 450;     // max diameter for fallback circles
-      heightOfImagesInArrayList = 450;
+
+      // Set fallback circle dimensions; calculate cell diagonal for circumscribed circle size
+      float cellDiagonal = sqrt(cellWidth * cellWidth + cellHeight * cellHeight);
+      float circleDiameter = cellDiagonal * 1.32;   // that multiplier overshoots the diameter that circumscribes the rectangle
+      widthOfImagesInArrayList = (int) circleDiameter;
+      heightOfImagesInArrayList = (int) circleDiameter;
+      println("  Fallback circle size set to " + (int) circleDiameter + " pixels (cell diagonal: " + (int) cellDiagonal + ")");
     } else {    //  otherwise set values derived from images:
       imagesArrayListLength = allImagesList.size() - 1;   // -1 because it will be used with zero-based indexing
       widthOfImagesInArrayList = allImagesList.get(0).width;
       heightOfImagesInArrayList = allImagesList.get(0).height;
-      // println("Using images. imagesArrayListLength: " + imagesArrayListLength);
     }
 
   }
 
   // Update the cell boundaries based on current position
   void updateCellBounds() {
-    // println("xMin, xMax, yMin, yMax before update: " + xMin + ", " + xMax, ", " + yMin + ", " + yMax);
-    xMin = gridX1 + currentCol * cellWidth;    // when currentCol is 0, via order of operations (currentCol * cellWidth) will be 0, which is correct
+    xMin = gridX1 + currentCol * cellWidth;
     xMax = xMin + cellWidth;
-    yMin = gridY1 + currentRow * cellHeight;   // same calculation as for xMin = 0 if currentRow is 0 applies here.
+    yMin = gridY1 + currentRow * cellHeight;
     yMax = yMin + cellHeight;
-    // println("xMin, xMax, yMin, yMax AFTER update: " + xMin + ", " + xMax, ", " + yMin + ", " + yMax);
   }
 
   // avoids duplicate logic but hard for hooman to math :)
   void nextCellHelper() {
-    // println("currentCol and currentRow are: " + currentCol + ", " + currentRow);
     currentCol++;
 
     // If we've passed the last column, wrap to the first column
     if (currentCol >= cols) {
-      // println("currentCol is >= cols (" + cols + "); will update.");
       currentCol = 0;
       currentRow++;
-      // println("currentCol and currentRow are now: " + currentCol + ", " + currentRow);
 
       // If we've passed the last row, wrap to the first row
       if (currentRow >= rows) {
-        // println("currentRow >= rows (" + rows + "); will update.");
         currentRow = 0;
-        // println("currentRow was updated to: " + currentRow);
         wrappedPastLastRow = true;
-        // println("set wrappedPastLastRow to true, as currentRow wrapped and was reset to zero.");
       }
     }
-    // println("currentCol and currentRow ARE NOW: " + currentCol + ", " + currentRow);
   }
 
   // Move to the next cell (left to right, top to bottom)
   void nextCell() {
     // randomly skip a cell if we draw a random number less than skipCellChance
     if (random(1) < skipCellChance) {
-      // println("SKIPPING CELL because of random draw of number less than skipCellChance, " + skipCellChance + "!");
       nextCellHelper();
       nextCellHelper();   // do this TWICE to effectively skip a cell
       updateCellBounds();
@@ -228,71 +250,8 @@ class GridIterator {
     updateCellBounds();
   }
 
-  // draws an element in current cell boundaries with scale, squish, and location randomization constraints:
-  void drawRNDelement() {
-    // if we randomly draw a number within range skipDrawElementChance, skip drawing any element. (This will never happen if skipDrawElementChance is 0.)
-    if (random(1) < skipDrawElementChance) {
-      // println("SKIPPING ELEMENT DRAW because of random draw of number less than skipDrawElementChance, " + skipDrawElementChance + "!");
-      return;   // we just return without drawing anything; no element drawn
-    }
-
-    int xCenter = (int) random(xMin, xMax);
-    int yCenter = (int) random(yMin, yMax);
-
-    pushMatrix();
-    translate(xCenter, yCenter);
-    float randomRotateDegree = random(minRotation, maxRotation);
-    rotate(radians(randomRotateDegree));
-
-    // set random height and width to scale image to (within constraints):
-    // randomize width and height within scale range, and maintain aspect (will alter aspect after this if told to) :
-    float width_and_height_scalar = random(minScaleMultiplier, maxScaleMultiplier);
-    float scaled_width = widthOfImagesInArrayList * width_and_height_scalar;
-    float scaled_height = heightOfImagesInArrayList * width_and_height_scalar;
-
-    // if boolean instructs to do so, alter dimensions to random squish:
-    if (squishImagesBool) {
-      float widthSquishMultiplier = random(minSquishMultiplier, maxSquishMultiplier);
-      scaled_width *= widthSquishMultiplier;
-    }
-
-    if (!circlesOverride) {
-      // we have images to use; get random index for an image in the array:
-      int rnd_imagesArray_idx = (int) random(0, imagesArrayListLength + 1);    // + 1 bcse random max range is not included in range
-      // if we don't do pushMatrix() and popMatrix(), xCenter and yCenter should be specied as nonzero; otherwise we translate() to those coordinates and they are 0, 0
-      // image(allImagesList.get(rnd_imagesArray_idx), xCenter, yCenter, scaled_width, scaled_height);    // use xCenter and yCenter if we don't push and pop matrix, use 0 otherwise?
-      image(allImagesList.get(rnd_imagesArray_idx), 0, 0, scaled_width, scaled_height);
-    } else {
-      int colorIndex = (int) random(0, colorsArray.length);
-      fill(colorsArray[colorIndex]);
-      noStroke();
-      // no images available -- use fallback circles:
-      ellipse(0, 0, scaled_width, scaled_height);  // Draw at translated origin
-    }
-    popMatrix();
-
-    // THIS GLOBAL iterated here immediately after we render any element; strictly the program may render many more frames than this, but we only want to reference frames that we "count" and which are in the numbered animation sequence:
-    countedFrames += 1;
-
-    // if told to save an animation frame, do so:
-    if (saveFrames == true) {
-      String paddedFrameNumber = String.format("%06d", countedFrames);
-      saveFrame(animFramesSaveDir + "/" + paddedFrameNumber + ".png");
-    }
-
-    // iterate grid config internal value:
-    drawnCellElements += 1;
-
-    // FIX: using == here leads to unentended result of wrappedPastLastRow set to true; using >= avoids that:
-    if (drawnCellElements >= elementsPerCell) {
-      nextCell();
-      drawnCellElements = 0;
-    }
-    //popMatrix();  // you need to uncomment this if you animate things. If you don't animate things, it isn't necessary. I think.
-  }
-
   boolean isComplete() {
-    return wrappedPastLastRow;    // set to true in a Class function when we've gone through all cells
+    return wrappedPastLastRow;
   }
 
   // to reset class members which will allow us to start a new variant for renderVariantsInfinitely mode, OR to initialize a GridIterator from the constructor:
@@ -315,31 +274,15 @@ ArrayList<GridIterator> grid_iterators;    // grid_iterators to be used in succe
 // Function that handles values etc. for new animated variant to be displayed;
 // intended only to be called at the moment we know a render of a variant is complete:
 void prepareNextVariant() {
-  // notify that program will conditionally exit if so; but I want the information after this printed last so I'm checking exitOnRenderComplete twice:
-  if (exitOnRenderComplete == true) {println("exitOnRenderComplete boolean set to true; program will exit.");}
+  // DO NOT print completion messages here - this is for STARTING a variant, not completing one
+  // The completion messages should only come from draw() when rendering actually finishes
 
-  // handle variant render complete feedback print
-  if (allGridsRenderedFeedbackPrinted == false) {
-    println("RENDERING COMPLETE (grid_iterators.size == 0).");
-    allGridsRenderedFeedbackPrinted = true;
-    if (saveFrames == true) {
-      println("Animation save frames are in the directory:\n  " + animFramesSaveDir);
-    }
-  }
-
-  // conditionally save the last frame of the variant if a boolean says so:
-  if (saveLastFrameOfEveryVariant == true) {manualSaveFrame();}
-  // conditionally exit program as earlier notified will happen:
-  if (exitOnRenderComplete == true) {
-    exit();
-  }
-
-  // handle setting up next variant if we haven't exited the program
-  if (booleanOverrideSeed == true) {   // this will only be the case the first time we check booleanOverrideSeed if it is initially set to true; after we set it false this will always be false:
-    println("booleanOverrideSeed true; overrideSeed value " + overrideSeed + " will be used to seed pseudorandom number generator.");
+  // handle setting up next variant
+  if (doSeedOverride == true) {
+    println("doSeedOverride true; overrideSeed value " + overrideSeed + " will be used to seed pseudorandom number generator.");
     seed = overrideSeed;
-    // set this false so that the above only happens once, because for renderVariantsInfinitely (if set true) we want a new random seed for every variant after the first one:
-    booleanOverrideSeed = false;
+    // set this false so that the above only happens once
+    doSeedOverride = false;
   } else {
     seed = (int) random(-2147483648, 2147483647);
   }
@@ -347,7 +290,7 @@ void prepareNextVariant() {
   // reset / reinitialize globals and objects:
   randomSeed(seed);
 
-  // if we haven't added anything to the grid_iterators ArrayList (if it is null), add to it via initGrids(); if we have (if it is not null), reset them. The whole reason of this is avoiding reload of image paths / resources when we can reuse them for a new variant, but still change other things in the list of grid iterators to a default / reset state to render a new variant:
+  // Initialize grids if needed
   if (grid_iterators == null) {
     initGrids();    // intended for first time, creates everything
   } else {
@@ -357,23 +300,31 @@ void prepareNextVariant() {
     }
   }
 
-  grid_iterator = null;   // will be reassigned on next draw
-  grid_iterator = grid_iterators.get(0);
+  // Initialize layer rendering if enabled
+  if (saveLayers) {
+    initLayerRendering();
+  } else {
+    // Reset layer rendering state for non-layer mode
+    layerBuffers = null;
+    currentGridIndex = 0;
+    layerRenderingComplete = false;
+  }
+
+  grid_iterator = null;
+  if (grid_iterators != null && grid_iterators.size() > 0) {
+    grid_iterator = grid_iterators.get(0);
+  }
   clearTheCanvas = true;
-
-  // DEPRECATED; moved to draw() loop which is really where it goes:
-  // background(backgroundColorWithAlpha);     // clear canvas
   countedFrames = 0;
-  allGridsRenderedFeedbackPrinted = false;
+  allGridsRenderedFeedbackPrinted = false;  // Reset this for the new variant
 
-  // Only call frameRate if saveFrames is false, because if we're saving animation frames we (or I--deciding for the user!) don't want any other slowdown; saving frames is slower already.
+  // Only call frameRate if saveFrames is false
   if (saveFrames == false) {
     if (useFrameRate == true) {
       frameRate(frameRate);
     }
   } else {
-  // ALTERS A GLOBAL:
-    animFramesSaveDir = "_rnd_images_processing__anim_run__v" + scriptVersionString + "_seed__" + seed;
+    animFramesSaveDir = "_imageBomber__anim_run__v" + scriptVersionString + "__seed__" + seed;
   }
 
   println(">> New variant prepared. Seed: " + seed);
@@ -384,6 +335,67 @@ void prepareNextVariant() {
   }
 }
 
+// initialize layer rendering buffers and directories
+void initLayerRendering() {
+  // Create timestamp for this layer set
+  int d = day();
+  int m = month();
+  int y = year();
+  int h = hour();
+  int min = minute();
+  int s = second();
+  layerTimestamp = String.format("%04d-%02d-%02d_%02d-%02d-%02d", y, m, d, h, min, s);
+
+  // Create output directory
+  layersOutputDir = sketchPath() + "/" + "_imageBomber__layers__v" + scriptVersionString + "__seed_" + seed;
+  java.io.File dir = new java.io.File(layersOutputDir);
+  if (!dir.exists()) {
+    dir.mkdirs();
+  }
+
+  // Calculate total layers including background (grids + background at index 0)
+  totalLayersWithBackground = grid_iterators.size() + 1;
+
+  // Initialize layer buffers array (including space for background layer at index 0)
+  layerBuffers = new PGraphics[totalLayersWithBackground];
+
+  // Create and save background layer (index 0)
+  layerBuffers[0] = createGraphics(width, height);
+  layerBuffers[0].beginDraw();
+  layerBuffers[0].background(backgroundColorWithAlpha);
+  layerBuffers[0].endDraw();
+
+  // Save background layer immediately
+  String bgFilename = layersOutputDir + "/layer_00_background.png";
+  layerBuffers[0].save(bgFilename);
+  println("Saved background layer to: " + bgFilename);
+
+  // Reset grid index and completion flag
+  // Note: currentGridIndex of 1 means we're starting with first actual grid (index 1 in buffers array)
+  currentGridIndex = 1;
+  layerRenderingComplete = false;
+
+  println("Layer rendering mode enabled. Output directory: " + layersOutputDir);
+  println("Total layers (including background): " + totalLayersWithBackground);
+  println("Will render " + grid_iterators.size() + " content layers.");
+}
+
+// save current layer buffer to file (adjusted for background at index 0)
+void saveCurrentLayer(int bufferIndex) {
+  if (bufferIndex < layerBuffers.length && layerBuffers[bufferIndex] != null) {
+    String layerFilename;
+    if (bufferIndex == 0) {
+      layerFilename = layersOutputDir + "/layer_00_background.png";
+    } else {
+      // bufferIndex-1 to get the correct grid config (since grids start at index 1 in buffers)
+      int gridConfigIndex = bufferIndex - 1;
+      layerFilename = layersOutputDir + "/layer_" + String.format("%02d", bufferIndex) + "_" +
+                     gridConfigsJSON.getJSONObject(gridConfigIndex).getString("name", "unnamed") + ".png";
+    }
+    layerBuffers[bufferIndex].save(layerFilename);
+    println("Saved layer " + bufferIndex + " to: " + layerFilename);
+  }
+}
 
 // I here adapt a function by Daniel Shiffman which recursively traverses subdirectories; the "ArrayList<File> a" is passed by reference (directly modifies the Arraylist), I think:
 void recurseDir(ArrayList<File> a, String dir) {
@@ -454,8 +466,17 @@ int setIntFromJSON(int intToSet, JSONObject configJSON, String fieldName) {
   }
 }
 
+// returns acquired float value if an investigated JSON field is non-null; otherwise returns the original value passed:
+float setFloatFromJSON(float floatToSet, JSONObject configJSON, String fieldName) {
+  if (configJSON.hasKey(fieldName) && !configJSON.isNull(fieldName)) {
+    return configJSON.getFloat(fieldName);
+  } else {
+    return floatToSet;
+  }
+}
 
-// obtains JSON values from "global_settings" object and, for any of them which do not have a null value, overiddes hard-coded globals in this script with their value from the corresponding JSON object's field; e.g. if the "boolanSaveFrames" field is "true" or "false" instead of null, it uses that "true" or "false" value:
+
+// obtains JSON values from "global_settings" object and, for any of them which do not have a null value, overiddes hard-coded globals in this script with their value from the corresponding JSON object's field; e.g. if the "saveFrames" field is "true" or "false" instead of null, it uses that "true" or "false" value:
 void overrideGlobals() {
   try {
     if (allImportedJSON == null) {loadConfigurationJSON();}
@@ -463,18 +484,19 @@ void overrideGlobals() {
     println("Global settings in-memory JSON object loaded successfully.");
     // Check if various keys (intended globals) exist and are not null; assign value from them if so:
     // fields for set~JSON functions:        boolean booleanToSet/int intToSet, JSONObject configJSON, String fieldName
-    booleanOverrideSeed =       setBooleanFromJSON(booleanOverrideSeed, globalsConfigJSON, "booleanOverrideSeed");
-    overrideSeed =              setIntFromJSON(overrideSeed, globalsConfigJSON, "intOverrideSeed");
-    saveFrames =                setBooleanFromJSON(saveFrames, globalsConfigJSON, "boolanSaveFrames");
-    useFrameRate =              setBooleanFromJSON(useFrameRate, globalsConfigJSON, "booleanUseFrameRate");
-    frameRate =                 setIntFromJSON(frameRate, globalsConfigJSON, "intFrameRate");
-    useCustomCanvasSize =       setBooleanFromJSON(useCustomCanvasSize, globalsConfigJSON, "booleanUseCustomCanvasSize");
-    customCanvasWidth =         setIntFromJSON(customCanvasWidth, globalsConfigJSON, "intCustomCanvasWidth");
-    customCanvasHeight =        setIntFromJSON(customCanvasHeight, globalsConfigJSON, "intCustomCanvasHeight");
-    stopAtFrame =               setIntFromJSON(stopAtFrame, globalsConfigJSON, "intStopAtFrame");
-    exitOnRenderComplete =      setBooleanFromJSON(exitOnRenderComplete, globalsConfigJSON, "booleanExitOnRenderComplete");
-    renderVariantsInfinitely =  setBooleanFromJSON(renderVariantsInfinitely, globalsConfigJSON, "booleanRenderVariantsInfinitely");
-    saveLastFrameOfEveryVariant = setBooleanFromJSON(saveLastFrameOfEveryVariant, globalsConfigJSON, "booleanSaveLastFrameOfEveryVariant");
+    doSeedOverride =            setBooleanFromJSON(doSeedOverride, globalsConfigJSON, "doSeedOverride");
+    overrideSeed =              setIntFromJSON(overrideSeed, globalsConfigJSON, "overrideSeed");
+    saveFrames =                setBooleanFromJSON(saveFrames, globalsConfigJSON, "saveFrames");
+    useFrameRate =              setBooleanFromJSON(useFrameRate, globalsConfigJSON, "useFrameRate");
+    frameRate =                 setIntFromJSON(frameRate, globalsConfigJSON, "frameRate");
+    useCustomCanvasSize =       setBooleanFromJSON(useCustomCanvasSize, globalsConfigJSON, "useCustomCanvasSize");
+    customCanvasWidth =         setIntFromJSON(customCanvasWidth, globalsConfigJSON, "customCanvasWidth");
+    customCanvasHeight =        setIntFromJSON(customCanvasHeight, globalsConfigJSON, "customCanvasHeight");
+    stopAtFrame =               setIntFromJSON(stopAtFrame, globalsConfigJSON, "stopAtFrame");
+    exitOnRenderComplete =      setBooleanFromJSON(exitOnRenderComplete, globalsConfigJSON, "exitOnRenderComplete");
+    renderVariantsInfinitely =  setBooleanFromJSON(renderVariantsInfinitely, globalsConfigJSON, "renderVariantsInfinitely");
+    saveLastFrameEveryVariant = setBooleanFromJSON(saveLastFrameEveryVariant, globalsConfigJSON, "saveLastFrameEveryVariant");
+    saveLayers =                setBooleanFromJSON(saveLayers, globalsConfigJSON, "saveLayers");
     // color
     if (globalsConfigJSON.hasKey("backGroundColorWithAlpha") && !globalsConfigJSON.isNull("backGroundColorWithAlpha")) {
       JSONArray bgColorArray = globalsConfigJSON.getJSONArray("backGroundColorWithAlpha");
@@ -615,6 +637,96 @@ void setup() {
 
 
 boolean clearTheCanvas = true;
+
+// Helper function to estimate if an element would be visible on canvas; operates on assumption
+// of an ellipse but ignores squishing, stretching or rotation
+boolean isElementVisible(int xCenter, int yCenter, float elementWidth, float elementHeight) {
+  // Calculate element edges
+  float leftEdge = xCenter - elementWidth/2;
+  float rightEdge = xCenter + elementWidth/2;
+  float topEdge = yCenter - elementHeight/2;
+  float bottomEdge = yCenter + elementHeight/2;
+
+  // Padding to keep elements slightly
+  int pad = 8;
+
+  // Check if element is probably completely to the left of canvas plus pad distance
+  if (rightEdge < pad) {return false;}
+  // Check if element is probably completely to the right of canvas minus pad distance
+  if (leftEdge > width - pad) {return false;}
+  // Check if element is probably completely above canvas plus pad distance
+  if (bottomEdge < pad) {return false;}
+  // Check if element is probably completely below canvas minus pad distance
+  if (topEdge > height - pad) {return false;}
+  // If we passed all checks, element is probably at least partly visible
+  return true;
+}
+
+// Unified rendering function that draws to any PGraphics target
+void renderElementToTarget(PGraphics target, GridIterator grid, float drawAlpha) {
+  // Generate random scale first (needed for visibility check)
+  float width_and_height_scalar = random(grid.minScaleMultiplier, grid.maxScaleMultiplier);
+  float scaled_width = grid.widthOfImagesInArrayList * width_and_height_scalar;
+  float scaled_height = grid.heightOfImagesInArrayList * width_and_height_scalar;
+
+  // Apply squish if enabled (affects width only)
+  if (grid.squishImages) {
+    float widthSquishMultiplier = random(grid.minSquishMultiplier, grid.maxSquishMultiplier);
+    scaled_width *= widthSquishMultiplier;
+  }
+
+  // For visibility check, use the larger dimension to be safe (since rotation could make either dimension matter)
+  float maxElementDimension = max(scaled_width, scaled_height);
+
+  // Find a visible position with overshoot
+  int xCenter, yCenter;
+  int attempts = 0;
+  int maxAttempts = 12; // Prevent infinite loops
+
+  do {
+    // Calculate overshoot range
+    int xMinOvershoot = (int) (grid.xMin * grid.elementOvershootMax);
+    int xMaxOvershoot = (int) (grid.xMax * grid.elementOvershootMax);
+    int yMinOvershoot = (int) (grid.yMin * grid.elementOvershootMax);
+    int yMaxOvershoot = (int) (grid.yMax * grid.elementOvershootMax);
+
+    // Generate random position within overshoot range
+    xCenter = (int) random(xMinOvershoot, xMaxOvershoot);
+    yCenter = (int) random(yMinOvershoot, yMaxOvershoot);
+
+    attempts++;
+
+    // If we've tried too many times, just use the position (better to render something than infinite loop)
+    if (attempts >= maxAttempts) {
+      println("Warning: Could not find visible position after " + maxAttempts + " attempts");
+      break;
+    }
+  } while (!isElementVisible(xCenter, yCenter, maxElementDimension, maxElementDimension));
+
+  target.pushMatrix();
+  target.translate(xCenter, yCenter);
+
+  float randomRotateDegree = random(grid.minRotation, grid.maxRotation);
+  target.rotate(radians(randomRotateDegree));
+
+  // Draw element (image or circle)
+  if (!grid.circlesOverride) {
+    int rnd_imagesArray_idx = (int) random(0, grid.imagesArrayListLength + 1);
+    target.tint(255, drawAlpha);
+    target.image(grid.allImagesList.get(rnd_imagesArray_idx), 0, 0, scaled_width, scaled_height);
+    target.noTint();
+  } else {
+    int colorIndex = (int) random(0, colorsArray.length);
+    color originalColor = colorsArray[colorIndex];
+    color transparentColor = color(red(originalColor), green(originalColor), blue(originalColor), drawAlpha);
+    target.fill(transparentColor);
+    target.noStroke();
+    target.ellipse(0, 0, scaled_width, scaled_height);
+  }
+
+  target.popMatrix();
+}
+
 void draw() {
   // clear canvas at start of new variant
   if (clearTheCanvas) {
@@ -622,69 +734,219 @@ void draw() {
     clearTheCanvas = false;
   }
 
-  if (grid_iterators != null && grid_iterators.size() > 0) {
-    // find first incomplete grid
-    GridIterator currentGrid = null;
-    for (GridIterator g : grid_iterators) {
-      if (!g.isComplete()) {
-        currentGrid = g;
-        break;
+  if (grid_iterators == null || grid_iterators.size() == 0) {
+    println("ERROR: No grid iterators available.");
+    noLoop();
+    return;
+  }
+
+  // Find first incomplete grid
+  GridIterator currentGrid = null;
+  int gridIndex = -1;
+
+  for (int i = 0; i < grid_iterators.size(); i++) {
+    if (!grid_iterators.get(i).isComplete()) {
+      currentGrid = grid_iterators.get(i);
+      gridIndex = i;
+      break;
+    }
+  }
+
+  // If all grids are complete, handle variant completion
+  if (currentGrid == null) {
+    handleVariantCompletion();
+    return;
+  }
+
+  // Check stop condition - only if we have a grid to render
+  if (stopAtFrame > -1 && countedFrames >= stopAtFrame) {
+    handleVariantCompletion();
+    return;
+  }
+
+  // Check skip draw chance
+  if (random(1) < currentGrid.skipDrawElementChance) {
+    // Skip drawing this element, but still count it for cell progression
+    currentGrid.drawnCellElements++;
+
+    if (currentGrid.drawnCellElements >= currentGrid.elementsPerCell) {
+      currentGrid.nextCell();
+      currentGrid.drawnCellElements = 0;
+    }
+
+    // Skipped elements don't produce a frame
+    return;
+  }
+
+  // Generate random alpha once for this element
+  float drawAlpha = random(currentGrid.minAlpha, currentGrid.maxAlpha);
+  println("set drawAlpha to: " + drawAlpha);
+
+  // Handle rendering based on mode
+  if (saveLayers) {
+    // LAYER MODE: Render to buffer only, then display composite
+    int bufferIndex = gridIndex + 1; // +1 because buffer[0] is background
+
+    // Handle layer transition
+    if (bufferIndex > currentGridIndex) {
+      // Save previous layer
+      if (currentGridIndex < layerBuffers.length && layerBuffers[currentGridIndex] != null) {
+        saveCurrentLayer(currentGridIndex);
+      }
+      currentGridIndex = bufferIndex;
+    }
+
+    // Create layer buffer if needed
+    if (layerBuffers[bufferIndex] == null) {
+      layerBuffers[bufferIndex] = createGraphics(width, height);
+      layerBuffers[bufferIndex].beginDraw();
+      layerBuffers[bufferIndex].imageMode(CENTER);
+      layerBuffers[bufferIndex].smooth();
+      layerBuffers[bufferIndex].background(0, 0, 0, 0); // Transparent
+      layerBuffers[bufferIndex].endDraw();
+    }
+
+    // Render to layer buffer
+    layerBuffers[bufferIndex].beginDraw();
+    renderElementToTarget(layerBuffers[bufferIndex], currentGrid, drawAlpha);
+    layerBuffers[bufferIndex].endDraw();
+
+    // Display composite preview (this is what user sees)
+    pushMatrix();
+    resetMatrix();
+    imageMode(CENTER);
+
+    // Clear main canvas and show all accumulated layers
+    background(0); // Clear to black or any color
+    image(layerBuffers[0], width/2, height/2); // background layer
+
+    for (int i = 1; i <= currentGridIndex; i++) {
+      if (layerBuffers[i] != null) {
+        image(layerBuffers[i], width/2, height/2); // each content layer
       }
     }
 
-    if (currentGrid != null) {
-      currentGrid.drawRNDelement();
-    } else {
-      // all grids complete!
-      if (renderVariantsInfinitely) {
-        // reset all grids for next variant
-        for (GridIterator g : grid_iterators) {
-          g.reset();
-        }
-        clearTheCanvas = true;
-        prepareNextVariant();
-      } else {
-        noLoop();  // Stop rendering if not infinite
-      }
-    }
-
-    // stop condition - frame count limit reached
-    if (stopAtFrame > -1 && countedFrames >= stopAtFrame) {
-      if (renderVariantsInfinitely) {
-        // reset all grids for next variant
-        for (GridIterator g : grid_iterators) {
-          g.reset();
-        }
-        clearTheCanvas = true;
-        prepareNextVariant();
-      } else {
-        noLoop();
-      }
-    }
+    popMatrix();
 
   } else {
-    // no grids exist yet (first run) - shouldn't happen after initGrids()
-    println("ERROR: No grid iterators available.");
+    // NORMAL MODE: Render directly to main canvas
+    renderElementToTarget(g, currentGrid, drawAlpha);
+  }
+
+  // Update grid state
+  currentGrid.drawnCellElements++;
+
+  // Check if we need to move to next cell
+  if (currentGrid.drawnCellElements >= currentGrid.elementsPerCell) {
+    currentGrid.nextCell();
+    currentGrid.drawnCellElements = 0;
+  }
+
+  // ALWAYS increment frame counter for EVERY element drawn
+  countedFrames++;
+
+  // ALWAYS save animation frame if enabled (works in BOTH modes)
+  if (saveFrames) {
+    String paddedFrameNumber = String.format("%06d", countedFrames);
+    saveFrame(animFramesSaveDir + "/" + paddedFrameNumber + ".png");
+  }
+}
+
+
+// helper function to handle variant completion consistently
+void handleVariantCompletion() {
+  // Print completion message once
+  if (!allGridsRenderedFeedbackPrinted) {
+    println("RENDERING COMPLETE (all grids done or stopAtFrame reached).");
+    allGridsRenderedFeedbackPrinted = true;
+    if (saveFrames) {
+      println("Animation save frames are in the directory:\n  " + animFramesSaveDir);
+    }
+  }
+
+  // Handle layer mode final saves
+  if (saveLayers && !layerRenderingComplete) {
+    // Save any unsaved layers
+    for (int i = 0; i < layerBuffers.length; i++) {
+      if (layerBuffers[i] != null) {
+        saveCurrentLayer(i);
+      }
+    }
+    layerRenderingComplete = true;
+    println("All layers saved to: " + layersOutputDir);
+  }
+
+  // Save last frame if enabled (works in BOTH modes)
+  if (saveLastFrameEveryVariant) {
+    manualSaveFrame();
+  }
+
+  // Check if we should exit
+  if (exitOnRenderComplete) {
+    println("exitOnRenderComplete boolean set to true; program will exit.");
+    exit();
+    return;
+  }
+
+  // Handle next variant if enabled
+  if (renderVariantsInfinitely) {
+    println("Preparing next variant...");
+    prepareNextVariant();
+  } else {
     noLoop();
   }
 }
 
 
+// Updated manualSaveFrame to save composite ONLY to sketch folder (no redundant saves in layer folder)
 void manualSaveFrame() {
-  if (countedFrames != 0) {   // I don't like this bandaid but it's a simple ouchie fix; it prevents saving a frame when there's only a blank canvas (no elements rendered)
-    String paddedFrameNumber = String.format("%06d", countedFrames);
-    String saveFileName = "_manual_save__rnd_images_processing_" + "v" + scriptVersionString + "__anim_run__seed_" + seed + "_fr_" + paddedFrameNumber + ".png";
-    saveFrame(saveFileName);
-    println("image of current canvas saved to " + saveFileName);
+  if (saveLayers) {
+    // In layer mode, save composite image of all layers
+    if (layerBuffers != null && layerBuffers.length > 0) {
+      println("Layer mode active - saving composite image of all layers...");
+
+      // Create composite from all layers
+      PGraphics composite = createGraphics(width, height);
+      composite.beginDraw();
+      composite.imageMode(CENTER);
+      composite.background(backgroundColorWithAlpha); // Start with background color
+
+      // Render all layers in order (including background at 0, then content layers)
+      for (int i = 0; i < layerBuffers.length; i++) {
+        if (layerBuffers[i] != null) {
+          composite.image(layerBuffers[i], width/2, height/2);
+          println("  Added layer " + i + " to composite");
+        }
+      }
+
+      composite.endDraw();
+
+      // Save the composite with manual save naming (ONLY to sketch folder)
+      String paddedFrameNumber = String.format("%06d", countedFrames);
+      String saveFileName = "_imageBomber__v" + scriptVersionString + "__seed_" + seed + "_fr_" + paddedFrameNumber + ".png";
+      composite.save(sketchPath() + "/" + saveFileName);
+      println("Composite image saved to: " + saveFileName);
+
+      // Display the composite briefly
+      image(composite, width/2, height/2);
+    } else {
+      println("No layers available to composite yet.");
+    }
+  } else {
+    // Original behavior for non-layer mode
+    if (countedFrames != 0) {
+      String paddedFrameNumber = String.format("%06d", countedFrames);
+      String saveFileName = "_imageBomber__v" + scriptVersionString + "__seed_" + seed + "_fr_" + paddedFrameNumber + ".png";
+      saveFrame(saveFileName);
+      println("Image of current canvas saved to " + saveFileName);
+    }
   }
 }
-
 
 // save image frame on mouse press, with file name indicating manual save
 void mousePressed() {
   manualSaveFrame();
 }
-
 
 // hotkeys for various things
 void keyPressed() {
@@ -703,7 +965,7 @@ void keyPressed() {
     manualSaveFrame();
   }
   if (key == 'v' || key == 'V') {
-    println("Keypress of 'n' detected; ending current variant render and starting a new one . . .");
+    println("Keypress of 'v' detected; ending current variant render and starting a new one . . .");
     prepareNextVariant();
   }
 }

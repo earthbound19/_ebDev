@@ -1,0 +1,65 @@
+test_id,saveFrames,stopAtFrame,exitOnRenderComplete,renderVariantsInfinitely,saveLastFrameEveryVariant,saveLayers,expected result
+1,True,-1,True,True,True,True,anim run dir(s) | exit after first render | last frame of one variant saved | layer images for one variant
+2,True,-1,True,True,True,False,anim run dir(s) | exit after first render | last frame of one variant saved
+3,True,-1,True,True,False,True,anim run dir(s) | exit after first render | layer images for one variant
+4,True,-1,True,True,False,False,anim run dir(s) | exit after first render
+5,True,-1,True,False,True,True,anim run dir(s) | exit after first render | last frame of one variant saved | layer images for one variant
+6,True,-1,True,False,True,False,anim run dir(s) | exit after first render | last frame of one variant saved
+7,True,-1,True,False,False,True,anim run dir(s) | exit after first render | layer images for one variant
+8,True,-1,True,False,False,False,anim run dir(s) | exit after first render
+9,True,-1,False,True,True,True,anim run dir(s) | variants render until you exit | last frame of every variant saved | layer images per variant
+10,True,-1,False,True,True,False,anim run dir(s) | variants render until you exit | last frame of every variant saved
+11,True,-1,False,True,False,True,anim run dir(s) | variants render until you exit | layer images per variant
+12,True,-1,False,True,False,False,anim run dir(s) | variants render until you exit
+13,True,-1,False,False,True,True,anim run dir(s) | last frame of one variant saved | layer images for one variant
+14,True,-1,False,False,True,False,anim run dir(s) | last frame of one variant saved
+15,True,-1,False,False,False,True,anim run dir(s) | layer images for one variant
+16,True,-1,False,False,False,False,anim run dir(s)
+17,True,17,True,True,True,True,anim run dir(s) | 17 frames of one anim | exit after first render | 17th frame of one anim | layer images (fewer) per variant
+18,True,17,True,True,True,False,anim run dir(s) | 17 frames of one anim | exit after first render | 17th frame of one anim
+19,True,17,True,True,False,True,anim run dir(s) | 17 frames of one anim | exit after first render | layer images (fewer) per variant
+20,True,17,True,True,False,False,anim run dir(s) | 17 frames of one anim | exit after first render
+21,True,17,True,False,True,True,anim run dir(s) | 17 frames of one anim | exit after first render | 17th frame of one anim | layer images (fewer) per variant
+22,True,17,True,False,True,False,anim run dir(s) | 17 frames of one anim | exit after first render | 17th frame of one anim
+23,True,17,True,False,False,True,anim run dir(s) | 17 frames of one anim | exit after first render | layer images (fewer) per variant
+24,True,17,True,False,False,False,anim run dir(s) | 17 frames of one anim | exit after first render
+25,True,17,False,True,True,True,anim run dir(s) | 17 frames per many variants | variants render until you exit | 17th frame per many variants | layer images (fewer) per variant
+26,True,17,False,True,True,False,anim run dir(s) | 17 frames per many variants | variants render until you exit | 17th frame per many variants
+27,True,17,False,True,False,True,anim run dir(s) | 17 frames per many variants | variants render until you exit | layer images (fewer) per variant
+28,True,17,False,True,False,False,anim run dir(s) | 17 frames per many variants | variants render until you exit
+29,True,17,False,False,True,True,anim run dir(s) | 17 frames of one anim | 17th frame of one anim | layer images (fewer) per variant
+30,True,17,False,False,True,False,anim run dir(s) | 17 frames of one anim | 17th frame of one anim
+31,True,17,False,False,False,True,anim run dir(s) | 17 frames of one anim | layer images (fewer) of one variant
+32,True,17,False,False,False,False,anim run dir(s) | 17 frames of one anim
+33,False,23,True,True,True,True,exit after first render | 23rd frame of one anim | layer images (fewer) per variant
+34,False,23,True,True,True,False,exit after first render | 23rd frame of one anim
+35,False,23,True,True,False,True,exit after first render | layer images (fewer) per variant
+36,False,23,True,True,False,False,exit after first render
+37,False,23,True,False,True,True,exit after first render | 23rd frame of one anim | layer images (fewer) per variant
+38,False,23,True,False,True,False,exit after first render | 23rd frame of one anim
+39,False,23,True,False,False,True,exit after first render | layer images (fewer) per variant
+40,False,23,True,False,False,False,exit after first render
+41,False,23,False,True,True,True,variants render until you exit | 23rd frame per many variants | layer images (fewer) per variant
+42,False,23,False,True,True,False,variants render until you exit | 23rd frame per many variants
+43,False,23,False,True,False,True,variants render until you exit | layer images (fewer) per variant
+44,False,23,False,True,False,False,variants render until you exit
+45,False,23,False,False,True,True,23rd frame of one anim | layer images (fewer) per variant
+46,False,23,False,False,True,False,23rd frame of one anim
+47,False,23,False,False,False,True,layer images (fewer) of one variant
+48,False,23,False,False,False,False,23 frames rendered and nothing is saved
+49,False,-1,True,True,True,True,exit after first render | last frame of one variant saved | layer images of one variant
+50,False,-1,True,True,True,False,exit after first render | last frame of one variant saved
+51,False,-1,True,True,False,True,exit after first render | layer images per variant
+52,False,-1,True,True,False,False,exit after first render and nothing saved
+53,False,-1,True,False,True,True,exit after first render | last frame of one variant saved | layer images of one variant
+54,False,-1,True,False,True,False,exit after first render | last frame of one variant saved
+55,False,-1,True,False,False,True,exit after first render | layer images of one variant
+56,False,-1,True,False,False,False,exit after first render and nothing saved
+57,False,-1,False,True,True,True,variants render until you exit | last frame of many variants saved | layer images per variant
+58,False,-1,False,True,True,False,variants render until you exit | last frame of many variants saved
+59,False,-1,False,True,False,True,variants render until you exit | layer images per variant
+60,False,-1,False,True,False,False,variants render until you exit while nothing is saved
+61,False,-1,False,False,True,True,last frame of one variant saved | all layer images for one variant saved
+62,False,-1,False,False,True,False,last frame of one variant saved
+63,False,-1,False,False,False,True,all layer images of one variant saved
+64,False,-1,False,False,False,False,one full variant is rendered and nothing is saved
