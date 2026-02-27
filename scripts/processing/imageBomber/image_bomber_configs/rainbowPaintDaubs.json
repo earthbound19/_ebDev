@@ -1,5 +1,5 @@
 {
-    "_comment": "The following global_settings object here lists fields which are all optional. See comments in imageBomber.pde for purposes and expected types (e.g. boolean, float, string). Fields with a null value will be ignored and a default from the script used. Fields with a non-null value (such as true or false for boolean, or something in quotes for a string) will override defaults.",
+    "_comment": "The following global_settings object here lists fields which are all optional. See comments in imageBomber.pde for purposes and expected types (e.g. boolean, float, string), for variables in the global settings and grid_configs objects below. Fields with a null value will be ignored and a default from the script used. Fields with a non-null value (such as true or false for boolean, or something in quotes for a string) will override defaults.",
     "global_settings": {
         "doSeedOverride": null,
         "overrideSeed": null,
@@ -18,6 +18,7 @@
     },
     "grid_configs": [
         {
+            "_NOTE" : "useStickiness, skipStickiness, and renderStickiness are only applicable to the 2nd grid or higher, not the 1st grid",
             "name": "coarse_grid",
             "minAlpha": 204,
             "maxAlpha": 255,

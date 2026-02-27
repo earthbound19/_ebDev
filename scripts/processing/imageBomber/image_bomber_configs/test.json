@@ -1,8 +1,8 @@
 {
-    "_comment": "The following global_settings object here lists fields which are all optional. See comments in imageBomber.pde for purposes and expected types (e.g. boolean, float, string). Fields with a null value will be ignored and a default from the script used. Fields with a non-null value (such as true or false for boolean, or something in quotes for a string) will override defaults.",
+    "_comment": "The following global_settings object here lists fields which are all optional. See comments in imageBomber.pde for purposes and expected types (e.g. boolean, float, string), for variables in the global settings and grid_configs objects below. Fields with a null value will be ignored and a default from the script used. Fields with a non-null value (such as true or false for boolean, or something in quotes for a string) will override defaults.",
     "global_settings": {
         "doSeedOverride": false,
-        "overrideSeed": null,
+        "overrideSeed": 1102286336,
         "useCustomCanvasSize": true,
         "customCanvasWidth": 800,
         "customCanvasHeight": 600,
@@ -12,12 +12,18 @@
         "exitOnRenderComplete": true,
         "renderVariantsInfinitely": true,
         "saveFrames": true,
-        "saveLastFrameEveryVariant": false,
-        "saveLayers": true,
-        "backGroundColorWithAlpha": [144, 184, 154, 255]
+        "saveLastFrameEveryVariant": true,
+        "saveLayers": false,
+        "backGroundColorWithAlpha": [
+            144,
+            184,
+            154,
+            255
+        ]
     },
     "grid_configs": [
         {
+            "_NOTE" : "useStickiness, skipStickiness, and renderStickiness are only applicable to the 2nd grid or higher, not the 1st grid",
             "name": "test_base_grid",
             "minAlpha": 177,
             "maxAlpha": 255,
@@ -36,17 +42,17 @@
             "gridY1": 0,
             "gridX2": 800,
             "gridY2": 600,
-            "elementsPerCell": 2,
-            "skipCellChance": 0,
-            "skipDrawElementChance": 0,
+            "elementsPerCell": 1,
+            "skipCellChance": 0.8,
+            "skipDrawElementChance": 0.8,
             "circlesOverride": true
         },
         {
             "name": "test_mid_grid",
             "minAlpha": 165,
             "maxAlpha": 218,
-            "minScale": 0.42,
-            "maxScale": 0.66,
+            "minScale": 0.12,
+            "maxScale": 0.36,
             "minRotation": 0,
             "maxRotation": 0,
             "minSquish": 1,
@@ -54,7 +60,7 @@
             "squishImages": false,
             "cols": 8,
             "rows": 5,
-            "elementOvershootMax": 0.15,
+            "elementOvershootMax": 0,
             "imagesPath": "thispathdoesnotexist",
             "gridX1": 0,
             "gridY1": 0,
@@ -63,6 +69,9 @@
             "elementsPerCell": 3,
             "skipCellChance": 0.8,
             "skipDrawElementChance": 0.6,
+            "useStickiness": true,
+            "skipStickiness": 0.05,
+            "renderStickiness": 0.9,
             "circlesOverride": true
         },
         {
@@ -87,6 +96,9 @@
             "elementsPerCell": 2,
             "skipCellChance": 0.87,
             "skipDrawElementChance": 0.79,
+            "useStickiness": true,
+            "skipStickiness": 0.234,
+            "renderStickiness": 0.265,
             "circlesOverride": true
         }
     ]

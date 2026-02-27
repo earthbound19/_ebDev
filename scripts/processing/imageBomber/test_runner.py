@@ -64,6 +64,12 @@ Examples:
         help='Numeric test ID to skip to. If omitted, starts from first test.'
     )
 
+    parser.add_argument(
+        '-r', '--randomorder',
+        action='store_true',
+        help='Flag. If provided, test order will be randomized. If provided with -t/--testid, that test ID will still be first.'
+    )
+
     return parser.parse_args()
 
 def warn_and_confirm():
@@ -153,8 +159,8 @@ def detect_type(value: str) -> Any:
         pass
     return value
 
-def load_test_cases(csv_path: str, start_test_id: Optional[int] = None) -> List[Dict]:
-    """Load test cases from CSV, optionally starting from a specific test ID."""
+def load_test_cases(csv_path: str, start_test_id: Optional[int] = None, randomorder: bool = False) -> List[Dict]:
+    """Load test cases from CSV, optionally starting from a specific test ID and/or randomizing order."""
     all_test_cases = []
     with open(resolve_path(csv_path), 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
@@ -168,24 +174,44 @@ def load_test_cases(csv_path: str, start_test_id: Optional[int] = None) -> List[
 
     print(f"Loaded {len(all_test_cases)} test cases total")
 
-    # Filter to start from specific test ID if requested
-    if start_test_id is not None:
-        filtered_cases = []
-        found = False
-        for test_case in all_test_cases:
-            if test_case.get('test_id') == start_test_id:
-                found = True
-            if found:
-                filtered_cases.append(test_case)
+    # Case 1: No start_test_id
+    if start_test_id is None:
+        if randomorder:
+            import random
+            shuffled = all_test_cases.copy()
+            random.shuffle(shuffled)
+            print(f"Randomized order of {len(shuffled)} test cases")
+            return shuffled
+        return all_test_cases
 
-        if not found:
-            print(f"ERROR: Test ID {start_test_id} not found in {csv_path}")
-            sys.exit(1)
+    # Case 2: We have a start_test_id
+    # Find the target test case
+    target_index = None
+    for i, test_case in enumerate(all_test_cases):
+        if test_case.get('test_id') == start_test_id:
+            target_index = i
+            break
 
-        print(f"Starting from test ID {start_test_id}, will run {len(filtered_cases)} tests")
-        return filtered_cases
+    if target_index is None:
+        print(f"ERROR: Test ID {start_test_id} not found in {csv_path}")
+        sys.exit(1)
 
-    return all_test_cases
+    # Reorder tests to start with the target, then continue in original order wrapping around
+    reordered = all_test_cases[target_index:] + all_test_cases[:target_index]
+    
+    if randomorder:
+        import random
+        # Keep the first test (target), randomize the rest
+        first_test = reordered[0:1]
+        rest_tests = reordered[1:]
+        random.shuffle(rest_tests)
+        result = first_test + rest_tests
+        print(f"Test ID {start_test_id} will run first, followed by {len(rest_tests)} randomized tests")
+    else:
+        result = reordered
+        print(f"Starting from test ID {start_test_id}, will run {len(reordered)} tests in original cyclic order")
+    
+    return result
 
 def patch_json_config(json_path: str, test_case: Dict) -> None:
     """Directly patch the JSON config file."""
@@ -474,8 +500,8 @@ def main():
     if not warn_and_confirm():
         sys.exit(0)
 
-    # Load all test cases once - we'll use an index to track position
-    all_test_cases = load_test_cases(DEFAULT_TEST_CSV_PATH, args.testid)
+    # Load all test cases once - we'll use an index to track position; optionally with random order also
+    all_test_cases = load_test_cases(DEFAULT_TEST_CSV_PATH, args.testid, args.randomorder)
     if not all_test_cases:
         print("ERROR: No test cases found")
         sys.exit(1)
