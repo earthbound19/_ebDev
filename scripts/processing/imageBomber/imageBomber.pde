@@ -58,14 +58,14 @@ color[] colorsArray = {
 // END GLOBAL VARIABLES which you may alter
 
 // GLOBALS NOT TO CHANGE HERE; program logic or the developer may change them in program runs or updates:
-String scriptVersionString = "4-30-1";
+String scriptVersionString = "4-31-36";
 
 String animFramesSaveDir;
 int countedFrames = 0;
 int seed;
 
 // controls feedback print:
-boolean allGridsRenderedFeedbackPrinted = false;   // when the size of the grid_iterators array becomes zero, a message is printed in the draw() loop, if this boolean is false, a message is printed that rendering is done. Then the boolean is immediately set to true so the message is never reprinted.
+boolean allGridsProcessedFeedbackPrinted = false;   // when the size of the grid_iterators array becomes zero, a message is printed in the draw() loop, if this boolean is false, a message is printed that rendering is done. Then the boolean is immediately set to true so the message is never reprinted.
 
 // related to automatic download of image bomber images sets subfolders:
 boolean enableAutoDownload = true;
@@ -81,15 +81,19 @@ String layerTimestamp = "";             // timestamp for this layer set
 int totalLayersWithBackground;          // total layers including background (grids count + 1)
 
 // Cell state class for precomputed grid cells
+// Cell state class for precomputed grid cells
 class GridCell {
   int col, row;
   int xMin, xMax, yMin, yMax;
   int centerX, centerY;
   boolean active;  // whether this cell should render elements (based on skipCellChance)
-  boolean rendered; // whether we've finished rendering this cell's elements
+  boolean processed; // whether we've finished processing this cell
   int elementsDrawn; // count of elements drawn in this cell
-  
-  GridCell(int c, int r, int x1, int x2, int y1, int y2) {
+
+  // Overshoot/padding boundaries (precomputed)
+  int xMinOvershoot, xMaxOvershoot, yMinOvershoot, yMaxOvershoot;
+
+  GridCell(int c, int r, int x1, int x2, int y1, int y2, float overshootValue) {
     col = c;
     row = r;
     xMin = x1;
@@ -99,8 +103,38 @@ class GridCell {
     centerX = (xMin + xMax) / 2;
     centerY = (yMin + yMax) / 2;
     active = true; // default to active
-    rendered = false;
+    processed = false;
     elementsDrawn = 0;
+
+    // Precompute overshoot/padding boundaries
+    if (overshootValue >= 0) {
+      // POSITIVE overshoot: expand outward
+      float expansionFactor = 1.0 + overshootValue;
+      xMinOvershoot = (int) (xMin * expansionFactor);
+      xMaxOvershoot = (int) (xMax * expansionFactor);
+      yMinOvershoot = (int) (yMin * expansionFactor);
+      yMaxOvershoot = (int) (yMax * expansionFactor);
+    } else {
+      // NEGATIVE overshoot: create interior padding
+      float paddingPercent = -overshootValue; // Make positive
+      int xPadding = (int) ((xMax - xMin) * paddingPercent / 2);
+      int yPadding = (int) ((yMax - yMin) * paddingPercent / 2);
+
+      xMinOvershoot = xMin + xPadding;
+      xMaxOvershoot = xMax - xPadding;
+      yMinOvershoot = yMin + yPadding;
+      yMaxOvershoot = yMax - yPadding;
+
+      // Ensure we don't invert the range if padding is too large
+      if (xMinOvershoot >= xMaxOvershoot) {
+        xMinOvershoot = xMin;
+        xMaxOvershoot = xMax;
+      }
+      if (yMinOvershoot >= yMaxOvershoot) {
+        yMinOvershoot = yMin;
+        yMaxOvershoot = yMax;
+      }
+    }
   }
 }
 
@@ -125,11 +159,16 @@ class GridIterator {
 
   // Grid total boundaries; gridX1 and gridY1 are the coordinate of the upper left corner of the grid.
   int gridX1, gridY1, gridX2, gridY2;
-  
-  // Stickiness controls
-  boolean useStickiness;         // master switch to enable/disable all stickiness behavior for this grid
-  float skipStickiness;          // chance to skip cell when nearest cell in previous grid is active; NOTE that 0 means never skip cells in that case
-  float renderStickiness;        // multiplier used with global skipDrawElementChance when nearest cell in previous grid is active; NOTE that 1 means never skip element render in that case
+
+  // Previous grid influence controls -- SOME OF THESE WERE RENAMED; previous grid influence used to be referred to as "stickiness:"
+  boolean usePreviousGridInfluence;                  // master switch to enable/disable all previous grid influence
+  float chanceSkipCellWhenBGcell_inactive;   // chance to SKIP ENTIRE CELL when nearest cell in previous grid is INACTIVE
+                                          // 0 = never skip, 1 = always skip.     PREVIOUS more confusing variable name: skipStickiness
+
+  float renderElementChanceMultiplierWhenBGcellActive;           // multiplier applied to baseRenderElementChance when nearest cell in previous grid is ACTIVE
+                                          // 1 = no change
+                                          // 0.5 = half as likely to render
+                                          // 2 = twice as likely to render (capped at 1.0)      PREVIOUS more confusing variable name: renderStickiness
 
   String imagesPath;
 
@@ -141,20 +180,20 @@ class GridIterator {
   int widthOfImagesInArrayList;
   int heightOfImagesInArrayList;
 
-  float skipCellChance;           // if nonzero there is a chance that a cell will be marked inactive
-  float skipDrawElementChance;    // if nonzero there is a chance that when drawing it will skip drawing an element
+  float skipCellChance;           // if nonzero there is a chance that a cell will be marked inactive.
+  float baseRenderElementChance;         // if nonzero there is a chance that when drawing it will skip drawing an element. PREVIOUSLY more confusingly named skipDrawElementChance.
 
   boolean circlesOverride;       // flag to use vector circles instead of images. Overridden to true if images load fails. Circle maximum diameter will be diagonal of cells times an overshoot.
 
   float elementOvershootMax;     // multiplier for random location range: 1 + overshoot value (converted from JSON input)
-  
+
   // Cell management
   ArrayList<GridCell> cells;      // list of all cells in this grid
   int[] renderOrder;              // randomized order of cell indices
   int currentRenderPosition;      // position in renderOrder array
-  boolean gridComplete;           // whether we've rendered all cells
-  
-  // Reference to previous grid for stickiness
+  boolean gridComplete;           // whether we've processed all cells
+
+  // Reference to previous grid
   GridIterator previousGrid;
 
   // a class instance is initialized with a JSON object imported from (by default) imageBomberDefaultConfig.json or any other JSON
@@ -180,30 +219,33 @@ class GridIterator {
     imagesPath = gridJSON.getString("imagesPath");
     elementsPerCell = gridJSON.getInt("elementsPerCell");
     skipCellChance = gridJSON.getFloat("skipCellChance");
-    skipDrawElementChance = gridJSON.getFloat("skipDrawElementChance");
+    baseRenderElementChance = gridJSON.getFloat("baseRenderElementChance");
     circlesOverride = gridJSON.getBoolean("circlesOverride");
-    // STICKINESS CONTROLS - with assigned defaults (not from JSON)
-    useStickiness = false;      // default
-    skipStickiness = 0.234;     // default chance to skip cell; NOTE: if set to 0, it will NEVER skip a cell if the nearest cell in the previous grid is active
-    renderStickiness = 0.265;   // default stickiness multiplier; NOTE: if set to 1, it will NEVER skip an element render for a cell if the nearest cell in the previous grid is active
-    // Override stickiness values from JSON if present:
-    if (gridJSON.hasKey("useStickiness") && !gridJSON.isNull("useStickiness")) {
-      useStickiness = gridJSON.getBoolean("useStickiness");
+    // PREVIOUS GRID INFLUENCE CONTROLS - with assigned defaults (not from JSON) -- PREVIOUSLY named "stickiness" controls
+    usePreviousGridInfluence = false;      // default
+    chanceSkipCellWhenBGcell_inactive = 0.234;     // default chance to skip cell; NOTE: if the nearest cell in the previous grid is INACTIVE, this percent chance of skipping the current cell
+    renderElementChanceMultiplierWhenBGcellActive = 0.265;       // default multiplier; NOTE: if usePreviousGridInfluence is true AND the nearest cell in the previous grid is ACTIVE, multiplies baseRenderElementChance by this
+    // Override previous grid influence variables from JSON if present:
+    if (gridJSON.hasKey("usePreviousGridInfluence") && !gridJSON.isNull("usePreviousGridInfluence")) {
+      usePreviousGridInfluence = gridJSON.getBoolean("usePreviousGridInfluence");
     }
-    if (gridJSON.hasKey("skipStickiness") && !gridJSON.isNull("skipStickiness")) {
-      skipStickiness = gridJSON.getFloat("skipStickiness");
+    if (gridJSON.hasKey("chanceSkipCellWhenBGcell_inactive") && !gridJSON.isNull("chanceSkipCellWhenBGcell_inactive")) {
+      chanceSkipCellWhenBGcell_inactive = gridJSON.getFloat("chanceSkipCellWhenBGcell_inactive");
     }
-    if (gridJSON.hasKey("renderStickiness") && !gridJSON.isNull("renderStickiness")) {
-      renderStickiness = gridJSON.getFloat("renderStickiness");
+    if (gridJSON.hasKey("renderElementChanceMultiplierWhenBGcellActive") && !gridJSON.isNull("renderElementChanceMultiplierWhenBGcellActive")) {
+      renderElementChanceMultiplierWhenBGcellActive = gridJSON.getFloat("renderElementChanceMultiplierWhenBGcellActive");
     }
 
-    // Convert elementOvershootMax from JSON (if present) to 1 + value
+    // Convert elementOvershootMax from JSON (if present) to 1 + value;
+    // in case of negative value, set up for "undershoot" which will be a negative padding rectangle within the cell boundary;
+    // in case of positive value, set up for overshoot; else if neither positive nor negative, 0 (on cell boundary)
     if (gridJSON.hasKey("elementOvershootMax") && !gridJSON.isNull("elementOvershootMax")) {
       float overshootValue = gridJSON.getFloat("elementOvershootMax");
-      elementOvershootMax = 1.0 + overshootValue;
-      println("  elementOvershootMax set to " + elementOvershootMax + " (from input " + overshootValue + ")");
+      // Store the raw overshoot value for later use in position calculation
+      elementOvershootMax = overshootValue;
+      println("  elementOvershootMax set to " + overshootValue + " (raw value)");
     } else {
-      elementOvershootMax = 1.0; // Default to no overshoot
+      elementOvershootMax = 0.0;    // Default to no overshoot/padding
     }
 
     // initializes members to defaults for a state that's ready to start rendering:
@@ -249,7 +291,7 @@ class GridIterator {
       widthOfImagesInArrayList = allImagesList.get(0).width;
       heightOfImagesInArrayList = allImagesList.get(0).height;
     }
-    
+
     // Initialize cells list
     cells = new ArrayList<GridCell>();
     for (int r = 0; r < rows; r++) {
@@ -258,9 +300,10 @@ class GridIterator {
         int x2 = x1 + cellWidth;
         int y1 = gridY1 + r * cellHeight;
         int y2 = y1 + cellHeight;
-        cells.add(new GridCell(c, r, x1, x2, y1, y2));
+        cells.add(new GridCell(c, r, x1, x2, y1, y2, elementOvershootMax));
       }
     }
+  // (end of GridIterator class constructor)
   }
 
   // Precompute which cells are active based on skipCellChance
@@ -272,18 +315,18 @@ class GridIterator {
       } else {
         cell.active = true;
       }
-      cell.rendered = false;
+      cell.processed = false;
       cell.elementsDrawn = 0;
     }
   }
-  
+
   // Find cell in given grid closest to (x, y)
-  GridCell findNearestCell(GridIterator grid, int x, int y) {
+  GridCell findNearestCellInPreviousGrid(GridIterator grid, int x, int y) {
     if (grid == null || grid.cells == null || grid.cells.isEmpty()) return null;
-    
+
     GridCell nearest = null;
     float minDist = Float.MAX_VALUE;
-    
+
     for (GridCell cell : grid.cells) {
       float dist = dist(x, y, cell.centerX, cell.centerY);
       if (dist < minDist) {
@@ -325,24 +368,154 @@ class GridIterator {
     return cells.get(cellIndex);
   }
 
-  // Mark current cell as having drawn an element
-  void elementDrawnInCurrentCell() {
+  // Main method to process the next element - returns true if something was rendered/skipped
+  boolean processNextElement(PGraphics target) {
+    // If grid is complete, nothing to process
+    if (gridComplete) return false;
+
+    // Get current cell
+    if (currentRenderPosition >= renderOrder.length) {
+      gridComplete = true;
+      return false;
+    }
+
+    int cellIndex = renderOrder[currentRenderPosition];
+    GridCell cell = cells.get(cellIndex);
+
+    // Handle inactive cells - skip entirely
+    if (!cell.active) {
+      advancePastCell();  // Mark cell as complete and move to next
+      return processNextElement(target); // Recursively try next cell
+    }
+
+    // Apply skip chance for this element
+    if (!shouldRenderElement()) {
+      // DON'T increment elementsDrawn here!
+      if (cell.elementsDrawn >= elementsPerCell) {
+        advancePastCell();
+      }
+      return true; // We will process by skipping
+    }
+
+    // Actually render an element
+    renderElement(target, cell);
+    cell.elementsDrawn++;  // ONLY increment when we actually render
+
+    if (cell.elementsDrawn >= elementsPerCell) {
+      advancePastCell();
+    }
+
+    return true; // We processed something (either rendered, skipped, or completed a cell)
+  }
+
+  // Helper to advance past current cell (mark as complete)
+  private void advancePastCell() {
     if (currentRenderPosition < renderOrder.length) {
       int cellIndex = renderOrder[currentRenderPosition];
       GridCell cell = cells.get(cellIndex);
-      cell.elementsDrawn++;
-      
-      // If we've drawn enough elements in this cell, move to next cell in random order
-      if (cell.elementsDrawn >= elementsPerCell) {
-        cell.rendered = true;
-        currentRenderPosition++;
+      cell.processed = true;
+      // DON'T set elementsDrawn here - let it reflect actual render count
+      currentRenderPosition++;
+
+      if (currentRenderPosition >= renderOrder.length) {
+        gridComplete = true;
       }
     }
-    
-    // Check if we're done
-    if (currentRenderPosition >= renderOrder.length) {
-      gridComplete = true;
+  }
+
+  // function WAS more confusingly named shouldSkipElement:
+  private boolean shouldRenderElement() {
+    float renderChance = baseRenderElementChance;
+
+    if (usePreviousGridInfluence && previousGrid != null) {
+      GridCell currentCell = getCurrentCell();
+      if (currentCell != null) {
+        GridCell nearestPrev = previousGrid.findNearestCellInPreviousGrid(previousGrid, currentCell.centerX, currentCell.centerY);
+
+        if (nearestPrev != null) {
+          boolean prevRendered = previousGrid.didCellRenderAnyElements(nearestPrev);
+          println("Grid " + (previousGrid == null ? "first" : "later") +
+                  " prev cell active: " + nearestPrev.active +
+                  ", elements drawn: " + nearestPrev.elementsDrawn +
+                  ", rendered: " + prevRendered);
+
+          if (!prevRendered) {
+            println("  -> Skipping cell entirely");
+            advancePastCell();
+            return false;
+          } else {
+            println("  -> Applying multiplier: " + renderChance + " * " + renderElementChanceMultiplierWhenBGcellActive);
+            renderChance = min(1.0, renderChance * renderElementChanceMultiplierWhenBGcellActive);
+          }
+        }
+      }
     }
+
+    boolean result = random(1) < renderChance;
+    println("  -> Render chance: " + renderChance + ", result: " + result);
+    return result;
+  }
+
+  // Render an element to the target
+  private void renderElement(PGraphics target, GridCell cell) {
+    // Generate random alpha once for this element
+    float drawAlpha = random(minAlpha, maxAlpha);
+
+    // Generate random scale first (needed for visibility check)
+    float width_and_height_scalar = random(minScaleMultiplier, maxScaleMultiplier);
+    float scaled_width = widthOfImagesInArrayList * width_and_height_scalar;
+    float scaled_height = heightOfImagesInArrayList * width_and_height_scalar;
+
+    // Apply squish if enabled (affects width only)
+    if (squishImages) {
+      float widthSquishMultiplier = random(minSquishMultiplier, maxSquishMultiplier);
+      scaled_width *= widthSquishMultiplier;
+    }
+
+    // For visibility check, use the larger dimension to be safe (since rotation could make either dimension matter)
+    float maxElementDimension = max(scaled_width, scaled_height);
+
+    // Find a visible position with overshoot or padding
+    int xCenter, yCenter;
+    int attempts = 0;
+    int maxAttempts = 12; // Prevent infinite loops
+
+    do {
+      // Use precomputed overshoot/padding boundaries
+      xCenter = (int) random(cell.xMinOvershoot, cell.xMaxOvershoot);
+      yCenter = (int) random(cell.yMinOvershoot, cell.yMaxOvershoot);
+
+      attempts++;
+
+      // If we've tried too many times, just use the position
+      if (attempts >= maxAttempts) {
+        println("Warning: Could not find visible position after " + maxAttempts + " attempts");
+        break;
+      }
+    } while (!isElementVisible(xCenter, yCenter, (int)maxElementDimension, (int)maxElementDimension));
+
+    target.pushMatrix();
+    target.translate(xCenter, yCenter);
+
+    float randomRotateDegree = random(minRotation, maxRotation);
+    target.rotate(radians(randomRotateDegree));
+
+    // Draw element (image or circle)
+    if (!circlesOverride) {
+      int rnd_imagesArray_idx = (int) random(0, imagesArrayListLength + 1);
+      target.tint(255, drawAlpha);
+      target.image(allImagesList.get(rnd_imagesArray_idx), 0, 0, scaled_width, scaled_height);
+      target.noTint();
+    } else {
+      int colorIndex = (int) random(0, colorsArray.length);
+      color originalColor = colorsArray[colorIndex];
+      color transparentColor = color(red(originalColor), green(originalColor), blue(originalColor), drawAlpha);
+      target.fill(transparentColor);
+      target.noStroke();
+      target.ellipse(0, 0, scaled_width, scaled_height);
+    }
+
+    target.popMatrix();
   }
 
   boolean isComplete() {
@@ -354,21 +527,26 @@ class GridIterator {
     gridComplete = false;
     currentRenderPosition = 0;
     renderOrder = null;
-    
+
     // Reset all cells
     if (cells != null) {
       for (GridCell cell : cells) {
-        cell.rendered = false;
+        cell.processed = false;
         cell.elementsDrawn = 0;
         cell.active = true; // Will be properly set in precomputeActiveCells
       }
     }
   }
-  
+
   void setPreviousGrid(GridIterator prev) {
     previousGrid = prev;
   }
+
+  boolean didCellRenderAnyElements(GridCell cell) {
+    return cell.elementsDrawn > 0;
+  }
 }
+// END GRID ITERATOR CLASS
 
 // OUTSIDE SETUP, DECLARE ArrayList of GridIterators:
 GridIterator grid_iterator;   // main instance of class to which instances in the following array will be assigned by reference for convenience
@@ -409,12 +587,12 @@ void prepareNextVariant() {
       g.startRendering();
     }
   }
-  
-  // Set up grid relationships for stickiness
+
+  // Set up grid relationships for previous grid influence
   if (grid_iterators != null && grid_iterators.size() > 0) {
     // First grid has no previous
     grid_iterators.get(0).setPreviousGrid(null);
-    
+
     // Subsequent grids get previous grid reference
     for (int i = 1; i < grid_iterators.size(); i++) {
       grid_iterators.get(i).setPreviousGrid(grid_iterators.get(i-1));
@@ -437,7 +615,7 @@ void prepareNextVariant() {
   }
   clearTheCanvas = true;
   countedFrames = 0;
-  allGridsRenderedFeedbackPrinted = false;  // Reset this for the new variant
+  allGridsProcessedFeedbackPrinted = false;  // Reset this for the new variant
 
   // Only call frameRate if saveFrames is false
   if (saveFrames == false) {
@@ -618,7 +796,7 @@ void overrideGlobals() {
     renderVariantsInfinitely =  setBooleanFromJSON(renderVariantsInfinitely, globalsConfigJSON, "renderVariantsInfinitely");
     saveLastFrameEveryVariant = setBooleanFromJSON(saveLastFrameEveryVariant, globalsConfigJSON, "saveLastFrameEveryVariant");
     saveLayers =                setBooleanFromJSON(saveLayers, globalsConfigJSON, "saveLayers");
-    
+
     // color
     if (globalsConfigJSON.hasKey("backGroundColorWithAlpha") && !globalsConfigJSON.isNull("backGroundColorWithAlpha")) {
       JSONArray bgColorArray = globalsConfigJSON.getJSONArray("backGroundColorWithAlpha");
@@ -849,6 +1027,24 @@ void renderElementToTarget(PGraphics target, GridIterator grid, GridCell cell, f
   target.popMatrix();
 }
 
+// helper for layer mode display
+void updateCompositeDisplay() {
+  pushMatrix();
+  resetMatrix();
+  imageMode(CENTER);
+
+  background(0);
+  image(layerBuffers[0], width/2, height/2);
+
+  for (int i = 1; i <= currentGridIndex; i++) {
+    if (layerBuffers[i] != null) {
+      image(layerBuffers[i], width/2, height/2);
+    }
+  }
+
+  popMatrix();
+}
+
 void draw() {
   // clear canvas at start of new variant
   if (clearTheCanvas) {
@@ -880,64 +1076,21 @@ void draw() {
     return;
   }
 
-  // Check stop condition - only if we have a grid to render
+  // Check stop condition
   if (stopAtFrame > -1 && countedFrames >= stopAtFrame) {
     handleVariantCompletion();
     return;
   }
 
-  // Get current cell (from random render order)
-  GridCell currentCell = currentGrid.getCurrentCell();
-  if (currentCell == null) {
-    // No more cells in this grid, mark as complete
-    currentGrid.gridComplete = true;
-    return;
-  }
-
-  // Start with base skip chance
-  float effectiveSkipChance = currentGrid.skipDrawElementChance;
-  
-  // Apply stickiness if enabled for this grid and we have a previous grid
-  if (currentGrid.useStickiness && gridIndex > 0) {
-    GridIterator prevGrid = currentGrid.previousGrid;
-    if (prevGrid != null) {
-      GridCell nearestPrev = currentGrid.findNearestCell(prevGrid, currentCell.centerX, currentCell.centerY);
-      
-      if (nearestPrev != null) {
-        if (!nearestPrev.active) {
-          // Lower cell is INACTIVE: chance to skip this entire cell based on this grid's skipStickiness
-          if (random(1) < currentGrid.skipStickiness) {
-            // Skip this cell entirely
-            currentGrid.elementDrawnInCurrentCell(); // Mark as rendered (skipped)
-            return;
-          }
-          // Otherwise proceed normally
-        } else {
-          // Lower cell is ACTIVE: reduce skip chance based on this grid's renderStickiness
-          effectiveSkipChance = effectiveSkipChance * (1 - currentGrid.renderStickiness);
-        }
-      }
-    }
-  }
-  
-  // Apply skip chance
-  if (random(1) < effectiveSkipChance) {
-    // Skip drawing this element, but still count it for cell progression
-    currentGrid.elementDrawnInCurrentCell();
-    return;
-  }
-
-  // Generate random alpha once for this element
-  float drawAlpha = random(currentGrid.minAlpha, currentGrid.maxAlpha);
-
   // Handle rendering based on mode
+  boolean rendered = false;
+
   if (saveLayers) {
-    // LAYER MODE: Render to buffer only, then display composite
+    // LAYER MODE: Render to buffer
     int bufferIndex = gridIndex + 1; // +1 because buffer[0] is background
 
     // Handle layer transition
     if (bufferIndex > currentGridIndex) {
-      // Save previous layer
       if (currentGridIndex < layerBuffers.length && layerBuffers[currentGridIndex] != null) {
         saveCurrentLayer(currentGridIndex);
       }
@@ -954,53 +1107,37 @@ void draw() {
       layerBuffers[bufferIndex].endDraw();
     }
 
-    // Render to layer buffer
+    // Let the grid iterator handle all logic and rendering
     layerBuffers[bufferIndex].beginDraw();
-    renderElementToTarget(layerBuffers[bufferIndex], currentGrid, currentCell, drawAlpha);
+    rendered = currentGrid.processNextElement(layerBuffers[bufferIndex]);
     layerBuffers[bufferIndex].endDraw();
 
-    // Display composite preview (this is what user sees)
-    pushMatrix();
-    resetMatrix();
-    imageMode(CENTER);
-
-    // Clear main canvas and show all accumulated layers
-    background(0); // Clear to black or any color
-    image(layerBuffers[0], width/2, height/2); // background layer
-
-    for (int i = 1; i <= currentGridIndex; i++) {
-      if (layerBuffers[i] != null) {
-        image(layerBuffers[i], width/2, height/2); // each content layer
-      }
-    }
-
-    popMatrix();
+    // Update composite display
+    updateCompositeDisplay();
 
   } else {
     // NORMAL MODE: Render directly to main canvas
-    renderElementToTarget(g, currentGrid, currentCell, drawAlpha);
+    rendered = currentGrid.processNextElement(g);
   }
 
-  // Update grid state - mark that we drew an element in this cell
-  currentGrid.elementDrawnInCurrentCell();
+  // Only increment frame counter if we actually processed something
+  if (rendered) {
+    countedFrames++;
 
-  // ALWAYS increment frame counter for EVERY element drawn
-  countedFrames++;
-
-  // ALWAYS save animation frame if enabled (works in BOTH modes)
-  if (saveFrames) {
-    String paddedFrameNumber = String.format("%06d", countedFrames);
-    saveFrame(animFramesSaveDir + "/" + paddedFrameNumber + ".png");
+    // Save animation frame if enabled
+    if (saveFrames) {
+      String paddedFrameNumber = String.format("%06d", countedFrames);
+      saveFrame(animFramesSaveDir + "/" + paddedFrameNumber + ".png");
+    }
   }
 }
-
 
 // helper function to handle variant completion consistently
 void handleVariantCompletion() {
   // Print completion message once
-  if (!allGridsRenderedFeedbackPrinted) {
+  if (!allGridsProcessedFeedbackPrinted) {
     println("RENDERING COMPLETE (all grids done or stopAtFrame reached).");
-    allGridsRenderedFeedbackPrinted = true;
+    allGridsProcessedFeedbackPrinted = true;
     if (saveFrames) {
       println("Animation save frames are in the directory:\n  " + animFramesSaveDir);
     }

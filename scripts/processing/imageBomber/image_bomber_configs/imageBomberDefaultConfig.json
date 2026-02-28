@@ -18,7 +18,7 @@
     },
     "grid_configs": [
         {
-            "_NOTE" : "useStickiness, skipStickiness, and renderStickiness are only applicable to the 2nd grid or higher, not the 1st grid",
+            "_NOTE" : "usePreviousGridInfluence, chanceSkipCellWhenBGcell_inactive, and renderElementChanceMultiplierWhenBGcellActive are only applicable to the 2nd grid or higher, not the 1st grid",
             "name": "coarse_grid_with_canvas_overshoot",
             "minAlpha": 210,
             "maxAlpha": 255,
