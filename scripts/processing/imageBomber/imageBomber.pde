@@ -81,7 +81,6 @@ String layerTimestamp = "";             // timestamp for this layer set
 int totalLayersWithBackground;          // total layers including background (grids count + 1)
 
 // Cell state class for precomputed grid cells
-// Cell state class for precomputed grid cells
 class GridCell {
   int col, row;
   int xMin, xMax, yMin, yMax;
@@ -180,18 +179,18 @@ class GridIterator {
   int widthOfImagesInArrayList;
   int heightOfImagesInArrayList;
 
-  float skipCellChance;           // if nonzero there is a chance that a cell will be marked inactive.
-  float baseRenderElementChance;         // if nonzero there is a chance that when drawing it will skip drawing an element. PREVIOUSLY more confusingly named skipDrawElementChance.
+  float skipCellChance;             // if nonzero there is a chance that a cell will be marked inactive.
+  float baseRenderElementChance;    // if nonzero there is a chance that when drawing it will skip drawing an element. PREVIOUSLY more confusingly named skipDrawElementChance.
 
-  boolean circlesOverride;       // flag to use vector circles instead of images. Overridden to true if images load fails. Circle maximum diameter will be diagonal of cells times an overshoot.
+  boolean circlesOverride;          // flag to use vector circles instead of images. Overridden to true if images load fails. Circle maximum diameter will be diagonal of cells times an overshoot.
 
-  float elementOvershootMax;     // multiplier for random location range: 1 + overshoot value (converted from JSON input)
+  float elementOvershootMax;        // multiplier for random location range: 1 + overshoot value (converted from JSON input)
 
   // Cell management
-  ArrayList<GridCell> cells;      // list of all cells in this grid
-  int[] renderOrder;              // randomized order of cell indices
-  int currentRenderPosition;      // position in renderOrder array
-  boolean gridComplete;           // whether we've processed all cells
+  ArrayList<GridCell> cells;        // list of all cells in this grid
+  int[] renderOrder;                // randomized order of cell indices
+  int currentRenderPosition;        // position in renderOrder array
+  boolean gridComplete;             // whether we've processed all cells
 
   // Reference to previous grid
   GridIterator previousGrid;
@@ -236,9 +235,6 @@ class GridIterator {
       renderElementChanceMultiplierWhenBGcellActive = gridJSON.getFloat("renderElementChanceMultiplierWhenBGcellActive");
     }
 
-    // Convert elementOvershootMax from JSON (if present) to 1 + value;
-    // in case of negative value, set up for "undershoot" which will be a negative padding rectangle within the cell boundary;
-    // in case of positive value, set up for overshoot; else if neither positive nor negative, 0 (on cell boundary)
     if (gridJSON.hasKey("elementOvershootMax") && !gridJSON.isNull("elementOvershootMax")) {
       float overshootValue = gridJSON.getFloat("elementOvershootMax");
       // Store the raw overshoot value for later use in position calculation
