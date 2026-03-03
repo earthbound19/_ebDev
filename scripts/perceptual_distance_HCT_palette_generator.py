@@ -1,28 +1,9 @@
 # DESCRIPTION
 # Generates perceptually-ordered color palettes by reversing the distance weighting
-# formula from the sRGB_palette2palettes_by_perceived_distance_Coloraide_HCT.py.
+# formula from the sRGBpalette2palettesByPerceivedDistance script.
 #
 # Instead of sorting existing colors, this script CREATES new colors that have
 # specific perceptual distance scores, using random sampling of HCT space.
-#
-# THEORY:
-# This script implements the reverse of the perceptual distance model:
-#
-# Forward model (from palette splitter):
-#   distance_score = 0.4*H_score + 0.35*C_score + 0.25*T_score
-#   where:
-#     H_score: 1.0 at 106° (yellow), 0.0 at 107° (furthest), linear in between
-#     C_score: chroma/140 (higher = nearer)
-#     T_score: complex function of tone and chroma (see code)
-#
-# Reverse generation:
-#   Given a target distance score (0-1), randomly sample HCT space
-#   and accept colors whose actual score is within tolerance.
-#   This creates colors that share the same perceptual "distance feel"
-#   while exploring diverse hues, chromas, and tones.
-#
-# Each generated palette contains colors with along a perceptual distance,
-# creating a gradient from "furthest" (palette 0) to "nearest" (palette N-1).
 
 # DEPENDENCIES
 # - coloraide (pip install coloraide)
@@ -39,34 +20,26 @@
 #   -p, --prefix PREFIX     Output file prefix (default: perceptual_gradient)
 #   -t, --tolerance TOL     Score tolerance for acceptance (default: 0.05)
 #   -s, --seed SEED         Random seed for reproducibility
+#   -f, --format FORMAT     Output format: 'hct' or 'raw' (default: raw)
+#                           hct = color(hct [h, c, t]) notation
+#                           raw = #RRGGBB hex codes
 #   --stdin                 Output environment variable assignments for sourcing
 #
-# ENVIRONMENT VARIABLE CONTRACT (for script integration):
-#   When called with --stdin, this script outputs three export statements:
-#     export GENERATED_PALETTE='/absolute/path/to/first_palette_file.hexplt'
-#     export GENERATED_PALETTE_COUNT=5
-#     export GENERATED_PALETTE_COLORS=50
-#
-#   These can be captured using:
-#     source <(python perceptual_distance_HCT_palette_generator.py --stdin [options])
-#
-#   The test script (perceptual_distance_HCT_palette_generator_test.py) uses this
-#   contract to automatically discover and verify generated palettes.
-#
-# PATH HANDLING:
-#   - Output paths are resolved relative to where the script is CALLED from
-#   - Environment variables contain ABSOLUTE paths for cross-script communication
-#   - The script can be called from any directory; all paths are handled robustly
-#
 # EXAMPLES:
-#   # Generate 5 palettes with 10 colors each
+#   # Generate 5 palettes with 10 colors each in raw hex
 #   python perceptual_distance_HCT_palette_generator.py -n 5 -c 10
 #
-#   # Generate with specific seed and tolerance
-#   python perceptual_distance_HCT_palette_generator.py -n 3 -c 8 -t 0.03 -s 42
+#   # Generate with HCT notation for Processing
+#   python perceptual_distance_HCT_palette_generator.py -n 3 -c 8 -f hct
 #
-#   # For integration with test script (sets GENERATED_PALETTE env var)
-#   source <(python perceptual_distance_HCT_palette_generator.py --stdin -n 4 -c 12)
+#   # Generate with specific seed and tolerance
+#   python perceptual_distance_HCT_palette_generator.py -n 3 -c 8 -t 0.03 -s 42 -f raw
+
+# POSSIBLE IMPROVEMENTS
+# - allow different tolerances per palette (wider for extremes)
+# - or implement directed search instead of pure random
+# - or ensure minimum colors per palette like the splitter does (this tends to
+#   produce empty palettes toward the end)
 
 # CODE
 import sys
@@ -81,180 +54,85 @@ from coloraide.spaces.hct import HCT
 # Register HCT color space
 Color.register(HCT())
 
-# Path handling - script knows its own location, but respects calling directory
-SCRIPT_DIR = Path(__file__).parent.absolute()
+# Path handling
 WORKING_DIR = Path.cwd()
 
-# ============================================================================
-# Perceptual distance scoring functions (mirroring the palette splitter)
-# ============================================================================
-
 def hue_distance_score(hue):
-    """
-    Calculate nearness score based on explicit ordering.
-    
-    Experimental theory: Yellow (106°) feels nearest. Perceived distance increases
-    as hue moves away in a single direction around the circle:
-    106° (NEAREST) → 105° → 104° → ... → 0° → 359° → 358° → ... → 107° (FURTHEST)
-    
-    Score = 1.0 at hue 106° (nearest)
-    Score decreases linearly along the sequence
-    Score = 0.0 at hue 107° (furthest)
-    """
-    # Handle the wrap: treat hues >= 107 as being on the "far side" of the sequence
     if hue >= 107:
-        # For hues 107-359, they come after the wrap
-        # Position = (106 - 0) + (360 - hue) = 106 + (360 - hue)
         position = 106 + (360 - hue)
     else:
-        # For hues 0-106, position is simply (106 - hue)
         position = 106 - hue
-    
-    # Total length of sequence: from 106 down to 0 (106 steps) + from 359 down to 107 (253 steps)
-    # = 106 + 253 = 359 total positions (0-358)
-    max_position = 359.0
-    
-    # Convert to 0-1 score where 1 = nearest (position 0), 0 = furthest (position 359)
-    score = 1.0 - (position / max_position)
-    
-    return score
+    return 1.0 - (position / 359.0)
 
 def chroma_distance_score(chroma):
-    """
-    Calculate chroma contribution to distance perception.
-    
-    Experimental theory: Lower chroma (desaturated) = more distant (atmospheric haze)
-    Higher chroma (saturated) = nearer (pulls attention forward)
-    """
-    # HCT chroma maximum is around 145, but can vary
-    # Normalize with a soft cap at 140
-    max_chroma = 140.0
-    chroma_norm = min(chroma / max_chroma, 1.0)
-    
-    # Simple linear: higher chroma = nearer
-    return chroma_norm
+    return min(chroma / 140.0, 1.0)
 
 def tone_distance_score(tone, chroma):
-    """
-    Calculate tone contribution to distance perception.
-    
-    Experimental theory: 
-    - For desaturated colors (low chroma): darker = nearer, lighter = more distant (haze)
-    - For saturated colors (high chroma): both very dark and very light can feel near
-      (high contrast draws attention regardless of lightness)
-    """
     tone_norm = tone / 100.0
-    
     if chroma > 50:
-        # High chroma: both ends feel near
-        if tone_norm < 0.3:
-            # Very dark: near
-            return 0.9
-        elif tone_norm > 0.7:
-            # Very light: near
+        if tone_norm < 0.3 or tone_norm > 0.7:
             return 0.9
         else:
-            # Mid tones: slightly less near
             return 0.7
     else:
-        # Low chroma: darker = nearer, lighter = more distant
         return 1.0 - tone_norm
 
 def calculate_unified_distance_score(hct_dict):
-    """
-    Combine all three HCT channels into a single "nearness" score.
-    Higher score = appears nearer, Lower score = appears further.
-    
-    Weights (experimental, adjustable):
-    - Hue: 40% - Based on artistic warm/cool perception
-    - Chroma: 35% - Atmospheric haze effect
-    - Tone: 25% - Lightness/darkness cues
-    """
-    h = hct_dict['hue']
-    c = hct_dict['chroma']
-    t = hct_dict['tone']
-    
-    # Calculate component scores
-    hue_score = hue_distance_score(h)
-    chroma_score = chroma_distance_score(c)
-    tone_score = tone_distance_score(t, c)
-    
-    # Weight the components
     weights = {'hue': 0.4, 'chroma': 0.35, 'tone': 0.25}
-    
-    total_score = (
-        weights['hue'] * hue_score +
-        weights['chroma'] * chroma_score +
-        weights['tone'] * tone_score
-    )
-    
-    return total_score
-
-# ============================================================================
-# Color generation functions
-# ============================================================================
+    return (weights['hue'] * hue_distance_score(hct_dict['hue']) +
+            weights['chroma'] * chroma_distance_score(hct_dict['chroma']) +
+            weights['tone'] * tone_distance_score(hct_dict['tone'], hct_dict['chroma']))
 
 def random_alphanumeric(length=6):
-    """Generate random alphanumeric string for unique filenames."""
-    chars = string.ascii_letters + string.digits
-    return ''.join(random.choice(chars) for _ in range(length))
+    return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
 
-def generate_colors_at_distance(target_score, n_colors=10, tolerance=0.05, max_attempts=5000):
-    """
-    Generate n_colors that approximately achieve the target perceptual distance score.
-    
-    This reverses the weighting formula by randomly sampling HCT space
-    and accepting colors that land near the target score.
-    
-    Args:
-        target_score: 0-1 where 0 = furthest, 1 = nearest
-        n_colors: How many colors to generate
-        tolerance: Accept colors with score within ±tolerance of target
-        max_attempts: Maximum attempts per color before giving up
-    
-    Returns:
-        List of hex color strings
-    """
+def format_color(color, output_format='raw'):
+    """Format color according to specified format."""
+    if output_format == 'hct':
+        # Convert to HCT and output as color(hct [h, c, t])
+        hct = color.convert('hct')
+        return f"color(hct [{hct['h']:.1f}, {hct['c']:.1f}, {hct['t']:.1f}])"
+    else:  # raw hex
+        return color.to_string(hex=True).upper()
+
+def generate_colors_at_distance(target_score, n_colors=10, tolerance=0.05, max_attempts=5000, output_format='raw'):
     colors = []
     attempts = 0
-    max_total_attempts = max_attempts * n_colors
+    max_total = max_attempts * n_colors
     
-    while len(colors) < n_colors and attempts < max_total_attempts:
+    while len(colors) < n_colors and attempts < max_total:
         attempts += 1
-        
-        # Randomly sample HCT space with biases toward valid colors
         hue = random.uniform(0, 360)
-        # Bias chroma toward lower values (more common in nature)
-        chroma = random.uniform(0, 140) ** 0.8  # Sqrt bias toward lower chroma
-        chroma = min(chroma, 140)
-        # Bias tone toward middle range
-        tone = random.uniform(20, 90) + random.uniform(-15, 15)
-        tone = max(0, min(100, tone))
+        chroma = min(random.uniform(0, 140) ** 0.8, 140)
+        tone = max(0, min(100, random.uniform(20, 90) + random.uniform(-15, 15)))
         
         try:
-            # Create color and fit to sRGB gamut
             c = Color('hct', [hue, chroma, tone])
             c.fit('srgb', method='hct-chroma', jnd=0.02)
             
-            # Get fitted HCT values
+            # Calculate score to check against target
             fitted = c.convert('hct')
-            hct_dict = {
+            score = calculate_unified_distance_score({
                 'hue': fitted['h'],
                 'chroma': fitted['c'],
                 'tone': fitted['t']
-            }
+            })
             
-            # Calculate its actual distance score
-            score = calculate_unified_distance_score(hct_dict)
-            
-            # Accept if close to target
             if abs(score - target_score) <= tolerance:
-                colors.append(c.to_string(hex=True).upper())
+                if output_format == 'raw':
+                    # Convert to sRGB hex
+                    srgb = c.convert('srgb')
+                    r = int(max(0, min(255, srgb['r'] * 255)))
+                    g = int(max(0, min(255, srgb['g'] * 255)))
+                    b = int(max(0, min(255, srgb['b'] * 255)))
+                    colors.append(f"#{r:02X}{g:02X}{b:02X}")
+                else:  # hct
+                    hct = c.convert('hct')
+                    colors.append(f"color(hct [{hct['h']:.1f}, {hct['c']:.1f}, {hct['t']:.1f}])")
+                
                 if len(colors) % 5 == 0:
                     print(f"  Found {len(colors)}/{n_colors} colors (score: {score:.3f})", file=sys.stderr)
-                
-        except Exception:
-            # Skip colors that can't be fitted
+        except:
             continue
     
     if len(colors) < n_colors:
@@ -262,135 +140,63 @@ def generate_colors_at_distance(target_score, n_colors=10, tolerance=0.05, max_a
     
     return colors
 
-def generate_perceptual_gradient(num_palettes=5, colors_per_palette=10, tolerance=0.05, seed=None):
-    """
-    Generate a gradient of palettes from furthest to nearest.
-    Each palette contains colors with similar perceptual distance.
-    
-    Returns:
-        List of palettes, where each palette is a list of hex color strings,
-        and a unique file identifier
-    """
-    if seed is not None:
+def generate_perceptual_gradient(num_palettes=5, colors_per_palette=10, tolerance=0.05, seed=None, output_format='raw'):
+    if seed:
         random.seed(seed)
-    
     gradient = []
-    filename_id = random_alphanumeric(6)
+    file_id = random_alphanumeric(6)
     
     for i in range(num_palettes):
-        # Target score from 0 (furthest) to 1 (nearest)
         target = i / (num_palettes - 1) if num_palettes > 1 else 0.5
-        
-        print(f"\nGenerating palette {i} (target score: {target:.2f})", file=sys.stderr)
-        
-        palette = generate_colors_at_distance(target, colors_per_palette, tolerance)
-        gradient.append(palette)
+        print(f"\nGenerating palette {i} (target: {target:.2f})", file=sys.stderr)
+        gradient.append(generate_colors_at_distance(target, colors_per_palette, tolerance, output_format=output_format))
     
-    return gradient, filename_id
+    return gradient, file_id
 
-def write_palette_files(palettes, output_dir, prefix, filename_id):
-    """
-    Write palettes to numbered files.
-    output_dir can be relative or absolute - resolved against WORKING_DIR.
+def write_palette_files(palettes, output_dir, prefix, file_id, output_format):
+    out = Path(output_dir) if os.path.isabs(output_dir) else WORKING_DIR / output_dir
+    out.mkdir(parents=True, exist_ok=True)
+    base = f"{prefix}_{file_id}"
+    first = None
     
-    Returns:
-        Absolute path to the first palette file
-    """
-    # Resolve output directory relative to where script was CALLED from
-    if not os.path.isabs(output_dir):
-        output_dir = WORKING_DIR / output_dir
-    else:
-        output_dir = Path(output_dir)
+    format_desc = "HCT notation" if output_format == 'hct' else "raw hex"
     
-    # Create directory if needed
-    output_dir.mkdir(parents=True, exist_ok=True)
-    
-    base_name = f"{prefix}_{filename_id}"
-    first_file = None
-    
-    for i, palette in enumerate(palettes):
-        # Create numbered filename: prefix_id_01.hexplt, prefix_id_02.hexplt, etc.
-        padded_num = f"{i+1:02d}"
-        filename = f"{base_name}_{padded_num}.hexplt"
-        filepath = output_dir / filename
-        
+    for i, p in enumerate(palettes):
+        path = out / f"{base}_{i+1:02d}.hexplt"
         if i == 0:
-            first_file = str(filepath)  # Store absolute path
-        
-        # Write in raw format with header
-        with open(filepath, 'w') as f:
-            if i == 0:
-                f.write(f"# Palette {i} - MOST DISTANT (background layers)\n")
-            elif i == len(palettes) - 1:
-                f.write(f"# Palette {i} - NEAREST (foreground layers)\n")
-            else:
-                f.write(f"# Palette {i}\n")
-            
-            for hex_color in palette:
-                f.write(f"{hex_color}\n")
-        
-        print(f"  Wrote {len(palette)} colors to {filepath}", file=sys.stderr)
+            first = str(path)
+        with open(path, 'w') as f:
+            f.write(f"# Palette {i}" + (" - MOST DISTANT" if i == 0 else " - NEAREST" if i == len(palettes)-1 else "") + f" ({format_desc})\n")
+            for color_str in p:
+                f.write(f"{color_str}\n")
+        print(f"  Wrote {len(p)} colors to {path}", file=sys.stderr)
     
-    return first_file
-
-# ============================================================================
-# Main entry point
-# ============================================================================
+    return first
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate perceptually-ordered color palettes by reversing distance weighting",
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        description="Generate perceptually-ordered color palettes by reversing distance weighting"
     )
     
-    parser.add_argument(
-        '-n', '--num-palettes',
-        type=int,
-        default=5,
-        help='Number of output palettes (default: 5)'
-    )
-    
-    parser.add_argument(
-        '-c', '--colors-per-palette',
-        type=int,
-        default=10,
-        help='Colors per palette (default: 10)'
-    )
-    
-    parser.add_argument(
-        '-o', '--output-dir',
-        default='.',
-        help='Output directory (default: current directory)'
-    )
-    
-    parser.add_argument(
-        '-p', '--prefix',
-        default='perceptual_gradient',
-        help='Output file prefix (default: perceptual_gradient)'
-    )
-    
-    parser.add_argument(
-        '-t', '--tolerance',
-        type=float,
-        default=0.05,
-        help='Score tolerance for acceptance (default: 0.05)'
-    )
-    
-    parser.add_argument(
-        '-s', '--seed',
-        type=int,
-        help='Random seed for reproducibility'
-    )
-    
-    parser.add_argument(
-        '--stdin',
-        action='store_true',
-        help='Output environment variable assignments for sourcing (sets GENERATED_PALETTE, GENERATED_PALETTE_COUNT, GENERATED_PALETTE_COLORS)'
-    )
+    parser.add_argument('-n', '--num-palettes', type=int, default=5,
+                       help='Number of output palettes (default: 5)')
+    parser.add_argument('-c', '--colors-per-palette', type=int, default=10,
+                       help='Colors per palette (default: 10)')
+    parser.add_argument('-o', '--output-dir', default='.',
+                       help='Output directory (default: current directory)')
+    parser.add_argument('-p', '--prefix', default='perceptual_gradient',
+                       help='Output file prefix (default: perceptual_gradient)')
+    parser.add_argument('-t', '--tolerance', type=float, default=0.05,
+                       help='Score tolerance for acceptance (default: 0.05)')
+    parser.add_argument('-s', '--seed', type=int,
+                       help='Random seed for reproducibility')
+    parser.add_argument('-f', '--format', choices=['raw', 'hct'], default='raw',
+                       help='Output format: raw (#RRGGBB) or hct (color(hct [h,c,t]) notation)')
+    parser.add_argument('--stdin', action='store_true',
+                       help='Output environment variable assignments for sourcing')
     
     args = parser.parse_args()
     
-    # Validate arguments
     if args.num_palettes < 1:
         print("ERROR: num-palettes must be at least 1", file=sys.stderr)
         sys.exit(1)
@@ -403,30 +209,18 @@ def main():
         print("ERROR: tolerance must be between 0 and 0.5", file=sys.stderr)
         sys.exit(1)
     
-    # Generate gradient
-    try:
-        palettes, file_id = generate_perceptual_gradient(
-            num_palettes=args.num_palettes,
-            colors_per_palette=args.colors_per_palette,
-            tolerance=args.tolerance,
-            seed=args.seed
-        )
-    except Exception as e:
-        print(f"ERROR during generation: {e}", file=sys.stderr)
-        sys.exit(1)
+    palettes, file_id = generate_perceptual_gradient(
+        args.num_palettes, args.colors_per_palette, args.tolerance, args.seed, args.format)
     
-    # Write files
-    first_file = write_palette_files(palettes, args.output_dir, args.prefix, file_id)
+    first = write_palette_files(palettes, args.output_dir, args.prefix, file_id, args.format)
     
-    # For script integration: output environment variable assignment
     if args.stdin:
-        # Output in format for 'source' command - paths are absolute
-        print(f"export GENERATED_PALETTE='{first_file}'")
+        print(f"export GENERATED_PALETTE='{first}'")
         print(f"export GENERATED_PALETTE_COUNT={len(palettes)}")
         print(f"export GENERATED_PALETTE_COLORS={sum(len(p) for p in palettes)}")
     else:
-        print(f"\nGenerated {len(palettes)} palettes with {args.colors_per_palette} colors each", file=sys.stderr)
-        print(f"First palette: {first_file}", file=sys.stderr)
+        print(f"\nGenerated {len(palettes)} palettes in {args.format} format", file=sys.stderr)
+        print(f"First palette: {first}", file=sys.stderr)
 
 if __name__ == "__main__":
     main()

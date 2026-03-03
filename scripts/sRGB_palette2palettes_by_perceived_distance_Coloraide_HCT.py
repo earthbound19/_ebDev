@@ -611,7 +611,7 @@ def write_output_files(palettes, base_output_path, output_format):
     # Split path into base and extension
     base, ext = os.path.splitext(base_output_path)
     if not ext:
-        ext = '.txt'  # Default extension
+        ext = '.hexplt'  # Default extension
     
     # Calculate padding width based on number of palettes
     padding = len(str(len(palettes)))
