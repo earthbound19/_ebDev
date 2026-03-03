@@ -76,6 +76,22 @@
 # - With -e: simple equal counts splitting
 # - Minimum palette size can be set with --min-size (default: 2)
 #
+# ENVIRONMENT VARIABLE CONTRACT (for script integration):
+#   This script does not set environment variables directly, but works with
+#   the test runner which expects:
+#     - Input files can be specified via -i or --stdin
+#     - Output files are created with predictable naming patterns
+#     - The test runner uses file system patterns to discover results
+#
+#   For integration with the palette generator, see:
+#     perceptual_distance_HCT_palette_generator.py --stdin
+#     perceptual_distance_HCT_palette_generator_test.py
+#
+#   The generator and sorter share the same perceptual distance model,
+#   allowing them to work together: the sorter can organize colors generated
+#   by the generator, and the generator can create colors that fit into
+#   the sorter's perceptual categories.
+#
 # TO USE with a Processing sketch:
 # String[] command = {"python", "sRGBpalette2palettesByPerceivedDistance_Coloraide_HCT.py", 
 #                     "--stdin", "-f", "processing", "-n", str(numPalettes)};

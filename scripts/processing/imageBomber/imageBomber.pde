@@ -14,6 +14,25 @@
 //  - type the letter 'v'(ariant) to stop rendering the current variant and start a new one
 // See comments in the modifiable GLOBAL VARIANTS area to learn what else this script can do.
 
+// INTEGRATION WITH COLOR PALETTE TOOLS:
+//   This sketch can work with two companion Python scripts:
+//
+//   1. sRGB_palette2palettes_by_perceived_distance_Coloraide_HCT.py
+//      - Sorts existing color palettes by perceptual distance
+//      - Splits into multiple palettes for layered rendering
+//      - Use: python script.py -i your_palette.txt -o output_prefix
+//
+//   2. perceptual_distance_HCT_palette_generator.py
+//      - Generates new colors with specific perceptual distance scores
+//      - Creates gradient palettes from "furthest" to "nearest"
+//      - Use: python script.py -n 5 -c 10 -o ./palettes
+//
+//   The test harness (perceptual_distance_HCT_palette_generator_test.py)
+//   demonstrates the environment variable contract between scripts:
+//     source <(python generator.py --stdin)  # Sets GENERATED_PALETTE
+//
+//   These tools share the same perceptual distance model (40% hue, 35% chroma, 25% tone)
+//   with the specific hue ordering: 106° (yellow) nearest, 107° furthest.
 
 // CODE
 // TO DO:

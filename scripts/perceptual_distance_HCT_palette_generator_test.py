@@ -36,21 +36,39 @@
 #   -o, --output-dir DIR        Output directory (default: test_output)
 #   -v, --verbose               Show detailed generation info
 #
-# The script can be called from any directory; all paths are handled robustly.
-# Generated palettes can be used with Image Bomber or any other color-aware tool.
-
+# ENVIRONMENT VARIABLE CONTRACT (for script integration):
+#   This script expects the generator to set:
+#     GENERATED_PALETTE: absolute path to the first palette file
+#     GENERATED_PALETTE_COUNT: number of palettes generated
+#     GENERATED_PALETTE_COLORS: total colors across all palettes
+#
+#   These are set by sourcing the generator's output:
+#     source <(python perceptual_distance_HCT_palette_generator.py --stdin [options])
+#
+#   The test script then:
+#   1. Verifies the file exists
+#   2. Counts the colors (ignoring comment lines)
+#   3. Confirms the count matches expectations
+#   4. Reports any discrepancies
+#
+# PATH HANDLING:
+#   - All paths are resolved relative to where the script is CALLED from
+#   - The generator returns absolute paths in environment variables
+#   - The test script verifies files using these absolute paths
+#   - Can be called from any directory; all paths are handled robustly
+#
 # EXAMPLES:
 #   # Basic test with default parameters
-#   python test_palette_generator.py
+#   python perceptual_distance_HCT_palette_generator_test.py
 #
 #   # Generate 3 palettes with 8 colors each, tight tolerance
-#   python test_palette_generator.py -n 3 -c 8 -t 0.02
+#   python perceptual_distance_HCT_palette_generator_test.py -n 3 -c 8 -t 0.02
 #
 #   # Reproducible generation with specific seed
-#   python test_palette_generator.py -n 4 -c 12 -s 42 -v
+#   python perceptual_distance_HCT_palette_generator_test.py -n 4 -c 12 -s 42 -v
 #
 #   # Output to specific directory
-#   python test_palette_generator.py -o ./my_palettes -v
+#   python perceptual_distance_HCT_palette_generator_test.py -o ./my_palettes -v
 
 # CODE
 import sys
@@ -67,23 +85,29 @@ def use_generated_palette(args):
     """
     Call the generation script and capture its environment variable output.
     
+    This function implements the environment variable contract:
+    1. Calls generator with --stdin flag
+    2. Captures export statements from stdout
+    3. Sets them in the current environment
+    4. Returns the absolute path to the generated palette
+    
     Handles paths robustly:
     - Generation script is found relative to this script's location
     - Output directory is resolved relative to where test runner was called
     - Environment variables contain absolute paths
     """
     # Find generation script (same directory as test runner)
-    gen_script = SCRIPT_DIR / "generate_perceptual_palette.py"
+    gen_script = SCRIPT_DIR / "perceptual_distance_HCT_palette_generator.py"
     
     if not gen_script.exists():
         print(f"ERROR: Generation script not found at {gen_script}", file=sys.stderr)
         return False
     
     # Resolve output directory relative to where test runner was CALLED
-    if not os.path.isabs(args.palette_dir):
-        palette_dir = WORKING_DIR / args.palette_dir
+    if not os.path.isabs(args.output_dir):
+        palette_dir = WORKING_DIR / args.output_dir
     else:
-        palette_dir = Path(args.palette_dir)
+        palette_dir = Path(args.output_dir)
     
     # Ensure directory exists
     palette_dir.mkdir(parents=True, exist_ok=True)
@@ -99,8 +123,8 @@ def use_generated_palette(args):
         "-o", str(palette_dir)  # Pass absolute path
     ]
     
-    if args.gen_seed:
-        gen_cmd.extend(["-s", str(args.gen_seed)])
+    if args.seed:
+        gen_cmd.extend(["-s", str(args.seed)])
     
     print(f"\nGenerating test palette with: {' '.join(gen_cmd)}", file=sys.stderr)
     
@@ -124,6 +148,13 @@ def use_generated_palette(args):
                     value = parts[1].strip("'")
                     env_vars[key] = value
                     os.environ[key] = value
+        
+        # Verify contract: all expected variables are set
+        expected_vars = ['GENERATED_PALETTE', 'GENERATED_PALETTE_COUNT', 'GENERATED_PALETTE_COLORS']
+        missing_vars = [v for v in expected_vars if v not in env_vars]
+        if missing_vars:
+            print(f"ERROR: Generator missing environment variables: {missing_vars}", file=sys.stderr)
+            return False
         
         if 'GENERATED_PALETTE' in env_vars:
             palette_path = Path(env_vars['GENERATED_PALETTE'])
@@ -152,6 +183,12 @@ def use_generated_palette(args):
             else:
                 print(f"Palette verified: {len(colors)} colors", file=sys.stderr)
             
+            # Verify total colors across all palettes
+            total_expected = args.num_palettes * args.colors_per_palette
+            total_reported = int(env_vars.get('GENERATED_PALETTE_COLORS', 0))
+            if total_reported != total_expected:
+                print(f"WARNING: Generator reported {total_reported} total colors, expected {total_expected}", file=sys.stderr)
+            
             print(f"Generated {env_vars.get('GENERATED_PALETTE_COUNT', '?')} palettes total", file=sys.stderr)
             
         return True
@@ -167,98 +204,78 @@ def use_generated_palette(args):
 
 def run_tests(args):
     """Run the actual tests (placeholder - implement your test logic here)."""
-    print(f"\nRunning tests with palette: {args.input}", file=sys.stderr)
-    print(f"Test parameters: num_palettes={args.num_palettes}, format={args.format}", file=sys.stderr)
+    print(f"\nRunning tests with generated palette", file=sys.stderr)
+    print(f"Test parameters: num_palettes={args.num_palettes}, "
+          f"colors_per_palette={args.colors_per_palette}, tolerance={args.tolerance}", file=sys.stderr)
     
-    # Your existing test logic here
-    # ...
+    # Here you would add actual test logic for the generator
+    # For example: verify color distribution, perceptual scoring, etc.
     
     return True
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Test runner for Image Bomber with palette generation support",
+        description="Test harness for perceptual_distance_HCT_palette_generator.py",
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     
     # Generation options
     parser.add_argument(
-        '--use-palette-generation',
-        action='store_true',
-        help='Generate a test palette instead of using input file'
-    )
-    
-    parser.add_argument(
-        '--palette-dir',
-        default='generated_palettes',
-        help='Directory for generated palettes (default: generated_palettes)'
-    )
-    
-    parser.add_argument(
-        '--colors-per-palette',
-        type=int,
-        default=10,
-        help='Colors per palette when generating (default: 10)'
-    )
-    
-    parser.add_argument(
-        '--tolerance',
-        type=float,
-        default=0.05,
-        help='Tolerance for color generation (default: 0.05)'
-    )
-    
-    parser.add_argument(
-        '--gen-seed',
-        type=int,
-        help='Random seed for palette generation'
-    )
-    
-    # Test options
-    parser.add_argument(
-        '--num-palettes',
+        '-n', '--num-palettes',
         type=int,
         default=5,
-        help='Number of palettes to generate/test (default: 5)'
+        help='Number of palettes to generate (default: 5)'
     )
     
     parser.add_argument(
-        '-i', '--input',
-        help='Input palette file (when not generating)'
+        '-c', '--colors-per-palette',
+        type=int,
+        default=10,
+        help='Colors per palette (default: 10)'
     )
     
     parser.add_argument(
-        '-o', '--output',
-        default='test_results',
-        help='Output base name for test results'
+        '-t', '--tolerance',
+        type=float,
+        default=0.05,
+        help='Score tolerance for generation (default: 0.05)'
     )
     
     parser.add_argument(
-        '-f', '--format',
-        choices=['raw', 'processing'],
-        default='raw',
-        help='Output format (default: raw)'
+        '-s', '--seed',
+        type=int,
+        help='Random seed for reproducibility'
     )
     
     parser.add_argument(
-        'sketch_folder',
-        nargs='?',
-        help='Processing sketch folder (optional for some test modes)'
+        '-o', '--output-dir',
+        default='test_output',
+        help='Output directory for generated palettes (default: test_output)'
+    )
+    
+    parser.add_argument(
+        '-v', '--verbose',
+        action='store_true',
+        help='Show detailed generation info'
     )
     
     args = parser.parse_args()
     
-    # Handle palette generation if requested
-    if args.use_palette_generation:
-        if not use_generated_palette(args):
-            sys.exit(1)
-        # Override input file with generated palette
-        args.input = os.environ.get('GENERATED_PALETTE')
-        if not args.input:
-            print("ERROR: GENERATED_PALETTE not set after generation", file=sys.stderr)
-            sys.exit(1)
-    elif not args.input:
-        print("ERROR: Either --use-palette-generation or -i INPUT must be specified", file=sys.stderr)
+    # Validate arguments
+    if args.num_palettes < 1:
+        print("ERROR: num-palettes must be at least 1", file=sys.stderr)
+        sys.exit(1)
+    
+    if args.colors_per_palette < 1:
+        print("ERROR: colors-per-palette must be at least 1", file=sys.stderr)
+        sys.exit(1)
+    
+    if args.tolerance <= 0 or args.tolerance > 0.5:
+        print("ERROR: tolerance must be between 0 and 0.5", file=sys.stderr)
+        sys.exit(1)
+    
+    # Generate palette using environment variable contract
+    if not use_generated_palette(args):
         sys.exit(1)
     
     # Run tests

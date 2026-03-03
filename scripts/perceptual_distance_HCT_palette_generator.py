@@ -1,6 +1,6 @@
 # DESCRIPTION
 # Generates perceptually-ordered color palettes by reversing the distance weighting
-# formula from the sRGB_palette2palettes_by_perceived_distance_Coloraide_HCT.py (SEE).
+# formula from the sRGB_palette2palettes_by_perceived_distance_Coloraide_HCT.py.
 #
 # Instead of sorting existing colors, this script CREATES new colors that have
 # specific perceptual distance scores, using random sampling of HCT space.
@@ -23,11 +23,6 @@
 #
 # Each generated palette contains colors with along a perceptual distance,
 # creating a gradient from "furthest" (palette 0) to "nearest" (palette N-1).
-#
-# The script handles paths robustly:
-# - Output paths are resolved relative to where the script is CALLED from
-# - Environment variables contain absolute paths for cross-script communication
-# - Can be sourced to set variables: source <(python script.py --stdin)
 
 # DEPENDENCIES
 # - coloraide (pip install coloraide)
@@ -45,6 +40,23 @@
 #   -t, --tolerance TOL     Score tolerance for acceptance (default: 0.05)
 #   -s, --seed SEED         Random seed for reproducibility
 #   --stdin                 Output environment variable assignments for sourcing
+#
+# ENVIRONMENT VARIABLE CONTRACT (for script integration):
+#   When called with --stdin, this script outputs three export statements:
+#     export GENERATED_PALETTE='/absolute/path/to/first_palette_file.hexplt'
+#     export GENERATED_PALETTE_COUNT=5
+#     export GENERATED_PALETTE_COLORS=50
+#
+#   These can be captured using:
+#     source <(python perceptual_distance_HCT_palette_generator.py --stdin [options])
+#
+#   The test script (perceptual_distance_HCT_palette_generator_test.py) uses this
+#   contract to automatically discover and verify generated palettes.
+#
+# PATH HANDLING:
+#   - Output paths are resolved relative to where the script is CALLED from
+#   - Environment variables contain ABSOLUTE paths for cross-script communication
+#   - The script can be called from any directory; all paths are handled robustly
 #
 # EXAMPLES:
 #   # Generate 5 palettes with 10 colors each
