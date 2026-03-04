@@ -38,7 +38,7 @@
 #   -h, --help              Show this help message
 #   -n, --num-palettes N    Number of output palettes (default: 5)
 #   -e, --equalcounts       Use simple equal counts instead of adaptive recursive splitting
-#   --min-size M            Minimum number of colors per palette (default: 2)
+#   -m --min-size M            Minimum number of colors per palette (default: 2)
 #   -i, --input FILE        Input file to read
 #   -o, --output FILE       Output file base name (default: stdout)
 #                           When specified, creates N files: output_01.ext, output_02.ext, etc.
@@ -470,19 +470,51 @@ def split_into_palettes(hct_colors, n_palettes=5, equal_counts=False, min_palett
     
     # ADAPTIVE SPLITTING - mathematically guaranteed to reach n_palettes
     
-    # Step 1: Find natural perceptual groups (sensitive threshold)
-    print(f"\nFinding natural perceptual groups...", file=sys.stderr)
+    # Step 1: Find natural perceptual groups with appropriate threshold
+    # Use a threshold that balances sensitivity with practical grouping
+    initial_threshold = 0.05
     groups = adaptive_band_recursive_split(
         sorted_colors, 
         n_palettes, 
-        min_gap_threshold=0.01,
-        min_palette_size=1  # No constraint for initial grouping
+        min_gap_threshold=initial_threshold,
+        min_palette_size=min_palette_size  # Pass the actual min size, not 1
     )
-    
+
     print(f"  Initial natural groups: {len(groups)}", file=sys.stderr)
     for i, group in enumerate(groups):
         print(f"    Group {i}: {len(group)} colors", file=sys.stderr)
-    
+
+    # If we have fewer groups than requested, we'll need to split some
+    # If we have more groups than requested, we need to merge some
+    if len(groups) < n_palettes:
+        print(f"  Need {n_palettes - len(groups)} more groups, will split largest groups...", file=sys.stderr)
+    elif len(groups) > n_palettes:
+        print(f"  Have {len(groups) - n_palettes} extra groups, will merge smallest groups...", file=sys.stderr)
+        
+        # Sort groups by average score
+        groups.sort(key=lambda g: sum(c['distance_score'] for c in g) / len(g))
+        
+        # Merge the smallest groups first (but ensure we don't create groups smaller than min_palette_size)
+        while len(groups) > n_palettes:
+            # Find the two adjacent groups with the smallest total size to merge
+            # This minimizes the impact on perceptual ordering
+            smallest_total = float('inf')
+            merge_idx = 0
+            
+            for i in range(len(groups) - 1):
+                total_size = len(groups[i]) + len(groups[i+1])
+                if total_size < smallest_total:
+                    smallest_total = total_size
+                    merge_idx = i
+            
+            # Merge the two groups
+            merged = groups[merge_idx] + groups[merge_idx + 1]
+            groups.pop(merge_idx)
+            groups.pop(merge_idx)  # Remove the second group
+            groups.insert(merge_idx, merged)
+            
+            print(f"    Merged groups at index {merge_idx}, now {len(groups)} groups", file=sys.stderr)
+
     # Verify all colors present
     colors_in_groups = sum(len(g) for g in groups)
     if colors_in_groups != total_colors:
