@@ -1,11 +1,5 @@
-#!/usr/bin/env bash
 # DESCRIPTION
-# Integration script for perceptual distance pipeline.
-# Generates a large test palette and immediately splits it using the perceptual splitter.
-#
-# This script demonstrates the environment variable contract between:
-#   perceptual_distance_HCT_palette_generator.py (generates raw test data)
-#   sRGB_palette2palettes_by_perceived_distance_Coloraide_HCT.py (splits into perceptual palettes)
+# Generates a large test palette and splits it via another script which attempts to split a palette via perceptual distance.
 #
 # USAGE
 #   ./test_sRGB_palette2palettes_by_distance_via_HCT_palette_generator.sh [options]
@@ -14,7 +8,7 @@
 #   -n, --num-palettes N    Number of output palettes from splitter (default: 5)
 #   -c, --colors N          Number of colors to generate (default: 280)
 #   -m, --min-size M        Minimum colors per palette for splitter (default: 2)
-#   -o, --output-dir DIR    Output directory (default: ./pipeline_output)
+#   -o, --output-dir DIR    Output directory (default: ./_palette2palettes_by_distance_HCT_test)
 #   -s, --seed SEED         Random seed for reproducibility
 #   -h, --help              Show this help message
 #
@@ -24,27 +18,27 @@
 #     GENERATED_PALETTE_COUNT: always 1 (single palette)
 #     GENERATED_PALETTE_COLORS: total colors generated (default 280)
 #
-#   splitter reads GENERATED_PALETTE as input and creates N output files.
+#   The splitter script reads GENERATED_PALETTE as input and creates N output files.
 #
 # EXAMPLES:
-#   # Generate 280 colors, split into 5 palettes (min 2 each)
+#   # Generate 280 colors, split into 5 palettes, of minimums size 2 colors each; the defaults:
 #   ./test_sRGB_palette2palettes_by_distance_via_HCT_palette_generator.sh
 #
 #   # Generate 500 colors, split into 8 palettes with min 3 each
 #   ./test_sRGB_palette2palettes_by_distance_via_HCT_palette_generator.sh -n 8 -c 500 -m 3
 #
-#   # Reproducible run with seed
+#   # For consistent testability you can always generate the same palette by using a seed -s <integer number> :
 #   ./test_sRGB_palette2palettes_by_distance_via_HCT_palette_generator.sh -s 42 -o ./test_run
 
-# CODE
 
+# CODE
 set -e  # Exit on error
 
 # Default values
 NUM_PALETTES=5
 GEN_COLORS=280
 MIN_SIZE=2
-OUTPUT_DIR="./_palette2palettes_by_distance_on_generated_palettes_test"
+OUTPUT_DIR="./_palette2palettes_by_distance_HCT_test"
 SEED=""
 
 # Parse arguments
@@ -81,8 +75,6 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-echo "========================================="
-echo "Perceptual Distance Pipeline"
 echo "========================================="
 echo "Step 1: Generating $GEN_COLORS test colors..."
 
@@ -148,8 +140,7 @@ echo "Running: ${SPLIT_CMD[@]}"
 "${SPLIT_CMD[@]}"
 
 echo ""
-echo "========================================="
-echo "Pipeline complete!"
+echo "DONE."
 echo "Generated palette: $GENERATED_PALETTE"
 echo "Split palettes:"
 ls -la "$OUTPUT_DIR"/split_*.hexplt 2>/dev/null || echo "   (no split palettes found)"
