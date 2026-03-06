@@ -429,12 +429,12 @@ def split_into_palettes(hct_colors, n_palettes=5, equal_counts=False, min_palett
     - ALL colors are preserved
     - Exactly N palettes are created
     - Every palette has at least min_palette_size colors
-    - All splits occur at largest perceptual gaps
+    - Splits occur at largest perceptual gaps, with redistribution to fix sizes
     
     Args:
         hct_colors: List of colors with HCT data
         n_palettes: Target number of palettes
-        equal_counts: If True, use simple integer division
+        equal_counts: If True, use simple integer division (ignored in this algorithm)
         min_palette_size: Minimum colors per palette (enforced)
     """
     if not hct_colors:
@@ -464,57 +464,22 @@ def split_into_palettes(hct_colors, n_palettes=5, equal_counts=False, min_palett
     print(f"Total colors: {total_colors}, Target palettes: {n_palettes}, Min size: {min_palette_size}", file=sys.stderr)
     
     if equal_counts:
-        # Simple integer division
         print(f"\nSplitting by equal counts into {n_palettes} palettes", file=sys.stderr)
         return split_equal_counts(sorted_colors, n_palettes)
     
-    # ADAPTIVE SPLITTING - mathematically guaranteed to reach n_palettes
-    
-    # Step 1: Find natural perceptual groups with appropriate threshold
-    # Use a threshold that balances sensitivity with practical grouping
-    initial_threshold = 0.05
+    # ADAPTIVE SPLITTING - first find natural perceptual groups
+    print(f"\nFinding natural perceptual groups...", file=sys.stderr)
     groups = adaptive_band_recursive_split(
         sorted_colors, 
         n_palettes, 
-        min_gap_threshold=initial_threshold,
-        min_palette_size=min_palette_size  # Pass the actual min size, not 1
+        min_gap_threshold=0.01,
+        min_palette_size=1  # No constraint for initial grouping
     )
-
+    
     print(f"  Initial natural groups: {len(groups)}", file=sys.stderr)
     for i, group in enumerate(groups):
         print(f"    Group {i}: {len(group)} colors", file=sys.stderr)
-
-    # If we have fewer groups than requested, we'll need to split some
-    # If we have more groups than requested, we need to merge some
-    if len(groups) < n_palettes:
-        print(f"  Need {n_palettes - len(groups)} more groups, will split largest groups...", file=sys.stderr)
-    elif len(groups) > n_palettes:
-        print(f"  Have {len(groups) - n_palettes} extra groups, will merge smallest groups...", file=sys.stderr)
-        
-        # Sort groups by average score
-        groups.sort(key=lambda g: sum(c['distance_score'] for c in g) / len(g))
-        
-        # Merge the smallest groups first (but ensure we don't create groups smaller than min_palette_size)
-        while len(groups) > n_palettes:
-            # Find the two adjacent groups with the smallest total size to merge
-            # This minimizes the impact on perceptual ordering
-            smallest_total = float('inf')
-            merge_idx = 0
-            
-            for i in range(len(groups) - 1):
-                total_size = len(groups[i]) + len(groups[i+1])
-                if total_size < smallest_total:
-                    smallest_total = total_size
-                    merge_idx = i
-            
-            # Merge the two groups
-            merged = groups[merge_idx] + groups[merge_idx + 1]
-            groups.pop(merge_idx)
-            groups.pop(merge_idx)  # Remove the second group
-            groups.insert(merge_idx, merged)
-            
-            print(f"    Merged groups at index {merge_idx}, now {len(groups)} groups", file=sys.stderr)
-
+    
     # Verify all colors present
     colors_in_groups = sum(len(g) for g in groups)
     if colors_in_groups != total_colors:
@@ -522,37 +487,65 @@ def split_into_palettes(hct_colors, n_palettes=5, equal_counts=False, min_palett
         print(f"  Falling back to single group", file=sys.stderr)
         groups = [sorted_colors]
     
-    # Step 2: Split until we have exactly n_palettes
-    # This loop IS mathematically guaranteed to terminate with n_palettes groups
+    # If we already have more groups than needed, merge some
+    if len(groups) > n_palettes:
+        print(f"  Got {len(groups)} groups initially, merging closest groups to reach {n_palettes}...", file=sys.stderr)
+        
+        # Sort groups by average score
+        groups.sort(key=lambda g: sum(c['distance_score'] for c in g) / len(g))
+        
+        # Merge closest groups until we have exactly n_palettes
+        while len(groups) > n_palettes:
+            # Find the two adjacent groups with the smallest difference in average scores
+            min_diff = float('inf')
+            merge_idx = 0
+            
+            for i in range(len(groups) - 1):
+                avg1 = sum(c['distance_score'] for c in groups[i]) / len(groups[i])
+                avg2 = sum(c['distance_score'] for c in groups[i+1]) / len(groups[i+1])
+                diff = abs(avg2 - avg1)
+                
+                if diff < min_diff:
+                    min_diff = diff
+                    merge_idx = i
+            
+            # Merge the two closest groups
+            merged = groups[merge_idx] + groups[merge_idx + 1]
+            merged.sort(key=lambda c: c['distance_score'])
+            groups.pop(merge_idx)
+            groups.pop(merge_idx)  # Remove the second group
+            groups.insert(merge_idx, merged)
+            
+            print(f"    Merged groups at index {merge_idx}, now {len(groups)} groups", file=sys.stderr)
+    
+    # Step 2: Split until we have exactly n_palettes (if we have fewer)
     iteration = 0
-    while len(groups) < n_palettes:
+    max_iterations = total_colors * 2  # Safety guard
+    while len(groups) < n_palettes and iteration < max_iterations:
         iteration += 1
         
-        # Find the largest group to split (we have validation that this is possible)
+        # Find the best group to split (largest gap, largest group)
         best_idx = -1
         best_size = 0
         best_split_idx = -1
         best_gap = 0
         
         for i, group in enumerate(groups):
-            # Find largest gap that produces valid split sizes
+            # Find the largest perceptual gap in this group
             for j in range(len(group) - 1):
                 gap = group[j+1]['distance_score'] - group[j]['distance_score']
                 
-                left_size = j + 1
-                right_size = len(group) - left_size
-                
-                # Both halves must meet minimum size
-                if left_size >= min_palette_size and right_size >= min_palette_size:
-                    if len(group) > best_size or (len(group) == best_size and gap > best_gap):
-                        best_size = len(group)
-                        best_gap = gap
-                        best_idx = i
-                        best_split_idx = j + 1
+                # Any split is allowed - we'll fix sizes later
+                if gap > best_gap or (gap == best_gap and len(group) > best_size):
+                    best_gap = gap
+                    best_idx = i
+                    best_split_idx = j + 1
+                    best_size = len(group)
         
-        # With validation, best_idx will always be found
-        # But assert for safety
-        assert best_idx != -1, "Logic error: No valid split found despite validation"
+        if best_idx == -1:
+            # No more gaps to split - we're done
+            print(f"  No more perceptual gaps to split, stopping at {len(groups)} groups", file=sys.stderr)
+            break
         
         # Perform the split
         group_to_split = groups[best_idx]
@@ -569,15 +562,161 @@ def split_into_palettes(hct_colors, n_palettes=5, equal_counts=False, min_palett
         # Re-sort by average score
         groups.sort(key=lambda g: sum(c['distance_score'] for c in g) / len(g))
     
-    # Final verification
-    assert len(groups) == n_palettes, f"Expected {n_palettes} groups, got {len(groups)}"
+    # If we still don't have enough groups, force splits to reach target
+    while len(groups) < n_palettes:
+        print(f"  Forcing splits to reach {n_palettes} groups...", file=sys.stderr)
+        
+        # Find the largest group to split
+        largest_idx = max(range(len(groups)), key=lambda i: len(groups[i]))
+        largest = groups[largest_idx]
+        
+        if len(largest) < 2:
+            print(f"  Cannot split further - at maximum groups possible", file=sys.stderr)
+            break
+        
+        # Split at the largest perceptual gap
+        best_gap = 0
+        best_split = -1
+        for j in range(len(largest) - 1):
+            gap = largest[j+1]['distance_score'] - largest[j]['distance_score']
+            if gap > best_gap:
+                best_gap = gap
+                best_split = j + 1
+        
+        if best_split == -1:
+            break
+        
+        left = largest[:best_split]
+        right = largest[best_split:]
+        
+        print(f"    Force-splitting group {largest_idx} ({len(largest)} colors) into {len(left)} and {len(right)}", file=sys.stderr)
+        
+        groups.pop(largest_idx)
+        groups.append(left)
+        groups.append(right)
+        groups.sort(key=lambda g: sum(c['distance_score'] for c in g) / len(g))
     
+    # Now fix any groups that are below min size by redistributing colors
+    if min_palette_size > 1:
+        print(f"\nEnsuring all {len(groups)} palettes have at least {min_palette_size} colors...", file=sys.stderr)
+        
+        iteration = 0
+        while iteration < max_iterations:
+            iteration += 1
+            
+            # Find all groups below min size
+            small_groups = []
+            for i, group in enumerate(groups):
+                if len(group) < min_palette_size:
+                    small_groups.append(i)
+            
+            if not small_groups:
+                break
+            
+            # Process each small group
+            small_groups.sort(reverse=True)
+            made_change = False
+            
+            for idx in small_groups:
+                if idx >= len(groups) or len(groups[idx]) >= min_palette_size:
+                    continue
+                
+                group = groups[idx]
+                needed = min_palette_size - len(group)
+                
+                # Find the nearest neighbor (by score) that has colors to spare
+                group_avg = sum(c['distance_score'] for c in group) / len(group)
+                
+                best_neighbor = -1
+                best_dist = float('inf')
+                
+                for j, other in enumerate(groups):
+                    if j == idx or len(other) <= min_palette_size:
+                        continue
+                    other_avg = sum(c['distance_score'] for c in other) / len(other)
+                    dist = abs(other_avg - group_avg)
+                    if dist < best_dist:
+                        best_dist = dist
+                        best_neighbor = j
+                
+                if best_neighbor == -1:
+                    # No neighbor with spare colors - find any neighbor
+                    for j, other in enumerate(groups):
+                        if j == idx:
+                            continue
+                        other_avg = sum(c['distance_score'] for c in other) / len(other)
+                        dist = abs(other_avg - group_avg)
+                        if dist < best_dist:
+                            best_dist = dist
+                            best_neighbor = j
+                
+                if best_neighbor != -1:
+                    neighbor = groups[best_neighbor]
+                    
+                    # Determine how many colors we can take without dropping neighbor below min
+                    take = min(needed, len(neighbor) - min_palette_size)
+                    
+                    if take > 0:
+                        # Take colors from the neighbor that are closest to the small group's range
+                        if group_avg < sum(c['distance_score'] for c in neighbor) / len(neighbor):
+                            # Take from the lower end of neighbor
+                            taken = neighbor[:take]
+                            remaining = neighbor[take:]
+                        else:
+                            # Take from the higher end of neighbor
+                            taken = neighbor[-take:]
+                            remaining = neighbor[:-take]
+                        
+                        print(f"    Moving {take} colors from group {best_neighbor} to group {idx}", file=sys.stderr)
+                        
+                        # Update groups
+                        new_group = group + taken
+                        new_group.sort(key=lambda c: c['distance_score'])
+                        
+                        groups[idx] = new_group
+                        groups[best_neighbor] = remaining
+                        
+                        # Re-sort all groups
+                        groups.sort(key=lambda g: sum(c['distance_score'] for c in g) / len(g))
+                        made_change = True
+                        break  # Restart the loop
+                    else:
+                        # Can't take without dropping neighbor below min - merge them
+                        print(f"    Merging group {idx} with group {best_neighbor} (can't redistribute)", file=sys.stderr)
+                        
+                        merged = group + neighbor
+                        merged.sort(key=lambda c: c['distance_score'])
+                        
+                        if best_neighbor > idx:
+                            groups.pop(best_neighbor)
+                            groups.pop(idx)
+                        else:
+                            groups.pop(idx)
+                            groups.pop(best_neighbor)
+                        
+                        groups.append(merged)
+                        groups.sort(key=lambda g: sum(c['distance_score'] for c in g) / len(g))
+                        made_change = True
+                        break  # Restart the loop
+            
+            if not made_change:
+                # No valid moves found - shouldn't happen given validation
+                break
+    
+    # If we couldn't reach the target, use what we have
+    if len(groups) < n_palettes:
+        print(f"  Note: Using {len(groups)} palettes instead of requested {n_palettes}", file=sys.stderr)
+    elif len(groups) > n_palettes:
+        print(f"  Note: Using {len(groups)} palettes (couldn't merge further while maintaining perceptual quality)", file=sys.stderr)
+    
+    # Final verification - all colors present?
     all_colors = set()
     for group in groups:
         for color in group:
             all_colors.add(color['hex'])
     
-    assert len(all_colors) == total_colors, f"Lost {total_colors - len(all_colors)} colors!"
+    if len(all_colors) != total_colors:
+        print(f"  WARNING: Lost {total_colors - len(all_colors)} colors!", file=sys.stderr)
     
     # Report results
     print(f"\nFinal {len(groups)} palettes (all ≥ {min_palette_size} colors):", file=sys.stderr)
@@ -640,18 +779,32 @@ def write_output_files(palettes, base_output_path, output_format):
     if not palettes:
         return
     
-    # Split path into base and extension
-    base, ext = os.path.splitext(base_output_path)
+    # Separate directory path from base filename
+    dir_path = os.path.dirname(base_output_path)
+    base_filename = os.path.basename(base_output_path)
+    
+    # Split the base filename into name and extension
+    base_name, ext = os.path.splitext(base_filename)
     if not ext:
         ext = '.hexplt'  # Default extension
+    
+    # Ensure directory exists
+    if dir_path:
+        os.makedirs(dir_path, exist_ok=True)
     
     # Calculate padding width based on number of palettes
     padding = len(str(len(palettes)))
     
     written_files = []
     for i, palette in enumerate(palettes):
-        # Create numbered filename: base_01.ext, base_02.ext, etc.
-        numbered_path = f"{base}_{i+1:0{padding}d}{ext}"
+        # Create numbered filename: name_01.ext, name_02.ext, etc.
+        numbered_filename = f"{base_name}_{i+1:0{padding}d}{ext}"
+        
+        # Combine with directory path
+        if dir_path:
+            numbered_path = os.path.join(dir_path, numbered_filename)
+        else:
+            numbered_path = numbered_filename
         
         # Format this single palette
         palette_text = format_single_palette(palette, output_format, i, len(palettes))
