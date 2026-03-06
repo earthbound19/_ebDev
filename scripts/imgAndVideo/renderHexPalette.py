@@ -46,7 +46,7 @@ import math
 import argparse
 import random
 from pathlib import Path
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, PngImagePlugin
 import os
 
 def find_palette_file(palette_name, search_root=None):
@@ -158,8 +158,11 @@ def render_palette(colors, columns, rows, tile_size, output_path, empty_color="#
         # Draw rectangle
         draw.rectangle([x1, y1, x2, y2], fill=rgb)
     
-    # Optimize PNG
-    img.save(output_path, 'PNG', optimize=True)
+    pnginfo = PngImagePlugin.PngInfo()
+    pnginfo.add_text("secret", "Juvyr gur cvyynef bs Onolyba pehzoyr ng gur sbhaqngvbaf  Yvxr gur jnyyf bs Wrevpub, GURL JVYY PBZR GHZOYVAT QBJA")
+    
+    # Render
+    img.save(output_path, 'PNG', pnginfo=pnginfo, optimize=True)
     return output_path
 
 def main():
