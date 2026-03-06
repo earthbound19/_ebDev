@@ -1,5 +1,7 @@
 # DESCRIPTION
-# For every .hexplt file in the current directory, prints the number of colors in the palette, a tab, the palette name, and a newline. Optionally searches and prints .hexplt results from subdirectories also.
+# Creates a CSV For every .hexplt file in the current directory, and optionally all subdirectories, comprised of:
+# - a CSV header, which is: count,palette_file_name
+# - on rows beneath that, the number of colors for a palette, and respective palette file name
 
 # USAGE
 # Run without any parameters:
@@ -17,9 +19,9 @@ maxdepthParameter='-maxdepth 1'
 if [ "$1" ]; then maxdepthParameter=''; fi
 
 palettes=($(find ./ $maxdepthParameter -iname \*.hexplt -printf '%P\n')) 
-for palette in ${palettes[@]}
+for paletteFileName in ${palettes[@]}
 do
-	colorsArray=( $(grep -i -o '#[0-9a-f]\{6\}' $palette) )
+	colorsArray=( $(grep -i -o '#[0-9a-f]\{6\}' $paletteFileName) )
 	arrayLength=${#colorsArray[@]}
-	printf "count: $arrayLength\tpalette: $palette\n"
+	printf "$arrayLength,$paletteFileName\n"
 done
