@@ -1,4 +1,5 @@
 # DESCRIPTION
+# DEPRECATED, see renderAllHexPalettesPy.sh, which calls a much faster script. In a test which rendered the same set of palettes in a directory (manually deleting them before the test to do a valid render test), that showed 350% render speedup over this.
 # Runs renderHexPalette.sh for every .hexplt file in the path (non-recursive) from which this script is run. Result: all hex palette files in the current path are rendered. Also optionally recurses into subdirectories. Also has cooldown (no work) periods after every N renders.
 
 # USAGE
