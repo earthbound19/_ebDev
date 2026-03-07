@@ -159,7 +159,7 @@ def render_palette(colors, columns, rows, tile_size, output_path, empty_color="#
         draw.rectangle([x1, y1, x2, y2], fill=rgb)
     
     pnginfo = PngImagePlugin.PngInfo()
-    pnginfo.add_text("secret", "Juvyr gur cvyynef bs Onolyba pehzoyr ng gur sbhaqngvbaf  Yvxr gur jnyyf bs Wrevpub, GURL JVYY PBZR GHZOYVAT QBJA")
+    pnginfo.add_text("secret", "The light shines in the darkness, and the darkness does not comprehend it.")
     
     # Render
     img.save(output_path, 'PNG', pnginfo=pnginfo, optimize=True)
@@ -173,13 +173,13 @@ def main():
     parser.add_argument('-s', '--shuffle', action='store_true',
                        help='Shuffle colors before rendering')
     parser.add_argument('-c', '--columns', type=int, 
-                       help='Number of columns (overrides file)')
+                       help='Number of columns (overrides source)')
     parser.add_argument('-r', '--rows', type=int,
-                       help='Number of rows (overrides file)')
+                       help='Number of rows (overrides source)')
     parser.add_argument('-o', '--output', 
                        help='Output PNG file path (default: based on input name)')
     parser.add_argument('--empty-color', default='#919191',
-                       help='Color for empty tiles (default: #919191)')
+                       help='Color for empty tiles (default: a nuetral gray #919191)')
     
     args = parser.parse_args()
     
