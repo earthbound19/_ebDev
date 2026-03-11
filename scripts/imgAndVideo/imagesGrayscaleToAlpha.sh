@@ -80,6 +80,15 @@
 # - Perceptual color space selection (HCT, okHSV) for alpha via external Python +
 #   coloraide script; this would allow making specific colors transparent based
 #   more nearly on human perception (where sRGB does so very little).
+# - Write glitch-rock music after unexpected behavior encounterd in development,
+#   where a 1-bit OPAQUE alpha channel in a source image was carried over
+#   into target images so we couldn't modify alpha from grayscale as expected:
+# Glitch-rock band: "1-Bit Alpha Channel" - debut album: "Opaque Expectations"
+# Track listing:
+# "Hidden Transparency"
+# "The Gremlin in the Bits"
+# "Plus Matte (Radio Edit)"
+# "CopyOpacity Blues"
 
 
 PROGNAME=$(basename "$0")
@@ -254,30 +263,31 @@ function process_image {
         echo "Processing: $input_file -> $output_file [fuzz: $fuzz%]"
     fi
     
-    # GraphicsMagick conversion with fuzz option
-    # Technical explanation:
-    # 1. If fuzz > 0: Use -fuzz to set color matching tolerance, then -transparent white
-    #    This makes all pixels within fuzz% Euclidean distance of pure white transparent
-    #    (based on RGB color space, not luminance)
-    # 2. Then apply grayscale-to-alpha to the remaining pixels for smooth edge transitions
-    #
-    # Note: -fuzz must come before -transparent for it to take effect
+    # Create temporary files
+    local temp_input="${dir}/temp_input_$$.${extension}"
+    local temp_mask="${dir}/temp_mask_$$.${extension}"
     
-    local gm_cmd="gm convert"
+    # Step 1: Strip any existing alpha channel from input
+    gm convert "$input_file" +matte "$temp_input"
     
+    # Step 2: Create mask based on fuzz setting
     if [ "$fuzz" != "0" ]; then
-        # Apply fuzz-based color removal first
-        # This catches near-white pixels based on RGB color distance
-        gm_cmd="$gm_cmd -fuzz ${fuzz}% -transparent white"
+        # With fuzz: first remove near-white pixels by color, then create grayscale mask
+        gm convert "$temp_input" -fuzz ${fuzz}% -transparent white \
+            -colorspace Gray -negate +matte "$temp_mask"
+    else
+        # Without fuzz: pure grayscale-to-alpha mask
+        gm convert "$temp_input" -colorspace Gray -negate +matte "$temp_mask"
     fi
     
-    # Complete the conversion with grayscale-to-alpha for smooth edges
-    if ! $gm_cmd "$input_file" \
-        -colorspace Gray \
-        -negate \
-        -matte \
-        -copy opacity \
-        "$output_file"; then
+    # Step 3: Apply mask as alpha channel
+    gm composite -compose CopyOpacity "$temp_mask" "$temp_input" "$output_file"
+    
+    # Step 4: Clean up temp files
+    rm -f "$temp_input" "$temp_mask"
+    
+    # Check if successful
+    if [ ! -f "$output_file" ]; then
         echo "ERROR: Failed to process $input_file"
         return 1
     fi
