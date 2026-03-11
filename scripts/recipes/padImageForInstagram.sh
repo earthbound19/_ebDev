@@ -32,7 +32,8 @@ else
 	genPadColors=($(shuf <<<"${genPadColors[*]}"))
 	IFS="$OIFS"
 	genPadColor=${genPadColors[0]}
-	# make new padded image from $targetXpix	$targetYpix set via `source` call of getDoesIMGinstagram.sh earlier, using that $genPadColor:
+	# make new padded image from $targetXpix
+	# $targetYpix set via `source` call of getDoesIMGinstagram.sh earlier, using that $genPadColor:
 	padImageScriptPath=$(getFullPathToFile.sh padImage.py)
-	python $padImageScriptPath $sourceFilename $targetXpix $targetYpix $genPadColor
+	python $padImageScriptPath -i $sourceFilename -r $targetXpix -s $targetYpix $genPadColor
 fi
