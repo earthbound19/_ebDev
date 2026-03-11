@@ -22,6 +22,7 @@ maxdepthParameter='-maxdepth 1'
 if [ "$1" ]; then maxdepthParameter=''; fi
 
 palettes=($(find ./ $maxdepthParameter -iname \*.hexplt -printf '%P\n')) 
+printf "count,palette_file_name\n"
 for paletteFileName in ${palettes[@]}
 do
 	colorsArray=( $(grep -i -o '#[0-9a-f]\{6\}' $paletteFileName) )
