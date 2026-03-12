@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Generate a raster image of a random blob using ImageMagick. Black blob on white created from randomly distributed points connected by thick lines or splines, then Gaussian blurred and thresholded.
+# DEPRECATED. See randomBlob.py. This script is much slower. Generates a raster image of a random blob using ImageMagick. Black blob on white created from randomly distributed points connected by thick lines or splines, then Gaussian blurred and thresholded. NOTE, however, that this does many bash utility calls and is relatively quite inefficient, and there is a far faster replacement, as mentioned, ergo the deprecation.
 
 # The concept and algorithm design were originally created by Fred Weinhaus. This 
 # is a clean-room reimplementation written from functional specifications 
@@ -8,8 +8,6 @@
 # The script provides extensive control over point distribution, connection methods, 
 # blurring, and thresholding parameters, allowing for a wide variety of organic blob 
 # shapes to be generated programmatically.
-
-# NOTE, however, that this does many bash utility calls and is relatively quite inefficient.
 
 # DEPENDENCIES
 # - ImageMagick 7, for all image processing operations
@@ -37,7 +35,7 @@
 #   -k kind       Point distribution: uniform, gaussian (default: uniform)
 #   -g gsigma     Gaussian distribution sigma (default: 67)
 #   -c constrain  Constrain to inner region: yes, no (default: yes)
-#   -d drawtype   Connection method: straight, spline (default: spline)
+#   -d drawtype   Connection method: line, spline (default: spline)
 #   -T tension    Spline tension (default: 0, can be negative)
 #   -C continuity Spline continuity (default: 0, can be negative)
 #   -B bias       Spline bias (default: 0, can be negative)
@@ -54,7 +52,7 @@
 
 # Examples:
 #   randomblob.sh blob.png
-#   randomblob.sh -n 20 -l 20 -b 50 -t 30 -d straight blob.png
+#   randomblob.sh -n 20 -l 20 -b 50 -t 30 -d line blob.png
 #   randomblob.sh -k gaussian -g 100 -s square -o 1024 blob.png
 #   randomblob.sh -f points.txt -T 0.5 -C -0.3 blob.png
 
@@ -227,9 +225,9 @@ if [[ "$constrain" != "yes" && "$constrain" != "no" ]]; then
     exit 1
 fi
 
-# Validate drawtype - UPDATED: Now only accepts 'straight' or 'spline'
-if [[ "$drawtype" != "straight" && "$drawtype" != "spline" ]]; then
-    echo "Error: drawtype must be 'straight' or 'spline'"
+# Validate drawtype
+if [[ "$drawtype" != "line" && "$drawtype" != "spline" ]]; then
+    echo "Error: drawtype must be 'line' or 'spline'"
     exit 1
 fi
 
@@ -445,8 +443,8 @@ temp_files+=("$tmp_canvas")
 
 magick -size "${owidth}x${oheight}" xc:white "$tmp_canvas"
 
-# Draw connections - UPDATED: Now uses 'straight' instead of 'line'
-if [[ "$drawtype" == "straight" ]]; then
+# Draw connections
+if [[ "$drawtype" == "line" ]]; then
     # Draw straight lines as polygon
     polygon=""
     for ((i=0; i<numpts; i++)); do
