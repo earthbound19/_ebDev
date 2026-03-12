@@ -1,130 +1,415 @@
+#!/bin/bash
+#
 # DESCRIPTION
-# Creates N ($1) randomly shaped "blob" images using a clean-room reimplementation
-# of Fred Weinhaus's randomblob concept.
+# Creates N randomly shaped "blob" images using either the fast Python implementation randomBlobs.py, or the legacy bash/ImageMagick implementation randomBlob.sh
 
 # USAGE
-# From a directory you wish to fill with so many random blob images, run with one parameter, which is the number of blobs to make, e.g.:
-#    getRandomBlobs.sh 100
+#    getRandomBlobs.sh [options]
+#
+# Options:
+#   -n, --number NUM         Number of blobs to generate (required)
+#   -s, --scriptversion VER  Script version: 'python' (default) or 'bash'
+#   --newswitches "SWITCHES" Additional switches for Python version (fails if using bash)
+#   
+#   Common switches (with defaults shown):
+#     --pts, --numpts NUM     Fixed number of points per blob (default: random 4-22 per blob)
+#     -l, --linewidth WIDTH   Width of connecting lines (default: random 8-21 per blob)
+#     -p, --pixinc INC        Pixel increment for splines (default: 1)
+#     -d, --drawtype TYPE     Draw type: 'line' or 'spline' (default: 'spline')
+#     -T, --tension VAL       Spline tension (default: 0)
+#     -C, --continuity VAL    Spline continuity (default: 0)
+#     -B, --bias VAL          Spline bias (default: 0)
+#     -k, --kind TYPE         Distribution: 'uniform' or 'gaussian' (default: 'uniform')
+#     -g, --gsigma VAL        Gaussian sigma (default: 67)
+#     -c, --constrain VAL     Constrain: 'yes' or 'no' (default: 'yes')
+#     -i, --isize SIZE        Inner region size (default: 400)
+#     -o, --osize SIZE        Output image size (default: 512)
+#     -b, --blur SIGMA        Gaussian blur sigma (default: 11)
+#     -t, --thresh PERCENT    Threshold percentage (default: 5)
+#     -s, --shape SHAPE       Inner shape: 'square' or 'disk' (default: 'disk')
+#     -f, --file FILE         Point pairs file (exact count)
+#     -F, --file2 FILE        Point pairs file (indexed)
+#     -S, --seed SEED         Random seed (works for both bash and python)
+#   
+#   -h, --help                Show this help
+#
+# Examples:
+#   getRandomBlobs.sh -n 100 --pts 15 -l 5 -d spline -T 0.5
+#   getRandomBlobs.sh -n 50 -s bash -l 5 -d spline -S 42
+#   getRandomBlobs.sh -n 20 --newswitches "--typeoutput svg --cpu 75"
 
-# DEPENDENCIES
-# - bash 4.0+ (for seq command)
-# - randomBlob.sh (the clean-room reimplementation in this repository) in your PATH or current directory
-# - ImageMagick 7 (required by randomBlob.sh)
-# - bc (basic calculator) - required by randomBlob.sh
-# - od (octal dump) - for reading /dev/urandom
-# - sed, tr - for text processing
+PROGNAME=$(basename $0)
 
-# Platform Support:
-# - Linux/Unix: Works natively
-# - macOS: Works with standard tools
-# - Windows/Cygwin: Requires Cygwin with necessary packages (coreutils, sed, etc.)
+function print_halp {
+    cat << EOF
+Usage: $PROGNAME [options]
 
-# NOTES
-# - Known issue: Random images may occasionally be blank. This could happen if:
-#   * Cygwin's /dev/urandom entropy is exhausted (rare)
-#   * randomBlob.sh generates points outside the image bounds
-#   * The combination of parameters produces an empty result
-# - This script now uses the clean-room reimplementation of randomBlob.sh
-# - For ImageMagick 7 compatibility, the underlying randomBlob.sh uses 'magick' not 'convert'
-# - These blobs could be animated by cycling the spline tension from negative to positive values
-# - Using the -d straight parameter (as this script does) is significantly faster than splines
-# - The seed value from /dev/urandom can be any size; the randomBlob.sh script will handle it
+Required:
+  -n, --number NUM         Number of blobs to generate
 
-# TIPS FOR CUSTOMIZATION
-# To vary more parameters, you can uncomment and modify lines in the loop below:
-#   - Spline tension: add -T $tension to the command
-#   - Distribution type: add -k gaussian -g $sigma
-#   - Inner region size: add -i $isize
-#   - Blur amount: add -b $blur
-#   - Threshold: add -t $threshold
+Options:
+  -s, --scriptversion VER  Script version: 'python' (default) or 'bash'
+  --newswitches "SWITCHES" Additional switches for Python version (fails if using bash)
+  -h, --help               Show this help
 
-# CODE
-# -----------------------------------------------------------------------------
+Common switches (with defaults):
+  --pts, --numpts NUM      Fixed number of points per blob (default: random 4-22 per blob)
+  -l, --linewidth WIDTH    Width of connecting lines (default: random 8-21 per blob)
+  -p, --pixinc INC         Pixel increment for splines (default: 1)
+  -d, --drawtype TYPE      Draw type: 'line' or 'spline' (default: 'spline')
+  -T, --tension VAL        Spline tension (default: 0)
+  -C, --continuity VAL     Spline continuity (default: 0)
+  -B, --bias VAL           Spline bias (default: 0)
+  -k, --kind TYPE          Distribution: 'uniform' or 'gaussian' (default: 'uniform')
+  -g, --gsigma VAL         Gaussian sigma (default: 67)
+  -c, --constrain VAL      Constrain: 'yes' or 'no' (default: 'yes')
+  -i, --isize SIZE         Inner region size (default: 400)
+  -o, --osize SIZE         Output image size (default: 512)
+  -b, --blur SIGMA         Gaussian blur sigma (default: 11)
+  -t, --thresh PERCENT     Threshold percentage (default: 5)
+  -s, --shape SHAPE        Inner shape: 'square' or 'disk' (default: 'disk')
+  -f, --file FILE          Point pairs file (exact count)
+  -F, --file2 FILE         Point pairs file (indexed)
+  -S, --seed SEED          Random seed (works for both bash and python)
 
-# Check for required parameter
-if [ $# -ne 1 ]; then
-    echo "Error: Please specify the number of blobs to generate"
-    echo "Usage: getRandomBlobs.sh <number_of_blobs>"
+Examples:
+  $PROGNAME -n 100
+  $PROGNAME -n 50 -s bash -l 5 -d spline -S 42
+  $PROGNAME -n 20 --newswitches "--typeoutput svg --cpu 75"
+EOF
+}
+
+function check_space_in_opt_arg {
+    if [ "$2" == "" ]; then 
+        echo "ERROR: No value or a space (resulting in empty value) passed after optional switch $1. Pass a value without any space after $1 (for example: $1""value""), or if a default is available, don't pass $1, and the default will be used. Exit."; 
+        exit 4; 
+    fi
+}
+
+function get_python_script_path {
+    # Try to find randomBlob.py in common locations
+    local script_name="randomBlob.py"
+    local search_paths=(
+        "."
+        "./scripts"
+        "$HOME/bin"
+        "/usr/local/bin"
+        "/usr/bin"
+    )
+    
+    # Check if getFullPathToFile.sh exists and use it
+    if command -v getFullPathToFile.sh >/dev/null 2>&1; then
+        local path=$(getFullPathToFile.sh "$script_name")
+        if [ -n "$path" ] && [ -f "$path" ]; then
+            echo "$path"
+            return 0
+        fi
+    fi
+    
+    # Fallback: search common paths
+    for path in "${search_paths[@]}"; do
+        if [ -f "$path/$script_name" ]; then
+            echo "$path/$script_name"
+            return 0
+        fi
+    done
+    
+    # Last resort: try to find in PATH
+    local path=$(command -v "$script_name" 2>/dev/null)
+    if [ -n "$path" ]; then
+        echo "$path"
+        return 0
+    fi
+    
+    return 1
+}
+
+# Notify of use of defaults if no parameters passed
+if [ ${#@} == 0 ]; then
+    echo "No options provided. Use -h for help."
+    print_halp
     exit 1
 fi
 
-# Validate input is a positive integer
-if ! [[ "$1" =~ ^[0-9]+$ ]] || [ "$1" -eq 0 ]; then
-    echo "Error: Parameter must be a positive integer"
-    exit 1
+# Parse command line arguments with getopt
+# Note: The colon after a letter means it takes an argument
+OPTS=$(getopt -o hn:s:l:p:d:T:C:B:k:g:c:i:o:b:t:s:f:F:S: --long help,number:,scriptversion:,newswitches:,numpts:,pts:,linewidth:,pixinc:,drawtype:,tension:,continuity:,bias:,kind:,gsigma:,constrain:,isize:,osize:,blur:,thresh:,shape:,file:,file2:,seed: -n $PROGNAME -- "$@")
+
+if [ $? != 0 ]; then 
+    echo "Failed parsing options." >&2 
+    exit 1 
 fi
 
-# Check if randomBlob.sh exists and is executable
-if ! command -v randomBlob.sh >/dev/null 2>&1; then
-    # Also check current directory
-    if [ -f "./randomBlob.sh" ] && [ -x "./randomBlob.sh" ]; then
-        # Add current directory to PATH for this script
-        PATH=".:$PATH"
-    else
-        echo "Error: randomBlob.sh not found in PATH or current directory"
-        echo "Please ensure the clean-room reimplementation of randomBlob.sh is available"
-        exit 1
-    fi
-fi
+eval set -- "$OPTS"
 
-# Check for required tools
-for cmd in od sed tr seq; do
-    if ! command -v $cmd >/dev/null 2>&1; then
-        echo "Error: Required tool '$cmd' not found"
-        exit 1
-    fi
+# Set defaults for common parameters
+SCRIPT_VERSION="python"
+NEW_SWITCHES=""
+NUMBER=""  # Required, no default
+
+# Common parameter defaults
+NUM_PTS=""  # Special: will be randomized per blob if not set
+LINE_WIDTH=""  # Special: will be randomized per blob if not set
+PIXINC="1"
+DRAWTYPE="spline"
+TENSION="0"
+CONTINUITY="0"
+BIAS="0"
+KIND="uniform"
+GSIGMA="67"
+CONSTRAIN="yes"
+ISIZE="400"
+OSIZE="512"
+BLUR="11"
+THRESH="5"
+SHAPE="disk"
+FILE=""
+FILE2=""
+SEED=""  # Works for both bash and python
+
+# Build array to collect pass-through arguments
+PASSTHROUGH_ARGS=()
+
+while true; do
+    case "$1" in
+        -h | --help ) 
+            print_halp
+            exit 0 
+            ;;
+        -n | --number )
+            check_space_in_opt_arg $1 $2
+            NUMBER=$2
+            shift 2
+            ;;
+        -s | --scriptversion )
+            check_space_in_opt_arg $1 $2
+            if [[ "$2" != "python" && "$2" != "bash" ]]; then
+                echo "ERROR: scriptversion must be 'python' or 'bash'"
+                exit 1
+            fi
+            SCRIPT_VERSION=$2
+            shift 2
+            ;;
+        --newswitches )
+            check_space_in_opt_arg $1 $2
+            NEW_SWITCHES=$2
+            shift 2
+            ;;
+        # Handle numpts (with both --pts and --numpts for convenience)
+        --pts | --numpts )
+            check_space_in_opt_arg $1 $2
+            NUM_PTS=$2
+            PASSTHROUGH_ARGS+=("-n" "$2")
+            shift 2
+            ;;
+        # Common switches - store values and add to passthrough
+        -l | --linewidth )
+            check_space_in_opt_arg $1 $2
+            LINE_WIDTH=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -p | --pixinc )
+            check_space_in_opt_arg $1 $2
+            PIXINC=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -d | --drawtype )
+            check_space_in_opt_arg $1 $2
+            if [[ "$2" != "line" && "$2" != "spline" ]]; then
+                echo "ERROR: drawtype must be 'line' or 'spline'"
+                exit 1
+            fi
+            DRAWTYPE=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -T | --tension )
+            check_space_in_opt_arg $1 $2
+            TENSION=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -C | --continuity )
+            check_space_in_opt_arg $1 $2
+            CONTINUITY=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -B | --bias )
+            check_space_in_opt_arg $1 $2
+            BIAS=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -k | --kind )
+            check_space_in_opt_arg $1 $2
+            if [[ "$2" != "uniform" && "$2" != "gaussian" ]]; then
+                echo "ERROR: kind must be 'uniform' or 'gaussian'"
+                exit 1
+            fi
+            KIND=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -g | --gsigma )
+            check_space_in_opt_arg $1 $2
+            GSIGMA=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -c | --constrain )
+            check_space_in_opt_arg $1 $2
+            if [[ "$2" != "yes" && "$2" != "no" ]]; then
+                echo "ERROR: constrain must be 'yes' or 'no'"
+                exit 1
+            fi
+            CONSTRAIN=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -i | --isize )
+            check_space_in_opt_arg $1 $2
+            ISIZE=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -o | --osize )
+            check_space_in_opt_arg $1 $2
+            OSIZE=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -b | --blur )
+            check_space_in_opt_arg $1 $2
+            BLUR=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -t | --thresh )
+            check_space_in_opt_arg $1 $2
+            THRESH=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -s | --shape )
+            check_space_in_opt_arg $1 $2
+            if [[ "$2" != "square" && "$2" != "disk" ]]; then
+                echo "ERROR: shape must be 'square' or 'disk'"
+                exit 1
+            fi
+            SHAPE=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -f | --file )
+            check_space_in_opt_arg $1 $2
+            FILE=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -F | --file2 )
+            check_space_in_opt_arg $1 $2
+            FILE2=$2
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -S | --seed )
+            check_space_in_opt_arg $1 $2
+            SEED=$2
+            # Add to passthrough for BOTH versions (seed works everywhere)
+            PASSTHROUGH_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        -- ) 
+            shift
+            break 
+            ;;
+        * ) 
+            break 
+            ;;
+    esac
 done
 
-# Check for /dev/urandom availability
-if [ ! -r "/dev/urandom" ]; then
-    echo "Warning: /dev/urandom not readable, falling back to \$RANDOM"
-    use_fixed_random=1
+# Throw error and exit if mandatory argument(s) missing
+if [ -z "$NUMBER" ]; then
+    echo "ERROR: Number of blobs (-n | --number) is required"
+    exit 1
 fi
 
-echo "Generating $1 random blob images..."
+# Validate NEW_SWITCHES with bash version
+if [ "$SCRIPT_VERSION" = "bash" ] && [ -n "$NEW_SWITCHES" ]; then
+    echo "ERROR: --newswitches cannot be used with bash script version (these switches are Python-only features)"
+    exit 1
+fi
 
-for i in $(seq $1)
-do
-	# Get a random seed from /dev/urandom if available, otherwise use bash's RANDOM
-	if [ -z "$use_fixed_random" ]; then
-		# Read 8 bytes from /dev/urandom as a decimal number
-		seed=$(od -vAn -N8 -tu8 < /dev/urandom | tr -d ' \n\r')
-		# Ensure we have a valid number (od might produce leading spaces)
-		seed=${seed:-0}
-	else
-		# Fallback to bash's RANDOM (only 15-bit range)
-		seed=$RANDOM
-	fi
+# Get Python script path if needed
+PYTHON_SCRIPT=""
+if [ "$SCRIPT_VERSION" = "python" ]; then
+    PYTHON_SCRIPT=$(get_python_script_path)
+    if [ $? -ne 0 ] || [ -z "$PYTHON_SCRIPT" ]; then
+        echo "ERROR: Could not find randomBlob.py. Please ensure it's in PATH or use -s bash"
+        exit 1
+    fi
+    echo "Using Python script: $PYTHON_SCRIPT"
+fi
 
-	# Use string comparison instead of arithmetic, to avoid errors about expected integer expressions
-	if [ -z "$seed" ] || [ "$seed" = "0" ]; then
-		seed=$(( RANDOM + 1 ))
-	fi
+echo "Generating $NUMBER random blob images using $SCRIPT_VERSION script..."
+echo "Common parameters: numpts=${NUM_PTS:-random}, linewidth=${LINE_WIDTH:-random}, pixinc=$PIXINC, drawtype=$DRAWTYPE, tension=$TENSION, continuity=$CONTINUITY, bias=$BIAS, kind=$KIND, gsigma=$GSIGMA, constrain=$CONSTRAIN, isize=$ISIZE, osize=$OSIZE, blur=$BLUR, thresh=$THRESH, shape=$SHAPE"
+
+for i in $(seq $NUMBER); do
+    # Determine number of points (fixed if set by user, otherwise random)
+    if [ -z "$NUM_PTS" ]; then
+        current_numpts=$(( 4 + (RANDOM % 22) ))
+        numpts_arg="-n $current_numpts"
+    else
+        numpts_arg=""  # Already in PASSTHROUGH_ARGS
+        current_numpts=$NUM_PTS
+    fi
     
-    # Generate random parameters
-    # Number of points: 3-13 (3 + 0-10)
-    numRandomPoints=$(( 3 + (RANDOM % 11) ))
+    # Determine line width (fixed if set by user, otherwise random)
+    if [ -z "$LINE_WIDTH" ]; then
+        current_linewidth=$(( 8 + (RANDOM % 21) ))
+        linewidth_arg="-l $current_linewidth"
+    else
+        linewidth_arg=""  # Already in PASSTHROUGH_ARGS
+        current_linewidth=$LINE_WIDTH
+    fi
     
-    # Line width: 3-13 (3 + 0-10)
-    lineWidth=$(( 3 + (RANDOM % 11) ))
+    # Create output filename
+    if [ -n "$SEED" ]; then
+        # User provided a seed, use it in filename
+        outfile="randomBlob_S${SEED}_n${current_numpts}_p${PIXINC}_l${current_linewidth}.png"
+    else
+        # No seed provided, use timestamp
+        timestamp=$(date +%s%N | cut -b1-13)
+        outfile="randomBlob_${timestamp}_n${current_numpts}_p${PIXINC}_l${current_linewidth}.png"
+    fi
     
-    # Fixed parameters
-    interpolationPoints=1
+    # Build command with debug and save for investigation
+    if [ "$SCRIPT_VERSION" = "bash" ]; then
+        # Bash/IM7 version
+        cmd="randomBlob.sh ${PASSTHROUGH_ARGS[@]} $numpts_arg $linewidth_arg --debug --save \"$outfile\""
+    else
+        # Python version; for connected lins save and debug add --debug --save before \"$outfile\" ; OR pass those with --newswitches as:
+		#    --newswitches "-debug --save"
+        cmd="python \"$PYTHON_SCRIPT\" ${PASSTHROUGH_ARGS[@]} $numpts_arg $linewidth_arg $NEW_SWITCHES \"$outfile\""
+    fi
     
-    # Create output filename - using parameter expansion instead of sed for clarity
-    outfile="randomBlob_S${seed}_n${numRandomPoints}_p${interpolationPoints}_l${lineWidth}.png"
+    # Remove extra spaces
+    cmd=$(echo "$cmd" | tr -s ' ')
     
-    # Build and execute command
-    command="randomBlob.sh -S $seed -n $numRandomPoints -p $interpolationPoints -l $lineWidth -d straight \"$outfile\""
+    echo "[$i/$NUMBER] Generating: $outfile"
+    echo "  Command: $cmd"
     
-    echo "[$i/$1] Generating: $outfile"
-    
-    # Execute the command
-    if eval $command; then
+    if eval $cmd; then
         echo "  -> Success"
     else
         echo "  -> Failed with error code $?"
+        # Optionally exit on first failure? For now, continue
+        # exit 1
     fi
 done
 
-echo "Done! Generated $1 blob images."
+echo "Done! Generated $NUMBER blob images."
