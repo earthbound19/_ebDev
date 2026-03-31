@@ -1,3 +1,4 @@
+_tests
 scripts
 scripts\admin
 scripts\admin\cygwin
