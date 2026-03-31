@@ -1,4 +1,5 @@
 # DESCRIPTION
+# DEPRECATED, see renderHexPalette.py, which is much faster.
 # Takes a list of hex color codes, one per line, and renders a PNG image composed of tiles of those colors (a palette image), via other scripts.
 
 # DEPENDENCIES
