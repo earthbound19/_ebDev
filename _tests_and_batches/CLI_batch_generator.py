@@ -82,7 +82,6 @@
 #   * Interpreting results
 # - For large switch sets, combinatorial explosion is possible. Use criticality
 #   filtering and depth selection to manage test script numbers. Required switches set a minimum depth.
-# Script version 2.32.5
 
 # CODE
 # TO DO
@@ -106,6 +105,8 @@ import string
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional, Any
 import shutil
+
+SCRIPT_VERSION ="2.34.5"
 
 class Switch:
     """Represents a command line switch with its metadata"""
@@ -487,7 +488,7 @@ def save_config(config_path: str, script_name: str, switches: List[Switch], dept
         return
 
     data = {
-        '_instructions': f"Load with CLI_batch_generator.py, this way: CLI_batch_generator.py --config {config_path}",
+        '_notes': f"Load with CLI_batch_generator.py, this way, without the backticks: `python /path_to/CLI_batch_generator.py --config {config_path}`. Also, note the 'command': field in this config can take a value which is a full path or only the script name, and the batch generator will locate the script (if it is in PATH) and substitute the full path in created batches. Made by CLI_batch_generator.py {SCRIPT_VERSION}",
         'command': script_name,
         'depth': depth,
         'crit_filter': crit_filter,
