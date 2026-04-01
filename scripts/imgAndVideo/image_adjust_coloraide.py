@@ -1,6 +1,6 @@
 # DESCRIPTION
-# Shifts images through various perceptual color spaces and saves result.
-# Supports: HCT, okhsl, okhsv, oklch
+# Shifts images through one of various perceptual color spaces and
+# saves result. Supports HCT, okhsl, okhsv, oklch.
 # Loads an image, converts it from sRGB to the specified color space,
 # applies shifts to the relevant channels, converts back to sRGB,
 # and saves the result with the adjustments encoded in the filename.
