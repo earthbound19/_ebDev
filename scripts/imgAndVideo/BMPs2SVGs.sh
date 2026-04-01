@@ -5,8 +5,13 @@
 # potrace.
 
 # USAGE
-# Run without any parameter:
+# Run without any parameter to use the default preset, which does moderate corner preservation:
 #    BMPs2SVGs.sh
+# $1 OPTIONAL. Or run it with a preset parameter for $1; see the $PRESET case block for presets in the code; use any one of them -- and you can define new ones too! :
+#    BMPs2SVGs.sh smooth       # Best for organic/curvy/blob shapes
+#    BMPs2SVGs.sh sharp        # Best for fine detail/sharp angles
+#    BMPs2SVGs.sh verysharp    # Aggressive corner preservation
+#    BMPs2SVGs.sh detailed     # Minimal optimization, preserves fine features
 # NOTES
 # - The script considers white the background color and black the line/trace area color.
 # - It will not trace a bmp image if the target svg file already exists.
@@ -14,6 +19,37 @@
 
 
 # CODE
+# Preset selection based on first argument
+PRESET="${1:-default}"
+
+# original command:
+# potrace -n -s --group -r 24 -C \#000000 --fillcolor \#ffffff $element
+# Variations for different image types/preferences; also:
+# BRIEF POTRACE OPTIONS REFERENCE:
+# -a = angle threshold (1 means widest angle, 0 means most acute--really no--angle); -O = optimization threshold (0 will optimize less, 1 will optimize most); r = resolution (dots per inch)
+case "$PRESET" in
+    smooth)
+        echo "Using SMOOTH preset (best for blobs/curves)"
+        POTRACE_PRESET=(-r 72 -u 5 -t 4 -a 1.6 -O 0.54 -C '#000000')
+        ;;
+    sharp)
+        echo "Using SHARP preset (best for fine detail/angles)"
+        POTRACE_PRESET=(-t 2 -a 0.73 -r 150 -O 0.71 -C '#000000')
+        ;;
+    verysharp)
+        echo "Using VERY SHARP preset (aggressive corner preservation)"
+        POTRACE_PRESET=(-t 7 -a 0.64 -r 150 -O 0.78 -C '#000000')
+        ;;
+    detailed)
+        echo "Using DETAILED preset (minimal optimization)"
+        POTRACE_PRESET=(-t 4 -a 0.84 -r 150 -O 0.347 -C '#000000')
+        ;;
+    default)
+        echo "Using DEFAULT preset (moderate corners)"
+        POTRACE_PRESET=(-t 7 -a 0.88 -r 150 -O 0.45 -C '#000000')
+        ;;
+esac
+
 imgs=($(find . -maxdepth 1 -iname \*.bmp))
 for element in "${imgs[@]}"
 do
@@ -21,16 +57,8 @@ do
 	if [ ! -f $imgFileNoExt.svg ]
 	then
 	echo tracing $element . . .
-	# original command:
-	# potrace -n -s --group -r 24 -C \#000000 --fillcolor \#ffffff $element
-		# Variations for different image types/preferences; also:
-		# POTRACE OPTIONS REFERENCE:
-		# -a = angle threshold (1 means widest angle, 0 means most acute--really no--angle); -O = optimization threshold (0 will optimize less, 1 will optimize most); r = resolution (dots per inch)?
-		# potrace -n -s --group -r 72 -u 5 -t 4 -a 10 -O 10 -C \#000000 --fillcolor \#ffffff $element
-		# potrace -s -t 2 -a 0.73 -r 150 -O 0.71 -C \#000000 --fillcolor \#ffffff $element
-		potrace -s -t 12 -a 0.88 -r 150 -O 0.86 -C \#000000 --fillcolor \#ffffff $element
-		# potrace -s -t 12 -a 0.64 -r 150 -O 0.78 -C \#000000 --fillcolor \#ffffff $element
-		# potrace -s -t 4 -a 0.84 -r 150 -O 0.347 -C \#000000 --fillcolor \#ffffff $element
+	# "${POTRACE_PRESET[@]}" expands to each element as a separate quoted argument; adding "$element" after that adds the file name to each expansion; the terminal interprets each as a separate command to run:
+	potrace -s --flat -z minority "${POTRACE_PRESET[@]}" "$element"
 	fi
 done
 
