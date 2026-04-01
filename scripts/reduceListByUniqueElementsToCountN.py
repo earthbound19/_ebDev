@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Reduce a list of elements with duplicates proportionally per unique element to count N, keeping all elements. An intended purpose is reducing .hexplt pallete files with duplicate colors while maintaining some duplicate colors (for example as placehol. In more detail: takes an input file of a flat list of unique elements with some duplicates, of length M, and reduces it to (lesser) length N by removing from adjacent duplicate elements, one per group of unique elements, iteratively until it is of length N.ders to later interpolate between the start duplicate color and the next color change N spaces away).
+# Reduce a list of elements with duplicates proportionally per unique element to count N, keeping all elements. An intended purpose is reducing .hexplt pallete files with duplicate colors while maintaining some duplicate colors (for example as placeholder). In more detail: takes an input file of a flat list of unique elements with some duplicates, of length M, and reduces it to (lesser) length N by removing from adjacent duplicate elements, one per group of unique elements, iteratively until it is of length N. Used by another script (reducePalettesDuplicateColorsAndPatchWithInterpolation.sh) to interpolate between the start duplicate color and the next color change N spaces away.
 
 # USAGE
 # Run with these parameters:

@@ -93,7 +93,7 @@ Named parameters may be designated with switches, and offers more flexibility, w
 
 (Note how the order of `-n` and `-s` were switched there: named arguments may be in any order).
 
-The vast majority of scripts in this repository take positional arguments (or parameters), for these reasons:
+Many cripts in this repository may take positional arguments (or parameters), for these reasons:
 
 - If there are not many arguments, it's simplest to program them that way and simple enough to look up the arguments before I run the script (or code another script to run a script).
 - In practice, I very often look at the USAGE comments in the source code to remember them anyway. No way do I remember all these things. That's why I write useful USAGE etc. comments.
@@ -581,5 +581,26 @@ A Windows cmd prompt will open in that directory.
 And/or see [StExBar](https://github.com/stefankueng/tools/releases/tag/StExBar_1.11.0).
 
 All these tips re [an "off-topic"](https://stackoverflow.com/q/378319/1397555) post at StackExchange.
+
+### git
+
+Only hard to remember oddments, where <branch_name> is an actual branch name without angle brackets:
+
+Git squash commit: move all changed files on one branch to staging on another branch, and rewrite thier commit history more neatly on that branch:
+
+Commands overview; say that your messy branch is named messy-branch:
+- checkout the branch which messy-branch branched off, e.g. `git checkout main`
+- make and checkout a new branch from that: `git checkout -b clean-branch`
+- squash merge messy branch to that: `git merge --squash messy-branch`
+- from here you can start with `git reset HEAD` to unstage everything and stage it peacemeal, e.g.:
+- usual stating and git commit operations from here (`git status`, `git add <filename>`, `git commit -m "hay dis what dis is"`, etc), only more neatly than you had opportunity to do on a wildly developing branch. 
+- push, merge request / merge or local marge and push
+- discard messy branch
+
+If that shows a lot of renames, show only renamed files in a branch:
+
+    git diff <branch_name> --diff-filter=R --name-status --find-renames > log.txt
+
+Then open log.txt to look at renames.
 
 # END
