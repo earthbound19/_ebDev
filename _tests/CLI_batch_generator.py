@@ -48,6 +48,7 @@
 #   - Any CLI tool executable that accepts switches supported by
 #     the syntax this script handles
 #   - With path:                    "../tools/deploy.sh"
+#   - WITHOUT path, and the script will try to find the path:        "randomBlob.py"
 #   - With flags:                   "node --experimental-modules app.js"
 #   - Paths with spaces (quoted):   'python "C:\\My Project\\script.py"'
 # The command field can also include fixed switches that apply to all runs.
@@ -60,6 +61,7 @@
 #   * Can be created interactively or manually
 #   * When loading a config, missing fields prompt for input
 #   * Use --save to overwrite existing config, --save-as to create new file
+#   * Commands are stored as entered (portable format recommended)
 #
 # - HOW RUN EXECUTION WORKS:
 #   * You run this generator from your working director (where your data files are)
@@ -80,7 +82,7 @@
 #   * Interpreting results
 # - For large switch sets, combinatorial explosion is possible. Use criticality
 #   filtering and depth selection to manage test script numbers. Required switches set a minimum depth.
-# Script version 2.1.22
+# Script version 2.32.5
 
 # CODE
 # TO DO
@@ -103,6 +105,7 @@ import random
 import string
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional, Any
+import shutil
 
 class Switch:
     """Represents a command line switch with its metadata"""
@@ -150,6 +153,36 @@ class Switch:
         form_display = '/'.join(forms)
         req = " REQUIRED" if self.required else ""
         return f"{form_display} [{val_display}] crit:{self.criticality} conflicts:{self.conflicts_with}{req}"
+
+def resolve_script_paths(command: str) -> str:
+    """
+    If script path is a simple name (no slashes), try to find it in PATH.
+    Otherwise, leave it exactly as-is.
+    """
+    parts = command.strip().split()
+    if not parts:
+        return command
+    
+    interpreters = {
+        'python', 'python3', 'python2', 'ruby', 'perl', 'node', 'php', 'bash', 'sh'
+    }
+    
+    if parts[0] in interpreters and len(parts) > 1:
+        script_path = parts[1]
+        
+        # Only try to resolve if it's a simple name (no path separators)
+        if '/' not in script_path and '\\' not in script_path:
+            found = shutil.which(script_path)
+            if found:
+                parts[1] = found.replace('\\', '/')
+                print(f"  Resolved '{script_path}' → '{found}'")
+                return ' '.join(parts)
+            # If not found in PATH, leave as-is (maybe it'll be found at runtime)
+        
+        # Has slashes or wasn't found - leave as-is
+        return command
+    
+    return command
 
 def get_user_input(prompt: str, default: str = "", required: bool = False) -> str:
     """Get user input with optional default"""
@@ -341,11 +374,6 @@ def validate_and_fix_switches(switches: List[Switch]) -> Tuple[bool, bool]:
     any_changes = False
     
     for i, s in enumerate(switches):
-        # print(f"\n[DEBUG] Checking switch {i+1}: {s.name}")
-        # print(f"[DEBUG]   is_flag: {s.is_flag}")
-        # print(f"[DEBUG]   values: {s.values}")
-        # print(f"[DEBUG]   values length: {len(s.values)}")
-        
         # Check that flags have no values
         if s.is_flag and s.values:
             print(f"Warning: Switch {i+1} ({s.name}) is a flag but has values!")
@@ -392,10 +420,7 @@ def validate_and_fix_switches(switches: List[Switch]) -> Tuple[bool, bool]:
             else:
                 print(f"Skipping switch {s.name}. It will be excluded from runs.")
                 valid = False
-        #else:
-            # print(f"[DEBUG] Switch {i+1} is OK (has values or is flag with no values)")
     
-    # print(f"\n[DEBUG] Validation complete. valid={valid}, any_changes={any_changes}")
     return valid, any_changes
 
 def load_config(config_path: str, fix_missing: bool = True) -> Tuple[str, List[Switch], str, str, bool]:
@@ -604,6 +629,11 @@ def generate_run_scripts(switches: List[Switch], script_name: str, depth: str, c
     cwd = Path.cwd()
     print(f"\nWorking directory: {cwd}")
     
+    # Resolve script path in the command
+    print(f"\nResolving script paths in command: {script_name}")
+    actual_command = resolve_script_paths(script_name)
+    print(f"  Using command: {actual_command}")
+    
     # Extract a safe directory name from whatever command the user entered
     script_basename_raw = script_name.replace('\\', '/').split('/')[-1]
     if '.' in script_basename_raw:
@@ -685,8 +715,8 @@ def generate_run_scripts(switches: List[Switch], script_name: str, depth: str, c
         # Process both valid and invalid combos
         for combo_list, combo_type in [(valid_combos, "valid"), (invalid_combos, "invalid")]:
             for combo in combo_list:
-                # Build command
-                cmd_parts = [script_name]
+                # Build command using the resolved command
+                cmd_parts = [actual_command]
                 switch_parts_for_filename = []
                 
                 # Sort by switch index for consistent ordering
@@ -737,8 +767,6 @@ def generate_run_scripts(switches: List[Switch], script_name: str, depth: str, c
                     name_part = name_part[:max_switch_len]
                 
                 # Generate 8 random alphanumeric characters
-                import random
-                import string
                 random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
                 
                 # Build the final filename with index for ordering
@@ -781,7 +809,7 @@ def generate_run_scripts(switches: List[Switch], script_name: str, depth: str, c
     runner_path = base_dir / f"run_suite_{script_basename}.sh"
     with open(runner_path, 'w', newline='\n') as f:
         f.write("#!/usr/bin/env bash\n")
-        f.write(f"# Main runner for {script_name}\n")
+        f.write(f"# Main runner for {actual_command}\n")
         f.write(f"# Generated: {timestamp}\n")
         f.write("# The runner handles all interactive prompting and file organization\n")
         f.write("#\n")
@@ -805,7 +833,7 @@ def generate_run_scripts(switches: List[Switch], script_name: str, depth: str, c
         f.write('runner_dir="$(cd "$(dirname "$0")" && pwd)"\n')
         f.write('\n')
         f.write('echo "=== Suite Runner ===\n"\n')
-        f.write('echo "Command under test: ' + script_name + '"\n')
+        f.write(f'echo "Command under test: {actual_command}"\n')
         f.write('echo "Runner directory: $runner_dir"\n')
         f.write('echo "Original directory (where generator ran): ' + str(cwd) + '"\n')
         f.write('echo ""\n')
@@ -964,7 +992,7 @@ def main():
     args = parser.parse_args()
     
     print("=" * 60)
-    print("CLI Batch Generator - Combinatorial Run Generator")
+    print("CLI Batch Generator - Combinatorial Run Generator (v2.2.5)")
     print("=" * 60)
     print(f"Current working directory: {Path.cwd()}")
     print("All run artifacts will be created here.")
@@ -1013,9 +1041,8 @@ def main():
         print("  - With flags: node --experimental-modules app.js")
         print("  - Quoted paths: 'python \"C:\\My Projects\\script.py\"'")
         print("")
-        print("Note: The script does NOT validate if this command exists -")
-        print("      that's your responsibility. The entire string you enter")
-        print("      will be used as the command prefix for all runs.")
+        print("Note: The script will resolve script paths to absolute paths.")
+        print("      Interpreters (python, node, etc.) are left as-is and found via PATH.")
         print("")
         script_name = get_user_input("Command to run", required=True)
         
@@ -1131,8 +1158,6 @@ def main():
             cmd_basename = re.sub(r'[^\w\-]', '_', cmd_basename)
             
             # Generate random suffix
-            import random
-            import string
             random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
             
             default_name = f"{cmd_basename}_config_{random_suffix}.json"
@@ -1159,8 +1184,6 @@ def main():
                     cmd_basename = re.sub(r'[^\w\-]', '_', cmd_basename)
                     
                     # Generate random suffix
-                    import random
-                    import string
                     random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
                     
                     default_name = f"{cmd_basename}_config_{random_suffix}.json"
