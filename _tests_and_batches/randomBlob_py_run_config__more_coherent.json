@@ -1,0 +1,49 @@
+{
+  "_instructions": "Load with CLI_batch_generator.py, this way, without the backticks: `python /path_to/CLI_batch_generator.py --config randomBlob_py_run_config__more_coherent_blobs.json`. Also, note the 'command': field in this config can take a value which is a full path or only the script name, and the batch generator will locate the script (if it is in PATH) and substitute the full path in created batches. Made by CLI_batch_generator.py 2.34.5. FOR randomBlob.py: -l 13 to -l 15 is the low end where gaps / smaller blobs or multi-blobs start to appear. -n 15 is the low end of acceptable for more coherent blobs; but -n 7 can get loose small / spattery blobs.",
+  "command": "python randomBlob.py -p 1",
+  "depth": "2",
+  "crit_filter": "H",
+  "switches": [
+    {
+      "name": "n",
+      "long_form": "",
+      "short_form": "-n",
+      "is_flag": false,
+      "values": [
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "24",
+        "28"
+      ],
+      "criticality": "H",
+      "required": true,
+      "conflicts_with": []
+    },
+    {
+      "name": "l",
+      "long_form": "",
+      "short_form": "-l",
+      "is_flag": false,
+      "values": [
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "24",
+        "28"
+      ],
+      "criticality": "H",
+      "required": true,
+      "conflicts_with": []
+    }
+  ]
+}
