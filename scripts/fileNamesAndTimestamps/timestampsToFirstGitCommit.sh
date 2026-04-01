@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Finds the oldest commit date for every file in this directory and all subdirectories, and sets the modification date of the file to the date and time of that earliest commit. SEE ALSO gitDumpAllFileVersions.sh, which for data archeology purposes around timestampe for a specific file (e.g. finding out the last time a file was commit in git, where the system's timestampe for a cloned or copied repo may differ), may be more efficient.
+# Finds the oldest commit date for every file in this directory and all subdirectories, and sets the creation date of the file to the date and time of that earliest commit. It seems to also set the modification date to the same? Maybe if the modification date was later than the creation date? And a creation date stamp may be unique to Windows, so maybe this is a Windows-only script. SEE ALSO gitDumpAllFileVersions.sh, which for data archeology purposes around timestampe for a specific file (e.g. finding out the last time a file was commit in git, where the system's timestampe for a cloned or copied repo may differ), may be more efficient.
 
 # DEPENDENCIES
 # Git, and for Windows, ExifTool. For Unix-like environments, GNU coreutils that come with most of them, including touch.
