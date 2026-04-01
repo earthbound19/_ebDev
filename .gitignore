@@ -31,3 +31,5 @@ image_bomber_dev
 *_rnd_images_processing__anim*
   # end text filtering excludes
 test_results.csv
+*.conf
+suite_*
