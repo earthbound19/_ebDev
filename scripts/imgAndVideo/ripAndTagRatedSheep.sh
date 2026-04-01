@@ -1,22 +1,41 @@
 # DESCRIPTION
-# Copies the video stream (lossless transcoding) of rated electric sheep .avi files (from the electric sheep content folder) into .mp4 videos in a specified directory. Examines the list_member.xml file to do so.
+# Copies the video stream (lossless transcoding) of rated electric sheep .avi files (from the electric sheep content folder) into .mp4 videos in a specified directory. Examines the list_none.xml (or via hacking list_member.xml) file to do so.
 
 # DEPENDENCIES
 # Electric Sheep screensaver, a 'Nixy environment (coded for MSYS2 on Windows)
 
 # USAGE
-# Set the variables at the start of the script per the locations of various files in your Electric Sheep screensaver install, and run the script without any parameter:
+# Create a file, ripAndTagRatedSheep.conf, which stores unix-path style variable assignments for the following variables, for which example assignments will be shown:
+# - sheep_content_XML_path, the full path to an XML file with local electric sheep video file information. This may be list_none.xml or list_member.xml.
+# - sheep_avis_local_path, the full path to the electric sheep storage folder for videos
+# - sheep_transcodedDestPath, the full path to a folder you wish to store the losslessly transcoded video copies
+# For example, again as the content of ripAndTagRatedSheep.conf ; see NOTES for more details:
+#
+#    sheep_content_XML_path='d/electric_sheep_content/content/xml/list_none.xml'
+#    sheep_avis_local_path='d/electric_sheep_content/content/mpeg'
+#    sheep_transcodedDestPath='/d/archive/video/electric_sheepses_mostest_favorites'
+#
+# With that configuration set up for import by the script, and with this script in your PATH, run the script:
 #    ripAndTagRatedSheep.sh
-# NOTE: at this writing list_none.xml has the newest generation and rated sheep.
-
+# NOTES:
+# - the code assumes that the paths in your configuration variable assigments don't end with a forward slash '/'.
+# - It may be that list_none.xml has the newest generation and rated sheep.
+# - it may also be that list_member.xml has sheep that are rated and can be downloaded.
+# - if you want multiple configurations you could create any file with the .conf extension, and store alternate values for the variables in them, and hack the start of the script to assign PATH_TO_CONFIG_FILE a different value (being the full path to your alternate configuration file)
+# - the config file path is assumed to be relative to this script itself; it is coded as just the config file name, assumed to be in the same directory as this script. It may be that it will also work as a relative path. That scenario has not been tested. It will probably not work as an absolute path, as this is coded to start the derived path with this script's directory ($0).
 
 # CODE
-# Global PATH VARIABLES:
-sheep_content_XML_path='/c/ProgramData/ElectricSheep/content/xml/list_member.xml'
-sheep_avis_local_path='/c/ProgramData/ElectricSheep/content/mpeg/'
-# NOTE: THE CODE ASSUMES that this path doesn't end with a forward slash '/':
-sheep_transcodedDestPath='/c/ratedSheep'
-# END global PATH VARIABLES
+# Global PATH VARIABLES import from config:
+PATH_TO_CONFIG_FILE="$(dirname "$0")/ripAndTagRatedSheep.conf"
+if [ -f "$PATH_TO_CONFIG_FILE" ]; then
+    source "$PATH_TO_CONFIG_FILE"
+	echo "values assigned from config file $PATH_TO_CONFIG_FILE:"
+	printf "  sheep_content_XML_path:\n    $sheep_content_XML_path\n"
+	printf "  sheep_avis_local_path:\n    $sheep_avis_local_path\n"
+	printf "  sheep_transcodedDestPath:\n    $sheep_transcodedDestPath\n"
+else
+    echo "ERROR: config file $PATH_TO_CONFIG_FILE not found. Exit. See comments of $0."
+fi
 
 # check paths and if any does not exist, error out.
 # I wanted to hide any error print with &>/dev/null but it's not liking that in the command substitution $() :
