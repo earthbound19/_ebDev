@@ -1,0 +1,65 @@
+Here's a concise summary of recommended tests for renumberFiles.sh:
+
+Option Parsing
+No arguments → show help
+
+Missing -e → exit 3
+
+-s with space (e.g., -s 42) → pre-scan catches, exit 1
+
+-s with non-numeric value → exit 4
+
+-x/-p/-d with space → pre-scan catches, exit 1
+
+-d with non-numeric → exit 5
+
+Both -o and -n → exit 6
+
+Sort Order
+Default (no -o/-n) → alphabetical by filename
+
+-o → oldest file first (ascending timestamp)
+
+-n → newest file first (descending timestamp)
+
+Collision Detection
+Numeric-only filename (e.g., 003.png) → exit 2, no files renamed
+
+Pre-existing target file → exit 2, no files renamed
+
+Clean directory with no collisions → succeeds
+
+Numbering & Padding
+Default numbering → starts at 0
+
+Custom start -s42 → starts at 42
+
+Auto-padding → based on file count
+
+Custom padding -d3 → zero-padded to 3 digits
+
+Prefix & Postfix
+-p alone → prefix before number
+
+-x alone → postfix after number, before extension
+
+Both -p and -x → prefix + number + postfix
+
+Recursion (-r)
+Current directory only (no -r)
+
+All subdirectories processed (-r)
+
+Empty subdirectory → skipped gracefully
+
+Edge Cases
+No matching files → message, continues
+
+Special characters/spaces in filenames → handled correctly
+
+Mixed case extensions (PNG vs png) → case-insensitive match
+
+Recursive Collision
+Collisions in subdirectories → detected, exit 2, no files renamed
+
+That's the core test coverage. Each test can be verified manually or via script.
