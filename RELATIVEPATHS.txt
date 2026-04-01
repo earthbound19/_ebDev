@@ -1,4 +1,4 @@
-_tests
+_tests_and_batches
 scripts
 scripts\admin
 scripts\admin\cygwin
