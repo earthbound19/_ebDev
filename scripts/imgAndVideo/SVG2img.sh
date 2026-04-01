@@ -63,5 +63,8 @@ else
 	# GRAPHICSMAGICK OPTION, which breaks on some svgs optimized via svgo :(  :
 	# gm convert -size $IMGsize $backgroundColorParam $svgFileName $svgFilenameNoExtension.$IMGformat
 	# IMAGEMAGICK OPTION (which doesn't break that way) :
-	magick -size $IMGsize $backgroundColorParam $svgFileName $svgFilenameNoExtension.$IMGformat
+	# DEPRECATED; results in shortest side being $2 pixels long, potentially scaling up another side to be larger:
+	# magick -size $IMGsize $backgroundColorParam $svgFileName $svgFilenameNoExtension.$IMGformat
+	# PREFERRED: resize so longest side = exactly IMGsize pixels
+	magick $backgroundColorParam $svgFileName -resize ${IMGsize}x${IMGsize} $svgFilenameNoExtension.$IMGformat
 fi
