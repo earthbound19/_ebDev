@@ -1,0 +1,57 @@
+{
+  "_instructions": "Load with CLI_batch_generator.py, this way: python /path_to/CLI_batch_generator.py --config HCT_quantize_get_dominant_colors-py_test_template.json -- adapting the --input value below for an actual image you want to sample.",
+  "command": "python HCT_quantize_get_dominant_colors.py --cores 0.85",
+  "depth": "3",
+  "crit_filter": "M",
+  "switches": [
+    {
+      "name": "input",
+      "long_form": "--input",
+      "short_form": "",
+      "is_flag": false,
+      "values": [
+        "Image_to_get_perceptual_color_samples_of.png"
+      ],
+      "criticality": "H",
+      "required": true,
+      "conflicts_with": []
+    },
+    {
+      "name": "n",
+      "long_form": "",
+      "short_form": "-n",
+      "is_flag": false,
+      "values": [
+        "17",
+        "29",
+        "58",
+        "116"
+      ],
+      "criticality": "H",
+      "required": true,
+      "conflicts_with": []
+    },
+    {
+      "name": "presets",
+      "long_form": "--preset",
+      "short_form": "",
+      "is_flag": false,
+      "values": [
+        "auto --auto-samples 32500",
+        "auto --weight-preset high-impact --auto-samples 32500",
+        "auto --weight-preset higher-impact --auto-samples 32500",
+        "auto --weight-preset hue-focused --auto-samples 32500",
+        "auto --weight-preset tone-focused --auto-samples 32500",
+        "--preset tone-focused",
+        "--preset color-focused",
+        "--preset pastel-bias",
+        "--preset high-impact",
+        "--preset higher-impact",
+        "--preset balanced"
+      ],
+      "criticality": "H",
+      "required": true,
+      "conflicts_with": []
+    }
+  ]
+}
