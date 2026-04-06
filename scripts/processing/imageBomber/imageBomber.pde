@@ -36,6 +36,8 @@
 
 // CODE
 // TO DO:
+// - fix many redundant image saves but no new cell render in current config?
+// - warn or workaround situations where no cells render anything on a grid?
 // - optional random palette retrieval and recoloring of colorizable source rasters (or SVGs??)
 // - randomRotationDegrees implementation and in config
 // - behavior update: make it so that with this (and other?) configs:
@@ -78,7 +80,7 @@ color[] colorsArray = {
 // END GLOBAL VARIABLES which you may alter
 
 // GLOBALS NOT TO CHANGE HERE; program logic or the developer may change them in program runs or updates:
-String scriptVersionString = "4-34-20";
+String scriptVersionString = "4-34-21";
 
 String animFramesSaveDir;
 int countedFrames = 0;
