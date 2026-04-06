@@ -10,6 +10,8 @@
 
 
 # CODE
+# TO DO
+# Use coloraide comparision instead? Deprecated CIECAM02 script / comparison?
 if [ ! -f paletteDifferenceRankings.txt ]
 then
 	echo "paletteDifferenceRankings.txt does not exist; will generate via call of allPalettesCompareCIECAM02.sh."

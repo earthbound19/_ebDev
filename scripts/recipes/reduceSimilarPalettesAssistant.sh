@@ -15,6 +15,8 @@
 
 
 # CODE
+# TO DO
+# Use coloraide comparision instead? Deprecated CIECAM02 script / comparison?
 deletePalettesBelowDifferenceThreshold=0.137
 
 currentDir=$(pwd)

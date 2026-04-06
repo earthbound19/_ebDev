@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Produces list of images in the current directory arranged by next most similar. Compares all images in a directory. For the first image, it lists which image is most similar to it, then does the same for the second, then third image, and on until the end of the image list. The result is a list of images where every image is adjacent to the two images which are most similar to it. See NOTES for potential uses. It may end up that sort order is not strict; there may be some some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list. I have not re-examined this since coding it and did not document that.
+# Produces list of images in the current directory arranged by next most similar. Compares all images in a directory. For the first image, it lists which image is most similar to it, then does the same for the second, then third image, and on until the end of the image list. The result is a list of images where every image is followed by an image most similar to it. See NOTES for potential uses. It may end up that sort order is not strict; there may be some some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list. I have not re-examined this since coding it, and did not document that other than leaving that note.
 
 # DEPENDENCIES
 # `printAllIMGfileNames.sh`, GraphicsMagick, image files in a directory to work on, and bash / GNU utilities
@@ -16,6 +16,7 @@
 # - See re_sort_imgsMostSimilar.sh to sort the result other ways.
 # - See the echo statement at the end of the script for notes on scripts that can do things with the result lists.
 # - Some potential uses: use file list with ffmpeg to create an animation jumping from one image to the next most similar, through the list. Render abstract art collections in animation by sort of most similar groups, quasi-un-randomize randomly color-filled (or palette random filled) renders from e.g. colored svg images. Jumble up movie frames from a film scene excerpt in a perhaps wrong but similar frame order, etc.
+# - In the result list, similarity, or rather difference comparison, is a decimal between 0 and 1. Difference is defined as nearer to 1; a difference threshold of 1 means the images are completely different (an RGB color space definition of "opposite," I think), and 0 means the images are identical.
 
 
 # CODE

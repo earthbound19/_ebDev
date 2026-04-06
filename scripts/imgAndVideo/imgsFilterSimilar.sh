@@ -1,13 +1,12 @@
 # DESCRIPTION
-# Sorts (filters) all images in the current directory which have similarity threshold $1 to image $2. Moves those sorted images into a randomly named subfolder (after the pattern _similar_images_<rndChars>) and prints the subfolder name when sorting is complete.
-
+# Sorts (filters) all images in the current directory into a subfodler if they have similarity threshold $1 to image $2. The subfolder is named after the pattern _similar_images_<rndChars>. Prints the subfolder name when sorting is complete.
 
 # DEPENDENCIES
 # `printAllIMGfileNames.sh`, GraphicsMagick, image files in the current directory to work on, and bash / GNU utilities
 
 # USAGE
 # Run with these parameters:
-# - $1 A decimal between 0 and 1, which is the difference threshold to consider a file similar enough to sort. Similarity is defined as nearer to 1; a difference threshold of 0 means the images are identical, and 1 means they're completely different. Comparisons where the found threshold are equal to or lower than this number will be sorted as meeting the difference threshold.
+# - $1 A decimal between 0 and 1, which is the difference threshold to consider a file similar enough to sort. Difference is defined as nearer to 1; a difference threshold of 1 means the images are completely different (an RGB color space definition of "opposite," I think), and 0 means the images are identical. Comparisons where the found threshold is equal to or lower than $1 will be sorted as meeting the difference threshold.
 # - $2 File name of image to compare all other images to.
 
 
