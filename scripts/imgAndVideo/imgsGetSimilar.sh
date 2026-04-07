@@ -21,28 +21,38 @@
 # - render abstract art collections in animation by sort of most similar groups
 # - order randomly color-filled (or palette random filled) renders from e.g. colored svg images by similarity
 # - jumble up movie frames from a film scene excerpt in a perhaps wrong but similar frame order
+# - downscaled images now stored in _imgsGetSimilarDownscales/ subfolder
+# - resume capability uses state file (imgsGetSimilar_state.txt) to track completed comparisons pairs
 
 
 # CODE
-# TO DO:
-# - create downscaled comparison images in a subfolder named _imgsGetSimilarDownscales, to keep things more tidy
-# - allow continuation of interrupted runs:
-#   - don't erase intermediary data files (shrunk images) (the pattern __superShrunkRc6d__*)
-#   - append to intermediary comparision info files on resume
-#   - ?
+STATE_FILE="imgsGetSimilar_state.txt"
+SCALED_SUBDIR="_imgsGetSimilarDownscales"
+
 if [ -f IMGlistByMostSimilar.txt ]; then echo "NOTE: information target file IMGlistByMostSimilar.txt already exists. To recreate it, rename or delete it and run this script again. Exit."; exit 1; fi
+
+# Check dependencies before proceeding
+command -v gm >/dev/null 2>&1 || { echo "ERROR: GraphicsMagick (gm) not found in PATH. Please install GraphicsMagick and ensure 'gm' command is available. Exit."; exit 1; }
 
 allIMGs=()
 if [ ! "$1" ]
 then
 	# this calls a script which prints a preset collection of image extensions
+	if ! command -v printAllIMGfileNames.sh >/dev/null 2>&1; then
+		echo "ERROR: printAllIMGfileNames.sh not found in PATH. Please provide file extension as parameter (e.g., 'png') or install this dependency. Exit."
+		exit 1
+	fi
 	allIMGs=( $(printAllIMGfileNames.sh) )
 else
 	allIMGs=( $(find . -maxdepth 1 -type f -iname "*.$1" -printf '%f\n') )
 fi
 
 # OPTIONAL wipe of all leftover files from previous run; comment out the next line if you don't want or need that:
+# NOTE: With resume capability enabled, wiping these files will prevent resuming. Only uncomment if you want a fresh start.
 # rm -rf ./_imgsGetSimilarDownscales/__superShrunkRc6d__*
+
+# Create subfolder for scaled images
+mkdir -p "$SCALED_SUBDIR"
 
 # calculate number of comparisons to be done as reference for feedback print; re https://www.calculator.net/permutation-and-combination-calculator.html?cnv=8&crv=2&x=55&y=16
 # yes, this is crazy. Do it with inline Python code calls to the Python interpreter;
@@ -69,22 +79,34 @@ fi
 echo Generating severely shrunken image copies to run comparisons against . . .
 for element in "${allIMGs[@]}"
 do
-	if [ -f "__superShrunkRc6d__""$element" ]
-	then
-				echo COMPARISON SOURCE FILE "__superShrunkRc6d__""$element" already exists\; assuming comparisons against it were already run\; skipping comparison.
-	else
-				echo converting $element to new shrunken image "__superShrunkRc6d__""$element" to make image comparison much faster . . .
-		# gm convert $element -scale 7 __superShrunkRc6d__$element
-		# gm convert $element -scale 11 __superShrunkRc6d__$element
-		gm convert $element -scale 48 __superShrunkRc6d__$element
+	scaled_path="$SCALED_SUBDIR/__superShrunkRc6d__$element"
+	if [ ! -f "$scaled_path" ]; then
+		echo converting $element to new shrunken image "$scaled_path" to make image comparison much faster . . .
+		gm convert "$element" -scale 48 "$scaled_path"
 	fi
 done
-printf "" > compare__superShrunkRc6d__col1.txt
-printf "" > compare__superShrunkRc6d__col2.txt
+
+# Initialize or read state file for resume capability
+if [ -f "$STATE_FILE" ]; then
+	completed_count=$(wc -l < "$STATE_FILE")
+	echo "Found state file $STATE_FILE with $completed_count lines"
+	echo "Resuming from previous run: $completed_count comparisons already completed."
+else
+	completed_count=0
+	echo "No state file found at $STATE_FILE"
+	echo "Starting fresh comparison run."
+	# Initialize comparison files
+	printf "" > compare__superShrunkRc6d__col1.txt
+	printf "" > compare__superShrunkRc6d__col2.txt
+fi
 
 # List all possible pairs of file type $1, order is not important, repetition is not allowed (math algorithm $1 pick 2).
 i_count=0
 j_count=0
+pair_counter=0
+skipped_count=0
+new_comparisons=0
+
 for i in ${allIMGs[@]}
 do
 	i_count=$(( i_count + 1 ))
@@ -92,20 +114,44 @@ do
 	allIMGs_innerLoop=("${allIMGs[@]:$i_count}")
 	for j in ${allIMGs_innerLoop[@]}
 	do
+		pair_counter=$(( pair_counter + 1 ))
+
+		# DEBUG: Show current pair and comparison limits
+		# echo "DEBUG: pair_counter=$pair_counter, completed_count=$completed_count"
+
+		# Skip already completed comparisons (resume logic)
+		if [ $pair_counter -le $completed_count ]; then
+			echo "Skipping already-completed comparison $pair_counter: $i | $j"
+			skipped_count=$(( skipped_count + 1 ))
+			continue
+		fi
+
+		# echo "DEBUG: PROCESSING pair $pair_counter ($i | $j) - this is NEW"
+		# If we get here, this is a new comparison we need to perform
+		new_comparisons=$(( new_comparisons + 1 ))
 		j_count=$(( j_count + 1 ))
+
 		echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
-		echo "MAKING COMPARISON $j_count of $numComparisonsToDo . . ."
+		echo "MAKING COMPARISON $new_comparisons of remaining comparisons (pair #$pair_counter of $numComparisonsToDo total) . . ."
 # Template GraphicsMagick compare command, re: http://www.ImageMagick.org/Usage/compare/
 # compare -metric MAE img_11.png img_3.png null: 2>&1
-				comp1="__superShrunkRc6d__""$i"
-				comp2="__superShrunkRc6d__""$j"
+		comp1="$SCALED_SUBDIR/__superShrunkRc6d__$i"
+		comp2="$SCALED_SUBDIR/__superShrunkRc6d__$j"
 		echo "comparing images: $i | $j . . . VIA COMMAND on proxy files for: gm compare -metric MAE $i $j null: 2>&1 | grep 'Total'"
-		metricPrint=`gm compare -metric MAE $comp1 $comp2 null: 2>&1 | grep 'Total'`
+		metricPrint=`gm compare -metric MAE "$comp1" "$comp2" null: 2>&1 | grep 'Total'`
 		# ODD ERRORS arise from mixed line-ending types, where gm returns windows-style, and printf commands produce Unix-style. Solution: write to separate column files, later (after these nested loop blocks) convert all gm-created files to Unix via dos2unix, then paste them into one file.
 		echo "$metricPrint" >> compare__superShrunkRc6d__col1.txt
 		printf "|$i|$j\n" >> compare__superShrunkRc6d__col2.txt
+
+		# Append to state file immediately after successful comparison
+		echo "$i|$j" >> "$STATE_FILE"
 	done
 done
+
+if [ $skipped_count -gt 0 ]; then
+	echo "Resumed: skipped $skipped_count already-completed comparisons."
+	echo "Performed $new_comparisons new comparisons."
+fi
 
 # Re prevous comment in nested loop blocks:
 dos2unix compare__superShrunkRc6d__col1.txt
@@ -151,8 +197,13 @@ dos2unix IMGlistByMostSimilar.txt
 
 # Rename comparison results list that has numeric image similarity rankings, and keep it around (don't delete it), so we can make further use of it via other scripts:
 mv comparisons__superShrunkRc6d__cols.txt imageDifferenceRankings.txt
-# Delete the other temp files:
-rm *__superShrunkRc6d__* tmp_fx49V6cdmuFp.txt
+
+# Clean up state file on successful completion
+rm -f "$STATE_FILE"
+
+# Delete the other temp files
+rm -f tmp_fx49V6cdmuFp.txt
+rm -f compare__superShrunkRc6d__col1.txt compare__superShrunkRc6d__col2.txt
 
 echo ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
-echo "FINIS! Results are in IMGlistByMostSimilar.txt and imageDifferenceRankings.txt. The former is a list sorted by approximately nearest most similar image. The latter is a list of all image comparison values. NOTE: A value approaching (or actually at!) zero (0) in the list means the compared images are near identical or are identical. A value approaching 1 (or at 1!) means they are nearly totally different (or actually opposite!) Scripts which may process these result lists: mkNumberedCopiesFromFileList.sh, ffmpegCrossfadeIMGsToVideoFromFileList.sh, ffmpegAnimFromFileList.sh, and maybe others."
+echo "FINIS! You may discard the downsized image comparison folder _imgsGetSimilarDownscales. Results are in IMGlistByMostSimilar.txt and imageDifferenceRankings.txt. The former is a list sorted by nearest most similar image. The latter is a list of all image comparison values. NOTE: A value approaching (or actually at!) zero (0) in the list means the compared images are near identical or are identical. A value approaching 1 (or at 1!) means they are nearly totally different (or actually opposite!) Scripts which may process these result lists: mkNumberedCopiesFromFileList.sh, ffmpegCrossfadeIMGsToVideoFromFileList.sh, ffmpegAnimFromFileList.sh, and maybe others."
