@@ -77,34 +77,34 @@ def display_image(index):
            image_file = image_files[current_index]
            if os.path.isfile(image_file):
                file_label.config(text=image_file + "\t(" + print_index + " of " + str(image_files_len) + ")")
-               
+
                # Open the image using Pillow
                pil_image = Image.open(image_file)
                width, height = pil_image.size
-               
+
                # Use consistent screen dimensions as reference (doesn't change between images)
                available_width = root.winfo_screenwidth() - 100
                available_height = root.winfo_screenheight() - 200
-               
+
                # Calculate resize maintaining aspect ratio, never upscale
                width_ratio = available_width / width
                height_ratio = available_height / height
                scale_factor = min(width_ratio, height_ratio, 1.0)
-               
+
                new_width = int(width * scale_factor)
                new_height = int(height * scale_factor)
-               
+
                # Resize the image using Pillow
                resized_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
-               
+
                # Convert the PIL image to a Tkinter-compatible format
                tk_image = ImageTk.PhotoImage(resized_image)
-               
+
                # Update the image label with the resized image
                image_label.config(image=tk_image)
                image_label.photo = tk_image
                image_label.update_idletasks()
-               
+
                break
            else:
                image_files.remove(image_file)
