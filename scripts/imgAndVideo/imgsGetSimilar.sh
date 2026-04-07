@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Produces list of images in the current directory arranged by next most similar. Compares all images in a directory. For the first image, it lists which image is most similar to it, then does the same for the second, then third image, and on until the end of the image list. The result is a list of images where every image is followed by an image most similar to it. See NOTES for potential uses. It may end up that sort order is not strict; there may be some some randomization in sorting so that most nearly-identical images are not always clumped together with least similar images toward the head or tail of the list. I have not re-examined this since coding it, and did not document that other than leaving that note.
+# Produces list of images in the current directory arranged by next most similar. Compares all images in a directory. For the first image, it lists which image is most similar to it, then does the same for the second, then third image, and so on until the end of the image list. The result is a list of images where every image is followed by an image most similar to it. See NOTES for potential uses. It may end up that sort order is not strict; there may be some randomization in sorting, so that most nearly-identical images are not always clumped together, with least similar images toward the head or tail of the list. I have not re-examined this since coding it, and did not document that other than leaving that note.
 
 # DEPENDENCIES
 # `printAllIMGfileNames.sh`, GraphicsMagick, image files in a directory to work on, and bash / GNU utilities
@@ -12,28 +12,37 @@
 # To compare all (supported) image formats in the current directory, run:
 #    imgsGetSimilar.sh
 # NOTES
-# - The comparison algorithm never compares the same image pair more than once.
+# - This never compares the same image pair more than once.
 # - See re_sort_imgsMostSimilar.sh to sort the result other ways.
 # - See the echo statement at the end of the script for notes on scripts that can do things with the result lists.
-# - Some potential uses: use file list with ffmpeg to create an animation jumping from one image to the next most similar, through the list. Render abstract art collections in animation by sort of most similar groups, quasi-un-randomize randomly color-filled (or palette random filled) renders from e.g. colored svg images. Jumble up movie frames from a film scene excerpt in a perhaps wrong but similar frame order, etc.
 # - In the result list, similarity, or rather difference comparison, is a decimal between 0 and 1. Difference is defined as nearer to 1; a difference threshold of 1 means the images are completely different (an RGB color space definition of "opposite," I think), and 0 means the images are identical.
+# Some potential uses:
+# - use file list with ffmpeg to create an animation jumping from one image to the next most similar, through the list.
+# - render abstract art collections in animation by sort of most similar groups
+# - order randomly color-filled (or palette random filled) renders from e.g. colored svg images by similarity
+# - jumble up movie frames from a film scene excerpt in a perhaps wrong but similar frame order
 
 
 # CODE
 # TO DO:
-# - Allow continuation of interrupted runs (do not erase temp files; rather append to them)? This means not resizing for comparision any pre-existing files of the pattern __superShrunkRc6d__*, not wiping comparision result temp files, picking up where comparisons left off, and . . . ? Unless until that is done, exit on detect of info target file:
+# - create downscaled comparison images in a subfolder named _imgsGetSimilarDownscales, to keep things more tidy
+# - allow continuation of interrupted runs:
+#   - don't erase intermediary data files (shrunk images) (the pattern __superShrunkRc6d__*)
+#   - append to intermediary comparision info files on resume
+#   - ?
 if [ -f IMGlistByMostSimilar.txt ]; then echo "NOTE: information target file IMGlistByMostSimilar.txt already exists. To recreate it, rename or delete it and run this script again. Exit."; exit 1; fi
 
 allIMGs=()
 if [ ! "$1" ]
 then
+	# this calls a script which prints a preset collection of image extensions
 	allIMGs=( $(printAllIMGfileNames.sh) )
 else
 	allIMGs=( $(find . -maxdepth 1 -type f -iname "*.$1" -printf '%f\n') )
 fi
 
 # OPTIONAL wipe of all leftover files from previous run; comment out the next line if you don't want or need that:
-rm -rf __superShrunkRc6d__*
+# rm -rf ./_imgsGetSimilarDownscales/__superShrunkRc6d__*
 
 # calculate number of comparisons to be done as reference for feedback print; re https://www.calculator.net/permutation-and-combination-calculator.html?cnv=8&crv=2&x=55&y=16
 # yes, this is crazy. Do it with inline Python code calls to the Python interpreter;
