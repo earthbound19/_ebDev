@@ -52,8 +52,24 @@ image_label.pack(pady=10)  # Center with padding, no expansion
 file_label = ttk.Label(frame, text="")
 file_label.pack(fill=tk.BOTH, expand=True)
 
+# Create status bar
+status_var = tk.StringVar()
+status_var.set("Ready")
+status_bar = ttk.Label(root, textvariable=status_var, relief=tk.SUNKEN, anchor=tk.W)
+status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+
 # Define a subfolder for discarded images
 discard_folder = "_discards"
+
+# Helper function to update status bar
+def update_status(message, is_error=False):
+    status_var.set(message)
+    if is_error:
+        status_bar.config(foreground="red")
+        root.after(3000, lambda: status_bar.config(foreground="black"))
+    else:
+        status_bar.config(foreground="black")
+        root.after(5000, lambda: status_var.set("Ready"))
 
 # Load image file list - parse by extracting content between single quotes
 image_files = []
@@ -140,6 +156,11 @@ def delete_image():
         with open(original_list_file, "w") as file_handle:
             for image_file in image_files:
                 file_handle.write(f"file '{image_file}'\n")
+        
+        # Report success
+        success_msg = f"Moved to {discard_folder}: {image_file}"
+        update_status(success_msg)
+        print(success_msg)
 
 # Function to rename the current image
 def rename_image():
@@ -161,36 +182,63 @@ def rename_image():
         entry = ttk.Entry(dialog, width=40)
         entry.pack(pady=5)
         entry.insert(0, base_name)
-        entry.icursor(tk.END)  # Move cursor to the end
+        entry.icursor(tk.END)
         entry.focus_set()
         
         # Variables to store the result
         result = [None]
+        should_close = [True]
+        
+        def show_error(message):
+            error_dialog = tk.Toplevel(root)
+            error_dialog.title("Rename Error")
+            error_dialog.transient(root)
+            error_dialog.grab_set()
+            ttk.Label(error_dialog, text=message, foreground="red").pack(pady=20, padx=20)
+            ttk.Button(error_dialog, text="OK", command=error_dialog.destroy).pack(pady=10)
+            error_dialog.update_idletasks()
+            x = root.winfo_x() + (root.winfo_width() // 2) - (error_dialog.winfo_width() // 2)
+            y = root.winfo_y() + (root.winfo_height() // 2) - (error_dialog.winfo_height() // 2)
+            error_dialog.geometry(f"+{x}+{y}")
+            update_status(message, is_error=True)
+            print(f"ERROR: {message}")
         
         def on_enter():
             new_base = entry.get().strip()
-            if new_base:
-                result[0] = new_base
+            if not new_base:
+                show_error("Filename cannot be empty.")
+                return
+            
+            # Validate filename characters
+            invalid_chars = r'[<>:"/\\|?*]'
+            if re.search(invalid_chars, new_base):
+                show_error(f"Invalid characters in filename.\nCannot use: < > : \" / \\ | ? *")
+                return
+            
+            result[0] = new_base
+            should_close[0] = True
             dialog.destroy()
         
         def on_cancel():
+            result[0] = None
+            should_close[0] = True
             dialog.destroy()
         
         # Create button frame
-        button_frame = ttk.Frame(dialog)
-        button_frame.pack(pady=10)
+        button_frame_widget = ttk.Frame(dialog)
+        button_frame_widget.pack(pady=10)
         
-        enter_button = ttk.Button(button_frame, text="ENTER", command=on_enter)
+        enter_button = ttk.Button(button_frame_widget, text="ENTER", command=on_enter)
         enter_button.pack(side=tk.LEFT, padx=5)
         
-        cancel_button = ttk.Button(button_frame, text="Cancel", command=on_cancel)
+        cancel_button = ttk.Button(button_frame_widget, text="Cancel", command=on_cancel)
         cancel_button.pack(side=tk.LEFT, padx=5)
         
         # Bind keyboard events
         dialog.bind("<Return>", lambda event: on_enter())
         dialog.bind("<Escape>", lambda event: on_cancel())
         
-        # Center the dialog relative to the main window
+        # Center the dialog
         dialog.update_idletasks()
         x = root.winfo_x() + (root.winfo_width() // 2) - (dialog.winfo_width() // 2)
         y = root.winfo_y() + (root.winfo_height() // 2) - (dialog.winfo_height() // 2)
@@ -207,37 +255,69 @@ def rename_image():
             
             # Check if target filename already exists
             if os.path.exists(new_path):
-                print(f"Error: {new_path} already exists. Rename cancelled.")
+                show_error(f"'{new_path}' already exists.")
                 return
             
+            # Try to rename the actual file
             try:
-                # Rename the actual file
                 os.rename(old_path, new_path)
-                # Update the image_files list
-                image_files[current_index] = new_name
-                # Update the original list file (IMGlistByMostSimilar.txt or custom)
+                print(f"File renamed: {old_name} -> {new_name}")
+            except Exception as e:
+                show_error(f"Failed to rename file:\n{e}")
+                return
+            
+            # File rename succeeded. Now update text files and track results
+            update_success = True
+            results = []
+            
+            # Update the original list file
+            try:
                 with open(original_list_file, "w") as file_handle:
                     for image_file in image_files:
                         file_handle.write(f"file '{image_file}'\n")
-                
-                # Update imageDifferenceRankings.txt if it exists
-                rankings_file = "imageDifferenceRankings.txt"
-                if os.path.exists(rankings_file):
+                results.append(f"[OK] Updated {original_list_file}")
+                print(f"[OK] Updated {original_list_file}")
+            except Exception as e:
+                update_success = False
+                results.append(f"[FAIL] Failed to update {original_list_file}: {e}")
+                print(f"[FAIL] Failed to update {original_list_file}: {e}")
+            
+            # Update imageDifferenceRankings.txt if it exists
+            rankings_file = "imageDifferenceRankings.txt"
+            if os.path.exists(rankings_file):
+                try:
                     with open(rankings_file, "r") as file_handle:
                         rankings_content = file_handle.read()
-                    
-                    # Replace all occurrences of the old filename with the new filename
                     updated_content = re.sub(re.escape(old_name), new_name, rankings_content)
-                    
                     with open(rankings_file, "w") as file_handle:
                         file_handle.write(updated_content)
-                    print(f"Updated {rankings_file} with new filename.")
-                
-                # Refresh the display
-                display_image(current_index)
-                print(f"Renamed: {old_name} -> {new_name}")
-            except Exception as e:
-                print(f"Error renaming file: {e}")
+                    results.append(f"[OK] Updated {rankings_file}")
+                    print(f"[OK] Updated {rankings_file}")
+                except Exception as e:
+                    update_success = False
+                    results.append(f"[FAIL] Failed to update {rankings_file}: {e}")
+                    print(f"[FAIL] Failed to update {rankings_file}: {e}")
+            else:
+                results.append(f"[SKIP] {rankings_file} not found")
+                print(f"[SKIP] {rankings_file} not found")
+            
+            # Update in-memory list
+            image_files[current_index] = new_name
+            
+            # Refresh the display
+            display_image(current_index)
+            
+            # Report cumulative results
+            summary = f"Renamed: {old_name} -> {new_name}"
+            if update_success:
+                ok_results = [r for r in results if r.startswith("[OK]")]
+                status_msg = summary + " | " + "; ".join(ok_results)
+                update_status(status_msg)
+                print(f"SUCCESS: {summary}")
+            else:
+                status_msg = summary + " (partial failure) | " + "; ".join(results)
+                update_status(status_msg, is_error=True)
+                print(f"PARTIAL FAILURE: {summary}")
 
 # Create a separate frame for buttons to keep them at bottom
 button_frame = ttk.Frame(root)
