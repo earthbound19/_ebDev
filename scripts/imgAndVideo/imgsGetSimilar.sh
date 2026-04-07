@@ -55,25 +55,8 @@ fi
 mkdir -p "$SCALED_SUBDIR"
 
 # calculate number of comparisons to be done as reference for feedback print; re https://www.calculator.net/permutation-and-combination-calculator.html?cnv=8&crv=2&x=55&y=16
-# yes, this is crazy. Do it with inline Python code calls to the Python interpreter;
-# see if Python is installed and gives errorlevel 0 for version check:
-python --version &>/dev/null
-if [ $? == 0 ]
-then
-	allIMGsArrLen=${#allIMGs[@]}
-	combinationsCalcNumerator=$(
-	echo $allIMGsArrLen | python -c 'import sys; import math; print(math.factorial(int(sys.stdin.readline())));'
-	)
-	combinationsCalcDenominator_calcOne=$(($allIMGsArrLen - 2))
-	combinationsCalcDenominator_calcTwo=$(
-	echo $combinationsCalcDenominator_calcOne | python -c 'import sys; import math; print(math.factorial(int(sys.stdin.readline())));'
-	)
-	# using Python here also because ridiculous integer digit counts broke bash math :)
-	combinationsCalcDenominator=$(python -c "val = 2 * $combinationsCalcDenominator_calcTwo; print(val)")
-	numComparisonsToDo=$(python -c "val = $combinationsCalcNumerator / $combinationsCalcDenominator; print(int(val))")
-else
-	numComparisonsToDo="(UNKNOWN -- you may wish to install Python and be sure it is in your PATH)"
-fi
+allIMGsArrLen=${#allIMGs[@]}
+numComparisonsToDo=$(( allIMGsArrLen * (allIMGsArrLen - 1) / 2 ))
 
 # Create heavily shrunken image copies to run comparison on.
 echo Generating severely shrunken image copies to run comparisons against . . .
