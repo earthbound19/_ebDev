@@ -16,7 +16,7 @@
 #    python /path/to/reduceIMGsimilarAssistant.py
 # Or if your comparison list file is named imageSorting01.txt, run:
 #    python /path/to/reduceIMGsimilarAssistant.py imageSorting01.txt
-# On launch, the script displays the first image in the list, with buttons to advance forward and backward through the list of images or delete them. Use the left arrow key or 'Back' button to navigate up (back) in the list, or the right arrow key or 'Forward' button to navigate forward in the list, and the 'Delete' key or button to move a viewed image into a _discards subfolder.
+# On launch, the script displays the first image in the list, with buttons to advance forward and backward through the list of images or delete them. Use the left arrow key or 'Back' button to navigate up (back) in the list, or the right arrow key or 'Forward' button to navigate forward in the list, and the 'Delete' key or button to move a viewed image into a _discards subfolder. Press F2 to rename the current image.
 
 # CODE
 import tkinter as tk
@@ -141,6 +141,104 @@ def delete_image():
             for image_file in image_files:
                 file_handle.write(f"file '{image_file}'\n")
 
+# Function to rename the current image
+def rename_image():
+    global current_index
+    if 0 <= current_index < len(image_files):
+        old_name = image_files[current_index]
+        base_name, extension = os.path.splitext(old_name)
+        
+        # Create custom dialog
+        dialog = tk.Toplevel(root)
+        dialog.title("Rename Image")
+        dialog.transient(root)
+        dialog.grab_set()
+        
+        # Create and pack widgets
+        label = ttk.Label(dialog, text="Enter new name (without extension):")
+        label.pack(pady=10)
+        
+        entry = ttk.Entry(dialog, width=40)
+        entry.pack(pady=5)
+        entry.insert(0, base_name)
+        entry.icursor(tk.END)  # Move cursor to the end
+        entry.focus_set()
+        
+        # Variables to store the result
+        result = [None]
+        
+        def on_enter():
+            new_base = entry.get().strip()
+            if new_base:
+                result[0] = new_base
+            dialog.destroy()
+        
+        def on_cancel():
+            dialog.destroy()
+        
+        # Create button frame
+        button_frame = ttk.Frame(dialog)
+        button_frame.pack(pady=10)
+        
+        enter_button = ttk.Button(button_frame, text="ENTER", command=on_enter)
+        enter_button.pack(side=tk.LEFT, padx=5)
+        
+        cancel_button = ttk.Button(button_frame, text="Cancel", command=on_cancel)
+        cancel_button.pack(side=tk.LEFT, padx=5)
+        
+        # Bind keyboard events
+        dialog.bind("<Return>", lambda event: on_enter())
+        dialog.bind("<Escape>", lambda event: on_cancel())
+        
+        # Center the dialog relative to the main window
+        dialog.update_idletasks()
+        x = root.winfo_x() + (root.winfo_width() // 2) - (dialog.winfo_width() // 2)
+        y = root.winfo_y() + (root.winfo_height() // 2) - (dialog.winfo_height() // 2)
+        dialog.geometry(f"+{x}+{y}")
+        
+        # Wait for dialog to close
+        root.wait_window(dialog)
+        
+        new_base = result[0]
+        if new_base and new_base != base_name:
+            new_name = new_base + extension
+            old_path = old_name
+            new_path = new_name
+            
+            # Check if target filename already exists
+            if os.path.exists(new_path):
+                print(f"Error: {new_path} already exists. Rename cancelled.")
+                return
+            
+            try:
+                # Rename the actual file
+                os.rename(old_path, new_path)
+                # Update the image_files list
+                image_files[current_index] = new_name
+                # Update the original list file (IMGlistByMostSimilar.txt or custom)
+                with open(original_list_file, "w") as file_handle:
+                    for image_file in image_files:
+                        file_handle.write(f"file '{image_file}'\n")
+                
+                # Update imageDifferenceRankings.txt if it exists
+                rankings_file = "imageDifferenceRankings.txt"
+                if os.path.exists(rankings_file):
+                    with open(rankings_file, "r") as file_handle:
+                        rankings_content = file_handle.read()
+                    
+                    # Replace all occurrences of the old filename with the new filename
+                    updated_content = re.sub(re.escape(old_name), new_name, rankings_content)
+                    
+                    with open(rankings_file, "w") as file_handle:
+                        file_handle.write(updated_content)
+                    print(f"Updated {rankings_file} with new filename.")
+                
+                # Refresh the display
+                display_image(current_index)
+                print(f"Renamed: {old_name} -> {new_name}")
+            except Exception as e:
+                print(f"Error renaming file: {e}")
+
 # Create a separate frame for buttons to keep them at bottom
 button_frame = ttk.Frame(root)
 button_frame.pack(side=tk.BOTTOM, fill=tk.X)
@@ -149,10 +247,12 @@ button_frame.pack(side=tk.BOTTOM, fill=tk.X)
 previous_button = ttk.Button(button_frame, text="Back (left arrow key)", command=previous_image)
 next_button = ttk.Button(button_frame, text="Forward (right arrow key)", command=next_image)
 delete_button = ttk.Button(button_frame, text="Sort to _discards (delete key)", command=delete_image)
+rename_button = ttk.Button(button_frame, text="Rename (F2)", command=rename_image)
 
 previous_button.pack(side=tk.LEFT, padx=5, pady=5)
 next_button.pack(side=tk.LEFT, padx=5, pady=5)
 delete_button.pack(side=tk.LEFT, padx=5, pady=5)
+rename_button.pack(side=tk.LEFT, padx=5, pady=5)
 
 # Display the first image
 display_image(current_index)
@@ -165,6 +265,8 @@ def on_key(event):
         next_image()
     elif event.keysym == "Delete":  # Delete key
         delete_image()
+    elif event.keysym == "F2":  # F2 key for rename
+        rename_image()
     elif event.keysym == "Escape":  # Escape key
         sys.exit()
 
@@ -172,6 +274,7 @@ def on_key(event):
 root.bind("<Left>", on_key)
 root.bind("<Right>", on_key)
 root.bind("<Delete>", on_key)
+root.bind("<F2>", on_key)
 root.bind("<Escape>", on_key)
 
 # Run the Tkinter main loop
