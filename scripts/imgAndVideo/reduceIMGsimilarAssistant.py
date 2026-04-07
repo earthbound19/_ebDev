@@ -18,13 +18,13 @@
 #    python /path/to/reduceIMGsimilarAssistant.py imageSorting01.txt
 # On launch, the script displays the first image in the list, with buttons to advance forward and backward through the list of images or delete them. Use the left arrow key or 'Back' button to navigate up (back) in the list, or the right arrow key or 'Forward' button to navigate forward in the list, and the 'Delete' key or button to move a viewed image into a _discards subfolder.
 
-
 # CODE
 import tkinter as tk
 from tkinter import ttk
 import os
 import sys
 import re
+from PIL import Image, ImageTk
 
 if len(sys.argv) > 1:       # positional parameter 1
     file_list = sys.argv[1]
@@ -32,6 +32,9 @@ if len(sys.argv) > 1:       # positional parameter 1
 else:
     file_list = "IMGlistByMostSimilar.txt"
     print('\nNo list file name (parameter 1) passed to script; defaulted to:', file_list)
+
+# Store the original list filename for later use when saving after deletions
+original_list_file = file_list
 
 # Initialize the main window
 root = tk.Tk()
@@ -43,7 +46,7 @@ frame.pack(fill=tk.BOTH, expand=True)
 
 # Create a label for displaying the image
 image_label = ttk.Label(frame)
-image_label.pack(fill=tk.BOTH, expand=True)
+image_label.pack(pady=10)  # Center with padding, no expansion
 
 # Create labels for displaying the file name
 file_label = ttk.Label(frame, text="")
@@ -52,22 +55,16 @@ file_label.pack(fill=tk.BOTH, expand=True)
 # Define a subfolder for discarded images
 discard_folder = "_discards"
 
-# Regex pattern to extract the file name
-pattern = r"[^'\"\s]+\.png"
-
-# Load image file list from IMGlistByMostSimilar.txt
+# Load image file list - parse by extracting content between single quotes
 image_files = []
-with open(file_list, "r") as file_list:
-    for line in file_list:
-        match = re.search(pattern, line)
+with open(original_list_file, "r") as file_handle:
+    for line in file_handle:
+        # Extract the filename between single quotes
+        match = re.search(r"'([^']+)'", line)
         if match:
-            image_files.append(match.group())
+            image_files.append(match.group(1))
 
 current_index = 0  # Current index of the displayed image
-
-import os
-import tkinter as tk
-from PIL import Image, ImageTk  # Import Pillow for image handling
 
 # Function to display the current image
 def display_image(index):
@@ -84,23 +81,21 @@ def display_image(index):
                # Open the image using Pillow
                pil_image = Image.open(image_file)
                width, height = pil_image.size
-               screen_width = image_label.winfo_screenwidth()
-               screen_height = image_label.winfo_screenheight()
                
-               # Maintain aspect ratio and fit to nearly the greatest available display dimension
-               downscale_factor = 0.9
-               if width > screen_width or height > screen_height:
-                   if width > screen_width:
-                       new_width = int(screen_width * downscale_factor)
-                       new_height = int(new_width * (height / width) * downscale_factor)
-                   else:
-                       new_height = int(screen_height * downscale_factor)
-                       new_width = int(screen_height * (width / height) * downscale_factor)
-               else:
-                   new_width, new_height = width, height
+               # Use consistent screen dimensions as reference (doesn't change between images)
+               available_width = root.winfo_screenwidth() - 100
+               available_height = root.winfo_screenheight() - 200
                
-               # Resize the image using Pillow without antialiasing
-               resized_image = pil_image.resize((new_width, new_height))
+               # Calculate resize maintaining aspect ratio, never upscale
+               width_ratio = available_width / width
+               height_ratio = available_height / height
+               scale_factor = min(width_ratio, height_ratio, 1.0)
+               
+               new_width = int(width * scale_factor)
+               new_height = int(height * scale_factor)
+               
+               # Resize the image using Pillow
+               resized_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
                
                # Convert the PIL image to a Tkinter-compatible format
                tk_image = ImageTk.PhotoImage(resized_image)
@@ -109,6 +104,7 @@ def display_image(index):
                image_label.config(image=tk_image)
                image_label.photo = tk_image
                image_label.update_idletasks()
+               
                break
            else:
                image_files.remove(image_file)
@@ -117,9 +113,6 @@ def display_image(index):
        if index >= len(image_files):
            print("No valid images found.")
            break
-
-
-
 
 # Function to navigate to the next image
 def next_image():
@@ -143,19 +136,23 @@ def delete_image():
         if current_index >= len(image_files):
             current_index = len(image_files) - 1
         display_image(current_index)
-        # Update the IMGlistByMostSimilar.txt file
-        with open("IMGlistByMostSimilar.txt", "w") as file_list:
+        # Update the original list file (not hardcoded)
+        with open(original_list_file, "w") as file_handle:
             for image_file in image_files:
-                file_list.write(f"file '{image_file}'\n")
+                file_handle.write(f"file '{image_file}'\n")
+
+# Create a separate frame for buttons to keep them at bottom
+button_frame = ttk.Frame(root)
+button_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
 # Create navigation buttons
-previous_button = ttk.Button(frame, text="Back (left arrow key)", command=previous_image)
-next_button = ttk.Button(frame, text="Forward (right arrow key)", command=next_image)
-delete_button = ttk.Button(frame, text="Sort to _discards (delete key)", command=delete_image)
+previous_button = ttk.Button(button_frame, text="Back (left arrow key)", command=previous_image)
+next_button = ttk.Button(button_frame, text="Forward (right arrow key)", command=next_image)
+delete_button = ttk.Button(button_frame, text="Sort to _discards (delete key)", command=delete_image)
 
-previous_button.pack(side=tk.LEFT)
-next_button.pack(side=tk.LEFT)
-delete_button.pack(side=tk.LEFT)
+previous_button.pack(side=tk.LEFT, padx=5, pady=5)
+next_button.pack(side=tk.LEFT, padx=5, pady=5)
+delete_button.pack(side=tk.LEFT, padx=5, pady=5)
 
 # Display the first image
 display_image(current_index)
