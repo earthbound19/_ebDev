@@ -1,4 +1,8 @@
 # DESCRIPTION
+# DEPRECATED, as it is less efficient and also non-idiomatic. Instead of this, in any script that you want to locate any file in PATH, do this:
+#    command -v <file or script name to locate on path>
+# -- or to capture that to a variable if you are for example looking for the full path to scriptName.py:
+#    fullPathToScript=$(command -v scriptName.py)
 # Searches for file name $1 (parameter 1) and prints the full path to it if found. Tries the current directory first, then tries which`, and if that fails, searches every directory in $PATH. Can help other scripts find the full path to a script or resource they use, if they capture and utilize the printed output from this.
 
 # USAGE
