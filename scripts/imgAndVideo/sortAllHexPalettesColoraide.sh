@@ -7,7 +7,7 @@
 
 # USAGE
 # With more than one .hexplt file in your current directory, and `sortSRGBhexColorsColoraide.py` in your PATH, run with these parameters:
-# - $1 OPTIONAL. Surrounded by quote marks, the same parameters as you would pass to `sortSRGBhexColorsColoraide.py` (see), but without any input file parameter. You don't want to specify any input file because this script repeatedly calls `sortSRGBhexColorsColoraide.py` with your parameters but a different source file paramater for each call. (At this writing the input file parameter is -i; don't use -i.) To clarify this, read on to examples.
+# - $1 OPTIONAL. Surrounded by quote marks, the same parameters as you would pass to `sortSRGBhexColorsColoraide.py` (see), but without any input file parameter. NOTES: 1. This script adds -w (overwrite original file); you don't need to add that. 2. You don't want to specify any input file because this script repeatedly calls `sortSRGBhexColorsColoraide.py` with your parameters but a different source file paramater for each call. At this writing the input file parameter is -i; don't use -i. To clarify this, read on for examples.
 # - $2 OPTIONAL. Anything, such as the word FROGBALF, which will cause the script to also search for `.hexplt` files in all subdirectories under the current directory, and call `sortSRGBhexColorsColoraide.py` for all such found `.hexplt` files (in subdirectories) also. If omitted, only `.hexplt` files in the current directory will be found and passed to `sortSRGBhexColorsColoraide.py`. To use this parameter but not $1, pass an empty string '' (two single or double quote marks in a row) for $1, thereby effectively passing nothing for $1 (which will cause the called script to use any default options).
 # EXAMPLES
 # At this writing, the following examples are current; if you find they don't work, refer to the documentation in `sortSRGBhexColorsColoraide.py`:
@@ -37,7 +37,8 @@ if [ ! "$2" ]; then maxdepthParameter='-maxdepth 1'; fi
 
 array=( $(find . $maxdepthParameter -type f -iname \*.hexplt -printf '%P\n') )
 
-fullPathToPythonScript=$(getFullPathToFile.sh sortSRGBhexColorsColoraide.py)
+dependencyScriptFileName='sortSRGBhexColorsColoraide.py'
+fullPathToPythonScript=$(command -v $dependencyScriptFileName)
 if [ "$fullPathToPythonScript" == "" ]; then echo "ERROR: dependency script sortSRGBhexColorsColoraide.py not found in your PATH. Exit."; fi
 
 for element in ${array[@]}
