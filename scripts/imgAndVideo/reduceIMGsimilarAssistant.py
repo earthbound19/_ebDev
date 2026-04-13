@@ -8,10 +8,8 @@
 # Python with the tkinter library installed, a populated image file list `IMGlistByMostSimilar.txt` (or other file name; see comments of `imgsGetSimilar.sh`), and image files in that list in the same directory also.
 
 # USAGE
-# Call this script from python, with these parameters to Python and the script:
-# - REQUIRED sys.argv[0] (for Python) : the path to this script; e.g:
-#    /path/to/reduceIMGsimilarAssistant.py
-# - OPTIONAL sys.argv[1] name of a text file which is a list of images ordered (for example by next most similar image). Such a file may be made by `imgsGetSimilar.sh` etc. If omitted, the script defaults to search for `IMGlistByMostSimilar.txt` in the directory your run this from, and assumes that is the list if it finds it. The images in the list file should be in the same directory.
+# Call this script from Python with these parameters:
+# - OPTIONAL sys.argv[1] name of a text file which is a list of images. Such a file may be made by `imgsGetSimilar.sh` etc. If omitted, the script defaults to search for `IMGlistByMostSimilar.txt` in the directory your run this from, and assumes that is the list if it finds it. The images in the list file should be in the same directory.
 # For example, to run this script without specifying the file name of the list of image comparisons, and use the default `IMGlistByMostSimilar.txt`:
 #    python /path/to/reduceIMGsimilarAssistant.py
 # Or if your comparison list file is named imageSorting01.txt, run:
@@ -38,7 +36,7 @@ original_list_file = file_list
 
 # Initialize the main window
 root = tk.Tk()
-root.title("IMGlistByMostSimilar Reduce Assistant (list: " + file_list + ")")  # Updated window title
+root.title("IMGlistByMostSimilar Reduce Assistant (list: " + file_list + ")")
 
 # Create a frame for the image and navigation buttons
 frame = ttk.Frame(root)
@@ -46,7 +44,7 @@ frame.pack(fill=tk.BOTH, expand=True)
 
 # Create a label for displaying the image
 image_label = ttk.Label(frame)
-image_label.pack(pady=10)  # Center with padding, no expansion
+image_label.pack(pady=10)
 
 # Create labels for displaying the file name
 file_label = ttk.Label(frame, text="")
@@ -58,8 +56,31 @@ status_var.set("Ready")
 status_bar = ttk.Label(root, textvariable=status_var, relief=tk.SUNKEN, anchor=tk.W)
 status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 
-# Define a subfolder for discarded images
+# Define a subfolder for discarded images (in the current working directory)
 discard_folder = "_discards"
+working_dir = os.getcwd()  # Directory where script is run from (where _discards should go)
+
+# Helper function to normalize path separators for consistent handling
+def normalize_path(path):
+    """Convert any path to use os.sep"""
+    # Replace backslashes with forward slashes first for consistency
+    path = path.replace('\\', '/')
+    # Handle MSYS2/Cygwin paths that might start with /cygdrive/
+    if path.startswith('/cygdrive/'):
+        # Convert /cygdrive/c/path to C:/path
+        drive_letter = path[10]  # character after /cygdrive/
+        path = f"{drive_letter.upper()}:/" + path[12:]
+    # Convert to native path separators
+    return os.path.normpath(path)
+
+# Helper function to get full path for file operations
+def get_full_path(relative_path):
+    """Convert relative or absolute path to a usable full path"""
+    normalized = normalize_path(relative_path)
+    # If it's absolute, use it directly; otherwise join with script directory
+    if os.path.isabs(normalized):
+        return normalized
+    return os.path.join(working_dir, normalized)
 
 # Helper function to update status bar
 def update_status(message, is_error=False):
@@ -71,64 +92,82 @@ def update_status(message, is_error=False):
         status_bar.config(foreground="black")
         root.after(5000, lambda: status_var.set("Ready"))
 
-# Load image file list - parse by extracting content between single quotes
-image_files = []
+# Load image file list - parse by extracting content between single quotes OR plain filenames
+image_files = []  # Store paths as they appear in the list (relative or absolute)
 with open(original_list_file, "r") as file_handle:
     for line in file_handle:
-        # Extract the filename between single quotes
+        line = line.strip()
+        if not line:
+            continue
+        
+        # Try to extract filename between single quotes first
         match = re.search(r"'([^']+)'", line)
         if match:
             image_files.append(match.group(1))
+        else:
+            # If no quotes found, assume the entire line is the filename
+            # But strip off "file " prefix if it exists without quotes
+            if line.startswith('file '):
+                line = line[5:]  # Remove 'file ' prefix
+            image_files.append(line)
 
 current_index = 0  # Current index of the displayed image
 
 # Function to display the current image
 def display_image(index):
-   global current_index
-   image_files_len = len(image_files)
-   while True:
-       if 0 <= index < len(image_files):
-           current_index = index
-           print_index = str(current_index + 1)
-           image_file = image_files[current_index]
-           if os.path.isfile(image_file):
-               file_label.config(text=image_file + "\t(" + print_index + " of " + str(image_files_len) + ")")
-
-               # Open the image using Pillow
-               pil_image = Image.open(image_file)
-               width, height = pil_image.size
-
-               # Use consistent screen dimensions as reference (doesn't change between images)
-               available_width = root.winfo_screenwidth() - 100
-               available_height = root.winfo_screenheight() - 200
-
-               # Calculate resize maintaining aspect ratio, never upscale
-               width_ratio = available_width / width
-               height_ratio = available_height / height
-               scale_factor = min(width_ratio, height_ratio, 1.0)
-
-               new_width = int(width * scale_factor)
-               new_height = int(height * scale_factor)
-
-               # Resize the image using Pillow
-               resized_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
-
-               # Convert the PIL image to a Tkinter-compatible format
-               tk_image = ImageTk.PhotoImage(resized_image)
-
-               # Update the image label with the resized image
-               image_label.config(image=tk_image)
-               image_label.photo = tk_image
-               image_label.update_idletasks()
-
-               break
-           else:
-               image_files.remove(image_file)
-               image_files_len = len(image_files)
-       index += 1
-       if index >= len(image_files):
-           print("No valid images found.")
-           break
+    global current_index
+    image_files_len = len(image_files)
+    while True:
+        if 0 <= index < len(image_files):
+            current_index = index
+            print_index = str(current_index + 1)
+            image_path = image_files[current_index]
+            full_path = get_full_path(image_path)
+            
+            if os.path.isfile(full_path):
+                file_label.config(text=f"{image_path}\n({print_index} of {str(image_files_len)})")
+                
+                # Open the image using Pillow
+                pil_image = Image.open(full_path)
+                width, height = pil_image.size
+                
+                # Use consistent screen dimensions as reference (doesn't change between images)
+                available_width = root.winfo_screenwidth() - 100
+                available_height = root.winfo_screenheight() - 200
+                
+                # Calculate resize maintaining aspect ratio, never upscale
+                width_ratio = available_width / width
+                height_ratio = available_height / height
+                scale_factor = min(width_ratio, height_ratio, 1.0)
+                
+                new_width = int(width * scale_factor)
+                new_height = int(height * scale_factor)
+                
+                # Resize the image using Pillow
+                resized_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
+                
+                # Convert the PIL image to a Tkinter-compatible format
+                tk_image = ImageTk.PhotoImage(resized_image)
+                
+                # Update the image label with the resized image
+                image_label.config(image=tk_image)
+                image_label.photo = tk_image
+                image_label.update_idletasks()
+                
+                break
+            else:
+                print(f"Warning: Image not found: {full_path}")
+                del image_files[current_index]
+                image_files_len = len(image_files)
+                if index >= image_files_len:
+                    index = image_files_len - 1
+                continue
+        else:
+            if index >= len(image_files) and len(image_files) > 0:
+                index = len(image_files) - 1
+            else:
+                print("No valid images found.")
+                break
 
 # Function to navigate to the next image
 def next_image():
@@ -140,34 +179,50 @@ def previous_image():
 
 # Function to delete the current image
 def delete_image():
-    # check for this folder on every discard attempt because I would rather not presume to create an empty subfolder on loading the script if I end up discarding nothing. (Even if this may end up causing redundant wasteful checks):
-    if not os.path.exists(discard_folder):
-        os.mkdir(discard_folder)
+    # Create discard folder if it doesn't exist (in script directory)
+    discard_path = os.path.join(working_dir, discard_folder)
+    if not os.path.exists(discard_path):
+        os.mkdir(discard_path)
+    
     global current_index
     if 0 <= current_index < len(image_files):
-        image_file = image_files[current_index]
-        discarded_path = os.path.join(discard_folder, os.path.basename(image_file))
-        os.rename(image_file, discarded_path)
-        del image_files[current_index]
-        if current_index >= len(image_files):
-            current_index = len(image_files) - 1
-        display_image(current_index)
-        # Update the original list file (not hardcoded)
-        with open(original_list_file, "w") as file_handle:
-            for image_file in image_files:
-                file_handle.write(f"file '{image_file}'\n")
+        image_path = image_files[current_index]
+        full_path = get_full_path(image_path)
         
-        # Report success
-        success_msg = f"Moved to {discard_folder}: {image_file}"
-        update_status(success_msg)
-        print(success_msg)
+        # Create a safe filename for discard (flatten subfolders)
+        safe_name = image_path.replace(os.sep, '_').replace('/', '_').replace('\\', '_')
+        discarded_path = os.path.join(discard_path, safe_name)
+        
+        try:
+            os.rename(full_path, discarded_path)
+            del image_files[current_index]
+            
+            if current_index >= len(image_files):
+                current_index = len(image_files) - 1
+            display_image(current_index)
+            
+            # Update the original list file
+            with open(original_list_file, "w") as file_handle:
+                for img_path in image_files:
+                    file_handle.write(f"file '{img_path}'\n")
+            
+            success_msg = f"Moved to {discard_folder}/{safe_name}: {image_path}"
+            update_status(success_msg)
+            print(success_msg)
+        except Exception as e:
+            error_msg = f"Failed to move {image_path}: {e}"
+            update_status(error_msg, is_error=True)
+            print(error_msg)
 
 # Function to rename the current image
 def rename_image():
     global current_index
     if 0 <= current_index < len(image_files):
-        old_name = image_files[current_index]
-        base_name, extension = os.path.splitext(old_name)
+        old_path = image_files[current_index]
+        old_full_path = get_full_path(old_path)
+        old_dir = os.path.dirname(old_full_path)
+        old_basename = os.path.basename(old_path)
+        old_base, extension = os.path.splitext(old_basename)
         
         # Create custom dialog
         dialog = tk.Toplevel(root)
@@ -181,13 +236,11 @@ def rename_image():
         
         entry = ttk.Entry(dialog, width=40)
         entry.pack(pady=5)
-        entry.insert(0, base_name)
+        entry.insert(0, old_base)
         entry.icursor(tk.END)
         entry.focus_set()
         
-        # Variables to store the result
         result = [None]
-        should_close = [True]
         
         def show_error(message):
             error_dialog = tk.Toplevel(root)
@@ -209,22 +262,18 @@ def rename_image():
                 show_error("Filename cannot be empty.")
                 return
             
-            # Validate filename characters
             invalid_chars = r'[<>:"/\\|?*]'
             if re.search(invalid_chars, new_base):
                 show_error(f"Invalid characters in filename.\nCannot use: < > : \" / \\ | ? *")
                 return
             
             result[0] = new_base
-            should_close[0] = True
             dialog.destroy()
         
         def on_cancel():
             result[0] = None
-            should_close[0] = True
             dialog.destroy()
         
-        # Create button frame
         button_frame_widget = ttk.Frame(dialog)
         button_frame_widget.pack(pady=10)
         
@@ -234,53 +283,46 @@ def rename_image():
         cancel_button = ttk.Button(button_frame_widget, text="Cancel", command=on_cancel)
         cancel_button.pack(side=tk.LEFT, padx=5)
         
-        # Bind keyboard events
         dialog.bind("<Return>", lambda event: on_enter())
         dialog.bind("<Escape>", lambda event: on_cancel())
         
-        # Center the dialog
         dialog.update_idletasks()
         x = root.winfo_x() + (root.winfo_width() // 2) - (dialog.winfo_width() // 2)
         y = root.winfo_y() + (root.winfo_height() // 2) - (dialog.winfo_height() // 2)
         dialog.geometry(f"+{x}+{y}")
         
-        # Wait for dialog to close
         root.wait_window(dialog)
         
         new_base = result[0]
-        if new_base and new_base != base_name:
-            new_name = new_base + extension
-            old_path = old_name
-            new_path = new_name
+        if new_base and new_base != old_base:
+            new_filename = new_base + extension
+            new_full_path = os.path.join(old_dir, new_filename)
             
-            # Check if target filename already exists
-            if os.path.exists(new_path):
+            # Determine the relative path for storing in list
+            try:
+                new_path = os.path.relpath(new_full_path, working_dir)
+            except ValueError:
+                # Different drives on Windows
+                new_path = new_full_path
+            
+            if os.path.exists(new_full_path):
                 show_error(f"'{new_path}' already exists.")
                 return
             
-            # Try to rename the actual file
             try:
-                os.rename(old_path, new_path)
-                print(f"File renamed: {old_name} -> {new_name}")
+                os.rename(old_full_path, new_full_path)
+                print(f"File renamed: {old_path} -> {new_path}")
             except Exception as e:
                 show_error(f"Failed to rename file:\n{e}")
                 return
             
-            # File rename succeeded. Now update text files and track results
-            update_success = True
-            results = []
+            # Update the list
+            image_files[current_index] = new_path
             
             # Update the original list file
-            try:
-                with open(original_list_file, "w") as file_handle:
-                    for image_file in image_files:
-                        file_handle.write(f"file '{image_file}'\n")
-                results.append(f"[OK] Updated {original_list_file}")
-                print(f"[OK] Updated {original_list_file}")
-            except Exception as e:
-                update_success = False
-                results.append(f"[FAIL] Failed to update {original_list_file}: {e}")
-                print(f"[FAIL] Failed to update {original_list_file}: {e}")
+            with open(original_list_file, "w") as file_handle:
+                for img_path in image_files:
+                    file_handle.write(f"file '{img_path}'\n")
             
             # Update imageDifferenceRankings.txt if it exists
             rankings_file = "imageDifferenceRankings.txt"
@@ -288,36 +330,20 @@ def rename_image():
                 try:
                     with open(rankings_file, "r") as file_handle:
                         rankings_content = file_handle.read()
-                    updated_content = re.sub(re.escape(old_name), new_name, rankings_content)
+                    escaped_old = re.escape(old_path)
+                    updated_content = re.sub(escaped_old, new_path, rankings_content)
                     with open(rankings_file, "w") as file_handle:
                         file_handle.write(updated_content)
-                    results.append(f"[OK] Updated {rankings_file}")
                     print(f"[OK] Updated {rankings_file}")
                 except Exception as e:
-                    update_success = False
-                    results.append(f"[FAIL] Failed to update {rankings_file}: {e}")
                     print(f"[FAIL] Failed to update {rankings_file}: {e}")
-            else:
-                results.append(f"[SKIP] {rankings_file} not found")
-                print(f"[SKIP] {rankings_file} not found")
-            
-            # Update in-memory list
-            image_files[current_index] = new_name
             
             # Refresh the display
             display_image(current_index)
             
-            # Report cumulative results
-            summary = f"Renamed: {old_name} -> {new_name}"
-            if update_success:
-                ok_results = [r for r in results if r.startswith("[OK]")]
-                status_msg = summary + " | " + "; ".join(ok_results)
-                update_status(status_msg)
-                print(f"SUCCESS: {summary}")
-            else:
-                status_msg = summary + " (partial failure) | " + "; ".join(results)
-                update_status(status_msg, is_error=True)
-                print(f"PARTIAL FAILURE: {summary}")
+            success_msg = f"Renamed: {old_path} -> {new_path}"
+            update_status(success_msg)
+            print(f"SUCCESS: {success_msg}")
 
 # Create a separate frame for buttons to keep them at bottom
 button_frame = ttk.Frame(root)
@@ -339,15 +365,15 @@ display_image(current_index)
 
 # Function to handle keypress events
 def on_key(event):
-    if event.keysym == "Left":  # Left arrow key
+    if event.keysym == "Left":
         previous_image()
-    elif event.keysym == "Right":  # Right arrow key
+    elif event.keysym == "Right":
         next_image()
-    elif event.keysym == "Delete":  # Delete key
+    elif event.keysym == "Delete":
         delete_image()
-    elif event.keysym == "F2":  # F2 key for rename
+    elif event.keysym == "F2":
         rename_image()
-    elif event.keysym == "Escape":  # Escape key
+    elif event.keysym == "Escape":
         sys.exit()
 
 # Bind keypress events to the root window
