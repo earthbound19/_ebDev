@@ -1,6 +1,6 @@
 # DESCRIPTION
-# Analyzes and/or crops borders from images based on alpha (transparency) or bright pixels.
-# Supports two cropping modes: alpha (transparency channel) or bright (non-alpha / opaque bright pixels).
+# Analyzes and/or crops borders from images based on alpha (transparency), bright pixels, or dark pixels.
+# Supports three cropping modes: alpha (transparency channel), bright (opaque bright pixels), or dark (dark/black pixels).
 # Includes diagnostic mode to help determine optimal parameters, and auto mode to choose
 # the best cropping method automatically.
 
@@ -17,6 +17,7 @@
 # BASIC USAGE:
 #   python cropTransparencyOffAllImages.py -t png --mode alpha --threshold 0.95
 #   python cropTransparencyOffAllImages.py -t jpg --mode bright --threshold 0.90 -o
+#   python cropTransparencyOffAllImages.py -t png --mode dark --threshold 0.95
 #   python cropTransparencyOffAllImages.py -t png --auto --threshold 0.95
 #   python cropTransparencyOffAllImages.py -t png --diagnose
 #
@@ -25,24 +26,26 @@
 #                     Case insensitive - will match .PNG, .JPG, etc.
 #
 # CROP MODE ARGUMENTS (mutually exclusive - pick one):
-#   -m, --mode        {alpha,bright}  Explicitly choose cropping mode:
+#   -m, --mode        {alpha,bright,dark}  Explicitly choose cropping mode:
 #                       alpha  - Crop based on transparency channel
 #                                (removes transparent borders)
 #                       bright - Crop based on pixel brightness
 #                                (removes white or bright-colored borders)
+#                       dark   - Crop based on pixel darkness
+#                                (removes black or dark-colored borders)
 #   
 #   -a, --auto        Automatically choose best mode for each image
-#                     Compares alpha and bright results and picks the one
+#                     Compares alpha, bright, and dark results and picks the one
 #                     that removes more pixels (produces smaller image)
 #
 #   -d, --diagnose    Run in diagnostic mode (analyze only, no file changes)
-#                     Shows detailed analysis of alpha and bright pixels,
+#                     Shows detailed analysis of alpha, bright, and dark pixels,
 #                     predicts crop results at various thresholds, and
 #                     recommends optimal settings.
 #
 # THRESHOLD ARGUMENT:
 #   --threshold       Decimal value 0.0-1.0 controlling how aggressive the cropping is.
-#                     Default: 1.0 (crop only pure transparent or pure white)
+#                     Default: 1.0 (crop only pure transparent, pure white, or pure black)
 #                     
 #                     In ALPHA mode:
 #                       threshold = 0.95 means "crop off pixels that are 95% transparent or more"
@@ -55,6 +58,12 @@
 #                       (internally: pixels with each RGB channel >= 0.95*255 = 242 are considered bright)
 #                       Lower threshold = more aggressive cropping (includes off-white, light colors)
 #                       Higher threshold = less aggressive (only pure white #FFFFFF)
+#
+#                     In DARK mode:
+#                       threshold = 0.95 means "crop off pixels that are 95% dark or more"
+#                       (internally: pixels with each RGB channel <= (1-0.95)*255 = 12 are considered dark)
+#                       Lower threshold = more aggressive cropping (includes dark grays, near-black colors)
+#                       Higher threshold = less aggressive (only pure black #000000)
 #
 # OUTPUT CONTROL:
 #   -o, --overwrite   Overwrite original files instead of creating new _cropped files
@@ -70,11 +79,14 @@
 #    Crop all JPGs, removing white borders with 90% threshold:
 #      python cropTransparencyOffAllImages.py -t jpg --mode bright --threshold 0.90
 #
+#    Crop all JPGs, removing black borders with 95% threshold:
+#      python cropTransparencyOffAllImages.py -t jpg --mode dark --threshold 0.95
+#
 #    Crop all PNGs, removing transparent borders, overwrite originals:
 #      python cropTransparencyOffAllImages.py -t png --mode alpha -o
 #
 # 2. AUTO MODE:
-#    Let the script decide alpha vs bright for each PNG (95% threshold):
+#    Let the script decide alpha vs bright vs dark for each PNG (95% threshold):
 #      python cropTransparencyOffAllImages.py -t png --auto --threshold 0.95
 #
 #    Auto mode with aggressive cropping (80% threshold) on JPGs:
@@ -115,6 +127,9 @@
 #    Aggressive bright cropping for scanned documents:
 #      python cropTransparencyOffAllImages.py -t jpg --mode bright --threshold 0.85 -o
 #
+#    Aggressive dark cropping for product photos on black background:
+#      python cropTransparencyOffAllImages.py -t png --mode dark --threshold 0.85 -o
+#
 #    Conservative alpha cropping for UI assets:
 #      python cropTransparencyOffAllImages.py -t png --mode alpha --threshold 0.99
 #
@@ -128,10 +143,15 @@
 #     * If borders are pure white (#FFFFFF), use threshold 1.0
 #     * If borders are off-white or have anti-aliasing, lower threshold (0.90-0.95)
 #   
+#   - For dark mode: Look at the "Dark thresholds" section
+#     * If borders are pure black (#000000), use threshold 1.0
+#     * If borders are dark gray or have anti-aliasing, lower threshold (0.90-0.95)
+#   
 #   - In auto mode: Script picks the more aggressive crop at your threshold
 #   
 #   - Recommended starting points:
 #     * Screenshots with white backgrounds: --mode bright --threshold 0.95
+#     * Product photos on black backgrounds: --mode dark --threshold 0.95
 #     * PNG graphics with transparency: --mode alpha --threshold 0.98
 #     * Mixed content: --auto --threshold 0.95
 #     * Unknown images: --diagnose first!
@@ -144,7 +164,7 @@ import numpy as np
 from PIL import Image
 
 parser = argparse.ArgumentParser(
-    description='Analyze and/or crop borders from images based on alpha (transparency) or bright pixels.'
+    description='Analyze and/or crop borders from images based on alpha (transparency), bright pixels, or dark pixels.'
 )
 parser.add_argument(
     '-t', '--type',
@@ -153,19 +173,19 @@ parser.add_argument(
 )
 parser.add_argument(
     '-m', '--mode',
-    choices=['alpha', 'bright'],
-    help='Crop mode: "alpha" (transparency) or "bright" (bright pixels). Not needed if using --auto.'
+    choices=['alpha', 'bright', 'dark'],
+    help='Crop mode: "alpha" (transparency), "bright" (bright pixels), or "dark" (dark pixels). Not needed if using --auto.'
 )
 parser.add_argument(
     '--threshold',
     type=float,
     default=1.0,
-    help='Threshold as decimal 0.0-1.0. In alpha mode: pixels with alpha <= (1-threshold) are transparent. In bright mode: pixels with each RGB channel >= (255 * threshold) are considered bright. (default: 1.0)'
+    help='Threshold as decimal 0.0-1.0. In alpha mode: pixels with alpha <= (1-threshold) are transparent. In bright mode: pixels with each RGB channel >= (255 * threshold) are considered bright. In dark mode: pixels with each RGB channel <= (255 * (1-threshold)) are considered dark. (default: 1.0)'
 )
 parser.add_argument(
     '-a', '--auto',
     action='store_true',
-    help='Automatically choose best mode (alpha or bright) based on which produces larger crop'
+    help='Automatically choose best mode (alpha, bright, or dark) based on which produces larger crop'
 )
 parser.add_argument(
     '-d', '--diagnose',
@@ -201,6 +221,13 @@ def threshold_to_bright_cutoff(threshold):
     threshold=0.95 means "95% bright" -> each channel >= 0.95*255 = 242.25
     """
     return int(threshold * 255)
+
+def threshold_to_dark_cutoff(threshold):
+    """
+    Convert user-friendly threshold (0.0-1.0) to dark cutoff value.
+    threshold=0.95 means "95% dark" -> each channel <= (1-0.95)*255 = 12.75
+    """
+    return int((1.0 - threshold) * 255)
 
 def diagnose_image(filepath, threshold):
     """Run diagnostic analysis on a single image."""
@@ -245,7 +272,7 @@ def diagnose_image(filepath, threshold):
                 trans_pct = transparent/total*100
                 print(f"    {pct*100:3.0f}% transparent (alpha <= {cutoff:3d}): {transparent:6d} pixels ({trans_pct:5.2f}%)")
         
-        # Bright content analysis (formerly white)
+        # Bright content analysis
         print(f"\nBRIGHT PIXEL ANALYSIS:")
         # Convert to RGB for analysis
         rgb_img = img.convert('RGB')
@@ -264,18 +291,36 @@ def diagnose_image(filepath, threshold):
                 bright_pct = bright_count/total*100
                 print(f"    {pct*100:3.0f}% bright (each channel >= {cutoff:3d}): {bright_count:6d} pixels ({bright_pct:5.2f}%)")
             
+            # Dark content analysis
+            print(f"\nDARK PIXEL ANALYSIS:")
+            print(f"\n  Dark thresholds (as darkness %):")
+            for pct in [0.90, 0.95, 0.98, 0.99, 1.0]:
+                cutoff = threshold_to_dark_cutoff(pct)
+                dark_pixels = (r <= cutoff) & (g <= cutoff) & (b <= cutoff)
+                dark_count = np.sum(dark_pixels)
+                total = dark_count + np.sum(~dark_pixels)
+                dark_pct = dark_count/total*100
+                print(f"    {pct*100:3.0f}% dark (each channel <= {cutoff:3d}): {dark_count:6d} pixels ({dark_pct:5.2f}%)")
+            
             # Find a sample non-bright pixel if exists
             non_bright = (r < 250) | (g < 250) | (b < 250)
             if np.any(non_bright):
                 y, x = np.argwhere(non_bright)[0]
                 print(f"\n  Sample non-bright pixel at ({x},{y}): RGB({r[y,x]},{g[y,x]},{b[y,x]})")
+            
+            # Find a sample non-dark pixel if exists
+            non_dark = (r > 10) | (g > 10) | (b > 10)
+            if np.any(non_dark):
+                y, x = np.argwhere(non_dark)[0]
+                print(f"  Sample non-dark pixel at ({x},{y}): RGB({r[y,x]},{g[y,x]},{b[y,x]})")
         
-        # Calculate what the crop would be for BOTH modes
+        # Calculate what the crop would be for ALL modes
         print(f"\nPREDICTED CROP RESULTS FOR ALL MODES:")
         
         # Store results for comparison
         alpha_results = {}
         bright_results = {}
+        dark_results = {}
         
         # Alpha-based crop predictions at various thresholds
         if has_alpha:
@@ -326,54 +371,90 @@ def diagnose_image(filepath, threshold):
                 print(f"    {pct*100:3.0f}% bright: No non-bright pixels found! (NO CROP)")
                 bright_results[pct] = None
         
+        # Dark-based crop predictions at various thresholds
+        print(f"\n  DARK MODE PREDICTIONS:")
+        for pct in [0.90, 0.95, 0.98, 0.99, 1.0]:
+            cutoff = threshold_to_dark_cutoff(pct)
+            non_dark = (r > cutoff) | (g > cutoff) | (b > cutoff)
+            if np.any(non_dark):
+                coords = np.argwhere(non_dark)
+                y0, x0 = coords.min(axis=0)
+                y1, x1 = coords.max(axis=0)
+                crop_box = (x0, y0, x1+1, y1+1)
+                crop_size = (x1+1-x0) * (y1+1-y0)
+                original_size = img.size[0] * img.size[1]
+                reduction_pct = (1 - crop_size/original_size) * 100
+                crop_indicator = " (CROP)" if reduction_pct > 0.1 else " (NO CROP)"
+                print(f"    {pct*100:3.0f}% dark: ({x0}, {y0}, {x1+1}, {y1+1})  Size: {x1+1-x0} x {y1+1-y0}  Reduction: {reduction_pct:.1f}%{crop_indicator}")
+                dark_results[pct] = {'box': crop_box, 'size': crop_size, 'reduction': reduction_pct}
+            else:
+                print(f"    {pct*100:3.0f}% dark: No non-dark pixels found! (NO CROP)")
+                dark_results[pct] = None
+        
         # Direct comparison at the user's specified threshold
         print(f"\n  DIRECT COMPARISON AT {threshold*100:.0f}% THRESHOLD:")
         user_pct = threshold
         
         alpha_result = alpha_results.get(user_pct, None) if has_alpha else None
         bright_result = bright_results.get(user_pct, None)
+        dark_result = dark_results.get(user_pct, None)
         
-        if alpha_result is None and bright_result is None:
-            print(f"    Both modes: No content pixels found - no crop possible")
-        elif alpha_result is None and bright_result is not None:
-            print(f"    Alpha mode: No crop possible")
-            print(f"    Bright mode: {bright_result['reduction']:.1f}% reduction - BRIGHT WINS")
-        elif alpha_result is not None and bright_result is None:
-            print(f"    Alpha mode: {alpha_result['reduction']:.1f}% reduction")
-            print(f"    Bright mode: No crop possible - ALPHA WINS")
+        # Collect available results
+        available_results = []
+        if alpha_result is not None:
+            available_results.append(('ALPHA', alpha_result['reduction']))
+        if bright_result is not None:
+            available_results.append(('BRIGHT', bright_result['reduction']))
+        if dark_result is not None:
+            available_results.append(('DARK', dark_result['reduction']))
+        
+        if not available_results:
+            print(f"    All modes: No content pixels found - no crop possible")
         else:
-            # Both have results, compare
-            if alpha_result['reduction'] > bright_result['reduction']:
-                winner = "ALPHA"
-                winner_reduction = alpha_result['reduction']
-                loser_reduction = bright_result['reduction']
-            elif bright_result['reduction'] > alpha_result['reduction']:
-                winner = "BRIGHT"
-                winner_reduction = bright_result['reduction']
-                loser_reduction = alpha_result['reduction']
+            # Print each mode's reduction
+            if alpha_result is not None:
+                print(f"    Alpha mode: {alpha_result['reduction']:.1f}% reduction")
             else:
-                winner = "TIE"
-                winner_reduction = alpha_result['reduction']
-                loser_reduction = alpha_result['reduction']
+                print(f"    Alpha mode: No crop possible")
             
-            print(f"    Alpha mode: {alpha_result['reduction']:.1f}% reduction")
-            print(f"    Bright mode: {bright_result['reduction']:.1f}% reduction")
-            print(f"    {winner} WINS by {abs(alpha_result['reduction'] - bright_result['reduction']):.1f}%")
+            if bright_result is not None:
+                print(f"    Bright mode: {bright_result['reduction']:.1f}% reduction")
+            else:
+                print(f"    Bright mode: No crop possible")
+            
+            if dark_result is not None:
+                print(f"    Dark mode: {dark_result['reduction']:.1f}% reduction")
+            else:
+                print(f"    Dark mode: No crop possible")
+            
+            # Find winner
+            if len(available_results) > 1:
+                winner, winner_reduction = max(available_results, key=lambda x: x[1])
+                print(f"    {winner} WINS with {winner_reduction:.1f}% reduction")
+            elif len(available_results) == 1:
+                winner, winner_reduction = available_results[0]
+                print(f"    Only {winner} mode produces a crop ({winner_reduction:.1f}% reduction)")
         
         # Recommendation based on which removes more
         print(f"\n  RECOMMENDATION:")
-        if user_pct in alpha_results and alpha_results[user_pct] is not None:
-            if user_pct in bright_results and bright_results[user_pct] is not None:
-                if alpha_results[user_pct]['reduction'] > bright_results[user_pct]['reduction']:
-                    print(f"    Use --mode alpha for maximum crop ({alpha_results[user_pct]['reduction']:.1f}% reduction)")
-                elif bright_results[user_pct]['reduction'] > alpha_results[user_pct]['reduction']:
-                    print(f"    Use --mode bright for maximum crop ({bright_results[user_pct]['reduction']:.1f}% reduction)")
-                else:
-                    print(f"    Either mode works equally well ({alpha_results[user_pct]['reduction']:.1f}% reduction)")
-            elif bright_results.get(user_pct) is None:
-                print(f"    Bright mode not possible - use --mode alpha ({alpha_results[user_pct]['reduction']:.1f}% reduction)")
-        elif bright_results.get(user_pct) is not None:
-            print(f"    Alpha mode not possible - use --mode bright ({bright_results[user_pct]['reduction']:.1f}% reduction)")
+        recommendations = []
+        
+        if alpha_result is not None:
+            recommendations.append(('alpha', alpha_result['reduction']))
+        if bright_result is not None:
+            recommendations.append(('bright', bright_result['reduction']))
+        if dark_result is not None:
+            recommendations.append(('dark', dark_result['reduction']))
+        
+        if recommendations:
+            best_mode, best_reduction = max(recommendations, key=lambda x: x[1])
+            print(f"    Use --mode {best_mode} for maximum crop ({best_reduction:.1f}% reduction)")
+            
+            # Show alternative if close
+            if len(recommendations) > 1:
+                second_best = sorted(recommendations, key=lambda x: x[1], reverse=True)[1]
+                if second_best[1] > best_reduction * 0.95:  # Within 5% of best
+                    print(f"    Alternative: --mode {second_best[0]} also works well ({second_best[1]:.1f}% reduction)")
         else:
             print(f"    No crop possible at {threshold*100:.0f}% threshold - try lowering the threshold")
         
@@ -449,9 +530,45 @@ def bbox_by_bright(im, threshold):
     
     return (x0, y0, x1 + 1, y1 + 1)
 
+def bbox_by_dark(im, threshold):
+    """
+    Calculate bounding box that contains all non-dark pixels.
+    threshold is user-friendly decimal where higher = more aggressive cropping of dark areas.
+    """
+    dark_cutoff = threshold_to_dark_cutoff(threshold)
+    
+    # Convert to RGB for consistent processing
+    if im.mode != 'RGB':
+        im_rgb = im.convert('RGB')
+    else:
+        im_rgb = im
+    
+    # Get RGB array
+    rgb_array = np.array(im_rgb)
+    
+    # Create a mask for non-dark pixels
+    # For each pixel, check if it's NOT dark within threshold
+    if len(rgb_array.shape) == 3 and rgb_array.shape[2] >= 3:
+        r, g, b = rgb_array[:, :, 0], rgb_array[:, :, 1], rgb_array[:, :, 2]
+        
+        # Check if any channel is above the dark cutoff (non-dark means it has some color/brightness)
+        non_dark = (r > dark_cutoff) | (g > dark_cutoff) | (b > dark_cutoff)
+    else:
+        # Grayscale image
+        non_dark = rgb_array > dark_cutoff
+    
+    if not np.any(non_dark):
+        return None
+    
+    coords = np.argwhere(non_dark)
+    y0, x0 = coords.min(axis=0)
+    y1, x1 = coords.max(axis=0)
+    
+    return (x0, y0, x1 + 1, y1 + 1)
+
 def choose_best_mode(im, threshold):
     """
-    Determine which mode (alpha or bright) produces the larger crop.
+    Determine which mode (alpha, bright, or dark) produces the larger crop.
     Returns (mode_name, crop_box) tuple.
     """
     # Try alpha mode if image has alpha
@@ -463,30 +580,38 @@ def choose_best_mode(im, threshold):
     # Try bright mode
     bright_box = bbox_by_bright(im, threshold)
     
+    # Try dark mode
+    dark_box = bbox_by_dark(im, threshold)
+    
     # Calculate areas
-    alpha_area = 0
+    alpha_area = float('inf')
     if alpha_box is not None:
         alpha_area = (alpha_box[2] - alpha_box[0]) * (alpha_box[3] - alpha_box[1])
     
-    bright_area = 0
+    bright_area = float('inf')
     if bright_box is not None:
         bright_area = (bright_box[2] - bright_box[0]) * (bright_box[3] - bright_box[1])
     
-    original_area = im.size[0] * im.size[1]
+    dark_area = float('inf')
+    if dark_box is not None:
+        dark_area = (dark_box[2] - dark_box[0]) * (dark_box[3] - dark_box[1])
     
-    # Choose mode that removes more pixels (smaller crop area)
-    if alpha_box is None and bright_box is None:
+    # Collect available modes
+    available_modes = []
+    if alpha_box is not None:
+        available_modes.append(('alpha', alpha_box, alpha_area))
+    if bright_box is not None:
+        available_modes.append(('bright', bright_box, bright_area))
+    if dark_box is not None:
+        available_modes.append(('dark', dark_box, dark_area))
+    
+    if not available_modes:
         return None, None
-    elif alpha_box is None:
-        return 'bright', bright_box
-    elif bright_box is None:
-        return 'alpha', alpha_box
-    else:
-        # Both exist, choose the one with smaller area (more aggressive crop)
-        if alpha_area < bright_area:
-            return 'alpha', alpha_box
-        else:
-            return 'bright', bright_box
+    
+    # Choose mode with smallest crop area (most aggressive cropping)
+    best_mode, best_box, best_area = min(available_modes, key=lambda x: x[2])
+    
+    return best_mode, best_box
 
 def analyze_content(im, mode, threshold):
     """
@@ -544,6 +669,33 @@ def analyze_content(im, mode, threshold):
                 sample_y, sample_x = sample_coords
                 sample_r, sample_g, sample_b = r[sample_y, sample_x], g[sample_y, sample_x], b[sample_y, sample_x]
                 print(f"    Sample non-bright pixel at ({sample_x},{sample_y}): RGB({sample_r},{sample_g},{sample_b})")
+    
+    elif mode == 'dark':
+        dark_cutoff = threshold_to_dark_cutoff(threshold)
+        # Convert to RGB for analysis
+        im_rgb = im.convert('RGB')
+        rgb_array = np.array(im_rgb)
+        
+        if len(rgb_array.shape) == 3:
+            r, g, b = rgb_array[:, :, 0], rgb_array[:, :, 1], rgb_array[:, :, 2]
+            
+            # Calculate darkness
+            dark_pixels = (r <= dark_cutoff) & (g <= dark_cutoff) & (b <= dark_cutoff)
+            non_dark = ~dark_pixels
+            
+            dark_count = np.sum(dark_pixels)
+            non_dark_count = np.sum(non_dark)
+            total = dark_count + non_dark_count
+            
+            print(f"    Dark pixels (each channel <= {dark_cutoff} / {threshold*100:.0f}% dark): {dark_count} ({dark_count/total*100:.2f}%)")
+            print(f"    Non-dark pixels: {non_dark_count} ({non_dark_count/total*100:.2f}%)")
+            
+            # Show sample of pixel values if there are non-dark pixels
+            if non_dark_count > 0:
+                sample_coords = np.argwhere(non_dark)[0]
+                sample_y, sample_x = sample_coords
+                sample_r, sample_g, sample_b = r[sample_y, sample_x], g[sample_y, sample_x], b[sample_y, sample_x]
+                print(f"    Sample non-dark pixel at ({sample_x},{sample_y}): RGB({sample_r},{sample_g},{sample_b})")
 
 def crop_images(file_type, mode=None, threshold=1.0, auto=False, overwrite=False):
     """Crop all images of specified type."""
@@ -556,13 +708,14 @@ def crop_images(file_type, mode=None, threshold=1.0, auto=False, overwrite=False
     
     if auto:
         print(f"\nFound {len(files)} .{file_type} file(s) to process.")
-        print(f"Mode: AUTO - will choose best method for each image")
-        print(f"Threshold: {threshold*100:.0f}% (alpha: >={threshold*100:.0f}% transparent, bright: >={threshold*100:.0f}% bright)")
+        print(f"Mode: AUTO - will choose best method for each image (alpha/bright/dark)")
+        print(f"Threshold: {threshold*100:.0f}% (alpha: >={threshold*100:.0f}% transparent, bright: >={threshold*100:.0f}% bright, dark: >={threshold*100:.0f}% dark)")
         print(f"Overwrite: {'YES' if overwrite else 'NO'}")
     else:
         mode_desc = {
             'alpha': f"crop transparent pixels (>={threshold*100:.0f}% transparent)",
-            'bright': f"crop bright pixels (>={threshold*100:.0f}% bright)"
+            'bright': f"crop bright pixels (>={threshold*100:.0f}% bright)",
+            'dark': f"crop dark pixels (>={threshold*100:.0f}% dark)"
         }
         print(f"\nFound {len(files)} .{file_type} file(s) to process.")
         print(f"Mode: {mode} - {mode_desc[mode]}")
@@ -589,7 +742,7 @@ def crop_images(file_type, mode=None, threshold=1.0, auto=False, overwrite=False
             if auto:
                 chosen_mode, crop_box = choose_best_mode(im, threshold)
                 if chosen_mode is None:
-                    print(f"  WARNING: No content pixels found with either mode! File will not be cropped.")
+                    print(f"  WARNING: No content pixels found with any mode! File will not be cropped.")
                     skipped += 1
                     continue
                 print(f"  Auto mode chose: {chosen_mode}")
@@ -600,8 +753,10 @@ def crop_images(file_type, mode=None, threshold=1.0, auto=False, overwrite=False
                 analyze_content(im, mode, threshold)
                 if mode == 'alpha':
                     crop_box = bbox_by_alpha(im, threshold)
-                else:
+                elif mode == 'bright':
                     crop_box = bbox_by_bright(im, threshold)
+                else:  # dark mode
+                    crop_box = bbox_by_dark(im, threshold)
             
             if crop_box is None:
                 print(f"  WARNING: No content pixels found! File will not be cropped.")
