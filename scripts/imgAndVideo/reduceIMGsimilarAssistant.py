@@ -17,12 +17,18 @@
 # On launch, the script displays the first image in the list, with buttons to advance forward and backward through the list of images or delete them. Use the left arrow key or 'Back' button to navigate up (back) in the list, or the right arrow key or 'Forward' button to navigate forward in the list, and the 'Delete' key or button to move a viewed image into a _discards subfolder. Press F2 to rename the current image.
 
 # CODE
+
 import tkinter as tk
 from tkinter import ttk
 import os
 import sys
 import re
 from PIL import Image, ImageTk
+
+import ctypes
+# Make the application DPI-aware on Windows to prevent automatic scaling
+if sys.platform == 'win32':
+    ctypes.windll.shcore.SetProcessDpiAwareness(2)
 
 if len(sys.argv) > 1:       # positional parameter 1
     file_list = sys.argv[1]
