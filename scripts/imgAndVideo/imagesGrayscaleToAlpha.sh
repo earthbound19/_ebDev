@@ -16,8 +16,8 @@
 #   -i, --input FILENAME     Process single file only
 #   -t, --type EXTENSION     Process all files with given extension in current directory
 #   -r, --recursive          When used with --type, process subdirectories recursively
-#   -o, --overwriteoriginal  Overwrite original files instead of creating copies that add _alpha to the
-#                            base file name
+#   -o, --overwriteoriginal  Overwrite original files instead of creating copies. If omitted,
+#                            copies are created which add _alpha to the base filename.
 #   -f, --fuzz PERCENT       Fuzz factor for color matching tolerance -- an integer or decimal
 #                            between 0 to 100 (for percent). For example:
 #                            15  = 15%
@@ -26,12 +26,12 @@
 #   -h, --help               Display this help message
 #
 # Examples:
-#   imagesGrayscaleToAlpha.sh -i image.jpg                    # Process single file -> image_alpha.jpg
-#   imagesGrayscaleToAlpha.sh -t png                           # Process all PNGs in current dir
-#   imagesGrayscaleToAlpha.sh -t jpg -o                         # Process all JPGs, overwrite originals
-#   imagesGrayscaleToAlpha.sh -t png -r                          # Process all PNGs recursively
-#   imagesGrayscaleToAlpha.sh -i photo.png -f 15                # 15% fuzz for near-white pixels
-#   imagesGrayscaleToAlpha.sh -t png -f 10 -r                    # 10% fuzz on all PNGs recursively
+#   imagesGrayscaleToAlpha.sh -i image.jpg					# Process single file -> image_alpha.jpg
+#   imagesGrayscaleToAlpha.sh -t png						# Process all PNGs in current dir
+#   imagesGrayscaleToAlpha.sh -t jpg -o						# Process all JPGs, overwrite originals
+#   imagesGrayscaleToAlpha.sh -t png -r						# Process all PNGs recursively
+#   imagesGrayscaleToAlpha.sh -i photo.png -f 15			# 15% fuzz for near-white pixels
+#   imagesGrayscaleToAlpha.sh -t png -f 10 -r				# 10% fuzz on all PNGs recursively
 
 # NOTES
 # - The --input and --type options are mutually exclusive
