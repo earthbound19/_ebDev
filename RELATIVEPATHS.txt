@@ -10,3 +10,5 @@ scripts\imgAndVideo
 scripts\imgAndVideo\EXIFdataBatch
 scripts\imgAndVideo\EXIFdataBatch\metaDataTemplates
 scripts\recipes
+scripts\imgAndVideo\ComfyUI
+scripts\imgAndVideo\stable-diffusion-webui
