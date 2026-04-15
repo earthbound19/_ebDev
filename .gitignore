@@ -33,3 +33,4 @@ image_bomber_dev
 test_results.csv
 *.conf
 suite_*
+*.pkl
