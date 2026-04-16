@@ -22,12 +22,17 @@ else
 	printf "script file $scriptFileName found at $fullPathToScript; proceeding.\n"
 fi
 
-if [ ! -z "$(ls -A .)" ]; then
-    printf "\nPROBLEM: this directory has files already. This script generates many files and enforces as a design choice that it to only run in an empty directory. Create and navigate to an empty directory and run this script again from that.\n"
-	exit 2
+# check that:
+
+
+if [ -n "$(ls -A)" ] && [ -n "$(ls -A | grep -v -E '^(pngs|svgs)$')" ]; then
+    printf "\nPROBLEM: this directory has files already. This script generates many files and enforces as a design choice that it to only run in an empty directory. Create and navigate to an empty directory and run this script again from that. It's okay to alternately only have subdirectories named 'pngs' and/or 'svgs' (without quote marks in the names). Any other setup will cause this script to throw.)\n"
+	exit 1
 else
-	printf "Current directory found to be empty; proceeding.\n"
+	printf "Current directory found to be empty (or have only acceptable subfolders svgs|pngs); proceeding.\n\n"
 fi
+
+printf "CHEWBACCCAAAA HRRHRNRNRRNRRRGGG!!\n\n"
 
 commandSwitchesSets=(
 "-p 1 -n 14 -l 15"
