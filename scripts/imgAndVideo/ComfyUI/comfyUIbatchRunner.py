@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SCRIPT: comfyUIbatchRunner.py
-VERSION: 1.5.0
+VERSION: 2.1.30
 
 DESCRIPTION:
     ComfyUI Batch Render Script
@@ -14,13 +14,31 @@ DESCRIPTION:
     metaprompts into superprompt templates where '{}' placeholders appear,
     randomizes seeds, and sends each combination to a running ComfyUI server.
 
+ADVANCED FEATURES
+    - DISTRIBUTED MODE: Multiple script instances can run simultaneously against 
+      different ComfyUI hosts sharing a state file (requires shared filesystem like NFS)
+    - MULTI-HOST SUPPORT: Single script instance can manage multiple ComfyUI hosts
+      in parallel with load balancing
+    - Automatic mode detection: Use comma-separated URLs with -u for multi-host mode
+    - Render status tracking: 'pending', 'rendering', 'completed', 'failed'
+    - Lock file mechanism for distributed state access
+    - Heartbeat monitoring for stale 'rendering' entries
+
 DEPENDENCIES:
     Python 3.6 or higher
     requests library (pip install requests)
     ComfyUI server running with API access enabled
 
 USAGE:
+    # Single host:
     python comfyUIbatchRunner.py -w WORKFLOW.json -s 1 -m 1
+    
+    # Multi-host distributed mode (single instance manages multiple ComfyUI servers)
+    python comfyUIbatchRunner.py -w WORKFLOW.json -u "http://host1:8188,http://host2:8188"
+    
+    # Distributed workers on shared state file (run on multiple machines)
+    # Machine 1: python comfyUIbatchRunner.py -w WORKFLOW.json -u http://machine1:8188 --state-file /shared/state.pkl
+    # Machine 2: python comfyUIbatchRunner.py -w WORKFLOW.json -u http://machine2:8188 --state-file /shared/state.pkl
 
 REQUIRED ARGUMENTS:
     -w, --workflowfilename    Path to API-format workflow JSON file
@@ -31,7 +49,9 @@ OPTIONAL ARGUMENTS:
     -m, --metapromptiterations     Number of times to repeat each metaprompt
                                    (default: 1)
     -p, --pause                    Pause seconds between renders (default: 90)
-    -u, --url                      ComfyUI server URL (default: http://127.0.0.1:8188)
+    -u, --url                      ComfyUI server URL. For multiple hosts, use 
+                                   comma-separated: http://host1:8188,http://host2:8188
+                                   (default: http://127.0.0.1:8188)
     -o, --outputdir                Base output directory (default: renders)
     -r, --resume                   Resume from global index number (validates bounds)
     --sample SAMPLE_RATE           Preview mode: render only a fraction of remaining combinations.
@@ -60,6 +80,8 @@ OPTIONAL ARGUMENTS:
     --superprompts FILE            Path to superprompts file (default: superprompts.txt)
     --metaprompts FILE             Path to metaprompts file (default: metaprompts.txt)
     --state-file FILE              Path to state pickle file (default: .comfyUIbatchRunner_render_state.pkl)
+    --heartbeat-interval SECONDS   Heartbeat interval for distributed mode (default: 30)
+    --timeout SECONDS              Maximum seconds to wait for a single render (default: 600)
 
 FILE REQUIREMENTS:
     superprompts.txt (or custom file)    - One template per line, use '{}' as metaprompt placeholder
@@ -122,12 +144,45 @@ NOTES:
         When --shuffle is also used, shuffling occurs within each of the 4 subgroups
         to maintain priority order while adding randomness.
 
+    DISTRIBUTED MODE (Multi-Host):
+        When -u contains comma-separated URLs, the script automatically runs in
+        distributed multi-host mode. Features include:
+        
+        - Load balancing: Distributes renders across all healthy hosts
+        - Health checking: Periodically checks each host's /queue endpoint
+        - Concurrency control: Limits active renders per host (prevents GPU OOM)
+        - Shared state: All workers share the same pickle file (requires shared storage)
+        - Automatic failover: Failed renders return to queue for other workers
+        - Heartbeat system: Prevents stale locks from blocking progress
+        
+        To run multiple workers on different machines:
+        1. Place the state file on shared storage (NFS, EFS, etc.)
+        2. Run the script on each machine with the same --state-file path
+        3. Each worker will automatically claim and process pending renders
+        
+        Example distributed setup:
+        # On machine A (GPU server 1)
+        python comfyUIbatchRunner.py -w workflow.json \\
+            -u http://192.168.1.10:8188 \\
+            --state-file /shared/network/drive/render_state.pkl
+        
+        # On machine B (GPU server 2)
+        python comfyUIbatchRunner.py -w workflow.json \\
+            -u http://192.168.1.11:8188 \\
+            --state-file /shared/network/drive/render_state.pkl
+        
+        # Single machine managing multiple ComfyUI instances on different hosts;
+        # list all hosts in -u, separated by commas (note here they use different
+        # ports as required (it seems?) by ComfyUI):
+        python comfyUIbatchRunner.py -w workflow.json \\
+            -u "http://192.168.0.1:8188,http://192.168.0.2:8189,http://192.168.0.3:8190"
+
     RENDER STATE FILE (.comfyUIbatchRunner_render_state.pkl):
         Created automatically in the current working directory when the script runs.
         Contains a complete record of every combination (superprompt index, metaprompt index,
-        completion status, seed used, timestamp, output path).
+        completion status, seed used, timestamp, output path, worker_id, status).
         
-        This file allows you to resume an interrupted batch run.
+        This file allows you to resume an interrupted batch run or run distributed workers.
         The file is NOT portable - if you move it to another machine or change your
         prompt files, the index mappings will break.
         
@@ -317,6 +372,13 @@ EXAMPLES:
     # Custom server and output directory (relative to ComfyUI/output/)
     python comfyUIbatchRunner.py -w workflow.json -u http://192.168.1.100:8188 -o renders
 
+    # Multi-host mode - single instance managing multiple ComfyUI servers
+    python comfyUIbatchRunner.py -w workflow.json -u "http://192.168.1.10:8188,http://192.168.1.11:8188"
+
+    # Distributed workers using shared storage
+    # Worker 1: python comfyUIbatchRunner.py -w workflow.json -u http://192.168.0.1:8188 --state-file /nfs/shared_state.pkl
+    # Worker 2: python comfyUIbatchRunner.py -w workflow.json -u http://192.168.0.2:8189 --state-file /nfs/shared_state.pkl
+
 CODE:
 """
 
@@ -331,8 +393,283 @@ import requests
 import sys
 import pickle
 import re
+import threading
+import uuid
+import socket
+import os
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import List, Dict, Optional, Tuple
+
+class DistributedState:
+    """Manages shared state with locking for distributed access across multiple workers"""
+    
+    def __init__(self, state_file, worker_id=None, lock_timeout=30):
+        self.state_file = Path(state_file)
+        self.lock_file = self.state_file.with_suffix('.lock')
+        self.worker_id = worker_id or f"{socket.gethostname()}:{os.getpid()}:{uuid.uuid4().hex[:8]}"
+        self.lock_timeout = lock_timeout
+        self._lock_acquired = False
+    
+    def acquire_lock(self, timeout=60):
+        """Acquire lock file with timeout to prevent deadlocks"""
+        import os
+        
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            try:
+                # Check for stale lock (older than lock_timeout seconds)
+                if self.lock_file.exists():
+                    lock_age = time.time() - self.lock_file.stat().st_mtime
+                    if lock_age > self.lock_timeout:
+                        print(f"Removing stale lock (age: {lock_age:.0f}s)")
+                        try:
+                            self.lock_file.unlink()
+                        except PermissionError:
+                            pass
+                
+                # Create lock file - try multiple methods
+                lock_data = {
+                    'worker_id': self.worker_id,
+                    'timestamp': time.time()
+                }
+                
+                # Method 1: Exclusive creation (most atomic)
+                try:
+                    with open(self.lock_file, 'x') as f:
+                        f.write(json.dumps(lock_data))
+                    self._lock_acquired = True
+                    return True
+                except FileExistsError:
+                    pass
+                
+                # Method 2: Check if we already own it
+                if self.lock_file.exists():
+                    try:
+                        with open(self.lock_file, 'r') as f:
+                            existing = json.load(f)
+                        if existing.get('worker_id') == self.worker_id:
+                            # Refresh the lock
+                            with open(self.lock_file, 'w') as f:
+                                f.write(json.dumps(lock_data))
+                            self._lock_acquired = True
+                            return True
+                    except:
+                        pass
+                
+                time.sleep(1)
+            except Exception as e:
+                time.sleep(1)
+        
+        return False
+    
+    def release_lock(self):
+        """Release lock file"""
+        if self._lock_acquired and self.lock_file.exists():
+            try:
+                self.lock_file.unlink()
+            except:
+                pass
+        self._lock_acquired = False
+    
+    def load_state(self, combinations_template=None):
+        """Load state from pickle file with proper error handling"""
+        if not self.state_file.exists():
+            return combinations_template if combinations_template else []
+        
+        try:
+            with open(self.state_file, 'rb') as f:
+                state = pickle.load(f)
+            return state
+        except Exception as e:
+            print(f"Warning: Could not load state: {e}")
+            return combinations_template if combinations_template else []
+    
+    def save_state(self, state):
+        """Save state atomically using temporary file with multiple fallback strategies"""
+        import os
+        import shutil
+        
+        temp_file = self.state_file.with_suffix('.tmp')
+        
+        try:
+            # Write to temp file
+            with open(temp_file, 'wb') as f:
+                pickle.dump(state, f)
+                f.flush()
+                os.fsync(f.fileno())
+            
+            # Try atomic replace (works on Unix, Windows with replace())
+            try:
+                temp_file.replace(self.state_file)
+                return True
+            except (OSError, PermissionError) as e:
+                print(f"  Atomic replace failed: {e}, trying fallback...")
+                
+                # Fallback 1: Try rename
+                try:
+                    os.rename(temp_file, self.state_file)
+                    return True
+                except OSError:
+                    pass
+                
+                # Fallback 2: Copy then delete
+                try:
+                    shutil.copy2(temp_file, self.state_file)
+                    temp_file.unlink()
+                    return True
+                except Exception:
+                    pass
+                
+                # Fallback 3: Direct write (no atomicity, but better than nothing)
+                try:
+                    with open(self.state_file, 'wb') as f:
+                        pickle.dump(state, f)
+                    # Clean up temp file if it exists
+                    if temp_file.exists():
+                        temp_file.unlink()
+                    return True
+                except Exception:
+                    pass
+                
+                raise Exception("All save strategies failed")
+                
+        except Exception as e:
+            print(f"Error saving state: {e}")
+            # Clean up temp file if it exists
+            if temp_file.exists():
+                try:
+                    temp_file.unlink()
+                except:
+                    pass
+            return False
+    
+    def update_render_status(self, combo_index, status, **kwargs):
+        """Update status of a single render with lock acquisition"""
+        if not self.acquire_lock():
+            print(f"Could not acquire lock for status update")
+            return False
+        
+        try:
+            state = self.load_state()
+            if combo_index < len(state):
+                state[combo_index]['status'] = status
+                state[combo_index]['worker_id'] = self.worker_id
+                state[combo_index]['last_update'] = datetime.now().isoformat()
+                for key, value in kwargs.items():
+                    state[combo_index][key] = value
+                self.save_state(state)
+            return True
+        finally:
+            self.release_lock()
+
+    def claim_next_pending(self, heartbeat_interval=60, shuffle=False, unique_untried_first=False):
+        """Claim the next pending render for this worker atomically
+        
+        Supports three modes:
+        1. Default (shuffle=False, unique_untried_first=False): Returns first pending render (index order)
+        2. Shuffle (shuffle=True): Returns random pending render
+        3. Unique-untried-first (unique_untried_first=True): Returns highest priority pending render based on:
+        - Priority 1: Never-rendered combos with untouched prompts
+        - Priority 2: Never-rendered combos with touched prompts  
+        - Priority 3: Already-rendered combos with untouched prompts
+        - Priority 4: Already-rendered combos with touched prompts
+        
+        Args:
+            heartbeat_interval: Seconds after which a 'rendering' entry is considered stale
+            shuffle: If True, randomly select from pending renders (overrides priority ordering)
+            unique_untried_first: If True, use priority ordering instead of index order
+        
+        Returns:
+            The claimed combo dictionary, or None if no pending renders available
+        """
+        if not self.acquire_lock():
+            return None
+        
+        try:
+            state = self.load_state()
+            
+            # Clean up stale 'rendering' entries (workers that died without updating heartbeat)
+            now = datetime.now()
+            for combo in state:
+                if combo.get('status') == 'rendering':
+                    last_update = datetime.fromisoformat(combo.get('last_update', '2000-01-01'))
+                    if (now - last_update).total_seconds() > heartbeat_interval * 2:
+                        print(f"Cleaning stale render {combo['index']} from worker {combo.get('worker_id')}")
+                        combo['status'] = 'pending'
+                        combo['worker_id'] = None
+            
+            # Find all pending renders
+            pending = []
+            for combo in state:
+                if combo.get('status') == 'pending' or ('status' not in combo and not combo.get('completed')):
+                    pending.append(combo)
+            
+            if not pending:
+                return None
+            
+            # Select which pending render to claim
+            if shuffle:
+                # Mode 1: Random selection (overrides priority)
+                import random
+                combo = random.choice(pending)
+            elif unique_untried_first:
+                # Mode 2: Priority ordering based on render history and prompt touch status
+                
+                # Build sets of touched prompts from completed renders
+                touched_superprompts = {c['superprompt_idx'] for c in state if c.get('status') == 'completed'}
+                touched_metaprompts = {c['metaprompt_idx'] for c in state if c.get('status') == 'completed' and c['metaprompt_idx'] >= 0}
+                
+                def get_priority(combo):
+                    """Calculate priority level (lower number = higher priority)"""
+                    # Check if this combo has ever been completed
+                    has_been_rendered = combo.get('status') == 'completed' or combo.get('completed', False)
+                    
+                    # Check if prompts are untouched
+                    sp_touched = combo['superprompt_idx'] in touched_superprompts
+                    mp_touched = combo['metaprompt_idx'] in touched_metaprompts if combo['metaprompt_idx'] >= 0 else False
+                    is_untouched = not (sp_touched or mp_touched)
+                    
+                    # Priority levels:
+                    # Level 0: Never rendered + untouched prompts (highest)
+                    # Level 1: Never rendered + touched prompts
+                    # Level 2: Already rendered + untouched prompts
+                    # Level 3: Already rendered + touched prompts (lowest)
+                    if not has_been_rendered:
+                        return 0 if is_untouched else 1
+                    else:
+                        return 2 if is_untouched else 3
+                
+                # Sort pending by priority (lower number first)
+                pending.sort(key=get_priority)
+                combo = pending[0]
+            else:
+                # Mode 3: Default - first in list (original index order)
+                combo = pending[0]
+            
+            # Claim the selected render
+            combo['status'] = 'rendering'
+            combo['worker_id'] = self.worker_id
+            combo['claimed_at'] = datetime.now().isoformat()
+            combo['last_update'] = combo['claimed_at']
+            self.save_state(state)
+            return combo
+        finally:
+            self.release_lock()
+
+    def heartbeat(self, combo_index):
+        """Update heartbeat for currently rendering item to prevent stale lock cleanup"""
+        if not self.acquire_lock():
+            return
+        
+        try:
+            state = self.load_state()
+            if combo_index < len(state) and state[combo_index].get('worker_id') == self.worker_id:
+                state[combo_index]['last_update'] = datetime.now().isoformat()
+                self.save_state(state)
+        finally:
+            self.release_lock()
 
 class ComfyUIBatchRenderer:
     def __init__(self, server_url="http://127.0.0.1:8188", output_base_dir="renders"):
@@ -495,33 +832,6 @@ class ComfyUIBatchRenderer:
                         })
         return combinations
     
-    def load_state(self, combinations, state_file):
-        """Load previous state if exists"""
-        if Path(state_file).exists():
-            try:
-                with open(state_file, 'rb') as f:
-                    saved_state = pickle.load(f)
-                    # Restore completion status
-                    for saved_item in saved_state:
-                        if saved_item['index'] < len(combinations):
-                            combinations[saved_item['index']]['completed'] = saved_item['completed']
-                            combinations[saved_item['index']]['seed'] = saved_item.get('seed')
-                            combinations[saved_item['index']]['output_path'] = saved_item.get('output_path')
-                            combinations[saved_item['index']]['timestamp'] = saved_item.get('timestamp')
-                    completed_count = sum(1 for c in combinations if c['completed'])
-                    print(f"Loaded state: {completed_count} renders already completed")
-            except Exception as e:
-                print(f"Warning: Could not load state file: {e}")
-        return combinations
-    
-    def save_state(self, combinations, state_file):
-        """Save current state"""
-        try:
-            with open(state_file, 'wb') as f:
-                pickle.dump(combinations, f)
-        except Exception as e:
-            print(f"Warning: Could not save state: {e}")
-    
     def find_node_by_class_type(self, workflow, class_type, title_substring=None):
         """Find node IDs by class_type and optionally title substring"""
         matching_nodes = []
@@ -594,7 +904,7 @@ class ComfyUIBatchRenderer:
                 workflow[node_id]['inputs']['filename_prefix'] = f"{full_output_path}/{prefix}"
                 print(f"Set output prefix with path: {full_output_path}/{prefix}")
 
-    def send_to_comfyui(self, workflow, render_timeout=600):
+    def send_to_comfyui(self, workflow, render_timeout=600, server_url=None):
         """Send workflow to ComfyUI and monitor execution until completion or timeout.
         
         Polls /history for completion and /queue to detect if render is still alive.
@@ -603,28 +913,32 @@ class ComfyUIBatchRenderer:
         Args:
             workflow: The workflow dictionary to send
             render_timeout: Maximum seconds to wait for a single render before assuming failure and submitting another render (default: 600)
+            server_url: Optional override for server URL (used by MultiHostManager)
         
         Returns:
             bool: True if render completed successfully, False otherwise
         """
+        url = server_url or self.server_url
+        prompt_endpoint = f"{url}/prompt"
+        history_endpoint = f"{url}/history"
+        queue_url = f"{url}/queue"
+        
         # Submit the job
         try:
             payload = {"prompt": workflow}
-            response = requests.post(self.prompt_endpoint, json=payload, timeout=30)
+            response = requests.post(prompt_endpoint, json=payload, timeout=30)
             response.raise_for_status()
             result = response.json()
             prompt_id = result.get('prompt_id')
             if not prompt_id:
-                print("Error: No prompt_id returned from ComfyUI")
+                print(f"Error: No prompt_id returned from {url}")
                 return False
-            print(f"Sent to ComfyUI, prompt_id: {prompt_id}")
+            print(f"Sent to {url}, prompt_id: {prompt_id}")
         except requests.exceptions.RequestException as e:
-            print(f"Error sending workflow to ComfyUI: {e}")
+            print(f"Error sending workflow to {url}: {e}")
             return False
         
         # Poll for completion
-        history_url = f"{self.server_url}/history/{prompt_id}"
-        queue_url = f"{self.server_url}/queue"
         start_time = time.time()
         poll_interval = 12
         last_alive_time = start_time
@@ -632,7 +946,7 @@ class ComfyUIBatchRenderer:
         while time.time() - start_time < render_timeout:
             # Check history first (completion)
             try:
-                history_response = requests.get(history_url, timeout=10)
+                history_response = requests.get(f"{history_endpoint}/{prompt_id}", timeout=10)
                 if history_response.status_code == 200:
                     history_data = history_response.json()
                     if prompt_id in history_data:
@@ -677,13 +991,41 @@ class ComfyUIBatchRenderer:
         print(f"Error: Render {prompt_id} timed out after {render_timeout} seconds")
         return False
 
-    def run_batch(self, workflow_path, superprompt_iterations, metaprompt_iterations, 
-              pause_seconds=90, start_from=None, sample_rate=None, shuffle=False,
-              render_timeout=600, superprompt_file="superprompts.txt", 
-              metaprompt_file="metaprompts.txt", state_file=".comfyUIbatchRunner_render_state.pkl",
-              unique_untried_first=False):
+    def run_batch_distributed(self, workflow_path, superprompt_iterations, metaprompt_iterations,
+                            pause_seconds=90, render_timeout=600, superprompt_file="superprompts.txt",
+                            metaprompt_file="metaprompts.txt", state_file=".comfyUIbatchRunner_render_state.pkl",
+                            heartbeat_interval=30, multi_host_urls=None,
+                            shuffle=False, unique_untried_first=False, sample_rate=None, start_from=None):
+        """Distributed mode - one thread per host, each completely independent
         
-        # Load templates and metaprompts (allow empty for metaprompts)
+        This mode runs one independent worker thread per ComfyUI host. Each thread:
+        1. Claims a pending render from the shared state file
+        2. Renders it on its dedicated host
+        3. Waits for completion (with pause for GPU cooldown)
+        4. Updates the state file
+        5. Loops to claim the next render
+        
+        All ordering features (shuffle, unique-untried-first, sample, resume) are applied
+        when generating the initial state file, before any rendering begins.
+        
+        Args:
+            workflow_path: Path to API-format workflow JSON file
+            superprompt_iterations: Number of times to repeat each superprompt
+            metaprompt_iterations: Number of times to repeat each metaprompt
+            pause_seconds: Pause between renders on each host (GPU cooldown)
+            render_timeout: Maximum seconds to wait for a single render
+            superprompt_file: Path to superprompts text file
+            metaprompt_file: Path to metaprompts text file
+            state_file: Path to state pickle file for distributed coordination
+            heartbeat_interval: Seconds between heartbeat updates
+            multi_host_urls: List of ComfyUI host URLs (one thread per host)
+            shuffle: Randomize render order
+            unique_untried_first: Prioritize never-rendered combos and untouched prompts
+            sample_rate: Fraction of combinations to render (0.0-1.0)
+            start_from: Resume from global index number
+        """
+        
+        # Load prompts from files
         superprompts = self.load_templates_from_file(superprompt_file, allow_empty=False)
         metaprompts = self.load_metaprompts_from_file(metaprompt_file, allow_empty=True)
         
@@ -691,187 +1033,373 @@ class ComfyUIBatchRenderer:
             print("Error: Superprompts file must contain at least one entry")
             sys.exit(1)
         
-        # Generate full combination index (handles empty metaprompts internally)
-        combinations = self.generate_combination_index(
-            superprompts, metaprompts, 
-            superprompt_iterations, metaprompt_iterations
-        )
-        
-        max_index = len(combinations) - 1
-        
-        # Validate resume index before doing anything else
-        if start_from is not None:
-            if start_from < 0:
-                print(f"Error: Resume index {start_from} is negative. Must be >= 0")
-                sys.exit(1)
-            if start_from > max_index:
-                print(f"Error: Resume index {start_from} exceeds maximum index {max_index}")
-                print(f"Valid range: 0 to {max_index}")
-                sys.exit(1)
-        
-        # Load previous state
-        combinations = self.load_state(combinations, state_file)
-        
-        # Filter for incomplete renders
-        pending = [c for c in combinations if not c['completed']]
-        
-        if not pending:
-            print("All renders already completed")
-            return
-        
-        # Apply resume filter (now safe because we validated start_from)
-        if start_from is not None:
-            pending = [c for c in pending if c['index'] >= start_from]
-            if not pending:
-                print(f"Error: No pending renders from index {start_from} onward")
-                print(f"Either index {start_from} is already completed, or all subsequent renders are done")
-                sys.exit(1)
-            print(f"Resuming from index {start_from}, {len(pending)} renders remaining")
-        
-        # Apply unique-untried-first prioritization if requested
-        if unique_untried_first:
-            # Stage 1: Split by whether combo has ANY completed render (simple)
-            never_rendered = [c for c in pending if not c['completed']]
-            already_rendered = [c for c in pending if c['completed']]
-            
-            # Build sets of touched prompts from ALL combinations (not just pending)
-            touched_superprompts = {c['superprompt_idx'] for c in combinations if c['completed']}
-            touched_metaprompts = {c['metaprompt_idx'] for c in combinations if c['completed'] and c['metaprompt_idx'] >= 0}
-            
-            # Function to determine if a combo has untouched prompts
-            def is_untouched_prompts(combo):
-                sp_touched = combo['superprompt_idx'] in touched_superprompts
-                mp_touched = combo['metaprompt_idx'] in touched_metaprompts if combo['metaprompt_idx'] >= 0 else False
-                return not (sp_touched or mp_touched)
-            
-            # Stage 2: Split each group by prompt touch status
-            never_untouched = [c for c in never_rendered if is_untouched_prompts(c)]
-            never_touched = [c for c in never_rendered if not is_untouched_prompts(c)]
-            already_untouched = [c for c in already_rendered if is_untouched_prompts(c)]
-            already_touched = [c for c in already_rendered if not is_untouched_prompts(c)]
-            
-            # Shuffle each subgroup if requested
-            if shuffle:
-                random.shuffle(never_untouched)
-                random.shuffle(never_touched)
-                random.shuffle(already_untouched)
-                random.shuffle(already_touched)
-            
-            # Combine in priority order
-            pending = never_untouched + never_touched + already_untouched + already_touched
-            
-            print(f"Unique-untried-first mode: Enabled")
-            print(f"  Never-rendered + untouched prompts: {len(never_untouched)}")
-            print(f"  Never-rendered + touched prompts: {len(never_touched)}")
-            print(f"  Already-rendered + untouched prompts: {len(already_untouched)}")
-            print(f"  Already-rendered + touched prompts: {len(already_touched)}")
-        
-        # Apply sampling if requested (after prioritization)
-        if sample_rate and sample_rate > 0 and sample_rate < 1:
-            sample_step = int(1.0 / sample_rate)
-            original_count = len(pending)
-            sampled_indices = set(range(0, original_count, sample_step))
-            pending = [pending[i] for i in sorted(sampled_indices)]
-            print(f"Sampling mode: {sample_rate*100:.1f}% of remaining renders ({len(pending)} of {original_count} items)")
-        
-        # Shuffle if requested (and not already shuffled by unique-untried-first)
-        if shuffle and not unique_untried_first:
-            random.shuffle(pending)
-            print("Shuffle mode: render order randomized")
-        elif shuffle and unique_untried_first:
-            print("Shuffle mode: Applied within unique-untried-first subgroups")
-        
-        total_renders = len(pending)
-        
-        print(f"\n{'='*70}")
-        print(f"Batch Render")
-        print(f"  Superprompts: {len(superprompts)}")
-        print(f"  Metaprompts: {len(metaprompts) if metaprompts else 0} (treating empty as single empty string)")
-        print(f"  Superprompt iterations: {superprompt_iterations}")
-        print(f"  Metaprompt iterations: {metaprompt_iterations}")
-        print(f"  Total combinations: {len(combinations)}")
-        print(f"  Already completed: {len([c for c in combinations if c['completed']])}")
-        print(f"  Pending renders: {total_renders}")
-        print(f"  Pause between renders: {pause_seconds}s")
-        print(f"  Output directory: {self.output_base_dir}")
-        print(f"{'='*70}\n")
-        
-        # Track statistics
-        successful_renders = 0
-        failed_renders = 0
-        
-        for render_num, combo in enumerate(pending, 1):
-            print(f"\n--- Render {render_num}/{total_renders} (Global index: {combo['index']}) ---")
-            
-            # Load fresh workflow for each render
-            workflow = self.load_workflow(workflow_path)
-            
-            # Create organized output subdirectory
-            if combo['metaprompt_idx'] >= 0:
-                output_subdir = str(Path(f"sp{combo['superprompt_idx']:03d}") / f"mp{combo['metaprompt_idx']:03d}")
-            else:
-                output_subdir = str(Path(f"sp{combo['superprompt_idx']:03d}") / "no_meta")
-            
-            # Substitute metaprompt into template (handles empty metaprompt)
-            final_prompt = self.substitute_metaprompt(combo['superprompt'], combo['metaprompt'])
-            
-            # Randomize seed
-            random_seed = random.randint(1, 2**32 - 1)
+        # Initialize distributed state manager for file locking
+        dist_state = DistributedState(state_file)
 
-            # Generate meaningful filename prefix
-            safe_sp = self.sanitize_for_filename(combo['superprompt'], 20)
-            if combo['metaprompt']:
-                safe_mp = self.sanitize_for_filename(combo['metaprompt'], 20)
-                filename_prefix = f"{safe_sp}__{safe_mp}__seed{random_seed}"
-            else:
-                filename_prefix = f"{safe_sp}__seed{random_seed}"
-            
-            print(f"  Superprompt [{combo['superprompt_idx']}]: {combo['superprompt'][:60]}...")
-            if combo['metaprompt']:
-                print(f"  Metaprompt [{combo['metaprompt_idx']}]: {combo['metaprompt']}")
-            else:
-                print(f"  Metaprompt: (none - empty string)")
-            print(f"  Final prompt: {final_prompt[:100]}...")
-            print(f"  Output folder: {output_subdir}")
-            print(f"  Filename prefix: {filename_prefix}")
-            
-            # Update workflow
-            self.update_prompt_in_workflow(workflow, final_prompt, is_positive=True)
-            self.update_seed_in_workflow(workflow, random_seed)
-            self.update_output_node(workflow, output_subdir, filename_prefix)
-            
-            # Send to ComfyUI with timeout monitoring
-            success = self.send_to_comfyui(workflow, render_timeout=render_timeout)
-            
-            if success:
-                successful_renders += 1
-                combo['completed'] = True
-                combo['seed'] = random_seed
-                combo['timestamp'] = datetime.now().isoformat()
-                combo['output_path'] = str(self.output_base_dir / output_subdir)
-                # Save state after each successful render
-                self.save_state(combinations, state_file)
-            else:
-                failed_renders += 1
-            
-            # Pause between renders (except after the last one)
-            if render_num < total_renders:
-                print(f"\nPausing for {pause_seconds} seconds...")
-                time.sleep(pause_seconds)
+        import queue
+        state_update_queue = queue.Queue()
+        stop_state_writer = threading.Event()
+
+        def state_writer_thread():
+            """Single thread to handle all state file writes with atomic saves and periodic backups"""
+            write_count = 0  # Counter for tracking writes for backup
+            while not stop_state_writer.is_set():
+                try:
+                    update = state_update_queue.get(timeout=1)
+                    if update is None:  # Poison pill
+                        break
+                    
+                    combo_index, status, kwargs = update
+                    
+                    # Single-threaded write with lock
+                    if dist_state.acquire_lock(timeout=30):
+                        try:
+                            with open(state_file, 'rb') as f:
+                                state = pickle.load(f)
+                            
+                            if combo_index < len(state):
+                                state[combo_index]['status'] = status
+                                state[combo_index]['worker_id'] = dist_state.worker_id
+                                state[combo_index]['last_update'] = datetime.now().isoformat()
+                                for key, value in kwargs.items():
+                                    state[combo_index][key] = value
+                                
+                                # Atomic write - write to temp file then rename
+                                temp_file = state_file + '.tmp'
+                                with open(temp_file, 'wb') as f:
+                                    pickle.dump(state, f)
+                                    f.flush()
+                                    os.fsync(f.fileno())
+                                
+                                # Verify temp file is valid before replacing
+                                try:
+                                    with open(temp_file, 'rb') as test_f:
+                                        pickle.load(test_f)  # Test load
+                                    os.replace(temp_file, state_file)
+                                except Exception as verify_error:
+                                    print(f"Temp file invalid - skipping write: {verify_error}")
+                                    if os.path.exists(temp_file):
+                                        os.remove(temp_file)
+                                    continue
+                                
+                                # Periodic backup every 100 successful writes
+                                write_count += 1
+                                if write_count >= 100:
+                                    write_count = 0
+                                    backup_file = state_file + f'.backup_{combo_index}'
+                                    with open(backup_file, 'wb') as f:
+                                        pickle.dump(state, f)
+                                    print(f"  Created backup: {backup_file}")
+                                    
+                        except (pickle.UnpicklingError, EOFError) as e:
+                            print(f"State file corrupted - will regenerate on next run: {e}")
+                            # Don't write - file is corrupt
+                        except Exception as e:
+                            print(f"State writer error: {e}")
+                        finally:
+                            dist_state.release_lock()
+                except queue.Empty:
+                    continue
+
+        # Start the writer thread
+        state_writer = threading.Thread(target=state_writer_thread, daemon=True)
+        state_writer.start()
+
+        # Check if state file exists and is valid
+        state_is_valid = False
+        combinations = None
         
-        # Print summary
+        if dist_state.state_file.exists() and dist_state.state_file.stat().st_size > 0:
+            try:
+                combinations = dist_state.load_state()
+                if combinations and len(combinations) > 0:
+                    state_is_valid = True
+                    print(f"Loaded existing state with {len(combinations)} combinations")
+                else:
+                    print("State file exists but is empty or corrupt - will regenerate")
+            except Exception as e:
+                print(f"State file error: {e} - will regenerate")
+        
+        # Generate new state if needed (applies all ordering features)
+        if not state_is_valid or not combinations:
+            print("Generating new render queue...")
+            
+            # Step 1: Generate all possible combinations
+            combinations = self.generate_combination_index(
+                superprompts, metaprompts,
+                superprompt_iterations, metaprompt_iterations
+            )
+            print(f"Generated {len(combinations)} total combinations")
+            
+            # Step 2: Apply unique-untried-first prioritization (if requested)
+            # Note: For a fresh state, all combos are never-rendered with untouched prompts
+            # This means the priority order is just the original order, but we preserve
+            # the logic for when state files have existing completed renders
+            if unique_untried_first:
+                # For existing state files, we need to load completed status
+                # For fresh state, all combos are equally "untried"
+                if state_is_valid:
+                    # Build sets of touched prompts from completed renders
+                    touched_superprompts = {c['superprompt_idx'] for c in combinations if c.get('completed', False)}
+                    touched_metaprompts = {c['metaprompt_idx'] for c in combinations if c.get('completed', False) and c['metaprompt_idx'] >= 0}
+                    
+                    def is_untouched_prompts(combo):
+                        sp_touched = combo['superprompt_idx'] in touched_superprompts
+                        mp_touched = combo['metaprompt_idx'] in touched_metaprompts if combo['metaprompt_idx'] >= 0 else False
+                        return not (sp_touched or mp_touched)
+                    
+                    # Split pending combos by render history and prompt touch status
+                    never_rendered = [c for c in combinations if not c.get('completed', False)]
+                    already_rendered = [c for c in combinations if c.get('completed', False)]
+                    
+                    never_untouched = [c for c in never_rendered if is_untouched_prompts(c)]
+                    never_touched = [c for c in never_rendered if not is_untouched_prompts(c)]
+                    already_untouched = [c for c in already_rendered if is_untouched_prompts(c)]
+                    already_touched = [c for c in already_rendered if not is_untouched_prompts(c)]
+                    
+                    # Combine in priority order
+                    combinations = never_untouched + never_touched + already_untouched + already_touched
+                    
+                    print(f"Unique-untried-first mode: Enabled")
+                    print(f"  Never-rendered + untouched prompts: {len(never_untouched)}")
+                    print(f"  Never-rendered + touched prompts: {len(never_touched)}")
+                    print(f"  Already-rendered + untouched prompts: {len(already_untouched)}")
+                    print(f"  Already-rendered + touched prompts: {len(already_touched)}")
+                else:
+                    print(f"Unique-untried-first mode: Enabled (fresh state - all combos untried)")
+            
+            # Step 3: Apply sampling (take every Nth item)
+            if sample_rate and 0 < sample_rate < 1:
+                sample_step = int(1.0 / sample_rate)
+                original_count = len(combinations)
+                sampled_indices = set(range(0, original_count, sample_step))
+                combinations = [combinations[i] for i in sorted(sampled_indices)]
+                print(f"Sampling mode: {sample_rate*100:.1f}% of combinations ({len(combinations)} of {original_count} items)")
+            
+            # Step 4: Apply shuffle (randomize order)
+            if shuffle:
+                random.shuffle(combinations)
+                print(f"Shuffle mode: Render order randomized")
+            
+            # Step 5: Apply resume filter (skip indices before start_from)
+            if start_from is not None and start_from > 0:
+                # Note: start_from refers to original indices before shuffling/sampling
+                # This is a best-effort mapping
+                combinations = [c for c in combinations if c.get('original_index', c['index']) >= start_from]
+                print(f"Resume mode: Starting from original index {start_from}, {len(combinations)} combinations remain")
+            
+            # Step 6: Re-number all indices sequentially
+            for idx, combo in enumerate(combinations):
+                combo['index'] = idx
+                combo['status'] = 'pending'
+                combo['worker_id'] = None
+                combo['claimed_at'] = None
+                combo['last_update'] = None
+                # Preserve completed status if it exists (for resume scenarios)
+                if 'completed' in combo:
+                    if combo['completed']:
+                        combo['status'] = 'completed'
+                    del combo['completed']
+            
+            # Save the newly generated state file
+            with open(state_file, 'wb') as f:
+                pickle.dump(combinations, f)
+            print(f"Saved {len(combinations)} combinations to state file")
+        
+        # Verify we have combinations to render
+        if not combinations:
+            print("Error: No combinations to render")
+            sys.exit(1)
+        
+        # Count pending renders
+        pending_count = sum(1 for c in combinations if c.get('status') == 'pending')
+        completed_count = sum(1 for c in combinations if c.get('status') == 'completed')
+        
         print(f"\n{'='*70}")
-        print(f"Batch Render Complete")
-        print(f"  Successful renders: {successful_renders}")
-        print(f"  Failed renders: {failed_renders}")
-        print(f"  Total renders this session: {total_renders}")
-        remaining = len([c for c in combinations if not c['completed']])
-        if remaining > 0:
-            print(f"  Remaining renders: {remaining}")
+        print(f"Starting {len(multi_host_urls)} independent render threads")
+        print(f"  Total combinations: {len(combinations)}")
+        print(f"  Already completed: {completed_count}")
+        print(f"  Pending renders: {pending_count}")
+        print(f"  Each host runs its own loop: claim -> render -> pause -> repeat")
         print(f"{'='*70}\n")
+        
+        # Worker function for a single dedicated host
+        def host_worker(host_url, worker_id):
+            """Independent worker thread for one host"""
+            successful = 0
+            failed = 0
+            
+            print(f"\n[Worker {worker_id}] Started for {host_url}")
+            
+            while True:
+                # Claim a pending render from the shared state
+                combo = dist_state.claim_next_pending(
+                    heartbeat_interval, 
+                    shuffle=shuffle, 
+                    unique_untried_first=unique_untried_first
+                )
+                if not combo:
+                    # Check if any renders are still pending or in progress
+                    try:
+                        with open(state_file, 'rb') as f:
+                            state = pickle.load(f)
+                        any_pending = any(c.get('status') == 'pending' for c in state)
+                        any_rendering = any(c.get('status') == 'rendering' for c in state)
+                        
+                        if not any_pending and not any_rendering:
+                            print(f"[Worker {worker_id}] No more renders - shutting down")
+                            break
+                        elif any_rendering:
+                            print(f"[Worker {worker_id}] Waiting for other workers... ({sum(1 for c in state if c.get('status') == 'rendering')} in progress)")
+                            time.sleep(30)
+                            continue
+                        else:
+                            print(f"[Worker {worker_id}] No pending renders found")
+                            break
+                    except Exception as e:
+                        print(f"[Worker {worker_id}] Error checking state: {e}")
+                        time.sleep(30)
+                        continue
+                
+                # Get global progress statistics before starting the render
+                try:
+                    with open(state_file, 'rb') as f:
+                        state = pickle.load(f)
+                    global_completed = sum(1 for c in state if c.get('status') == 'completed')
+                    global_pending = sum(1 for c in state if c.get('status') == 'pending')
+                    global_total = len(state)
+                    global_rendering = sum(1 for c in state if c.get('status') == 'rendering')
+                    
+                    print(f"\n[Worker {worker_id}] --- Render {combo['index']} --- [{global_completed}/{global_total} completed, {global_pending} pending, {global_rendering} rendering]")
+                except Exception as e:
+                    print(f"\n[Worker {worker_id}] --- Render {combo['index']} --- (progress unavailable: {e})")
+                
+                print(f"[Worker {worker_id}] Superprompt [{combo['superprompt_idx']}]: {combo['superprompt'][:60]}...")
+                if combo.get('metaprompt'):
+                    print(f"[Worker {worker_id}] Metaprompt: {combo['metaprompt'][:60]}")
+                
+                # Load a fresh copy of the workflow for this render
+                workflow = self.load_workflow(workflow_path)
+                
+                # Set up output directory structure
+                if combo['metaprompt_idx'] >= 0:
+                    output_subdir = str(Path(f"sp{combo['superprompt_idx']:03d}") / f"mp{combo['metaprompt_idx']:03d}")
+                else:
+                    output_subdir = str(Path(f"sp{combo['superprompt_idx']:03d}") / "no_meta")
+                
+                # Generate the final prompt by substituting metaprompt into template
+                final_prompt = self.substitute_metaprompt(combo['superprompt'], combo.get('metaprompt', ''))
+                random_seed = random.randint(1, 2**32 - 1)
+                
+                # Create a meaningful filename prefix from the prompt content
+                safe_sp = self.sanitize_for_filename(combo['superprompt'], 20)
+                if combo.get('metaprompt'):
+                    safe_mp = self.sanitize_for_filename(combo['metaprompt'], 20)
+                    filename_prefix = f"{safe_sp}__{safe_mp}__seed{random_seed}"
+                else:
+                    filename_prefix = f"{safe_sp}__seed{random_seed}"
+                
+                # Update the workflow with our render settings
+                self.update_prompt_in_workflow(workflow, final_prompt, is_positive=True)
+                self.update_seed_in_workflow(workflow, random_seed)
+                self.update_output_node(workflow, output_subdir, filename_prefix)
+                
+                # Send to THIS dedicated host (no load balancing between hosts)
+                print(f"[Worker {worker_id}] Sending to {host_url}")
+                success = self.send_to_comfyui(workflow, render_timeout, host_url)
+                
+                # Update state based on result using the queue
+                if success:
+                    successful += 1
+                    state_update_queue.put((combo['index'], 'completed', {
+                        'seed': random_seed,
+                        'timestamp': datetime.now().isoformat(),
+                        'output_path': str(self.output_base_dir / output_subdir),
+                        'worker_host': host_url
+                    }))
+                    print(f"[Worker {worker_id}] Render {combo['index']} COMPLETED (worker stats - successful: {successful}, failed: {failed})")
+                else:
+                    failed += 1
+                    state_update_queue.put((combo['index'], 'pending', {
+                        'seed': random_seed,
+                        'timestamp': datetime.now().isoformat(),
+                        'output_path': str(self.output_base_dir / output_subdir),
+                        'worker_host': host_url
+                    }))
+                    print(f"[Worker {worker_id}] Render {combo['index']} FAILED (worker stats - successful: {successful}, failed: {failed})")
+                
+                # Pause AFTER each render on THIS host for GPU cooldown
+                if pause_seconds > 0:
+                    print(f"[Worker {worker_id}] Pausing {pause_seconds}s for GPU cooldown...")
+                    time.sleep(pause_seconds)
+            
+            print(f"\n[Worker {worker_id}] Shutdown - Successful: {successful}, Failed: {failed}")
+            return successful, failed
+
+        # Start one thread per host
+        threads = []
+        
+        def run_worker(host_url, worker_id, result_list):
+            """Wrapper to capture thread return values"""
+            result = host_worker(host_url, worker_id)
+            result_list.append(result)
+        
+        # Launch all worker threads
+        for i, host_url in enumerate(multi_host_urls):
+            result_holder = []
+            thread = threading.Thread(target=run_worker, args=(host_url, i, result_holder))
+            thread.daemon = True  # Allow Ctrl+C to work
+            thread.start()
+            threads.append((thread, result_holder))
+        
+        # Wait for all threads to complete (this will run until all renders are done)
+        try:
+            for thread, _ in threads:
+                thread.join()
+        except KeyboardInterrupt:
+            print("\n\nInterrupted by user - waiting for threads to finish current renders...")
+            # Note: threads are daemon, but we still give them a moment to finish
+            time.sleep(5)
+        
+        # Calculate and display final statistics
+        total_successful = 0
+        total_failed = 0
+        for _, result_holder in threads:
+            if result_holder:
+                successful, failed = result_holder[0]
+                total_successful += successful
+                total_failed += failed
+        
+        # Load final state for overall statistics
+        try:
+            with open(state_file, 'rb') as f:
+                final_state = pickle.load(f)
+            final_completed = sum(1 for c in final_state if c.get('status') == 'completed')
+            final_pending = sum(1 for c in final_state if c.get('status') == 'pending')
+            final_rendering = sum(1 for c in final_state if c.get('status') == 'rendering')
+        except:
+            final_completed = total_successful
+            final_pending = 0
+            final_rendering = 0
+        
+        print(f"\n{'='*70}")
+        print(f"ALL WORKERS COMPLETE")
+        print(f"  This session - Successful: {total_successful}, Failed: {total_failed}")
+        print(f"  Overall state - Completed: {final_completed}, Pending: {final_pending}, In progress: {final_rendering}")
+        if final_pending > 0 or final_rendering > 0:
+            print(f"  NOTE: Some renders remain. Run again with --resume to continue.")
+        print(f"{'='*70}")
+        
+        # === SHUTDOWN STATE WRITER (after printing stats, before exiting) ===
+        try:
+            state_update_queue.put(None)  # Poison pill to stop writer
+            stop_state_writer.set()
+            state_writer.join(timeout=5)
+        except NameError:
+            pass  # state_writer was never created (error before initialization)
 
 def main():
-    parser = argparse.ArgumentParser(description='ComfyUI Batch Render')
+    parser = argparse.ArgumentParser(description='ComfyUI Batch Render - Multi-Host & Distributed Support')
     parser.add_argument('-s', '--superpromptiterations', 
                        type=int, 
                        default=1,
@@ -887,7 +1415,8 @@ def main():
     parser.add_argument('-u', '--url', 
                        type=str, 
                        default='http://127.0.0.1:8188',
-                       help='ComfyUI server URL')
+                       help='ComfyUI server URL(s). For multiple hosts, use comma-separated: '
+                            'http://host1:8188,http://host2:8188 (default: http://127.0.0.1:8188)')
     parser.add_argument('-p', '--pause', 
                        type=int, 
                        default=90,
@@ -928,6 +1457,10 @@ def main():
                        type=str, 
                        default='.comfyUIbatchRunner_render_state.pkl',
                        help='Path to state pickle file (default: .comfyUIbatchRunner_render_state.pkl)')
+    parser.add_argument('--heartbeat-interval', 
+                       type=int, 
+                       default=30,
+                       help='Heartbeat interval for distributed mode (seconds, default: 30)')
     
     args = parser.parse_args()
     
@@ -946,21 +1479,32 @@ def main():
         print(f"Error: Workflow file not found: {workflow_path}")
         sys.exit(1)
     
-    # Create renderer and run batch
-    renderer = ComfyUIBatchRenderer(server_url=args.url, output_base_dir=args.outputdir)
-    renderer.run_batch(
+    # Parse hosts - always split by comma (works for 1 or many)
+    hosts = [url.strip() for url in args.url.split(',')]
+    
+    print(f"\n{'='*70}")
+    print(f"DISTRIBUTED RENDER MODE")
+    print(f"  Hosts: {len(hosts)}")
+    for i, host in enumerate(hosts):
+        print(f"    {i+1}. {host}")
+    print(f"{'='*70}\n")
+    
+    renderer = ComfyUIBatchRenderer(server_url=hosts[0], output_base_dir=args.outputdir)
+    renderer.run_batch_distributed(
         workflow_path=args.workflowfilename,
         superprompt_iterations=args.superpromptiterations,
         metaprompt_iterations=args.metapromptiterations,
         pause_seconds=args.pause,
-        start_from=args.resume,
-        sample_rate=args.sample,
-        shuffle=args.shuffle,
         render_timeout=args.timeout,
         superprompt_file=args.superprompts,
         metaprompt_file=args.metaprompts,
         state_file=args.state_file,
-        unique_untried_first=args.unique_untried_first
+        heartbeat_interval=args.heartbeat_interval,
+        multi_host_urls=hosts,
+        shuffle=args.shuffle,
+        unique_untried_first=args.unique_untried_first,
+        sample_rate=args.sample,
+        start_from=args.resume
     )
 
 if __name__ == "__main__":
