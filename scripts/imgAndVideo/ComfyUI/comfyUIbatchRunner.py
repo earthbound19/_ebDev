@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SCRIPT: comfyUIbatchRunner.py
-VERSION: 2.1.30
+VERSION: 2.1.40
 
 DESCRIPTION:
     ComfyUI Batch Render Script
@@ -15,11 +15,15 @@ DESCRIPTION:
     randomizes seeds, and sends each combination to a running ComfyUI server.
 
 ADVANCED FEATURES
-    - DISTRIBUTED MODE: Multiple script instances can run simultaneously against 
-      different ComfyUI hosts sharing a state file (requires shared filesystem like NFS)
-    - MULTI-HOST SUPPORT: Single script instance can manage multiple ComfyUI hosts
-      in parallel with load balancing
-    - Automatic mode detection: Use comma-separated URLs with -u for multi-host mode
+    The script always runs in a distributed architecture with a shared state file,
+    supporting any number of ComfyUI hosts from 1 to N:
+    
+    - Single host: One worker thread processes renders sequentially
+    - Multiple hosts: One worker thread per host processes renders in parallel
+    - Multiple script instances: Run on different machines sharing a state file
+      (requires shared filesystem like NFS)
+    
+    Use comma-separated URLs with -u to specify multiple hosts.
     - Render status tracking: 'pending', 'rendering', 'completed', 'failed'
     - Lock file mechanism for distributed state access
     - Heartbeat monitoring for stale 'rendering' entries
@@ -30,10 +34,10 @@ DEPENDENCIES:
     ComfyUI server running with API access enabled
 
 USAGE:
-    # Single host:
+    # Single host (one worker thread):
     python comfyUIbatchRunner.py -w WORKFLOW.json -s 1 -m 1
     
-    # Multi-host distributed mode (single instance manages multiple ComfyUI servers)
+    # Multiple hosts (one worker thread per host):
     python comfyUIbatchRunner.py -w WORKFLOW.json -u "http://host1:8188,http://host2:8188"
     
     # Distributed workers on shared state file (run on multiple machines)
@@ -888,10 +892,13 @@ class ComfyUIBatchRenderer:
             # Build the full relative path: outputdir/sp000/mp000
             full_output_path = self.output_base_dir / output_subdir
             
+            # FIX: Convert Windows backslashes to forward slashes for ComfyUI
+            subfolder_str = str(full_output_path).replace('\\', '/')
+            
             if 'subfolder' in workflow[node_id]['inputs']:
                 # Use subfolder if node supports it
-                workflow[node_id]['inputs']['subfolder'] = str(full_output_path)
-                print(f"Set output subfolder: {full_output_path}")
+                workflow[node_id]['inputs']['subfolder'] = subfolder_str
+                print(f"Set output subfolder: {subfolder_str}")
             else:
                 # For nodes without subfolder, modify filename_prefix to include path
                 original_prefix = workflow[node_id]['inputs'].get('filename_prefix', 'ComfyUI')
@@ -901,8 +908,8 @@ class ComfyUIBatchRenderer:
                 else:
                     prefix = original_prefix
                 # ComfyUI interprets forward slashes as subdirectory separators
-                workflow[node_id]['inputs']['filename_prefix'] = f"{full_output_path}/{prefix}"
-                print(f"Set output prefix with path: {full_output_path}/{prefix}")
+                workflow[node_id]['inputs']['filename_prefix'] = f"{subfolder_str}/{prefix}"
+                print(f"Set output prefix with path: {subfolder_str}/{prefix}")
 
     def send_to_comfyui(self, workflow, render_timeout=600, server_url=None):
         """Send workflow to ComfyUI and monitor execution until completion or timeout.
@@ -940,7 +947,7 @@ class ComfyUIBatchRenderer:
         
         # Poll for completion
         start_time = time.time()
-        poll_interval = 12
+        poll_interval = 4
         last_alive_time = start_time
         
         while time.time() - start_time < render_timeout:
@@ -1336,59 +1343,81 @@ class ComfyUIBatchRenderer:
             print(f"\n[Worker {worker_id}] Shutdown - Successful: {successful}, Failed: {failed}")
             return successful, failed
 
-        # Start one thread per host
-        threads = []
-        
-        def run_worker(host_url, worker_id, result_list):
-            """Wrapper to capture thread return values"""
-            result = host_worker(host_url, worker_id)
-            result_list.append(result)
-        
-        # Launch all worker threads
-        for i, host_url in enumerate(multi_host_urls):
-            result_holder = []
-            thread = threading.Thread(target=run_worker, args=(host_url, i, result_holder))
-            thread.daemon = True  # Allow Ctrl+C to work
-            thread.start()
-            threads.append((thread, result_holder))
-        
-        # Wait for all threads to complete (this will run until all renders are done)
-        try:
-            for thread, _ in threads:
-                thread.join()
-        except KeyboardInterrupt:
-            print("\n\nInterrupted by user - waiting for threads to finish current renders...")
-            # Note: threads are daemon, but we still give them a moment to finish
-            time.sleep(5)
-        
-        # Calculate and display final statistics
-        total_successful = 0
-        total_failed = 0
-        for _, result_holder in threads:
-            if result_holder:
-                successful, failed = result_holder[0]
-                total_successful += successful
-                total_failed += failed
-        
-        # Load final state for overall statistics
-        try:
-            with open(state_file, 'rb') as f:
-                final_state = pickle.load(f)
-            final_completed = sum(1 for c in final_state if c.get('status') == 'completed')
-            final_pending = sum(1 for c in final_state if c.get('status') == 'pending')
-            final_rendering = sum(1 for c in final_state if c.get('status') == 'rendering')
-        except:
-            final_completed = total_successful
-            final_pending = 0
-            final_rendering = 0
-        
-        print(f"\n{'='*70}")
-        print(f"ALL WORKERS COMPLETE")
-        print(f"  This session - Successful: {total_successful}, Failed: {total_failed}")
-        print(f"  Overall state - Completed: {final_completed}, Pending: {final_pending}, In progress: {final_rendering}")
-        if final_pending > 0 or final_rendering > 0:
-            print(f"  NOTE: Some renders remain. Run again with --resume to continue.")
-        print(f"{'='*70}")
+        # Single host vs multi-host handling
+        if len(multi_host_urls) == 1:
+            # Single host mode - run directly to capture accurate statistics
+            print(f"Running in single-host mode (1 host)")
+            successful, failed = host_worker(multi_host_urls[0], 0)
+            total_successful, total_failed = successful, failed
+            
+            # Load final state for overall statistics
+            try:
+                with open(state_file, 'rb') as f:
+                    final_state = pickle.load(f)
+                final_completed = sum(1 for c in final_state if c.get('status') == 'completed')
+                final_pending = sum(1 for c in final_state if c.get('status') == 'pending')
+                final_rendering = sum(1 for c in final_state if c.get('status') == 'rendering')
+                final_total = len(final_state)
+                
+                print(f"\n{'='*70}")
+                print(f"SESSION COMPLETE")
+                print(f"  This session - Successful: {total_successful}, Failed: {total_failed}")
+                print(f"  ")
+                print(f"  Current state from pickle file:")
+                print(f"    Total combinations: {final_total}")
+                print(f"    Completed: {final_completed}")
+                print(f"    Pending: {final_pending}")
+                print(f"    In progress: {final_rendering}")
+                if final_pending > 0 or final_rendering > 0:
+                    print(f"  ")
+                    print(f"  NOTE: Some renders remain. Run again with --resume to continue.")
+                print(f"{'='*70}")
+            except Exception as e:
+                print(f"\nCould not read final state: {e}")
+        else:
+            # Multi-host mode - use threads, stats not reliable
+            threads = []
+            
+            # Launch all worker threads directly
+            for i, host_url in enumerate(multi_host_urls):
+                thread = threading.Thread(target=host_worker, args=(host_url, i))
+                thread.daemon = True
+                thread.start()
+                threads.append(thread)
+            
+            # Wait for all threads to complete
+            try:
+                for thread in threads:
+                    thread.join()
+            except KeyboardInterrupt:
+                print("\n\nInterrupted by user - waiting for threads to finish current renders...")
+                time.sleep(5)
+            
+            # Load final state from pickle file (only reliable source in multi-host)
+            try:
+                with open(state_file, 'rb') as f:
+                    final_state = pickle.load(f)
+                final_completed = sum(1 for c in final_state if c.get('status') == 'completed')
+                final_pending = sum(1 for c in final_state if c.get('status') == 'pending')
+                final_rendering = sum(1 for c in final_state if c.get('status') == 'rendering')
+                final_total = len(final_state)
+                
+                print(f"\n{'='*70}")
+                print(f"SESSION INTERRUPTED OR COMPLETED")
+                print(f"  NOTE: Per-session statistics are not available in multi-host mode")
+                print(f"        due to async worker threads and interrupt handling.")
+                print(f"  ")
+                print(f"  Current state from pickle file:")
+                print(f"    Total combinations: {final_total}")
+                print(f"    Completed: {final_completed}")
+                print(f"    Pending: {final_pending}")
+                print(f"    In progress: {final_rendering}")
+                if final_pending > 0 or final_rendering > 0:
+                    print(f"  ")
+                    print(f"  NOTE: Some renders remain. Run again with --resume to continue.")
+                print(f"{'='*70}")
+            except Exception as e:
+                print(f"\nCould not read final state: {e}")
         
         # === SHUTDOWN STATE WRITER (after printing stats, before exiting) ===
         try:
@@ -1483,7 +1512,10 @@ def main():
     hosts = [url.strip() for url in args.url.split(',')]
     
     print(f"\n{'='*70}")
-    print(f"DISTRIBUTED RENDER MODE")
+    if len(hosts) == 1:
+        print(f"COMFYUI BATCH RENDERER")
+    else:
+        print(f"DISTRIBUTED BATCH RENDERER ({len(hosts)} hosts)")
     print(f"  Hosts: {len(hosts)}")
     for i, host in enumerate(hosts):
         print(f"    {i+1}. {host}")
