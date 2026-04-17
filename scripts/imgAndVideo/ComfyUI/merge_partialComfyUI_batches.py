@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SCRIPT: merge_partial_ComfyUI_batches.py
-VERSION: 1.6.0
+VERSION: 1.7.16
 
 DESCRIPTION:
     Merge partially completed batch runs into a single state file, to allow
@@ -116,10 +116,6 @@ EXAMPLES:
         --merge-to-state-file ./recovered_state.pkl \\
         --original-super superprompts.txt --original-meta metaprompts.txt \\
         --dry-run
-
-TO DO:
-Option to move files marked completed (for cases where there is a mix of matches or not,
-or any time, for convenience).
 """
 
 import argparse
@@ -357,7 +353,12 @@ def merge_from_state_file(source_state, target_lookup, target_state, dry_run=Fal
                 added += 1
                 
                 if not dry_run:
-                    print(f"  ✓ Marked as completed: sp{combo['superprompt_idx']}, "
+                    print(f"  Match found: sp{combo['superprompt_idx']}, "
+                          f"mp{combo.get('metaprompt_idx', -1)}, "
+                          f"s_rep={combo['superprompt_repetition']}, "
+                          f"m_rep={combo['metaprompt_repetition']}")
+                else:
+                    print(f"  Would mark as completed: sp{combo['superprompt_idx']}, "
                           f"mp{combo.get('metaprompt_idx', -1)}, "
                           f"s_rep={combo['superprompt_repetition']}, "
                           f"m_rep={combo['metaprompt_repetition']}")
@@ -370,7 +371,7 @@ def merge_from_state_file(source_state, target_lookup, target_state, dry_run=Fal
     return added, already_completed, not_found
 
 def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup_by_sp_mp, 
-                           target_state, dry_run=False):
+                           target_state, dry_run=False, matched_files=None):
     """Merge completed renders from PNG files in curated directory.
     
     Matches by (sp_idx, mp_idx) and seed. First checks if the exact seed already exists
@@ -378,12 +379,15 @@ def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup
     
     Returns:
         tuple: (added_count, already_completed_count, unmatched_count, 
-                no_metadata_count, no_pending_slots_count)
+                no_metadata_count, no_pending_slots_count, matched_files_list)
     """
+    if matched_files is None:
+        matched_files = []
+    
     curated_path = Path(curated_dir)
     if not curated_path.exists():
         print(f"Error: Curated directory not found: {curated_dir}")
-        return 0, 0, 0, 0, 0
+        return 0, 0, 0, 0, 0, matched_files
     
     # Find all PNGs recursively
     png_files = list(curated_path.rglob("*.png"))
@@ -443,24 +447,26 @@ def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup
         found_pending = False
         for target_idx in target_indices:
             if target_state[target_idx].get('status') != 'completed':
-                # Found a pending entry - mark it completed
+                # Found a pending entry - would mark it completed
                 if not dry_run:
                     target_state[target_idx]['status'] = 'completed'
                     target_state[target_idx]['worker_id'] = 'merged_from_curated'
                     target_state[target_idx]['last_update'] = datetime.now().isoformat()
-                    target_state[target_idx]['seed'] = seed  # Store the seed from PNG
-                added += 1
-                found_pending = True
-                
-                if not dry_run:
+                    target_state[target_idx]['seed'] = seed
+                    print(f"  Match found: sp{sp_idx}, mp{mp_idx}, "
+                          f"s_rep={target_state[target_idx]['superprompt_repetition']}, "
+                          f"m_rep={target_state[target_idx]['metaprompt_repetition']}, seed={seed}")
+                    matched_files.append(str(png_path))
+                else:
                     s_rep = target_state[target_idx]['superprompt_repetition']
                     m_rep = target_state[target_idx]['metaprompt_repetition']
-                    print(f"  Marked as completed: sp{sp_idx}, mp{mp_idx}, "
+                    print(f"  Would mark as completed: sp{sp_idx}, mp{mp_idx}, "
                           f"s_rep={s_rep}, m_rep={m_rep}, seed={seed}")
+                added += 1
+                found_pending = True
                 break
         
         if not found_pending:
-            # All repetitions for this (sp, mp) are already completed
             no_pending_slots += 1
             if not dry_run:
                 print(f"  Warning: No pending slots for (sp{sp_idx}, mp{mp_idx}) from {png_path.name}")
@@ -473,7 +479,7 @@ def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup
         print(f"  Warning: {no_pending_slots} PNGs matched (sp,mp) but had no pending slots")
         print(f"           (all repetitions of that prompt pair are already completed)")
     
-    return added, already_completed, unmatched, no_metadata, no_pending_slots
+    return added, already_completed, unmatched, no_metadata, no_pending_slots, matched_files
 
 def main():
     parser = argparse.ArgumentParser(
@@ -601,18 +607,20 @@ CRITICAL WARNINGS:
     curated_unmatched = 0
     curated_no_metadata = 0
     curated_no_pending = 0
+    matched_png_files = []
     
     if args.source_curated_dir:
         print(f"Processing curated directory: {args.source_curated_dir}")
-        added, already, unmatched, no_metadata, no_pending = merge_from_curated_dir(
+        added, already, unmatched, no_metadata, no_pending, matched = merge_from_curated_dir(
             args.source_curated_dir, superprompts, metaprompts, 
-            target_lookup_by_sp_mp, target_state, args.dry_run
+            target_lookup_by_sp_mp, target_state, args.dry_run, []
         )
         curated_added = added
         curated_already = already
         curated_unmatched = unmatched
         curated_no_metadata = no_metadata
         curated_no_pending = no_pending
+        matched_png_files = matched
         total_added += added
         total_already += already
         print(f"  Added: {added} new completions, {already} already completed\n")
@@ -638,11 +646,6 @@ CRITICAL WARNINGS:
     print(f"    Pending: {total_combinations - new_completed}")
     print(f"{'='*70}")
     
-    if total_added > 0 and not args.dry_run:
-        print(f"\nREMINDER: The state file will be updated, but the actual image files")
-        print(f"          from your source runs will still need to be copied manually")
-        print(f"          into your target output directory to complete the merge.")
-    
     if total_added == 0:
         print("\nNo new completions to add. Nothing to save.")
         sys.exit(0)
@@ -660,9 +663,60 @@ CRITICAL WARNINGS:
                 sys.exit(0)
         
         if save_state_file(target_state, target_path):
-            print(f"\n✓ Successfully updated {target_path}")
+            print(f"\nSuccessfully updated {target_path}")
+            
+            # Offer to move matched PNG files if any were merged from curated dir
+            if matched_png_files and args.source_curated_dir:
+                print(f"\nThe following {len(matched_png_files)} PNG files were matched and merged:")
+                
+                # Show first 10 as examples
+                for f in matched_png_files[:10]:
+                    print(f"  {f}")
+                if len(matched_png_files) > 10:
+                    print(f"  ... and {len(matched_png_files) - 10} more")
+                
+                print(f"\nThese files should be moved to your target output directory")
+                print(f"to complete the merge process.")
+                print(f"\nYou will be prompted for the target directory path.")
+                print(f"Files will be MOVED (not copied) to preserve the relative")
+                print(f"subdirectory structure from the source curated directory.")
+                
+                move_response = input(f"\nMove these files to target output directory? (y/N): ").strip().lower()
+                if move_response == 'y':
+                    target_output = input(f"\nEnter target output directory path: ").strip()
+                    if target_output:
+                        target_output_path = Path(target_output)
+                        if target_output_path.exists():
+                            moved_count = 0
+                            for src_path in matched_png_files:
+                                src = Path(src_path)
+                                # Get the relative path from the source curated dir
+                                source_curated_path = Path(args.source_curated_dir)
+                                try:
+                                    rel_path = src.relative_to(source_curated_path)
+                                    dst = target_output_path / rel_path
+                                    # Create parent directories if needed
+                                    dst.parent.mkdir(parents=True, exist_ok=True)
+                                    # MOVE the file (not copy)
+                                    shutil.move(str(src), str(dst))
+                                    moved_count += 1
+                                except ValueError:
+                                    # Fallback: just move to root with filename
+                                    dst = target_output_path / src.name
+                                    shutil.move(str(src), str(dst))
+                                    moved_count += 1
+                                except Exception as e:
+                                    print(f"  Failed to move {src.name}: {e}")
+                            print(f"\nMoved {moved_count} files to {target_output_path}")
+                        else:
+                            print(f"Target directory not found: {target_output}")
+                            print("Files not moved. Move them manually.")
+                    else:
+                        print("No target directory provided. Files not moved.")
+                else:
+                    print("Files not moved. Move them manually to complete the merge.")
         else:
-            print(f"\n✗ Failed to save {target_path}")
+            print(f"\nFailed to save {target_path}")
             sys.exit(1)
     else:
         print(f"\nDRY RUN: No changes were saved.")
