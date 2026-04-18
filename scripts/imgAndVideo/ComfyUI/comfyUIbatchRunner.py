@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SCRIPT: comfyUIbatchRunner.py
-VERSION: 2.1.40
+VERSION: 2.1.42
 
 DESCRIPTION:
     ComfyUI Batch Render Script
@@ -197,6 +197,26 @@ NOTES:
         will change the total number of combinations and the mapping of global indices,
         corrupting the state file. If you need to change iterations, start a fresh batch
         or delete the existing .pkl file.
+
+        BACKUP STATE FILES:
+            The script automatically creates a backup of the state file every 100
+            completed renders. Backup files are named:
+            {state_file}.backup_{completed_count}
+
+            For example: .comfyUIbatchRunner_render_state.pkl.backup_2411
+
+            The number is the count of completed renders at the time of backup,
+            not a global index. This makes it easy to identify the most recent
+            backup even when using --shuffle (which randomizes render order).
+
+            Backups are created in the same directory as the state file.
+
+            The companion script merge_partialComfyUI_batches.py can be used to
+            update a backup state file to include the state of current renders
+            in case the production state file becomes corrupted. See the
+            DISASTER RECOVERY comment in that script. It can also be used to
+            merge fragmented or disparate batch runs with the same prompts etc.
+            into a state file.
 
     RESUME BEHAVIOR (with existing state pickle file):
         The --resume flag requires a valid state pickle file. If the state file is
@@ -1093,7 +1113,8 @@ class ComfyUIBatchRenderer:
                                 write_count += 1
                                 if write_count >= 100:
                                     write_count = 0
-                                    backup_file = state_file + f'.backup_{combo_index}'
+                                    completed_count = sum(1 for c in state if c.get('status') == 'completed')
+                                    backup_file = state_file + f'.backup_{completed_count}'
                                     with open(backup_file, 'wb') as f:
                                         pickle.dump(state, f)
                                     print(f"  Created backup: {backup_file}")
