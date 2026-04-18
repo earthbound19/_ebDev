@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SCRIPT: merge_partial_ComfyUI_batches.py
-VERSION: 1.7.16
+VERSION: 1.8.25
 
 DESCRIPTION:
     Merge partially completed batch runs into a single state file, to allow
@@ -16,7 +16,20 @@ DESCRIPTION:
     can merge the rendered images information into the state (pickle) file. (And manually
     copy the subfolder structures and files into the same directory.) This script allows
     you to do that: merge them into one master state file. 
-    
+
+    DISASTER RECOVERY:
+        If your active state file becomes corrupted but you have a backup, you can
+        copy a the most recent backup to the current pickle file name, and run
+        this script to recover any missing update states via PNG renders evidence:
+            cp backup.pkl active_state.pkl
+            python merge_partial_ComfyUI_batches.py \\
+                --source-curated-dir ./output_renders \\
+                --merge-to-state-file ./active_state.pkl \\
+                --original-super superprompts.txt --original-meta metaprompts.txt
+        
+        The script will scan your PNG files and mark any completed renders
+        that occurred after the backup was created.
+
     This merges render information into a target pickle file by processing either
     or both of these sources:
         --source-state-file     : Another state pickle file from a partial run
@@ -24,6 +37,29 @@ DESCRIPTION:
     
     It updates the target state file (pickle file) by marking matching renders as
     'completed', creating a union of all completed renders from all sources.
+
+    ORPHAN RECOVERY:
+        Orphans are PNG files that exist in your curated directory but could not be
+        matched to any entry in the state file. This can happen when:
+            - Prompt files have changed since the images were generated
+            - Images come from a different workflow or batch configuration
+            - PNG metadata is corrupted or missing
+            - Prompt matching fails?
+        
+        When orphans are detected, the script offers to move them to:
+            {source_curated_dir}/_discards/_orphans/
+        
+        This keeps your curated directory clean while preserving orphans for:
+            - Manual inspection to understand why they didn't match
+            - Recovery if you later determine they should be merged
+            - Comparison against updated prompt files in future runs
+        
+        Orphans are MOVED (not copied) to preserve disk space. The relative
+        subdirectory structure is maintained within the _orphans sub-subfolder.
+        
+        To process orphans without merging state updates, run with:
+            --source-curated-dir ./kept_images --dry-run
+        (Then remove --dry-run to actually move them)
 
 DEPENDENCIES:
     Python 3.6 or higher
@@ -371,23 +407,27 @@ def merge_from_state_file(source_state, target_lookup, target_state, dry_run=Fal
     return added, already_completed, not_found
 
 def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup_by_sp_mp, 
-                           target_state, dry_run=False, matched_files=None):
+                           target_state, dry_run=False, matched_files=None, orphan_files=None):
     """Merge completed renders from PNG files in curated directory.
     
     Matches by (sp_idx, mp_idx) and seed. First checks if the exact seed already exists
     as completed. If not, finds the first pending repetition for that (sp, mp) pair.
     
+    Tracks unmatched PNGs (orphans) separately for optional moving.
+    
     Returns:
         tuple: (added_count, already_completed_count, unmatched_count, 
-                no_metadata_count, no_pending_slots_count, matched_files_list)
+                no_metadata_count, no_pending_slots_count, matched_files_list, orphan_files_list)
     """
     if matched_files is None:
         matched_files = []
+    if orphan_files is None:
+        orphan_files = []
     
     curated_path = Path(curated_dir)
     if not curated_path.exists():
         print(f"Error: Curated directory not found: {curated_dir}")
-        return 0, 0, 0, 0, 0, matched_files
+        return 0, 0, 0, 0, 0, matched_files, orphan_files
     
     # Find all PNGs recursively
     png_files = list(curated_path.rglob("*.png"))
@@ -412,16 +452,18 @@ def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup
         
         if sp_idx is None:
             unmatched += 1
+            orphan_files.append(str(png_path))
             if not dry_run:
-                print(f"  Warning: Could not match prompt from {png_path.name}")
+                print(f"  Orphan (could not match prompt): {png_path.name}")
             continue
         
         # Find all target indices for this (sp, mp) pair
         key = (sp_idx, mp_idx)
         if key not in target_lookup_by_sp_mp:
             unmatched += 1
+            orphan_files.append(str(png_path))
             if not dry_run:
-                print(f"  Warning: No state entries for (sp{sp_idx}, mp{mp_idx}) from {png_path.name}")
+                print(f"  Orphan (no state entries): {png_path.name}")
             continue
         
         target_indices = target_lookup_by_sp_mp[key]
@@ -473,13 +515,11 @@ def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup
     
     if no_metadata > 0:
         print(f"  Warning: {no_metadata} PNGs had no extractable prompt/seed metadata")
-    if unmatched > 0:
-        print(f"  Warning: {unmatched} PNGs could not be matched to state entries")
     if no_pending_slots > 0:
         print(f"  Warning: {no_pending_slots} PNGs matched (sp,mp) but had no pending slots")
         print(f"           (all repetitions of that prompt pair are already completed)")
     
-    return added, already_completed, unmatched, no_metadata, no_pending_slots, matched_files
+    return added, already_completed, unmatched, no_metadata, no_pending_slots, matched_files, orphan_files
 
 def main():
     parser = argparse.ArgumentParser(
@@ -608,12 +648,13 @@ CRITICAL WARNINGS:
     curated_no_metadata = 0
     curated_no_pending = 0
     matched_png_files = []
+    orphan_png_files = []
     
     if args.source_curated_dir:
         print(f"Processing curated directory: {args.source_curated_dir}")
-        added, already, unmatched, no_metadata, no_pending, matched = merge_from_curated_dir(
+        added, already, unmatched, no_metadata, no_pending, matched, orphans = merge_from_curated_dir(
             args.source_curated_dir, superprompts, metaprompts, 
-            target_lookup_by_sp_mp, target_state, args.dry_run, []
+            target_lookup_by_sp_mp, target_state, args.dry_run, [], []
         )
         curated_added = added
         curated_already = already
@@ -621,6 +662,7 @@ CRITICAL WARNINGS:
         curated_no_metadata = no_metadata
         curated_no_pending = no_pending
         matched_png_files = matched
+        orphan_png_files = orphans
         total_added += added
         total_already += already
         print(f"  Added: {added} new completions, {already} already completed\n")
@@ -636,7 +678,7 @@ CRITICAL WARNINGS:
     if curated_no_metadata > 0:
         print(f"  PNGs with no metadata: {curated_no_metadata}")
     if curated_unmatched > 0:
-        print(f"  PNGs that couldn't be matched: {curated_unmatched}")
+        print(f"  PNGs that couldn't be matched (orphans): {curated_unmatched}")
     if curated_no_pending > 0:
         print(f"  PNGs with no pending slots: {curated_no_pending}")
     print(f"  ")
@@ -646,12 +688,12 @@ CRITICAL WARNINGS:
     print(f"    Pending: {total_combinations - new_completed}")
     print(f"{'='*70}")
     
-    if total_added == 0:
-        print("\nNo new completions to add. Nothing to save.")
+    if total_added == 0 and curated_unmatched == 0:
+        print("\nNo new completions to add and no orphans found. Nothing to save.")
         sys.exit(0)
     
-    # Confirm and save
-    if not args.dry_run:
+    # Confirm and save (only if there are additions to save)
+    if not args.dry_run and total_added > 0:
         if not args.force:
             print(f"\nWARNING: You are about to update {target_path}")
             print(f"This will add {total_added} new completion records.")
@@ -664,62 +706,114 @@ CRITICAL WARNINGS:
         
         if save_state_file(target_state, target_path):
             print(f"\nSuccessfully updated {target_path}")
-            
-            # Offer to move matched PNG files if any were merged from curated dir
-            if matched_png_files and args.source_curated_dir:
-                print(f"\nThe following {len(matched_png_files)} PNG files were matched and merged:")
-                
-                # Show first 10 as examples
-                for f in matched_png_files[:10]:
-                    print(f"  {f}")
-                if len(matched_png_files) > 10:
-                    print(f"  ... and {len(matched_png_files) - 10} more")
-                
-                print(f"\nThese files should be moved to your target output directory")
-                print(f"to complete the merge process.")
-                print(f"\nYou will be prompted for the target directory path.")
-                print(f"Files will be MOVED (not copied) to preserve the relative")
-                print(f"subdirectory structure from the source curated directory.")
-                
-                move_response = input(f"\nMove these files to target output directory? (y/N): ").strip().lower()
-                if move_response == 'y':
-                    target_output = input(f"\nEnter target output directory path: ").strip()
-                    if target_output:
-                        target_output_path = Path(target_output)
-                        if target_output_path.exists():
-                            moved_count = 0
-                            for src_path in matched_png_files:
-                                src = Path(src_path)
-                                # Get the relative path from the source curated dir
-                                source_curated_path = Path(args.source_curated_dir)
-                                try:
-                                    rel_path = src.relative_to(source_curated_path)
-                                    dst = target_output_path / rel_path
-                                    # Create parent directories if needed
-                                    dst.parent.mkdir(parents=True, exist_ok=True)
-                                    # MOVE the file (not copy)
-                                    shutil.move(str(src), str(dst))
-                                    moved_count += 1
-                                except ValueError:
-                                    # Fallback: just move to root with filename
-                                    dst = target_output_path / src.name
-                                    shutil.move(str(src), str(dst))
-                                    moved_count += 1
-                                except Exception as e:
-                                    print(f"  Failed to move {src.name}: {e}")
-                            print(f"\nMoved {moved_count} files to {target_output_path}")
-                        else:
-                            print(f"Target directory not found: {target_output}")
-                            print("Files not moved. Move them manually.")
-                    else:
-                        print("No target directory provided. Files not moved.")
-                else:
-                    print("Files not moved. Move them manually to complete the merge.")
         else:
             print(f"\nFailed to save {target_path}")
             sys.exit(1)
-    else:
-        print(f"\nDRY RUN: No changes were saved.")
+    elif not args.dry_run and total_added == 0:
+        print(f"\nNo state file updates needed.")
+    
+    # Handle file moving (matched and orphan) after state save (or even if no state changes)
+    if not args.dry_run and args.source_curated_dir:
+        source_curated_path = Path(args.source_curated_dir)
+        
+        # Offer to move matched PNG files if any were merged
+        if matched_png_files:
+            print(f"\nThe following {len(matched_png_files)} PNG files were matched and merged:")
+            
+            # Show first 10 as examples
+            for f in matched_png_files[:10]:
+                print(f"  {f}")
+            if len(matched_png_files) > 10:
+                print(f"  ... and {len(matched_png_files) - 10} more")
+            
+            print(f"\nThese files should be moved to your target output directory")
+            print(f"to complete the merge process.")
+            print(f"\nYou will be prompted for the target directory path.")
+            print(f"Files will be MOVED (not copied) to preserve the relative")
+            print(f"subdirectory structure from the source curated directory.")
+            
+            move_response = input(f"\nMove these files to target output directory? (y/N): ").strip().lower()
+            if move_response == 'y':
+                target_output = input(f"\nEnter target output directory path: ").strip()
+                if target_output:
+                    target_output_path = Path(target_output)
+                    if target_output_path.exists():
+                        moved_count = 0
+                        for src_path in matched_png_files:
+                            src = Path(src_path)
+                            try:
+                                rel_path = src.relative_to(source_curated_path)
+                                dst = target_output_path / rel_path
+                                dst.parent.mkdir(parents=True, exist_ok=True)
+                                shutil.move(str(src), str(dst))
+                                moved_count += 1
+                            except ValueError:
+                                dst = target_output_path / src.name
+                                shutil.move(str(src), str(dst))
+                                moved_count += 1
+                            except Exception as e:
+                                print(f"  Failed to move {src.name}: {e}")
+                        print(f"\nMoved {moved_count} files to {target_output_path}")
+                    else:
+                        print(f"Target directory not found: {target_output}")
+                        print("Files not moved. Move them manually.")
+                else:
+                    print("No target directory provided. Files not moved.")
+            else:
+                print("Files not moved. Move them manually to complete the merge.")
+        
+        # Offer to move orphan PNG files (unmatched) to _discards/_orphans
+        if orphan_png_files:
+            print(f"\nThe following {len(orphan_png_files)} PNG files could not be matched")
+            print(f"to any state entry (orphans):")
+            
+            # Show first 10 as examples
+            for f in orphan_png_files[:10]:
+                print(f"  {f}")
+            if len(orphan_png_files) > 10:
+                print(f"  ... and {len(orphan_png_files) - 10} more")
+            
+            print(f"\nThese files can be moved to '_discards/_orphans' subfolder to keep")
+            print(f"your curated directory clean.")
+            
+            orphan_response = input(f"\nMove orphans to '_discards/_orphans'? (y/N): ").strip().lower()
+            if orphan_response == 'y':
+                discards_dir = source_curated_path / "_discards"
+                orphans_dir = discards_dir / "_orphans"
+                orphans_dir.mkdir(parents=True, exist_ok=True)
+                
+                moved_orphans = 0
+                for src_path in orphan_png_files:
+                    src = Path(src_path)
+                    try:
+                        rel_path = src.relative_to(source_curated_path)
+                        dst = orphans_dir / rel_path
+                        dst.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.move(str(src), str(dst))
+                        moved_orphans += 1
+                    except Exception as e:
+                        print(f"  Failed to move {src.name}: {e}")
+                
+                print(f"\nMoved {moved_orphans} orphan files to {orphans_dir}")
+                
+                # Offer to delete empty directories left behind
+                if moved_orphans > 0:
+                    cleanup = input(f"\nRemove empty source directories left behind? (y/N): ").strip().lower()
+                    if cleanup == 'y':
+                        for root, dirs, files in os.walk(source_curated_path, topdown=False):
+                            for dir_name in dirs:
+                                dir_path = Path(root) / dir_name
+                                # Skip the _discards directory itself
+                                if dir_path == discards_dir or dir_path.parent == discards_dir:
+                                    continue
+                                if not any(dir_path.iterdir()):
+                                    dir_path.rmdir()
+                                    print(f"  Removed empty directory: {dir_path}")
+            else:
+                print("Orphans not moved. You may delete them manually.")
+    
+    if args.dry_run:
+        print(f"\nDRY RUN: No changes were saved and no files were moved.")
         print(f"To actually apply changes, run without --dry-run")
 
 if __name__ == "__main__":
