@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SCRIPT: comfyUIbatchRunner.py
-VERSION: 2.1.42
+VERSION: 2.1.45
 
 DESCRIPTION:
     ComfyUI Batch Render Script
@@ -38,11 +38,11 @@ USAGE:
     python comfyUIbatchRunner.py -w WORKFLOW.json -s 1 -m 1
     
     # Multiple hosts (one worker thread per host):
-    python comfyUIbatchRunner.py -w WORKFLOW.json -u "http://host1:8188,http://host2:8188"
+    python comfyUIbatchRunner.py -w WORKFLOW.json -u "http://192.168.0.25:8188,http://192.168.0.25:8189"
     
     # Distributed workers on shared state file (run on multiple machines)
-    # Machine 1: python comfyUIbatchRunner.py -w WORKFLOW.json -u http://machine1:8188 --state-file /shared/state.pkl
-    # Machine 2: python comfyUIbatchRunner.py -w WORKFLOW.json -u http://machine2:8188 --state-file /shared/state.pkl
+    # Machine 1: python comfyUIbatchRunner.py -w WORKFLOW.json -u http://192.168.0.25:8188 --state-file /shared/state.pkl
+    # Machine 2: python comfyUIbatchRunner.py -w WORKFLOW.json -u http://192.168.0.25:8189 --state-file /shared/state.pkl
 
 REQUIRED ARGUMENTS:
     -w, --workflowfilename    Path to API-format workflow JSON file
@@ -54,7 +54,7 @@ OPTIONAL ARGUMENTS:
                                    (default: 1)
     -p, --pause                    Pause seconds between renders (default: 90)
     -u, --url                      ComfyUI server URL. For multiple hosts, use 
-                                   comma-separated: http://host1:8188,http://host2:8188
+                                   comma-separated: http://192.168.0.25:8188,http://192.168.0.25:8189
                                    (default: http://127.0.0.1:8188)
     -o, --outputdir                Base output directory (default: renders)
     -r, --resume                   Resume from global index number (validates bounds)
