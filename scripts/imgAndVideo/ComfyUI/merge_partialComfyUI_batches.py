@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SCRIPT: merge_partial_ComfyUI_batches.py
-VERSION: 1.8.25
+VERSION: 1.9.30
 
 DESCRIPTION:
     Merge partially completed batch runs into a single state file, to allow
@@ -60,6 +60,20 @@ DESCRIPTION:
         To process orphans without merging state updates, run with:
             --source-curated-dir ./kept_images --dry-run
         (Then remove --dry-run to actually move them)
+
+    ORGANIZE COMPLETED RENDERS:
+        After merging, the script will interactively prompt to organize PNG files
+        that are already marked as completed in the state file. This is useful for:
+            - Consolidating renders from multiple partial runs into one organized directory
+            - Reorganizing an existing render directory to match the standard structure
+            - Recovering files that were manually moved or scattered
+        
+        It will:
+        1. Scan the --source-curated-dir for PNG files (extracts prompt and seed from metadata)
+        2. Match them against completed renders in the state file
+        3. Move or copy them to a user-specified target directory using the proper folder structure:
+           spXXX/mpYYY/ (or spXXX/no_meta/ for empty metaprompts)
+        4. Preserve the filename structure (or optionally rename using seed information)
 
 DEPENDENCIES:
     Python 3.6 or higher
@@ -325,6 +339,23 @@ def build_state_lookup_by_sp_mp_only(state):
         lookup[key].append(idx)
     return lookup
 
+def build_completed_lookup_by_sp_mp_seed(state):
+    """Build lookup for completed entries by (sp_idx, mp_idx, seed).
+    
+    Returns:
+        dict: {(superprompt_idx, metaprompt_idx, seed): state_index}
+    """
+    lookup = {}
+    for idx, combo in enumerate(state):
+        if combo.get('status') == 'completed' and combo.get('seed') is not None:
+            key = (
+                combo['superprompt_idx'],
+                combo.get('metaprompt_idx', -1),
+                combo['seed']
+            )
+            lookup[key] = idx
+    return lookup
+
 def validate_state_lengths_match(target_state, source_state):
     """Validate that target and source state files have the same length.
     
@@ -521,6 +552,153 @@ def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup
     
     return added, already_completed, unmatched, no_metadata, no_pending_slots, matched_files, orphan_files
 
+def organize_completed_renders(state, superprompts, metaprompts, source_dir, target_dir, 
+                                copy_mode=False, rename_by_seed=False, dry_run=False):
+    """Organize PNG files that are already marked as completed in the state file.
+    
+    Args:
+        state: The target state list
+        superprompts: List of superprompt templates
+        metaprompts: List of metaprompt values
+        source_dir: Source directory to scan for PNGs
+        target_dir: Target directory to organize into
+        copy_mode: If True, copy files; if False, move files
+        rename_by_seed: If True, rename files to include seed; if False, keep original name
+        dry_run: If True, only show what would be done
+    
+    Returns:
+        tuple: (organized_count, failed_count, already_organized_count)
+    """
+    source_path = Path(source_dir)
+    target_path = Path(target_dir)
+    
+    if not source_path.exists():
+        print(f"Error: Source directory not found: {source_dir}")
+        return 0, 0, 0
+    
+    # Create target directory if it doesn't exist
+    if not dry_run:
+        target_path.mkdir(parents=True, exist_ok=True)
+    
+    # Build lookup for completed entries by (sp_idx, mp_idx, seed)
+    completed_lookup = {}
+    for combo in state:
+        if combo.get('status') == 'completed' and combo.get('seed') is not None:
+            key = (
+                combo['superprompt_idx'],
+                combo.get('metaprompt_idx', -1),
+                combo['seed']
+            )
+            completed_lookup[key] = combo
+    
+    print(f"  Found {len(completed_lookup)} completed renders in state file")
+    
+    # Find all PNGs in source directory
+    png_files = list(source_path.rglob("*.png"))
+    print(f"  Found {len(png_files)} PNGs in {source_dir}")
+    
+    organized = 0
+    failed = 0
+    already_organized = 0
+    
+    for png_path in png_files:
+        # Extract metadata
+        full_prompt, seed = extract_prompt_and_seed_from_png(png_path)
+        
+        if full_prompt is None or seed is None:
+            print(f"  Warning: Could not extract metadata from {png_path.name}")
+            failed += 1
+            continue
+        
+        # Find which superprompt/metaprompt this corresponds to
+        sp_idx, mp_idx = extract_super_and_metaprompt(full_prompt, superprompts, metaprompts)
+        
+        if sp_idx is None:
+            print(f"  Warning: Could not match prompt for {png_path.name}")
+            failed += 1
+            continue
+        
+        # Check if this render is completed in state
+        key = (sp_idx, mp_idx, seed)
+        if key not in completed_lookup:
+            print(f"  Warning: Render not found in state file (sp{sp_idx}, mp{mp_idx}, seed={seed}) for {png_path.name}")
+            failed += 1
+            continue
+        
+        combo = completed_lookup[key]
+        
+        # Determine output subdirectory
+        if mp_idx >= 0:
+            output_subdir = f"sp{sp_idx:03d}/mp{mp_idx:03d}"
+        else:
+            output_subdir = f"sp{sp_idx:03d}/no_meta"
+        
+        output_dir = target_path / output_subdir
+        
+        # Determine output filename
+        if rename_by_seed:
+            # Create filename from seed and sanitized prompts
+            safe_sp = sanitize_for_filename(combo['superprompt'], 20)
+            if mp_idx >= 0:
+                safe_mp = sanitize_for_filename(combo['metaprompt'], 20)
+                new_filename = f"{safe_sp}__{safe_mp}__seed{seed}.png"
+            else:
+                new_filename = f"{safe_sp}__seed{seed}.png"
+        else:
+            # Keep original filename
+            new_filename = png_path.name
+        
+        output_path = output_dir / new_filename
+        
+        # Check if file already exists at destination
+        if output_path.exists():
+            print(f"  Already organized: {output_path}")
+            already_organized += 1
+            continue
+        
+        # Create output directory
+        if not dry_run:
+            output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Copy or move the file
+        if not dry_run:
+            try:
+                if copy_mode:
+                    shutil.copy2(png_path, output_path)
+                    print(f"  Copied: {png_path.name} -> {output_path}")
+                else:
+                    shutil.move(str(png_path), str(output_path))
+                    print(f"  Moved: {png_path.name} -> {output_path}")
+                organized += 1
+            except Exception as e:
+                print(f"  Error processing {png_path.name}: {e}")
+                failed += 1
+        else:
+            print(f"  Would {'copy' if copy_mode else 'move'}: {png_path.name} -> {output_path}")
+            organized += 1
+    
+    return organized, failed, already_organized
+
+def sanitize_for_filename(text, max_len=20):
+    """Sanitize text for use in filenames.
+    
+    Args:
+        text: String to sanitize
+        max_len: Maximum length of the sanitized string
+    
+    Returns:
+        Sanitized string safe for filenames
+    """
+    # Remove any non-alphanumeric, non-space, non-underscore, non-dash characters
+    import re
+    cleaned = re.sub(r'[^\w\s-]', '', text)
+    # Replace spaces with underscores
+    cleaned = cleaned.replace(' ', '_')
+    # Remove multiple consecutive underscores
+    cleaned = re.sub(r'_+', '_', cleaned)
+    # Truncate
+    return cleaned[:max_len]
+
 def main():
     parser = argparse.ArgumentParser(
         description='Merge partially completed ComfyUI batch runs into a single state file',
@@ -565,7 +743,7 @@ CRITICAL WARNINGS:
     
     args = parser.parse_args()
     
-    # Validate at least one source
+    # Validate at least one source (for merge)
     if not args.source_state_file and not args.source_curated_dir:
         print("Error: At least one of --source-state-file or --source-curated-dir is required")
         sys.exit(1)
@@ -577,7 +755,7 @@ CRITICAL WARNINGS:
         sys.exit(1)
     
     print(f"\n{'='*70}")
-    print(f"Merging partial batch runs into: {target_path}")
+    print(f"Processing state file: {target_path}")
     print(f"{'='*70}\n")
     
     target_state = load_state_file(target_path)
@@ -667,7 +845,7 @@ CRITICAL WARNINGS:
         total_already += already
         print(f"  Added: {added} new completions, {already} already completed\n")
     
-    # Show summary
+    # Show merge summary
     new_completed = current_completed + total_added
     print(f"{'='*70}")
     print(f"MERGE SUMMARY")
@@ -689,30 +867,29 @@ CRITICAL WARNINGS:
     print(f"{'='*70}")
     
     if total_added == 0 and curated_unmatched == 0:
-        print("\nNo new completions to add and no orphans found. Nothing to save.")
-        sys.exit(0)
-    
-    # Confirm and save (only if there are additions to save)
-    if not args.dry_run and total_added > 0:
-        if not args.force:
-            print(f"\nWARNING: You are about to update {target_path}")
-            print(f"This will add {total_added} new completion records.")
-            print(f"Backup {target_path} before proceeding.")
-            print(f"Merge cannot be undone.")
-            response = input("Proceed? (y/N): ").strip().lower()
-            if response != 'y':
-                print("Aborted.")
-                sys.exit(0)
-        
-        if save_state_file(target_state, target_path):
-            print(f"\nSuccessfully updated {target_path}")
+        print("\nNo new completions to add and no orphans found.")
+    elif total_added > 0:
+        # Confirm and save (only if there are additions to save)
+        if not args.dry_run:
+            if not args.force:
+                print(f"\nWARNING: You are about to update {target_path}")
+                print(f"This will add {total_added} new completion records.")
+                print(f"Backup {target_path} before proceeding.")
+                print(f"Merge cannot be undone.")
+                response = input("Proceed? (y/N): ").strip().lower()
+                if response != 'y':
+                    print("Aborted.")
+                    sys.exit(0)
+            
+            if save_state_file(target_state, target_path):
+                print(f"\nSuccessfully updated {target_path}")
+            else:
+                print(f"\nFailed to save {target_path}")
+                sys.exit(1)
         else:
-            print(f"\nFailed to save {target_path}")
-            sys.exit(1)
-    elif not args.dry_run and total_added == 0:
-        print(f"\nNo state file updates needed.")
+            print(f"\nDRY RUN: No changes were saved.")
     
-    # Handle file moving (matched and orphan) after state save (or even if no state changes)
+    # Handle file moving (matched and orphan) after state save
     if not args.dry_run and args.source_curated_dir:
         source_curated_path = Path(args.source_curated_dir)
         
@@ -726,8 +903,8 @@ CRITICAL WARNINGS:
             if len(matched_png_files) > 10:
                 print(f"  ... and {len(matched_png_files) - 10} more")
             
-            print(f"\nThese files should be moved to your target output directory")
-            print(f"to complete the merge process.")
+            print(f"\nThese files can be moved to your target output directory")
+            print(f"if needed, to organize them and complete the merge process.")
             print(f"\nYou will be prompted for the target directory path.")
             print(f"Files will be MOVED (not copied) to preserve the relative")
             print(f"subdirectory structure from the source curated directory.")
@@ -811,6 +988,73 @@ CRITICAL WARNINGS:
                                     print(f"  Removed empty directory: {dir_path}")
             else:
                 print("Orphans not moved. You may delete them manually.")
+    
+    # Offer to organize completed renders (if source_curated_dir exists and not dry run)
+    if args.source_curated_dir and not args.dry_run:
+        print(f"\n{'='*70}")
+        print(f"ORGANIZE COMPLETED RENDERS")
+        print(f"{'='*70}\n")
+        
+        print(f"Now that the state file has been updated, you can organize")
+        print(f"the PNG files that are marked as completed in the state file.")
+        print(f"If you do, you will be prompted for the directory to move and")
+        print(f"organize them into.")
+        print(f"Source directory: {args.source_curated_dir}")
+        
+        organize_response = input(f"\nOrganize completed renders into proper spXXX/mpYYY/ structure? (y/N): ").strip().lower()
+        
+        if organize_response == 'y':
+            # Prompt for target directory
+            organize_target = input(f"\nEnter target directory to organize into: ").strip()
+            if not organize_target:
+                print("Organization cancelled - no target directory provided.")
+            else:
+                # Prompt for copy vs move
+                copy_response = input(f"\nCopy files (keep originals) or move? (c=Copy, m=Move) [m]: ").strip().lower()
+                copy_mode = (copy_response == 'c')
+                
+                # Prompt for rename option
+                rename_response = input(f"\nRename files using seed in filename? (y/N): ").strip().lower()
+                rename_by_seed = (rename_response == 'y')
+                
+                print(f"\nOrganizing completed renders:")
+                print(f"  Source: {args.source_curated_dir}")
+                print(f"  Target: {organize_target}")
+                print(f"  Mode: {'Copy' if copy_mode else 'Move'}")
+                print(f"  Rename by seed: {'Yes' if rename_by_seed else 'No'}")
+                
+                if not args.force:
+                    confirm = input(f"\nProceed? (y/N): ").strip().lower()
+                    if confirm != 'y':
+                        print("Organization cancelled.")
+                    else:
+                        organized, failed, already = organize_completed_renders(
+                            target_state, superprompts, metaprompts,
+                            args.source_curated_dir, organize_target,
+                            copy_mode=copy_mode,
+                            rename_by_seed=rename_by_seed,
+                            dry_run=False
+                        )
+                        
+                        print(f"\nORGANIZATION SUMMARY")
+                        print(f"  Organized: {organized}")
+                        print(f"  Already organized: {already}")
+                        print(f"  Failed: {failed}")
+                else:
+                    organized, failed, already = organize_completed_renders(
+                        target_state, superprompts, metaprompts,
+                        args.source_curated_dir, organize_target,
+                        copy_mode=copy_mode,
+                        rename_by_seed=rename_by_seed,
+                        dry_run=False
+                    )
+                    
+                    print(f"\nORGANIZATION SUMMARY")
+                    print(f"  Organized: {organized}")
+                    print(f"  Already organized: {already}")
+                    print(f"  Failed: {failed}")
+        else:
+            print("Organization skipped.")
     
     if args.dry_run:
         print(f"\nDRY RUN: No changes were saved and no files were moved.")
