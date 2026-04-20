@@ -1095,6 +1095,30 @@ class ComfyUIBatchRenderer:
         def state_writer_thread():
             """Single thread to handle all state file writes with atomic saves and periodic backups"""
             write_count = 0  # Counter for tracking writes for backup
+            
+            def is_file_locked(filepath):
+                """Check if a file is locked by another process (Windows friendly)"""
+                if not os.path.exists(filepath):
+                    return False
+                try:
+                    # Try to open for append (non-modifying)
+                    with open(filepath, 'a'):
+                        pass
+                    return False
+                except (OSError, PermissionError):
+                    return True
+            
+            def is_state_file_corrupt(filepath):
+                """Check if a state pickle file can be read (basic corruption check)"""
+                if not os.path.exists(filepath):
+                    return False
+                try:
+                    with open(filepath, 'rb') as f:
+                        pickle.load(f)
+                    return False  # Successfully loaded, not corrupt
+                except Exception:
+                    return True   # Any error means corrupt
+            
             while not stop_state_writer.is_set():
                 try:
                     update = state_update_queue.get(timeout=1)
@@ -1116,45 +1140,90 @@ class ComfyUIBatchRenderer:
                                 for key, value in kwargs.items():
                                     state[combo_index][key] = value
                                 
-                                # Atomic write - write to temp file then rename
+                                # Atomic write with retries for Windows file locking
                                 temp_file = state_file + '.tmp'
-                                with open(temp_file, 'wb') as f:
-                                    pickle.dump(state, f)
-                                    f.flush()
-                                    os.fsync(f.fileno())
+                                max_attempts = 30  # Will retry for up to ~1 hour
+                                retry_delay = 2    # Start with 2 seconds
+                                save_success = False
                                 
-                                # Verify temp file is valid before replacing
-                                try:
-                                    with open(temp_file, 'rb') as test_f:
-                                        verified_state = pickle.load(test_f)  # Test load
-                                    # Verify the loaded state matches expected length
-                                    if len(verified_state) != len(state):
-                                        raise ValueError(f"State length mismatch: saved {len(verified_state)} vs expected {len(state)}")
-                                    os.replace(temp_file, state_file)
-                                except Exception as verify_error:
-                                    print(f"Temp file invalid - skipping write: {verify_error}")
-                                    if os.path.exists(temp_file):
-                                        os.remove(temp_file)
-                                    continue
-                                
-                                # Post-save verification: ensure state file is readable
-                                try:
-                                    with open(state_file, 'rb') as verify_f:
-                                        final_state = pickle.load(verify_f)
-                                    if len(final_state) != len(state):
-                                        raise ValueError("Final state length mismatch")
-                                except Exception as final_error:
-                                    print(f"CRITICAL: State file corrupt immediately after save! {final_error}")
-                                    print(f"Attempting restore from temp file: {temp_file}")
-                                    shutil.copy2(temp_file, state_file)
-                                    # Verify again after restore
+                                for attempt in range(max_attempts):
                                     try:
+                                        # Check if target file is locked before trying
+                                        if os.path.exists(state_file) and is_file_locked(state_file):
+                                            wait_time = min(retry_delay * (1.5 ** attempt), 120)
+                                            if attempt < 5:
+                                                print(f"  State file locked - waiting {wait_time:.0f}s...")
+                                            time.sleep(wait_time)
+                                            continue
+                                        
+                                        # Write to temp file
+                                        with open(temp_file, 'wb') as f:
+                                            pickle.dump(state, f)
+                                            f.flush()
+                                            os.fsync(f.fileno())
+                                        
+                                        # Verify temp file is valid
+                                        with open(temp_file, 'rb') as test_f:
+                                            verified_state = pickle.load(test_f)
+                                        if len(verified_state) != len(state):
+                                            raise ValueError(f"State length mismatch: saved {len(verified_state)} vs expected {len(state)}")
+                                        
+                                        # Try atomic replace
+                                        os.replace(temp_file, state_file)
+                                        
+                                        # Post-save verification
                                         with open(state_file, 'rb') as verify_f:
-                                            pickle.load(verify_f)
-                                        print(f"Restore successful")
-                                    except:
-                                        print(f"RESTORE FAILED - state file may be corrupted")
-                                        raise
+                                            final_state = pickle.load(verify_f)
+                                        if len(final_state) != len(state):
+                                            raise ValueError("Final state length mismatch")
+                                        
+                                        save_success = True
+                                        break  # Success
+                                        
+                                    except (OSError, PermissionError) as e:
+                                        # File locking conflict - wait and retry
+                                        wait_time = min(retry_delay * (1.5 ** attempt), 120)
+                                        
+                                        if attempt < 5:
+                                            print(f"  Save attempt {attempt + 1} failed: {e}")
+                                            print(f"  Waiting {wait_time:.0f}s before retry...")
+                                        elif attempt == 5:
+                                            print(f"  File still locked - will keep retrying every ~{wait_time:.0f}s...")
+                                        
+                                        time.sleep(wait_time)
+                                        
+                                    except Exception as verify_error:
+                                        print(f"Temp file invalid - skipping write: {verify_error}")
+                                        if os.path.exists(temp_file):
+                                            os.remove(temp_file)
+                                        break
+                                
+                                if not save_success:
+                                    # Critical failure - check if state file is corrupted
+                                    print(f"\n{'='*70}")
+                                    print(f"CRITICAL ERROR: Failed to save state file after {max_attempts} attempts")
+                                    print(f"{'='*70}")
+                                    
+                                    if is_state_file_corrupt(state_file):
+                                        print(f"  The existing state file is CORRUPTED.")
+                                        print(f"  Your render progress may be lost.")
+                                        print(f"  ")
+                                        print(f"  RECOVERY OPTIONS:")
+                                        print(f"    1. Check for a backup: {state_file}.backup_*")
+                                        print(f"    2. Use merge_partial_ComfyUI_batches.py to recover from PNGs")
+                                        print(f"    3. Delete the state file and start over (loses progress)")
+                                        print(f"  ")
+                                        print(f"  Temp file preserved at: {temp_file}")
+                                    else:
+                                        print(f"  The existing state file appears VALID, but writes are failing.")
+                                        print(f"  This may be due to: File Explorer preview pane, antivirus,")
+                                        print(f"  search indexing, or another process holding a lock.")
+                                        print(f"  ")
+                                        print(f"  Temp file preserved at: {temp_file}")
+                                    
+                                    print(f"{'='*70}")
+                                    # Stop the entire script
+                                    os._exit(1)
                                 
                                 # Periodic backup every 25 successful writes
                                 write_count += 1
@@ -1167,8 +1236,12 @@ class ComfyUIBatchRenderer:
                                     print(f"  Created backup: {backup_file}")
                                     
                         except (pickle.UnpicklingError, EOFError) as e:
-                            print(f"State file corrupted - will regenerate on next run: {e}")
-                            # Don't write - file is corrupt
+                            print(f"State file corrupted - cannot read existing state: {e}")
+                            print(f"Attempting to continue with in-memory state only...")
+                            # Don't write - file is corrupt, but continue running?
+                            # Better to exit:
+                            print(f"CRITICAL: Exiting to prevent data loss.")
+                            os._exit(1)
                         except Exception as e:
                             print(f"State writer error: {e}")
                         finally:
