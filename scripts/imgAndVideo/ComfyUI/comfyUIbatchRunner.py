@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SCRIPT: comfyUIbatchRunner.py
-VERSION: 2.1.45
+VERSION: 2.2.9
 
 DESCRIPTION:
     ComfyUI Batch Render Script
@@ -199,7 +199,7 @@ NOTES:
         or delete the existing .pkl file.
 
         BACKUP STATE FILES:
-            The script automatically creates a backup of the state file every 100
+            The script automatically creates a backup of the state file every 25
             completed renders. Backup files are named:
             {state_file}.backup_{completed_count}
 
@@ -421,6 +421,7 @@ import threading
 import uuid
 import socket
 import os
+import shutil
 from pathlib import Path
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -435,11 +436,35 @@ class DistributedState:
         self.worker_id = worker_id or f"{socket.gethostname()}:{os.getpid()}:{uuid.uuid4().hex[:8]}"
         self.lock_timeout = lock_timeout
         self._lock_acquired = False
+        self._refresh_thread = None
+        self._stop_refresh = threading.Event()
+    
+    def _refresh_loop(self):
+        """Background thread that refreshes lock timestamp to prevent staleness"""
+        while not self._stop_refresh.is_set():
+            if self._lock_acquired and self.lock_file.exists():
+                try:
+                    with open(self.lock_file, 'w') as f:
+                        json.dump({'worker_id': self.worker_id, 'timestamp': time.time()}, f)
+                except Exception:
+                    pass  # Non-critical, best effort
+            time.sleep(15)  # Refresh every 15 seconds
+    
+    def start_lock_refresh(self):
+        """Start background thread to refresh lock periodically"""
+        if self._refresh_thread is None or not self._refresh_thread.is_alive():
+            self._stop_refresh.clear()
+            self._refresh_thread = threading.Thread(target=self._refresh_loop, daemon=True)
+            self._refresh_thread.start()
+    
+    def stop_lock_refresh(self):
+        """Stop background lock refresh thread"""
+        self._stop_refresh.set()
+        if self._refresh_thread:
+            self._refresh_thread.join(timeout=5)
     
     def acquire_lock(self, timeout=60):
         """Acquire lock file with timeout to prevent deadlocks"""
-        import os
-        
         start_time = time.time()
         while time.time() - start_time < timeout:
             try:
@@ -464,6 +489,7 @@ class DistributedState:
                     with open(self.lock_file, 'x') as f:
                         f.write(json.dumps(lock_data))
                     self._lock_acquired = True
+                    self.start_lock_refresh()
                     return True
                 except FileExistsError:
                     pass
@@ -478,6 +504,7 @@ class DistributedState:
                             with open(self.lock_file, 'w') as f:
                                 f.write(json.dumps(lock_data))
                             self._lock_acquired = True
+                            self.start_lock_refresh()
                             return True
                     except:
                         pass
@@ -489,7 +516,8 @@ class DistributedState:
         return False
     
     def release_lock(self):
-        """Release lock file"""
+        """Release lock file and stop refresh thread"""
+        self.stop_lock_refresh()
         if self._lock_acquired and self.lock_file.exists():
             try:
                 self.lock_file.unlink()
@@ -512,9 +540,6 @@ class DistributedState:
     
     def save_state(self, state):
         """Save state atomically using temporary file with multiple fallback strategies"""
-        import os
-        import shutil
-        
         temp_file = self.state_file.with_suffix('.tmp')
         
         try:
@@ -1101,7 +1126,10 @@ class ComfyUIBatchRenderer:
                                 # Verify temp file is valid before replacing
                                 try:
                                     with open(temp_file, 'rb') as test_f:
-                                        pickle.load(test_f)  # Test load
+                                        verified_state = pickle.load(test_f)  # Test load
+                                    # Verify the loaded state matches expected length
+                                    if len(verified_state) != len(state):
+                                        raise ValueError(f"State length mismatch: saved {len(verified_state)} vs expected {len(state)}")
                                     os.replace(temp_file, state_file)
                                 except Exception as verify_error:
                                     print(f"Temp file invalid - skipping write: {verify_error}")
@@ -1109,9 +1137,28 @@ class ComfyUIBatchRenderer:
                                         os.remove(temp_file)
                                     continue
                                 
-                                # Periodic backup every 100 successful writes
+                                # Post-save verification: ensure state file is readable
+                                try:
+                                    with open(state_file, 'rb') as verify_f:
+                                        final_state = pickle.load(verify_f)
+                                    if len(final_state) != len(state):
+                                        raise ValueError("Final state length mismatch")
+                                except Exception as final_error:
+                                    print(f"CRITICAL: State file corrupt immediately after save! {final_error}")
+                                    print(f"Attempting restore from temp file: {temp_file}")
+                                    shutil.copy2(temp_file, state_file)
+                                    # Verify again after restore
+                                    try:
+                                        with open(state_file, 'rb') as verify_f:
+                                            pickle.load(verify_f)
+                                        print(f"Restore successful")
+                                    except:
+                                        print(f"RESTORE FAILED - state file may be corrupted")
+                                        raise
+                                
+                                # Periodic backup every 25 successful writes
                                 write_count += 1
-                                if write_count >= 100:
+                                if write_count >= 25:
                                     write_count = 0
                                     completed_count = sum(1 for c in state if c.get('status') == 'completed')
                                     backup_file = state_file + f'.backup_{completed_count}'
