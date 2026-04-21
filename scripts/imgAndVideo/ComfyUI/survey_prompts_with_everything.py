@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SCRIPT: survey_prompts_with_everything.py
-VERSION: 2.2.0
+VERSION: 2.3.50
 
 DESCRIPTION:
     Launch Everything search windows to visually survey rendered images
@@ -42,6 +42,22 @@ USAGE:
         --state-file state.pkl \
         --output-dir Y:\\output\\renders \
         --skip-metaprompts
+
+## Important: Quoting the --output-dir Path, and no spaces in paths
+
+When running the script, always enclose the --output-dir path in double quotes:
+
+    python survey_prompts_with_everything.py \
+        --state-file state.pkl \
+        --output-dir "Y:\path\to\renders"
+
+This ensures that backslashes and spaces (if any) are preserved correctly.
+The script will then open Everything windows that properly locate your images.
+
+You may also have to provide the path as a proper Windows path.
+
+Also, it will break search if your paths have space characters in them. Avoid
+having spaces in your paths (folder names).
 
 REQUIRED ARGUMENTS:
     --state-file FILE           State pickle file from comfyUIbatchRunner.py
