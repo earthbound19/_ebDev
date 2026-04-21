@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SCRIPT: merge_partial_ComfyUI_batches.py
-VERSION: 1.9.30
+VERSION: 1.10.15
 
 DESCRIPTION:
     Merge partially completed batch runs into a single state file, to allow
@@ -240,22 +240,18 @@ def extract_super_and_metaprompt(full_prompt, superprompts, metaprompts):
     
     for sp_idx, sp in enumerate(superprompts):
         if '{}' in sp:
-            # Try to extract metaprompt by splitting on placeholder
             parts = sp.split('{}')
             if len(parts) == 2:
-                # Check if full_prompt starts with parts[0] and ends with parts[1]
                 if full_prompt.startswith(parts[0]) and full_prompt.endswith(parts[1]):
-                    mp_candidate = full_prompt[len(parts[0]):-len(parts[1])]
+                    # Fix: handle empty parts[1] correctly (avoid -0 slice bug)
+                    if len(parts[1]) == 0:
+                        mp_candidate = full_prompt[len(parts[0]):]
+                    else:
+                        mp_candidate = full_prompt[len(parts[0]):-len(parts[1])]
                     
-                    # Match against metaprompts list
                     if mp_candidate in effective_metaprompts:
                         mp_idx = metaprompts.index(mp_candidate) if metaprompts else -1
                         return sp_idx, mp_idx
-        else:
-            # No placeholder - direct match
-            if full_prompt == sp:
-                return sp_idx, -1 if not metaprompts else 0  # -1 indicates no metaprompt
-    
     return None, None
 
 def load_state_file(state_path):
@@ -461,7 +457,7 @@ def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup
         return 0, 0, 0, 0, 0, matched_files, orphan_files
     
     # Find all PNGs recursively
-    png_files = list(curated_path.rglob("*.png"))
+    png_files = [p for p in curated_path.rglob("*.png") if '_discards' not in p.parts]
     print(f"  Found {len(png_files)} PNGs in {curated_dir}")
     
     added = 0
