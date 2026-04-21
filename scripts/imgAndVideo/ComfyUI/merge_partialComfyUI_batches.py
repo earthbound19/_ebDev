@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SCRIPT: merge_partial_ComfyUI_batches.py
-VERSION: 1.10.15
+VERSION: 1.12.30
 
 DESCRIPTION:
     Merge partially completed batch runs into a single state file, to allow
@@ -75,6 +75,17 @@ DESCRIPTION:
            spXXX/mpYYY/ (or spXXX/no_meta/ for empty metaprompts)
         4. Preserve the filename structure (or optionally rename using seed information)
 
+    ORGANIZE EXTRA RENDERS:
+        With --organize-extra-renders flag, the script will also organize PNGs that
+        matched a (superprompt, metaprompt) pair but had no pending slots (have already
+        had all intended renders marked completed in the state file). This is useful for
+        organizing renders from other batches with the same superduperprompt result, or for whatever
+        other reason you might have renders exceeding state file tracking design.
+        
+        These files are moved/copied to the target directory alongside regular
+        organization, preserving the spXXX/mpYYY/ folder structure, without validating
+        against the state file.
+
 DEPENDENCIES:
     Python 3.6 or higher
     Pillow (PIL) library (pip install Pillow)
@@ -96,6 +107,12 @@ USAGE:
         --source-state-file ./run_a/state.pkl \\
         --source-curated-dir ./run_a/kept \\
         --merge-to-state-file ./master_state.pkl
+    
+    # Organize extra renders (already completed) without modifying state
+    python merge_partial_ComfyUI_batches.py \\
+        --source-curated-dir ./kept_images \\
+        --merge-to-state-file ./state.pkl \\
+        --organize-extra-renders
 
 REQUIRED ARGUMENTS:
     --merge-to-state-file FILE    State file to update (must exist)
@@ -111,6 +128,8 @@ OPTIONAL ARGUMENTS:
                                   Required when using --source-curated-dir
     --dry-run                     Show what would be updated without modifying
     --force                       Skip the confirmation prompt
+    --organize-extra-renders      Move/copy matched PNGs that have no pending slots
+                                  (already completed in state file) to target directory
 
 CRITICAL WARNINGS:
     DO NOT run this script while comfyUIbatchRunner.py is running on the target
@@ -174,10 +193,26 @@ import pickle
 import sys
 import os
 import shutil
+import re
 from pathlib import Path
 from collections import defaultdict
 from datetime import datetime
 from PIL import Image
+
+def sanitize_for_filename(text, max_len=20):
+    """Sanitize text for use in filenames.
+    
+    Args:
+        text: String to sanitize
+        max_len: Maximum length of the sanitized string
+    
+    Returns:
+        Sanitized string safe for filenames
+    """
+    cleaned = re.sub(r'[^\w\s-]', '', text)
+    cleaned = cleaned.replace(' ', '_')
+    cleaned = re.sub(r'_+', '_', cleaned)
+    return cleaned[:max_len]
 
 def extract_prompt_and_seed_from_png(png_path):
     """Extract positive prompt and seed from PNG metadata.
@@ -301,8 +336,6 @@ def save_state_file(state, state_path):
 
 def build_state_lookup_by_full_key(state):
     """Build lookup dictionary for state entries by (sp_idx, mp_idx, s_rep, m_rep).
-    
-    This is the actual unique key for each combination in the state file.
     
     Returns:
         dict: {(superprompt_idx, metaprompt_idx, superprompt_repetition, metaprompt_repetition): state_index}
@@ -434,7 +467,8 @@ def merge_from_state_file(source_state, target_lookup, target_state, dry_run=Fal
     return added, already_completed, not_found
 
 def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup_by_sp_mp, 
-                           target_state, dry_run=False, matched_files=None, orphan_files=None):
+                           target_state, dry_run=False, matched_files=None, 
+                           already_completed_files=None, orphan_files=None):
     """Merge completed renders from PNG files in curated directory.
     
     Matches by (sp_idx, mp_idx) and seed. First checks if the exact seed already exists
@@ -444,20 +478,29 @@ def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup
     
     Returns:
         tuple: (added_count, already_completed_count, unmatched_count, 
-                no_metadata_count, no_pending_slots_count, matched_files_list, orphan_files_list)
+                no_metadata_count, no_pending_slots_count, matched_files_list, 
+                already_completed_files_list, orphan_files_list)
     """
     if matched_files is None:
         matched_files = []
+    if already_completed_files is None:
+        already_completed_files = []
     if orphan_files is None:
         orphan_files = []
     
     curated_path = Path(curated_dir)
     if not curated_path.exists():
         print(f"Error: Curated directory not found: {curated_dir}")
-        return 0, 0, 0, 0, 0, matched_files, orphan_files
+        return 0, 0, 0, 0, 0, matched_files, already_completed_files, orphan_files
     
-    # Find all PNGs recursively
-    png_files = [p for p in curated_path.rglob("*.png") if '_discards' not in p.parts]
+    # Find all PNGs recursively, excluding _discards folder
+    png_files = []
+    for p in curated_path.rglob("*.png"):
+        # Skip any PNG in _discards folder or its subfolders
+        if '_discards' in p.parts:
+            continue
+        png_files.append(p)
+    
     print(f"  Found {len(png_files)} PNGs in {curated_dir}")
     
     added = 0
@@ -502,6 +545,7 @@ def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup
                 target_state[target_idx].get('seed') == seed):
                 seed_found_completed = True
                 already_completed += 1
+                already_completed_files.append(str(png_path))
                 if not dry_run:
                     s_rep = target_state[target_idx]['superprompt_repetition']
                     m_rep = target_state[target_idx]['metaprompt_repetition']
@@ -516,7 +560,7 @@ def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup
         found_pending = False
         for target_idx in target_indices:
             if target_state[target_idx].get('status') != 'completed':
-                # Found a pending entry - would mark it completed
+                # Found a pending entry - mark it completed
                 if not dry_run:
                     target_state[target_idx]['status'] = 'completed'
                     target_state[target_idx]['worker_id'] = 'merged_from_curated'
@@ -537,6 +581,8 @@ def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup
         
         if not found_pending:
             no_pending_slots += 1
+            # Still track these for organize-extra-renders flag
+            already_completed_files.append(str(png_path))
             if not dry_run:
                 print(f"  Warning: No pending slots for (sp{sp_idx}, mp{mp_idx}) from {png_path.name}")
     
@@ -546,84 +592,67 @@ def merge_from_curated_dir(curated_dir, superprompts, metaprompts, target_lookup
         print(f"  Warning: {no_pending_slots} PNGs matched (sp,mp) but had no pending slots")
         print(f"           (all repetitions of that prompt pair are already completed)")
     
-    return added, already_completed, unmatched, no_metadata, no_pending_slots, matched_files, orphan_files
+    return added, already_completed, unmatched, no_metadata, no_pending_slots, matched_files, already_completed_files, orphan_files
 
-def organize_completed_renders(state, superprompts, metaprompts, source_dir, target_dir, 
-                                copy_mode=False, rename_by_seed=False, dry_run=False):
-    """Organize PNG files that are already marked as completed in the state file.
+def organize_completed_renders(png_files, target_state, superprompts, metaprompts, 
+                                target_dir, copy_mode=False, rename_by_seed=False,
+                                skip_state_lookup=False):
+    """Organize PNG files into spXXX/mpYYY/ structure.
     
     Args:
-        state: The target state list
+        png_files: List of PNG file paths to organize
+        target_state: State list with completed entries (ignored if skip_state_lookup=True)
         superprompts: List of superprompt templates
         metaprompts: List of metaprompt values
-        source_dir: Source directory to scan for PNGs
-        target_dir: Target directory to organize into
+        target_dir: Destination directory for organized files
         copy_mode: If True, copy files; if False, move files
-        rename_by_seed: If True, rename files to include seed; if False, keep original name
-        dry_run: If True, only show what would be done
+        rename_by_seed: If True, rename files using seed in filename
+        skip_state_lookup: If True, don't validate against state file (for extra renders)
     
     Returns:
-        tuple: (organized_count, failed_count, already_organized_count)
+        tuple: (organized_count, already_organized_count, failed_count)
     """
-    source_path = Path(source_dir)
+    # Build lookup for completed entries only if not skipping
+    completed_lookup = None
+    if not skip_state_lookup:
+        completed_lookup = {}
+        for combo in target_state:
+            if combo.get('status') == 'completed' and combo.get('seed') is not None:
+                key = (
+                    combo['superprompt_idx'],
+                    combo.get('metaprompt_idx', -1),
+                    combo['seed']
+                )
+                completed_lookup[key] = combo
+    
     target_path = Path(target_dir)
-    
-    if not source_path.exists():
-        print(f"Error: Source directory not found: {source_dir}")
-        return 0, 0, 0
-    
-    # Create target directory if it doesn't exist
-    if not dry_run:
-        target_path.mkdir(parents=True, exist_ok=True)
-    
-    # Build lookup for completed entries by (sp_idx, mp_idx, seed)
-    completed_lookup = {}
-    for combo in state:
-        if combo.get('status') == 'completed' and combo.get('seed') is not None:
-            key = (
-                combo['superprompt_idx'],
-                combo.get('metaprompt_idx', -1),
-                combo['seed']
-            )
-            completed_lookup[key] = combo
-    
-    print(f"  Found {len(completed_lookup)} completed renders in state file")
-    
-    # Find all PNGs in source directory
-    png_files = list(source_path.rglob("*.png"))
-    print(f"  Found {len(png_files)} PNGs in {source_dir}")
+    target_path.mkdir(parents=True, exist_ok=True)
     
     organized = 0
-    failed = 0
     already_organized = 0
+    failed = 0
     
-    for png_path in png_files:
-        # Extract metadata
-        full_prompt, seed = extract_prompt_and_seed_from_png(png_path)
+    for src_path in png_files:
+        src = Path(src_path)
+        full_prompt, seed = extract_prompt_and_seed_from_png(src)
         
         if full_prompt is None or seed is None:
-            print(f"  Warning: Could not extract metadata from {png_path.name}")
             failed += 1
             continue
         
-        # Find which superprompt/metaprompt this corresponds to
         sp_idx, mp_idx = extract_super_and_metaprompt(full_prompt, superprompts, metaprompts)
-        
         if sp_idx is None:
-            print(f"  Warning: Could not match prompt for {png_path.name}")
             failed += 1
             continue
         
-        # Check if this render is completed in state
-        key = (sp_idx, mp_idx, seed)
-        if key not in completed_lookup:
-            print(f"  Warning: Render not found in state file (sp{sp_idx}, mp{mp_idx}, seed={seed}) for {png_path.name}")
-            failed += 1
-            continue
+        # If not skipping state lookup, verify the render exists in state
+        if not skip_state_lookup:
+            key = (sp_idx, mp_idx, seed)
+            if key not in completed_lookup:
+                failed += 1
+                continue
+            combo = completed_lookup[key]
         
-        combo = completed_lookup[key]
-        
-        # Determine output subdirectory
         if mp_idx >= 0:
             output_subdir = f"sp{sp_idx:03d}/mp{mp_idx:03d}"
         else:
@@ -631,95 +660,53 @@ def organize_completed_renders(state, superprompts, metaprompts, source_dir, tar
         
         output_dir = target_path / output_subdir
         
-        # Determine output filename
         if rename_by_seed:
-            # Create filename from seed and sanitized prompts
-            safe_sp = sanitize_for_filename(combo['superprompt'], 20)
-            if mp_idx >= 0:
-                safe_mp = sanitize_for_filename(combo['metaprompt'], 20)
-                new_filename = f"{safe_sp}__{safe_mp}__seed{seed}.png"
+            if skip_state_lookup:
+                # Get prompt text from files directly
+                sp_text = superprompts[sp_idx] if sp_idx < len(superprompts) else f"sp{sp_idx}"
+                safe_sp = sanitize_for_filename(sp_text, 20)
+                if mp_idx >= 0:
+                    mp_text = metaprompts[mp_idx] if mp_idx < len(metaprompts) else f"mp{mp_idx}"
+                    safe_mp = sanitize_for_filename(mp_text, 20)
+                    new_filename = f"{safe_sp}__{safe_mp}__seed{seed}.png"
+                else:
+                    new_filename = f"{safe_sp}__seed{seed}.png"
             else:
-                new_filename = f"{safe_sp}__seed{seed}.png"
+                combo = completed_lookup[key]
+                safe_sp = sanitize_for_filename(combo['superprompt'], 20)
+                if mp_idx >= 0:
+                    safe_mp = sanitize_for_filename(combo['metaprompt'], 20)
+                    new_filename = f"{safe_sp}__{safe_mp}__seed{seed}.png"
+                else:
+                    new_filename = f"{safe_sp}__seed{seed}.png"
         else:
-            # Keep original filename
-            new_filename = png_path.name
+            new_filename = src.name
         
         output_path = output_dir / new_filename
         
-        # Check if file already exists at destination
         if output_path.exists():
-            print(f"  Already organized: {output_path}")
             already_organized += 1
             continue
         
-        # Create output directory
-        if not dry_run:
-            output_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Copy or move the file
-        if not dry_run:
-            try:
-                if copy_mode:
-                    shutil.copy2(png_path, output_path)
-                    print(f"  Copied: {png_path.name} -> {output_path}")
-                else:
-                    shutil.move(str(png_path), str(output_path))
-                    print(f"  Moved: {png_path.name} -> {output_path}")
-                organized += 1
-            except Exception as e:
-                print(f"  Error processing {png_path.name}: {e}")
-                failed += 1
-        else:
-            print(f"  Would {'copy' if copy_mode else 'move'}: {png_path.name} -> {output_path}")
+        try:
+            if copy_mode:
+                output_dir.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, output_path)
+            else:
+                output_dir.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(src), str(output_path))
             organized += 1
+        except Exception as e:
+            print(f"  Error processing {src.name}: {e}")
+            failed += 1
     
-    return organized, failed, already_organized
-
-def sanitize_for_filename(text, max_len=20):
-    """Sanitize text for use in filenames.
-    
-    Args:
-        text: String to sanitize
-        max_len: Maximum length of the sanitized string
-    
-    Returns:
-        Sanitized string safe for filenames
-    """
-    # Remove any non-alphanumeric, non-space, non-underscore, non-dash characters
-    import re
-    cleaned = re.sub(r'[^\w\s-]', '', text)
-    # Replace spaces with underscores
-    cleaned = cleaned.replace(' ', '_')
-    # Remove multiple consecutive underscores
-    cleaned = re.sub(r'_+', '_', cleaned)
-    # Truncate
-    return cleaned[:max_len]
+    return organized, already_organized, failed
 
 def main():
     parser = argparse.ArgumentParser(
         description='Merge partially completed ComfyUI batch runs into a single state file',
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-CRITICAL WARNINGS:
-    DO NOT run this script while comfyUIbatchRunner.py is running on the target
-    state file! Any resulting concurrent access if you do that could corrupt the state file.
-    
-    The source and target runs MUST have used IDENTICAL:
-        - superprompts.txt (same content, same line order)
-        - metaprompts.txt (same content, same line order)
-        - -s (superpromptiterations) value
-        - -m (metapromptiterations) value
-    
-    For state-file-to-state-file merging, the script validates that both state files
-    have the same length (same number of combinations). If they differ, it aborts.
-    
-    This script does NOT implement file locking. You are responsible for
-    ensuring no batch runner is accessing the target state file during state file
-    merge via this script.
-    
-    If you provide mismatched prompt files, PNGs will fail to match and will
-    be skipped with warning messages. The state file will not be corrupted.
-"""
+        epilog=__doc__
     )
     
     parser.add_argument('--merge-to-state-file', required=True,
@@ -736,6 +723,9 @@ CRITICAL WARNINGS:
                        help='Show what would be updated without modifying')
     parser.add_argument('--force', action='store_true',
                        help='Skip the confirmation prompt')
+    parser.add_argument('--organize-extra-renders', action='store_true',
+                       help='Move/copy matched PNGs that have no pending slots '
+                            '(already completed in state file) to target directory')
     
     args = parser.parse_args()
     
@@ -822,13 +812,14 @@ CRITICAL WARNINGS:
     curated_no_metadata = 0
     curated_no_pending = 0
     matched_png_files = []
+    already_completed_png_files = []
     orphan_png_files = []
     
     if args.source_curated_dir:
         print(f"Processing curated directory: {args.source_curated_dir}")
-        added, already, unmatched, no_metadata, no_pending, matched, orphans = merge_from_curated_dir(
+        added, already, unmatched, no_metadata, no_pending, matched, already_completed, orphans = merge_from_curated_dir(
             args.source_curated_dir, superprompts, metaprompts, 
-            target_lookup_by_sp_mp, target_state, args.dry_run, [], []
+            target_lookup_by_sp_mp, target_state, args.dry_run, [], [], []
         )
         curated_added = added
         curated_already = already
@@ -836,6 +827,7 @@ CRITICAL WARNINGS:
         curated_no_metadata = no_metadata
         curated_no_pending = no_pending
         matched_png_files = matched
+        already_completed_png_files = already_completed
         orphan_png_files = orphans
         total_added += added
         total_already += already
@@ -862,7 +854,7 @@ CRITICAL WARNINGS:
     print(f"    Pending: {total_combinations - new_completed}")
     print(f"{'='*70}")
     
-    if total_added == 0 and curated_unmatched == 0:
+    if total_added == 0 and curated_unmatched == 0 and curated_no_pending == 0:
         print("\nNo new completions to add and no orphans found.")
     elif total_added > 0:
         # Confirm and save (only if there are additions to save)
@@ -909,31 +901,56 @@ CRITICAL WARNINGS:
             if move_response == 'y':
                 target_output = input(f"\nEnter target output directory path: ").strip()
                 if target_output:
-                    target_output_path = Path(target_output)
-                    if target_output_path.exists():
-                        moved_count = 0
-                        for src_path in matched_png_files:
-                            src = Path(src_path)
-                            try:
-                                rel_path = src.relative_to(source_curated_path)
-                                dst = target_output_path / rel_path
-                                dst.parent.mkdir(parents=True, exist_ok=True)
-                                shutil.move(str(src), str(dst))
-                                moved_count += 1
-                            except ValueError:
-                                dst = target_output_path / src.name
-                                shutil.move(str(src), str(dst))
-                                moved_count += 1
-                            except Exception as e:
-                                print(f"  Failed to move {src.name}: {e}")
-                        print(f"\nMoved {moved_count} files to {target_output_path}")
-                    else:
-                        print(f"Target directory not found: {target_output}")
-                        print("Files not moved. Move them manually.")
+                    # Convert to Path objects for the organizer
+                    png_paths = [Path(f) for f in matched_png_files]
+                    organized, already_organized, failed = organize_completed_renders(
+                        png_paths, target_state, superprompts, metaprompts,
+                        target_output, copy_mode=False, rename_by_seed=False, skip_state_lookup=False
+                    )
+                    print(f"\nOrganized {organized} files to {target_output} (already existed: {already_organized}, failed: {failed})")
                 else:
                     print("No target directory provided. Files not moved.")
             else:
                 print("Files not moved. Move them manually to complete the merge.")
+        
+        # Organize extra renders (already completed, no pending slots) if flag is set
+        if args.organize_extra_renders and already_completed_png_files:
+            # Filter out files that no longer exist (were already moved by previous step)
+            existing_files = [f for f in already_completed_png_files if Path(f).exists()]
+            missing_files = len(already_completed_png_files) - len(existing_files)
+            
+            if missing_files > 0:
+                print(f"\n  Note: {missing_files} of {len(already_completed_png_files)} extra render files no longer exist (may have been moved already)")
+            
+            if not existing_files:
+                print("  No existing extra render files to organize.")
+            else:
+                print(f"\n{'='*70}")
+                print(f"ORGANIZE EXTRA RENDERS")
+                print(f"{'='*70}\n")
+                print(f"{len(existing_files)} PNGs were already completed in the state file; they matched but had no pending")
+                print(f"slots; they exceed intended renders. You can organize these into a target directory")
+                print(f"regardless. If you do, you'll be prompted for the target directory.")
+
+                organize_response = input(f"\nOrganize these extra renders into target directory? (y/N): ").strip().lower()
+                if organize_response == 'y':
+                    target_dir = input(f"\nEnter target directory path: ").strip()
+                    if target_dir:
+                        copy_response = input(f"\nCopy files (keep originals) or move? (c=Copy, m=Move) [m]: ").strip().lower()
+                        copy_mode = (copy_response == 'c')
+                        rename_response = input(f"\nRename files using seed in filename? (y/N): ").strip().lower()
+                        rename_by_seed = (rename_response == 'y')
+                        
+                        png_paths = [Path(f) for f in existing_files]
+                        organized, already_organized, failed = organize_completed_renders(
+                            png_paths, target_state, superprompts, metaprompts,
+                            target_dir, copy_mode, rename_by_seed, skip_state_lookup=True
+                        )
+                        print(f"\n  Organized: {organized}, Already existed: {already_organized}, Failed: {failed}")
+                    else:
+                        print("No target directory provided. Files not organized.")
+                else:
+                    print("Organization skipped.")
         
         # Offer to move orphan PNG files (unmatched) to _discards/_orphans
         if orphan_png_files:
@@ -1000,16 +1017,12 @@ CRITICAL WARNINGS:
         organize_response = input(f"\nOrganize completed renders into proper spXXX/mpYYY/ structure? (y/N): ").strip().lower()
         
         if organize_response == 'y':
-            # Prompt for target directory
             organize_target = input(f"\nEnter target directory to organize into: ").strip()
             if not organize_target:
                 print("Organization cancelled - no target directory provided.")
             else:
-                # Prompt for copy vs move
                 copy_response = input(f"\nCopy files (keep originals) or move? (c=Copy, m=Move) [m]: ").strip().lower()
                 copy_mode = (copy_response == 'c')
-                
-                # Prompt for rename option
                 rename_response = input(f"\nRename files using seed in filename? (y/N): ").strip().lower()
                 rename_by_seed = (rename_response == 'y')
                 
@@ -1024,30 +1037,32 @@ CRITICAL WARNINGS:
                     if confirm != 'y':
                         print("Organization cancelled.")
                     else:
-                        organized, failed, already = organize_completed_renders(
-                            target_state, superprompts, metaprompts,
-                            args.source_curated_dir, organize_target,
-                            copy_mode=copy_mode,
-                            rename_by_seed=rename_by_seed,
-                            dry_run=False
+                        # Find all PNGs in source directory excluding _discards
+                        source_path = Path(args.source_curated_dir)
+                        png_files = [p for p in source_path.rglob("*.png") if '_discards' not in p.parts]
+                        
+                        organized, already_organized, failed = organize_completed_renders(
+                            png_files, target_state, superprompts, metaprompts,
+                            organize_target, copy_mode, rename_by_seed, skip_state_lookup=False
                         )
                         
                         print(f"\nORGANIZATION SUMMARY")
                         print(f"  Organized: {organized}")
-                        print(f"  Already organized: {already}")
+                        print(f"  Already organized: {already_organized}")
                         print(f"  Failed: {failed}")
                 else:
-                    organized, failed, already = organize_completed_renders(
-                        target_state, superprompts, metaprompts,
-                        args.source_curated_dir, organize_target,
-                        copy_mode=copy_mode,
-                        rename_by_seed=rename_by_seed,
-                        dry_run=False
+                    # With --force, skip confirmation
+                    source_path = Path(args.source_curated_dir)
+                    png_files = [p for p in source_path.rglob("*.png") if '_discards' not in p.parts]
+                    
+                    organized, already_organized, failed = organize_completed_renders(
+                        png_files, target_state, superprompts, metaprompts,
+                        organize_target, copy_mode, rename_by_seed, skip_state_lookup=False
                     )
                     
                     print(f"\nORGANIZATION SUMMARY")
                     print(f"  Organized: {organized}")
-                    print(f"  Already organized: {already}")
+                    print(f"  Already organized: {already_organized}")
                     print(f"  Failed: {failed}")
         else:
             print("Organization skipped.")
