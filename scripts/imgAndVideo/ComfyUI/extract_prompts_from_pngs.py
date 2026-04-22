@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 """
 SCRIPT: extract_prompts_from_pngs.py
-VERSION: 1.0.0
+VERSION: 1.0.2
 
 DESCRIPTION:
-    Extract unique full prompts from all PNGs in a directory tree and save to a text file.
-    One prompt per line, deduplicated automatically.
+    Extracts unique full prompts from all PNGs in a directory tree and saves to a text file,
+    one prompt per line, deduplicated.
     
     Useful for:
         - Recovering orphans to see what prompts they contain
         - Building a superduperprompts file from existing images
-        - Auditing what prompts are actually present in your curated collection
+        - Auditing what prompts are in a curated collection
 
 USAGE:
-    python extract_prompts_from_pngs.py --curated-dir ./kept_images --output prompts.txt
+    Run with the following switches:
+    - REQUIRED --curated-dir the location of images
+    - OPTIONAL --output filename_to_write_prompts_to.txt. If omitted,
+      defautls to extracted_prompts.txt
+    For example:
+    python path_to/extract_prompts_from_pngs.py --curated-dir ./kept_images --output prompts.txt
 """
 
 import argparse
