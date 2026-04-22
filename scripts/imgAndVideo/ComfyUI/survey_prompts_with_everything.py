@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SCRIPT: survey_prompts_with_everything.py
+SCRIPT: survey_renders_with_everything.py
 VERSION: 2.3.50
 
 DESCRIPTION:
@@ -27,18 +27,18 @@ DEPENDENCIES:
 
 USAGE:
     # Survey superprompts and metaprompts from a state file
-    python survey_prompts_with_everything.py \
+    python survey_renders_with_everything.py \
         --state-file .comfyUIbatchRunner_render_state.pkl \
         --output-dir Y:\\path\\to\\ComfyUI\\output\\renders
     
     # With custom Everything path
-    python survey_prompts_with_everything.py \
+    python survey_renders_with_everything.py \
         --state-file state.pkl \
         --output-dir Y:\\output\\renders \
         --everything-path "C:\\Program Files\\Everything\\Everything.exe"
     
     # Survey only superprompts (skip metaprompts)
-    python survey_prompts_with_everything.py \
+    python survey_renders_with_everything.py \
         --state-file state.pkl \
         --output-dir Y:\\output\\renders \
         --skip-metaprompts
@@ -47,7 +47,7 @@ USAGE:
 
 When running the script, always enclose the --output-dir path in double quotes:
 
-    python survey_prompts_with_everything.py \
+    python survey_renders_with_everything.py \
         --state-file state.pkl \
         --output-dir "Y:\path\to\renders"
 
