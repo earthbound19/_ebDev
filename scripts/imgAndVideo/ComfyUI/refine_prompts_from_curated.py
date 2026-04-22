@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SCRIPT: refine_prompts_from_curated.py
-VERSION: 1.0.0
+VERSION: 1.1.1
 
 DESCRIPTION:
     Prompt Refinement Tool for ComfyUI Batch Runner Workflow
@@ -284,13 +284,13 @@ def main():
         superprompt_total = defaultdict(int)
         metaprompt_total = defaultdict(int)
         pair_total = defaultdict(int)
-        
+
         # Map indices back to prompt text
         idx_to_superprompt = {idx: sp for idx, sp in enumerate(superprompts)}
         idx_to_metaprompt = {idx: mp for idx, mp in enumerate(metaprompts)} if metaprompts else {}
-        
+
         for combo in render_state:
-            if combo.get('completed', False):
+            if combo.get('status') == 'completed':   # <-- only check 'status'
                 sp_idx = combo['superprompt_idx']
                 sp_text = idx_to_superprompt.get(sp_idx)
                 if sp_text:
