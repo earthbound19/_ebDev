@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SCRIPT: refine_prompts_from_curated.py
-VERSION: 1.1.1
+VERSION: 1.2.9
 
 DESCRIPTION:
     Prompt Refinement Tool for ComfyUI Batch Runner Workflow
@@ -15,6 +15,7 @@ DESCRIPTION:
         1. Run comfyUIbatchRunner.py to generate many images.
         2. Curate by deleting unwanted images directly inside the output folder.
         3. Run this script to get ranked superprompts, metaprompts, and full prompts.
+           Optionally filtered to only those used in curated files (see USAGE).
         4. Use the ranked files as input for the next batch run.
 
 DEPENDENCIES:
@@ -39,6 +40,14 @@ OPTIONAL ARGUMENTS:
                                 (default: {original_meta_basename}_ranked_TIMESTAMP.txt)
     --output-pairs FILE         Custom output for superduperprompts (full prompts)
                                 (default: superduperprompts_TIMESTAMP.txt)
+    --only-write-used-prompts   When used together with --state-file, the output superprompts
+                                and metaprompts files will contain only prompts that are in the
+                                curated set (have at least one kept image). Prompts do not
+                                appear in any of the curated set are omitted. Useful for
+                                creating a minimal, focused prompt set for another iteration
+                                or more renders, discarding "dead" prompts that never produced
+                                a keeper. (default: False, writes all original prompts sorted
+                                by win rate)
 
 FILE REQUIREMENTS:
     superprompts.txt (or custom)    One template per line, use '{}' as placeholder.
@@ -58,11 +67,20 @@ NOTES:
     WIN RATE CALCULATION (with --state-file):
         Win rate = (number of kept images for a prompt) / (total rendered images for that prompt)
         Prompts that were never rendered (total = 0) get a win rate of 0.0 and appear at
-        the bottom of the ranked lists.
+        the bottom of the ranked lists. If --only-write-used-prompts is given, such prompts
+        are omitted entirely from the output files. NOTE that this calculation gives a
+        more accurate idea of what may be considered a more popular result, because
+        it tracks total renders noted in the state file whether those renders are in the
+        scanned curated PNG (render) set or not, and uses those for calculating rank.
 
     OCCURRENCE FALLBACK (without --state-file):
         Ranks prompts purely by how many kept images contain them.
         Useful when you no longer have the original state file or want a quick frequency list.
+        Note: --only-write-used-prompts is inapplicable in this mode, because the
+        fallback writes prompts that appear in the curated set without any knowledge of
+        whether those prompts were in a state file. NOTE that this fallback provides a
+        potentially less accurate picture of what may be more popular, because it doesn't
+        use any state file knowledge of prior renders (see WIN RATE CALCULATION).
 
     OUTPUT FILES:
         * Ranked superprompts:     One template per line, sorted by win rate (descending).
@@ -90,6 +108,10 @@ EXAMPLES:
     # Full win‑rate ranking using state file
     python refine_prompts_from_curated.py --curated-dir ./renders \\
         --state-file .comfyUIbatchRunner_render_state.pkl
+
+    # Only write prompts that actually produced kept images
+    python refine_prompts_from_curated.py --curated-dir ./renders \\
+        --state-file state.pkl --only-write-used-prompts
 
     # Custom input/output files
     python refine_prompts_from_curated.py --curated-dir ./my_kept \\
@@ -158,7 +180,7 @@ def extract_super_and_metaprompt(full_prompt, superprompts, metaprompts):
             if len(parts) == 2:
                 # Check if full_prompt starts with parts[0] and ends with parts[1]
                 if full_prompt.startswith(parts[0]) and full_prompt.endswith(parts[1]):
-                    metaprompt_candidate = full_prompt[len(parts[0]):-len(parts[1])]
+                    metaprompt_candidate = full_prompt[len(parts[0]):-len(parts[1])] if parts[1] else full_prompt[len(parts[0]):]
                     # Handle empty metaprompt case
                     if metaprompt_candidate == "" and not metaprompts:
                         return sp, ""
@@ -183,6 +205,11 @@ def main():
     parser.add_argument('--output-super', help='Output file for ranked superprompts (default: {original_super_basename}_ranked_TIMESTAMP.txt)')
     parser.add_argument('--output-meta', help='Output file for ranked metaprompts (default: {original_meta_basename}_ranked_TIMESTAMP.txt)')
     parser.add_argument('--output-pairs', help='Output file for superduperprompts (default: superduperprompts_TIMESTAMP.txt)')
+    parser.add_argument('--only-write-used-prompts', action='store_true',
+                        help='--only-write-used-prompts and --state-file: write only those superprompts and metaprompts'
+                             'that actually appear in the curated images (i.e., have kept_count > 0), sorted by most kept (win rate).'
+                             '--state-file only (no --only~) : all original prompts are written, also by win rate.'
+                             'No --only~ or --state-file: fallback, only used prompts are written, ranked by occurrence count.')
     
     args = parser.parse_args()
     
@@ -284,13 +311,14 @@ def main():
         superprompt_total = defaultdict(int)
         metaprompt_total = defaultdict(int)
         pair_total = defaultdict(int)
-
+        
         # Map indices back to prompt text
         idx_to_superprompt = {idx: sp for idx, sp in enumerate(superprompts)}
         idx_to_metaprompt = {idx: mp for idx, mp in enumerate(metaprompts)} if metaprompts else {}
-
+        
         for combo in render_state:
-            if combo.get('status') == 'completed':   # <-- only check 'status'
+            # Check completion status (supports current 'status' field)
+            if combo.get('status') == 'completed':
                 sp_idx = combo['superprompt_idx']
                 sp_text = idx_to_superprompt.get(sp_idx)
                 if sp_text:
@@ -336,6 +364,12 @@ def main():
         # Rank by win rate (higher is better)
         ranked_superprompts = sorted(superprompts, key=lambda sp: superprompt_win_rate.get(sp, 0), reverse=True)
         ranked_metaprompts = sorted(metaprompts, key=lambda mp: metaprompt_win_rate.get(mp, 0), reverse=True)
+        
+        # Apply --only-write-used-prompts filtering if requested
+        if args.only_write_used_prompts:
+            ranked_superprompts = [sp for sp in ranked_superprompts if sp in found_superprompts]
+            ranked_metaprompts = [mp for mp in ranked_metaprompts if mp in found_metaprompts]
+            print(f"Filtering: Only writing used prompts (kept_count > 0)")
         
         # Filter pairs to only those that were actually kept (winning combinations)
         winning_pairs = [(sp, mp) for (sp, mp) in found_pairs if pair_win_rate.get((sp, mp), 0) > 0]
