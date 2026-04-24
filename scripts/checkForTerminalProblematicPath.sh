@@ -1,5 +1,8 @@
 # DESCRIPTION
-# Checks for unusual characters in the path (pwd), or a very long path name, and exits assigning an errorlevel in either case.
+# Checks for unusual characters in the path, or a very long path name, and exits assigning an errorlevel in either case.
+
+# DEPENDENCIES
+# pwd and grep, a unixy bash envrionment / GNU coreutils
 
 # USAGE
 # Run without any parameters:
