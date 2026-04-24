@@ -20,7 +20,7 @@
 # Parse for parameters and set defaults for missing ones\; if they are present\, use them.
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (file extension to sort into folders) passed to script. Exit."; exit 1; else fileExt=$1; fi
 
-if [ ! "$2" ]; then printf "\nNo parameter \$1 (number of files to sort into each folder) passed to script. Exit."; exit 1; else numberToAxeOn=$2; fi
+if [ ! "$2" ]; then printf "\nNo parameter \$2 (number of files to sort into each folder) passed to script. Exit."; exit 2; else numberToAxeOn=$2; fi
 
 if [ ! "$3" ] || [ "$3" == "DEFAULT" ]
 then
