@@ -10,12 +10,13 @@
 #   - A test automation assistant for CLI applications (verifying all switch combinations)
 #   - A batch job generator (running the same command with many parameter combinations)
 #   - A parameter exploration tool (systematically testing all variations)
+#   - A CSV test configuration exporter (for spreadsheet-based test planning)
 
 # DEPENDENCIES
-# - MSYS2 bash environment on Windows
+# - MSYS2 bash environment on Windows (for shell script generation)
 # - Python 3.6+
 # - The command under test must be executable or invokable via interpreter
-# - Standard bash utilities (mv, cp, rm, etc.)
+# - Standard bash utilities (mv, cp, rm, etc.) (for shell script generation)
 
 # USAGE
 # Interactive mode (no config):
@@ -30,13 +31,19 @@
 # Load config and save as new file:
 #   python CLI_batch_generator.py --config my_run.json --save-as new_run.json
 #
+# Generate CSV only (no shell scripts):
+#   python CLI_batch_generator.py --csv-only
+#
+# Generate CSV with config:
+#   python CLI_batch_generator.py --config my_run.json --csv-only
+#
 # After generating run scripts:
 #   cd suite_<commandname>_<timestamp>
 #   ./run_suite_<commandname>.sh
 #   Select batch or interactive mode
 #
 # NOTES
-# - This tool tests named switches only. Positional swithces will not work.
+# - This tool tests named switches only. Positional switches will not work.
 # - Run scripts are generated as combinations, not permutations (order doesn't matter)
 # - Each run uses only one value per switch
 # - Mutually exclusive switches are always tested together to verify error handling
@@ -63,8 +70,16 @@
 #   * Use --save to overwrite existing config, --save-as to create new file
 #   * Commands are stored as entered (portable format recommended)
 #
-# - HOW RUN EXECUTION WORKS:
-#   * You run this generator from your working director (where your data files are)
+# - CSV EXPORT MODE:
+#   * Generates a spreadsheet-friendly CSV file with all test configurations
+#   * Includes columns: Run ID, Command, Form Type, Switch Count, Valid/Invalid,
+#     Expected Result, and one column per switch with its value
+#   * Perfect for test planning, manual test execution, or importing into test management tools
+#   * Can be used alone or alongside shell script generation
+#   * CSV files can be opened in Excel, OpenOffice Calc, Google Sheets, etc.
+#
+# - HOW RUN EXECUTION WORKS (Shell script mode):
+#   * You run this generator from your working directory (where your data files are)
 #   * It creates individual run scripts for all possible configurations determined by data
 #     which you give it via interactive prompts _or_ by loading a config. Run scripts are
 #     created in a subdirectory (suite_*/)
@@ -102,6 +117,7 @@ import json
 import argparse
 import random
 import string
+import csv
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional, Any
 import shutil
@@ -619,6 +635,172 @@ def has_conflict(switches: List[Switch], combo: Dict) -> bool:
                 return True
     return False
 
+def generate_csv_export(switches: List[Switch], script_name: str, depth: str, crit_filter: str, output_csv: str = None):
+    """
+    Generate CSV configuration matrix for manual testing and overview.
+    Each row = one test configuration with switch values in separate columns.
+    """
+    cwd = Path.cwd()
+    print(f"\nWorking directory: {cwd}")
+    
+    # Resolve script path in the command
+    print(f"\nResolving script paths in command: {script_name}")
+    actual_command = resolve_script_paths(script_name)
+    print(f"  Using command: {actual_command}")
+    
+    # Extract a safe name for output filename
+    script_basename_raw = script_name.replace('\\', '/').split('/')[-1]
+    if '.' in script_basename_raw:
+        script_basename = script_basename_raw[:script_basename_raw.rfind('.')]
+    else:
+        script_basename = script_basename_raw
+    script_basename = re.sub(r'[^\w\-]', '_', script_basename)
+    if not script_basename:
+        script_basename = "command"
+    
+    # Generate all combinations
+    combos = generate_combinations(switches, depth, crit_filter)
+    
+    if not combos:
+        print("No configurations generated!")
+        return None
+    
+    # Separate valid and invalid combinations
+    valid_combos = []
+    invalid_combos = []
+    
+    for combo in combos:
+        if has_conflict(switches, combo):
+            invalid_combos.append(combo)
+        else:
+            valid_combos.append(combo)
+    
+    total_unique = len(valid_combos) + len(invalid_combos)
+    
+    # Determine if we'll generate both long and short forms
+    has_both_forms = False
+    for switch in switches:
+        if switch.long_form and switch.short_form:
+            has_both_forms = True
+            break
+    
+    form_types_count = 2 if has_both_forms else 1
+    total_configs = total_unique * form_types_count
+    
+    print(f"\nGenerating CSV with {total_unique} unique switch configurations...")
+    print(f"  Valid configurations (no conflicts): {len(valid_combos)}")
+    print(f"  Invalid configurations (with conflicts): {len(invalid_combos)}")
+    if form_types_count == 2:
+        print(f"  Long and short forms will create {total_configs} total test configurations.")
+    else:
+        print(f"  Single form will create {total_configs} total test configurations.")
+    
+    # Generate CSV filename if not provided
+    if not output_csv:
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_csv = f"{script_basename}_config_matrix_{timestamp}.csv"
+    
+    # Prepare CSV data
+    csv_rows = []
+    config_id = 1
+    
+    # For each form type (long and short) only if both forms exist
+    form_types_to_generate = [True, False] if has_both_forms else [True]  # True = long, False = short
+    
+    for use_long in form_types_to_generate:
+        form_type = "long" if use_long else "short"
+        
+        # Process both valid and invalid combos
+        for combo_list, combo_type in [(valid_combos, "valid"), (invalid_combos, "invalid")]:
+            for combo in combo_list:
+                # Build full command
+                cmd_parts = [actual_command]
+                
+                # Create a dictionary to hold values for each switch
+                switch_values = {}
+                criticality_levels = set()
+                
+                # Sort by switch index for consistent ordering
+                for idx in sorted(combo.keys()):
+                    switch = switches[idx]
+                    value = combo[idx]
+                    criticality_levels.add(switch.criticality)
+                    
+                    # Choose which form to use
+                    if not use_long and switch.short_form:
+                        switch_text = switch.short_form
+                    elif use_long and switch.long_form:
+                        switch_text = switch.long_form
+                    elif switch.short_form:
+                        switch_text = switch.short_form
+                    elif switch.long_form:
+                        switch_text = switch.long_form
+                    else:
+                        continue
+                    
+                    if not switch.is_flag and value is not None:
+                        cmd_parts.append(f"{switch_text} {value}")
+                        switch_values[switch.name] = str(value) if value else ""
+                    else:
+                        cmd_parts.append(switch_text)
+                        switch_values[switch.name] = "flag"  # Mark as flag switch
+                
+                full_command = " ".join(cmd_parts)
+                
+                # Determine expected result
+                if combo_type == "invalid":
+                    expected_result = "should error (conflict)"
+                else:
+                    expected_result = "normal execution"
+                
+                # Build row data with columns for each switch
+                row = {
+                    'id': config_id,
+                    'combo_type': combo_type,
+                    'criticality': ','.join(sorted(criticality_levels)),
+                    'switch_count': len(combo),
+                    'form_type': form_type,
+                    'expected': expected_result,
+                    'full_command': full_command,
+                }
+                
+                # Add a column for each switch with its value
+                for switch in switches:
+                    if switch.name in switch_values:
+                        row[f'switch_{switch.name}'] = switch_values[switch.name]
+                    else:
+                        row[f'switch_{switch.name}'] = ''
+                
+                csv_rows.append(row)
+                config_id += 1
+    
+    # Write CSV file
+    if csv_rows:
+        # Build column order: metadata first, then each switch column
+        fieldnames = ['id', 'combo_type', 'criticality', 'switch_count', 'form_type', 'expected', 'full_command']
+        
+        # Add switch columns (each switch gets its own column)
+        for switch in switches:
+            fieldnames.append(f'switch_{switch.name}')
+        
+        with open(output_csv, 'w', newline='', encoding='utf-8-sig') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(csv_rows)
+        
+        print(f"\n=== Configuration Matrix Generated ===")
+        print(f"CSV file: {output_csv}")
+        print(f"Total configurations: {len(csv_rows)}")
+        print(f"\nColumn breakdown:")
+        print(f"  - Metadata: id, combo_type, criticality, switch_count, form_type, expected, full_command")
+        print(f"  - Switch columns: {len(switches)} column(s) (one per switch)")
+        print(f"\nOpen in spreadsheet software for easy viewing and manual testing.")
+        
+        return output_csv
+    else:
+        print("No configurations generated!")
+        return None
+
 def generate_run_scripts(switches: List[Switch], script_name: str, depth: str, crit_filter: str):
     """
     Generate simple run scripts (just the command) and the main runner.
@@ -990,13 +1172,17 @@ def main():
     parser.add_argument('--config', help='Load run configuration from JSON file')
     parser.add_argument('--save', action='store_true', help='Overwrite config file after any changes')
     parser.add_argument('--save-as', help='Save config to new file after generation')
+    parser.add_argument('--csv-only', action='store_true', help='Generate CSV export only (no shell scripts)')
+    parser.add_argument('--csv-output', help='Output filename for CSV export (default: auto-generated)')
     args = parser.parse_args()
     
     print("=" * 60)
-    print("CLI Batch Generator - Combinatorial Run Generator (v2.2.5)")
+    print("CLI Batch Generator - Combinatorial Run Generator (v2.34.5)")
     print("=" * 60)
     print(f"Current working directory: {Path.cwd()}")
     print("All run artifacts will be created here.")
+    if args.csv_only:
+        print("Mode: CSV Export Only (no shell scripts will be generated)")
     print("=" * 60)
     
     # Load config if provided
@@ -1148,7 +1334,7 @@ def main():
         print("Switch validation failed. Please fix the errors and try again.")
         return
     
-    # Offer to save config before generating runs
+    # Offer to save config before generating runs (unless in csv-only mode)
     if not args.config:
         save_choice = get_user_input("\nSave this configuration for future use? (y/n)", default="n").lower()
         if save_choice == 'y':
@@ -1193,8 +1379,13 @@ def main():
                         save_path = default_name
                     save_config(save_path, script_name, switches, depth, crit_filter)
     
-    # Generate runs
-    generate_run_scripts(switches, script_name, depth, crit_filter)
+    # Generate runs either as CSV or shell scripts
+    if args.csv_only:
+        # CSV export mode
+        generate_csv_export(switches, script_name, depth, crit_filter, args.csv_output)
+    else:
+        # Normal shell script generation mode
+        generate_run_scripts(switches, script_name, depth, crit_filter)
     
 if __name__ == "__main__":
     main()
