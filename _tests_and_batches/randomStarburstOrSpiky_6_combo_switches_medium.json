@@ -1,0 +1,118 @@
+{
+  "_notes": "Load with CLI_batch_generator.py, this way, without the backticks: `python /path_to/CLI_batch_generator.py --config randomStarburstOrSpiky_6_combo_switches_medium.json`. Also, note the 'command': field in this config can take a value which is a full path or only the script name, and the batch generator will locate the script (if it is in PATH) and substitute the full path in created batches. Made by CLI_batch_generator.py 2.34.5",
+  "command": "python randomStarburstOrSpiky.py",
+  "depth": "6",
+  "crit_filter": "M",
+  "switches": [
+    {
+      "name": "mode",
+      "long_form": "--mode",
+      "short_form": "",
+      "is_flag": false,
+      "values": [
+        "starburst",
+        "random"
+      ],
+      "criticality": "H",
+      "required": true,
+      "conflicts_with": []
+    },
+    {
+      "name": "N",
+      "long_form": "",
+      "short_form": "-N",
+      "is_flag": false,
+      "values": [
+        "6",
+        "10",
+        "14",
+        "18",
+        "22",
+        "26",
+        "30"
+      ],
+      "criticality": "H",
+      "required": true,
+      "conflicts_with": []
+    },
+    {
+      "name": "width",
+      "long_form": "--width",
+      "short_form": "",
+      "is_flag": false,
+      "values": [
+        "512"
+      ],
+      "criticality": "M",
+      "required": false,
+      "conflicts_with": []
+    },
+    {
+      "name": "height",
+      "long_form": "--height",
+      "short_form": "",
+      "is_flag": false,
+      "values": [
+        "680",
+        "512",
+        "380"
+      ],
+      "criticality": "L",
+      "required": false,
+      "conflicts_with": []
+    },
+    {
+      "name": "inner-radius",
+      "long_form": "--inner-radius",
+      "short_form": "",
+      "is_flag": false,
+      "values": [
+        "0.82",
+        "0.72",
+        "0.6",
+        "0.48",
+        "0.33",
+        "0.2"
+      ],
+      "criticality": "H",
+      "required": true,
+      "conflicts_with": []
+    },
+    {
+      "name": "jitter-angle",
+      "long_form": "--jitter-angle",
+      "short_form": "",
+      "is_flag": false,
+      "values": [
+        "0",
+        "12",
+        "18",
+        "29",
+        "38",
+        "61",
+        "97",
+        "125"
+      ],
+      "criticality": "H",
+      "required": true,
+      "conflicts_with": []
+    },
+    {
+      "name": "jitter-radius",
+      "long_form": "--jitter-radius",
+      "short_form": "",
+      "is_flag": false,
+      "values": [
+        "0.1",
+        "0.25",
+        "0.4",
+        "0.63",
+        "0.8",
+        "0.92"
+      ],
+      "criticality": "H",
+      "required": true,
+      "conflicts_with": []
+    }
+  ]
+}
