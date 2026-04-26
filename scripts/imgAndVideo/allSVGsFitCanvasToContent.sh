@@ -1,43 +1,163 @@
+#!/usr/bin/env bash
+
 # DESCRIPTION
 # Resaves all SVGs in a directory (and optionally subdirectories) so that the view canvas shows everything. Useful for example for adjusting auto-exported glyphs from fonts where the canvas crops out things below the letter baseline. In detail: for every vector file of a given type (default SVG) in the current directory (and optionally all subdirectories), selects all, resizes the canvas to fit the selection, and exports a plain (if possible?) format version of that file over itself.
+#
+# Optional parallel processing using xargs -P. Ctrl+C kills all child processes.
 
 # DEPENDENCIES
 # inkscape with CLI capability installed and in your PATH.
+# xargs (standard on MSYS2) for parallel execution.
+# nproc (usually part of coreutils) to detect core count.
 
 # USAGE
-# Run with these parameters:
-# - $1 OPTIONAL. File format to work on; all files of this type in the current directory will be worked on.
-# - $2 OPTIONAL. Anything, for example the word Psychoudy, which will cause the script to operate on all files of type $1 in all subdirectories also. If omitted, only files of type $1 in the current directory will be operated on. Note that to use this you must specify a value for $1 (you can't omit $1 to use the default).
-# For example, to resave all SVG format files in the current directory so the canvas accomodates a view of everything in the file, run this without any parameters:
-#    allSVGsFitCanvasToContent.sh
-# To work on SVGs in the current directory and all subdirectories also, specify svg for the first parameter and anything for the second parameter:
-#    allSVGsFitCanvasToContent.sh svg STAR
-# NOTE that I actually don't know what this can operate on besides svg files and have only coded it to accomodate that known possibility.
-
+#   -t, --type <ext>                   File type to process (default: svg)
+#   -r, --recursive                    Process files in subdirectories as well
+#   -m, --multiprocess-percent-cores [float]   Enable parallel mode; optional fraction of cores (default 0.75)
+#   -h, --help                         Show this help
+#
+# If -m is omitted, runs sequentially.
 
 # CODE
-# set input file type from $1 else default to svg
-if [ "$1" ]; then inputFileType=$1; else inputFileType=svg; echo "\nNo parameter \$1 (input file type) passed to script. Defaulting to svg."; fi
 
-# set the find commands' maxdepth switch to only one level deep if no parameter or NULL is passed for $2, and default to nothing (which searches all subdirectories) if a parameter other than NULL is passed for $2:
-if [ ! "$2" ] || [ "$2" == "NULL" ]; then subDirSearchParam="-maxdepth 1"; fi
+PROGNAME=$(basename "$0")
 
-filesList=( $(find . $subDirSearchParam -type f -iname \*.$inputFileType -printf "%P\n" ) )
+function print_halp {
+    cat <<EOF
+Usage: $PROGNAME [options]
 
-nFilesInList=${#filesList[@]}
-i=0
-# iterates over and operate on all resulting the resulting inputFileType-s:
-for file in ${filesList[@]}
-do
-	i=$((i + 1))
-	# inkscape CLI documentation: https://wiki.inkscape.org/wiki/index.php/Using_the_Command_Line
-	# also via writing to help file: inkscape --action-list > halp.txt
-	echo "working on file $file . . . ($i of $nFilesInList)"
-	# if the input file format is SVG, add a flag to export plain SVG:
-	if [ "$inputFileType" == 'svg' ]
-	then
-		inkscape --export-filename="$file" --export-plain-svg --actions="select-all;fit-canvas-to-selection" $file
-	else
-		inkscape --export-filename="$file" --actions="select-all;fit-canvas-to-selection" $file
-	fi
+Options:
+  -t, --type <ext>       File extension to process (default: svg)
+  -r, --recursive        Process files in all subdirectories as well
+  -m, --multiprocess-percent-cores [0.0-1.0]   Enable parallel mode (xargs); optional fraction of cores (default 0.75)
+  -h, --help             Show this help
+
+If -m is not given, runs sequentially (one file at a time).
+EOF
+}
+
+function check_space_in_opt_arg {
+    if [ "$2" == "" ]; then
+        echo "ERROR: No value (or space followed by empty value) after option $1. Pass value immediately after the option (e.g. $1""value)." >&2
+        exit 4
+    fi
+}
+
+# Trap for Ctrl+C
+cleanup() {
+    echo -e "\nInterrupted. Terminating all child processes..."
+    pkill -TERM -P $$ 2>/dev/null
+    sleep 0.5
+    pkill -KILL -P $$ 2>/dev/null
+    exit 1
+}
+trap cleanup SIGINT SIGTERM
+
+# Defaults
+inputFileType="svg"
+recursiveFlag=""
+parallelJobs=0          # 0 = sequential
+
+# Parse options (getopt)
+OPTS=$(getopt -o ht:rm:: --long help,type:,recursive,multiprocess-percent-cores:: -n "$PROGNAME" -- "$@")
+if [ $? != 0 ]; then
+    echo "Failed parsing options." >&2
+    exit 1
+fi
+eval set -- "$OPTS"
+
+while true; do
+    case "$1" in
+        -h|--help)
+            print_halp
+            exit 0
+            ;;
+        -t|--type)
+            inputFileType="$2"
+            shift; shift
+            ;;
+        -r|--recursive)
+            recursiveFlag=" -r"
+            shift
+            ;;
+        -m|--multiprocess-percent-cores)
+            if [ -n "$2" ] && [[ "$2" != -* ]]; then
+                fraction="$2"
+                shift; shift
+            else
+                fraction=""
+                shift
+            fi
+            totalCores=$(nproc 2>/dev/null || echo 1)
+            if [ -z "$fraction" ]; then
+                parallelJobs=$(awk "BEGIN {printf \"%d\", 0.75 * $totalCores}")
+            else
+                if [[ ! "$fraction" =~ ^0(\.[0-9]+)?$|^1(\.0+)?$ ]]; then
+                    echo "ERROR: Value for -m must be a decimal between 0 and 1 (e.g., 0.5). Got '$fraction'" >&2
+                    exit 1
+                fi
+                parallelJobs=$(awk "BEGIN {printf \"%d\", $fraction * $totalCores}")
+            fi
+            if [ "$parallelJobs" -lt 1 ]; then
+                parallelJobs=1
+            fi
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            break
+            ;;
+    esac
 done
+
+# Find files
+if [ -n "$recursiveFlag" ]; then
+    subDirSearchParam=""
+else
+    subDirSearchParam="-maxdepth 1"
+fi
+
+mapfile -t filesList < <(find . $subDirSearchParam -type f -iname "*.$inputFileType" -printf "%P\n")
+nFilesInList=${#filesList[@]}
+
+if [ $nFilesInList -eq 0 ]; then
+    echo "No *.$inputFileType files found. Exiting."
+    exit 0
+fi
+
+echo "Found $nFilesInList file(s) of type .$inputFileType"
+
+# Process one file (with filename prefix for output)
+process_one_file() {
+    local file="$1"
+    echo "[$file] Starting..."
+    if [ "$inputFileType" == "svg" ]; then
+        inkscape --export-filename="$file" --export-plain-svg --actions="select-all;fit-canvas-to-selection" "$file"
+    else
+        inkscape --export-filename="$file" --actions="select-all;fit-canvas-to-selection" "$file"
+    fi
+    echo "[$file] Finished."
+}
+export -f process_one_file
+export inputFileType
+
+# Run parallel or sequential
+if [ "$parallelJobs" -gt 1 ]; then
+    echo "Running in parallel mode with $parallelJobs concurrent jobs (xargs)."
+    printf "%s\0" "${filesList[@]}" | xargs -0 -P "$parallelJobs" -I {} bash -c 'process_one_file "$@"' _ {}
+else
+    echo "Running sequentially (one file at a time)."
+	echo "===================== NOTE ====================="
+	echo "If you have multiple CPU cores, --multiprocess-percent-cores"
+	echo "is strongly recommended. See --help."
+    i=0
+    for file in "${filesList[@]}"; do
+        i=$((i+1))
+        echo "working on file $file ... ($i of $nFilesInList)"
+        process_one_file "$file"
+    done
+fi
+
+echo "All files processed."
