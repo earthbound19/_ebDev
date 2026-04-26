@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-
 # DESCRIPTION
 # Resaves all SVGs in a directory (and optionally subdirectories) so that the view canvas shows everything. Useful for example for adjusting auto-exported glyphs from fonts where the canvas crops out things below the letter baseline. In detail: for every vector file of a given type (default SVG) in the current directory (and optionally all subdirectories), selects all, resizes the canvas to fit the selection, and exports a plain (if possible?) format version of that file over itself.
 #
-# Optional parallel processing using xargs -P. Ctrl+C kills all child processes.
+# Optionally parallel processes using xargs -P. Ctrl+C kills all child processes.
 
 # DEPENDENCIES
 # inkscape with CLI capability installed and in your PATH.
@@ -13,10 +12,10 @@
 # USAGE
 #   -t, --type <ext>                   File type to process (default: svg)
 #   -r, --recursive                    Process files in subdirectories as well
-#   -m, --multiprocess-percent-cores [float]   Enable parallel mode; optional fraction of cores (default 0.75)
+#   -m, --multiprocess-percent-cores <float>   Enable parallel mode. If used, a float between 0 and 1 (e.g., -m0.4) is required. Short form -m must have the float immediately after the -m, for example -m0.4. Long form --multiprocess-percent-cores must use the form =value, for example --multiprocess-percent-cores=0.4
 #   -h, --help                         Show this help
 #
-# If -m is omitted, runs sequentially.
+# If -m is omitted, runs sequentially. Example: -m 0.4 uses 40% of cores.
 
 # CODE
 
@@ -29,21 +28,13 @@ Usage: $PROGNAME [options]
 Options:
   -t, --type <ext>       File extension to process (default: svg)
   -r, --recursive        Process files in all subdirectories as well
-  -m, --multiprocess-percent-cores [0.0-1.0]   Enable parallel mode (xargs); optional fraction of cores (default 0.75)
+  -m, --multiprocess-percent-cores <float>   Enable parallel mode. If used, a float between 0 and 1 (e.g., -m0.4) is required. Short form -m must have the float immediately after the -m, for example -m0.4. Long form --multiprocess-percent-cores must use the form =value, for example --multiprocess-percent-cores=0.4
   -h, --help             Show this help
 
-If -m is not given, runs sequentially (one file at a time).
+If -m is not given, runs sequentially.
 EOF
 }
 
-function check_space_in_opt_arg {
-    if [ "$2" == "" ]; then
-        echo "ERROR: No value (or space followed by empty value) after option $1. Pass value immediately after the option (e.g. $1""value)." >&2
-        exit 4
-    fi
-}
-
-# Trap for Ctrl+C
 cleanup() {
     echo -e "\nInterrupted. Terminating all child processes..."
     pkill -TERM -P $$ 2>/dev/null
@@ -56,9 +47,10 @@ trap cleanup SIGINT SIGTERM
 # Defaults
 inputFileType="svg"
 recursiveFlag=""
-parallelJobs=0          # 0 = sequential
+parallelJobs=0
+fraction=""
 
-# Parse options (getopt)
+# Parse options: -m is optional argument (::) so we can detect missing value
 OPTS=$(getopt -o ht:rm:: --long help,type:,recursive,multiprocess-percent-cores:: -n "$PROGNAME" -- "$@")
 if [ $? != 0 ]; then
     echo "Failed parsing options." >&2
@@ -77,30 +69,17 @@ while true; do
             shift; shift
             ;;
         -r|--recursive)
-            recursiveFlag=" -r"
+            recursiveFlag="-r"
             shift
             ;;
         -m|--multiprocess-percent-cores)
-            if [ -n "$2" ] && [[ "$2" != -* ]]; then
-                fraction="$2"
-                shift; shift
-            else
-                fraction=""
-                shift
+            # No space allowed after -m; for long form, use =.
+            if [ -z "$2" ] || [[ "$2" == -* ]]; then
+                echo "ERROR: Option $1 requires a value. When using the short form (-m), don't use a space (example: -m0.4). For the long form, use an equals sign (example: --multiprocess-percent-cores=0.4)." >&2
+                exit 4
             fi
-            totalCores=$(nproc 2>/dev/null || echo 1)
-            if [ -z "$fraction" ]; then
-                parallelJobs=$(awk "BEGIN {printf \"%d\", 0.75 * $totalCores}")
-            else
-                if [[ ! "$fraction" =~ ^0(\.[0-9]+)?$|^1(\.0+)?$ ]]; then
-                    echo "ERROR: Value for -m must be a decimal between 0 and 1 (e.g., 0.5). Got '$fraction'" >&2
-                    exit 1
-                fi
-                parallelJobs=$(awk "BEGIN {printf \"%d\", $fraction * $totalCores}")
-            fi
-            if [ "$parallelJobs" -lt 1 ]; then
-                parallelJobs=1
-            fi
+            fraction="$2"
+            shift; shift
             ;;
         --)
             shift
@@ -112,7 +91,26 @@ while true; do
     esac
 done
 
-# Find files
+# Compute parallel jobs if -m was used
+if [ -n "$fraction" ]; then
+    totalCores=$(nproc 2>/dev/null || echo 1)
+    if [[ ! "$fraction" =~ ^0(\.[0-9]+)?$|^1(\.0+)?$ ]]; then
+        echo "ERROR: Value for -m must be a decimal between 0 and 1 (e.g., 0.5). Got '$fraction'" >&2
+        exit 1
+    fi
+    parallelJobs=$(awk "BEGIN {printf \"%d\", $fraction * $totalCores}")
+    if [ "$parallelJobs" -lt 1 ]; then
+        parallelJobs=1
+    fi
+    # Optional cap via environment variable
+    if [ -n "$MAX_PARALLEL_JOBS" ] && [ "$parallelJobs" -gt "$MAX_PARALLEL_JOBS" ]; then
+        echo "Capping parallel jobs from $parallelJobs to $MAX_PARALLEL_JOBS (MAX_PARALLEL_JOBS)"
+        parallelJobs=$MAX_PARALLEL_JOBS
+    fi
+    echo "Using $parallelJobs concurrent jobs (detected $totalCores cores, fraction $fraction)."
+fi
+
+# Build find command
 if [ -n "$recursiveFlag" ]; then
     subDirSearchParam=""
 else
@@ -129,7 +127,6 @@ fi
 
 echo "Found $nFilesInList file(s) of type .$inputFileType"
 
-# Process one file (with filename prefix for output)
 process_one_file() {
     local file="$1"
     echo "[$file] Starting..."
@@ -143,15 +140,11 @@ process_one_file() {
 export -f process_one_file
 export inputFileType
 
-# Run parallel or sequential
 if [ "$parallelJobs" -gt 1 ]; then
     echo "Running in parallel mode with $parallelJobs concurrent jobs (xargs)."
     printf "%s\0" "${filesList[@]}" | xargs -0 -P "$parallelJobs" -I {} bash -c 'process_one_file "$@"' _ {}
 else
     echo "Running sequentially (one file at a time)."
-	echo "===================== NOTE ====================="
-	echo "If you have multiple CPU cores, --multiprocess-percent-cores"
-	echo "is strongly recommended. See --help."
     i=0
     for file in "${filesList[@]}"; do
         i=$((i+1))
