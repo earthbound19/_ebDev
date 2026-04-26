@@ -86,12 +86,15 @@ Detailed switch reference:
                          Ignored in 'random' mode.
 """
 # CODE
+script_version = "1.2.13"
 
 import argparse
 import math
 import random
 import sys
 import datetime
+import xml.sax.saxutils as saxutils
+import os
 
 MARGIN = 2   # pixels subtracted from each side to keep the polygon inside the viewBox
 
@@ -193,6 +196,8 @@ def generate_random(args):
     return vertices
 
 
+import html   # add at top of file
+
 def write_svg(args, vertices):
     """Create and output the SVG file (or stdout)."""
     W, H = args.width, args.height
@@ -214,38 +219,46 @@ def write_svg(args, vertices):
         points.append(f"{x:.3f},{y:.3f}")
     points_str = " ".join(points)
 
-    # Build switches string for metadata
-    switch_parts = [f"--mode {args.mode}",
-                    f"-N {args.num_vertices}",
-                    f"-W {args.width}"]
+    # Build command string for metadata (reusing the same logic as original switches_str)
+    cmd_parts = [f"--mode {args.mode}",
+                 f"-N {args.num_vertices}",
+                 f"-W {args.width}"]
     if args.height != args.width:
-        switch_parts.append(f"-H {args.height}")
+        cmd_parts.append(f"-H {args.height}")
     if args.inner_radius != 0.4:
-        switch_parts.append(f"-r {args.inner_radius}")
+        cmd_parts.append(f"-r {args.inner_radius}")
     if args.mode in ('perfect', 'starburst'):
         if args.alternate_start != 'outer':
-            switch_parts.append(f"--alternate-start {args.alternate_start}")
+            cmd_parts.append(f"--alternate-start {args.alternate_start}")
     if args.mode == 'starburst':
         if args.jitter_angle != 0.0:
-            switch_parts.append(f"-j {args.jitter_angle}")
+            cmd_parts.append(f"-j {args.jitter_angle}")
         if args.jitter_radius != 0.0:
-            switch_parts.append(f"-J {args.jitter_radius}")
+            cmd_parts.append(f"-J {args.jitter_radius}")
     if args.fill != 'black':
-        switch_parts.append(f"--fill {args.fill}")
+        cmd_parts.append(f"--fill {args.fill}")
     if args.stroke != 'none':
-        switch_parts.append(f"--stroke {args.stroke}")
+        cmd_parts.append(f"--stroke {args.stroke}")
         if args.stroke_width != 0:
-            switch_parts.append(f"--stroke-width {args.stroke_width}")
-    if args.output:
-        switch_parts.append(f"-o {args.output}")
-    switch_parts.append(f"--seed {args.seed}")
+            cmd_parts.append(f"--stroke-width {args.stroke_width}")
+    # Optional: include the output filename; not really needful, as all other switches
+    # would cause it to produce the same output file name, so this is commented out:
+    # if args.output:
+        # cmd_parts.append(f"-o {args.output}")
+    cmd_parts.append(f"--seed {args.seed}")
 
-    switches_str = " ".join(switch_parts)
+    cmd_str = " ".join(cmd_parts)
+    script_base = os.path.basename(__file__)
+    full_description = f"Created with {script_base} v{script_version}; command:\npython {script_base} {cmd_str}"
+    escaped_description = html.escape(full_description)
 
     # Build SVG content
     svg_lines = [
-        f'<svg viewBox="0 0 {W} {H}" xmlns="http://www.w3.org/2000/svg">',
-        f'  <!-- Created with randomStarburstOrSpiky.py. Switches: {switches_str} -->',
+        f'<svg viewBox="0 0 {W} {H}"',
+        f'     xmlns="http://www.w3.org/2000/svg"',
+        f'     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"',
+        f'     xmlns:cc="http://creativecommons.org/ns#"',
+        f'     xmlns:dc="http://purl.org/dc/elements/1.1/">',
         f'  <polygon points="{points_str}"',
         f'            fill="{args.fill}"',
     ]
@@ -255,7 +268,19 @@ def write_svg(args, vertices):
         svg_lines.append(f'            stroke="{args.stroke}"')
         if args.stroke_width:
             svg_lines.append(f'            stroke-width="{args.stroke_width}"')
-    svg_lines.extend(["  />", "</svg>"])
+    svg_lines.append('  />')
+
+    # Add metadata block exactly like Inkscape (and your working example)
+    svg_lines.extend([
+        '  <metadata>',
+        '    <rdf:RDF>',
+        '      <cc:Work rdf:about="">',
+        f'        <dc:description>{escaped_description}</dc:description>',
+        '      </cc:Work>',
+        '    </rdf:RDF>',
+        '  </metadata>',
+        '</svg>'
+    ])
 
     svg_text = "\n".join(svg_lines)
 
