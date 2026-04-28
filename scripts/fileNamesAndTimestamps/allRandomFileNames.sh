@@ -23,7 +23,7 @@ then
 	# Throw an error and exit if $1 is not numeric; re: https://stackoverflow.com/a/806923
 	re='^[0-9]+$'
 	if ! [[ $1 =~ $re ]] ; then
-	   echo "Error: parameter \$1 not a number. Pass a numer value (number of random characters to rename files to) for first parameter."
+	   echo "Error: parameter \$1 not a number. Pass a numeric value, the number of random characters to rename files to, for first parameter."
 	   exit 1
 	else
 		getNrandChars="$1"
