@@ -18,8 +18,9 @@
 #    autoMontageIM.sh png 9 800 FULL
 
 
-
 # CODE
+# TO DO: there was an intended per-image padding option in here which I think just shifted the image down and to the right N pixels -- instead of centering them with padded surround? Fix that if so.
+
 # DEV NOTES
 # All combinations of possible parameter types the script can handle, for testing:
 #    autoMontageIM.sh png (or any image type) +
@@ -105,9 +106,12 @@ heightPadding=$(echo "scale=0; $tileHeight - ($tileHeight * 95.5 / 100)" | bc)
 # echo "tilesAcross $tilesAcross tilesAcrossParam $tilesAcrossParam numImagesFound=$numImagesFound SQRTofNumImagesFound=$SQRTofNumImagesFound tileWidth=$tileWidth firstImage=$firstImage originalIMGwidth=$originalIMGwidth originalIMGheight=$originalIMGheight heightToWidthAspect=$heightToWidthAspect tileHeight=$tileHeight widthPadding=$widthPadding heightPadding=$heightPadding"
 
 # Create the montage to a temp image file.
-# Because I can't seem to find the escape sequence necessary to do this from bash+cmd, print the command to a bash script, then execute the script:
+# Because I can't seem to find the escape sequence necessary to do this from MSYS2 bach + cmd, print the command to a bash script, then execute the script:
 paddingParam=">+$heightPadding+$heightPadding"
 geometryParam="$tileWidth"x"$tileHeight""$paddingParam"
+# hack to change background color from a hard-coded array on each run; then set '$BG_COLOR' instead of '#919191' in the magick call that follows:
+# OLD_GLORY=(\#b22234 \#3c3b6e)
+# BG_COLOR=$(printf '%s\n' "${OLD_GLORY[@]}" | shuf | head -n 1)
 echo "magick montage -background '#919191' $tilesAcrossParam -geometry '$geometryParam' *.$imageType ___oooot_n4yR24PG.png" > tmp_command_MbVTjRGUYXUJ.sh
 ./tmp_command_MbVTjRGUYXUJ.sh
 rm tmp_command_MbVTjRGUYXUJ.sh
