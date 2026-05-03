@@ -261,7 +261,7 @@ imgs2imgs.sh png bmp
 BMPs2SVGs.sh smooth
 rm *.bmp *.png
 
-allSVG2img.sh 512 png ffffff00
+allSVG2img.sh --longest-side-px 512 --target-image-format png --background-color ffffff00
 
 if [ ! -d svgs ]; then mkdir svgs; fi
 mv *.svg ./svgs/
