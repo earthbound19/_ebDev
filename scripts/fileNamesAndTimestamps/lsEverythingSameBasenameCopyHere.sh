@@ -1,8 +1,9 @@
 # DESCRIPTION
 #   For all files in the current directory, iterates over them, identifies the
-#   file name without the extension ("base name"), and copies all files that
+#   file name without the extension (basename), and copies here all files that
 #   Everything search engine (voidtools.com) finds elsewhere on the computer
-#   which have that same base name but a different extension.
+#   which have that same base name but a different extension. Optionally moves
+#   the files instead (operation guarded by a password).
 #
 #   Example:
 #     Current directory contains:
@@ -51,7 +52,9 @@
 #   - Windows thumbnail database files (Thumbs.db) are ignored
 #
 # LIMITATIONS
-#   - Designed exclusively for the probably rare pairing of MSYS2 (Windows) and voidtools Everything search engine, which is also at this writing exclusively and probably always a Windows tool.
+#   - Designed exclusively for the probably rare pairing of MSYS2 (Windows) and
+#     voidtools Everything search engine, which is also at this writing exclusively
+#     and probably always a Windows tool.
 #   - Does not handle file paths containing newline characters (extremely rare
 #     on Windows and would require es.exe to support null-delimited output)
 #   - Assumes cygpath is available for path conversion
@@ -66,10 +69,13 @@
 #
 # =============================================================================
 
+
+# CODE
 # Determine operation mode
 MOVE_MODE=false
 if [ $# -gt 0 ]; then
-    echo "Move mode requested. Please enter password:"
+    echo "Move mode requested. To continue, please enter the word:"
+	echo "SploepShroopp"
     read -s password
     if [ "$password" = "SploepShroopp" ]; then
         MOVE_MODE=true
