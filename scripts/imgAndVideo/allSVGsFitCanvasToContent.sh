@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
 # DESCRIPTION
-# Resaves all SVGs in a directory (and optionally subdirectories) so that the view canvas shows everything. Useful for example for adjusting auto-exported glyphs from fonts where the canvas crops out things below the letter baseline. In detail: for every vector file of a given type (default SVG) in the current directory (and optionally all subdirectories), selects all, resizes the canvas to fit the selection, and exports a plain (if possible?) format version of that file over itself.
-#
-# Optionally parallel processes using xargs -P. Ctrl+C kills all child processes.
+# Resaves all SVGs in a directory (and optionally subdirectories)
+# so that the view canvas shows everything. Useful for example for
+# adjusting auto-exported glyphs from fonts where the canvas crops
+# out things below the letter baseline. In detail: for every vector
+# file of a given type (default SVG) in the current directory (and
+# optionally all subdirectories), selects all, resizes the canvas to
+# fit the selection, and exports a plain (if possible?) format version
+# of that file over itself. However, if your SVG only has polygons,
+# you'll want to use allSVGsFitCanvasToContent.py instead of this.
+# This is cumbersome; it slowly loads InkScape GUI for every SVG. The
+# Python alternative is lightning fast and also preserves at least
+# everything in <metadata> tags also; this may erase those.
 
 # DEPENDENCIES
 # inkscape with CLI capability installed and in your PATH.
