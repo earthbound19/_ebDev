@@ -46,7 +46,7 @@ do
 		renumberFiles.sh -e svg
 # OPTIONAL: delete all svg files after count N with this script call:
 # rmnn.sh svg 600 NULL BLUBARG
-		allSVG2img.sh 720 png
+		allSVG2img.sh --longest-side-px 720 --target-image-format png
 		ffmpegAnim.sh 30 30 9 png
 		mv ./_out.mp4 ../../_segment_"$zeroPaddedNumber"_"$element".mp4
 		cd ..

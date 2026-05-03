@@ -17,7 +17,7 @@ if [ "$2" ]; then padding=$2; else padding=1.2; printf "\nNo parameter \$2 (padd
 pixelFormat="-pix_fmt yuv420p"
 	# All images you operate on must be pngs for this to work:
 	# To render pngs from all svgs in the current directory, run:
-	# allSVG2img.sh 1080 png
+	# allSVG2img.sh --longest-side-px 1080 --target-image-format png
 imgsGetSimilar.sh png
 	# After that step, if you want to insert an image to the very start of the process (e.g. to fade in from black and back to black at the end), name that image e.g. 000.png so that the following scripts will sort that first in the process:
 mkNumberedCopiesFromFileList.sh

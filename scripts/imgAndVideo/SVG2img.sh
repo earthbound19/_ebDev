@@ -1,70 +1,198 @@
+#!/usr/bin/env bash
 # DESCRIPTION
-# Creates a .jpg (by default) file from an .svg file passed as parameter $1.
+# Converts an SVG file to a raster image format (PNG by default) using ImageMagick.
 
 # USAGE
-# Run with these parameters:
-# - $1 The svg file name to create an image from e.g. in.svg
-# - $2 OPTIONAL. Longest side in pixels for rendered output image. Default 4280 if not given.
-# - $3 OPTIONAL. Target file format e.g. png or jpg -- default jpg if not given.
-# - $4 OPTIONAL. A hex color code (format ffffff, no pound/hex symbol) which will be used to render the svg background (if it has a transparent background). To force a transparent background for an SVG without one (or if it isn't specified), you may be able to set an eight-hex color with 00 as the last two hex digits, to indicate zero transparency, like this: ffffff00. If your argument is not hex digits, [a-f0-9] (you can pass anything as this parameter), a hard-coded hex color will be used. See the BACKGROUND COLOR OPTIONS comment to hack that. IF OMITTED, the background will be transparent.
+#   SVG2img.sh --input-file <file.svg> [--longest-side-px <pixels>] [--target-image-format <format>] [--background-color <color>] [--help]
+#
+# Short form:
+#   SVG2img.sh -i <file.svg> [-l <pixels>] [-f <format>] [-c <color>] [-h]
+#
+# SWITCHES
+#   -i, --input-file <file>       Required: SVG file to convert
+#   -l, --longest-side-px <px>    Optional: Longest side in pixels (default: 4280)
+#   -f, --target-image-format <f> Optional: Output format png/jpg/etc (default: png)
+#   -c, --background-color <c>    Optional: Background color. Special values:
+#                                 'transparent' or 'none' -> transparent background
+#                                 'default-opaque' -> #39383bff (opaque dark purplish-gray)
+#                                 Hex values accepted with or without # prefix
+#                                 (6 or 8 digits). Anything else passed directly
+#                                 to ImageMagick's -background.
+#   -h, --help                    Show this help
+
+# PREVIOUSLY, the usage was positional parameters; if you have something calling this script and returning errors about wrong data or types, you may need to update the positional parameters to use the named switches below:
+# - $1 the SVG file name to create an image from (e.g., in.svg) -- NOW -i <file> OR --input-file <file>
+# - $2 OPTIONAL. Longest side in pixels for rendered output image. Default was 4280 if not given (though an echo incorrectly said 7680). -- NOW -l <pixels> OR --longest-side-px <pixels>
+# - $3 OPTIONAL. Target file format e.g. png or jpg -- default was jpg if not given (though code defaulted to png). NOW defaults to png. -- NOW -f <format> OR --target-image-format <format>
+# - $4 OPTIONAL. Background color. Accepted 6-digit hex (no #) for opaque background, or fell back to hardcoded #39383b if invalid. Previously, erroneously no alpha support? -- NOW -c <color> OR --background-color <color> (supports 'transparent', 'none', 'default-opaque', hex with/without #, 6/8 digits, CSS names, or anything ImageMagick accepts)
+#
+# e.g. WHAT WAS (positional)
+#    SVG2img.sh in.svg 4280 png ffffff
+# -- IS NOW (named switches)
+#    SVG2img.sh --input-file in.svg --longest-side-px 4280 --target-image-format png --background-color ffffff
+# -- OR USING SHORT FORM
+#    SVG2img.sh -i in.svg -l 4280 -f png -c ffffff
+# -- SPECIAL CASES IN NEW VERSION:
+#    Transparent background (was only possible by omitting $4):
+#       SVG2img.sh -i in.svg -c transparent
+#       SVG2img.sh -i in.svg -c none
+#    Default opaque background #39383bff (replaces old hardcoded fallback):
+#       SVG2img.sh -i in.svg -c default-opaque
+#    8-digit hex with alpha channel (not previously supported):
+#       SVG2img.sh -i in.svg -c ffffff80
+#       SVG2img.sh -i in.svg -c "#ffffff80"
 
 
 # CODE
 # TO DO
 # - Add an rnd bg color option?
 # - Or rnd background choice from a hexplt file?
+PROGNAME=$(basename "$0")
+
+print_help() {
+    cat <<EOF
+Usage: $PROGNAME -i <file.svg> [options]
+
+Required:
+  -i, --input-file <file>       SVG file to convert
+
+Options:
+  -l, --longest-side-px <px>    Longest side in pixels (default: 4280)
+  -f, --target-image-format <f> Output format: png, jpg, etc. (default: png)
+  -c, --background-color <c>    Background color. Special values:
+                                'transparent' or 'none' = transparent
+                                'default-opaque' = #39383bff
+                                Hex: RRGGBB, RRGGBBAA, #RRGGBB, #RRGGBBAA
+                                Anything else passed directly to ImageMagick's
+								-background.
+  -h, --help                    Show this help
+
+Examples:
+  $PROGNAME -i diagram.svg
+  $PROGNAME -i logo.svg -l 2000 -f png -c transparent
+  $PROGNAME -i icon.svg -c default-opaque
+  $PROGNAME -i graph.svg -c "#2266ff"
+  $PROGNAME -i plot.svg -c white
+EOF
+}
 
 # ==== START SET GLOBALS
-# If parameter $1 not present, notify user and exit. Otherwise use it and continue.
-if ! [ "$1" ]; then echo "No parameter \$1. Exit."; exit; else svgFileName=$1; svgFilenameNoExtension=${svgFileName%.*}; fi
-# If no image size parameter, set default image size of 4280.
-if ! [ "$2" ]; then IMGsize=4280; echo SET IMGsize to DEFAULT 7680; else IMGsize=$2; echo SET IMGsize to $2; fi
-# If no image format parameter, set default image format of jpg.
-if ! [ "$3" ]; then IMGformat=png; echo SET IMGformat to DEFAULT png; else IMGformat=$3; echo SET IMGformat to $3; fi
-# If no $4), set bg transparent, otherwise, if $4, check if matches [a-z0-9]{6}, and if that, use that; if not that, use a default.
-if ! [ "$4" ]
-then
-	backgroundColorParam="-background none"; echo SET parameter DEFAULT \"-background none\";
+# Defaults
+inputFile=""
+longestSide="4280"
+imgFormat="png"
+bgColor=""
+
+# Parse options
+OPTS=$(getopt -o hi:l:f:c: --long help,input-file:,longest-side-px:,target-image-format:,background-color: -n "$PROGNAME" -- "$@")
+if [ $? != 0 ]; then
+    echo "Failed parsing options." >&2
+    exit 1
+fi
+eval set -- "$OPTS"
+
+while true; do
+    case "$1" in
+        -h|--help)
+            print_help
+            exit 0
+            ;;
+        -i|--input-file)
+            inputFile="$2"
+            shift 2
+            ;;
+        -l|--longest-side-px)
+            longestSide="$2"
+            shift 2
+            ;;
+        -f|--target-image-format)
+            imgFormat="$2"
+            shift 2
+            ;;
+        -c|--background-color)
+            # Check for empty value
+            if [ -z "$2" ]; then
+                echo "ERROR: --background-color/-c requires a value." >&2
+                exit 4
+            fi
+            bgColor="$2"
+            shift 2
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Internal error during option parsing" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Validate required input
+if [ -z "$inputFile" ]; then
+    echo "ERROR: --input-file/-i is required." >&2
+    print_help
+    exit 1
+fi
+
+if [ ! -f "$inputFile" ]; then
+    echo "ERROR: Input file not found: $inputFile" >&2
+    exit 1
+fi
+
+# Extract filename without extension
+svgFilenameNoExtension="${inputFile%.*}"
+
+# Validate longestSide is a positive integer
+if ! [[ "$longestSide" =~ ^[0-9]+$ ]] || [ "$longestSide" -lt 1 ]; then
+    echo "ERROR: --longest-side-px must be a positive integer. Got: $longestSide" >&2
+    exit 1
+fi
+
+# Build ImageMagick background parameter
+backgroundColorParam=""
+if [ -z "$bgColor" ]; then
+    # Omitted -> transparent
+    backgroundColorParam="-background none"
 else
-	echo background color control parameter passed\; checking if parameter is a hex color code . . .
-	# Check errorlevel $? after piping $4 to grep search pattern. Errorlevel will be 0 if match, 1 if no match:
-	echo $4 | grep '[a-f0-9]\{6\}'; thisErrorLevel=$?
-	if [ "$thisErrorLevel" == "0" ]
-	then
-		echo Hex color code verified\; setting bgHEXcolorCode to $4!
-		bgHEXcolorCode=$4
-		echo bgHEXcolorCode val is\: $bgHEXcolorCode
-	else
-		# BACKGROUND COLOR OPTIONS
-		# Uncomment only one of the following options; comment out the others:
-		# bgHEXcolorCode=ffffff		# white
-		# bgHEXcolorCode=000000		# black
-		# bgHEXcolorCode=584560		# Darkish plum?
-		bgHEXcolorCode=39383b		# Medium-dark purplish-gray
-				# Other potentially good black line color change options: #2fd5fe #bde4e4
-		echo $4 is not a hex color code\! Background was set to default $bgHEXcolorCode\!
-	fi
-	# Whichever option was set, use it:
-	backgroundColorParam="-background "#"$bgHEXcolorCode"
+    case "$bgColor" in
+        transparent|none)
+            backgroundColorParam="-background none"
+            ;;
+        default-opaque)
+            backgroundColorParam='-background "#39383bff"'
+            ;;
+        *)
+            # Check if it's a hex value (with or without #, 6 or 8 digits)
+            strippedHex="${bgColor#\#}"
+            if [[ "$strippedHex" =~ ^[0-9a-fA-F]{6}$ ]] || [[ "$strippedHex" =~ ^[0-9a-fA-F]{8}$ ]]; then
+                # Valid hex - ensure it starts with # for ImageMagick
+                backgroundColorParam="-background \"#${strippedHex}\""
+            else
+                # Pass through as-is (CSS names, etc.)
+                backgroundColorParam="-background \"$bgColor\""
+            fi
+            ;;
+    esac
 fi
 # ==== END SET GLOBALS
 
-if [ -a $svgFilenameNoExtension.$IMGformat ]
-then
-	echo render candidate is $svgFilenameNoExtension.$IMGformat
-	echo target already exists\; will not render.
-	echo . . .
+# Check if output already exists
+outputFile="${svgFilenameNoExtension}.${imgFormat}"
+if [ -a "$outputFile" ]; then
+    echo "Target already exists: $outputFile — will not render."
+    exit 0
+fi
+
+# Perform conversion
+echo "Rendering: $inputFile -> $outputFile (longest side: ${longestSide}px)"
+eval magick $backgroundColorParam "$inputFile" -resize "${longestSide}x${longestSide}" "$outputFile"
+
+if [ $? -eq 0 ]; then
+    echo "Success: $outputFile"
+    exit 0
 else
-	# Have I already tried e.g. -size 1000x1000 as described here? :  
-	echo rendering target file $svgFilenameNoExtension.$IMGformat . . .
-			# DEPRECATED, as it causes the problem described at this question: https://stackoverflow.com/a/27919097/1397555 -- for which the active solution is also given:
-			# gm convert $backgroundColorParam -scale $IMGsize $svgFileName $svgFilenameNoExtension.$IMGformat
-	# UNCOMMENT EITHER the `gm convert` or `magick` option:
-	# GRAPHICSMAGICK OPTION, which breaks on some svgs optimized via svgo :(  :
-	# gm convert -size $IMGsize $backgroundColorParam $svgFileName $svgFilenameNoExtension.$IMGformat
-	# IMAGEMAGICK OPTION (which doesn't break that way) :
-	# DEPRECATED; results in shortest side being $2 pixels long, potentially scaling up another side to be larger:
-	# magick -size $IMGsize $backgroundColorParam $svgFileName $svgFilenameNoExtension.$IMGformat
-	# PREFERRED: resize so longest side = exactly IMGsize pixels
-	magick $backgroundColorParam $svgFileName -resize ${IMGsize}x${IMGsize} $svgFilenameNoExtension.$IMGformat
+    echo "ERROR: Conversion failed for $inputFile" >&2
+    exit 1
 fi
