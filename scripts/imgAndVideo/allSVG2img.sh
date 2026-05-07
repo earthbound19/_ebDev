@@ -27,8 +27,9 @@ Options:
                                        Special values: 'transparent', 'none',
                                        'default-opaque' (see SVG2img.sh for their
 									   meanings), hex codes with or without
-									   alpha, or any color name accepted by
-									   ImageMagick.
+									   alpha, or any color name passed along
+									   by SVG2img.sh that will work (at this
+									   writing, anything cairosvg accepts).
   -m, --multiprocess-percent-cores <float>   Fraction of CPU cores to use
                                        (0 to 1). Default: 0.6.
   -h, --help                           Show this help.
