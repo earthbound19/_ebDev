@@ -6,13 +6,18 @@
 # DEPENDENCIES
 #   CairoSVG and its dependencies must be installed. On Windows with MSYS2:
 #
-#   1. Install GTK+ runtime (required by CairoSVG):
+#   - Install GTK+ runtime (required by CairoSVG):
 #        pacman -S mingw-w64-x86_64-gtk3
 #
-#   2. Install CairoSVG via pip:
+#   - Install CairoSVG via pip:
 #        pip install cairosvg
 #
-#   3. Ensure the GTK bin directory is in your PATH:
+#   - Be sure the Python /Scripts directory (where cairosvg.exe is installed)
+#     is in your PATH:
+#        export PATH="/c/users/UserName/AppData/Roaming/Python/PythonVersion/Scripts"
+#     or add it to your path permanently
+#
+#   - Ensure the GTK bin directory is in your PATH:
 #        export PATH="/c/msys64/mingw64/bin:$PATH"
 #      Or add C:\msys64\mingw64\bin to your Windows PATH permanently.
 #
