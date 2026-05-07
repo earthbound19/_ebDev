@@ -18,16 +18,16 @@
 #    organizeCameraExports.sh
 # Or to operate on the current directory and all subdirectories, run:
 #    organizeCameraExports.sh SPACKFELT
-# Something that's TEMPORARILY DEPRECATED and this script is hacked to skip it: sidecar scanning and renaming (as follows), owing to this bug: in some setting (or all settings?) renamed files in a subfolder are not being matched to sidecards etc. nor sidecars renamed.
-# To skip sidecar etc. scanning for renameByMetadata.sh, pass a parameter $1 to the script [EDIT: I'll need to rework this script to take one switch to do this or another to operate on subdirectories], which can be anything, e.g.:
-#    organizeCameraExports.sh NORTHERP
 # See the various comments with "uncomment" instructions for the optional features.
 
 # CODE
 # TO DO
-# - FIX BUG detailed above in TEMPORARILY DEPRECATED comment
-# - parameterize optional features?
+# - parameterize all and optional features, with now optional-via-hacking features available via switches
+# - verify bug fix of sidecar renaming in case of hack to change it to do so
+# - break out lossless video recontain into mkv or mp4 options?
+# - make lowercasing of extensions unecessary by working in a case-insensitive way for all operations on file extensions, and lowercase the file extensions themselves?
 
+# AKTUL FUNCTIONALITY NOW
 # manage creation of array to iterate through directories, to do the work of this script in each. (intent: iterate through all subdirectories or none). If no $1 parameter passed to script, make the only directory the current one so that it only "changes" to the current directory.
 # init array so it will only be this dir:
 dirsArr=($(pwd))
@@ -80,9 +80,8 @@ do
 
 	cd tmp_renames_2ydTVzqG/
 	# Do the actual rename; this passes $1, which if it was passed to the script will be any string or whatever, and if not, it will be empty; that flag and the word NORTHERP control things in renameByMetadata.sh (see documentation in it) :
-	# TO DO: fix the issue mentioned above under the TEMPORARILY DEPRECATED comment (I think the issue is that renamed files are moved away from the same directory as the would-be sidecar matches to find), then uncomment the next line and delete the one after it:
-	# renameByMetadata.sh NORTHERP $1
-	renameByMetadata.sh NORTHERP SKIP_SIDECAR_CHECKING
+	# renameByMetadata.sh --password NORTHERP --nosidecars
+	renameByMetadata.sh
 	# Move those up a folder, move back to that folder, and destroy the temp folder:
 	mv -i * ..
 	cd ..
