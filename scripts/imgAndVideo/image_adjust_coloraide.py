@@ -4,47 +4,22 @@
 # Loads an image, converts it from sRGB to the specified color space,
 # applies shifts to the relevant channels, converts back to sRGB,
 # and saves the result with the adjustments encoded in the filename.
-
-# Written nearly entirely by a Large Language Model, deepseek, with
-# human guidance in features and fixes.
-
+#
+# White balance mode with --rgb-white-reference allows manual
+# sampling of a white reference pixel from any color picker. Adding
+# --no-hue-rotate can avoid hue rotation problems where hue isn't
+# clear with that.
+#
 # DEPENDENCIES
 # pip install Pillow numpy coloraide
+# Optional GPU: install CUDA Toolkit + cupy-cuda12x
 #
-# Required versions:
-# - Pillow>=9.0.0
-# - numpy>=1.21.0
-# - coloraide>=2.2.0
-
 # USAGE
 # python image_adjust_coloraide.py --source INPUT_FILE --colorspace {hct,okhsl,okhsv,oklch}
 #                       [--destination OUTPUT_FILE] [--hue DEGREES]
 #                       [--channel2 VALUE] [--channel3 VALUE] [--cores PERCENT]
-#
-# Examples:
-#   # HCT adjustment
-#   python image_adjust_coloraide.py -i photo.jpg --colorspace hct --hue 30 --chroma 10 --tone -5
-#   
-#   # okhsl adjustment  
-#   python image_adjust_coloraide.py -i photo.jpg --colorspace okhsl --hue 45 --sat 0.2 --lig 0.1
-#   
-#   # okhsv adjustment
-#   python image_adjust_coloraide.py -i photo.png --colorspace okhsv --hue 180 --sat -0.3 --val 0.15
-#   
-#   # oklch adjustment
-#   python image_adjust_coloraide.py -i photo.jpg --colorspace oklch --hue 30 --chroma 0.05 --lig -0.1
-#
-#   python image_adjust_coloraide.py --help
+#                       [--rgb-white-reference R G B] [--auto-white]
 
-# NOTES
-# - Channel names and ranges vary by colorspace (see help for each)
-# - If no destination is specified, filename encodes all adjustments with dashes
-# - At least one channel adjustment must be specified
-# - Processing uses specified percentage of CPU cores (default: 75%)
-# - A progress bar shows completion percentage during processing
-
-
-# CODE
 import argparse
 import sys
 import os
@@ -52,6 +27,17 @@ import numpy as np
 from PIL import Image
 from multiprocessing import Pool, cpu_count
 import time
+
+# Try GPU acceleration
+try:
+    import cupy as cp
+    ON_GPU = True
+    xp = cp
+    print("GPU acceleration enabled (CuPy)", file=sys.stderr)
+except ImportError:
+    ON_GPU = False
+    xp = np
+    print("CPU mode (NumPy). Install CuPy + CUDA for GPU speed.", file=sys.stderr)
 
 # Import Coloraide
 try:
@@ -107,15 +93,99 @@ COLORSPACES = {
         'name': 'oklch',
         'coloraide_name': 'oklch',
         'channels': [
-            {'name': 'lightness', 'range': (0, 1), 'wrap': False},    # Index 0
-            {'name': 'chroma', 'range': (0, 0.5), 'wrap': False},     # Index 1
-            {'name': 'hue', 'range': (0, 360), 'wrap': True}          # Index 2
+            {'name': 'lightness', 'range': (0, 1), 'wrap': False},
+            {'name': 'chroma', 'range': (0, 0.5), 'wrap': False},
+            {'name': 'hue', 'range': (0, 360), 'wrap': True}
         ],
         'channel2': 'chroma',
         'channel3': 'lightness',
         'format': {'chroma': '{:+.3f}', 'lightness': '{:+.2f}'}
     }
 }
+
+def parse_color_input(color_input):
+    """Parse either RGB values (0-255 or 0-1) or hex color code.
+    Returns tuple of (r, g, b) normalized to 0-1 range.
+    """
+    # Check if it's a hex string (starts with #)
+    if isinstance(color_input, str) and color_input.startswith('#'):
+        hex_color = color_input.lstrip('#')
+        
+        # Handle 3-digit hex (e.g., #FFF)
+        if len(hex_color) == 3:
+            r = int(hex_color[0] * 2, 16)
+            g = int(hex_color[1] * 2, 16)
+            b = int(hex_color[2] * 2, 16)
+        # Handle 6-digit hex (e.g., #FFFFFF)
+        elif len(hex_color) == 6:
+            r = int(hex_color[0:2], 16)
+            g = int(hex_color[2:4], 16)
+            b = int(hex_color[4:6], 16)
+        else:
+            raise ValueError(f"Invalid hex color format: {color_input}")
+        
+        return (r / 255.0, g / 255.0, b / 255.0)
+    
+    # Otherwise assume it's already RGB
+    return None
+
+def rgb_to_target_space(rgb_normalized, colorspace):
+    """Convert a single RGB pixel to target color space."""
+    try:
+        color = ColorSpace('srgb', rgb_normalized)
+        color_converted = color.convert(colorspace)
+        return list(color_converted.coords())
+    except Exception as e:
+        print(f"Warning: RGB to {colorspace} conversion failed: {e}", file=sys.stderr)
+        return None
+
+def compute_white_balance_shifts_from_rgb(rgb_ref, colorspace):
+    """Given an RGB reference pixel (values 0-1) that should be white,
+    compute the shifts needed in the target colorspace to make it true white."""
+    
+    if colorspace == 'oklch':
+        # oklch order: [lightness, chroma, hue]
+        coords = rgb_to_target_space(rgb_ref, colorspace)
+        if coords is None:
+            return None
+        
+        # Target white in oklch: lightness=1.0, chroma=0
+        hue_shift = -coords[2]
+        if hue_shift > 180:
+            hue_shift -= 360
+        elif hue_shift < -180:
+            hue_shift += 360
+        
+        chroma_shift = -coords[1]
+        lightness_shift = 1.0 - coords[0]
+        
+        return {'hue': hue_shift, 'channel2': chroma_shift, 'channel3': lightness_shift}
+    
+    else:
+        # hct, okhsl, okhsv: [hue, channel2, channel3]
+        coords = rgb_to_target_space(rgb_ref, colorspace)
+        if coords is None:
+            return None
+        
+        # Hue shift: bring reference hue to 0
+        hue_shift = -coords[0]
+        if hue_shift > 180:
+            hue_shift -= 360
+        elif hue_shift < -180:
+            hue_shift += 360
+        
+        # Channel2 shift: bring saturation/chroma to 0
+        channel2_shift = -coords[1]
+        
+        # Channel3 shift: bring to max (1.0 for okhsl/okhsv, 100 for hct)
+        if colorspace == 'hct':
+            target_ch3 = 100.0
+        else:  # okhsl, okhsv
+            target_ch3 = 1.0
+        
+        channel3_shift = target_ch3 - coords[2]
+        
+        return {'hue': hue_shift, 'channel2': channel2_shift, 'channel3': channel3_shift}
 
 def process_chunk(args):
     """Process a chunk of the image in parallel."""
@@ -187,7 +257,6 @@ def process_chunk(args):
                               np.clip(b_new, 0, 1)]
                 
             except Exception as e:
-                # Print error without special characters
                 print(f"\nWarning: Error processing pixel: {e}", file=sys.stderr)
     
     result = (pixels.reshape(original_shape) * 255).astype(np.uint8)
@@ -197,7 +266,6 @@ def print_progress(percentage):
     """Display a progress bar - using ASCII only to avoid encoding issues."""
     bar_length = 40
     filled = int(bar_length * percentage / 100)
-    # Use only ASCII characters
     bar = '=' * filled + '-' * (bar_length - filled)
     print(f'\rProgress: [{bar}] {percentage:.1f}%', end='', flush=True)
 
@@ -222,8 +290,21 @@ Supported color spaces:
   oklch:  oklch - lightness(0-1), chroma(0-0.5), hue(0-360)
 
 Examples:
+  # Manual adjustments
   %(prog)s -i photo.jpg --colorspace hct --hue 30 --chroma 10 --tone -5
-  %(prog)s -i photo.jpg --colorspace okhsl --hue 45 --sat 0.2 --lig 0.1
+
+  # White balance with hue rotation (for tinted lighting)
+  %(prog)s -i photo.jpg --colorspace okhsl --rgb-white-reference 220 210 200
+
+  # White balance without hue rotation (for near-white reference)
+  %(prog)s -i photo.jpg --colorspace okhsl --rgb-white-reference '#eff1f3' --no-hue-rotate
+
+  # Hex color support
+  %(prog)s -i photo.jpg --colorspace okhsl --rgb-white-reference '#E2D2C8'
+
+Output filenames auto-generate with parameters:
+  photo_coloraide_okhsl_wb_eff1f3.png
+  photo_coloraide_hct_h+30_chr+10_ton-5.png
         """
     )
 
@@ -247,6 +328,20 @@ Examples:
                        help='Value shift (for okhsv)')
     parser.add_argument('--cores', '-p', type=float, default=0.75,
                        help='Percentage of CPU cores to use (0.0-1.0)')
+    parser.add_argument('--rgb-white-reference', nargs='+', metavar='REF',
+                       help='White balance mode: provide an RGB reference that should be pure white. '
+                            'Accepts three numbers (e.g., 220 210 200) OR a hex color (e.g., #E2D2C8). '
+                            'Automatically computes hue/sat/lig shifts to make that color white, '
+                            'overriding any manual --hue, --sat, --lig, etc. values. '
+                            'See --no-hue-rotate for possible additional help.')
+    parser.add_argument('--no-hue-rotate', action='store_true',
+                        help='When used with --rgb-white-reference, do NOT apply hue rotation. '
+                                'See examples in --help. Only adjusts saturation/lightness (or '
+                                'chroma/tone). Useful when the reference is already near-white and hue '
+                                'measurement is unreliable, and / or that punk kid Ben Skywalker gave '
+                                'you a compressed image.')
+    parser.add_argument('--auto-white', action='store_true',
+                       help='Automatically find nearest-white pixel (experimental, may overcorrect)')
 
     args = parser.parse_args()
 
@@ -264,24 +359,77 @@ Examples:
     ch2_name = config['channel2']
     ch3_name = config['channel3']
     
-    # Map channel 2
-    if ch2_name == 'chroma' and args.chroma is not None:
-        shifts['channel2'] = args.chroma
-    elif ch2_name == 'saturation' and args.sat is not None:
-        shifts['channel2'] = args.sat
+    # Handle white balance modes FIRST (they override manual shifts)
+    # If --rgb-white-reference is provided, the shifts below will completely
+    # replace any manual --hue, --sat, --lig, --chroma, --tone, or --val values passed to the script.
+    if args.rgb_white_reference:
+        # Parse RGB reference (supports hex or 3 numbers)
+        rgb_ref = None
+        
+        if len(args.rgb_white_reference) == 1 and isinstance(args.rgb_white_reference[0], str) and args.rgb_white_reference[0].startswith('#'):
+            # Hex code
+            hex_color = args.rgb_white_reference[0].lstrip('#')
+            if len(hex_color) == 3:
+                r = int(hex_color[0] * 2, 16)
+                g = int(hex_color[1] * 2, 16)
+                b = int(hex_color[2] * 2, 16)
+            elif len(hex_color) == 6:
+                r = int(hex_color[0:2], 16)
+                g = int(hex_color[2:4], 16)
+                b = int(hex_color[4:6], 16)
+            else:
+                print(f"\nError: Invalid hex color format\n", file=sys.stderr)
+                sys.exit(1)
+            rgb_ref = [r / 255.0, g / 255.0, b / 255.0]
+        elif len(args.rgb_white_reference) == 3:
+            # Three RGB numbers
+            rgb_ref = [float(v) / 255.0 if float(v) > 1.0 else float(v) for v in args.rgb_white_reference]
+        else:
+            print(f"\nError: --rgb-white-reference takes either 3 RGB values or a single hex code\n", file=sys.stderr)
+            sys.exit(1)
+        
+        wb_shifts = compute_white_balance_shifts_from_rgb(rgb_ref, args.colorspace)
+        if wb_shifts is None:
+            print(f"\nError: Failed to compute white balance from RGB reference\n", file=sys.stderr)
+            sys.exit(1)
+        
+        # Apply shifts, conditionally skipping hue rotation
+        if args.no_hue_rotate:
+            shifts['hue'] = 0
+            print(f"\nWhite balance mode: hue rotation DISABLED (--no-hue-rotate)", file=sys.stderr)
+        else:
+            shifts['hue'] = wb_shifts['hue']
+        
+        shifts['channel2'] = wb_shifts['channel2']
+        shifts['channel3'] = wb_shifts['channel3']
+        
+        print(f"\nWhite balance mode: using RGB reference {args.rgb_white_reference[0] if len(args.rgb_white_reference)==1 else f'({rgb_ref[0]*255:.0f},{rgb_ref[1]*255:.0f},{rgb_ref[2]*255:.0f})'}", file=sys.stderr)
+        print(f"  Computed shifts: hue={shifts['hue']:+.1f}°, {ch2_name}={shifts['channel2']:+.3f}, {ch3_name}={shifts['channel3']:+.3f}", file=sys.stderr)
     
-    # Map channel 3
-    if ch3_name == 'tone' and args.tone is not None:
-        shifts['channel3'] = args.tone
-    elif ch3_name == 'lightness' and args.lig is not None:
-        shifts['channel3'] = args.lig
-    elif ch3_name == 'value' and args.val is not None:
-        shifts['channel3'] = args.val
-
-    # Validate at least one non-zero shift
-    if shifts['hue'] == 0 and shifts['channel2'] == 0 and shifts['channel3'] == 0:
-        print(f"\nError: No adjustments specified for {args.colorspace}!\n", file=sys.stderr)
+    elif args.auto_white:
+        print(f"\nAuto-white mode: not yet implemented. Use --rgb-white-reference for manual white balance.\n", file=sys.stderr)
         sys.exit(1)
+    
+    else:
+        # Manual shifts from command line
+        # Map channel 2
+        if ch2_name == 'chroma' and args.chroma is not None:
+            shifts['channel2'] = args.chroma
+        elif ch2_name == 'saturation' and args.sat is not None:
+            shifts['channel2'] = args.sat
+        
+        # Map channel 3
+        if ch3_name == 'tone' and args.tone is not None:
+            shifts['channel3'] = args.tone
+        elif ch3_name == 'lightness' and args.lig is not None:
+            shifts['channel3'] = args.lig
+        elif ch3_name == 'value' and args.val is not None:
+            shifts['channel3'] = args.val
+
+        # Validate at least one non-zero shift
+        if shifts['hue'] == 0 and shifts['channel2'] == 0 and shifts['channel3'] == 0:
+            print(f"\nError: No adjustments specified for {args.colorspace}!\n", file=sys.stderr)
+            sys.exit(1)
 
     # Check if source exists
     if not os.path.exists(args.source):
@@ -297,9 +445,51 @@ Examples:
         output_file = args.destination
     else:
         base = os.path.splitext(args.source)[0]
-        output_file = base + '.png'
-        if os.path.exists(output_file):
-            output_file = base + '_adj.png'
+        
+        # Build parameters string for filename
+        params = []
+        
+        # White balance mode takes precedence
+        if args.rgb_white_reference:
+            if len(args.rgb_white_reference) == 1 and str(args.rgb_white_reference[0]).startswith('#'):
+                ref_str = args.rgb_white_reference[0].lstrip('#')
+                params.append(f"wb_{ref_str}")
+            else:
+                r, g, b = [int(float(v)) for v in args.rgb_white_reference[:3]]
+                params.append(f"wb_{r:02x}{g:02x}{b:02x}")
+            if args.no_hue_rotate:
+                params.append("no_hue")
+        else:
+            # Manual adjustments
+            if args.hue != 0:
+                params.append(f"h{args.hue:+.0f}")
+            if args.chroma is not None and args.chroma != 0:
+                params.append(f"chr{args.chroma:+.1f}")
+            if args.tone is not None and args.tone != 0:
+                params.append(f"ton{args.tone:+.0f}")
+            if args.sat is not None and args.sat != 0:
+                params.append(f"sat{args.sat:+.2f}".replace('.', '_'))
+            if args.lig is not None and args.lig != 0:
+                params.append(f"lig{args.lig:+.2f}".replace('.', '_'))
+            if args.val is not None and args.val != 0:
+                params.append(f"val{args.val:+.2f}".replace('.', '_'))
+        
+        # Add colorspace
+        params.insert(0, args.colorspace)
+        
+        # Build filename
+        if params:
+            param_str = '_'.join(params)
+            output_file = f"{base}_coloraide_{param_str}.png"
+        else:
+            output_file = base + '_coloraide.png'
+        
+        # Handle existing file
+        counter = 1
+        original_output = output_file
+        while os.path.exists(output_file):
+            output_file = original_output.replace('.png', f'_{counter}.png')
+            counter += 1
 
     print(f"\nLoading image: {args.source}")
     print(f"Color space: {config['name']}")
