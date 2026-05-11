@@ -1,15 +1,16 @@
 #!/bin/bash
+# renameByMetadata.sh - Rename ONE file using metadata timestamps
+# 
 # DESCRIPTION
-# Renames a single file and by default also its sidecar (or sibling / same base
-# file name based on metadata. For example if you have a totally unhelpfully named
-# file from a digital camera named something like IMG3284.jpg, this will rename it
-# to something far more useful like the date and time it was taken, for example
-# 2026_05_05__00_21_08.jpg (yyyy_mm_dd__hh_mm_ss.extension). If creation time
-# metadata is not available, falls back to file system timestamps, trying first for
-# creation time, then modification time.
+# Renames a single file (and optionally its sidecar files) based on metadata
+# timestamps (DateTimeOriginal or CreateDate) with fallback to filesystem
+# timestamps (creation time, then modification time).
 #
-# Sidecar files are identified by matching basename before any rename occurs,
+# Sidecar files are identified by matching basename BEFORE any rename occurs,
 # then renamed to match the new basename.
+#
+# EXCLUDE LIST
+# See 'renameByMetadata.sh --help' for exclude list documentation.
 #
 # DEPENDENCIES
 # ExifTool, stat
@@ -17,72 +18,57 @@
 # USAGE
 print_help() {
     cat << EOF
-Renames a single file based on metadata timestamps, with sidecar support.
+$PROGNAME - Rename a single file based on metadata timestamps
 
-  Usage: $PROGNAME [OPTIONS] <filename>
+Usage: $PROGNAME [OPTIONS] <filename>
 
-OPTIONS
-  -y, --yes               skip confirmation prompt
-  -d, --dry-run           show what would happen without renaming
-  -v, --verbose           verbose output
-  --no-sidecars           skip sidecar file renaming
-  -h, --help              show this help message
+OPTIONS:
+    -y, --yes               Skip confirmation prompt
+    -d, --dry-run           Show what would happen without renaming
+    -v, --verbose           Verbose output
+    --no-sidecars           Skip sidecar file renaming
+    -h, --help              Show this help
 
-EXAMPLES
-To rename a file DSC_0001.NEF by metadata and bypass prompt to confirm rename, run:
-  $PROGNAME -y DSC_0001.NEF
-To see how video.mp4 would be renamed and print any relevant debug details:
-  $PROGNAME --dry-run --verbose video.mp4
-To rename ANY type of file for which metadata may (or may not be!) available, for
-example a PDF, with no sidecar check or rename:
-  $PROGNAME --no-sidecars document.pdf
+EXAMPLES:
+    $PROGNAME -y DSC_0001.NEF
+    $PROGNAME --dry-run --verbose video.mp4
+    $PROGNAME --no-sidecars document.pdf
 
-See the NOTES header comment section in the script for additional details.
+EXCLUDE LIST:
+    To exclude files from renaming, list them in rename_excludes.txt files.
+    
+	- a rename_exclude.txt file anywhere in the directory tree that this
+	  script works on will affect all files in the whole tree:
+      - parent directory exclude files apply to all child directories
+      - child directory exclude files add to parent excludes
+    - lines starting with '#' are ignored
+    - exact matches only (file name detection is case-sensitive)
+    - one filename per line (base name + extension only) in the file, for example:
+		# in a rename_excludes.txt:
+		crying_while_eating.jpg
+		crescent_fresh.png
+    
+    Examples:
+        # in /photos/rename_excludes.txt:
+        that_one_time_Rey_whooped_Kylos_hinie.jpg
+        precious_memories_with_Darth_Maul.png
+        
+        # in /photos/2024/wedding/rename_excludes.txt:
+        DSC_VIP.JPG        # Excludes just this one VIP photo
+
+NOTES:
+    - sidecar discovery is done for ALL files in same directory with matching basename
+    - rename collisions get suffixes to make unique: -1, -2, etc.
+    - exits with error if new filename exceeds 240 characters
+    - logs to rename_by_metadata.log in current directory
 EOF
 }
-
-# NOTES
-# - sidecar discovery and rename operates on ALL files in same directory with
-  # a matching basename. For example, if you have three files named:
-
-   # DSC_4813.jpg
-   # DSC_4813.NEF
-   # DSC_4813.xmp
-
-# -- and you run:
-
-   # $PROGNAME -y DSC_4813.NEF
-
-# -- the script will:
-# - identify the sidecar / sibling files DSC_4813.jpg and DSC_4813.xmp, and remember them
-# - look up creation time metadata in the NEF file and rename it, for example:
-
-   # mv DSC_4813.NEF 2026_05_10__20_06_30.NEF
-
-# it will then rename the sidecar and sibling files to match:
-
-   # mv DSC_4813.xmp 2026_05_10__20_06_30.xmp
-   # mv DSC_4813.jpg 2026_05_10__20_06_30.jpg
-
-# - duplicate filenames get -1, -2, etc. suffix (matching exiftool %-c)
-# - the script exits with an error if the origin or new filename exceeds 240 characters.
-# - the script logs renames to YYYY-MM-DD_HH-MM-SS.log in the current directory.
-# - media files use CreateDate or DateTimeOriginal metadata
-# - fallback rename if no metadata found uses creation time, then modification time
-# - any file with same basename (before rename) is considered a sidecar
-# - duplicate filenames get -1, -2 suffix
-# - filenames exceeding 240 characters trigger error
-# - logs are written to rename_by_metadata.log
-
-# REFERENCE
-  # https://exiftool.org/filename.html
-
 
 # CODE
 PROGNAME=$(basename "$0")
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 
-# log file global name
+# Log file global name
 LOG_FILE="rename_by_metadata.log"
 
 # If PARALLEL_TEMP_LOG is set, use it instead (for batch collection in renameAllTypeByMetadata.sh)
@@ -121,24 +107,81 @@ log() {
             echo "[$timestamp] ERROR: $message" >> "$LOG_FILE"
             ;;
         WARNING)
-            echo -e "${YELLOW}[WARNING]${NC} $message"
+            echo -e "${YELLOW}[WARNING]${NC} $message" >&2
             echo "[$timestamp] WARNING: $message" >> "$LOG_FILE"
             ;;
         INFO)
-            echo "$message"
+            echo "$message" >&2
             echo "[$timestamp] INFO: $message" >> "$LOG_FILE"
             ;;
         VERBOSE)
             if [ "$VERBOSE" = true ]; then
-                echo -e "${GREEN}[VERBOSE]${NC} $message"
+                echo -e "${GREEN}[VERBOSE]${NC} $message" >&2
             fi
             echo "[$timestamp] VERBOSE: $message" >> "$LOG_FILE"
             ;;
         *)
-            echo "$message"
+            echo "$message" >&2
             echo "[$timestamp] $message" >> "$LOG_FILE"
             ;;
     esac
+}
+
+# Global exclude patterns collected once per run
+declare -a GLOBAL_EXCLUDE_PATTERNS=()
+
+# Build global exclude list by scanning all directories for rename_excludes.txt
+build_global_exclude_list() {
+    local start_dir="$1"
+    
+    log "VERBOSE" "Building global exclude list from: $start_dir"
+    
+    # Find all rename_excludes.txt files in the tree
+    while IFS= read -r exclude_file; do
+        log "VERBOSE" "Found exclude file: $exclude_file"
+        
+        while IFS= read -r pattern || [ -n "$pattern" ]; do
+            # Skip comments and empty lines
+            [[ -z "$pattern" || "$pattern" =~ ^[[:space:]]*# ]] && continue
+            # Trim whitespace
+            pattern=$(echo "$pattern" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            [[ -z "$pattern" ]] && continue
+            
+            GLOBAL_EXCLUDE_PATTERNS+=("$pattern")
+            log "VERBOSE" "  Added global exclude: $pattern"
+        done < "$exclude_file"
+    done < <(find "$start_dir" -type f -name "rename_excludes.txt" 2>/dev/null)
+    
+    # Remove duplicates
+    if [ ${#GLOBAL_EXCLUDE_PATTERNS[@]} -gt 0 ]; then
+        local -A seen
+        local unique=()
+        for pattern in "${GLOBAL_EXCLUDE_PATTERNS[@]}"; do
+            if [ -z "${seen[$pattern]}" ]; then
+                seen[$pattern]=1
+                unique+=("$pattern")
+            fi
+        done
+        GLOBAL_EXCLUDE_PATTERNS=("${unique[@]}")
+        log "VERBOSE" "Global exclude patterns (${#GLOBAL_EXCLUDE_PATTERNS[@]} unique): ${GLOBAL_EXCLUDE_PATTERNS[*]}"
+    else
+        log "VERBOSE" "No global exclude patterns found"
+    fi
+}
+
+# Check if file should be excluded (uses global list)
+is_excluded() {
+    local file="$1"
+    local basename_file=$(basename "$file")
+    
+    for pattern in "${GLOBAL_EXCLUDE_PATTERNS[@]}"; do
+        if [ "$basename_file" = "$pattern" ]; then
+            log "INFO" "File excluded by global pattern: $basename_file"
+            return 0
+        fi
+    done
+    
+    return 1
 }
 
 get_timestamp_from_metadata() {
@@ -252,7 +295,7 @@ rename_with_sidecars() {
     log "INFO" "Original file: $old_basename"
     log "INFO" "Target basename: $new_basename"
     
-    # Discover sidecars BEFORE rename (by basename)
+    # Discover sidecars BEFORE rename (by basename), excluding any excluded files
     local sidecars=()
     if [ "$NO_SIDECARS" != true ]; then
         log "INFO" "Discovering sidecar files for basename: $old_name_no_ext"
@@ -261,46 +304,37 @@ rename_with_sidecars() {
                 local f_basename=$(basename "$f")
                 local f_name_no_ext="${f_basename%.*}"
                 
-                # Skip the target file itself (explicit basename comparison)
+                # Skip the target file itself
                 if [ "$f_basename" = "$old_basename" ]; then
-                    log "VERBOSE" "Skipping target file: $f_basename"
+                    continue
+                fi
+                
+                # Skip if this sidecar is in exclude list
+                if is_excluded "$f"; then
+                    log "VERBOSE" "Skipping excluded sidecar: $f_basename"
                     continue
                 fi
                 
                 # Check if basename matches (potential sidecar)
                 if [ "$f_name_no_ext" = "$old_name_no_ext" ]; then
                     sidecars+=("$f")
-                    log "VERBOSE" "Found sidecar: $(basename "$f")"
+                    log "VERBOSE" "Found sidecar: $f_basename"
                 fi
             fi
         done
-        
-        # Final verification: ensure target file is NOT in sidecar array
-        local found_target=false
-        for sidecar in "${sidecars[@]}"; do
-            if [ "$(basename "$sidecar")" = "$old_basename" ]; then
-                found_target=true
-                log "ERROR" "BUG: Target file $old_basename found in sidecar array!"
-            fi
-        done
-        
-        if [ "$found_target" = false ]; then
-            log "VERBOSE" "Verified target file not in sidecar array"
-        fi
-        
         log "INFO" "Found ${#sidecars[@]} sidecar file(s)"
     fi
     
-    # Generate new filename for main file
-    local new_filename=$(get_unique_filename "$new_basename" "$old_extension")
+    # Generate new filename for main file (preserving directory)
+    local new_filename="$old_dir/$(get_unique_filename "$new_basename" "$old_extension")"
     log "VERBOSE" "New filename generated: $new_filename"
     
     # Check path length
-    check_filename_length "$new_filename" || return 1
+    check_filename_length "$(basename "$new_filename")" || return 1
     
     # Dry run mode - just report
     if [ "$DRY_RUN" = true ]; then
-        log "INFO" "[DRY RUN] Would rename: $old_basename -> $new_filename"
+        log "INFO" "[DRY RUN] Would rename: $old_basename -> $(basename "$new_filename")"
         for sidecar in "${sidecars[@]}"; do
             local sidecar_basename=$(basename "$sidecar")
             local sidecar_name_no_ext="${sidecar_basename%.*}"
@@ -308,8 +342,8 @@ rename_with_sidecars() {
             if [ "$sidecar_name_no_ext" = "$sidecar_basename" ]; then
                 sidecar_ext=""
             fi
-            local new_sidecar_name=$(get_unique_filename "$new_basename" "$sidecar_ext")
-            log "INFO" "[DRY RUN] Would rename sidecar: $sidecar_basename -> $new_sidecar_name"
+            local new_sidecar_name="$old_dir/$(get_unique_filename "$new_basename" "$sidecar_ext")"
+            log "INFO" "[DRY RUN] Would rename sidecar: $sidecar_basename -> $(basename "$new_sidecar_name")"
         done
         return 0
     fi
@@ -317,8 +351,8 @@ rename_with_sidecars() {
     # Confirm if not in yes mode
     if [ "$YES_MODE" != true ]; then
         echo ""
-        echo -e "${YELLOW}This will rename the following files:${NC}"
-        echo "  Main:   $old_basename -> $new_filename"
+        echo -e "${YELLOW}WARNING: This will rename the following files:${NC}"
+        echo "  Main:   $old_basename -> $(basename "$new_filename")"
         if [ ${#sidecars[@]} -gt 0 ]; then
             echo "  Sidecars:"
             for sidecar in "${sidecars[@]}"; do
@@ -328,8 +362,8 @@ rename_with_sidecars() {
                 if [ "$sidecar_name_no_ext" = "$sidecar_basename" ]; then
                     sidecar_ext=""
                 fi
-                local new_sidecar_name=$(get_unique_filename "$new_basename" "$sidecar_ext")
-                echo "    $sidecar_basename -> $new_sidecar_name"
+                local new_sidecar_name="$old_dir/$(get_unique_filename "$new_basename" "$sidecar_ext")"
+                echo "    $sidecar_basename -> $(basename "$new_sidecar_name")"
             done
         fi
         echo ""
@@ -342,7 +376,7 @@ rename_with_sidecars() {
     fi
     
     # Perform the rename
-    log "INFO" "Renaming main file: $old_basename -> $new_filename"
+    log "INFO" "Renaming main file: $old_basename -> $(basename "$new_filename")"
     if ! mv "$file" "$new_filename" 2>/dev/null; then
         log "ERROR" "Failed to rename main file: $file -> $new_filename"
         return 1
@@ -358,10 +392,10 @@ rename_with_sidecars() {
             sidecar_ext=""
         fi
         
-        local new_sidecar_name=$(get_unique_filename "$new_basename" "$sidecar_ext")
-        log "INFO" "Renaming sidecar: $sidecar_basename -> $new_sidecar_name"
+        local new_sidecar_name="$old_dir/$(get_unique_filename "$new_basename" "$sidecar_ext")"
+        log "INFO" "Renaming sidecar: $sidecar_basename -> $(basename "$new_sidecar_name")"
         
-        if mv "$sidecar" "$(dirname "$sidecar")/$new_sidecar_name" 2>/dev/null; then
+        if mv "$sidecar" "$new_sidecar_name" 2>/dev/null; then
             ((renamed_count++))
         else
             log "ERROR" "Failed to rename sidecar: $sidecar_basename"
@@ -428,6 +462,15 @@ TARGET_FILE="$1"
 if [ ! -f "$TARGET_FILE" ]; then
     echo "ERROR: File not found: $TARGET_FILE"
     exit 1
+fi
+
+# Build global exclude list from current working directory
+build_global_exclude_list "$PWD"
+
+# Check exclude list for target file
+if is_excluded "$TARGET_FILE"; then
+    log "INFO" "File excluded from renaming: $TARGET_FILE"
+    exit 0
 fi
 
 # Initialize log file
