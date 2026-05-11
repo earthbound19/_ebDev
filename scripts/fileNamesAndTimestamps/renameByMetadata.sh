@@ -71,6 +71,8 @@ NOTES:
     - exits with error if new filename exceeds 240 characters
     - logs to rename_by_metadata.log in current directory
     - auto-exclude prevents re-renaming already-processed files
+	- data can be set up to test this script (or the wrapper that
+	  calls it, renameAllTypeByMetadata.sh) with makeRNDtestFilesTree.sh
 EOF
 }
 
