@@ -1,6 +1,7 @@
 # DESCRIPTION
 # Organizes exported media files (e.g. from cameras and devices), using other scripts, this way:
 #    - renames various common camera/device media file extensions to lowercase
+# WE INTERRUPTE THIS DOCUMENTATION FOR A SPECIAL UPDATE: everything after that point is at this writing skipped. See comments in the script under "ALL THE BELOW IS DEPRECATED".
 #    - renames files after metadata date
 #    - renames all .jpeg file extensions to .jpg (including doing this after optional thumbnail extraction, where dcraw extracts thumbnails as .jpeg files)
 # For the following optional features, search for comments with "uncomment" instructions:
@@ -18,15 +19,14 @@
 #    organizeCameraExports.sh
 # Or to operate on the current directory and all subdirectories, run:
 #    organizeCameraExports.sh SPACKFELT
-# Something that's TEMPORARILY DEPRECATED and this script is hacked to skip it: sidecar scanning and renaming (as follows), owing to this bug: in some setting (or all settings?) renamed files in a subfolder are not being matched to sidecards etc. nor sidecars renamed.
 # To skip sidecar etc. scanning for renameByMetadata.sh, pass a parameter $1 to the script [EDIT: I'll need to rework this script to take one switch to do this or another to operate on subdirectories], which can be anything, e.g.:
 #    organizeCameraExports.sh NORTHERP
 # See the various comments with "uncomment" instructions for the optional features.
 
 # CODE
 # TO DO
-# - FIX BUG detailed above in TEMPORARILY DEPRECATED comment
-# - parameterize optional features?
+# - update this script per the comments below "ALL THE BELOW IS DEPRECATED".
+# - parameterize this to harmonize with options of renameByMetadata.sh?
 
 # manage creation of array to iterate through directories, to do the work of this script in each. (intent: iterate through all subdirectories or none). If no $1 parameter passed to script, make the only directory the current one so that it only "changes" to the current directory.
 # init array so it will only be this dir:
@@ -41,14 +41,15 @@ fi
 extensions=(
 MOV
 CR2
-JPG
-JPEG
-PNG
-HEIC
+NEF
 MP4
 GIF
 M4A
 3GP
+HEIC
+PNG
+JPG
+JPEG
 )
 
 lowerCaseExtensions=()
@@ -60,6 +61,9 @@ do
 	lowerCasedFileExt=$(echo "$ext" | tr '[:upper:]' '[:lower:]')
 	lowerCaseExtensions+=($lowerCasedFileExt)
 done
+
+# ALL THE BELOW IS DEPRECATED, as one script that this would call functionally changed (the call broke), there are problems as constructed; in one setting for example this would rename all NEF files by metadata, and the jpg sibling (same base name) files would be renamed with that, but then it would do the reverse operation starting on jpg. Also, this script does multiple functions which might be best split into separate scripts which this script, as a "reciple" script, calls. Therefore, after this point of this script, at this writing, EXIT:
+exit
 
 for dir in ${dirsArr[@]}
 do
@@ -82,7 +86,8 @@ do
 	# Do the actual rename; this passes $1, which if it was passed to the script will be any string or whatever, and if not, it will be empty; that flag and the word NORTHERP control things in renameByMetadata.sh (see documentation in it) :
 	# TO DO: fix the issue mentioned above under the TEMPORARILY DEPRECATED comment (I think the issue is that renamed files are moved away from the same directory as the would-be sidecar matches to find), then uncomment the next line and delete the one after it:
 	# renameByMetadata.sh NORTHERP $1
-	renameByMetadata.sh NORTHERP SKIP_SIDECAR_CHECKING
+	# renameByMetadata.sh --nosidecars --password NORTHERP
+	renameByMetadata.sh --password NORTHERP
 	# Move those up a folder, move back to that folder, and destroy the temp folder:
 	mv -i * ..
 	cd ..
