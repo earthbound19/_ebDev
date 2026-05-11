@@ -31,7 +31,7 @@ fi
 # END SCRIPT WARNING =======================================
 
 # COMMENT OUT OR UNCOMMENT ANY OF THESE NEXT LINES PER NEED:
-# renameByMetadata.sh
+# renameByMetadata.sh, BUT THEN ADAPT per new (since the time this script was developed) named switches / needs
 # dateByFileName.sh
 # numberFilesByLabel.sh
 
