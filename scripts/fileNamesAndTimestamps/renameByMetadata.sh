@@ -85,6 +85,11 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 # log file global name
 LOG_FILE="rename_by_metadata.log"
 
+# If PARALLEL_TEMP_LOG is set, use it instead (for batch collection in renameAllTypeByMetadata.sh)
+if [ -n "$PARALLEL_TEMP_LOG" ]; then
+    LOG_FILE="$PARALLEL_TEMP_LOG"
+fi
+
 # Default values
 YES_MODE=false
 DRY_RUN=false
@@ -425,11 +430,17 @@ if [ ! -f "$TARGET_FILE" ]; then
     exit 1
 fi
 
-# Add a blank line before new session if log already has content
-if [ -s "$LOG_FILE" ]; then
-    echo "" >> "$LOG_FILE"
+# Initialize log file
+if [[ "$LOG_FILE" == *.tmp ]]; then
+    # Temp log for parallel batch - start fresh
+    > "$LOG_FILE"
 else
-	touch "$LOG_FILE"  # Creates file if not exists, does nothing if exists
+    # Main log - add separator if content exists
+    if [ -s "$LOG_FILE" ]; then
+        echo "" >> "$LOG_FILE"
+    else
+        touch "$LOG_FILE"
+    fi
 fi
 
 log "INFO" "========================================="
