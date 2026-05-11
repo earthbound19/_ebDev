@@ -9,6 +9,10 @@
 # Sidecar files are identified by matching basename BEFORE any rename occurs,
 # then renamed to match the new basename.
 #
+# After successful rename, the new filenames are automatically appended to
+# rename_excludes.txt in the current working directory to prevent re-processing
+# in future runs. This behavior can be disabled with --no-auto-exclude.
+#
 # EXCLUDE LIST
 # See 'renameByMetadata.sh --help' for exclude list documentation.
 #
@@ -27,6 +31,7 @@ OPTIONS:
     -d, --dry-run           Show what would happen without renaming
     -v, --verbose           Verbose output
     --no-sidecars           Skip sidecar file renaming
+    --no-auto-exclude       Skip auto-adding renamed files to exclude list
     -h, --help              Show this help
 
 EXAMPLES:
@@ -37,16 +42,20 @@ EXAMPLES:
 EXCLUDE LIST:
     To exclude files from renaming, list them in rename_excludes.txt files.
     
-	- a rename_exclude.txt file anywhere in the directory tree that this
-	  script works on will affect all files in the whole tree:
+    - a rename_excludes.txt file anywhere in the directory tree that this
+      script works on will affect all files in the whole tree:
       - parent directory exclude files apply to all child directories
       - child directory exclude files add to parent excludes
     - lines starting with '#' are ignored
     - exact matches only (file name detection is case-sensitive)
     - one filename per line (base name + extension only) in the file, for example:
-		# in a rename_excludes.txt:
-		crying_while_eating.jpg
-		crescent_fresh.png
+        # in a rename_excludes.txt:
+        crying_while_eating.jpg
+        crescent_fresh.png
+    
+    - After successful rename, new filenames are automatically added to
+      rename_excludes.txt in the current working directory, wrapped in
+      # === START renameByMetadata.sh auto-add === markers.
     
     Examples:
         # in /photos/rename_excludes.txt:
@@ -61,6 +70,7 @@ NOTES:
     - rename collisions get suffixes to make unique: -1, -2, etc.
     - exits with error if new filename exceeds 240 characters
     - logs to rename_by_metadata.log in current directory
+    - auto-exclude prevents re-renaming already-processed files
 EOF
 }
 
@@ -81,6 +91,7 @@ YES_MODE=false
 DRY_RUN=false
 VERBOSE=false
 NO_SIDECARS=false
+NO_AUTO_EXCLUDE=false
 TARGET_FILE=""
 
 # Color codes for output (if terminal supports)
@@ -140,15 +151,16 @@ build_global_exclude_list() {
     while IFS= read -r exclude_file; do
         log "VERBOSE" "Found exclude file: $exclude_file"
         
-        while IFS= read -r pattern || [ -n "$pattern" ]; do
-            # Skip comments and empty lines
-            [[ -z "$pattern" || "$pattern" =~ ^[[:space:]]*# ]] && continue
+        while IFS= read -r line || [ -n "$line" ]; do
+            # Strip inline comments (anything after # including the space)
+            line="${line%%#*}"
             # Trim whitespace
-            pattern=$(echo "$pattern" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-            [[ -z "$pattern" ]] && continue
+            line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            # Skip empty lines
+            [[ -z "$line" ]] && continue
             
-            GLOBAL_EXCLUDE_PATTERNS+=("$pattern")
-            log "VERBOSE" "  Added global exclude: $pattern"
+            GLOBAL_EXCLUDE_PATTERNS+=("$line")
+            log "VERBOSE" "  Added global exclude: $line"
         done < "$exclude_file"
     done < <(find "$start_dir" -type f -name "rename_excludes.txt" 2>/dev/null)
     
@@ -182,6 +194,80 @@ is_excluded() {
     done
     
     return 1
+}
+
+# Add successfully renamed files to auto-exclude list
+add_to_auto_exclude() {
+    local new_filenames=("$@")
+    
+    # Skip if disabled or dry-run
+    if [ "$NO_AUTO_EXCLUDE" = true ] || [ "$DRY_RUN" = true ]; then
+        return 0
+    fi
+    
+    local auto_exclude_file="$PWD/rename_excludes.txt"
+    local start_marker="# === START renameByMetadata.sh auto-add to prevent more renames! ==="
+    local end_marker="# === END renameByMetadata.sh auto-add to prevent more renames! ==="
+    
+    # If file doesn't exist, create it with markers
+    if [ ! -f "$auto_exclude_file" ]; then
+        {
+            echo "$start_marker"
+            for filename in "${new_filenames[@]}"; do
+                echo "$filename"
+                log "VERBOSE" "Added to auto-exclude: $filename"
+            done
+            echo "$end_marker"
+        } > "$auto_exclude_file"
+        return 0
+    fi
+    
+    # Check if markers already exist
+    if grep -q "^$start_marker$" "$auto_exclude_file"; then
+        # Extract content between markers (excluding empty lines)
+        local existing_content=$(sed -n "/^$start_marker$/,/^$end_marker$/p" "$auto_exclude_file" | tail -n +2 | head -n -1 | grep -v '^$')
+        
+        # Build new content between markers (each filename on its own line)
+        local new_content=""
+        for filename in "${new_filenames[@]}"; do
+            if ! echo "$existing_content" | grep -qFx "$filename"; then
+                new_content="${new_content}${filename}"$'\n'
+                log "VERBOSE" "Added to auto-exclude: $filename"
+            fi
+        done
+        
+        # If there are new files, update the file
+        if [ -n "$new_content" ]; then
+            # Remove old marker section and insert new one
+            local temp_file=$(mktemp)
+            # Copy everything before start marker
+            sed -n "1,/^$start_marker$/p" "$auto_exclude_file" | head -n -1 > "$temp_file"
+            # Write start marker
+            echo "$start_marker" >> "$temp_file"
+            # Write existing content (if any) with newline
+            if [ -n "$existing_content" ]; then
+                echo "$existing_content" >> "$temp_file"
+            fi
+            # Write new content (already has newline from $'\n')
+            echo -n "$new_content" >> "$temp_file"
+            # Write end marker
+            echo "$end_marker" >> "$temp_file"
+            # Copy everything after end marker
+            sed -n "/^$end_marker$/,\$p" "$auto_exclude_file" | tail -n +2 >> "$temp_file"
+            mv "$temp_file" "$auto_exclude_file"
+        fi
+    else
+        # No markers yet, append new section to end of file
+        {
+            echo ""
+            echo "$start_marker"
+            for filename in "${new_filenames[@]}"; do
+                echo "$filename"
+                log "VERBOSE" "Added to auto-exclude: $filename"
+            done
+            echo "$end_marker"
+        } >> "$auto_exclude_file"
+    fi
 }
 
 get_timestamp_from_metadata() {
@@ -281,6 +367,7 @@ check_filename_length() {
 rename_with_sidecars() {
     local file="$1"
     local new_basename="$2"
+    local -a renamed_filenames=()
     
     local old_dir=$(dirname "$file")
     local old_basename=$(basename "$file")
@@ -381,6 +468,7 @@ rename_with_sidecars() {
         log "ERROR" "Failed to rename main file: $file -> $new_filename"
         return 1
     fi
+    renamed_filenames+=("$(basename "$new_filename")")
     
     # Rename sidecars
     local renamed_count=0
@@ -396,6 +484,7 @@ rename_with_sidecars() {
         log "INFO" "Renaming sidecar: $sidecar_basename -> $(basename "$new_sidecar_name")"
         
         if mv "$sidecar" "$new_sidecar_name" 2>/dev/null; then
+            renamed_filenames+=("$(basename "$new_sidecar_name")")
             ((renamed_count++))
         else
             log "ERROR" "Failed to rename sidecar: $sidecar_basename"
@@ -403,11 +492,17 @@ rename_with_sidecars() {
     done
     
     log "INFO" "Successfully renamed $renamed_count of ${#sidecars[@]} sidecar(s)"
+    
+    # Add all renamed files to auto-exclude list
+    if [ ${#renamed_filenames[@]} -gt 0 ]; then
+        add_to_auto_exclude "${renamed_filenames[@]}"
+    fi
+    
     return 0
 }
 
 # Parse command line arguments
-TEMP=$(getopt -o ydvh --long yes,dry-run,verbose,no-sidecars,help -n "$PROGNAME" -- "$@")
+TEMP=$(getopt -o ydvh --long yes,dry-run,verbose,no-sidecars,no-auto-exclude,help -n "$PROGNAME" -- "$@")
 if [ $? != 0 ]; then
     echo "Failed parsing options" >&2
     exit 1
@@ -431,6 +526,10 @@ while true; do
             ;;
         --no-sidecars)
             NO_SIDECARS=true
+            shift
+            ;;
+        --no-auto-exclude)
+            NO_AUTO_EXCLUDE=true
             shift
             ;;
         -h|--help)
@@ -492,6 +591,7 @@ log "INFO" "Target file: $TARGET_FILE"
 log "INFO" "Dry run: $DRY_RUN"
 log "INFO" "Verbose: $VERBOSE"
 log "INFO" "Sidecar handling: $([ "$NO_SIDECARS" = true ] && echo 'disabled' || echo 'enabled')"
+log "INFO" "Auto-exclude: $([ "$NO_AUTO_EXCLUDE" = true ] && echo 'disabled' || echo 'enabled')"
 log "INFO" "========================================="
 
 # Get timestamp (metadata first, then filesystem)
