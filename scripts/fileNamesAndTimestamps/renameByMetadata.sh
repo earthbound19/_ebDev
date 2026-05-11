@@ -77,6 +77,8 @@ EOF
 }
 
 # CODE
+# TO DO
+# re-enable file system time stamp fallback (it's lines of code to uncomment), disabled by default, and enable with a switch. Why? Because file systems can get inaccurate file create times, which would lead to images being renamed as if they were associated with a date they really aren't. This mitigates that risk; a switch to enable it would allow opt-in careful use of it.
 PROGNAME=$(basename "$0")
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 
@@ -601,8 +603,8 @@ TIMESTAMP=""
 
 if TIMESTAMP=$(get_timestamp_from_metadata "$TARGET_FILE"); then
     log "INFO" "Using metadata timestamp: $TIMESTAMP"
-elif TIMESTAMP=$(get_timestamp_from_filesystem "$TARGET_FILE"); then
-    log "INFO" "Using filesystem timestamp: $TIMESTAMP"
+#elif TIMESTAMP=$(get_timestamp_from_filesystem "$TARGET_FILE"); then
+#    log "INFO" "Using filesystem timestamp: $TIMESTAMP"
 else
     log "ERROR" "Could not determine any timestamp for $TARGET_FILE"
     exit 1
