@@ -26,9 +26,13 @@ Usage: $PROGNAME -t EXTENSION [OPTIONS]
 OPTIONS:
     -t, --type EXTENSION        File extension to process (e.g., NEF, JPG, no dot)
     -s, --subdirectories        Process subdirectories recursively
+    -a, --allow-rename-by-file-time
+                                Allow fallback to filesystem timestamps (creation time,
+                                then modification time) if no metadata timestamp found.
+                                WARNING: Filesystem timestamps can be inaccurate!
     -m, --multiprocess-percent-cores FLOAT  
                                 Fraction of CPU cores for parallel processing
-                                (default: 0.6 = 60%% of cores)
+                                (default: 0.6 = 60% of cores)
     -d, --dry-run               Show what would happen without renaming
     -v, --verbose               Verbose output
     --no-sidecars               Skip sidecar renaming
@@ -40,16 +44,18 @@ EXAMPLES:
     $PROGNAME -t CR2 -s -m0.75               # multiprocessing mode using 75%% of cores on al CR2 files
     $PROGNAME -t MOV --dry-run               # operate on all MOV files, preview changes (no rename)
     $PROGNAME -t PNG -s --no-sidecars        # skip sidecar detection or rename
+    $PROGNAME -t NEF -a                      # allow filesystem timestamp fallback for files without metadata
 EOF
 }
 
 # CODE
 PROGNAME=$(basename "$0")
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+PATH_TO_RENAME_BY_METADATA=$(command -v renameByMetadata.sh)
 
 # Default values
 EXTENSION=""
 SUBDIRECTORIES=false
+ALLOW_FS_FALLBACK=false
 PARALLEL_FRACTION="0.6"
 DRY_RUN=false
 VERBOSE=false
@@ -63,7 +69,7 @@ cleanup() {
 trap cleanup SIGINT SIGTERM
 
 # Parse arguments
-OPTS=$(getopt -o ht:sm:dv --long help,type:,subdirectories,multiprocess-percent-cores:,dry-run,verbose,no-sidecars -n "$PROGNAME" -- "$@")
+OPTS=$(getopt -o ht:sm:adva --long help,type:,subdirectories,multiprocess-percent-cores:,allow-rename-by-file-time,dry-run,verbose,no-sidecars -n "$PROGNAME" -- "$@")
 if [ $? != 0 ]; then
     echo "Failed parsing options." >&2
     exit 1
@@ -75,6 +81,10 @@ while true; do
         -h|--help) print_help; exit 0 ;;
         -t|--type) EXTENSION="$2"; shift 2 ;;
         -s|--subdirectories) SUBDIRECTORIES=true; shift ;;
+        -a|--allow-rename-by-file-time)
+            ALLOW_FS_FALLBACK=true
+            shift
+            ;;
         -m|--multiprocess-percent-cores) 
             if [ -z "$2" ] || [[ "$2" == -* ]]; then
                 echo "ERROR: Option $1 requires a value. Short form: -m0.6 (no space). Long form: --multiprocess-percent-cores=0.6" >&2
@@ -116,6 +126,7 @@ echo "Parallel jobs: $parallel_jobs ($PARALLEL_FRACTION of $total_cores cores)"
 echo "Dry run: $DRY_RUN"
 echo "Verbose: $VERBOSE"
 echo "Sidecar handling: $([ "$NO_SIDECARS" = true ] && echo 'disabled' || echo 'enabled')"
+echo "Filesystem timestamp fallback: $([ "$ALLOW_FS_FALLBACK" = true ] && echo 'enabled' || echo 'disabled')"
 echo "========================================="
 
 # Find all target files (preserving relative paths)
@@ -137,14 +148,15 @@ echo ""
 failures_file="/tmp/rename_by_metadata.failures.$$"
 > "$failures_file"
 
-# Function to process one file (-y is FORCED to avoid prompts in parallel mode)
+# Function to process one file (-y is used to avoid prompts in parallel mode)
 process_one_file() {
     local file="$1"
     
-    if "$SCRIPT_DIR/renameByMetadata.sh" -y \
+    if "$PATH_TO_RENAME_BY_METADATA" -y \
         $([ "$DRY_RUN" = true ] && echo '-d') \
         $([ "$VERBOSE" = true ] && echo '-v') \
         $([ "$NO_SIDECARS" = true ] && echo '--no-sidecars') \
+        $([ "$ALLOW_FS_FALLBACK" = true ] && echo '-a') \
         "$file"; then
         echo "[$file] OK" >&2
         return 0
@@ -154,10 +166,13 @@ process_one_file() {
         return 1
     fi
 }
-export -f process_one_file
-export SCRIPT_DIR DRY_RUN VERBOSE NO_SIDECARS failures_file
 
-# Process files in parallel (exactly like allSVG2img.sh)
+export -f process_one_file
+# all these exports are actually needed for wonky reasons; if you remove any things may not work as expected.
+# the exported function relies on these exported variables is why.
+export PATH_TO_RENAME_BY_METADATA failures_file ALLOW_FS_FALLBACK DRY_RUN VERBOSE NO_SIDECARS
+
+# Process files in parallel
 echo "Processing with $parallel_jobs parallel job(s)..."
 
 if [ "$parallel_jobs" -gt 1 ]; then
