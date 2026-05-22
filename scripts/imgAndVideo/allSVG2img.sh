@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 # DESCRIPTION
 # Converts all SVG files in the current directory (non-recursive) to a raster image
-# format (PNG, JPG, etc.) using SVG2img.sh. By default runs in parallel using 60% of
-# available CPU cores. Output format defaults to PNG. Longest side is optional; if
-# omitted, SVG2img.sh will use its own default (4280px).
-#
-# Parallelism can be controlled with the -m / --multiprocess-percent-cores option.
-# Use -m0.6 (short form, no space) or --multiprocess-percent-cores=0.6.
-#
+# format (PNG, JPG, etc.) using SVG2img.sh. By default runs parallel conversions
+# using 60% of available CPU cores. Can convert svgs in subdirectories also
+# (recursive). Output format defaults to PNG. Longest side is optional; if omitted,
+# SVG2img.sh will use its own default (4280px).
+
 # DEPENDENCIES
 # - SVG2img.sh in PATH (or specify full path)
 # - dependencies of SVG2img.sh (see)
@@ -30,8 +28,13 @@ Options:
 									   alpha, or any color name passed along
 									   by SVG2img.sh that will work (at this
 									   writing, anything cairosvg accepts).
-  -m, --multiprocess-percent-cores <float>   Fraction of CPU cores to use
+  -m, --multiprocess-percent-cores <float>   Parallel process conversions.
+                                       float is fraction of CPU cores to use
                                        (0 to 1). Default: 0.6.
+  -r, --recursive                     Process SVG files in all subdirectories
+                                       recursively. Changes into each directory
+                                       before conversion to preserve relative
+                                       path references.
   -h, --help                           Show this help.
 
 Short form requires value attached: -m0.4
@@ -40,8 +43,20 @@ A previous version of this script used positional switches; see NOTES comments
 in source code if you need to adapt from the previous positional switches.
 
 Examples:
-  $PROGNAME --longest-side-px 4200 --target-image-format png --background-color transparent
-  $PROGNAME -l4200 -fpng -ctransparent -m0.75
+  # Basic usage - convert all SVGs in current directory to PNG
+  $PROGNAME
+  
+  # Recursive - convert all SVGs in current directory and all subdirectories
+  $PROGNAME --recursive
+  
+  # Recursive with custom dimensions and transparent background
+  $PROGNAME --recursive --longest-side-px 4200 --target-image-format png --background-color transparent
+  
+  # Recursive using 75% of CPU cores, JPEG output
+  $PROGNAME -r -l3000 -fjpg -cffffff -m0.75
+  
+  # Non-recursive with specific background color
+  $PROGNAME -l4200 -fpng -c000066ff
 EOF
 }
 
@@ -62,7 +77,10 @@ EOF
 #       SVG2img.sh -i in.svg -c default-opaque
 
 # CODE
+ORIGINAL_DIR="$PWD"
+
 cleanup() {
+    cd "$ORIGINAL_DIR" 2>/dev/null
     echo -e "\nInterrupted. Terminating all child processes..."
     pkill -TERM -P $$ 2>/dev/null
     sleep 0.5
@@ -77,9 +95,10 @@ imgFormat="png"
 bgColor=""
 parallelFraction="0.6"
 parallelJobs=0
+recursive=false
 
 # Parse options
-OPTS=$(getopt -o hl:f:c:m:: --long help,longest-side-px:,target-image-format:,background-color:,multiprocess-percent-cores:: -n "$PROGNAME" -- "$@")
+OPTS=$(getopt -o hl:f:c:m::r --long help,longest-side-px:,target-image-format:,background-color:,multiprocess-percent-cores::,recursive -n "$PROGNAME" -- "$@")
 if [ $? != 0 ]; then
     echo "Failed parsing options." >&2
     exit 1
@@ -116,6 +135,10 @@ while true; do
             parallelFraction="$2"
             shift 2
             ;;
+        -r|--recursive)
+            recursive=true
+            shift
+            ;;
         --)
             shift
             break
@@ -143,71 +166,131 @@ if [ -n "$MAX_PARALLEL_JOBS" ] && [ "$parallelJobs" -gt "$MAX_PARALLEL_JOBS" ]; 
 fi
 echo "Using $parallelJobs concurrent jobs (detected $totalCores cores, fraction $parallelFraction)."
 
-# Find SVG files (non‑recursive, current directory only)
-filesList=()
-while IFS= read -r -d '' file; do
-    filesList+=("$file")
-done < <(find . -maxdepth 1 -type f -iname "*.svg" -printf "%P\0")
-
-nFiles=${#filesList[@]}
-if [ $nFiles -eq 0 ]; then
-    echo "No .svg files found in current directory. Exiting."
-    exit 0
+# Build directory list
+directories=(".")
+if [[ "$recursive" == true ]]; then
+    echo "Recursive mode enabled. Scanning subdirectories..."
+    # Use mapfile for safe handling of directory names with spaces or special chars
+    mapfile -t subdirs < <(find . -mindepth 1 -type d -printf "%P\n" 2>/dev/null)
+    if [ ${#subdirs[@]} -gt 0 ]; then
+        directories+=("${subdirs[@]}")
+    fi
+    echo "Found $(( ${#directories[@]} - 1 )) subdirectories (plus current directory)."
 fi
-echo "Found $nFiles SVG file(s)."
 
-# Temporary file for collecting failures in parallel mode
-failures_file=$(mktemp)
-trap 'rm -f "$failures_file"' EXIT
+# Process each directory
+total_successful_dirs=0
+total_failed_dirs=0
+overall_failed_files=()
 
-# Function to process one file
-process_one_file() {
-    local file="$1"
-    local cmd="SVG2img.sh --input-file \"$file\""
+for dir in "${directories[@]}"; do
+    echo ""
+    echo "=========================================="
+    echo "Processing directory: $dir"
+    echo "=========================================="
     
-    [[ -n "$longestSide" ]] && cmd="$cmd --longest-side-px \"$longestSide\""
-    cmd="$cmd --target-image-format \"$imgFormat\""
-    [[ -n "$bgColor" ]] && cmd="$cmd --background-color \"$bgColor\""
+    # Change into directory
+    if ! pushd "$dir" > /dev/null 2>&1; then
+        echo "WARNING: Cannot enter directory '$dir', skipping"
+        ((total_failed_dirs++))
+        continue
+    fi
     
-    if eval $cmd; then
-        echo "[$file] OK"
-        return 0
-    else
-        echo "[$file] FAILED" >&2
-        echo "$file" >> "$failures_file"
-        return 1
+    # Find all SVG files in current directory
+    filesList=()
+    while IFS= read -r -d '' file; do
+        filesList+=("$file")
+    done < <(find . -maxdepth 1 -type f -iname "*.svg" -printf "%P\0" 2>/dev/null)
+    
+    nFiles=${#filesList[@]}
+    if [ $nFiles -eq 0 ]; then
+        echo "No .svg files found in $dir"
+        popd > /dev/null
+        continue
     fi
-}
-export -f process_one_file
-export longestSide imgFormat bgColor failures_file
+    echo "Found $nFiles SVG file(s) in $dir"
+    
+    # Temporary file for collecting failures in parallel mode for this directory
+    failures_file=$(mktemp)
+    trap 'rm -f "$failures_file"' RETURN
+    
+    # Function to process one file (uses current directory)
+    process_one_file() {
+        local file="$1"
+        local cmd="SVG2img.sh --input-file \"$file\""
+        
+        [[ -n "$longestSide" ]] && cmd="$cmd --longest-side-px \"$longestSide\""
+        cmd="$cmd --target-image-format \"$imgFormat\""
+        [[ -n "$bgColor" ]] && cmd="$cmd --background-color \"$bgColor\""
+        
+        if eval $cmd; then
+            echo "[$file] OK"
+            return 0
+        else
+            echo "[$file] FAILED" >&2
+            echo "$file" >> "$failures_file"
+            return 1
+        fi
+    }
+    export -f process_one_file
+    export longestSide imgFormat bgColor failures_file
+    
+    # Process files in this directory
+    failed_count=0
+    if [ "$parallelJobs" -gt 1 ]; then
+        echo "Running in parallel mode within $dir"
+        > "$failures_file"
+        printf "%s\0" "${filesList[@]}" | xargs -0 -P "$parallelJobs" -I {} bash -c 'process_one_file "$@"' _ {}
+        if [ -s "$failures_file" ]; then
+            failed_count=$(sort -u "$failures_file" | wc -l)
+            # Record failed files with full relative path
+            while IFS= read -r failed_file; do
+                overall_failed_files+=("$dir/$failed_file")
+            done < <(sort -u "$failures_file")
+        else
+            failed_count=0
+        fi
+    else
+        echo "Running sequentially within $dir"
+        for file in "${filesList[@]}"; do
+            if ! process_one_file "$file"; then
+                ((failed_count++))
+                overall_failed_files+=("$dir/$file")
+            fi
+        done
+    fi
+    
+    # Directory summary
+    if [ "$failed_count" -eq 0 ]; then
+        echo "Successfully processed $nFiles file(s) in $dir"
+        ((total_successful_dirs++))
+    else
+        echo "$failed_count of $nFiles file(s) failed in $dir"
+        ((total_failed_dirs++))
+    fi
+    
+    # Cleanup and return to original directory
+    rm -f "$failures_file"
+    popd > /dev/null
+done
 
-# Process files
-failed_count=0
-if [ "$parallelJobs" -gt 1 ]; then
-    echo "Running in parallel mode."
-    > "$failures_file"
-    printf "%s\0" "${filesList[@]}" | xargs -0 -P "$parallelJobs" -I {} bash -c 'process_one_file "$@"' _ {}
-    if [ -s "$failures_file" ]; then
-        failed_count=$(sort -u "$failures_file" | wc -l)
-    else
-        failed_count=0
-    fi
+# Final summary
+cd "$ORIGINAL_DIR"
+echo ""
+echo "=========================================="
+echo "FINAL SUMMARY"
+echo "=========================================="
+echo "Total directories processed: $(( total_successful_dirs + total_failed_dirs ))"
+echo "  - Successful: $total_successful_dirs"
+echo "  - Failed (or skipped): $total_failed_dirs"
+
+if [ ${#overall_failed_files[@]} -eq 0 ]; then
+    echo "All SVG files converted successfully!"
+    exit 0
 else
-    echo "Running sequentially."
-    for file in "${filesList[@]}"; do
-        process_one_file "$file" || ((failed_count++))
+    echo "Failed files (${#overall_failed_files[@]} total):"
+    for failed_file in "${overall_failed_files[@]}"; do
+        echo "  - $failed_file"
     done
-fi
-
-# Summary
-if [ "$failed_count" -eq 0 ]; then
-    echo "All $nFiles file(s) processed successfully."
-    exit 0
-else
-    echo "ERROR: $failed_count of $nFiles file(s) failed."
-    if [ "$parallelJobs" -gt 1 ] && [ -s "$failures_file" ]; then
-        echo "Failed files:"
-        sort -u "$failures_file" | sed 's/^/  - /'
-    fi
     exit 1
 fi
