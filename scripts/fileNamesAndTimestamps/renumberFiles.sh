@@ -102,7 +102,7 @@ if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 eval set -- "$OPTS"
 
 # set default:
-startCountingFrom=0
+startCountingFrom=1
 while true; do
   case "$1" in
     -h | --help ) print_halp; exit 0 ;;
