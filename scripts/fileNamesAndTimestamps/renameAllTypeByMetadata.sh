@@ -48,7 +48,10 @@ EXAMPLES:
 EOF
 }
 
+
 # CODE
+# TO-DO: add --no-auto-exclude pass-through option to called script
+
 PROGNAME=$(basename "$0")
 PATH_TO_RENAME_BY_METADATA=$(command -v renameByMetadata.sh)
 

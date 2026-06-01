@@ -75,18 +75,23 @@ EXCLUDE LIST:
 
 NOTES:
     - sidecar discovery is done for ALL files in same directory with matching basename
+	- file system timestamp fallback is an active-opt in option (DISABLED by default)
+	  to prevent inaccurate renaming based unreliable filesystem metadata. To enable
+	  renaming by file system time stamps, pass the switch --allow-rename-by-file-time
     - rename collisions get suffixes to make unique: -1, -2, etc.
     - exits with error if new filename exceeds 240 characters
     - logs to rename_by_metadata.log in current directory
     - auto-exclude prevents re-renaming already-processed files
     - data can be set up to test this script (or the wrapper that
       calls it, renameAllTypeByMetadata.sh) with makeRNDtestFilesTree.sh
+
 EOF
 }
 
 # CODE
-# File system timestamp fallback is DISABLED by default to prevent inaccurate
-# renaming based on unreliable filesystem metadata. Enable with --allow-rename-by-file-time
+# TO DO: flag to bypass metadata check and go straight to file system time stamp (to work more efficiently in cases where it is known metatada will not be found for any of the processed files), with any conflicting switch checks and errors that would apply
+
+# 
 
 PROGNAME=$(basename "$0")
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
@@ -564,7 +569,7 @@ while true; do
             ;;
     esac
 done
-echo "DEBUG renameByMetadata.sh: ALLOW_FS_FALLBACK = $ALLOW_FS_FALLBACK" >&2
+# echo "DEBUG renameByMetadata.sh: ALLOW_FS_FALLBACK = $ALLOW_FS_FALLBACK" >&2
 
 # Get target file
 if [ $# -eq 0 ]; then
