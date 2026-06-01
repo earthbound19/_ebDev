@@ -23,9 +23,14 @@
 
 # CODE
 # TO DO
-# - Examine http://espeak.sourceforge.net/
+# - Examine http://espeak.sourceforge.net/ - and or many other text to speech synthesis tools including newer "AI" ones
 
 if [ ! "$1" ]; then printf "\nNo parameter \$1 (source text file to convert to wav sound file) passed to script. Exit."; exit 1; fi
+
+# check for dependency exe, and throw error and exit if not found
+dependencyExecutableName=balcon.exe
+command -v $dependencyExecutableName
+if [[ "$?" != 0 ]]; then echo "EERRRORRORORORORORORORORRRRRRRRRRR: $dependencyExecutableName found. LENNY, however, was found. ͡͡( ͡° ͜ʖ ͡°)"; exit 1; fi
 
 textSay=$(cat $1 | tr '\n' ' ');
 # replace any terminal-unfriendly characters in the source string with underscores to help form the render target file name:
