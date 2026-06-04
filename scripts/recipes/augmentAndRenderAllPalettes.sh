@@ -24,6 +24,10 @@ hexpltFileNamesArray=( $(find . -maxdepth 1 -type f -iname "*.hexplt" -printf "%
 scriptName=get_color_gradient_OKLAB.js
 fullPathToOKLABAugmentationScript=$(getFullPathToFile.sh get_color_gradient_OKLAB.js)
 
+# check for dependency script and error out if it's absent:
+pathToPaletteRenderScript=$(command -v renderHexPalette.py)
+if [ ! -f "$pathToPaletteRenderScript" ]; then echo ERROR: intended palette render script renderHexPalette.py not found. Exit.; exit 1; fi
+
 for fileName in ${hexpltFileNamesArray[@]}
 do
 	paletteRenderTargetFileName=${fileName%.*}_gradient.hexplt
@@ -37,7 +41,9 @@ do
 		# get length of augmented palette:
 		augmentedPaletteArrayLength=${#augmentedPaletteArray[@]}
 		echo "Length of augmented palette is $augmentedPaletteArrayLength colors. Rendering palette . . ."
-		renderHexPalette.sh $paletteRenderTargetFileName 'NULL' 'NULL' $augmentedPaletteArrayLength 1
+		python $pathToPaletteRenderScript -c$augmentedPaletteArrayLength -r1 $paletteRenderTargetFileName
+			# prior script and deprecated command:
+			# renderHexPalette.sh $paletteRenderTargetFileName 'NULL' 'NULL' $augmentedPaletteArrayLength 1
 	else
 		printf "Render target $paletteRenderTargetFileName already exists; will not clobber. To recreate it, delete it and run this script the same way again.\n\n"
 	fi

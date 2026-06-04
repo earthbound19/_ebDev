@@ -57,7 +57,11 @@ do
 	# temporarily copy the palette here
 	cp $fullPathToPalette . &>/dev/null
 	reformatHexPalette.sh -i $paletteFileNameNoPath -a
-	renderHexPalette.sh $paletteFileNameNoPath
+	# get path to python script that renders palettes and error out if not found:
+	pathToPaletteRenderScript=$(command -v renderHexPalette.py)
+	if [ ! -f "$pathToPaletteRenderScript" ]; then echo ERROR: intended palette render script renderHexPalette.py not found. Exit.; exit 1; fi
+	# otherwise it will use that:
+	python $pathToPaletteRenderScript $paletteFileNameNoPath
 	paletteRenderTargetFileName=${paletteFileNameNoPath%.*}.png
 	img2imgNN.sh $paletteRenderTargetFileName bmp 1920 1080
 	rm $paletteRenderTargetFileName

@@ -9,6 +9,10 @@
 
 
 # CODE
+# check for dependency script and error out if it's absent:
+pathToPaletteRenderScript=$(command -v renderHexPalette.py)
+if [ ! -f "$pathToPaletteRenderScript" ]; then echo ERROR: intended palette render script renderHexPalette.py not found. Exit.; exit 1; fi
+
 augmentNcolors=7
 paletteFileNames=($(printPaletteFileNamesWithNColors.sh -n 2 -c -f))
 for paletteFileName in ${paletteFileNames[@]}
@@ -21,7 +25,9 @@ do
 	echo "Augmenting palette $paletteFileNameNoPath to $renderTargetFilename. . ."
 	augmentPalette.sh $paletteFileNameNoPath $augmentNcolors > $renderTargetFilename
 	# render it:
-	renderHexPalette.sh $renderTargetFilename
+	$pathToPaletteRenderScript $renderTargetFilename
+		# prior (deprecated) script and command:
+		# renderHexPalette.sh $renderTargetFilename
 	# delete the local copy of the palette:
 	rm $paletteFileNameNoPath
 done

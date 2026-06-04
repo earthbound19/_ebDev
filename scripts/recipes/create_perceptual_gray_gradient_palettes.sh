@@ -13,17 +13,23 @@
 if [ ! "$1" ]; then number_of_palettes_to_make=120; else number_of_palettes_to_make=$1; fi
 
 i=430
-fullPathToSript=$(getFullPathToFile.sh getNshadesOfColorCIECAM02.py)
+fullPathToGetShadesScript=$(getFullPathToFile.sh getNshadesOfColorCIECAM02.py)
+if [ ! -f "$fullPathToGetShadesScript" ]; then echo ERROR: intended scriptgetNshadesOfColorCIECAM02.py not found. Exit.; exit 1; fi
 	# Alternate, for comparing RGB grayscale (it gets darker faster!) :
-	# fullPathToSript=$(getFullPathToFile.sh getNshadesOfGrayRGB.py)
+	# fullPathToGetShadesScript=$(getFullPathToFile.sh getNshadesOfGrayRGB.py)
+pathToPaletteRenderScript=$(command -v renderHexPalette.py)
+if [ ! -f "$pathToPaletteRenderScript" ]; then echo ERROR: intended palette render script renderHexPalette.py not found. Exit.; exit 2; fi
+
 while [ $i -le $number_of_palettes_to_make ]
 do
 	renderTarget="$i"shadesOfGrayCIECAM02.hexplt
 	if [ ! -e $renderTarget ]
 	then
 		echo "Will create palette with $i shades of gray . . ."
-		python $fullPathToSript -c 'FFFFFF' -n $i -b 100
-		renderHexPalette.sh 'FFFFFF_'$i'shades.hexplt' 250 NULL $i 1
+		python $fullPathToGetShadesScript -c 'FFFFFF' -n $i -b 100
+		python $pathToPaletteRenderScript -t250 -c$i -r1 'FFFFFF_'$i'shades.hexplt'
+			# the prior and deprecated script / command:
+			# renderHexPalette.sh 'FFFFFF_'$i'shades.hexplt' 250 NULL $i 1
 	else
 		echo "Target palette file $renderTarget already exists. Will skip render."
 	fi
