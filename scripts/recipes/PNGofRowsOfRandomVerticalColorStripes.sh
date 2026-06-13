@@ -1,8 +1,12 @@
 # DESCRIPTION
+# DEPRECATED. I strongly recommend using PNGofRowsOfRandomVerticalColorStripes.py instead, which can do in a mere second what this does in minutes. Also at this writing this script fails at the ppm conversion stage in a current setup I have.
 # Uses other scripts to make many rows of various numbers of vertical color stripes from a randomly chosen palette (from _ebPalettes). Alternately can use a specified palette name. That and many other switches are available; try running the script without any parameters. This script does its work admittedly relatively extremely inefficiently.
 
 # DEPENDENCIES
 # `findPalette.sh`, `getRandomPaletteFileName.sh`, `printAllPaletteFileNames.sh`, `randomVerticalColorStripes.sh`, `imgs2imgsNN.sh`, `renumberFiles.sh`, everything they may rely on, and 7z CLI to archive source .ppm files. Also bc command line calculator if you use the [-o|--variantminstripes] and/or [-s|--variantrows] and [-p|--variantmaxstripes] options.
+
+# KNOWN ISSUES
+# It may be a problem with my setup but at this writing ppm conversion fails; that may need fixing, but as this script is deprecated it may actually just be deleted (and possibly some of its dependencies if they are not used by other scripts) soon.
 
 # USAGE
 # Run this script with the -h or --help switch for parameters and usage examples:
@@ -15,6 +19,7 @@
    # 07_Dusty_Periwinkle_Blue_to_Yellow_Orange_Flower.hexplt
    # Banana_Split.hexplt
    # The_Mystic.hexplt
+
 
 # CODE
 function print_halp {
@@ -182,10 +187,10 @@ NOTE: [-o|--variantminstripes] and/or -p|--variantmaxstripes] was passed, but no
 	# .. and then move it up:
 	mv _FINAL_"$workBaseName".png ..
 	cd ..
-	rm -rf pngIntermediaries
+	# rm -rf pngIntermediaries
 	# archive ppm sources into .7z format file, then remove archived source folder:
-	7z a ppm.7z ppm
-	rm -rf ppm
+	# 7z a ppm.7z ppm
+	# rm -rf ppm
 	cd ..
 
 	echo DONE. Results are in folder $workBaseName.
