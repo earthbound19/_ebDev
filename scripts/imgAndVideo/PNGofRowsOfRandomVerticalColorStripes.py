@@ -2,8 +2,8 @@
 """
 DESCRIPTION
 Generates PNG images composed of rows of random vertical color stripes using colors from a palette file (.hexplt).
-Can process a single palette, a random palette, or all palettes in the current directory.
-All rendering is done in-memory with NumPy and PIL for efficiency.
+Can use a single palette by name from a palette repository, or a random palette from a repository, or all
+palettes in the current directory. All rendering is done in-memory with NumPy and PIL for efficiency.
 
 DEPENDENCIES
 - Python 3.7+
@@ -57,6 +57,8 @@ OUTPUT
     Filename format: {timestamp}_{palette_name}_r{rows}_{min}_{max}_w{width}_h{height}_s{seed}_RORVCS.png
 """
 
+
+# CODE
 import os
 import sys
 import re
@@ -88,72 +90,58 @@ def load_palette(palette_path: str) -> list[tuple[int, int, int]]:
         FileNotFoundError: If palette file doesn't exist
         ValueError: If no valid hex colors found in file
     """
-    hex_pattern = re.compile(r'#[a-fA-F0-9]{6}')
     colors = []
     
     with open(palette_path, 'r') as f:
-        for line in f:
-            match = hex_pattern.search(line)
-            if match:
-                hex_color = match.group(0).lstrip('#')
-                r = int(hex_color[0:2], 16)
-                g = int(hex_color[2:4], 16)
-                b = int(hex_color[4:6], 16)
-                colors.append((r, g, b))
+        content = f.read()
+        matches = re.findall(r'#([0-9A-Fa-f]{6})', content)
+        
+        for hex_color in matches:
+            r = int(hex_color[0:2], 16)
+            g = int(hex_color[2:4], 16)
+            b = int(hex_color[4:6], 16)
+            colors.append((r, g, b))
     
     if not colors:
         raise ValueError(f"No valid hex color codes found in {palette_path}")
     
     return colors
 
-
 def get_palette_files(palette_spec: str, palettes_dir: str, current_dir: str) -> list[Path]:
     """
     Get list of palette file paths based on specification.
-    
-    Args:
-        palette_spec: None (random), "ALL", or specific filename
-        palettes_dir: Directory to search for palettes (EB_PALETTES_ROOT_DIR)
-        current_dir: Current working directory
-        
-    Returns:
-        List of Path objects to palette files
-        
-    Raises:
-        FileNotFoundError: If no palettes found or specific palette not found
     """
     if palette_spec == "ALL":
-        # Get all .hexplt files in current directory
-        palettes = list(Path(current_dir).glob("*.hexplt"))
+        palettes = list(Path(current_dir).glob("**/*.hexplt"))
         if not palettes:
             raise FileNotFoundError(f"No .hexplt files found in current directory: {current_dir}")
         return palettes
     
     elif palette_spec is None:
-        # Choose random palette from EB_PALETTES_ROOT_DIR
         palettes_dir_path = Path(palettes_dir)
         if not palettes_dir_path.exists():
             raise FileNotFoundError(f"Palettes directory does not exist: {palettes_dir}")
         
-        palettes = list(palettes_dir_path.glob("*.hexplt"))
+        palettes = list(palettes_dir_path.glob("**/*.hexplt"))
         if not palettes:
             raise FileNotFoundError(f"No .hexplt files found in {palettes_dir}")
         
-        # Return single random palette
         return [random.choice(palettes)]
     
     else:
-        # Specific palette - search in palettes_dir and current directory
-        palette_path = Path(palettes_dir) / palette_spec
-        if palette_path.exists():
-            return [palette_path]
+        # Search recursively in palettes_dir
+        palettes_dir_path = Path(palettes_dir)
+        matches = list(palettes_dir_path.glob(f"**/{palette_spec}"))
+        if matches:
+            return [matches[0]]
         
-        palette_path = Path(current_dir) / palette_spec
-        if palette_path.exists():
-            return [palette_path]
+        # Search recursively in current_dir
+        current_dir_path = Path(current_dir)
+        matches = list(current_dir_path.glob(f"**/{palette_spec}"))
+        if matches:
+            return [matches[0]]
         
         raise FileNotFoundError(f"Palette not found: {palette_spec}")
-
 
 # ============================================================================
 # Stripe Generation
