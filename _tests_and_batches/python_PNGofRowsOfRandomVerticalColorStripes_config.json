@@ -11,7 +11,8 @@
       "is_flag": false,
       "values": [
         "The_Plant_Mage_and_The_Mystic.hexplt",
-        "Yum.hexplt"
+        "Yum.hexplt",
+        "ALL"
       ],
       "criticality": "H",
       "required": false,
