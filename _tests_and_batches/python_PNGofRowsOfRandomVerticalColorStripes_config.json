@@ -1,0 +1,147 @@
+{
+  "_notes": "Load with CLI_batch_generator.py, this way, without the backticks: `python /path_to/CLI_batch_generator.py --config python_PNGofRowsOfRandomVerticalColorStripes_config_jgjmfbpb.json`. Also, note the 'command': field in this config can take a value which is a full path or only the script name, and the batch generator will locate the script (if it is in PATH) and substitute the full path in created batches. Made by CLI_batch_generator.py 2.34.5",
+  "command": "python PNGofRowsOfRandomVerticalColorStripes.py",
+  "depth": "3",
+  "crit_filter": "L",
+  "switches": [
+    {
+      "name": "s",
+      "long_form": "",
+      "short_form": "-s",
+      "is_flag": false,
+      "values": [
+        "The_Plant_Mage_and_The_Mystic.hexplt",
+        "Yum.hexplt"
+      ],
+      "criticality": "H",
+      "required": false,
+      "conflicts_with": []
+    },
+    {
+      "name": "m",
+      "long_form": "",
+      "short_form": "-m",
+      "is_flag": false,
+      "values": [
+        "8",
+        "114"
+      ],
+      "criticality": "M",
+      "required": false,
+      "conflicts_with": []
+    },
+    {
+      "name": "n",
+      "long_form": "",
+      "short_form": "-n",
+      "is_flag": false,
+      "values": [
+        "24",
+        "330"
+      ],
+      "criticality": "M",
+      "required": false,
+      "conflicts_with": []
+    },
+    {
+      "name": "r",
+      "long_form": "",
+      "short_form": "-r",
+      "is_flag": false,
+      "values": [
+        "4",
+        "42"
+      ],
+      "criticality": "M",
+      "required": false,
+      "conflicts_with": []
+    },
+    {
+      "name": "x",
+      "long_form": "",
+      "short_form": "-x",
+      "is_flag": false,
+      "values": [
+        "40",
+        "4020"
+      ],
+      "criticality": "M",
+      "required": false,
+      "conflicts_with": []
+    },
+    {
+      "name": "y",
+      "long_form": "",
+      "short_form": "-y",
+      "is_flag": false,
+      "values": [
+        "80",
+        "2010"
+      ],
+      "criticality": "M",
+      "required": false,
+      "conflicts_with": []
+    },
+    {
+      "name": "o",
+      "long_form": "",
+      "short_form": "-o",
+      "is_flag": false,
+      "values": [
+        "2",
+        "80"
+      ],
+      "criticality": "L",
+      "required": false,
+      "conflicts_with": []
+    },
+    {
+      "name": "p",
+      "long_form": "",
+      "short_form": "-p",
+      "is_flag": false,
+      "values": [
+        "411",
+        "3"
+      ],
+      "criticality": "L",
+      "required": false,
+      "conflicts_with": []
+    },
+    {
+      "name": "d",
+      "long_form": "",
+      "short_form": "-d",
+      "is_flag": false,
+      "values": [
+        "C:\nowhere",
+        "D:\testPalettes"
+      ],
+      "criticality": "L",
+      "required": false,
+      "conflicts_with": []
+    },
+    {
+      "name": "seed",
+      "long_form": "--seed",
+      "short_form": "",
+      "is_flag": false,
+      "values": [
+        "12345"
+      ],
+      "criticality": "L",
+      "required": false,
+      "conflicts_with": []
+    },
+    {
+      "name": "random-variant-interleave",
+      "long_form": "--random-variant-interleave",
+      "short_form": "",
+      "is_flag": true,
+      "values": [],
+      "criticality": "L",
+      "required": false,
+      "conflicts_with": []
+    }
+  ]
+}
