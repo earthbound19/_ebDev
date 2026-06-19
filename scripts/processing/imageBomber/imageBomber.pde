@@ -1,8 +1,8 @@
 // DESCRIPTION
 // Supply images which are all the same dimensions in a subfolder (see USAGE), and this Image Bomber Processing script will randomly position, rotate, and scale them, one after another, as rapidly as you instruct it to, into a new image. Definition sets of images to bomb may be configured in layers. It will optionally save animation images of the process, or interactively save any still which you tell it to, and more. See USAGE.
 
-// NO COPYRIGHT
-// This is my original code and I dedicate it to the Public Domain. 2026-02-06 Richard Alexander Hall
+// PUBLIC DOMAIN DEDICATION
+// This is my original code and I dedicate it to the Public Domain. 2026 Richard Alexander Hall
 
 // USAGE
 // - NOTE that no images are provided with this script "shipped." You must provide a subfolder of images, and set the variable instructing the script what that folder name is, in the global variable. Examine comments provided in the "GLOBAL VARIABLES WHICH YOU MAY ALTER" section for instructions.
@@ -14,25 +14,6 @@
 //  - type the letter 'v'(ariant) to stop rendering the current variant and start a new one
 // See comments in the modifiable GLOBAL VARIANTS area to learn what else this script can do.
 
-// INTEGRATION WITH COLOR PALETTE TOOLS:
-//   This sketch can work with two companion Python scripts:
-//
-//   1. sRGB_palette2palettes_by_perceived_distance_Coloraide_HCT.py
-//      - Sorts existing color palettes by perceptual distance
-//      - Splits into multiple palettes for layered rendering
-//      - Use: python script.py -i your_palette.txt -o output_prefix
-//
-//   2. perceptual_distance_HCT_palette_generator.py
-//      - Generates new colors with specific perceptual distance scores
-//      - Creates gradient palettes from "furthest" to "nearest"
-//      - Use: python script.py -n 5 -c 10 -o ./palettes
-//
-//   The test harness (perceptual_distance_HCT_palette_generator_test.py)
-//   demonstrates the environment variable contract between scripts:
-//     source <(python generator.py --stdin)  # Sets GENERATED_PALETTE
-//
-//   These tools share the same perceptual distance model (40% hue, 35% chroma, 25% tone)
-//   with the specific hue ordering: 106° (yellow) nearest, 107° furthest.
 
 // CODE
 // TO DO:
@@ -43,7 +24,12 @@
 // - behavior update: make it so that with this (and other?) configs:
 //   saveFrames: False, stopAtFrame: -1, exitOnRenderComplete: False, renderVariantsInfinitely: False, saveLastFrameEveryVariant: True, saveLayers: False
 //   -- after a render completes and I'm guessing noLoop() was run, I can't click the still canvas to save the current frame. I don't like a potential fix: make an independent keypress scan loop (infinite timer)?? :/
-
+// WANTED INTEGRATION WITH COLOR PALETTE TOOLS:
+// I would love to extend this script to work with or use resources from companion python scripts in development at this writing:
+// - sRGB_palette2palettes_by_perceived_distance_Coloraide_HCT.py
+// - perceptual_distance_HCT_palette_generator.py
+// - not related to this script, just a dev note: a test script for those, perceptual_distance_HCT_palette_generator_test.py.
+// At this writing those are on a color-experiments branch. Highly subject to change (I'm thinking about using an oklab color space with them instead.)
 
 // BEGIN GLOBAL VARIABLES which you may alter if you know what you're doing:
 JSONObject allImportedJSON;       // intended to store everything imported from JSONconfigFileName
@@ -51,19 +37,19 @@ JSONObject globalsConfigJSON;     // stores JSON global value overrides object e
 JSONArray gridConfigsJSON;        // stores JSON grid config values extracted from allImportedJSONx
 
 // json configuration to load; see the sibling file imageBomberDefaultConfig.json for a complete example of options. Read on for config options and JSON config usage.
-// String JSONconfigFileName = "image_bomber_configs/imageBomberDefaultConfig.json";
+String JSONconfigFileName = "image_bomber_configs/imageBomberDefaultConfig.json";
 // String JSONconfigFileName = "image_bomber_configs/runic_glyphic_folkish.json";
-String JSONconfigFileName = "image_bomber_configs/test.json";
+// String JSONconfigFileName = "image_bomber_configs/test.json";
 // NOTE that all of these below globals have counterpart values you can set in the .json file name assigned to the JSONconfigFileName (and parsed for usage after that). Any variables in that file which are assigned a null value will not have that value used, and the correspoding value assigned below will instead be used. (You must have useful values hard-coded to all the below globals; they function as defaults.) Any variables in the .json config file which are assigned a non-null value (such as an integer or float) will *override* any corresponding values below:
 boolean doSeedOverride = false;    // if set to true, overrideSeed will be used as the random seed for the first displayed variant. Any variants after that -- see renderVariantsInfinitely -- will have a random seed assigned. If doSeedOverride is set to false, a seed will be chosen randomly for the first variant, and also all variants after. Setting doSeedOverride to true with a dedicated value for overrideSeed will result in the same pseudo-randomness and result image for the first variant every time, given the same image resources and grid configurations.
 int overrideSeed = 936942080;   // see notes for doSeedOverride. The seed of the first feature complete version demo output was -289762560. Another early used seed: 936942080
 boolean saveFrames = true;    // set to true to save animation frames (images), false to not save them.
 int frameRate = 60;   // how many frames per second to display changes to art. But if saveFrames is set to true, this is not used: Processing built-in frameRate function will not be called, and therefore the default no max or no throttle framerate will be used.
-boolean useFrameRate = false;  // if set to true, frameRate value will be used via call of Processing built-in function frameRate(n). See also comment for saveFrames.
+boolean useFrameRate = false;  // If saveFrames is false and useFrameRate is true, frameRate value will be used via call of Processing built-in function frameRate(n). See also comment for saveFrames.
 boolean useCustomCanvasSize = true;    // if set to true, customCanvasWidth and customCanvasHeight will define the canvas dimensions. Ff set to false, the full screen size will be detected and used.
 int customCanvasWidth = 1920;  // set to any arbitrary width you want for the complete, composite image. for 1.33 aspect, I suggest 1280.
 int customCanvasHeight = 1080;  // set to any arbitrary height you want for ". for 1.33 aspect, I suggest 960.
-int stopAtFrame = -1;   // Processing program will exit after this many animation frames. If set to a negative number, the program runs forever until you manually stop it. If set to 0 it makes 1 frame regardless, because of the way the draw() and exit() functions work: exit() waits for draw() to finish. 764 may be a good number for this if you use a positive value. NOTES: intended use with this value and a gridIterator class is that the gridIterator keeps making images over cell areas of nested finer grids until stopAtFrame is reached. If stopAtFrame is -1 then a gridIterator will be used until all intended elements in the grid are rendered. After a render completes, other globals control what happens: see notes for exitOnRenderComplete and renderVariantsInfinitely.
+int stopAtFrame = -1;   // Processing program will stop rendering the current variant and trigger the completion handler, after this many animation frames. If set to a negative number, the program runs forever until you manually stop it. If set to 0 it makes 1 frame regardless, because of the way the draw() and exit() functions work: exit() waits for draw() to finish. 764 may be a good number for this if you use a positive value. NOTES: intended use with this value and a gridIterator class is that the gridIterator keeps making images over cell areas of nested finer grids until stopAtFrame is reached. If stopAtFrame is -1 then a gridIterator will be used until all intended elements in the grid are rendered. After a render completes, other globals control what happens: see notes for exitOnRenderComplete and renderVariantsInfinitely.
 boolean exitOnRenderComplete = false;   // causes program to terminate after completion of first variant render, even if renderVariantsInfinitely is set to true
 boolean renderVariantsInfinitely = false;   // causes program to render a new variant after the first one completes, and another after that, ad infinitum.
 boolean saveLastFrameEveryVariant = false;    // causes program to use manualSaveFrame(); for the final frame of every variant. Useful for finding a favorite among many variants. (Including if stopAtFrame causes an early variant render stop.)
@@ -71,7 +57,7 @@ boolean saveLayers = true;    // set to true to enable layer rendering mode - sa
 String layersOutputDir = "";           // will be set automatically with timestamp
 color backgroundColorWithAlpha = color(144,145,145,255);   // alter the three integer RGB values and alpha in that to set the background color. For neutral (as perceived by humans) gray, set all three RGB values to 145.
 
-// color array to randomly select from for fallback vector circles, OR for vector mode:
+// color array for fallback vector circles; used when circlesOverride is true or no images found:
 color[] colorsArray = {
   #FFFFFF, #EDEDED, #DBDCDC, #C9CACA, #B7B7B8, #A3A4A5, #909191,
   #7B7C7D, #656767, #4E5051, #353838, #191B1C,#000000
@@ -80,7 +66,7 @@ color[] colorsArray = {
 // END GLOBAL VARIABLES which you may alter
 
 // GLOBALS NOT TO CHANGE HERE; program logic or the developer may change them in program runs or updates:
-String scriptVersionString = "4-34-21";
+String scriptVersionString = "4-35-26";
 
 String animFramesSaveDir;
 int countedFrames = 0;
@@ -123,38 +109,42 @@ class GridCell {
     yMax = y2;
     centerX = (xMin + xMax) / 2;
     centerY = (yMin + yMax) / 2;
-    active = true; // default to active
+    active = true;
     processed = false;
     elementsDrawn = 0;
 
     // Precompute overshoot/padding boundaries
     if (overshootValue >= 0) {
-      // POSITIVE overshoot: expand outward
-      float expansionFactor = 1.0 + overshootValue;
-      xMinOvershoot = (int) (xMin * expansionFactor);
-      xMaxOvershoot = (int) (xMax * expansionFactor);
-      yMinOvershoot = (int) (yMin * expansionFactor);
-      yMaxOvershoot = (int) (yMax * expansionFactor);
+        // POSITIVE overshoot: expand outward from cell center
+        int cellWidth = xMax - xMin;
+        int cellHeight = yMax - yMin;
+        int overshootPixelsX = (int)(cellWidth * overshootValue / 2);
+        int overshootPixelsY = (int)(cellHeight * overshootValue / 2);
+        
+        xMinOvershoot = xMin - overshootPixelsX;
+        xMaxOvershoot = xMax + overshootPixelsX;
+        yMinOvershoot = yMin - overshootPixelsY;
+        yMaxOvershoot = yMax + overshootPixelsY;
     } else {
-      // NEGATIVE overshoot: create interior padding
-      float paddingPercent = -overshootValue; // Make positive
-      int xPadding = (int) ((xMax - xMin) * paddingPercent / 2);
-      int yPadding = (int) ((yMax - yMin) * paddingPercent / 2);
-
-      xMinOvershoot = xMin + xPadding;
-      xMaxOvershoot = xMax - xPadding;
-      yMinOvershoot = yMin + yPadding;
-      yMaxOvershoot = yMax - yPadding;
-
-      // Ensure we don't invert the range if padding is too large
-      if (xMinOvershoot >= xMaxOvershoot) {
-        xMinOvershoot = xMin;
-        xMaxOvershoot = xMax;
-      }
-      if (yMinOvershoot >= yMaxOvershoot) {
-        yMinOvershoot = yMin;
-        yMaxOvershoot = yMax;
-      }
+        // NEGATIVE overshoot: create interior padding
+        float paddingPercent = -overshootValue;
+        int xPadding = (int)((xMax - xMin) * paddingPercent / 2);
+        int yPadding = (int)((yMax - yMin) * paddingPercent / 2);
+        
+        xMinOvershoot = xMin + xPadding;
+        xMaxOvershoot = xMax - xPadding;
+        yMinOvershoot = yMin + yPadding;
+        yMaxOvershoot = yMax - yPadding;
+        
+        // Ensure we don't invert the range
+        if (xMinOvershoot >= xMaxOvershoot) {
+            xMinOvershoot = xMin;
+            xMaxOvershoot = xMax;
+        }
+        if (yMinOvershoot >= yMaxOvershoot) {
+            yMinOvershoot = yMin;
+            yMaxOvershoot = yMax;
+        }
     }
   }
 }
@@ -185,7 +175,10 @@ class GridIterator {
   int gridX1, gridY1, gridX2, gridY2;
 
   // Previous grid influence controls -- SOME OF THESE WERE RENAMED; previous grid influence used to be referred to as "stickiness:"
-  boolean usePreviousGridInfluence;                  // master switch to enable/disable all previous grid influence
+  boolean usePreviousGridInfluence;                 // Master switch to control grid influence. When true, current grid's rendering is influenced by the previous
+                                                    // grid's cell activity.
+                                                    // - Inactive previous cells: chanceSkipCellWhenBGcell_inactive determines if current cell is skipped entirely
+                                                    // - Active previous cells: renderElementChanceMultiplierWhenBGcellActive multiplies baseRenderElementChance
   float chanceSkipCellWhenBGcell_inactive;   // chance to SKIP ENTIRE CELL when nearest cell in previous grid is INACTIVE
                                           // 0 = never skip, 1 = always skip.     PREVIOUS more confusing variable name: skipStickiness
 
@@ -205,11 +198,11 @@ class GridIterator {
   int heightOfImagesInArrayList;
 
   float skipCellChance;             // if nonzero there is a chance that a cell will be marked inactive.
-  float baseRenderElementChance;    // if nonzero there is a chance that when drawing it will skip drawing an element. PREVIOUSLY more confusingly named skipDrawElementChance.
+  float baseRenderElementChance;    // probability (0.0 to 1.0) that an element will be rendered.  0 = never render, 1 = always render. PREVIOUSLY more confusingly named skipDrawElementChance.
 
   boolean circlesOverride;          // flag to use vector circles instead of images. Overridden to true if images load fails. Circle maximum diameter will be diagonal of cells times an overshoot.
 
-  float elementOvershootMax;        // multiplier for random location range: 1 + overshoot value (converted from JSON input)
+  float elementOvershootMult;        // controls element placement beyond cell boundaries OR via padding in boundary. Positive values expand outward (e.g., 0.15 = 15% overshoot). Negative values create interior padding (e.g., -0.1 = 10% padding inward from cell edges). Raw value from JSON, used directly.
 
   // Cell management
   ArrayList<GridCell> cells;        // list of all cells in this grid
@@ -220,17 +213,20 @@ class GridIterator {
   // Reference to previous grid
   GridIterator previousGrid;
 
-  // a class instance is initialized with a JSON object imported from (by default) imageBomberDefaultConfig.json or any other JSON
-  GridIterator(JSONObject gridJSON) {
-    gridX1 = gridJSON.getInt("gridX1");
-    gridY1 = gridJSON.getInt("gridY1");
-    gridX2 = gridJSON.getInt("gridX2");
-    gridY2 = gridJSON.getInt("gridY2");
+  // a class instance is initialized with a JSON object imported from (by default) imageBomberDefaultConfig.json or any other JSON;
+  // canvasWidth and canvasHeight are needed for adaptive layer dimensions by percent of width or height (gridX1, gridY1, gridX2, and gridY2) :
+  GridIterator(JSONObject gridJSON, int canvasWidth, int canvasHeight) {
+    gridX1 = parseDimension(gridJSON.get("gridX1"), canvasWidth);
+    gridY1 = parseDimension(gridJSON.get("gridY1"), canvasHeight);
+    gridX2 = parseDimension(gridJSON.get("gridX2"), canvasWidth);
+    gridY2 = parseDimension(gridJSON.get("gridY2"), canvasHeight);
     cols = gridJSON.getInt("cols");
     rows = gridJSON.getInt("rows");
-    // Calculate cell dimensions
-    cellWidth = gridX2 / cols;
-    cellHeight = gridY2 / rows;
+    // Calculate cell dimensions from grid boundaries
+    int gridWidth = gridX2 - gridX1;
+    int gridHeight = gridY2 - gridY1;
+    cellWidth = gridWidth / cols;
+    cellHeight = gridHeight / rows;
     minAlpha = gridJSON.getFloat("minAlpha");
     maxAlpha = gridJSON.getFloat("maxAlpha");
     minScaleMultiplier = gridJSON.getFloat("minScale");
@@ -251,6 +247,7 @@ class GridIterator {
     chanceSkipCellWhenBGcell_inactive = 0.234;     // default chance to skip cell; NOTE: if the nearest cell in the previous grid is INACTIVE, this percent chance of skipping the current cell
     renderElementChanceMultiplierWhenBGcellActive = 0.265;       // default multiplier; NOTE: if usePreviousGridInfluence is true AND the nearest cell in the previous grid is ACTIVE, multiplies baseRenderElementChance by this
     // Override previous grid influence variables from JSON if present:
+    scaleToCellSize = true;    // set a default before checking JSON
     if (gridJSON.hasKey("scaleToCellSize") && !gridJSON.isNull("scaleToCellSize")) {
       scaleToCellSize = gridJSON.getBoolean("scaleToCellSize");
     }
@@ -265,13 +262,13 @@ class GridIterator {
     }
     println("Initialized grid " + name + " with renderElementChanceMultiplierWhenBGcellActive = " + renderElementChanceMultiplierWhenBGcellActive);
 
-    if (gridJSON.hasKey("elementOvershootMax") && !gridJSON.isNull("elementOvershootMax")) {
-      float overshootValue = gridJSON.getFloat("elementOvershootMax");
+    if (gridJSON.hasKey("elementOvershootMult") && !gridJSON.isNull("elementOvershootMult")) {
+      float overshootValue = gridJSON.getFloat("elementOvershootMult");
       // Store the raw overshoot value for later use in position calculation
-      elementOvershootMax = overshootValue;
-      println("  elementOvershootMax set to " + overshootValue + " (raw value)");
+      elementOvershootMult = overshootValue;
+      println("  elementOvershootMult set to " + overshootValue + " (raw value)");
     } else {
-      elementOvershootMax = 0.0;    // Default to no overshoot/padding
+      elementOvershootMult = 0.0;    // Default to no overshoot/padding
     }
 
     // initializes members to defaults for a state that's ready to start rendering:
@@ -326,7 +323,7 @@ class GridIterator {
         int x2 = x1 + cellWidth;
         int y1 = gridY1 + r * cellHeight;
         int y2 = y1 + cellHeight;
-        cells.add(new GridCell(c, r, x1, x2, y1, y2, elementOvershootMax));
+        cells.add(new GridCell(c, r, x1, x2, y1, y2, elementOvershootMult));
       }
     }
   // (end of GridIterator class constructor)
@@ -921,6 +918,25 @@ float setFloatFromJSON(float floatToSet, JSONObject configJSON, String fieldName
   }
 }
 
+// Parse dimension value that may be:
+// - An integer: 0 or 1920
+// - A percentage string: "100%" or "-8%"
+int parseDimension(Object value, int canvasSize) {
+    if (value instanceof String) {
+        String str = ((String) value).trim();
+        if (str.endsWith("%")) {
+            float percent = Float.parseFloat(str.substring(0, str.length() - 1)) / 100.0f;
+            return (int)(canvasSize * percent);
+        } else {
+            return Integer.parseInt(str);
+        }
+    } else if (value instanceof Number) {
+        return ((Number) value).intValue();
+    } else {
+        println("WARNING: Could not parse dimension value: " + value);
+        return 0;
+    }
+}
 
 // obtains JSON values from "global_settings" object and, for any of them which do not have a null value, overiddes hard-coded globals in this script with their value from the corresponding JSON object's field; e.g. if the "saveFrames" field is "true" or "false" instead of null, it uses that "true" or "false" value:
 void overrideGlobals() {
@@ -976,7 +992,8 @@ void initGrids() {
   for (int i = 0; i < gridConfigsJSON.size(); i++) {
     try {
       JSONObject gridJSON = gridConfigsJSON.getJSONObject(i);
-      GridIterator grid = new GridIterator(gridJSON);
+      // initializing with width and height globals that are available from canvas:
+      GridIterator grid = new GridIterator(gridJSON, width, height);
       grid_iterators.add(grid);
       println("Created grid: " + gridJSON.getString("name"));
 
@@ -1066,7 +1083,7 @@ void downloadAndExtractImages() {
 
 
 void settings() {
-  pixelDensity(2);    // or (2) for high def/dotpitch screens?
+  pixelDensity(1);    // (1) for standard DPI, or (2) for high def/dotpitch screens?
   // obtains any non-null values from imported JSON config and overrides corresponding globals from them;
   // NOTE that this way, you can for example specify a temporarily used custom canvas size in the JSON config, instead of hard-coding it in this file! :
   overrideGlobals();
@@ -1079,6 +1096,14 @@ void settings() {
 
 
 void setup() {
+  // Allow config path override from command line; if no override, use hard-coded:
+  if (args != null && args.length > 0) {
+      JSONconfigFileName = args[0];
+      println("Using config from command line args[0]: " + JSONconfigFileName);
+  } else {
+      println("Using hard-coded config: " + JSONconfigFileName);
+  }
+
   downloadAndExtractImages();
   imageMode(CENTER);
   prepareNextVariant();
@@ -1109,71 +1134,6 @@ boolean isElementVisible(int xCenter, int yCenter, float elementWidth, float ele
   if (topEdge > height - pad) {return false;}
   // If we passed all checks, element is probably at least partly visible
   return true;
-}
-
-// Unified rendering function that draws to any PGraphics target
-void renderElementToTarget(PGraphics target, GridIterator grid, GridCell cell, float drawAlpha) {
-  // Generate random scale first (needed for visibility check)
-  float width_and_height_scalar = random(grid.minScaleMultiplier, grid.maxScaleMultiplier);
-  float scaled_width = grid.widthOfImagesInArrayList * width_and_height_scalar;
-  float scaled_height = grid.heightOfImagesInArrayList * width_and_height_scalar;
-
-  // Apply squish if enabled (affects width only)
-  if (grid.squishImages) {
-    float widthSquishMultiplier = random(grid.minSquishMultiplier, grid.maxSquishMultiplier);
-    scaled_width *= widthSquishMultiplier;
-  }
-
-  // For visibility check, use the larger dimension to be safe (since rotation could make either dimension matter)
-  float maxElementDimension = max(scaled_width, scaled_height);
-
-  // Find a visible position with overshoot
-  int xCenter, yCenter;
-  int attempts = 0;
-  int maxAttempts = 12; // Prevent infinite loops
-
-  do {
-    // Calculate overshoot range based on cell bounds
-    int xMinOvershoot = (int) (cell.xMin * grid.elementOvershootMax);
-    int xMaxOvershoot = (int) (cell.xMax * grid.elementOvershootMax);
-    int yMinOvershoot = (int) (cell.yMin * grid.elementOvershootMax);
-    int yMaxOvershoot = (int) (cell.yMax * grid.elementOvershootMax);
-
-    // Generate random position within overshoot range
-    xCenter = (int) random(xMinOvershoot, xMaxOvershoot);
-    yCenter = (int) random(yMinOvershoot, yMaxOvershoot);
-
-    attempts++;
-
-    // If we've tried too many times, just use the position (better to render something than infinite loop)
-    if (attempts >= maxAttempts) {
-      println("Warning: Could not find visible position after " + maxAttempts + " attempts");
-      break;
-    }
-  } while (!isElementVisible(xCenter, yCenter, maxElementDimension, maxElementDimension));
-
-  target.pushMatrix();
-  target.translate(xCenter, yCenter);
-
-  float randomRotateDegree = random(grid.minRotation, grid.maxRotation);
-  target.rotate(radians(randomRotateDegree));
-
-  // Draw element (image or circle)
-  if (!grid.circlesOverride) {
-    int rnd_imagesArray_idx = (int) random(0, grid.imagesArrayListLength + 1);
-    target.tint(255, drawAlpha);
-    target.image(grid.allImagesList.get(rnd_imagesArray_idx), 0, 0, scaled_width, scaled_height);
-    target.noTint();
-  } else {
-    int colorIndex = (int) random(0, colorsArray.length);
-    color originalColor = colorsArray[colorIndex];
-    color transparentColor = color(red(originalColor), green(originalColor), blue(originalColor), drawAlpha);
-    target.fill(transparentColor);
-    target.noStroke();
-    target.ellipse(0, 0, scaled_width, scaled_height);
-  }
-
-  target.popMatrix();
 }
 
 // helper for layer mode display
