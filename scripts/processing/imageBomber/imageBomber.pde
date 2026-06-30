@@ -1097,6 +1097,8 @@ void settings() {
 
 void setup() {
   // Allow config path override from command line; if no override, use hard-coded:
+  // TO DO: error handling of config load if possible, because the python script I don't think reports
+  // errors if there are, and it fails and falls back to hard-coded without telling?
   if (args != null && args.length > 0) {
       JSONconfigFileName = args[0];
       println("Using config from command line args[0]: " + JSONconfigFileName);
