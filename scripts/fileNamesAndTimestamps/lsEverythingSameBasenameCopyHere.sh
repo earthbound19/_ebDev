@@ -22,46 +22,43 @@
 #
 #   Does NOT overwrite existing files in the current directory.
 #
+# DEPENDENCIES
+# - everything command-line tool "es.exe" to be installed and in PATH
+#     (https://www.voidtools.com/support/everything/command_line_interface/)
+# - designed for Windows/Cygwin/MSYS2 environments; uses cygpath; might work
+#   in any similar environment that also uses cygpath.
+#
 # USAGE
-#   Copy mode (default):
+#   To run in copy mode, pass no switch
 #     ./lsEverythingSameBasenameCopyHere.sh
 #
-#   Move mode (requires password):
-#     ./lsEverythingSameBasenameCopyHere.sh any_param
-#
-# PARAMETERS
-#   $1 - Optional. Any value triggers move mode. The script will prompt for
-#        a case-sensitive password. If correct, files are MOVED instead of
-#        copied. If incorrect, script exits with error.
-#
-# PASSWORD
-#   Move mode password: SploepShroopp (case-sensitive)
+#   To run in move mode, pass one switch, which is the password SploepShroop:
+#     ./lsEverythingSameBasenameCopyHere.sh SploepShroop
 #
 # NOTES
-#   - Requires Everything command-line tool "es.exe" to be installed and in PATH
-#     (https://www.voidtools.com/support/everything/command_line_interface/)
-#   - Designed for Windows/Cygwin/MSYS2 environments (uses cygpath)
-#   - Skips duplicate basenames within the current directory to avoid redundant
-#     searches (if both file.png and file.jpg exist, only searches for "file" once)
-#   - When multiple files with the same basename exist elsewhere on the system,
-#     the script processes ALL of them (not just the first)
-#   - Files are skipped if they:
-#       * Already exist in the current directory (prevents overwriting)
-#       * Are located in the current directory (would copy/move to itself)
-#   - Uses `cp -n` (no clobber) when in copy mode to prevent overwriting existing files
-#   - Windows thumbnail database files (Thumbs.db) are ignored
+# - Skips pre-existing duplicate basenames within the current directory to avoid
+#   redundantsearches (if both file.png and file.jpg exist, only searches for
+#   "file" once)
+# - When multiple files with the same basename exist elsewhere on the system,
+#   the script processes ALL of them (not just the first)
+# - Files are skipped if they:
+#     * Already exist in the current directory (prevents overwrites clobbers
+#       -- PREVENTS DATA LOSS
+#     * Are located in the current directory (would copy/move to itself)
+# - Uses `cp -n` (no clobber) when in copy mode to prevent overwriting existing files
+# - Windows thumbnail database files (Thumbs.db) are ignored
 #
 # LIMITATIONS
-#   - Designed exclusively for the probably rare pairing of MSYS2 (Windows) and
-#     voidtools Everything search engine, which is also at this writing exclusively
-#     and probably always a Windows tool.
-#   - Does not handle file paths containing newline characters (extremely rare
-#     on Windows and would require es.exe to support null-delimited output)
-#   - Assumes cygpath is available for path conversion
-#   - Case sensitivity in filenames follows Windows conventions (generally
-#     case-insensitive, but the script treats them as case-sensitive)
-#   - If copy/move operation fails (permissions, disk full, etc.), the script
-#     continues with remaining files and reports the failure
+# - Designed exclusively for the probably rare pairing of MSYS2 (Windows) and
+#   voidtools Everything search engine, which is also at this writing exclusively
+#   and probably always a Windows tool.
+# - Does not handle file paths containing newline characters (extremely rare
+#   on Windows and would require es.exe to support null-delimited output)
+# - Assumes cygpath is available for path conversion
+# - Case sensitivity in filenames follows Windows conventions (generally
+#   case-insensitive, but the script treats them as case-sensitive)
+# - If copy/move operation fails (permissions, disk full, etc.), the script
+#   continues with remaining files and reports the failure
 #
 # EXIT CODES
 #   0 - Script completed successfully
@@ -71,22 +68,19 @@
 
 
 # CODE
-# Determine operation mode
+# determine whether to override default MOVE_MODE false to true
 MOVE_MODE=false
-if [ $# -gt 0 ]; then
-    echo "Move mode requested. To continue, please enter the word:"
-	echo "SploepShroopp"
-    read -s password
-    if [ "$password" = "SploepShroopp" ]; then
-        MOVE_MODE=true
-        echo "Password correct. Will MOVE files instead of copying."
-    else
-        echo "ERROR: Incorrect password. Exiting."
-        exit 1
-    fi
+if [ "$1" ] && [ "$1" != "SploepShroop" ]
+then
+	echo "Switch \$1 provided but does not match password SploepShroop; exit."
+	echo MOVE_MODE is $MOVE_MODE
+	exit 1;
+else
+	MOVE_MODE=true
 fi
 
-# Set the operation command based on mode
+# set the operation command based on mode; yes we could have done that in
+# the prior block but this is clearer and more explicit?
 if [ "$MOVE_MODE" = true ]; then
     OPERATION_CMD="mv"
     OPERATION_VERB="Move"
