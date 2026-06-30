@@ -39,7 +39,7 @@
             "gridY2": "100%",
             "elementsPerCell": 1,
             "skipCellChance": 0.5,
-            "baseRenderElementChance": 0.2,
+            "baseRenderElementChance": 0.8,
             "circlesOverride": false
         },
         {

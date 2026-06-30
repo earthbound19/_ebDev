@@ -39,7 +39,7 @@
             "gridY2": "112%",
             "elementsPerCell": 5,
             "skipCellChance": 0,
-            "skipDrawElementChance": 0,
+            "baseRenderElementChance": 1,
             "circlesOverride": false
         },
         {
@@ -63,7 +63,7 @@
             "gridY2": "105%",
             "elementsPerCell": 3,
             "skipCellChance": 0.8,
-            "skipDrawElementChance": 0.6,
+            "baseRenderElementChance": 0.6,
             "circlesOverride": false
         },
         {
@@ -87,7 +87,7 @@
             "gridY2": "103%",
             "elementsPerCell": 3,
             "skipCellChance": 0.87,
-            "skipDrawElementChance": 0.79,
+            "baseRenderElementChance": 0.79,
             "circlesOverride": false
         },
         {
@@ -111,7 +111,7 @@
             "gridY2": "106%",
             "elementsPerCell": 1,
             "skipCellChance": 0.92,
-            "skipDrawElementChance": 0.88,
+            "baseRenderElementChance": 0.88,
             "circlesOverride": false
         },
         {
@@ -135,7 +135,7 @@
             "gridY2": "107%",
             "elementsPerCell": 1,
             "skipCellChance": 0.86,
-            "skipDrawElementChance": 0.81,
+            "baseRenderElementChance": 0.81,
             "circlesOverride": false
         }
     ]

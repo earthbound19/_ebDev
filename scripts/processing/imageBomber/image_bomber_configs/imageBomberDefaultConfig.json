@@ -40,7 +40,6 @@
             "elementsPerCell": 3,
             "skipCellChance": 0,
             "baseRenderElementChance": 1.0,
-            "skipDrawElementChance": 0,
             "circlesOverride": true
         },
         {
@@ -64,8 +63,7 @@
             "gridY2": "108%",
             "elementsPerCell": 3,
             "skipCellChance": 0.66,
-            "baseRenderElementChance": 0.6,     // this comment is RAD, RIGHT??!!!
-            "skipDrawElementChance": 0.6,
+            "baseRenderElementChance": 0.6,
             "circlesOverride": true
         },
         {
@@ -89,8 +87,7 @@
             "gridY2": "108%",
             "elementsPerCell": 3,
             "skipCellChance": 0.77,
-            "baseRenderElementChance": 0.2,
-            "skipDrawElementChance": 0.79,
+            "baseRenderElementChance": 0.79,
             "circlesOverride": true
         },
         {
@@ -114,8 +111,7 @@
             "gridY2": "108%",
             "elementsPerCell": 2,
             "skipCellChance": 0.81,
-            "baseRenderElementChance": 0.3,
-            "skipDrawElementChance": 0.91,
+            "baseRenderElementChance": 0.91,
             "circlesOverride": true
         },
         {
@@ -139,8 +135,7 @@
             "gridY2": "108%",
             "elementsPerCell": 2,
             "skipCellChance": 0.6,
-            "baseRenderElementChance": 0.5,
-            "skipDrawElementChance": 0.81,
+            "baseRenderElementChance": 0.81,
             "circlesOverride": true
         }
     ]
