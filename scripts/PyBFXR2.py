@@ -54,7 +54,13 @@ WAVEFORM OPTIONS:
 
 PITCH OPTIONS:
   --freq-start VALUE      Starting frequency (0.0-1.0, default: random)
+                            overrides freq. min and max as noted below
+  --freq-min VALUE        Minimum frequency for randomization (0.0-1.0, default: 0.0)
+                            only used when --freq-start is not specified
+  --freq-max VALUE        Maximum frequency for randomization (0.0-1.0, default: 1.0)
+                            only used when --freq-start is not specified
   --freq-slide VALUE      Frequency slide (-0.5 to 0.5, default: random)
+                            causes pitch to go up or down over time
 
 ENVELOPE OPTIONS:
   --sustain VALUE         Sustain time (0.0-1.0, default: random)
@@ -72,6 +78,26 @@ BLEND OPTIONS:
   --blend-sine PERCENT    Sine blend percentage (0-100, default: 0)
   --blend-saw PERCENT     Sawtooth blend percentage (0-100, default: 0)
   --blend-freq HZ         Blend frequency in Hz (default: 60)
+
+NOTES:
+- if --freq-start is specified, it ignores --freq-min and --freq-max (fixed frequency)
+- if --freq-start is NOT specified, it randomizes within [freq-min, freq-max]
+- if only one of min/max is specified, the other defaults to 0.0 or 1.0
+- if min > max, they're swapped
+
+Frequency translation:
+freq	Squared     Period (samples)	Frequency (Hz) at 44.1kHz
+0.0     0.0         100000              ~0.44 Hz (inaudible)
+0.1     0.01    	9090	            ~4.85 Hz
+0.2     0.04    	2439	            ~18 Hz
+0.3     0.09        1101            	~40 Hz
+0.4     0.16        621                 ~71 Hz
+0.5     0.25        398                 ~110 Hz
+0.6     0.36        277                 ~159 Hz
+0.7     0.49        203                 ~217 Hz
+0.8     0.64        156                 ~282 Hz
+0.9     0.81        123                 ~358 Hz
+1.0     1.0         99                  ~445 Hz
 """
     print(help_text)
 
@@ -88,7 +114,7 @@ from osc_gen import sig
 from osc_gen import dsp
 
 # Version
-__version__ = "1.0.0"
+__version__ = "1.1.8"
 
 
 # ============================================================================
@@ -365,6 +391,10 @@ def parse_args():
     # Pitch options
     parser.add_argument('--freq-start', type=float, default=None,
                        help='Starting frequency (0.0-1.0)')
+    parser.add_argument('--freq-min', type=float, default=None,
+                       help='Minimum frequency for randomization (0.0-1.0)')
+    parser.add_argument('--freq-max', type=float, default=None,
+                       help='Maximum frequency for randomization (0.0-1.0)')
     parser.add_argument('--freq-slide', type=float, default=None,
                        help='Frequency slide (-0.5 to 0.5)')
     
@@ -416,11 +446,22 @@ def get_params_from_args(args, variation_index=0):
         'spacing': args.spacing,
     }
     
-    # Pitch parameters
+    # Pitch parameters - with min/max support
     if args.freq_start is not None:
+        # Fixed frequency - ignore min/max
         params['freq_start'] = max(0.0, min(1.0, args.freq_start))
     else:
-        params['freq_start'] = random.random() * 0.6 + 0.1
+        # Random frequency within min/max range
+        freq_min = args.freq_min if args.freq_min is not None else 0.0
+        freq_max = args.freq_max if args.freq_max is not None else 1.0
+        # Clamp min/max to valid range
+        freq_min = max(0.0, min(1.0, freq_min))
+        freq_max = max(0.0, min(1.0, freq_max))
+        # Ensure min <= max
+        if freq_min > freq_max:
+            freq_min, freq_max = freq_max, freq_min
+        # Random within range (same distribution as before, just clamped)
+        params['freq_start'] = freq_min + random.random() * (freq_max - freq_min)
     
     if args.freq_slide is not None:
         params['freq_slide'] = max(-0.5, min(0.5, args.freq_slide))
