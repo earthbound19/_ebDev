@@ -10,6 +10,8 @@
 #    decimateFileType.sh png 3
 # Example which will do the same and bypass prompt to delete:
 #    decimateFileType.sh png 3 YORFEL
+# Example which will delete all of the even-numbered count svg files, preserving file #1, #3, #5, and so on (deleting file #2, #4, #6 etc.) :
+#    decimateFileType.sh svg 2 YORFEL
 
 # NOTES
 # - You may wish, after running this script, to run renumberFiles.sh (see the USAGE comment in that script) to make e.g. animation frame numbers in files contiguous again.
