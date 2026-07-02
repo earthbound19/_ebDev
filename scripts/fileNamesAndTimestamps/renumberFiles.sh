@@ -198,7 +198,8 @@ do
 	# Get digits to pad to from length of array, IF no custom digits to pad to were passed.
 	if [ ! $digitsToPadTo ]
 	then
-		digitsToPadTo=${#filesArray[@]}; digitsToPadTo=${#digitsToPadTo}
+		file_count=${#filesArray[@]}
+		digitsToPadTo=${#file_count}
 	fi
 	
 	# FIRST PASS: Build rename map and check for collisions before any renaming
