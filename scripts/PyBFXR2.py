@@ -60,12 +60,27 @@ PITCH OPTIONS:
   --freq-max VALUE        Maximum frequency for randomization (0.0-1.0, default: 1.0)
                             only used when --freq-start is not specified
   --freq-slide VALUE      Frequency slide (-0.5 to 0.5, default: random)
-                            causes pitch to go up or down over time
+  --freq-slide-min VALUE  Minimum frequency slide for randomization (-0.5 to 0.5, default: -0.5)
+                            only used when --freq-slide is not specified
+  --freq-slide-max VALUE  Maximum frequency slide for randomization (-0.5 to 0.5, default: 0.5)
+                            only used when --freq-slide is not specified
 
 ENVELOPE OPTIONS:
   --sustain VALUE         Sustain time (0.0-1.0, default: random)
+  --sustain-min VALUE     Minimum sustain time for randomization (0.0-1.0, default: 0.0)
+                            only used when --sustain is not specified
+  --sustain-max VALUE     Maximum sustain time for randomization (0.0-1.0, default: 1.0)
+                            only used when --sustain is not specified
   --decay VALUE           Decay/release time (0.0-1.0, default: random)
+  --decay-min VALUE       Minimum decay time for randomization (0.0-1.0, default: 0.0)
+                            only used when --decay is not specified
+  --decay-max VALUE       Maximum decay time for randomization (0.0-1.0, default: 1.0)
+                            only used when --decay is not specified
   --punch VALUE           Attack punch (0.0-1.0, default: random)
+  --punch-min VALUE       Minimum punch for randomization (0.0-1.0, default: 0.0)
+                            only used when --punch is not specified
+  --punch-max VALUE       Maximum punch for randomization (0.0-1.0, default: 1.0)
+                            only used when --punch is not specified
 
 EFFECTS OPTIONS:
   --flanger-offset VALUE  Flanger offset (-1.0 to 1.0, default: 0)
@@ -74,16 +89,12 @@ EFFECTS OPTIONS:
   --pitch-jump-amount VALUE  Pitch jump amount (-1.0 to 1.0, default: 0)
   --compression VALUE     Compression amount (0.0-1.0, default: 0)
 
-BLEND OPTIONS:
-  --blend-sine PERCENT    Sine blend percentage (0-100, default: 0)
-  --blend-saw PERCENT     Sawtooth blend percentage (0-100, default: 0)
-  --blend-freq HZ         Blend frequency in Hz (default: 60)
-
 NOTES:
 - if --freq-start is specified, it ignores --freq-min and --freq-max (fixed frequency)
 - if --freq-start is NOT specified, it randomizes within [freq-min, freq-max]
 - if only one of min/max is specified, the other defaults to 0.0 or 1.0
 - if min > max, they're swapped
+- Similar min/max logic applies to --freq-slide, --sustain, --decay, and --punch
 
 Frequency translation:
 freq	Squared     Period (samples)	Frequency (Hz) at 44.1kHz
@@ -114,7 +125,61 @@ from osc_gen import sig
 from osc_gen import dsp
 
 # Version
-__version__ = "1.1.8"
+__version__ = "1.2.28"
+
+# ============================================================================
+# PARAMETER BOUNDS UTILITIES
+# ============================================================================
+
+def get_bounded_parameter(value, min_val, max_val, default=None, bounds=(0.0, 1.0)):
+    """
+    Generalized function to handle parameter bounds with min/max logic.
+    
+    Args:
+        value: The fixed value (if provided, overrides min/max)
+        min_val: Minimum value for randomization
+        max_val: Maximum value for randomization
+        default: Default value if nothing is provided and randomization fails
+        bounds: Tuple of (min_bound, max_bound) for clamping values
+    
+    Returns:
+        float: The parameter value
+        
+    Behavior:
+        - If value is not None: return clamped value (fixed)
+        - If min_val and max_val are both None: return random within full bounds
+        - If min_val is None: use bounds[0] as min, max_val as max
+        - If max_val is None: use min_val as min, bounds[1] as max
+        - If both provided: use them (swapped if min > max)
+        - If default is provided and all else fails: return default
+    """
+    lower_bound, upper_bound = bounds
+    
+    # Fixed value takes precedence
+    if value is not None:
+        return np.clip(value, lower_bound, upper_bound)
+    
+    # Determine min and max with defaults
+    if min_val is None and max_val is None:
+        # Completely random within bounds
+        return lower_bound + random.random() * (upper_bound - lower_bound)
+    
+    # Handle single-sided bounds
+    if min_val is None:
+        min_val = lower_bound
+    if max_val is None:
+        max_val = upper_bound
+    
+    # Clamp to valid range
+    min_val = np.clip(min_val, lower_bound, upper_bound)
+    max_val = np.clip(max_val, lower_bound, upper_bound)
+    
+    # Ensure min <= max
+    if min_val > max_val:
+        min_val, max_val = max_val, min_val
+    
+    # Return random value within range
+    return min_val + random.random() * (max_val - min_val)
 
 
 # ============================================================================
@@ -141,9 +206,6 @@ class BfxrExplosion:
                 - flanger_sweep: float (-1.0 to 1.0)
                 - pitch_jump_speed: float (0.0-1.0)
                 - pitch_jump_amount: float (-1.0 to 1.0)
-                - blend_sine: float (0-100, percentage)
-                - blend_saw: float (0-100, percentage)
-                - blend_freq: float (Hz)
                 - seed: int or None
         """
         self.params = params
@@ -342,8 +404,7 @@ def log_parameters(filename_base, params_list, sound_durations, is_one_shot=Fals
             param_names = [
                 'waveform', 'freq_start', 'freq_slide', 'sustain', 'decay', 
                 'punch', 'flanger_offset', 'flanger_sweep', 'pitch_jump_speed',
-                'pitch_jump_amount', 'compression', 'blend_sine', 'blend_saw', 
-                'blend_freq', 'spacing'
+                'pitch_jump_amount', 'compression', 'spacing'
             ]
             for name in param_names:
                 if name in params:
@@ -397,14 +458,30 @@ def parse_args():
                        help='Maximum frequency for randomization (0.0-1.0)')
     parser.add_argument('--freq-slide', type=float, default=None,
                        help='Frequency slide (-0.5 to 0.5)')
+    parser.add_argument('--freq-slide-min', type=float, default=None,
+                       help='Minimum frequency slide for randomization (-0.5 to 0.5)')
+    parser.add_argument('--freq-slide-max', type=float, default=None,
+                       help='Maximum frequency slide for randomization (-0.5 to 0.5)')
     
     # Envelope options
     parser.add_argument('--sustain', type=float, default=None,
                        help='Sustain time (0.0-1.0)')
+    parser.add_argument('--sustain-min', type=float, default=None,
+                       help='Minimum sustain time for randomization (0.0-1.0)')
+    parser.add_argument('--sustain-max', type=float, default=None,
+                       help='Maximum sustain time for randomization (0.0-1.0)')
     parser.add_argument('--decay', type=float, default=None,
                        help='Decay/release time (0.0-1.0)')
+    parser.add_argument('--decay-min', type=float, default=None,
+                       help='Minimum decay time for randomization (0.0-1.0)')
+    parser.add_argument('--decay-max', type=float, default=None,
+                       help='Maximum decay time for randomization (0.0-1.0)')
     parser.add_argument('--punch', type=float, default=None,
                        help='Attack punch (0.0-1.0)')
+    parser.add_argument('--punch-min', type=float, default=None,
+                       help='Minimum punch for randomization (0.0-1.0)')
+    parser.add_argument('--punch-max', type=float, default=None,
+                       help='Maximum punch for randomization (0.0-1.0)')
     
     # Effects options
     parser.add_argument('--flanger-offset', type=float, default=None,
@@ -418,26 +495,11 @@ def parse_args():
     parser.add_argument('--compression', type=float, default=None,
                        help='Compression amount (0.0-1.0)')
     
-    # Blend options
-    parser.add_argument('--blend-sine', type=float, default=None,
-                       help='Sine blend percentage (0-100)')
-    parser.add_argument('--blend-saw', type=float, default=None,
-                       help='Sawtooth blend percentage (0-100)')
-    parser.add_argument('--blend-freq', type=float, default=60,
-                       help='Blend frequency in Hz (default: 60)')
-    
     return parser.parse_args()
 
 
 def get_params_from_args(args, variation_index=0):
     """Convert CLI arguments to parameter dictionary with randomization"""
-    
-    def rand_or_fixed(value, min_val, max_val, default=None):
-        if value is not None:
-            return value
-        if default is not None:
-            return default
-        return min_val + random.random() * (max_val - min_val)
     
     params = {
         'sample_rate': args.sample_rate,
@@ -446,35 +508,35 @@ def get_params_from_args(args, variation_index=0):
         'spacing': args.spacing,
     }
     
-    # Pitch parameters - with min/max support
+    # Pitch parameters - with min/max support using generalized function
     if args.freq_start is not None:
-        # Fixed frequency - ignore min/max
-        params['freq_start'] = max(0.0, min(1.0, args.freq_start))
+        params['freq_start'] = np.clip(args.freq_start, 0.0, 1.0)
     else:
-        # Random frequency within min/max range
-        freq_min = args.freq_min if args.freq_min is not None else 0.0
-        freq_max = args.freq_max if args.freq_max is not None else 1.0
-        # Clamp min/max to valid range
-        freq_min = max(0.0, min(1.0, freq_min))
-        freq_max = max(0.0, min(1.0, freq_max))
-        # Ensure min <= max
-        if freq_min > freq_max:
-            freq_min, freq_max = freq_max, freq_min
-        # Random within range (same distribution as before, just clamped)
-        params['freq_start'] = freq_min + random.random() * (freq_max - freq_min)
+        params['freq_start'] = get_bounded_parameter(
+            None, args.freq_min, args.freq_max, bounds=(0.0, 1.0)
+        )
     
-    if args.freq_slide is not None:
-        params['freq_slide'] = max(-0.5, min(0.5, args.freq_slide))
-    else:
-        if random.random() < 0.5:
-            params['freq_slide'] = -0.1 + random.random() * 0.4
-        else:
-            params['freq_slide'] = -0.2 - random.random() * 0.2
+    # Frequency slide with bounds
+    params['freq_slide'] = get_bounded_parameter(
+        args.freq_slide, args.freq_slide_min, args.freq_slide_max, 
+        bounds=(-0.5, 0.5)
+    )
     
-    # Envelope parameters
-    params['sustain'] = rand_or_fixed(args.sustain, 0.0, 1.0, 0.3)
-    params['decay'] = rand_or_fixed(args.decay, 0.0, 1.0, 0.5)
-    params['punch'] = rand_or_fixed(args.punch, 0.0, 1.0, 0.5)
+    # Envelope parameters with bounds
+    params['sustain'] = get_bounded_parameter(
+        args.sustain, args.sustain_min, args.sustain_max, 
+        bounds=(0.0, 1.0)
+    )
+    
+    params['decay'] = get_bounded_parameter(
+        args.decay, args.decay_min, args.decay_max, 
+        bounds=(0.0, 1.0)
+    )
+    
+    params['punch'] = get_bounded_parameter(
+        args.punch, args.punch_min, args.punch_max, 
+        bounds=(0.0, 1.0)
+    )
     
     # Effects
     params['flanger_offset'] = args.flanger_offset if args.flanger_offset is not None else 0
@@ -482,11 +544,6 @@ def get_params_from_args(args, variation_index=0):
     params['pitch_jump_speed'] = args.pitch_jump_speed if args.pitch_jump_speed is not None else 0
     params['pitch_jump_amount'] = args.pitch_jump_amount if args.pitch_jump_amount is not None else 0
     params['compression'] = args.compression if args.compression is not None else 0
-    
-    # Blend parameters
-    params['blend_sine'] = args.blend_sine if args.blend_sine is not None else 0
-    params['blend_saw'] = args.blend_saw if args.blend_saw is not None else 0
-    params['blend_freq'] = args.blend_freq
     
     return params
 
