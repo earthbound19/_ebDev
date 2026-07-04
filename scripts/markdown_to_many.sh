@@ -96,6 +96,10 @@
 
 # CODE
 #===============================================================================
+# TO DO:
+# - not look for any style document for HTML documents (generate-md styles them)
+# - smart locate of HTML documents for auto-open (as the HTML ends up in a
+#   subfolder named after the document)
 
 set -e  # Exit on error
 # set -u removed - it causes more problems than it solves with jq and empty arrays
