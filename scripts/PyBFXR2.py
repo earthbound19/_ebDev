@@ -26,6 +26,9 @@ https://www.bfxr.net/ - source: https://github.com/increpare/bfxr2, and:
 https://github.com/increpare/bfxr2/blob/master/js/synths/Bfxr.js
 https://github.com/increpare/bfxr2/blob/master/js/audio/Bfxr_DSP.js
 These last two were referenced in developing this.
+
+SEE ALSO
+This maybe could replace this here script! : https://pyfxr.readthedocs.io/en/stable/generating.html
 """
 
 def print_help():
@@ -60,6 +63,7 @@ PITCH OPTIONS:
   --freq-max VALUE        Maximum frequency for randomization (0.0-1.0, default: 1.0)
                             only used when --freq-start is not specified
   --freq-slide VALUE      Frequency slide (-0.5 to 0.5, default: random)
+                            Positive = pitch slides down, negative = pitch slides up
   --freq-slide-min VALUE  Minimum frequency slide for randomization (-0.5 to 0.5, default: -0.5)
                             only used when --freq-slide is not specified
   --freq-slide-max VALUE  Maximum frequency slide for randomization (-0.5 to 0.5, default: 0.5)
@@ -82,19 +86,42 @@ ENVELOPE OPTIONS:
   --punch-max VALUE       Maximum punch for randomization (0.0-1.0, default: 1.0)
                             only used when --punch is not specified
 
-EFFECTS OPTIONS:
-  --flanger-offset VALUE  Flanger offset (-1.0 to 1.0, default: 0)
+FLANGER OPTIONS:
+  --flanger-offset VALUE  Flanger offset (0.0-1.0, default: random)
+  --flanger-offset-min VALUE  Minimum flanger offset for randomization (0.0-1.0, default: 0.0)
+                            only used when --flanger-offset is not specified
+  --flanger-offset-max VALUE  Maximum flanger offset for randomization (0.0-1.0, default: 1.0)
+                            only used when --flanger-offset is not specified
   --flanger-sweep VALUE   Flanger sweep (-1.0 to 1.0, default: 0)
-  --pitch-jump-speed VALUE  Pitch jump speed (0.0-1.0, default: 0)
+                            Positive = sweep upward, negative = sweep downward
+  --flanger-sweep-min VALUE  Minimum flanger sweep for randomization (-1.0 to 1.0, default: -1.0)
+                            only used when --flanger-sweep is not specified
+  --flanger-sweep-max VALUE  Maximum flanger sweep for randomization (-1.0 to 1.0, default: 1.0)
+                            only used when --flanger-sweep is not specified
+
+PITCH JUMP OPTIONS:
   --pitch-jump-amount VALUE  Pitch jump amount (-1.0 to 1.0, default: 0)
+                            Positive = pitch jumps up, negative = pitch jumps down
+  --pitch-jump-amount-min VALUE  Minimum pitch jump amount (-1.0 to 1.0, default: -1.0)
+                            only used when --pitch-jump-amount is not specified
+  --pitch-jump-amount-max VALUE  Maximum pitch jump amount (-1.0 to 1.0, default: 1.0)
+                            only used when --pitch-jump-amount is not specified
+  --pitch-jump-speed VALUE  Pitch jump speed (0.0-1.0, default: 0)
+                            0 = single jump, 1 = jumps repeat 10 times per second
+  --pitch-jump-speed-min VALUE  Minimum pitch jump speed (0.0-1.0, default: 0.0)
+                            only used when --pitch-jump-speed is not specified
+  --pitch-jump-speed-max VALUE  Maximum pitch jump speed (0.0-1.0, default: 1.0)
+                            only used when --pitch-jump-speed is not specified
+
+EFFECTS OPTIONS:
   --compression VALUE     Compression amount (0.0-1.0, default: 0)
 
 NOTES:
 - if --freq-start is specified, it ignores --freq-min and --freq-max (fixed frequency)
 - if --freq-start is NOT specified, it randomizes within [freq-min, freq-max]
-- if only one of min/max is specified, the other defaults to 0.0 or 1.0
+- if only one of min/max is specified, the other defaults to the bound limit
 - if min > max, they're swapped
-- Similar min/max logic applies to --freq-slide, --sustain, --decay, and --punch
+- Similar min/max logic applies to all parameters with -min/-max variants
 
 Frequency translation:
 freq	Squared     Period (samples)	Frequency (Hz) at 44.1kHz
@@ -125,7 +152,7 @@ from osc_gen import sig
 from osc_gen import dsp
 
 # Version
-__version__ = "1.2.28"
+__version__ = "1.3.20"
 
 # ============================================================================
 # PARAMETER BOUNDS UTILITIES
@@ -202,10 +229,11 @@ class BfxrExplosion:
                 - sustain: float (0.0-1.0)
                 - decay: float (0.0-1.0)
                 - punch: float (0.0-1.0)
-                - flanger_offset: float (-1.0 to 1.0)
+                - flanger_offset: float (0.0-1.0)
                 - flanger_sweep: float (-1.0 to 1.0)
-                - pitch_jump_speed: float (0.0-1.0)
                 - pitch_jump_amount: float (-1.0 to 1.0)
+                - pitch_jump_speed: float (0.0-1.0)
+                - compression: float (0.0-1.0)
                 - seed: int or None
         """
         self.params = params
@@ -231,6 +259,8 @@ class BfxrExplosion:
         
         freq_slide = self.params.get('freq_slide', -0.2)
         # slide = 1.0 - freq_slide^3 * 0.01
+        # Note: positive freq_slide = pitch goes DOWN (period increases)
+        #       negative freq_slide = pitch goes UP (period decreases)
         slide = 1.0 - abs(freq_slide) * abs(freq_slide) * abs(freq_slide) * 0.01
         
         # Get envelope parameters (matching Bfxr's calculations)
@@ -291,22 +321,32 @@ class BfxrExplosion:
         bitnoise_state = 1 << 14
         bitnoise_sample = 0.0  # Initialize with a default value
         
-        # Filter state
-        lp_pos = 0.0
-        lp_delta = 0.0
-        hp_pos = 0.0
-        lp_cutoff = 0.0
-        hp_cutoff = 0.0
+        # Flanger state
+        flanger_buffer = np.zeros(1024)
+        flanger_pos = 0
+        flanger_offset = self.params.get('flanger_offset', 0.0)
+        # Convert 0-1 range to 0-1020 samples delay
+        flanger_delay = flanger_offset * flanger_offset * 1020.0
+        flanger_delay_int = int(flanger_delay)
+        flanger_sweep = self.params.get('flanger_sweep', 0.0)
+        # Positive sweep = increasing delay, negative = decreasing
+        flanger_delta = flanger_sweep * flanger_sweep * flanger_sweep * 0.2
         
-        # Bitcrush state
-        bitcrush_phase = 0.0
-        bitcrush_last = 0.0
+        # Pitch jump state
+        pitch_jump_amount = self.params.get('pitch_jump_amount', 0.0)
+        pitch_jump_speed = self.params.get('pitch_jump_speed', 0.0)
+        # Positive pitch_jump_amount = pitch goes UP (period decreases)
+        # Negative pitch_jump_amount = pitch goes DOWN (period increases)
+        if pitch_jump_amount > 0.0:
+            pitch_jump_multiplier = 1.0 - pitch_jump_amount * pitch_jump_amount * 0.9
+        else:
+            pitch_jump_multiplier = 1.0 + pitch_jump_amount * pitch_jump_amount * 10.0
         
         # Determine waveform type
         waveform = self.params.get('waveform', 'white')
         
         for i in range(total_samples):
-            # Apply slide and acceleration (simplified)
+            # Apply slide
             slide_current += 0.0  # frequency_acceleration would go here
             period = int(period_samples * slide_current)
             if period < 8:
@@ -330,6 +370,38 @@ class BfxrExplosion:
                 # White noise - use noise buffer
                 idx = int((phase * 32 / period)) % 32
                 sample = noise_buffer[idx]
+            
+            # Apply pitch jump
+            if pitch_jump_speed > 0:
+                # Periodic pitch jumps
+                jump_period = int(self.sample_rate / (10.0 * pitch_jump_speed))
+                if i > 0 and i % jump_period == 0:
+                    period = int(period * pitch_jump_multiplier)
+                    if period < 8:
+                        period = 8
+            else:
+                # Single pitch jump at onset
+                if i == int(total_samples * 0.1):  # Jump at 10% into the sound
+                    period = int(period * pitch_jump_multiplier)
+                    if period < 8:
+                        period = 8
+            
+            # Apply flanger
+            if flanger_delay_int > 0:
+                # Update flanger sweep
+                flanger_delay += flanger_delta
+                flanger_delay_int = int(abs(flanger_delay))
+                if flanger_delay_int < 0:
+                    flanger_delay_int = 0
+                if flanger_delay_int > 1023:
+                    flanger_delay_int = 1023
+                
+                # Store sample in flanger buffer
+                flanger_buffer[flanger_pos] = sample
+                # Mix with delayed sample
+                delay_idx = (flanger_pos - flanger_delay_int + 1024) % 1024
+                sample += flanger_buffer[delay_idx]
+                flanger_pos = (flanger_pos + 1) % 1024
             
             # Apply compression
             compression = self.params.get('compression', 0)
@@ -403,8 +475,8 @@ def log_parameters(filename_base, params_list, sound_durations, is_one_shot=Fals
             f.write("\nPARAMETERS:\n")
             param_names = [
                 'waveform', 'freq_start', 'freq_slide', 'sustain', 'decay', 
-                'punch', 'flanger_offset', 'flanger_sweep', 'pitch_jump_speed',
-                'pitch_jump_amount', 'compression', 'spacing'
+                'punch', 'flanger_offset', 'flanger_sweep', 'pitch_jump_amount',
+                'pitch_jump_speed', 'compression', 'spacing'
             ]
             for name in param_names:
                 if name in params:
@@ -483,15 +555,35 @@ def parse_args():
     parser.add_argument('--punch-max', type=float, default=None,
                        help='Maximum punch for randomization (0.0-1.0)')
     
-    # Effects options
+    # Flanger options
     parser.add_argument('--flanger-offset', type=float, default=None,
-                       help='Flanger offset (-1.0 to 1.0)')
+                       help='Flanger offset (0.0-1.0)')
+    parser.add_argument('--flanger-offset-min', type=float, default=None,
+                       help='Minimum flanger offset for randomization (0.0-1.0)')
+    parser.add_argument('--flanger-offset-max', type=float, default=None,
+                       help='Maximum flanger offset for randomization (0.0-1.0)')
     parser.add_argument('--flanger-sweep', type=float, default=None,
                        help='Flanger sweep (-1.0 to 1.0)')
-    parser.add_argument('--pitch-jump-speed', type=float, default=None,
-                       help='Pitch jump speed (0.0-1.0)')
+    parser.add_argument('--flanger-sweep-min', type=float, default=None,
+                       help='Minimum flanger sweep for randomization (-1.0 to 1.0)')
+    parser.add_argument('--flanger-sweep-max', type=float, default=None,
+                       help='Maximum flanger sweep for randomization (-1.0 to 1.0)')
+    
+    # Pitch jump options
     parser.add_argument('--pitch-jump-amount', type=float, default=None,
                        help='Pitch jump amount (-1.0 to 1.0)')
+    parser.add_argument('--pitch-jump-amount-min', type=float, default=None,
+                       help='Minimum pitch jump amount (-1.0 to 1.0)')
+    parser.add_argument('--pitch-jump-amount-max', type=float, default=None,
+                       help='Maximum pitch jump amount (-1.0 to 1.0)')
+    parser.add_argument('--pitch-jump-speed', type=float, default=None,
+                       help='Pitch jump speed (0.0-1.0)')
+    parser.add_argument('--pitch-jump-speed-min', type=float, default=None,
+                       help='Minimum pitch jump speed (0.0-1.0)')
+    parser.add_argument('--pitch-jump-speed-max', type=float, default=None,
+                       help='Maximum pitch jump speed (0.0-1.0)')
+    
+    # Effects options
     parser.add_argument('--compression', type=float, default=None,
                        help='Compression amount (0.0-1.0)')
     
@@ -538,11 +630,29 @@ def get_params_from_args(args, variation_index=0):
         bounds=(0.0, 1.0)
     )
     
-    # Effects
-    params['flanger_offset'] = args.flanger_offset if args.flanger_offset is not None else 0
-    params['flanger_sweep'] = args.flanger_sweep if args.flanger_sweep is not None else 0
-    params['pitch_jump_speed'] = args.pitch_jump_speed if args.pitch_jump_speed is not None else 0
-    params['pitch_jump_amount'] = args.pitch_jump_amount if args.pitch_jump_amount is not None else 0
+    # Flanger parameters with bounds
+    params['flanger_offset'] = get_bounded_parameter(
+        args.flanger_offset, args.flanger_offset_min, args.flanger_offset_max,
+        bounds=(0.0, 1.0)
+    )
+    
+    params['flanger_sweep'] = get_bounded_parameter(
+        args.flanger_sweep, args.flanger_sweep_min, args.flanger_sweep_max,
+        bounds=(-1.0, 1.0)
+    )
+    
+    # Pitch jump parameters with bounds
+    params['pitch_jump_amount'] = get_bounded_parameter(
+        args.pitch_jump_amount, args.pitch_jump_amount_min, args.pitch_jump_amount_max,
+        bounds=(-1.0, 1.0)
+    )
+    
+    params['pitch_jump_speed'] = get_bounded_parameter(
+        args.pitch_jump_speed, args.pitch_jump_speed_min, args.pitch_jump_speed_max,
+        bounds=(0.0, 1.0)
+    )
+    
+    # Compression
     params['compression'] = args.compression if args.compression is not None else 0
     
     return params
