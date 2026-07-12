@@ -39,6 +39,11 @@ OPTIONS:
                             Allow fallback to filesystem timestamps (creation time,
                             then modification time) if no metadata timestamp found.
                             WARNING: Filesystem timestamps can be inaccurate!
+    -b, --bypass-metadata-check
+                            Skip metadata examination entirely and attempt rename using
+                            filesystem timestamps. Enables --allow-rename-by-file-time.
+                            Use this when you know files have no metadata and want
+                            to save processing time by skipping exiftool checks.
     -h, --help              Show this help
 
 EXAMPLES:
@@ -46,6 +51,7 @@ EXAMPLES:
     $PROGNAME --dry-run --verbose video.mp4
     $PROGNAME --no-sidecars document.pdf
     $PROGNAME --allow-rename-by-file-time old_photo.jpg
+    $PROGNAME --bypass-metadata-check old_photo.jpg
 
 EXCLUDE LIST:
     To exclude files from renaming, list them in rename_excludes.txt files.
@@ -75,10 +81,13 @@ EXCLUDE LIST:
 
 NOTES:
     - sidecar discovery is done for ALL files in same directory with matching basename
-	- file system timestamp fallback is an active-opt in option (DISABLED by default)
-	  to prevent inaccurate renaming based unreliable filesystem metadata. To enable
-	  renaming by file system time stamps, pass the switch --allow-rename-by-file-time
-    - rename collisions get suffixes to make unique: -1, -2, etc.
+    - file system timestamp fallback is an active-opt in option (DISABLED by default)
+      to prevent inaccurate renaming based on unreliable filesystem metadata. To enable
+      renaming by file system time stamps, pass the switch --allow-rename-by-file-time,
+	  or use:
+    - --bypass-metadata-check enables renaming by timestamps and skips all exiftool
+	  checks for faster processing
+    - rename collisions get suffixes to make the file names unique: -1, -2, etc.
     - exits with error if new filename exceeds 240 characters
     - logs to rename_by_metadata.log in current directory
     - auto-exclude prevents re-renaming already-processed files
@@ -111,6 +120,7 @@ VERBOSE=false
 NO_SIDECARS=false
 NO_AUTO_EXCLUDE=false
 ALLOW_FS_FALLBACK=false
+BYPASS_METADATA=false
 TARGET_FILE=""
 
 # Color codes for output (if terminal supports)
@@ -521,7 +531,7 @@ rename_with_sidecars() {
 }
 
 # Parse command line arguments
-TEMP=$(getopt -o ydvha --long yes,dry-run,verbose,no-sidecars,no-auto-exclude,allow-rename-by-file-time,help -n "$PROGNAME" -- "$@")
+TEMP=$(getopt -o ydvhab --long yes,dry-run,verbose,no-sidecars,no-auto-exclude,allow-rename-by-file-time,bypass-metadata-check,help -n "$PROGNAME" -- "$@")
 if [ $? != 0 ]; then
     echo "Failed parsing options" >&2
     exit 1
@@ -547,6 +557,11 @@ while true; do
             ALLOW_FS_FALLBACK=true
             shift
             ;;
+        -b|--bypass-metadata-check)
+            BYPASS_METADATA=true
+            ALLOW_FS_FALLBACK=true  # Implicitly enable filesystem fallback
+            shift
+            ;;
         --no-sidecars)
             NO_SIDECARS=true
             shift
@@ -570,6 +585,7 @@ while true; do
     esac
 done
 # echo "DEBUG renameByMetadata.sh: ALLOW_FS_FALLBACK = $ALLOW_FS_FALLBACK" >&2
+# echo "DEBUG renameByMetadata.sh: BYPASS_METADATA = $BYPASS_METADATA" >&2
 
 # Get target file
 if [ $# -eq 0 ]; then
@@ -617,19 +633,28 @@ log "INFO" "Verbose: $VERBOSE"
 log "INFO" "Sidecar handling: $([ "$NO_SIDECARS" = true ] && echo 'disabled' || echo 'enabled')"
 log "INFO" "Auto-exclude: $([ "$NO_AUTO_EXCLUDE" = true ] && echo 'disabled' || echo 'enabled')"
 log "INFO" "Filesystem timestamp fallback: $([ "$ALLOW_FS_FALLBACK" = true ] && echo 'enabled' || echo 'disabled')"
+log "INFO" "Metadata bypass: $([ "$BYPASS_METADATA" = true ] && echo 'enabled' || echo 'disabled')"
 log "INFO" "========================================="
 
 # Get timestamp (metadata first, then filesystem ONLY if allowed)
 TIMESTAMP=""
 
-if TIMESTAMP=$(get_timestamp_from_metadata "$TARGET_FILE"); then
+if [ "$BYPASS_METADATA" = true ]; then
+    log "INFO" "Bypassing metadata check as requested"
+    if TIMESTAMP=$(get_timestamp_from_filesystem "$TARGET_FILE"); then
+        log "INFO" "Using filesystem timestamp: $TIMESTAMP"
+    else
+        log "ERROR" "Could not get filesystem timestamp for $TARGET_FILE"
+        exit 1
+    fi
+elif TIMESTAMP=$(get_timestamp_from_metadata "$TARGET_FILE"); then
     log "INFO" "Using metadata timestamp: $TIMESTAMP"
 elif [ "$ALLOW_FS_FALLBACK" = true ] && TIMESTAMP=$(get_timestamp_from_filesystem "$TARGET_FILE"); then
     log "INFO" "Using filesystem timestamp (fallback): $TIMESTAMP"
 else
     if [ "$ALLOW_FS_FALLBACK" = false ]; then
         log "ERROR" "No metadata timestamp found for $TARGET_FILE"
-        log "ERROR" "Filesystem timestamp fallback is disabled. Use --allow-rename-by-file-time to enable it."
+        log "ERROR" "Filesystem timestamp fallback is disabled. Use --allow-rename-by-file-time or --bypass-metadata-check to enable it."
     else
         log "ERROR" "Could not determine any timestamp for $TARGET_FILE"
     fi

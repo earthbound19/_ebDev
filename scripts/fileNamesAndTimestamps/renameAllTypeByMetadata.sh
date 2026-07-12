@@ -30,6 +30,11 @@ OPTIONS:
                                 Allow fallback to filesystem timestamps (creation time,
                                 then modification time) if no metadata timestamp found.
                                 WARNING: Filesystem timestamps can be inaccurate!
+    -b, --bypass-metadata-check
+                                Skip metadata examination entirely and rename using
+                                filesystem timestamps. Implicitly enables -a.
+                                Use when you know files have no metadata and want
+                                to save processing time.
     -m, --multiprocess-percent-cores FLOAT  
                                 Fraction of CPU cores for parallel processing
                                 (default: 0.6 = 60% of cores)
@@ -45,6 +50,7 @@ EXAMPLES:
     $PROGNAME -t MOV --dry-run               # operate on all MOV files, preview changes (no rename)
     $PROGNAME -t PNG -s --no-sidecars        # skip sidecar detection or rename
     $PROGNAME -t NEF -a                      # allow filesystem timestamp fallback for files without metadata
+    $PROGNAME -t JPG -b                      # bypass metadata, use filesystem timestamps directly
 EOF
 }
 
@@ -59,6 +65,7 @@ PATH_TO_RENAME_BY_METADATA=$(command -v renameByMetadata.sh)
 EXTENSION=""
 SUBDIRECTORIES=false
 ALLOW_FS_FALLBACK=false
+BYPASS_METADATA=false
 PARALLEL_FRACTION="0.6"
 DRY_RUN=false
 VERBOSE=false
@@ -71,8 +78,8 @@ cleanup() {
 }
 trap cleanup SIGINT SIGTERM
 
-# Parse arguments
-OPTS=$(getopt -o ht:sm:adva --long help,type:,subdirectories,multiprocess-percent-cores:,allow-rename-by-file-time,dry-run,verbose,no-sidecars -n "$PROGNAME" -- "$@")
+# Parse arguments - short options: h, t:(requires arg), s, m:(requires arg), a, d, v, b
+OPTS=$(getopt -o ht:sm:advb --long help,type:,subdirectories,multiprocess-percent-cores:,allow-rename-by-file-time,bypass-metadata-check,dry-run,verbose,no-sidecars -n "$PROGNAME" -- "$@")
 if [ $? != 0 ]; then
     echo "Failed parsing options." >&2
     exit 1
@@ -86,6 +93,11 @@ while true; do
         -s|--subdirectories) SUBDIRECTORIES=true; shift ;;
         -a|--allow-rename-by-file-time)
             ALLOW_FS_FALLBACK=true
+            shift
+            ;;
+        -b|--bypass-metadata-check)
+            BYPASS_METADATA=true
+            ALLOW_FS_FALLBACK=true  # Implicitly enable filesystem fallback
             shift
             ;;
         -m|--multiprocess-percent-cores) 
@@ -130,6 +142,7 @@ echo "Dry run: $DRY_RUN"
 echo "Verbose: $VERBOSE"
 echo "Sidecar handling: $([ "$NO_SIDECARS" = true ] && echo 'disabled' || echo 'enabled')"
 echo "Filesystem timestamp fallback: $([ "$ALLOW_FS_FALLBACK" = true ] && echo 'enabled' || echo 'disabled')"
+echo "Metadata bypass: $([ "$BYPASS_METADATA" = true ] && echo 'enabled' || echo 'disabled')"
 echo "========================================="
 
 # Find all target files (preserving relative paths)
@@ -160,6 +173,7 @@ process_one_file() {
         $([ "$VERBOSE" = true ] && echo '-v') \
         $([ "$NO_SIDECARS" = true ] && echo '--no-sidecars') \
         $([ "$ALLOW_FS_FALLBACK" = true ] && echo '-a') \
+        $([ "$BYPASS_METADATA" = true ] && echo '-b') \
         "$file"; then
         echo "[$file] OK" >&2
         return 0
@@ -173,7 +187,7 @@ process_one_file() {
 export -f process_one_file
 # all these exports are actually needed for wonky reasons; if you remove any things may not work as expected.
 # the exported function relies on these exported variables is why.
-export PATH_TO_RENAME_BY_METADATA failures_file ALLOW_FS_FALLBACK DRY_RUN VERBOSE NO_SIDECARS
+export PATH_TO_RENAME_BY_METADATA failures_file ALLOW_FS_FALLBACK BYPASS_METADATA DRY_RUN VERBOSE NO_SIDECARS
 
 # Process files in parallel
 echo "Processing with $parallel_jobs parallel job(s)..."
