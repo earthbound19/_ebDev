@@ -12,7 +12,7 @@ Executes command -c --command (any valid bash command enclosed in double or sing
 # USAGE
 Call this script with these parameters:
 REQUIRED. -c --command, and valid bash command enclosed in double or single quote marks.
-OPTIONAL. -d --depth, an integer, which is how many folders deep to search for folders to execute command -c in. If omitted, defaults to all subfolders under the current directory. If 0, you may as well not use this script and just run a command by itself, as it only operates on the current directory. If 1, it operates on all subfolders one level deep (all folders within the current folder, but not any of their subfolders), and if 2, two levels deep (all folders within those but no deeper), and so on.
+OPTIONAL. -d --depth, an integer, which is how many folders deep to search for folders to execute command -c in. If omitted, defaults to 1, which is all folders within the current directory, but not the folders beneath them. To search subfolders of those subfolders (2 levels down), pass -d2. If passed as 0, you may as well not use this script and just run a command by itself, as it only operates on the current directory. To search all subfolders and all their subfolders to every depth, pass -d-1 (a switch value of negative 1.) NOTE that this is not a bash convention; it's a convention of this script. (Bash convention is to pass nothing for maxdepth if you want infinite depth.)
 OPTIONAL. -s --skip-to-folder-number <integer>, skips the first (s-1) folders and starts executing the command at folder number s (1-indexed). For example, -s 3 would skip folders 1 and 2, and start executing at folder 3. This is useful for resuming interrupted operations.
 
 # NOTE
@@ -35,7 +35,7 @@ if [ $# -eq 0 ]; then
 fi
 
 # The following variable, being empty, is seen by bash as undefined and returns a false check for existance. find searches all subdirectories if you don't specify maxdepth; this variable being undefined results in that default. But if -d --depth, an integer, is passed to this script, it will result in constructing a --maxdepth <value of -d> switch, so that directories are only searched to that depth:
-SUBDIRECTORIES_MAXDEPTH=
+SUBDIRECTORIES_MAXDEPTH=1
 # SKIP_TO_FOLDER_NUMBER defaults to 1 (start at first folder)
 SKIP_TO_FOLDER_NUMBER=1
 # SWITCH PARSING MAY OVERRIDE THAT ^ :
@@ -84,7 +84,7 @@ if [ -z "$COMMAND" ]; then
 fi
 
 # Build find command with -maxdepth if depth was specified
-if [ -n "$SUBDIRECTORIES_MAXDEPTH" ]; then
+if [ -n "$SUBDIRECTORIES_MAXDEPTH" ] && [ "$SUBDIRECTORIES_MAXDEPTH" != "-1" ]; then
     subdirSearchCommand="-maxdepth $SUBDIRECTORIES_MAXDEPTH"
     echo "Searching directories to depth: $SUBDIRECTORIES_MAXDEPTH"
 else
