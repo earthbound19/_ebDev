@@ -5,24 +5,49 @@
 # This code of this script was written almost entirely by an AI in collaboration with a human (yours truly), with breathtaking exactness of what was requested (minus a few minor quickly fixed oversights). The conversation that developed it is at: https://chat.openai.com/share/095b6108-aa38-4687-9521-0b19773625af
 
 # DEPENDENCIES
-# Python with the tkinter library installed, a populated image file list `IMGlistByMostSimilar.txt` (or other file name; see comments of `imgsGetSimilar.sh`), and image files in that list in the same directory also.
+# Python with the tkinter library installed, a populated image file list (default `IMGlistByMostSimilar.txt` or specified with -i), and image files in that list in the same directory also.
 
 # USAGE
-# Call this script from Python with these parameters:
-# - OPTIONAL sys.argv[1] name of a text file which is a list of images. Such a file may be made by `imgsGetSimilar.sh` etc. If omitted, the script defaults to search for `IMGlistByMostSimilar.txt` in the directory your run this from, and assumes that is the list if it finds it. The images in the list file should be in the same directory.
-# For example, to run this script without specifying the file name of the list of image comparisons, and use the default `IMGlistByMostSimilar.txt`:
-#    python /path/to/reduceIMGsimilarAssistant.py
-# Or if your comparison list file is named imageSorting01.txt, run:
-#    python /path/to/reduceIMGsimilarAssistant.py imageSorting01.txt
-# On launch, the script displays the first image in the list, with buttons to advance forward and backward through the list of images or delete them. Use the left arrow key or 'Back' button to navigate up (back) in the list, or the right arrow key or 'Forward' button to navigate forward in the list, and the 'Delete' key or button to move a viewed image into a _discards subfolder. Press F2 to rename the current image.
+# Call this script from Python with these optional parameters:
+#   -i, --image-list FILENAME   Name of a text file which is a list of images. 
+#                               Such a file may be made by `imgsGetSimilar.sh` etc.
+#                               Default: IMGlistByMostSimilar.txt
+#   -r, --resume                Resume navigation from the last viewed image.
+#                               Uses an index file named [basename]_IDX.[ext]
+#   -h, --help                  Show this help message
+#
+# Examples:
+#   # Start from beginning with default list
+#   python reduceIMGsimilarAssistant.py
+#   
+#   # Resume from last position with default list
+#   python reduceIMGsimilarAssistant.py -r
+#   
+#   # Start from beginning with custom list
+#   python reduceIMGsimilarAssistant.py -i mylist.txt
+#   
+#   # Resume from last position with custom list
+#   python reduceIMGsimilarAssistant.py -r -i mylist.txt
+#
+# NOTES
+# - On launch, the script displays the first image in the list (or resumes if -r is used),
+# with buttons to advance forward and backward through the list of images or delete them.
+# - Use the left arrow key or 'Back' button to navigate up (back) in the list, or the right
+# arrow key or 'Forward' button to navigate forward in the list, and the 'Delete' key or
+# button to move a viewed image into a _discards subfolder. Press F2 to rename the current image.
+# - you can hack the image list file to add or remove file names if you keep the format the
+#   same as the program uses it. Same for the image list index file. The image list index
+#   file simply has the file name of the index file on one (the first) line in the file,
+#   surrounding by single quote marks.
+
 
 # CODE
-
 import tkinter as tk
 from tkinter import ttk
 import os
 import sys
 import re
+import argparse
 from PIL import Image, ImageTk
 
 import ctypes
@@ -30,19 +55,64 @@ import ctypes
 if sys.platform == 'win32':
     ctypes.windll.shcore.SetProcessDpiAwareness(2)
 
-if len(sys.argv) > 1:       # positional parameter 1
-    file_list = sys.argv[1]
-    print('\nList file name (parameter 1) passed to script; using that:', file_list)
+# Parse command line arguments
+parser = argparse.ArgumentParser(
+    description='Image similarity reduction assistant - navigate and manage similar images',
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    epilog='''
+Examples:
+  # Start from beginning with default list
+  python reduceIMGsimilarAssistant.py
+  
+  # Resume from last position with default list
+  python reduceIMGsimilarAssistant.py -r
+  
+  # Start from beginning with custom list
+  python reduceIMGsimilarAssistant.py -i mylist.txt
+  
+  # Resume from last position with custom list
+  python reduceIMGsimilarAssistant.py -r -i mylist.txt
+'''
+)
+
+parser.add_argument(
+    '-i', '--image-list',
+    default='IMGlistByMostSimilar.txt',
+    help='Name of the image list file (default: IMGlistByMostSimilar.txt)'
+)
+
+parser.add_argument(
+    '-r', '--resume',
+    action='store_true',
+    help='Resume navigation from the last viewed image using index file'
+)
+
+args = parser.parse_args()
+
+file_list = args.image_list
+resume_mode = args.resume
+
+print(f'\nImage list file: {file_list}')
+if resume_mode:
+    print('Resume mode: ENABLED (will try to resume from last position)')
 else:
-    file_list = "IMGlistByMostSimilar.txt"
-    print('\nNo list file name (parameter 1) passed to script; defaulted to:', file_list)
+    print('Resume mode: DISABLED (starting from first image)')
+
+# Generate index filename from the image list filename
+def get_index_filename(list_filename):
+    """Generate index filename from list filename: [basename]_IDX.[ext]"""
+    base, ext = os.path.splitext(list_filename)
+    return f"{base}_IDX{ext}"
+
+index_file = get_index_filename(file_list)
+print(f'Index file: {index_file}')
 
 # Store the original list filename for later use when saving after deletions
 original_list_file = file_list
 
 # Initialize the main window
 root = tk.Tk()
-root.title("IMGlistByMostSimilar Reduce Assistant (list: " + file_list + ")")
+root.title(f"IMGlistByMostSimilar Reduce Assistant (list: {file_list})")
 
 # Create a frame for the image and navigation buttons
 frame = ttk.Frame(root)
@@ -98,6 +168,56 @@ def update_status(message, is_error=False):
         status_bar.config(foreground="black")
         root.after(5000, lambda: status_var.set("Ready"))
 
+# Helper function to write current position to index file
+def write_index_file(filename):
+    """Write the current filename to the index file, clobbering existing content"""
+    try:
+        with open(index_file, "w") as f:
+            f.write(f"'{filename}'\n")
+        # Don't spam status bar with index writes; they're silent
+    except Exception as e:
+        # Silently fail - don't interrupt user experience
+        print(f"Warning: Could not write index file {index_file}: {e}")
+
+# Helper function to read index file and find resume position
+def get_resume_position():
+    """Read index file and return the index of the resume file, or -1 if not found"""
+    if not os.path.exists(index_file):
+        return -1
+    
+    try:
+        with open(index_file, "r") as f:
+            line = f.readline().strip()
+            if not line:
+                return -1
+            
+            # Extract filename between single quotes
+            match = re.search(r"'([^']+)'", line)
+            if match:
+                resume_filename = match.group(1)
+            else:
+                # If no quotes, use entire line
+                resume_filename = line
+            
+            # Try to find this filename in the image_files list
+            for idx, img_path in enumerate(image_files):
+                if img_path == resume_filename:
+                    return idx
+            
+            # If not found, try normalized comparison
+            normalized_resume = normalize_path(resume_filename)
+            for idx, img_path in enumerate(image_files):
+                if normalize_path(img_path) == normalized_resume:
+                    return idx
+            
+            # File not found in list
+            update_status(f"Warning: Resume file '{resume_filename}' not found in list. Starting from beginning.", is_error=True)
+            return -1
+            
+    except Exception as e:
+        update_status(f"Error reading index file: {e}", is_error=True)
+        return -1
+
 # Load image file list - parse by extracting content between single quotes OR plain filenames
 image_files = []  # Store paths as they appear in the list (relative or absolute)
 with open(original_list_file, "r") as file_handle:
@@ -118,6 +238,23 @@ with open(original_list_file, "r") as file_handle:
             image_files.append(line)
 
 current_index = 0  # Current index of the displayed image
+
+# Determine starting index based on resume mode
+if resume_mode:
+    resume_idx = get_resume_position()
+    if resume_idx >= 0:
+        current_index = resume_idx
+        update_status(f"Resuming from: {image_files[current_index]}")
+        print(f"Resuming from index {current_index}: {image_files[current_index]}")
+    else:
+        current_index = 0
+        # Note: get_resume_position() already shows warning if file not found
+        if not os.path.exists(index_file):
+            update_status("No index file found. Starting from beginning.", is_error=True)
+            print("No index file found. Starting from beginning.")
+else:
+    current_index = 0
+    print("Starting from beginning of list.")
 
 # Function to display the current image
 def display_image(index):
@@ -159,6 +296,9 @@ def display_image(index):
                 image_label.config(image=tk_image)
                 image_label.photo = tk_image
                 image_label.update_idletasks()
+                
+                # Write current position to index file
+                write_index_file(image_path)
                 
                 break
             else:
