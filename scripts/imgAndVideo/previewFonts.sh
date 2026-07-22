@@ -1,3 +1,5 @@
+echo "Sorry, at this writing this seems to not render all intended images, or maybe deletes them. It needs fixup."
+exit
 # DESCRIPTION
 # Renders a phrase to an image using every font file found in the current directory, with a caption that gives the font name. Useful for logo/font prototyping. Caption, point size, and image width are customizable via parameters; see USAGE. The render png is named after the source font file. Will not render to target file name that already exists.
 
@@ -6,7 +8,7 @@
 
 # USAGE
 # Run with these parameters:
-# - $1 OPTIONAL. The string to render font previews from, surrounded in either single or double quotes. (If you want double quotes in this string, surround the whole phrase with single quotes, like this: '"QUOTE MARKS SURROUND OUR SLOGAN!"'. If you want single quotes or apostraphes, surround everything in double quotes. If you want both, you may need to escape the innermost single or double quote with \.) If not provided, the script generates a new string of randomly chosen printable characters for every font preview render image. If you wish to generate a random string but also use the additional optional parameters, pass this as "RANDOM".
+# - $1 OPTIONAL. The string to render font previews from, surrounded in either single or double quotes. (If you want double quotes in this string, surround the whole phrase with single quotes, like this: '"QUOTE MARKS SURROUND OUR SLOGAN!"'. If you want single quotes or apostraphes, surround everything in double quotes. If you want both, you may need to escape the innermost single or double quote with \.) If not provided, the script generates a new string of randomly chosen printable characters for every font preview render image. If you wish to generate a random string but also use the additional optional parameters, pass this as "RANDOM". Also, if you want newlines, encode them as \n, for example to print the phrase "ALL OPPRESSION SHALL CEASE" with newlines instead of spaces, send "ALL\nOPPRESSION\nSHALL\nCEASE"
 # - $2 OPTIONAL. The width of the font preview image, in pixels. If not provided, a default is used.
 # - $3 OPTIONAL. The point size to render the font previews in. If not provided, defaults to a percent of the image width.
 # Example that will render the phrase "COLOR GROWTH color growth" for every font file in the current directory:
