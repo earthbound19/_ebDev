@@ -114,13 +114,13 @@ do
 		new_comparisons=$(( new_comparisons + 1 ))
 		j_count=$(( j_count + 1 ))
 
-		echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
-		echo "MAKING COMPARISON $new_comparisons of remaining comparisons (pair #$pair_counter of $numComparisonsToDo total) . . ."
+		echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-"
+		echo "COMPARISON $new_comparisons OF $numComparisonsToDo . . ."
 # Template GraphicsMagick compare command, re: http://www.ImageMagick.org/Usage/compare/
 # compare -metric MAE img_11.png img_3.png null: 2>&1
 		comp1="$SCALED_SUBDIR/__superShrunkRc6d__$i"
 		comp2="$SCALED_SUBDIR/__superShrunkRc6d__$j"
-		echo "comparing images: $i | $j . . . VIA COMMAND on proxy files for: gm compare -metric MAE $i $j null: 2>&1 | grep 'Total'"
+		echo "$i | $j . . . via proxies comparison command: gm compare -metric MAE $i $j null: 2>&1 | grep 'Total'"
 		metricPrint=`gm compare -metric MAE "$comp1" "$comp2" null: 2>&1 | grep 'Total'`
 		# ODD ERRORS arise from mixed line-ending types, where gm returns windows-style, and printf commands produce Unix-style. Solution: write to separate column files, later (after these nested loop blocks) convert all gm-created files to Unix via dos2unix, then paste them into one file.
 		echo "$metricPrint" >> compare__superShrunkRc6d__col1.txt
