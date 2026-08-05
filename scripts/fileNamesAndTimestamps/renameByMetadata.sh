@@ -1,10 +1,10 @@
 #!/bin/bash
-# renameByMetadata.sh - Rename ONE file using metadata timestamps
-# 
 # DESCRIPTION
 # Renames a single file (and optionally its sidecar files) based on metadata
 # timestamps (DateTimeOriginal or CreateDate) with fallback to filesystem
-# timestamps (creation time, then modification time) ONLY if --allow-rename-by-file-time is specified.
+# timestamps (creation time, then modification time) ONLY if
+# --allow-rename-by-file-time is specified.
+# Renames to format YYYY-MM-DD_HH-MM-SS (ISO 8601-inspired, safe for filenames)
 #
 # By default, filesystem timestamps are NOT used as a fallback to prevent
 # inaccurate renaming based on unreliable filesystem metadata.
@@ -306,7 +306,7 @@ get_timestamp_from_metadata() {
     log "VERBOSE" "Checking exiftool metadata for $file"
     
     # Try CreateDate first, then DateTimeOriginal
-    timestamp=$(exiftool -d "%Y_%m_%d__%H_%M_%S" \
+    timestamp=$(exiftool -d "%Y-%m-%d_%H-%M-%S" \
         -if 'defined $CreateDate' -p '$CreateDate' \
         -else -p '$DateTimeOriginal' \
         "$file" 2>/dev/null | head -1)
@@ -340,8 +340,7 @@ get_timestamp_from_filesystem() {
         local date_part=$(echo "$fs_time" | awk '{print $1}')
         local time_part=$(echo "$fs_time" | awk '{print $2}' | cut -d'.' -f1)
         
-        # Replace hyphens with underscores, colons with underscores
-        timestamp="${date_part//-/_}__${time_part//:/_}"
+        timestamp="${date_part}_${time_part//:/-}"
         log "VERBOSE" "Filesystem timestamp found: $timestamp"
         echo "$timestamp"
         return 0
