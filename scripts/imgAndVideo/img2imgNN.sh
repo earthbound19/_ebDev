@@ -1,5 +1,5 @@
 # DESCRIPTION
-# Resizes an image of type $1, in the current directory, by nearest-neighbor method, to target format $2, with the longest edge scaled up (or down!) to pixels $3. The shortest edge is scaled to maintain aspect, but that can be overriden to change aspect, with $4. Nearest neighbor method will keep hard edges, or look "pixelated." Uses GraphicsMagick, unless the file is ppm or pbm format, in which case it uses IrfanView (which to my knowledge is Windows only). Also updates timestamp of target file to match the source it was converted from, for file by time stamp sorting (or any other) reference.
+# Resizes an image of type $1, in the current directory, by nearest-neighbor method, to target format $2, with the longest edge scaled up (or down!) to pixels $3. The shortest edge is scaled to maintain aspect, but that can be overriden to change aspect, with $4. Nearest neighbor method will keep hard edges, or look "pixelated." Uses GraphicsMagick. Also updates timestamp of target file to match the source it was converted from, for file by time stamp sorting (or any other) reference.
 
 # DEPENDENCIES
 # GraphicsMagick, touch, checkForTerminalProblematicPath.sh
@@ -31,7 +31,8 @@ if [ ! "$3" ]; then printf "\nNo parameter \$3 (scale by nearest neighbor method
 
 # MAIN WORK
 imgFileExt=${srcFileName##*.}
-targetFileName=${srcFileName%.*}.$destFormat
+# Append "$targetLongDim"x"$4" dimension info to the target file name. Besides providing information in the file name this allows for example png to png conversion without skipping because it would clobber the original file:
+targetFileName=${srcFileName%.*}_"$targetLongDim"x"$4".$destFormat
 if [ ! -f $targetFileName ]; then
 			# DEPRECATED: if source file is ppm or pbm, use IrfanView -- graphicsmagick works fine now (if at one point it didn't?) for converting ppm format files.
 			#if [ $imgFileExt == "ppm" ] || [ $imgFileExt == "pbm" ]; then
