@@ -31,7 +31,7 @@ if [ ! "$3" ]; then printf "\nNo parameter \$3 (scale by nearest neighbor method
 
 # MAIN WORK
 imgFileExt=${srcFileName##*.}
-# Append "$targetLongDim"x"$4" dimension info to the target file name. Besides providing information in the file name this allows for example png to png conversion without skipping because it would clobber the original file:
+# Append "$targetLongDim"x"$<optional forced dimension pixels Y>" dimension info to the target file name. Besides providing information in the file name this allows for example png to png conversion without skipping because it would clobber the original file:
 targetFileName=${srcFileName%.*}_"$targetLongDim"x"$4".$destFormat
 if [ ! -f $targetFileName ]; then
 			# DEPRECATED: if source file is ppm or pbm, use IrfanView -- graphicsmagick works fine now (if at one point it didn't?) for converting ppm format files.
