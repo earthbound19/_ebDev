@@ -1,22 +1,29 @@
 # DESCRIPTION
-# Does custom sorting of a file list or a list in the clipboard (the clipboard probably only for MSYS2 / Windows). Intended for Spotify playlist custom reordering, but could be used for other purposes. It does this:
-# - splits a list in a file (e.g. copied and pasted from the UI of a spotify playlist) $1 OR from the clipboard
-# - interleaves the lines of the split files (or clipboard) with the 1st file (A) reversed before interleaving.
-# This results in file A blending in reverse with file B (B still in the order it was). The result file name is  destFileName=${sourceFile%.*}_split_and_rejoined_B_interleaved.txt. If you provide no source file (and use the clipboard) the result is written to fb320fe2_fileList.txt_split_and_rejoined_B_interleaved.txt.
-# If no source file is provided it assumes the list is on the clipboard, and also copies the result back over the clipboard. Otherwise it doesn't copy to the clipboard.
+# Does custom sorting of a file list or a list in the clipboard (the clipboard probably only for MSYS2 / Windows). Intended for Spotify playlist custom reordering, but could be used for other purposes.
+# The process:
+# - Takes a list from a file $1, OR from the clipboard if no source file provided.
+# - Processes the list by removing items one at a time from the start of the list, and distributing them into three component lists (A, B, C) in a repeating 4-step cycle:
+#   1. Append to the end of component A (start of final list)
+#   2. Append to the start of component C (end of final list)
+#   3. Append to the start of component B (middle section)
+#   4. Append to the end of component B (middle section), then reset cycle
+# - When all items have been removed from the source list, it joins list components in order: A + B + C
+# - Assuming a source list sorted by descending valence (highest first), this creates two valence waves, with higher values at the start, end and middle; a three-peak/tent-like distribution.
+# - if it used a file as the source, it writes the result to a file named after the source file, in the format <source file basename>_two_wave_distribution.txt.
+# - if it used the clipboard as the source, it copies the result back to the clipboard, replacing the clipboard.
 
 # USAGE
 # Run with these parameters:
 # - $1 OPTIONAL file name of source list to parse. If not provided, the script assumes you copied the list to the clipboard (MSYS2 only, probably), and works with that.
 # Example using a source file:
-#    split_and_rejoin_interleaved_B_reversed.sh sourceList.txt
+#    three_pole_tent_sort.sh sourceList.txt
 # Example using the clipboard; copy the list to the clipboard, then run this script with no parameter:
-#    split_and_rejoin_interleaved_B_reversed.sh
+#    three_pole_tent_sort.sh
 
 
 # CODE
 # delete temp file names in case they're leftover from broken runs:
-rm part1.txt part2.txt part1_reversedTMP.txt &>/dev/null
+rm part1.txt part2.txt part1_reversedTMP.txt part2_reversedTMP.txt &>/dev/null
 
 # first use of cygwin clipboard functionality in any script; re https://williammitchell.blogspot.com/2008/03/fun-with-cygwins-devclipboard.html
 if [ "$1" ]
@@ -27,36 +34,59 @@ else
 fi
 
 # construct target file name:
-destFileName=${sourceFile%.*}_split_and_rejoined_B_interleaved.txt
+destFileName=${sourceFile%.*}_two_wave_distribution.txt
 
-	# split the source file -- the resulting file names for this command are x00 and x01:
-	# DEPRECATED -- THIS BRAT SPLIT IN THE MIDDLE OF A LINE! :
-	# split --numeric-suffixes=0 -n 2 $sourceFile
+# Read source list into an array
+mapfile -t sourceList < "$sourceFile"
 
-awk 'NR <= (n = int((NR_TOTAL+1)/2)) {print > "part1.txt"; next} {print > "part2.txt"}' NR_TOTAL=$(wc -l < $sourceFile) $sourceFile
+# Initialize component arrays and cycle counter
+componentA=()
+componentB=()
+componentC=()
+cycleIndex=0
 
-# append newline; if there's a trailing line with no newline at the end, tac reads two lines as 1; this works around that:
-printf "\n" >> part1.txt
-printf "\n" >> part2.txt
+# Process each item from the source list
+for item in "${sourceList[@]}"; do
+	# Increment cycle counter (1-4)
+	((cycleIndex++))
+	
+	case $cycleIndex in
+		1)
+			# Append to component A (start of final list)
+			componentA+=("$item")
+			;;
+		2)
+			# Prepend to component C (end of final list)
+			componentC=("$item" "${componentC[@]}")
+			;;
+		3)
+			# Prepend to component B (middle section, before existing B items)
+			componentB=("$item" "${componentB[@]}")
+			;;
+		4)
+			# Append to component B (middle section, after existing B items)
+			componentB+=("$item")
+			# Reset cycle counter
+			cycleIndex=0
+			;;
+	esac
+done
 
-# but then reverse A for our purposes; agh, on disk:
-tac part1.txt > part1_reversedTMP.txt
-
-# make new array from both; this omits any resulting blank lines:
-filenames=($(paste -d '\n' part1_reversedTMP.txt part2.txt ))
+# Join components in order: A + B + C
+finalList=("${componentA[@]}" "${componentB[@]}" "${componentC[@]}")
 
 # only overwrite clipboard if there is no $1 variable (if nothing was passed to the script); otherwise write to file:
 if [ ! "$1" ];
 then
-	printf '%s\n' "${filenames[@]}" > /dev/clipboard
-	# also delete related temp files is clipboard was used:
+	printf '%s\n' "${finalList[@]}" > /dev/clipboard
+	# also delete related temp files if clipboard was used:
 	rm fb320fe2_fileList.txt
 	echo "DONE. Result written to clipboard."
 else
 	# else print that array to dest file:
-	printf '%s\n' "${filenames[@]}" | tr -d '\15\32' > $destFileName
+	printf '%s\n' "${finalList[@]}" | tr -d '\15\32' > $destFileName
 	echo "DONE. Result written to $destFileName"
 fi
 
 # delete temp intermediary files
-rm part1.txt part2.txt part1_reversedTMP.txt
+rm part1.txt part2.txt part1_reversedTMP.txt part2_reversedTMP.txt &>/dev/null
