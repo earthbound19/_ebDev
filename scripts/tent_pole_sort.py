@@ -89,6 +89,8 @@
 
 
 # CODE
+scriptVersionString = "1.0.48"
+
 import argparse
 import os
 import sys
