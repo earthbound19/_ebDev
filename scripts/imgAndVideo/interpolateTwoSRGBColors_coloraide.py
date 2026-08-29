@@ -10,13 +10,13 @@
 
 # USAGE
 # See help information with this command:
-#    interpolateTwoSRGBColors_coloraide.py --help
+#    interpolateSRGBColorsArray_coloraide.py --help
 
 
 # CODE
 # START IMPORTS AND GLOBALS
-ThisScriptVersionString = '1.0.0'
-import argparse, sys
+ThisScriptVersionString = '2.0.0'
+import argparse, sys, re
 from more_itertools import unique_everseen
 # With coloraide, we can import things so that it's specifically set up to convert in a given space:
 #    from coloraide import Color as Base
@@ -43,23 +43,18 @@ like #ff0596.'
 PARSER.register('action', 'versionStringPrint', versionStringPrintAction)
 PARSER.add_argument('-v', '--VERSION', nargs=0, action='versionStringPrint', help='Print version number and exit.')
 # suppress annoying redundant metavar print on help with metavar='' -- but MAYBE ONLY FOR REQUIRED ARGUMENTS? re: https://stackoverflow.com/a/62350140
-PARSER.add_argument('-s', '--START', metavar='\b', required=True, type=str, help=
-'Color to (s)tart interpolation (gradient) from. Must be six sRGB hex digits, \
-for example \'ff0596\' (your terminal may need to surround the parameter with \
-quote marks).'
-)
-PARSER.add_argument('-e', '--END', metavar='\b', required=True, type=str, help=
-'Color to (e)nd interpolation (gradient) with. Must be six sRGB hex digits, \
-for example \'01edfd\' (your terminal may need to surround the parameter with \
-quote marks).'
+PARSER.add_argument('-a', '--ARRAY', metavar='\b', required=True, type=str, help=
+'Array of colors to interpolate between. Must be a list of sRGB hex colors, \
+for example \'[#151B2E, 0E183E, 0A287A, #004FC6, 006FC3, 4DA6E7, #66BEFF]\' \
+(your terminal may need to surround the parameter with quote marks). Array \
+must have at least 2 colors. The script will create sub-gradients between \
+each consecutive pair.'
 )
 PARSER.add_argument('-n', '--NUMBER', metavar='\b', required=True, type=int, help=
-'[Natural number > 2] the (n)umber of colors to create by interpolation. Note \
-that this includes the first and last color. Asking for 5 colors will give \
-you the start color, three colors between it and the end color, and the end \
-color: start + 3 + end = 5. NOTE: if you ask for more colors than it\'s \
-possible to get -n discrete colors for, you\'ll end up with duplicate colors. \
-See -d DEDUPLICATE to fix that.'
+'[Natural number > 2] the (n)umber of colors to create in the final composite \
+gradient. Note that this includes the first and last color. The total number \
+of colors will be divided among the sub-gradients between each pair of colors \
+in the array. The minimum value is (number of colors in array × 2).'
 )
 PARSER.add_argument('-c', '--COLORSPACE', metavar='\b', default='hct', type=str, help=
 'The (c)olorspace through which to interpolate colors. Default \'hct\' if \
@@ -72,20 +67,15 @@ PARSER.add_argument('-l', '--LASTCOLORSREMOVE', metavar='\b', type=int, help=
 before print.\n'
 )
 PARSER.add_argument('-d', '--DEDUPLICATE', action='store_true', help='Remove \
-any duplicate colors before print. See NOTE of -n --NUMBER. Also NOTE: \
-# this may result in fewer colors than you asked for with -n --NUMBER.')
+any duplicate colors within each sub-gradient before combining. See NOTE of \
+-n --NUMBER. Also NOTE: # this may result in fewer colors than you asked for \
+with -n --NUMBER.')
 
 # ARGUMENT PARSING
 ARGS = PARSER.parse_args()
 
 # INIT VALUES FROM ARGS
 INTERPOLATION_COLORSPACE = ARGS.COLORSPACE
-# create sRGB color objects from hex codes
-# This is dumb but could be necessary. If the user passes parameters with leading # symbols, remove them with lstrip . . . and add them back (so there's only 1, not 2 or more # characters):
-START_COLOR = "#" + ARGS.START.strip().lstrip("#")
-START_COLOR = Color(START_COLOR)
-END_COLOR = "#" + ARGS.END.strip().lstrip("#")
-END_COLOR = Color(END_COLOR)
 INTERPOLATION_STEPS = int(ARGS.NUMBER)
 # declare and init this global with default 0; override with argumetn if it is passed:
 N_END_COLORS_REMOVE = 0
@@ -95,46 +85,107 @@ if ARGS.LASTCOLORSREMOVE:
         print('ERROR: parameter -l LASTCOLORSREMOVE <= 0. Must be a positive integer. Exit 1.')
         sys.exit(1)
 
+# Parse and normalize the array of colors
+def parse_color_array(array_str):
+    """Parse a string representation of a color array into a list of normalized hex colors.
+    Handles irregular spacing, missing # prefixes, and extracts 6-digit hex codes."""
+    # Remove brackets and split by commas
+    cleaned = array_str.strip()
+    # Remove outer brackets if present
+    if cleaned.startswith('[') and cleaned.endswith(']'):
+        cleaned = cleaned[1:-1]
+    
+    # Split by commas and clean each part
+    raw_colors = [item.strip() for item in cleaned.split(',') if item.strip()]
+    
+    normalized_colors = []
+    for raw in raw_colors:
+        # Remove any # prefix and whitespace
+        clean = raw.strip().lstrip('#')
+        # Validate it's exactly 6 hex digits
+        if not re.match(r'^[0-9a-fA-F]{6}$', clean):
+            print(f'ERROR: Invalid color format: "{raw}". Must be 6 hex digits (with or without # prefix). Exit 1.')
+            sys.exit(1)
+        normalized_colors.append(clean)
+    
+    return normalized_colors
+
+# Parse the color array
+try:
+    color_hex_list = parse_color_array(ARGS.ARRAY)
+except Exception as e:
+    print(f'ERROR: Failed to parse color array: {e}. Exit 1.')
+    sys.exit(1)
+
+# Validate array has at least 2 colors
+if len(color_hex_list) < 2:
+    print('ERROR: Array must contain at least 2 colors. Exit 1.')
+    sys.exit(1)
+
+# Validate -n is at least (number_of_colors * 2)
+min_steps = len(color_hex_list) * 2
+if INTERPOLATION_STEPS < min_steps:
+    print(f'ERROR: -n NUMBER ({INTERPOLATION_STEPS}) must be at least {min_steps} (2 × number of colors in array). Exit 1.')
+    sys.exit(1)
+
+# Calculate colors per sub-gradient
+num_segments = len(color_hex_list) - 1
+colors_per_segment = INTERPOLATION_STEPS // num_segments
+remainder = INTERPOLATION_STEPS % num_segments
+
+# Create Color objects for each hex color
+color_objects = []
+for hex_color in color_hex_list:
+    # Add # prefix for Color object creation
+    color_objects.append(Color("#" + hex_color))
+
 # REFERENCE:
 # sRGB color convert from/to hex: https://facelessuser.github.io/coloraide/colors/srgb/
 # interpolate through any supported space: https://facelessuser.github.io/coloraide/interpolation/
 # setup for any convert space, or convert through any space: https://github.com/facelessuser/coloraide-extras
 
-#UNUSED REFERENCE: use of hct for direct value create:
-# thing = Color('hct', [27.41, 113.36, 53.237], 1)
-# print(thing)
-#PRIOR, DEPRECATED, nearly equivalently functional method (produced *very slighlty different colors* sometimes;
-#here only for reference, skip on ahead to the AKTUL METHOD comment:
-#interpolate them through HCT space, OR okHSV, or ANY supported space; just change the value assigned to space='<color space name>':
-#i = Color.interpolate([startColor, endColor], space=\"$colorspaceKey\")
-# NOTE that we do ($nColors - 1) here because the interpolation starts with the start color but does not end with the end color; if we want the end color..
-#lerp = [i(x / nColors).to_string() for x in range($nColors - 1)]
-#for element in lerp:
-#    sRGBcolor = Color(element).convert('srgb').to_string(hex=True)
-#    print(sRGBcolor)
-# .. manually print the end color we want:
-#print(\"$endColor\")
-
-# Re: https://facelessuser.github.io/coloraide/interpolation/
-colors = Color.steps(
-	[START_COLOR, END_COLOR],
-	steps=INTERPOLATION_STEPS,
-	space=INTERPOLATION_COLORSPACE,
-	out_space="srgb"
-)
-
-hexColors = []
-for color in colors:
-	hexColors.append(color.to_string(hex=True))
-
-# If asked to an argument to remove duplicate colors (but maintain order), do so:
-if ARGS.DEDUPLICATE:
-    hexColors = list(unique_everseen(hexColors))
+# Generate sub-gradients between each consecutive pair
+all_hex_colors = []
+for i in range(num_segments):
+    start_color = color_objects[i]
+    end_color = color_objects[i + 1]
+    
+    # Calculate steps for this segment
+    steps_for_segment = colors_per_segment
+    # Add remainder to the final segment
+    if i == num_segments - 1:
+        steps_for_segment += remainder
+    
+    # Generate gradient for this segment
+    # Re: https://facelessuser.github.io/coloraide/interpolation/
+    colors = Color.steps(
+        [start_color, end_color],
+        steps=steps_for_segment,
+        space=INTERPOLATION_COLORSPACE,
+        out_space="srgb"
+    )
+    
+    # Convert to hex strings
+    hex_colors = []
+    for color in colors:
+        hex_colors.append(color.to_string(hex=True))
+    
+    # If asked to remove duplicate colors within this segment (but maintain order), do so:
+    if ARGS.DEDUPLICATE:
+        hex_colors = list(unique_everseen(hex_colors))
+    
+    # Strip the last color from all segments except the final one
+    # This prevents duplicate colors at the join points
+    if i < num_segments - 1:
+        hex_colors = hex_colors[:-1]
+    
+    # Add this segment's colors to the overall list
+    all_hex_colors.extend(hex_colors)
 
 # If asked via an argument to remove N colors from the end, do so:
 if N_END_COLORS_REMOVE > 0:
-    del hexColors[- N_END_COLORS_REMOVE:]
+    del all_hex_colors[-N_END_COLORS_REMOVE:]
 
 # Print result, one per line:
-for hexColor in hexColors:
-	print(hexColor)
+for hexColor in all_hex_colors:
+    print(hexColor)
