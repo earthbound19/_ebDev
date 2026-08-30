@@ -144,42 +144,72 @@ for hex_color in color_hex_list:
 # interpolate through any supported space: https://facelessuser.github.io/coloraide/interpolation/
 # setup for any convert space, or convert through any space: https://github.com/facelessuser/coloraide-extras
 
+# Calculate segment targets and distribute remainder evenly
+num_segments = len(color_hex_list) - 1
+base_per_segment = INTERPOLATION_STEPS // num_segments
+remainder = INTERPOLATION_STEPS % num_segments
+
+# Target net line counts per segment (spreads remainder across first R segments)
+net_counts = [
+    base_per_segment + (1 if i < remainder else 0) 
+    for i in range(num_segments)
+]
+
 # Generate sub-gradients between each consecutive pair
 all_hex_colors = []
 for i in range(num_segments):
     start_color = color_objects[i]
     end_color = color_objects[i + 1]
     
-    # Calculate steps for this segment
-    steps_for_segment = colors_per_segment
-    # Add remainder to the final segment
-    if i == num_segments - 1:
-        steps_for_segment += remainder
+    # Add +1 raw step to intermediate segments to offset hex_colors[:-1] trimming
+    steps_to_request = net_counts[i] + (1 if i < num_segments - 1 else 0)
     
     # Generate gradient for this segment
-    # Re: https://facelessuser.github.io/coloraide/interpolation/
     colors = Color.steps(
         [start_color, end_color],
-        steps=steps_for_segment,
+        steps=steps_to_request,
         space=INTERPOLATION_COLORSPACE,
-        out_space="srgb"
+        out_space="srgb",
+        max_steps=None  # Overrides ColorAide's 1000-step default clamp
     )
-    
+
+    # === Capture ColorAide feedback ===
+    import warnings
+
+    # debug function that saved a problem in development; commented out for production:
+    # def log_segment_info(segment_idx, requested, returned, start_hex, end_hex):
+        # """Log segment interpolation details to stderr for debugging."""
+        # msg = f"[Segment {segment_idx}] Requested {requested} steps, got {len(returned)}"
+        # if len(returned) != requested:
+            # msg += f" ! MISMATCH!"
+        # msg += f" | {start_hex} > {end_hex}"
+        # if len(returned) > 0:
+            # msg += f" | first: {returned[0].to_string(hex=True)}, last: {returned[-1].to_string(hex=True)}"
+        # print(msg, file=sys.stderr)
+
+    # Inside the generation loop, after Color.steps():
+    colors = Color.steps(
+        [start_color, end_color],
+        steps=steps_to_request,
+        space=INTERPOLATION_COLORSPACE,
+        out_space="srgb",
+        max_steps=None
+    )
+
+    # Log what ColorAide actually did with an interpolation request; comment out for production:
+    # log_segment_info(i, steps_to_request, colors, start_color.to_string(hex=True), end_color.to_string(hex=True))
+
     # Convert to hex strings
-    hex_colors = []
-    for color in colors:
-        hex_colors.append(color.to_string(hex=True))
+    hex_colors = [color.to_string(hex=True) for color in colors]
     
-    # If asked to remove duplicate colors within this segment (but maintain order), do so:
+    # Optional deduplication within segment
     if ARGS.DEDUPLICATE:
         hex_colors = list(unique_everseen(hex_colors))
     
-    # Strip the last color from all segments except the final one
-    # This prevents duplicate colors at the join points
+    # Strip boundary join point on all intermediate segments
     if i < num_segments - 1:
         hex_colors = hex_colors[:-1]
     
-    # Add this segment's colors to the overall list
     all_hex_colors.extend(hex_colors)
 
 # If asked via an argument to remove N colors from the end, do so:
