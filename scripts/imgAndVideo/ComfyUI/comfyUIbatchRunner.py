@@ -15,8 +15,7 @@ DESCRIPTION:
     randomizes seeds, and sends each combination to a running ComfyUI server.
 
 ADVANCED FEATURES
-    The script always runs in a distributed architecture with a shared state file,
-    supporting any number of ComfyUI hosts from 1 to N:
+    The script always runs in a distributed architecture with a shared state file, supporting any number of ComfyUI hosts from 1 to N:
     
     - Single host: One worker thread processes renders sequentially
     - Multiple hosts: One worker thread per host processes renders in parallel
