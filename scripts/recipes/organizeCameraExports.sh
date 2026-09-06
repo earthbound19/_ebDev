@@ -1,7 +1,7 @@
 # DESCRIPTION
 # Organizes exported media files (e.g. from cameras and devices), using other scripts, this way:
 #    - renames various common camera/device media file extensions to lowercase
-# WE INTERRUPTE THIS DOCUMENTATION FOR A SPECIAL UPDATE: everything after that point is at this writing skipped. See comments in the script under "ALL THE BELOW IS DEPRECATED".
+# WE INTERRUPT THIS DOCUMENTATION FOR A SPECIAL UPDATE: everything after that point is at this writing skipped. See comments in the script under "ALL THE BELOW IS DEPRECATED".
 #    - renames files after metadata date
 #    - renames all .jpeg file extensions to .jpg (including doing this after optional thumbnail extraction, where dcraw extracts thumbnails as .jpeg files)
 # For the following optional features, search for comments with "uncomment" instructions:
