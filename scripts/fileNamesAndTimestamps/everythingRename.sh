@@ -95,5 +95,5 @@ printf "\nDONE with everythingRename.sh run. Logged in file $renameLog."
 # additional feedback print if things were done in preview mode (no $4 YOINK parameter) :
 if [ ! "$4" == "YOINK" ]
 then
-	printf '\nParameter 4 was incorrect. "Renames" performed were a preview of what could be done, and were in logs also. See USAGE comments in script.'
+	printf '\nParameter 4, password "YOINK" was not passed. Presented renames were a preview of what would be done if that password to confirm renames was given. Logs also reflect this. See USAGE comments in script.'
 fi
