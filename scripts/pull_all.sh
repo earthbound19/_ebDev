@@ -22,12 +22,38 @@ autobrood
 )
 
 parent_directory=$(pwd)
-for directory in ${repo_directories[@]}
+error_count=0
+
+for directory in "${repo_directories[@]}"
 do
-	cd $directory
-	thisDir=$(pwd)
-	printf "\n\nSyncing local git repo $thisDir with remote. . .\n"
-	git pull
-	git fetch --prune
-	cd $parent_directory
+    # Check if directory exists before trying to cd
+    if [ ! -d "$directory" ]; then
+        echo "ERROR: Directory '$directory' not found in $(pwd) - skipping"
+        error_count=$((error_count + 1))
+        continue
+    fi
+    
+	cd "$directory"
+    thisDir=$(pwd)
+    printf "\n\nSyncing local git repo $thisDir with remote. . .\n"
+    
+    # Check if it's actually a git repo before running git commands
+    if [ -d ".git" ]; then
+        git fetch --prune
+		git-cleanup.sh
+    else
+        echo "WARNING: '$thisDir' is not a git repository - skipping"
+        error_count=$((error_count + 1))
+    fi
+    
+    cd $parent_directory
 done
+
+# Final summary
+if [ $error_count -gt 0 ]; then
+    echo ""
+    echo "Completed with $error_count error(s)"
+else
+    echo ""
+    echo "All repositories synced successfully"
+fi
