@@ -34,3 +34,4 @@ test_results.csv
 *.conf
 suite_*
 *.pkl
+.clinerules
