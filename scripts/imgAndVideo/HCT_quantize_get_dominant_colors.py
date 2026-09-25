@@ -11,7 +11,7 @@
 # - Chroma (0-145): Perceptual colorfulness/saturation from CAM16
 # - Tone (0-100): Perceptual lightness from CIELAB D65
 #
-# HCT provides more perceptually uniform results than RGB clustering,
+# HCT provides a more perceptually informed representation than RGB clustering,
 # meaning the extracted colors will better represent what humans perceive
 # as the "dominant" colors in an image. This implementation uses the proper
 # HCT color space from Coloraide (CAM16 hue/chroma + CIELAB tone).
@@ -164,6 +164,9 @@
 #   # Sample pixels for faster processing on very large images
 #   python HCT_quantize_get_dominant_colors.py -i photo.jpg -s
 #
+#   # Reproduce random sampling and clustering exactly
+#   python HCT_quantize_get_dominant_colors.py -i photo.jpg --random-seed 1234
+#
 #   # Show this help message
 #   python HCT_quantize_get_dominant_colors.py --help
 #
@@ -191,7 +194,7 @@
 #   (e.g., 4K+), use -s to sample up to 1.33M pixels for faster performance.
 # - Adaptive extreme detection (--capture-extremes) adds processing time but may capture
 #   outlier colors at perceptual extremes: most/least vibrant (chroma), most/least bright (tone),
-#   or hues that are sparsely represented in the image (bottom 10% of hue bins)
+#   or hue bins that are sparsely represented in the image (bottom 10% by bin population)
 # - Auto preset (--preset auto) uses hierarchical clustering to discover natural perceptual groups
 #   The number of output colors is determined by the natural groups (at least 1 per group).
 #   The --numbercolors value is treated as a minimum; actual output may be larger.
@@ -201,6 +204,8 @@
 # - Auto preset caches dendrograms in .color_quantize_cache/ directory next to the source image.
 #   Use --no-cache to force recomputation.
 # - Auto preset ignores --capture-extremes (grouping is data-driven)
+# - --random-seed controls random pixel sampling and k-means initialization for reproducible runs
+# - Palette output includes population percentage, within-cluster spread, and selection reason
 
 # CODE
 # Script version
@@ -208,7 +213,7 @@
 # - Oklch variant: it may have less purple bias (HCT has that); maybe better hue linearity and uniformity. It may subtly cluster colors differently near the boundary of what sRGB (a typical monitor) can display. Although some sources argue HCT has better overal perceptual uniformity for predicting color differences; Oklch gives cleaner hue behavior (especially for blues/purples), while HCT might feel more "balanced" overall in how it perceives differences across all colors.
 # - Oklab (Cartesian) variant: it may give a fundamentally different "feel" - more even-handed across all colors, potentially less vibrant palettes, but more "honest" about the distribution.
 
-SCRIPT_VERSION = "4.2.46"
+SCRIPT_VERSION = "4.3.0"
 
 import argparse
 import sys
@@ -287,8 +292,9 @@ def process_chunk_rgb_to_hct(args):
             h, c, t = color_hct.coords()
             hct_values.append([h, c, t])
         except Exception:
-            # If conversion fails, append a default (black in HCT)
-            hct_values.append([0.0, 0.0, 0.0])
+            # Preserve conversion failures as invalid values so they can be tracked
+            # and filtered without silently turning them into black pixels.
+            hct_values.append([np.nan, np.nan, np.nan])
     
     return np.array(hct_values, dtype=np.float32)
 
@@ -326,44 +332,47 @@ def calculate_feature_weights(hue_weight=1.0, chroma_weight=1.0, tone_weight=1.0
         tone_weight          # tone
     ])
 
-def create_features(pixels_hct):
+def create_features(pixels_hct, return_valid_indices=False):
     """
     Convert HCT pixels to feature space for clustering.
-    Includes validation to filter out invalid values.
+
+    When return_valid_indices is True, also return the indices of the input
+    rows represented by the returned features. This keeps feature rows aligned
+    with source pixels when invalid values are filtered.
     """
-    # First, check for any invalid input
-    if np.any(~np.isfinite(pixels_hct)):
-        invalid_count = np.sum(~np.isfinite(pixels_hct))
-        print(f"  Warning: Found {invalid_count} invalid HCT values, filtering...")
-        # Keep only rows where all three values are finite
-        valid_mask = np.all(np.isfinite(pixels_hct), axis=1)
+    pixels_hct = np.asarray(pixels_hct)
+    valid_mask = np.all(np.isfinite(pixels_hct), axis=1)
+    valid_indices = np.flatnonzero(valid_mask)
+
+    if len(valid_indices) != len(pixels_hct):
+        invalid_count = len(pixels_hct) - len(valid_indices)
+        print(f"  Warning: Found {invalid_count} invalid HCT pixels, filtering...")
         pixels_hct = pixels_hct[valid_mask]
-        if len(pixels_hct) == 0:
-            raise ValueError("No valid pixels after filtering - all HCT values were invalid")
-        print(f"  Filtered to {len(pixels_hct):,} valid pixels")
-    
-    # Convert hue to radians for sin/cos encoding
+
+    if len(pixels_hct) == 0:
+        raise ValueError("No valid pixels after filtering - all HCT values were invalid")
+
     hue_rad = np.radians(pixels_hct[:, 0])
-    
-    # Create features: sin(hue), cos(hue), normalized chroma, normalized tone
+
     features = np.column_stack([
         np.sin(hue_rad),
         np.cos(hue_rad),
-        pixels_hct[:, 1] / 145.0,  # Normalize chroma to 0-1 (max ~145)
-        pixels_hct[:, 2] / 100.0    # Normalize tone to 0-1 (max 100)
+        pixels_hct[:, 1] / 145.0,
+        pixels_hct[:, 2] / 100.0
     ])
-    
-    # Final check for NaN or Inf in features
-    if np.any(~np.isfinite(features)):
-        nan_count = np.sum(~np.isfinite(features))
-        print(f"  Warning: Features contain {nan_count} non-finite values after conversion")
-        # Filter out rows with any non-finite values
-        valid_mask = np.all(np.isfinite(features), axis=1)
-        features = features[valid_mask]
-        if len(features) == 0:
-            raise ValueError("No valid features after filtering - cannot proceed")
-        print(f"  Filtered to {len(features):,} valid feature rows")
-    
+
+    feature_mask = np.all(np.isfinite(features), axis=1)
+    if not np.all(feature_mask):
+        invalid_count = np.sum(~feature_mask)
+        print(f"  Warning: Found {invalid_count} invalid feature rows, filtering...")
+        features = features[feature_mask]
+        valid_indices = valid_indices[feature_mask]
+
+    if len(features) == 0:
+        raise ValueError("No valid features after filtering - cannot proceed")
+
+    if return_valid_indices:
+        return features, valid_indices
     return features
 
 def reconstruct_hct(centers_features):
@@ -375,6 +384,25 @@ def reconstruct_hct(centers_features):
     centers_hct[:, 1] = np.clip(centers_hct[:, 1], 0, 145)
     centers_hct[:, 2] = np.clip(centers_hct[:, 2], 0, 100)
     return centers_hct
+
+def analyze_kmeans_clusters(pixels_hct, kmeans, features, centers_hct, total_population_pixels=None, population_hct=None):
+    """Return population and diversity metadata for k-means palette centers."""
+    labels = kmeans.labels_
+    n_clusters = len(centers_hct)
+    populations = np.bincount(labels, minlength=n_clusters)
+    metadata = []
+    source_pixels = pixels_hct
+    denominator = len(source_pixels) if total_population_pixels is None else total_population_pixels
+
+    for i in range(n_clusters):
+        cluster_pixels = source_pixels[labels == i]
+        metadata.append({
+            "population": int(populations[i]),
+            "population_denominator": int(denominator),
+            "diversity": float(measure_group_diversity(cluster_pixels)),
+            "reason": "cluster-representative"
+        })
+    return metadata
 
 def measure_group_diversity(group_pixels):
     """
@@ -389,11 +417,14 @@ def measure_group_diversity(group_pixels):
     distances = np.linalg.norm(features - centroid, axis=1)
     return np.mean(distances)
 
-def hybrid_sample(pixels_hct, total_pixels, target_samples, random_ratio=0.81):
+def hybrid_sample(pixels_hct, total_pixels, target_samples, random_ratio=0.81, rng=None):
     """
     Hybrid sampling combining random and grid sampling.
     Returns sampled pixels as array.
     """
+    if rng is None:
+        rng = np.random.default_rng()
+
     n_random = int(target_samples * random_ratio)
     n_grid = target_samples - n_random
     
@@ -405,12 +436,12 @@ def hybrid_sample(pixels_hct, total_pixels, target_samples, random_ratio=0.81):
     remaining_mask = np.ones(total_pixels, dtype=bool)
     remaining_mask[grid_indices] = False
     remaining_indices = np.arange(total_pixels)[remaining_mask]
-    random_indices = np.random.choice(remaining_indices, n_random, replace=False)
+    random_indices = rng.choice(remaining_indices, n_random, replace=False)
     
     indices = np.sort(np.concatenate([grid_indices, random_indices]))
     return pixels_hct[indices]
 
-def get_cache_filename(input_path, max_samples, random_ratio):
+def get_cache_filename(input_path, max_samples, random_ratio, random_seed=42):
     """Generate a descriptive cache filename in the global cache directory."""
     cache_dir = get_cache_dir()
     
@@ -419,7 +450,7 @@ def get_cache_filename(input_path, max_samples, random_ratio):
     base = base.replace(' ', '_')
     
     r_percent = int(round(random_ratio * 100))
-    param_str = f"a{max_samples}_r{r_percent}"
+    param_str = f"a{max_samples}_r{r_percent}_s{random_seed}"
     
     filename = f"{base}_{param_str}_dendrogram.pkl"
     return os.path.join(cache_dir, filename)
@@ -435,11 +466,11 @@ def get_hct_cache_path(input_path):
     filename = f"{base}_hct_cache.pkl"
     return os.path.join(cache_dir, filename)
 
-def debug_cache_paths(input_path, auto_samples, random_ratio):
+def debug_cache_paths(input_path, auto_samples, random_ratio, random_seed=42):
     """Print detailed cache file paths for debugging."""
     cache_dir = get_cache_dir()
     hct_cache = get_hct_cache_path(input_path)
-    dendrogram_cache = os.path.join(cache_dir, get_cache_filename(input_path, auto_samples, random_ratio))
+    dendrogram_cache = os.path.join(cache_dir, get_cache_filename(input_path, auto_samples, random_ratio, random_seed))
     
     print(f"\n  DEBUG: Cache directory: {cache_dir}")
     print(f"  DEBUG: Expected HCT cache: {hct_cache}")
@@ -454,11 +485,11 @@ def debug_cache_paths(input_path, auto_samples, random_ratio):
             if f.endswith('.pkl'):
                 print(f"    - {f}")
 
-def check_caches_exist(input_path, auto_samples, random_ratio):
+def check_caches_exist(input_path, auto_samples, random_ratio, random_seed=42):
     """Check if both HCT and dendrogram caches exist for an image.
     Automatically deletes corrupted HCT caches."""
     hct_cache = get_hct_cache_path(input_path)
-    dendrogram_cache = os.path.join(get_cache_dir(), get_cache_filename(input_path, auto_samples, random_ratio))
+    dendrogram_cache = os.path.join(get_cache_dir(), get_cache_filename(input_path, auto_samples, random_ratio, random_seed))
     
     hct_exists = os.path.exists(hct_cache)
     dendro_exists = os.path.exists(dendrogram_cache)
@@ -468,8 +499,8 @@ def check_caches_exist(input_path, auto_samples, random_ratio):
         try:
             with open(hct_cache, 'rb') as f:
                 hct_data = pickle.load(f)
-            if np.any(~np.isfinite(hct_data)):
-                print(f"  Warning: HCT cache contains invalid values, deleting...")
+            if not isinstance(hct_data, np.ndarray) or hct_data.ndim != 2 or hct_data.shape[1] != 3:
+                print(f"  Warning: HCT cache has an invalid shape, deleting...")
                 os.remove(hct_cache)
                 hct_exists = False
         except Exception as e:
@@ -485,20 +516,20 @@ def load_hct_from_cache(input_path):
     with open(cache_file, 'rb') as f:
         pixels_hct = pickle.load(f)
     
-    # Validate loaded data
-    if np.any(~np.isfinite(pixels_hct)):
-        invalid_count = np.sum(~np.isfinite(pixels_hct))
-        raise ValueError(f"HCT cache contains {invalid_count} invalid values. Delete the cache file and re-run with source image.")
-    
+    # Preserve invalid rows so their positions remain aligned with the source image.
+    # Feature creation will filter them when clustering.
+    invalid_count = np.sum(~np.all(np.isfinite(pixels_hct), axis=1))
+    if invalid_count:
+        print(f"  Warning: HCT cache contains {invalid_count:,} invalid rows; they will be excluded from clustering")
     return pixels_hct
 
-def load_or_convert_hct(pixels_rgb, input_path, cores_to_use, chunk_size, auto_samples=54000, random_ratio=0.81):
+def load_or_convert_hct(pixels_rgb, input_path, cores_to_use, chunk_size, auto_samples=54000, random_ratio=0.81, random_seed=42):
     """
     Load cached HCT values or convert and cache.
     Returns pixels_hct array.
     """
     cache_file = get_hct_cache_path(input_path)
-    dendrogram_cache = os.path.join(get_cache_dir(), get_cache_filename(input_path, auto_samples, random_ratio))
+    dendrogram_cache = os.path.join(get_cache_dir(), get_cache_filename(input_path, auto_samples, random_ratio, random_seed))
     
     # Check for valid cache
     if os.path.exists(cache_file):
@@ -507,16 +538,17 @@ def load_or_convert_hct(pixels_rgb, input_path, cores_to_use, chunk_size, auto_s
             with open(cache_file, 'rb') as f:
                 pixels_hct = pickle.load(f)
             
-            if np.any(~np.isfinite(pixels_hct)):
-                invalid_count = np.sum(~np.isfinite(pixels_hct))
-                print(f"  Warning: Cache contains {invalid_count} invalid values.")
-                print(f"  Deleting both HCT and dendrogram caches to force clean regeneration...")
-                os.remove(cache_file)
+            if len(pixels_hct) != len(pixels_rgb):
+                print(f"  Warning: HCT cache contains {len(pixels_hct):,} pixels but current image requires {len(pixels_rgb):,}; recomputing...")
                 if os.path.exists(dendrogram_cache):
                     os.remove(dendrogram_cache)
-                # Fall through to recompute
+                pixels_hct = None
             else:
-                print(f"  Loaded {len(pixels_hct):,} valid HCT values from cache")
+                invalid_count = np.sum(~np.all(np.isfinite(pixels_hct), axis=1))
+                if invalid_count:
+                    print(f"  Loaded {len(pixels_hct):,} HCT values from cache ({invalid_count:,} invalid rows will be filtered during analysis)")
+                else:
+                    print(f"  Loaded {len(pixels_hct):,} valid HCT values from cache")
                 return pixels_hct
         except Exception as e:
             print(f"  Warning: Failed to load HCT cache ({e}), recomputing...")
@@ -541,174 +573,146 @@ def load_or_convert_hct(pixels_rgb, input_path, cores_to_use, chunk_size, auto_s
     print()  # New line after progress
     pixels_hct = np.vstack(all_hct)
     
-    # Filter out any invalid values before saving
-    valid_mask = np.all(np.isfinite(pixels_hct), axis=1)
-    invalid_count = np.sum(~valid_mask)
+    # Preserve row-for-pixel alignment in the cache. Invalid conversion rows
+    # remain invalid and are filtered only when a feature array is created.
+    invalid_count = np.sum(~np.all(np.isfinite(pixels_hct), axis=1))
     if invalid_count > 0:
-        print(f"  Filtering out {invalid_count} invalid pixels before saving to cache")
-        pixels_hct_clean = pixels_hct[valid_mask]
-    else:
-        pixels_hct_clean = pixels_hct
+        print(f"  Retaining {invalid_count:,} invalid conversion rows in cache so pixel indices remain aligned")
+    pixels_hct_clean = pixels_hct
     
-    # Cache the cleaned results
+    # Cache the full image results
     try:
         os.makedirs(os.path.dirname(cache_file), exist_ok=True)
         with open(cache_file, 'wb') as f:
             pickle.dump(pixels_hct_clean, f)
-        print(f"  Saved {len(pixels_hct_clean):,} valid HCT values to cache: {cache_file}")
+        print(f"  Saved {len(pixels_hct_clean):,} HCT values to cache: {cache_file}")
     except Exception as e:
         print(f"  Warning: Failed to save HCT cache ({e})")
     
     # Also delete any existing dendrogram cache since pixel indices have changed
-    dendrogram_cache = os.path.join(get_cache_dir(), get_cache_filename(input_path, auto_samples, random_ratio))
+    dendrogram_cache = os.path.join(get_cache_dir(), get_cache_filename(input_path, auto_samples, random_ratio, random_seed))
     if os.path.exists(dendrogram_cache):
         print(f"  Deleting outdated dendrogram cache: {dendrogram_cache}")
         os.remove(dendrogram_cache)
     
     return pixels_hct_clean
 
-def discover_natural_groups_cached(pixels_hct, input_path, max_samples=54000, random_ratio=0.81, use_cache=True):
+def discover_natural_groups_cached(pixels_hct, input_path, max_samples=54000, random_ratio=0.81, use_cache=True, random_seed=42):
     """
-    Use hierarchical clustering to find natural perceptual groups.
-    Loads from cache if available, otherwise computes and caches.
-    Returns group labels for each pixel and the number of groups discovered.
+    Estimate natural perceptual groups using hierarchical clustering.
+    Sampled pixels are clustered, then every pixel is assigned to the nearest
+    discovered group centroid so group populations represent the whole image.
     """
     total_pixels = len(pixels_hct)
-    
-    # Use global cache directory
     cache_dir = get_cache_dir()
-    cache_file = os.path.join(cache_dir, get_cache_filename(input_path, max_samples, random_ratio))
-    
-    # Check cache if enabled
+    cache_file = os.path.join(cache_dir, get_cache_filename(input_path, max_samples, random_ratio, random_seed))
+
     if use_cache and os.path.exists(cache_file):
-        print(f"  Loading cached dendrogram from: {cache_file}")
+        print(f"  Loading cached dendrogram/group assignments from: {cache_file}")
         try:
             with open(cache_file, 'rb') as f:
                 cache_data = pickle.load(f)
-                all_labels = cache_data['all_labels']
-                natural_groups = cache_data['natural_groups']
-                cached_total_pixels = cache_data.get('total_pixels', 0)
-            
-            # Check if cached pixel count matches current HCT array
-            if cached_total_pixels != total_pixels:
-                print(f"  Warning: Cached dendrogram expects {cached_total_pixels} pixels but current has {total_pixels}")
-                print(f"  Deleting outdated dendrogram cache and recomputing...")
+            all_labels = cache_data['all_labels']
+            natural_groups = cache_data['natural_groups']
+            cached_total_pixels = cache_data.get('total_pixels', 0)
+            if cached_total_pixels != total_pixels or len(all_labels) != total_pixels:
+                print(f"  Warning: Cached group assignments do not match current pixel count; recomputing...")
                 os.remove(cache_file)
-                # Fall through to recompute
             else:
                 print(f"  Loaded {natural_groups} groups from cache")
                 return all_labels, natural_groups
         except Exception as e:
             print(f"  Warning: Failed to load cache ({e}), recomputing...")
-            # Fall through to recompute
-    
-    # Compute dendrogram
+
     print(f"  Computing dendrogram (this may take a moment)...")
-    
-    # Sample if image is too large (hierarchical clustering is O(n^3))
+    rng = np.random.default_rng(random_seed)
+
     if total_pixels > max_samples:
-        # Get sample indices and pixels
         n_random = int(max_samples * random_ratio)
         n_grid = max_samples - n_random
-        
-        # Grid sampling indices
-        step = total_pixels // n_grid
+        step = max(1, total_pixels // n_grid)
         grid_indices = np.arange(0, total_pixels, step)[:n_grid]
-        
-        # Random sampling from remaining pixels
         remaining_mask = np.ones(total_pixels, dtype=bool)
         remaining_mask[grid_indices] = False
-        remaining_indices = np.arange(total_pixels)[remaining_mask]
-        random_indices = np.random.choice(remaining_indices, n_random, replace=False)
-        
-        # Combine and sort indices
+        remaining_indices = np.flatnonzero(remaining_mask)
+        if n_random > len(remaining_indices):
+            n_random = len(remaining_indices)
+        random_indices = rng.choice(remaining_indices, n_random, replace=False)
         sample_indices = np.sort(np.concatenate([grid_indices, random_indices]))
-        sample = pixels_hct[sample_indices]
         sampled = True
-        original_sample_size = len(sample)
+        original_sample_size = len(sample_indices)
         n_random_actual = len(random_indices)
         n_grid_actual = len(grid_indices)
-        
-        # Filter out invalid HCT values from sample
-        valid_mask = np.all(np.isfinite(sample), axis=1)
-        invalid_count = np.sum(~valid_mask)
-        if invalid_count > 0:
-            print(f"  Warning: Found {invalid_count} invalid HCT values in sample, filtering...")
-            sample = sample[valid_mask]
-            # Keep only indices of valid pixels
-            valid_sample_indices = sample_indices[valid_mask]
-        else:
-            valid_sample_indices = sample_indices
-        sample_size = len(sample)
     else:
-        sample = pixels_hct
+        sample_indices = np.arange(total_pixels)
         sampled = False
-        sample_size = total_pixels
+        original_sample_size = total_pixels
         n_random_actual = 0
         n_grid_actual = 0
-        invalid_count = 0
-        valid_sample_indices = np.arange(total_pixels)
-    
-    print(f"  Converting {sample_size:,} pixels to features...")
-    features = create_features(sample)
-    
-    # After create_features, features may also be filtered
+
+    sample = pixels_hct[sample_indices]
+    features, valid_local_indices = create_features(sample, return_valid_indices=True)
+    valid_sample_indices = sample_indices[valid_local_indices]
     final_sample_size = len(features)
-    if final_sample_size < sample_size:
-        print(f"  Warning: Further filtered by create_features, using {final_sample_size} pixels")
-        # Need to track which pixels remain after feature filtering
-        # For simplicity, we assume features are filtered in the same order
-        # This is a limitation - better would be to track indices through create_features
-        valid_feature_indices = valid_sample_indices[:final_sample_size]
-    else:
-        valid_feature_indices = valid_sample_indices
-    
+
     if final_sample_size < 2:
         raise ValueError(f"Only {final_sample_size} valid pixels found - cannot perform clustering")
-    
-    print(f"  Computing pairwise distances...")
+
+    print(f"  Computing pairwise distances for {final_sample_size:,} sampled pixels...")
     distance_matrix = pdist(features, metric='euclidean')
-    
     print(f"  Building dendrogram with Ward linkage...")
     linkage_matrix = linkage(distance_matrix, method='ward')
-    
-    # Find natural cut points by analyzing merge distances
+
     merge_distances = linkage_matrix[:, 2]
     gap_sizes = np.diff(merge_distances)
-    
+
     if len(gap_sizes) == 0:
-        # Only one group possible
         natural_groups = 1
+        threshold = 0.0
+        largest_gaps = []
     else:
-        # Find gaps significantly larger than mean
         mean_gap = np.mean(gap_sizes)
         std_gap = np.std(gap_sizes)
         threshold = mean_gap + std_gap
         natural_groups = np.sum(gap_sizes > threshold) + 1
-    
-    # Ensure at least 1 group, at most number of samples
+        largest_gap_indices = np.argsort(gap_sizes)[-min(5, len(gap_sizes)):][::-1]
+        largest_gaps = [(int(i + 1), float(gap_sizes[i])) for i in largest_gap_indices]
+
     natural_groups = max(1, min(natural_groups, final_sample_size))
-    
-    # Cut dendrogram at that level
+
     if natural_groups == 1:
         cluster_labels = np.ones(final_sample_size, dtype=int)
     else:
-        # Find cut distance that yields natural_groups clusters
         cut_distance = merge_distances[-(natural_groups - 1)]
         cluster_labels = fcluster(linkage_matrix, cut_distance, criterion='distance')
-    
-    # Map back to original indices
+
+    # Compute a centroid for each discovered group, then assign every pixel
+    # in the image to its nearest group. This turns the sampled dendrogram
+    # into full-image group populations rather than leaving most pixels at 0.
+    group_centers = []
+    for group_id in range(1, natural_groups + 1):
+        members = features[cluster_labels == group_id]
+        if len(members) == 0:
+            group_centers.append(np.zeros(features.shape[1], dtype=np.float32))
+        else:
+            group_centers.append(np.mean(members, axis=0))
+    group_centers = np.vstack(group_centers)
+
+    all_features = create_features(pixels_hct)
+    # The cache requires a label for every valid pixel. Pixels that were invalid
+    # in the HCT array are left at label 0.
+    valid_all_indices = np.flatnonzero(np.all(np.isfinite(pixels_hct), axis=1))
+    distances = np.sum((all_features[:, None, :] - group_centers[None, :, :]) ** 2, axis=2)
+    nearest = np.argmin(distances, axis=1) + 1
+    all_labels = np.zeros(total_pixels, dtype=int)
+    all_labels[valid_all_indices] = nearest
+
+    print(f"  Group-structure estimate: {natural_groups} groups; gap threshold {threshold:.6g}")
+    if largest_gaps:
+        print("  Largest dendrogram gap(s): " + ", ".join(f"merge {i}: {gap:.6g}" for i, gap in largest_gaps))
     if sampled:
-        # Create labels for all pixels (default 0 = unassigned)
-        all_labels = np.zeros(total_pixels, dtype=int)
-        # Map valid pixels to their clusters using the actual sample indices
-        for idx, label in zip(valid_feature_indices, cluster_labels):
-            all_labels[idx] = label
-        print(f"  (Used hybrid sampling: {n_random_actual} random + {n_grid_actual} grid = {original_sample_size} pixels, {invalid_count} invalid filtered)")
-    else:
-        all_labels = cluster_labels
-    
-    # Cache the results
+        print(f"  (Used hybrid sampling: {n_random_actual} random + {n_grid_actual} grid = {original_sample_size} pixels)")
+
     if use_cache:
         try:
             os.makedirs(cache_dir, exist_ok=True)
@@ -717,14 +721,15 @@ def discover_natural_groups_cached(pixels_hct, input_path, max_samples=54000, ra
                 'natural_groups': natural_groups,
                 'max_samples': max_samples,
                 'random_ratio': random_ratio,
+                'random_seed': random_seed,
                 'total_pixels': total_pixels
             }
             with open(cache_file, 'wb') as f:
                 pickle.dump(cache_data, f)
-            print(f"  Saved dendrogram to cache: {cache_file}")
+            print(f"  Saved group assignments to cache: {cache_file}")
         except Exception as e:
             print(f"  Warning: Failed to save cache ({e})")
-    
+
     return all_labels, natural_groups
 
 def allocate_colors_from_groups(group_labels, pixels_hct, n_colors):
@@ -733,8 +738,9 @@ def allocate_colors_from_groups(group_labels, pixels_hct, n_colors):
     Returns list of (group_id, n_colors, group_pixels) for each group.
     """
     unique_groups = np.unique(group_labels)
+    unique_groups = unique_groups[unique_groups > 0]
     group_sizes = [np.sum(group_labels == g) for g in unique_groups]
-    total_pixels = len(pixels_hct)
+    total_pixels = np.sum(group_labels > 0)
     
     # Calculate group diversities for informative output
     group_diversities = []
@@ -785,13 +791,14 @@ def allocate_colors_from_groups(group_labels, pixels_hct, n_colors):
     
     return result
 
-def extract_colors_from_groups(group_assignments, feature_weights):
+def extract_colors_from_groups(group_assignments, feature_weights, random_seed=42):
     """
     For each group, run weighted k-means to extract allocated number of colors.
     Returns array of HCT centers and list of corresponding group IDs.
     """
     all_centers = []
     all_group_ids = []
+    all_metadata = []
     total_groups = len(group_assignments)
     
     print(f"  Extracting colors from {total_groups} groups...")
@@ -829,10 +836,12 @@ def extract_colors_from_groups(group_assignments, feature_weights):
             init='k-means++',
             n_init=10,
             max_iter=300,
-            random_state=42
+            random_state=random_seed
         )
         kmeans.fit(features)
         centers = reconstruct_hct(kmeans.cluster_centers_original)
+        populations = np.bincount(kmeans.labels_, minlength=n)
+        diversities = [measure_group_diversity(group_pixels[kmeans.labels_ == i]) for i in range(n)]
         
         if n > 20:
             elapsed = time.time() - start_time
@@ -842,12 +851,19 @@ def extract_colors_from_groups(group_assignments, feature_weights):
         for _ in range(len(centers)):
             all_centers.append(centers[_])
             all_group_ids.append(group_id)
+            all_metadata.append({
+                "population": int(populations[_]),
+                "population_denominator": len(pixels_hct),
+                "diversity": float(diversities[_]),
+                "reason": "group-representative",
+                "group_population_pct": float(group_pct)
+            })
     
     if not all_centers:
-        return np.array([]), []
+        return np.array([]), [], []
     
     print(f"  Total colors extracted: {len(all_centers)}")
-    return np.vstack(all_centers), all_group_ids
+    return np.vstack(all_centers), all_group_ids, all_metadata
 
 def check_allocation_warnings(group_assignments, n_colors):
     """
@@ -881,7 +897,7 @@ def check_allocation_warnings(group_assignments, n_colors):
     
     return warnings_list
 
-def extract_colors_with_adaptive_extremes(pixels_hct, n_colors, preset_weights, feature_weights, extreme_ratio=0.3):
+def extract_colors_with_adaptive_extremes(pixels_hct, n_colors, preset_weights, feature_weights, extreme_ratio=0.3, return_metadata=False, random_seed=42):
     """
     Extract colors using preset-aware adaptive extreme detection.
     
@@ -987,13 +1003,19 @@ def extract_colors_with_adaptive_extremes(pixels_hct, n_colors, preset_weights, 
             init='k-means++',
             n_init=10,
             max_iter=300,
-            random_state=42
+            random_state=random_seed
         )
         extreme_kmeans.fit(extreme_features)
         extreme_centers = reconstruct_hct(extreme_kmeans.cluster_centers_original)
+        extreme_labels = extreme_kmeans.labels_
+        extreme_populations = np.bincount(extreme_labels, minlength=n_extreme)
+        extreme_diversities = [measure_group_diversity(extreme_pixels[extreme_labels == i]) for i in range(n_extreme)]
     else:
         # Fallback if not enough extreme pixels
         extreme_centers = np.array([])
+        extreme_labels = np.array([], dtype=int)
+        extreme_populations = np.array([], dtype=int)
+        extreme_diversities = []
         n_dominant = n_colors
         print(f"    Not enough extreme pixels, using all for dominant clustering")
     
@@ -1006,10 +1028,13 @@ def extract_colors_with_adaptive_extremes(pixels_hct, n_colors, preset_weights, 
             init='k-means++',
             n_init=10,
             max_iter=300,
-            random_state=42
+            random_state=random_seed
         )
         normal_kmeans.fit(normal_features)
         normal_centers = reconstruct_hct(normal_kmeans.cluster_centers_original)
+        normal_labels = normal_kmeans.labels_
+        normal_populations = np.bincount(normal_labels, minlength=n_dominant)
+        normal_diversities = [measure_group_diversity(normal_pixels[normal_labels == i]) for i in range(n_dominant)]
     else:
         # Fallback: cluster all pixels
         print(f"    Falling back to standard clustering on all pixels")
@@ -1020,16 +1045,43 @@ def extract_colors_with_adaptive_extremes(pixels_hct, n_colors, preset_weights, 
             init='k-means++',
             n_init=10,
             max_iter=300,
-            random_state=42
+            random_state=random_seed
         )
         all_kmeans.fit(all_features)
-        return reconstruct_hct(all_kmeans.cluster_centers_original)
+        fallback_centers = reconstruct_hct(all_kmeans.cluster_centers_original)
+        if return_metadata:
+            populations = np.bincount(all_kmeans.labels_, minlength=n_colors)
+            metadata = [{"population": int(populations[i]), "diversity": measure_group_diversity(pixels_hct[all_kmeans.labels_ == i]), "reason": "cluster-representative"} for i in range(n_colors)]
+            return fallback_centers, metadata
+        return fallback_centers
     
     # STEP 6: Combine and return
     if len(extreme_centers) > 0:
         combined = np.vstack([normal_centers, extreme_centers])
+        if return_metadata:
+            metadata = []
+            for i in range(len(normal_centers)):
+                metadata.append({
+                    "population": int(normal_populations[i]),
+                    "diversity": float(normal_diversities[i]),
+                    "reason": "dominant-population"
+                })
+            for i in range(len(extreme_centers)):
+                metadata.append({
+                    "population": int(extreme_populations[i]),
+                    "diversity": float(extreme_diversities[i]),
+                    "reason": "perceptual-extreme"
+                })
+            return combined, metadata
         return combined
     else:
+        if return_metadata:
+            metadata = [{
+                "population": int(normal_populations[i]),
+                "diversity": float(normal_diversities[i]),
+                "reason": "dominant-population"
+            } for i in range(len(normal_centers))]
+            return normal_centers, metadata
         return normal_centers
 
 def generate_output_filename(input_path, preset, hue_w, chroma_w, tone_w, n_colors, capture_extremes):
@@ -1069,6 +1121,19 @@ def generate_output_filename(input_path, preset, hue_w, chroma_w, tone_w, n_colo
     # Join with underscores and add extension
     filename = "_".join(name_parts) + ".hexplt"
     return filename
+
+def format_palette_reason(reason):
+    """Convert internal selection reasons to concise output labels."""
+    return {
+        "cluster-representative": "cluster-representative",
+        "dominant-population": "dominant-population",
+        "perceptual-extreme": "perceptual-extreme",
+        "group-representative": "group-representative"
+    }.get(reason, reason)
+
+def sort_palette_entries(entries):
+    """Sort palette entries by population, while keeping equal-population entries stable."""
+    return sorted(entries, key=lambda e: e.get("population", 0), reverse=True)
 
 # Define presets (user-facing perceptual weights) in logical combination order
 PRESETS = {
@@ -1164,7 +1229,7 @@ OUTPUT FORMATS:
     - "auto-presetname" for weights matching a preset (via --weight-preset or manual)
     - "auto-custom" for non-matching custom weights
 
-The HCT space provides perceptually uniform color differences,
+The HCT space provides a perceptually informed color representation,
 resulting in more meaningful dominant color extraction than RGB clustering.
 This implementation uses the proper HCT color space from Coloraide.
         """
@@ -1188,6 +1253,8 @@ This implementation uses the proper HCT color space from Coloraide.
                        help='Number of samples for auto preset group discovery (default: 54000)')
     parser.add_argument('-r', '--randomsamplepercent', type=float, default=0.81,
                        help='Percentage of samples to take randomly in auto preset (0.0-1.0, default: 0.81). Remaining are grid samples.')
+    parser.add_argument('--random-seed', type=int, default=42,
+                       help='Random seed for pixel sampling and clustering (default: 42)')
     
     # Output file options - mutually exclusive
     output_group = parser.add_mutually_exclusive_group()
@@ -1266,7 +1333,7 @@ This implementation uses the proper HCT color space from Coloraide.
     input_exists = os.path.exists(args.input)
     
     # Check caches (this will delete corrupted HCT caches automatically)
-    hct_exists, dendro_exists = check_caches_exist(args.input, args.auto_samples, args.randomsamplepercent)
+    hct_exists, dendro_exists = check_caches_exist(args.input, args.auto_samples, args.randomsamplepercent, args.random_seed)
     
     if not input_exists:
         if hct_exists and dendro_exists:
@@ -1412,38 +1479,40 @@ This implementation uses the proper HCT color space from Coloraide.
             # Clamp to valid 0-255 range (fixes any out-of-range values in data)
             img_array = np.clip(img_array, 0, 255)
             
-            # Process all pixels by default, sample only if requested
-            max_pixels = 1333333
-            if args.sample_pixels and total_pixels > max_pixels:
-                pixels_flat = img_array.reshape(-1, 3)
-                sample_indices = np.random.choice(total_pixels, max_pixels, replace=False)
-                pixels_rgb = pixels_flat[sample_indices]
-                print(f"Sampling {max_pixels:,} of {total_pixels:,} pixels for processing (--sample-pixels enabled)")
-            else:
-                pixels_rgb = img_array.reshape(-1, 3)
-                if total_pixels > max_pixels:
-                    print(f"Processing all {total_pixels:,} pixels (use -s to sample for faster performance)")
-                else:
-                    print(f"Processing all {len(pixels_rgb):,} pixels")
-            
-            # Convert to HCT (will use cache if valid)
-            print(f"Converting {len(pixels_rgb):,} pixels to HCT space using {args.cores*100:.0f}% of CPU cores...")
+            # Always cache the full image HCT representation. If sampling is requested,
+            # sample from the cached HCT data after conversion so the cache always means
+            # "this image" rather than "one random sample of this image."
+            pixels_flat = img_array.reshape(-1, 3)
+            print(f"Processing all {total_pixels:,} pixels for HCT conversion")
+            print(f"Converting {total_pixels:,} pixels to HCT space using {args.cores*100:.0f}% of CPU cores...")
             start_time = time.time()
             cores_to_use = calculate_core_count(args.cores)
-            chunk_size = max(1000, len(pixels_rgb) // (cores_to_use * 4))
-            pixels_hct = load_or_convert_hct(pixels_rgb, args.input, cores_to_use, chunk_size, args.auto_samples, args.randomsamplepercent)
+            chunk_size = max(1000, total_pixels // (cores_to_use * 4))
+            all_pixels_hct = load_or_convert_hct(pixels_flat, args.input, cores_to_use, chunk_size, args.auto_samples, args.randomsamplepercent, args.random_seed)
             conversion_time = time.time() - start_time
             print(f"Conversion completed in {conversion_time:.2f} seconds")
+
+            max_pixels = 1333333
+            if args.sample_pixels and total_pixels > max_pixels:
+                rng = np.random.default_rng(args.random_seed)
+                sample_indices = rng.choice(total_pixels, max_pixels, replace=False)
+                pixels_hct = all_pixels_hct[sample_indices]
+                print(f"Sampling {max_pixels:,} of {total_pixels:,} cached HCT pixels for clustering (--sample-pixels enabled)")
+            else:
+                pixels_hct = all_pixels_hct
+                print(f"Using all {len(pixels_hct):,} HCT pixels for clustering")
         else:
             # Source missing - load HCT directly from cache
             print(f"Source image '{args.input}' not found, loading cached HCT values...")
             pixels_hct = load_hct_from_cache(args.input)
+            all_pixels_hct = pixels_hct
             total_pixels = len(pixels_hct)
             print(f"Image size: (cached) {total_pixels} pixels")
             print(f"Console output format: {args.output_format.upper()}")
         
         # Perform clustering based on mode
         print(f"\nPerforming clustering to find {args.numbercolors} dominant colors...")
+        palette_metadata = []
         
         cluster_start = time.time()
         
@@ -1459,7 +1528,8 @@ This implementation uses the proper HCT color space from Coloraide.
                 args.input, 
                 max_samples=args.auto_samples, 
                 random_ratio=args.randomsamplepercent,
-                use_cache=use_cache
+                use_cache=use_cache,
+                random_seed=args.random_seed
             )
             print(f"  Natural groups discovered: {n_groups}")
             
@@ -1485,16 +1555,18 @@ This implementation uses the proper HCT color space from Coloraide.
                 print(f"  Result will contain {n_groups} colors. Use --preset balanced for exact color counts.")
             
             # Extract colors from groups with group IDs
-            centers_hct, group_ids = extract_colors_from_groups(group_assignments, group_feature_weights)
+            centers_hct, group_ids, palette_metadata = extract_colors_from_groups(group_assignments, group_feature_weights, args.random_seed)
             
         elif args.capture_extremes:
             # Use adaptive extreme detection
             preset_dict = {'hue': hue_w, 'chroma': chroma_w, 'tone': tone_w}
-            centers_hct = extract_colors_with_adaptive_extremes(
+            centers_hct, palette_metadata = extract_colors_with_adaptive_extremes(
                 pixels_hct, 
                 args.numbercolors,
                 preset_dict,
-                feature_weights
+                feature_weights,
+                return_metadata=True,
+                random_seed=args.random_seed
             )
             group_ids = None
         else:
@@ -1507,7 +1579,7 @@ This implementation uses the proper HCT color space from Coloraide.
                 init='k-means++',
                 n_init=10,
                 max_iter=300,
-                random_state=42,
+                random_state=args.random_seed,
                 verbose=0
             )
             
@@ -1515,6 +1587,24 @@ This implementation uses the proper HCT color space from Coloraide.
             centers_features = kmeans.cluster_centers_original
             centers_hct = reconstruct_hct(centers_features)
             group_ids = None
+
+            # Analyze the clusters using the complete HCT population. This means
+            # percentages remain representative of the whole image even when -s
+            # was used to reduce the data used to fit k-means.
+            full_features = create_features(all_pixels_hct)
+            full_labels = kmeans.predict(full_features)
+            valid_full = np.all(np.isfinite(all_pixels_hct), axis=1)
+            full_valid_pixels = all_pixels_hct[valid_full]
+            populations = np.bincount(full_labels, minlength=args.numbercolors)
+            palette_metadata = []
+            for i in range(args.numbercolors):
+                cluster_pixels = full_valid_pixels[full_labels == i]
+                palette_metadata.append({
+                    "population": int(populations[i]),
+                    "population_denominator": len(full_valid_pixels),
+                    "diversity": float(measure_group_diversity(cluster_pixels)),
+                    "reason": "cluster-representative"
+                })
         
         cluster_time = time.time() - cluster_start
         print(f"Clustering completed in {cluster_time:.2f} seconds")
@@ -1531,35 +1621,60 @@ This implementation uses the proper HCT color space from Coloraide.
             g_8bit = int(np.clip(g * 255, 0, 255))
             b_8bit = int(np.clip(b * 255, 0, 255))
             hex_colors.append(f"#{r_8bit:02x}{g_8bit:02x}{b_8bit:02x}")
-        
+
+        # Attach all palette metadata to the colors, then sort by population.
+        # This makes output order meaningful without changing the selected palette.
+        palette_entries = []
+        for i, (hct, hex_color, metadata) in enumerate(zip(centers_hct, hex_colors, palette_metadata)):
+            entry = dict(metadata)
+            entry.update({"hct": hct, "hex": hex_color, "group_id": group_ids[i] if group_ids is not None else None})
+            palette_entries.append(entry)
+        palette_entries = sort_palette_entries(palette_entries)
+        centers_hct = np.array([entry["hct"] for entry in palette_entries])
+        hex_colors = [entry["hex"] for entry in palette_entries]
+        palette_metadata = palette_entries
+        if group_ids is not None:
+            group_ids = [entry["group_id"] for entry in palette_entries]
+
         # Prepare display lines based on requested format
         if args.output_format == 'hex':
             display_lines = hex_colors
             print(f"\nDominant color(s) in HEX format:\n")
             if group_ids is not None:
                 for i, (hex_color, hct, gid) in enumerate(zip(hex_colors, centers_hct, group_ids)):
-                    print(f"  {i+1}. {hex_color}  (H:{hct[0]:.1f}, C:{hct[1]:.1f}, T:{hct[2]:.1f}) [group {gid}]")
+                    meta = palette_metadata[i]
+                    pct = meta["population"] / meta["population_denominator"] * 100 if meta["population_denominator"] else 0.0
+                    print(f"  {i+1}. {hex_color}  (H:{hct[0]:.1f}, C:{hct[1]:.1f}, T:{hct[2]:.1f}) [{pct:.2f}% | spread:{meta['diversity']:.4f} | {format_palette_reason(meta['reason'])} | group {gid}]")
             else:
                 for i, (hex_color, hct) in enumerate(zip(hex_colors, centers_hct)):
-                    print(f"  {i+1}. {hex_color}  (H:{hct[0]:.1f}, C:{hct[1]:.1f}, T:{hct[2]:.1f})")
+                    meta = palette_metadata[i]
+                    pct = meta["population"] / meta["population_denominator"] * 100 if meta["population_denominator"] else 0.0
+                    print(f"  {i+1}. {hex_color}  (H:{hct[0]:.1f}, C:{hct[1]:.1f}, T:{hct[2]:.1f}) [{pct:.2f}% | spread:{meta['diversity']:.4f} | {format_palette_reason(meta['reason'])}]")
         else:
             hct_lines = [f"{hct[0]:.1f},{hct[1]:.1f},{hct[2]:.1f}" for hct in centers_hct]
             display_lines = hct_lines
             print(f"\nDominant color(s) in HCT format (HUE,CHROMA,TONE):\n")
             if group_ids is not None:
                 for i, (hct_line, hex_color, gid) in enumerate(zip(hct_lines, hex_colors, group_ids)):
-                    print(f"  {i+1}. {hct_line}  ({hex_color}) [group {gid}]")
+                    meta = palette_metadata[i]
+                    pct = meta["population"] / meta["population_denominator"] * 100 if meta["population_denominator"] else 0.0
+                    print(f"  {i+1}. {hct_line}  ({hex_color}) [{pct:.2f}% | spread:{meta['diversity']:.4f} | {format_palette_reason(meta['reason'])} | group {gid}]")
             else:
                 for i, (hct_line, hex_color) in enumerate(zip(hct_lines, hex_colors)):
-                    print(f"  {i+1}. {hct_line}  ({hex_color})")
+                    meta = palette_metadata[i]
+                    pct = meta["population"] / meta["population_denominator"] * 100 if meta["population_denominator"] else 0.0
+                    print(f"  {i+1}. {hct_line}  ({hex_color}) [{pct:.2f}% | spread:{meta['diversity']:.4f} | {format_palette_reason(meta['reason'])}]")
         
         # Prepare file output lines (always both hex and HCT)
-        if group_ids is not None:
-            file_lines = [f"{hex_color}  (H:{hct[0]:.1f}, C:{hct[1]:.1f}, T:{hct[2]:.1f}) [group {gid}]" 
-                         for hex_color, hct, gid in zip(hex_colors, centers_hct, group_ids)]
-        else:
-            file_lines = [f"{hex_color}  (H:{hct[0]:.1f}, C:{hct[1]:.1f}, T:{hct[2]:.1f})" 
-                         for hex_color, hct in zip(hex_colors, centers_hct)]
+        file_lines = []
+        for i, (hex_color, hct, meta) in enumerate(zip(hex_colors, centers_hct, palette_metadata)):
+            pct = meta["population"] / meta["population_denominator"] * 100 if meta["population_denominator"] else 0.0
+            line = (f"{hex_color}  (H:{hct[0]:.1f}, C:{hct[1]:.1f}, T:{hct[2]:.1f}) "
+                    f"[{pct:.2f}% | spread:{meta['diversity']:.4f} | {format_palette_reason(meta['reason'])}")
+            if group_ids is not None:
+                line += f" | group {group_ids[i]}"
+            line += "]"
+            file_lines.append(line)
        
         # Write file if output path specified
         if output_path:
@@ -1570,8 +1685,10 @@ This implementation uses the proper HCT color space from Coloraide.
                     if used_preset:
                         f.write(f"Preset: {used_preset}\n")
                     f.write(f"Weights: Hue={hue_w:.2f}, Chroma={chroma_w:.2f}, Tone={tone_w:.2f}\n")
-                    f.write(f"Colors: {args.numbercolors}\n")
-                    f.write(f"Format: sRGB hex and corresponding HCT values (H: hue, C: chroma, T: tone)\n\n")
+                    f.write(f"Colors requested: {args.numbercolors}\n")
+                    f.write(f"Random seed: {args.random_seed}\n")
+                    f.write(f"Format: sRGB hex and corresponding HCT values (H: hue, C: chroma, T: tone)\n")
+                    f.write("Palette metadata: population percentage, within-cluster spread, and selection reason\n\n")
                     
                     for line in file_lines:
                         f.write(f"{line}\n")
