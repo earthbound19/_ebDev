@@ -204,7 +204,7 @@
 
 # CODE
 # Script version
-SCRIPT_VERSION = "4.2.45"
+SCRIPT_VERSION = "4.2.46"
 
 import argparse
 import sys
@@ -563,7 +563,7 @@ def load_or_convert_hct(pixels_rgb, input_path, cores_to_use, chunk_size, auto_s
     
     return pixels_hct_clean
 
-def discover_natural_groups_cached(pixels_hct, input_path, max_samples=58250, random_ratio=0.81, use_cache=True):
+def discover_natural_groups_cached(pixels_hct, input_path, max_samples=54000, random_ratio=0.81, use_cache=True):
     """
     Use hierarchical clustering to find natural perceptual groups.
     Loads from cache if available, otherwise computes and caches.
