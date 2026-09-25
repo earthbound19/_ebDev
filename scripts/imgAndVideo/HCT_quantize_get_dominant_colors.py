@@ -204,6 +204,10 @@
 
 # CODE
 # Script version
+# TO DO
+# - Oklch variant: it may have less purple bias (HCT has that); maybe better hue linearity and uniformity. It may subtly cluster colors differently near the boundary of what sRGB (a typical monitor) can display. Although some sources argue HCT has better overal perceptual uniformity for predicting color differences; Oklch gives cleaner hue behavior (especially for blues/purples), while HCT might feel more "balanced" overall in how it perceives differences across all colors.
+# - Oklab (Cartesian) variant: it may give a fundamentally different "feel" - more even-handed across all colors, potentially less vibrant palettes, but more "honest" about the distribution.
+
 SCRIPT_VERSION = "4.2.46"
 
 import argparse
