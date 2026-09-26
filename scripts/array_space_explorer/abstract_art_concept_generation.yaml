@@ -1,0 +1,136 @@
+data:
+  groups:
+  - dimensions:
+    - depth: 0
+      no_comma: false
+      type: string
+      values:
+      - Geometric Abstraction
+      - Organic Constructivism
+      - Folk Decorative Art
+      - Vernacular Craft
+      - Architectural Embellishment
+      - Applied Decorative Arts
+      - Gestural Expressionism
+      - Kinetic Abstraction
+      - Sacred Geometry
+      - Biomorphic Modernism
+      - Primitive Folk Art
+    - depth: 1
+      no_comma: false
+      type: string
+      values:
+      - Impasto Paletting
+      - Drybrush Layering
+      - Sgraffito Carving
+      - Woodcut Relief Printing
+      - "Repouss\xE9 & Chasing"
+      - "Cloisonn\xE9 Enameling"
+      - Stained Glass Leadwork
+      - Marquetry & Inlay
+      - Hand Stenciling
+      - Filigree Wirework
+      - Intaglio Etching
+      - Batik Wax-resist
+      - Pointillist Stippling
+      - Glazes & Color Washes
+    - depth: 2
+      no_comma: false
+      type: string
+      values:
+      - "Guilloch\xE9 Spirals"
+      - Isometric Facets
+      - Voronoi Tessellations
+      - Paisley Motifs
+      - Celtic Knotwork Interlace
+      - Chevron Bands
+      - Arabesque Foliage
+      - Target Concentrics
+      - Fractal Branching
+      - Meander Key Patterns
+      - Optical Wavefronts
+      - Sawtooth Borders
+      - Hexagonal Honeycombs
+      - Radiating Sunbursts
+    - depth: 3
+      no_comma: false
+      type: string
+      values:
+      - High-gloss Lacquered
+      - Coarse Sand Textured
+      - Crackle Glazed patina
+      - Burnished Metallic Sheen
+      - Matte Acid-washed
+      - Distressed Weathered
+      - Silky Satin Glaze
+      - Rough Chiseled Stone
+      - Velvety Flocked
+      - Embossed Relief
+    - depth: 4
+      no_comma: false
+      type: string
+      values:
+      - Monochromatic Chiaroscuro
+      - Jewel-toned Iridescent
+      - Earthy Ochre & Terracotta
+      - High-contrast Neon
+      - Muted Pastel Harmonious
+      - Split-complementary Vivid
+      - Oxidized Bronze & Verdigris
+      - Triadic Primary Vibrancy
+      - Weathered Sepia & Charcoal
+    - depth: 5
+      no_comma: false
+      type: string
+      values:
+      - Kandinsky Kinetic Motion
+      - Hilma af Klint Mysticism
+      - Pennsylvania Dutch Hex
+      - Bauhaus Functional Geometry
+      - William Morris Arts & Crafts
+      - Art Nouveau Flowing Lines
+      - Mexican Otomi Embroidery
+      - Zapotec Geometric Weave
+      - Islamic Tilework Symmetry
+      - Klimt Gold-leaf Decorative
+      - Mondrian Grid Precision
+    - depth: 6
+      no_comma: false
+      type: string
+      values:
+      - Densely Layered All-over
+      - Minimalist Focal Accent
+      - Rhythmic Repeating Grid
+      - Gestural Chaotic Scatter
+      - Sparse Perimeter Border
+      - Symmetrical Centerpiece Focus
+      - Gradient Density Transition
+      - Asymmetric Counterbalanced
+    group_index: 0
+  raw_text: "Geometric Abstraction, Organic Constructivism, Folk Decorative Art, Vernacular\
+    \ Craft, Architectural Embellishment, Applied Decorative Arts, Gestural Expressionism,\
+    \ Kinetic Abstraction, Sacred Geometry, Biomorphic Modernism, Primitive Folk Art\n\
+    \  Impasto Paletting, Drybrush Layering, Sgraffito Carving, Woodcut Relief Printing,\
+    \ Repouss\xE9 & Chasing, Cloisonn\xE9 Enameling, Stained Glass Leadwork, Marquetry\
+    \ & Inlay, Hand Stenciling, Filigree Wirework, Intaglio Etching, Batik Wax-resist,\
+    \ Pointillist Stippling, Glazes & Color Washes\n    Guilloch\xE9 Spirals, Isometric\
+    \ Facets, Voronoi Tessellations, Paisley Motifs, Celtic Knotwork Interlace, Chevron\
+    \ Bands, Arabesque Foliage, Target Concentrics, Fractal Branching, Meander Key\
+    \ Patterns, Optical Wavefronts, Sawtooth Borders, Hexagonal Honeycombs, Radiating\
+    \ Sunbursts\n      High-gloss Lacquered, Coarse Sand Textured, Crackle Glazed\
+    \ patina, Burnished Metallic Sheen, Matte Acid-washed, Distressed Weathered, Silky\
+    \ Satin Glaze, Rough Chiseled Stone, Velvety Flocked, Embossed Relief\n      \
+    \  Monochromatic Chiaroscuro, Jewel-toned Iridescent, Earthy Ochre & Terracotta,\
+    \ High-contrast Neon, Muted Pastel Harmonious, Split-complementary Vivid, Oxidized\
+    \ Bronze & Verdigris, Triadic Primary Vibrancy, Weathered Sepia & Charcoal\n \
+    \         Kandinsky Kinetic Motion, Hilma af Klint Mysticism, Pennsylvania Dutch\
+    \ Hex, Bauhaus Functional Geometry, William Morris Arts & Crafts, Art Nouveau\
+    \ Flowing Lines, Mexican Otomi Embroidery, Zapotec Geometric Weave, Islamic Tilework\
+    \ Symmetry, Klimt Gold-leaf Decorative, Mondrian Grid Precision\n            Densely\
+    \ Layered All-over, Minimalist Focal Accent, Rhythmic Repeating Grid, Gestural\
+    \ Chaotic Scatter, Sparse Perimeter Border, Symmetrical Centerpiece Focus, Gradient\
+    \ Density Transition, Asymmetric Counterbalanced"
+settings:
+  appearance_mode: Dark
+  window_geometry: 1830x1278+626+58
+version: '1.0'
