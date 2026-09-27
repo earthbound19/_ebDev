@@ -404,6 +404,7 @@ class ArraySpaceExplorer(ctk.CTk):
         self.spinboxes = []
         total_raw_sizes = []
         total_expected_sizes = []
+        pending_state = []
 
         if not self.parsed_groups:
             self.info_label.configure(
@@ -561,20 +562,32 @@ class ArraySpaceExplorer(ctk.CTk):
                     }
                 )
 
-                # Restore saved state if provided
+                # Defer restoration until every group has been added to self.spinboxes.
                 if saved_state and g_idx < len(saved_state) and d_idx < len(saved_state[g_idx]):
-                    s = saved_state[g_idx][d_idx]
-                    if "index" in s and s["index"] is not None:
-                        entry_var.set(str(s["index"]))
-                    if "no_comma" in s:
-                        no_comma_var.set(bool(s["no_comma"]))
-                    if "skip_chance" in s:
-                        skip_var.set(f"{float(s['skip_chance']):.2f}")
-                    if "max_picks" in s:
-                        mp_slider.set(int(s["max_picks"]))
-                        _on_mp_change(int(s["max_picks"]))
+                    pending_state.append((g_idx, d_idx, saved_state[g_idx][d_idx]))
 
             self.spinboxes.append(group_spinboxes)
+
+        # Restore saved control state only after self.spinboxes is complete.
+        # The StringVar/slider callbacks call update_synthesized_output(), which
+        # expects every parsed dimension to already have a corresponding spinbox.
+        for g_idx, d_idx, s in pending_state:
+            sb = self.spinboxes[g_idx][d_idx]
+            if "index" in s and s["index"] is not None:
+                sb["var"].set(str(s["index"]))
+            if "no_comma" in s:
+                sb["no_comma_var"].set(bool(s["no_comma"]))
+            if "skip_chance" in s:
+                sb["skip_var"].set(f"{float(s['skip_chance']):.2f}")
+            if "max_picks" in s:
+                v = int(s["max_picks"])
+                sb["maxpicks_var"].set(v)
+                sb["maxpicks_slider"].set(v)
+                sb["maxpicks_label"].configure(text=str(v))
+                state = "disabled" if v > 1 else "normal"
+                sb["entry"].configure(state=state)
+                sb["btn_down"].configure(state=state)
+                sb["btn_up"].configure(state=state)
 
         self._update_info_label()
 
