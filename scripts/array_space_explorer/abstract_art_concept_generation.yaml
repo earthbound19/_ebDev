@@ -1,136 +1,39 @@
-data:
-  groups:
-  - dimensions:
-    - depth: 0
-      no_comma: false
-      type: string
-      values:
-      - Geometric Abstraction
-      - Organic Constructivism
-      - Folk Decorative Art
-      - Vernacular Craft
-      - Architectural Embellishment
-      - Applied Decorative Arts
-      - Gestural Expressionism
-      - Kinetic Abstraction
-      - Sacred Geometry
-      - Biomorphic Modernism
-      - Primitive Folk Art
-    - depth: 1
-      no_comma: false
-      type: string
-      values:
-      - Impasto Paletting
-      - Drybrush Layering
-      - Sgraffito Carving
-      - Woodcut Relief Printing
-      - "Repouss\xE9 & Chasing"
-      - "Cloisonn\xE9 Enameling"
-      - Stained Glass Leadwork
-      - Marquetry & Inlay
-      - Hand Stenciling
-      - Filigree Wirework
-      - Intaglio Etching
-      - Batik Wax-resist
-      - Pointillist Stippling
-      - Glazes & Color Washes
-    - depth: 2
-      no_comma: false
-      type: string
-      values:
-      - "Guilloch\xE9 Spirals"
-      - Isometric Facets
-      - Voronoi Tessellations
-      - Paisley Motifs
-      - Celtic Knotwork Interlace
-      - Chevron Bands
-      - Arabesque Foliage
-      - Target Concentrics
-      - Fractal Branching
-      - Meander Key Patterns
-      - Optical Wavefronts
-      - Sawtooth Borders
-      - Hexagonal Honeycombs
-      - Radiating Sunbursts
-    - depth: 3
-      no_comma: false
-      type: string
-      values:
-      - High-gloss Lacquered
-      - Coarse Sand Textured
-      - Crackle Glazed patina
-      - Burnished Metallic Sheen
-      - Matte Acid-washed
-      - Distressed Weathered
-      - Silky Satin Glaze
-      - Rough Chiseled Stone
-      - Velvety Flocked
-      - Embossed Relief
-    - depth: 4
-      no_comma: false
-      type: string
-      values:
-      - Monochromatic Chiaroscuro
-      - Jewel-toned Iridescent
-      - Earthy Ochre & Terracotta
-      - High-contrast Neon
-      - Muted Pastel Harmonious
-      - Split-complementary Vivid
-      - Oxidized Bronze & Verdigris
-      - Triadic Primary Vibrancy
-      - Weathered Sepia & Charcoal
-    - depth: 5
-      no_comma: false
-      type: string
-      values:
-      - Kandinsky Kinetic Motion
-      - Hilma af Klint Mysticism
-      - Pennsylvania Dutch Hex
-      - Bauhaus Functional Geometry
-      - William Morris Arts & Crafts
-      - Art Nouveau Flowing Lines
-      - Mexican Otomi Embroidery
-      - Zapotec Geometric Weave
-      - Islamic Tilework Symmetry
-      - Klimt Gold-leaf Decorative
-      - Mondrian Grid Precision
-    - depth: 6
-      no_comma: false
-      type: string
-      values:
-      - Densely Layered All-over
-      - Minimalist Focal Accent
-      - Rhythmic Repeating Grid
-      - Gestural Chaotic Scatter
-      - Sparse Perimeter Border
-      - Symmetrical Centerpiece Focus
-      - Gradient Density Transition
-      - Asymmetric Counterbalanced
-    group_index: 0
-  raw_text: "Geometric Abstraction, Organic Constructivism, Folk Decorative Art, Vernacular\
-    \ Craft, Architectural Embellishment, Applied Decorative Arts, Gestural Expressionism,\
-    \ Kinetic Abstraction, Sacred Geometry, Biomorphic Modernism, Primitive Folk Art\n\
-    \  Impasto Paletting, Drybrush Layering, Sgraffito Carving, Woodcut Relief Printing,\
-    \ Repouss\xE9 & Chasing, Cloisonn\xE9 Enameling, Stained Glass Leadwork, Marquetry\
-    \ & Inlay, Hand Stenciling, Filigree Wirework, Intaglio Etching, Batik Wax-resist,\
-    \ Pointillist Stippling, Glazes & Color Washes\n    Guilloch\xE9 Spirals, Isometric\
-    \ Facets, Voronoi Tessellations, Paisley Motifs, Celtic Knotwork Interlace, Chevron\
-    \ Bands, Arabesque Foliage, Target Concentrics, Fractal Branching, Meander Key\
-    \ Patterns, Optical Wavefronts, Sawtooth Borders, Hexagonal Honeycombs, Radiating\
-    \ Sunbursts\n      High-gloss Lacquered, Coarse Sand Textured, Crackle Glazed\
-    \ patina, Burnished Metallic Sheen, Matte Acid-washed, Distressed Weathered, Silky\
-    \ Satin Glaze, Rough Chiseled Stone, Velvety Flocked, Embossed Relief\n      \
-    \  Monochromatic Chiaroscuro, Jewel-toned Iridescent, Earthy Ochre & Terracotta,\
-    \ High-contrast Neon, Muted Pastel Harmonious, Split-complementary Vivid, Oxidized\
-    \ Bronze & Verdigris, Triadic Primary Vibrancy, Weathered Sepia & Charcoal\n \
-    \         Kandinsky Kinetic Motion, Hilma af Klint Mysticism, Pennsylvania Dutch\
-    \ Hex, Bauhaus Functional Geometry, William Morris Arts & Crafts, Art Nouveau\
-    \ Flowing Lines, Mexican Otomi Embroidery, Zapotec Geometric Weave, Islamic Tilework\
-    \ Symmetry, Klimt Gold-leaf Decorative, Mondrian Grid Precision\n            Densely\
-    \ Layered All-over, Minimalist Focal Accent, Rhythmic Repeating Grid, Gestural\
-    \ Chaotic Scatter, Sparse Perimeter Border, Symmetrical Centerpiece Focus, Gradient\
-    \ Density Transition, Asymmetric Counterbalanced"
+version: "2.0"
 settings:
   appearance_mode: Dark
   window_geometry: 1830x1278+626+58
-version: '1.0'
+data:
+  raw_text: |
+    Geometric Abstraction, Organic Constructivism, Constructivism, Suprematism, De Stijl, Bauhaus, Minimalism, Op Art, Kinetic Art, Abstract Expressionism, Color Field Painting, Hard-edge Painting, Orphism, Synchronism, Rayonism, Art Deco, Art Nouveau, Arts and Crafts, Vienna Secession, Memphis Design, Postmodern Ornament, Psychedelic Abstraction, Systems Art, Generative Art, Process Art, Lyrical Abstraction, Tachisme, Informalism, Neo-Geo, Ornamentalism, Pattern and Decoration, Abstract Illusionism, Biomorphic Modernism, Sacred Geometry
+      Islamic Tilework, Celtic Art, Norse Knotwork, Mughal Ornament, Persian Arabesque, Ottoman Iznik, Japanese Rinpa, Japanese Asanoha, Chinese Cloud Collar, Korean Bojagi, Indian Mandana, Indian Rangoli, Indonesian Batik Tradition, Thai Lai Rot Nam, Balinese Poleng, Andean Textile, Zapotec Weave, Mexican Otomi Embroidery, Mexican Talavera, Navajo Weaving, Pueblo Pottery, Pennsylvania Dutch Hex, Appalachian Quilt, Gee's Bend Quilt, Amish Quilt, Hungarian Kalocsa, Romanian Ie Motif, Ukrainian Petrykivka, Polish Wycinanki, Scandinavian Rosemaling, Sami Duodji, Finnish Marimekko, Aboriginal Australian Dot, Maori Kowhaiwhai, Samoan Siapo, Hawaiian Quilt, Kente Cloth, Adinkra Symbols, Bogolan Mud Cloth, Ndebele Wall Painting, Moroccan Zellige, Tunisian Nabeul, Berber Carpet, Tuareg Silverwork, Ethiopian Cross, Coptic Textile
+        Textile, Surface Pattern, Ceramics, Porcelain, Stoneware, Earthenware, Glass, Stained Glass, Mosaic, Metalwork, Goldsmithing, Silversmithing, Enameling, Woodwork, Marquetry, Lacquerware, Printmaking, Relief Print, Intaglio Print, Screenprint, Lithography, Bookbinding, Calligraphy, Illumination, Jewelry, Fibers, Basketry, Weaving, Embroidery, Appliqué, Quilting, Wallpaper, Tapestry, Rug Weaving, Furniture, Architectural Ornament, Interior Panel, Mural, Fresco, Relief Sculpture, Low Relief, Bas-relief, Kirigami, Origami, Papercut, Leatherwork, Bookplate, Poster, Mosaic Tile Panel
+          Impasto Paletting, Drybrush Layering, Sgraffito Carving, Scumbling, Glazing Layers, Wet-on-wet Blending, Alla Prima, Encaustic, Tempera, Fresco Buon, Fresco Secco, Gouache, Ink Wash, Sumi-e Stroke, Calligraphic Brushwork, Palette Knife Application, Sponge Stippling, Rag Rolling, Spattering, Dripping, Pouring, Splattering, Squeegee Drag, Masking and Resist, Salt Resist, Wax Resist, Batik Wax-resist, Ikat Binding, Shibori Binding, Tritik, Plangi, Airbrush Gradation, Spraypaint Fade, Stencil Overlay, Hand Stenciling, Block Printing, Woodcut Relief Printing, Linocut, Screenprinting Pull, Monotype, Collagraph, Intaglio Etching, Drypoint, Mezzotint, Aquatint, Engraving, Lithographic Crayon, Chine-collé, Champlevé, Cloisonné Enameling, Basse-taille, Plique-à-jour, Guilloché Engine-turning, Repoussé and Chasing, Filigree Wirework, Granulation, Lost-wax Casting, Sand Casting, Forging, Raising, Chasing, Engraving Metal, Etching Metal, Patination, Gilding, Leaf Gilding, Electroplating, Anodizing, Enamel Firing, Raku Firing, Pit Firing, Salt Glazing, Soda Firing, Wood-firing, Slip Trailing, Sgraffito Ceramic, Mishima Inlay, Nerikomi, Agateware, Lathe Turning, Hand Carving, Chip Carving, Relief Carving, Intarsia, Marquetry and Inlay, Parquetry, Bentwood Lamination, Steam Bending, Lacquer Layering, Urushi, Maki-e, Mother-of-pearl Inlay, Gesso Ground, Gold Leaf Sizing, Burnishing, Scraping, Pouncing, Cartoon Transfer
+            Linen Canvas, Cotton Duck, Burlap, Hessian, Jute, Silk, Raw Silk, Organza, Velvet, Brocade, Damask, Taffeta, Satin, Wool, Merino, Alpaca, Cashmere, Mohair, Cotton, Poplin, Muslin, Calico, Flannel, Felt, Leather, Rawhide, Parchment, Vellum, Rice Paper, Washi, Xuan Paper, Mulberry Paper, Rag Paper, Hemp Paper, Papyrus, Bamboo Slat, Wood Panel, Oak Panel, Walnut Panel, Birch Ply, Basswood, Balsa, Lime Wood, Poplar Panel, Masonite, Hardboard, Plywood, Cedar, Redwood, Teak, Ebony, Rosewood, Mahogany, Maple, Cherry, Ash, Clay Body, Terracotta, Earthenware Body, Stoneware Body, Porcelain Body, Bone China, Raku Clay, Paper Clay, Slip, Glaze Base, Copper, Brass, Bronze, Silver, Sterling Silver, Fine Silver, Gold, Rose Gold, White Gold, Platinum, Pewter, Tin, Zinc, Iron, Wrought Iron, Cast Iron, Steel, Stainless Steel, Aluminum, Titanium, Nickel Silver, Mercury, Lead, Glass, Soda-lime Glass, Lead Crystal, Borosilicate, Fused Glass, Slumped Glass, Blown Glass, Cast Glass, Dichroic Glass, Enamel, Vitreous Enamel, Marble, Granite, Alabaster, Sandstone, Slate, Limestone, Travertine, Onyx, Jasper, Agate, Lapis Lazuli, Turquoise, Malachite, Coral, Shell, Mother-of-Pearl, Horn, Bone, Ivory Substitute, Resin, Epoxy Resin, Polyurethane, Acrylic Sheet, Vinyl, PVC, Foam Board, Cardboard, Corrugated Card, Newsprint, Tissue Paper, Vellum Board, Plaster, Gesso, Stucco, Concrete, Cement Board, Terrazzo, Ceramic Tile, Mosaic Tessera, Smalti, Gold Smalti, Mirror, Papier-mâché, Wax, Beeswax, Paraffin, Soy Wax, Bitumen, Asphalt, Tar, Rubber, Latex, Silicone
+              Guilloché Spirals, Engine-turned Scrollwork, Isometric Facets, Voronoi Tessellations, Delaunay Triangulation, Truchet Tiles, Penrose Tiling, Ammann-Beenker Tiling, Pinwheel Tiling, Einstein Aperiodic Tile, Hexagonal Honeycombs, Rhombille Tiling, Triangular Lattice, Square Lattice, Kagome Lattice, Herringbone, Chevron Bands, Basketweave, Parquet, Brick Bond, Running Bond, Stack Bond, Paisley Motifs, Boteh, Persian Cypress, Arabesque Foliage, Islimi, Rumi, Hatai, Chinese Cloud Collar, Korean Cloud Motif, Japanese Asanoha, Japanese Seigaiha, Japanese Kikkō, Japanese Shippō, Japanese Kōjitsunagi, Japanese Kagome, Celtic Knotwork Interlace, Trinity Knot, Quaternary Knot, Norse Valknut, Urnes Style, Borre Style, Jelling Style, Mammen Style, Ringerike Style, Zoomorphic Interlace, Meander Key Patterns, Greek Key, Roman Key, Fretwork, Vitruvian Scroll, Running Dog, Sawtooth Borders, Dentil, Egg-and-dart, Bead-and-reel, Acanthus Leaf, Palmette, Anthemion, Rosette, Roundel, Medallion, Cartouche, Ogee, Quatrefoil, Trefoil, Cinquefoil, Multifoil, Target Concentrics, Bullseye, Radial Spokes, Radiating Sunbursts, Starburst, Compass Rose, Sun Wheel, Wheel of Life, Swastika (Fylfot), Gammadion, Triquetra, Triskelion, Ying-Yang, Tomoe, Mitsudomoe, Spiral Scroll, Volute, Helix, Labyrinth, Unicursal Labyrinth, Mosaic Maze, Fractal Branching, L-system Tree, Dracaena Pattern, Barnsley Fern, Sierpinski Gasket, Koch Snowflake, Dragon Curve, Hilbert Curve, Mandelbrot Contour, Julia Set Contour, Cellular Automaton, Reaction-Diffusion, Turing Spot, Belousov-Zhabotinsky, Phyllotaxis, Sunflower Spiral, Fibonacci Spiral, Golden Spiral, Logarithmic Spiral, Archimedean Spiral, Fermat Spiral, Optical Wavefronts, Moiré Interference, Halftone Dot Grid, Dither Pattern, Pixel Grid, Screen Door, Lenticular, Anaglyph, Op Art Ripple, Bridget Riley Wave, Vasarely Grid, Truchet Weave, Weave Draft, Overshot Pattern, Twill, Herringbone Twill, Basket Weave, Damask Repeat, Brocade Repeat, Toile Repeat, Paisley Drop Repeat, Ogee Drop Repeat, Half-drop Repeat, Brick Repeat, Mirror Repeat
+                High-gloss Lacquered, Semi-gloss Varnish, Eggshell Sheen, Matte Acid-washed, Dead-flat Matte, Chalky Matte, Satin Finish, Silky Satin Glaze, Waxed Sheen, Oiled Finish, Soap Finish, Lime Wash, Whitewash, Distressed Weathered, Patinated, Verdigris, Rusted Iron, Oxidized Copper, Fumed Oak, Ebonized Wood, Pickled Wood, Crackle Glazed patina, Craquelure, Raku Crackle, Ice Crackle, Ge Crackle, Oniita Crackle, Salt-glazed Orange Peel, Ash-glazed Speckle, Tenmoku Drip, Hare's Fur, Oil Spot, Yohen, Coarse Sand Textured, Stucco Texture, Rough Chiseled Stone, Bush-hammered Stone, Split-face Stone, Sandblasted, Bead-blasted, Wire-brushed, Burnished Metallic Sheen, Anodized Satin, Electroplated Mirror, Gold Leaf Burnish, Silver Leaf Burnish, Mother-of-pearl Luster, Iridescent Luster, Lustre Glaze, Pearl Essence, Velvety Flocked, Suede Finish, Napped Surface, Brushed Mohair, Boiled Wool, Felted Surface, Embossed Relief, Repoussé Relief, Chased Relief, Tooled Leather, Blind-tooled, Gold-tooled, Block-printed Relief, Foil Stamped, Debossed, Thermographed, Embroidered Relief, Padded Appliqué, Trapunto, Quilted Relief, Tufted Surface, Loop Pile, Cut Pile, Sculpted Pile, Carved Lacquer, Incised, Engraved, Etched Surface, Sand-carved, Wheel-engraved, Stippled, Punched, Pierced, Cutwork, Eyelet, Broderie Anglaise, Lace Mesh, Needle Lace, Bobbin Lace, Tatted Lace, Crocheted Surface, Knitted Rib, Woven Twill, Woven Plain Weave, Woven Satin, Ikat Blur, Shibori Crinkle, Arashi Pole Wrap, Itajime Fold, Nui Stitch Resist, Kanoko Dot Resist, Batik Crackle, Marbled Paper, Suminagashi, Ebru, Paste Paper, Dutch Gilt, Brocade Weave, Lampas, Velvet Pile, Devoré, Burnout Velvet, Shadow Velvet, Cisèle Velvet, Brocatelle, Passementerie
+                  Patinated, Verdigris Applied, Rusted Patina, Oxidized Brass, Oxidized Bronze, Oxidized Copper, Ammonia-fumed, Fumed with Oak, Ebonized, Pickled, Bleached, Lime-washed, Whitewashed, Glazed Color Wash, Stained, Dyed, Vat-dyed, Indigo-dyed, Woad-dyed, Madder-dyed, Cochineal-dyed, Logwood-dyed, Walnut-dyed, Onion-skin-dyed, Rust-dyed, Shibori-dyed, Ikat-dyed, Batik-dyed, Kalamkari-dyed, Block-printed Dye, Discharge-printed, Resist-printed, Direct-printed, Hand-painted, Hand-gilded, Gold-leaf Applied, Silver-leaf Applied, Copper-leaf Applied, Variegated Leaf, Leaf Burnished, Leaf Sized, Mica Applied, Mother-of-pearl Applied, Shell Inlay, Tortoiseshell Applied, Horn Applied, Bone Inlay, Ivory Substitute Inlay, Pewter Inlay, Wire Inlay, Silver Wire Inlay, Gold Wire Inlay, Niello, Damascened, Koftgari, Bidriware, Enamel Painted, Enamel Cloisonné, Enamel Champlevé, Enamel Basse-taille, Enamel Plique-à-jour, Enamel Grisaille, Enamel Limoges, Enamel Painted Portrait, Underglaze Painted, Overglaze Painted, On-glaze Enamel, In-glaze Reduction, Slip-painted, Slip-trailed, Sgraffito Painted, Mishima Inlaid, Nerikomi Colored, Agateware Colored, Terra Sigillata, Burnished Slip, Smoked, Pit-fired Reduction, Raku Carbonized, Saggar-fired, Salt-glazed Tinted, Ash-glazed Colored, Copper-red Glazed, Iron-red Glazed, Cobalt-blue Glazed, Celadon Glazed, Jun Glazed, Chun Glazed, Oxblood Glazed, Peachbloom Glazed, Flambé Glazed, Tenmoku Glazed, Temmoku Oil Spot, Hare's Fur Glazed, Tortoiseshell Glazed, Partridge Feather Glazed, Mirror-black Glazed, Mirror-gold Glazed
+                    Monochromatic Chiaroscuro, Monochromatic Tonal Ramp, Tinted Monochrome, Shaded Monochrome, High-contrast Neon, Fluorescent Clash, UV-reactive, Blacklight Palette, Bi-color Minimal, Duotone, Tritone, Quadtone, Jewel-toned Iridescent, Emerald and Ruby, Sapphire and Amethyst, Peacock Palette, Metallic Jewel, Earthy Ochre & Terracotta, Burnt Sienna and Umber, Raw Sienna and Ochre, Olive and Moss, Weathered Sepia & Charcoal, Tea-stained Palette, Antique Paper, Aged Vellum, Muted Pastel Harmonious, Chalk Pastel Palette, Baby Pastel Palette, Dusty Pastel Palette, Split-complementary Vivid, Complementary Clash, Triadic Primary Vibrancy, Triadic Secondary, Tetradic Square, Tetradic Rectangle, Analogous Warm, Analogous Cool, Analogous Earth, Oxidized Bronze & Verdigris, Patinated Copper Palette, Rust and Iron Palette, Weathered Copper Roof, Sunset Gradient, Sunrise Gradient, Dusk Gradient, Dawn Gradient, Twilight Palette, Nocturne Palette, Bioluminescent Palette, Deep Sea Palette, Coral Reef Palette, Tropical Palette, Desert Palette, Arctic Palette, Forest Palette, Meadow Palette, Autumn Palette, Winter Palette, Spring Palette, Summer Palette, Monsoon Palette, Volcanic Palette, Ash and Ember, Smoke and Cinder, Fog and Mist, Storm Palette, Rainbow Spectrum, Prism Split, Newton Seven, ROYGBIV Banded, Limited Three-color, Limited Four-color, Limited Five-color, Warm-only Palette, Cool-only Palette, Neutral-only Palette, Achromatic Black-White, Black-White-Red, Black-White-Gold, White-on-White, Tone-on-Tone, Ombré Gradient, Dip-dyed Gradient, Fade Gradient, Airbrushed Gradient, Stippled Gradient, Dotted Gradient, Halftone Gradient
+                      Kandinsky, Hilma af Klint, Kazimir Malevich, Piet Mondrian, Theo van Doesburg, Bart van der Leck, Gerrit Rietveld, Josef Albers, Anni Albers, Johannes Itten, Paul Klee, Wassily Kandinsky (Bauhaus Period), László Moholy-Nagy, Walter Gropius, Marcel Breuer, Marianne Brandt, Wilhelm Wagenfeld, Sophie Taeuber-Arp, Hans Arp, Sonia Delaunay, Robert Delaunay, František Kupka, Francis Picabia, Marsden Hartley, Arthur Dove, Georgia O'Keeffe, Stuart Davis, Charles Sheeler, Charles Demuth, Stanton Macdonald-Wright, Morgan Russell, Patrick Henry Bruce, Clyfford Still, Mark Rothko, Barnett Newman, Ad Reinhardt, Josef Albers (Homage to the Square), Ellsworth Kelly, Frank Stella, Kenneth Noland, Morris Louis, Helen Frankenthaler, Jackson Pollock, Willem de Kooning, Franz Kline, Robert Motherwell, Arshile Gorky, Mark Tobey, Lee Krasner, Joan Mitchell, Sam Francis, Helen Frankenthaler (Soak-stain), Alma Thomas, Beauford Delaney, Norman Lewis, Romare Bearden, Jacob Lawrence, Horace Pippin, William H. Johnson, Aaron Douglas, Lois Mailou Jones, Faith Ringgold, Betye Saar, Sam Gilliam, Jack Whitten, Al Loving, Melvin Edwards, Martin Puryear, Howardena Pindell, McArthur Binion, Mark Bradford, Julie Mehretu, Kara Walker, Kehinde Wiley, Amy Sherald, Bridget Riley, Victor Vasarely, Jesús Rafael Soto, Carlos Cruz-Diez, Yaacov Agam, Alexander Calder, George Rickey, Jean Tinguely, Takis, Harry Bertoia, Len Lye, Norman McLaren, Oskar Fischinger, John Whitney, Lillian Schwartz, Vera Molnár, Manfred Mohr, Frieder Nake, Georg Nees, Harold Cohen, Casey Reas, Ben Fry, Jared Tarbell, Joshua Davis, Golan Levin, Zach Lieberman, Refik Anadol, Sofia Crespo, Mario Klingemann, Anna Ridler, Helena Sarin, Robbie Barrat, Pierre Soulages, Hans Hartung, Georges Mathieu, Jean Dubuffet, Antoni Tàpies, Lucio Fontana, Alberto Burri, Piero Manzoni, Yves Klein, Arman, Daniel Spoerri, Jean Tinguely (Metamatic), Niki de Saint Phalle, Jesús Rafael Soto (Penetrables), Lygia Clark, Hélio Oiticica, Lygia Pape, Mira Schendel, Beatriz Milhazes, Adriana Varejão, Tarsila do Amaral, Emiliano Di Cavalcanti, Cândido Portinari, Joaquín Torres-García, Xul Solar, Alejandro Xul, Frida Kahlo, Diego Rivera, Rufino Tamayo, Gunther Gerzso, Mathias Goeritz, Luis Barragán, Pedro Friedeberg, Carlos Mérida, Anni Albers (Textiles), Sheila Hicks, Magdalena Abakanowicz, Olga de Amaral, Lenore Tawney, Ruth Asawa, Kay Sekimachi, Ferne Jacobs, Ed Rossbach, John McQueen, Gyöngy Laky, Dorothy Gill Barnes, Patrick Dougherty, Andy Goldsworthy, Richard Long, Hamish Fulton, Nils-Udo, herman de vries, Giuseppe Penone, Robert Smithson, Nancy Holt, Michael Heizer, Walter De Maria, James Turrell, Robert Irwin, Dan Flavin, Donald Judd, Carl Andre, Sol LeWitt, Eva Hesse, Yayoi Kusama, Chihuly, Dale Chihuly, Toots Zynsky, Lino Tagliapietra, Pino Signoretto, William Morris (Glass), Bertil Vallien, Kiki Smith, Ann Wolff, Toshiko Takaezu, Peter Voulkos, Ken Price, Ron Nagle, Betty Woodman, Magdalene Odundo, Grayson Perry, Ai Weiwei, Lucie Rie, Hans Coper, Ruth Duckworth, Gertrud and Otto Natzler, Beatrice Wood, Otto Lindig, Bernard Leach, Shoji Hamada, Kanjiro Kawai, Kitaoji Rosanjin, Soetsu Yanagi, Tadao Ando (Modern Ceramic), Edmund de Waal, Julian Stair, Ken Eastman, Bodil Manz, Gwyn Hanssen Pigott, John Ward, Michael Cardew, Katherine Pleydell-Bouverie, Henry Hammond, Sara Flynn, Jennifer Lee, Adam Buick, Tom Charbit, Gustavo Pérez, Nicolas Lees, Rupert Spira, Elizabeth Fritsch, Ewen Henderson, Gillian Lowndes, Ian Godfrey, John Maltby, Gordon Baldwin, Claudi Casanovas, Ryoji Koie, Kazuo Yagi, Yasuhisa Kohyama, Nao Matsunaga, Toshio Ohi, Shiro Tsujimura, Kiyomizu Rokubei, Kawai Kanjiro (Folk Craft), Yanagi Soetsu (Mingei), Bernard Leach (St Ives), Shoji Hamada (Mashiko), Michael Cardew (Winchcombe), Ray Finch, Sidney Tustin, David Leach, Janet Leach, Hans Coper (St Ives)
+                        Densely Layered All-over, Horror Vacui, All-over Field, Patterned Ground, Overall Repeat, Wall-to-wall Pattern, Unbroken Field, Sparse Perimeter Border, Framed Border, Guilloche Border, Corner Motif, Cartouche Frame, Medallion Centerpiece, Symmetrical Centerpiece Focus, Radial Mandala, Central Axis, Bilateral Symmetry, Quadrilateral Symmetry, Rhythmic Repeating Grid, Grid of Squares, Grid of Rectangles, Grid of Triangles, Grid of Hexagons, Offset Grid, Half-drop Grid, Brick Grid, Diamond Grid, Minimalist Focal Accent, Single Focal Point, Lone Motif, Floating Motif, Isolated Element, Negative Space Emphasis, Gestural Chaotic Scatter, Random Scatter, Drip Scatter, Splatter Field, Debris Field, Confetti Field, Asymmetric Counterbalanced, Diagonal Counterbalance, Weighted Balance, Off-center Balance, Tension Balance, Gradient Density Transition, Densifying Gradient, Thinning Gradient, Radial Gradient Density, Edge Dense Center Sparse, Center Dense Edge Sparse, Horizon Band, Sky Band, Ground Band, Frieze Band, Registers Stacked, Triptych Split, Diptych Split, Polyptych Grid, Cartouche Panel, Vignette Framing, Trompe-l'œil Frame, Scroll Panorama, Handscroll Format, Hanging Scroll, Album Leaf, Accordion Fold, Concertina Format, Kaleidoscopic Mirror, Mandala Radial, Yantra Diagram, Rangoli Ground, Kolam Ground, Apotropaic Border, Protective Threshold, Processional Frieze, Triumphal Band, Narrative Register, Hieratic Scale, Isocephalic Arrangement, Continuous Narrative, Simultaneous Narrative, Synoptic Panel
+                          Miniature, Illuminated Miniature, Cabinet Miniature, Medallion Scale, Intimate Scale, Domestic Scale, Book Scale, Portable Scale, Tabletop Scale, Freestanding Scale, Human Scale, Life-size, Monumental, Mural Scale, Architectural Scale, Urban Scale, Landscape Scale, Earthwork Scale, Ephemeral Scale, Detail Macro, Macro Photographic, Micrographic, Microscopic, Telescopic, Cosmic Scale, Celestial Scale, Cartographic Scale, Floor Plan Scale, Pattern Book Scale, Sample Scale, Swatch Scale, Swatchbook Format, Sampler Scale, Specimen Scale, Study Scale, Sketch Scale, Maquette Scale, Model Scale, Diorama Scale, Terrarium Scale, Miniature World, Toy Scale, Dollhouse Scale, Furniture Scale, Rug Scale, Textile Bolt Scale, Wallpaper Roll Scale, Tile Field Scale, Paving Scale, Ceiling Scale, Coffer Scale, Cornice Scale, Frieze Scale, Pediment Scale, Facade Scale, Interior Scale, Room Scale, Gallery Scale, Museum Scale, Public Art Scale, Billboard Scale, Projection Scale, Installation Scale, Environment Scale, Immersive Scale, Walk-in Scale
+                            Neolithic, Chalcolithic, Bronze Age, Iron Age, Classical Antiquity, Archaic Greek, Classical Greek, Hellenistic, Roman, Late Roman, Byzantine, Early Christian, Migration Period, Insular Art, Carolingian, Ottonian, Romanesque, Gothic, International Gothic, Early Renaissance, High Renaissance, Mannerism, Baroque, Rococo, Neoclassicism, Romanticism, Realism, Pre-Raphaelite, Arts and Crafts Movement, Aesthetic Movement, Art Nouveau, Jugendstil, Vienna Secession, Wiener Werkstätte, Glasgow School, De Stijl, Constructivism, Suprematism, Bauhaus, Art Deco, Streamline Moderne, International Style, Mid-Century Modern, Atomic Age, Space Age, Brutalism, Postmodernism, Memphis Group, Neo-Geo, Neo-Expressionism, Young British Artists, Relational Aesthetics, Post-Internet, Contemporary Craft Revival, Slow Craft Movement, DIY Maker Movement, Digital Baroque, Algorithmic Renaissance, AI-generated Contemporary, Bio-art, Eco-art, Land Art, Arte Povera, Fluxus, Minimalism, Conceptual Art, Performance Art, Video Art, Net Art, Generative Art Era, NFT Era
+                              Gallery-lit, Museum Spotlight, Diffuse Daylight, North-facing Light, Raking Light, Grazing Light, Backlit, Edge-lit, Underlit, Uplit, Downlit, Candlelit, Gaslit, Lamplit, Firelit, Sunlit, Moonlit, Twilight Ambient, Golden Hour, Blue Hour, Overcast Diffuse, Harsh Noon, Dappled Light, Caustic Projection, Colored Gel Light, Neon Ambient, Blacklight UV, Strobe, Stained-glass Transmitted, Stained-glass Reflected, Silver-screen Projection, Slide Projection, Overhead Projection, Rear Projection, Pepper's Ghost, Shadow Play, Cast Shadow Emphasis, Long-shadow Raking, Soft-box Even, Ring-light Even, Fresnel Focus, Barn-door Directional, Follow-spot, Environmental Ambient, Candle Procession, Torchlight, Ritual Firelight, Diya Oil-lamp, Paper Lantern, Bonfire Glow, Bioluminescent Ambient, Phosphorescent Glow, Electroluminescent, LED Array, Fiber-optic Point, Laser Line, Laser Plane, Holographic Ambient, Chromadepth, Anaglyph Stereo, Lenticular Shift, Moiré Interference Light
+                                Framed, Gilt Frame, Silver Frame, Ebony Frame, Carved Frame, Cassetta Frame, Sansovino Frame, Auricular Frame, Louis Frame, Empire Frame, Biedermeier Frame, Salon Frame, Floating Frame, Shadow-box Frame, Museum Frame, Archival Frame, Vitrine Display, Pedestal Display, Plinth Display, Wall-mounted, Ceiling-suspended, Floor-standing, Floor-leaning, Table Display, Shelf Display, Grid Display, Salon Hang, Triptych Display, Diptych Display, Polyptych Display, Predella Display, Altarpiece Display, Screen Display, Byōbu Display, Hanging Scroll Display, Handscroll Unrolling, Album Leaf Display, Concertina Display, Accordion Display, Codex Display, Book Cradle, Lectern Display, Rotating Display, Motorized Carousel, Kinetic Display, Projection Display, Immersive Room, Walk-in Environment, Sound-integrated Display, Scent-integrated Display, Tactile Display, Interactive Display, Touch-screen Display, VR Display, AR Overlay, Web Display, Screen-native Display
+  raw_roles: |
+    movement
+    cultural_origin
+    domain
+    technique
+    medium_material
+    motif
+    surface_finish
+    color_treatment
+    color_strategy
+    reference_artist
+    composition
+    scale
+    era_period
+    lighting
+    presentation
+  groups:
+    - group_index: 

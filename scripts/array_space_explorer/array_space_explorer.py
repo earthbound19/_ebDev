@@ -1,9 +1,11 @@
 # DESCRIPTION
-# Array Space Explorer & Prompt Generator
-# A CustomTkinter GUI tool for parsing line-separated, comma-delimited multidimensional arrays
-# with indentation-based Cartesian hierarchy. Features interactive coordinate exploration,
-# per-line "No comma" formatting controls, random coordinate generation, live prompt synthesis
-# with direct clipboard copy support, window geometry tracking, and YAML config load/save capabilities.
+# Array Space Explorer & Prompt Generator  (scriptVersion 2.0)
+# A CustomTkinter GUI tool for parsing line-separated, comma-delimited multidimensional
+# arrays with indentation-based Cartesian hierarchy. Features interactive coordinate
+# exploration, per-line "No comma" formatting controls, per-line role tagging via a
+# parallel Roles textarea, per-line skip chance, per-line max-picks, random coordinate
+# generation, live prompt synthesis with direct clipboard copy support, window geometry
+# tracking, and YAML config load/save capabilities.
 
 # DEPENDENCIES
 # - python >= 3.8
@@ -15,8 +17,11 @@
 #    pip install customtkinter pyyaml
 # 2. Run the application:
 #    python array_space_explorer.py
-# 3. Enter arrays line by line in the textarea. Use 2 spaces per indentation level to create
-#    child dimensions (Cartesian products). Click "Display Array Space!" or "Explore Random Coordinate!".
+# 3. Enter arrays line by line in the Values textarea. Use 2 spaces per indentation
+#    level to create child dimensions (Cartesian products). Optionally fill the parallel
+#    Roles textarea (one role per line, blank lines = role-less). Click
+#    "Display Array Space!" or "Explore Random Coordinate!". Optionally save the config
+#    as YAML with the provided button. OR load a previously saved YAML config.
 
 # CODE
 import math
@@ -25,6 +30,8 @@ import tkinter as tk
 from tkinter import filedialog
 import customtkinter as ctk
 import yaml
+
+scriptVersion = "2.0"
 
 # Initialize CustomTkinter appearance defaults
 ctk.set_appearance_mode("Dark")
@@ -36,11 +43,11 @@ class ArraySpaceExplorer(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("Array Space Explorer & Prompt Generator")
-        self.geometry("950x850")
+        self.title(f"Array Space Explorer & Prompt Generator  (v{scriptVersion})")
+        self.geometry("1200x900")
 
         self.parsed_groups = []  # Holds structured parsed array data
-        self.spinboxes = []  # Holds CTk Entry/Spinbox & Checkbox widgets for indices
+        self.spinboxes = []      # Holds CTk Entry/Spinbox & Checkbox widgets for indices
 
         # Bind window movement & resizing to track geometry for YAML saving
         self.bind("<Configure>", self._on_window_configure)
@@ -75,35 +82,78 @@ class ArraySpaceExplorer(ctk.CTk):
         self.constraint_label = ctk.CTkLabel(
             self,
             text=(
-                "Constraints: No double quotes in strings. Apostrophes/single"
-                " quotes allowed.\nBlank tokens between commas allowed (for optional/skipped elements). 2"
-                " spaces per Cartesian dimension level."
+                "Constraints: No double quotes in strings. Apostrophes/single quotes allowed. "
+                "Empty tokens between commas are stripped. 2 spaces per Cartesian dimension level. "
+                "Roles textarea: one role per line, line N applies to values line N; blank role lines "
+                "are allowed and yield role-less dimensions. Skip chance 0.0-1.0 and Max picks 1..N "
+                "are per-dimension."
             ),
             font=("Arial", 12, "italic"),
             text_color="gray",
+            justify="left",
         )
         self.constraint_label.pack(anchor="w", padx=20, pady=(5, 5))
 
-        # Textarea Input with Horizontal Scrollbar
+        # Side-by-side Values + Roles text areas
         self.text_frame = ctk.CTkFrame(self)
         self.text_frame.pack(fill="x", padx=15, pady=5)
 
-        self.text_area = ctk.CTkTextbox(
-            self.text_frame, height=180, font=("Consolas", 14), wrap="none"
+        # Inner container so we can put values on the left and roles on the right
+        self.text_inner = ctk.CTkFrame(self.text_frame, fg_color="transparent")
+        self.text_inner.pack(fill="x", expand=True, padx=5, pady=5)
+
+        # ---- Values column ----
+        self.values_col = ctk.CTkFrame(self.text_inner, fg_color="transparent")
+        self.values_col.pack(side="left", fill="both", expand=True)
+
+        self.values_label = ctk.CTkLabel(
+            self.values_col,
+            text="Values  (indent with 2 spaces per Cartesian dimension)",
+            font=("Arial", 12, "bold"),
         )
-        self.text_area.pack(fill="x", expand=True, padx=5, pady=(5, 0))
+        self.values_label.pack(anchor="w", padx=2, pady=(0, 2))
+
+        self.text_area = ctk.CTkTextbox(
+            self.values_col, height=180, font=("Consolas", 14), wrap="none"
+        )
+        self.text_area.pack(fill="x", expand=True, padx=0, pady=(0, 0))
 
         self.h_scrollbar = ctk.CTkScrollbar(
-            self.text_frame,
+            self.values_col,
             orientation="horizontal",
             command=self.text_area.xview,
         )
-        self.h_scrollbar.pack(fill="x", padx=5, pady=(2, 5))
+        self.h_scrollbar.pack(fill="x", padx=0, pady=(2, 0))
         self.text_area.configure(xscrollcommand=self.h_scrollbar.set)
 
-        # Default starter content (including empty entries)
+        # Default starter content
         self.text_area.insert(
-            "1.0", "a, b, c, \n  1, , 2, 3\n    10.5, 20.0\nx, y, z"
+            "1.0", "Geometric Abstraction, Organic Constructivism, Folk Decorative Art\n"
+                   "  Impasto Paletting, Drybrush Layering, Sgraffito Carving\n"
+                   "    Guilloché Spirals, Isometric Facets, Voronoi Tessellations"
+        )
+
+        # ---- Roles column (right, narrower) ----
+        self.roles_col = ctk.CTkFrame(self.text_inner, fg_color="transparent", width=220)
+        self.roles_col.pack(side="right", fill="y", expand=False, padx=(10, 0))
+        self.roles_col.pack_propagate(False)
+
+        self.roles_label = ctk.CTkLabel(
+            self.roles_col,
+            text="Roles  (optional, 1 per line)",
+            font=("Arial", 12, "bold"),
+        )
+        self.roles_label.pack(anchor="w", padx=2, pady=(0, 2))
+
+        self.role_text_area = ctk.CTkTextbox(
+            self.roles_col, height=180, font=("Consolas", 14), wrap="none"
+        )
+        self.role_text_area.pack(fill="both", expand=True, padx=0, pady=(0, 0))
+
+        self.role_text_area.insert(
+            "1.0", "movement\n"
+                   "technique\n"
+                   "\n"
         )
 
         # Main Action Buttons
@@ -137,12 +187,13 @@ class ArraySpaceExplorer(ctk.CTk):
             self,
             text="Array Space Size: Not Processed Yet",
             font=("Arial", 13, "bold"),
+            justify="left",
         )
         self.info_label.pack(anchor="w", padx=20, pady=5)
 
         # Inspection Area (Scrollable Frame)
         self.inspector_frame = ctk.CTkScrollableFrame(
-            self, height=220, label_text="Array Space Inspector"
+            self, height=260, label_text="Array Space Inspector"
         )
         self.inspector_frame.pack(fill="both", expand=True, padx=15, pady=10)
 
@@ -169,13 +220,23 @@ class ArraySpaceExplorer(ctk.CTk):
             side="left", fill="x", expand=True, padx=(0, 10)
         )
 
+        self.reroll_btn = ctk.CTkButton(
+            self.output_control_row,
+            text="Re-roll skips & picks",
+            width=170,
+            fg_color="#8a5a2b",
+            hover_color="#6e4720",
+            command=self.resample_skips_and_picks,
+        )
+        self.reroll_btn.pack(side="right", padx=(5, 5))
+
         self.copy_btn = ctk.CTkButton(
             self.output_control_row,
             text="Copy to Clipboard",
             width=140,
             command=self.copy_to_clipboard,
         )
-        self.copy_btn.pack(side="right")
+        self.copy_btn.pack(side="right", padx=(5, 0))
 
     def toggle_theme(self):
         if self.theme_btn.cget("text") == "Dark Mode":
@@ -195,10 +256,14 @@ class ArraySpaceExplorer(ctk.CTk):
             self.copy_btn.configure(text="Copied!")
             self.after(1500, lambda: self.copy_btn.configure(text=old_text))
 
+    # ------------------------------------------------------------------
+    # Parsing
+    # ------------------------------------------------------------------
+
     def _parse_token(self, token):
         token = token.strip()
         if not token:
-            return ""
+            return None  # explicit skip marker; caller strips Nones
 
         # Try Integer
         try:
@@ -221,43 +286,56 @@ class ArraySpaceExplorer(ctk.CTk):
 
     def parse_input_text(self):
         raw_text = self.text_area.get("1.0", "end-1c")
+        raw_roles_text = self.role_text_area.get("1.0", "end-1c")
+
+        # --- Values side (existing pipeline, minus "" skip semantic) ---
         raw_lines = raw_text.splitlines()
+        role_lines = raw_roles_text.splitlines()
 
         normalized_lines = []
-        prev_depth = 0  # Track previous line's depth
+        prev_depth = 0
 
-        for line in raw_lines:
-            # Convert tabs to 2 spaces
+        for idx, line in enumerate(raw_lines):
             expanded = line.replace("\t", "  ")
             stripped = expanded.lstrip(" ")
 
             if not stripped:
+                # Blank line: skipped. Role line at same index is also skipped.
                 continue
 
-            # Calculate indentation depth
             indent_count = len(expanded) - len(stripped)
             raw_depth = indent_count // 2
 
-            # Clamp to the maximum depth allowed relative to the prior line
             max_depth = prev_depth + 1
             depth = min(raw_depth, max_depth)
             prev_depth = depth
 
-            # Parse tokens including empty strings
-            tokens = [self._parse_token(tok) for tok in stripped.split(",")]
+            # Parse tokens, dropping empty ones (no more "" skip)
+            raw_tokens = [self._parse_token(tok) for tok in stripped.split(",")]
+            raw_tokens = [t for t in raw_tokens if t is not None]
 
-            if tokens:
-                normalized_lines.append(
-                    {"depth": depth, "raw_tokens": tokens, "stripped": stripped}
-                )
+            # Role: strict line-index alignment. Blank role -> None.
+            role = None
+            if idx < len(role_lines):
+                role_candidate = role_lines[idx].strip()
+                if role_candidate:
+                    role = role_candidate
 
-        # Re-format textarea content with standardized spaces
+            normalized_lines.append(
+                {
+                    "depth": depth,
+                    "raw_tokens": raw_tokens,
+                    "stripped": stripped,
+                    "role": role,
+                    "source_line_index": idx,
+                }
+            )
+
+        # Re-format values textarea with standardized spacing
         reformatted_text_lines = []
         for item in normalized_lines:
             indent_str = "  " * item["depth"]
-            tokens_str = ", ".join(
-                '""' if t == "" else str(t) for t in item["raw_tokens"]
-            )
+            tokens_str = ", ".join(str(t) for t in item["raw_tokens"])
             reformatted_text_lines.append(f"{indent_str}{tokens_str}")
 
         self.text_area.delete("1.0", "end")
@@ -271,27 +349,24 @@ class ArraySpaceExplorer(ctk.CTk):
             raw_tokens = item["raw_tokens"]
             depth = item["depth"]
 
-            has_str = any(isinstance(t, str) and t != "" for t in raw_tokens)
+            has_str = any(isinstance(t, str) for t in raw_tokens)
             has_float = any(isinstance(t, float) for t in raw_tokens)
 
             if has_str:
                 typed_tokens = [str(t) for t in raw_tokens]
                 line_type = "string"
             elif has_float:
-                typed_tokens = [
-                    float(t) if t != "" else "" for t in raw_tokens
-                ]
+                typed_tokens = [float(t) for t in raw_tokens]
                 line_type = "float"
             else:
-                typed_tokens = [
-                    int(t) if t != "" else "" for t in raw_tokens
-                ]
+                typed_tokens = [int(t) for t in raw_tokens]
                 line_type = "int"
 
             dim_info = {
                 "depth": depth,
                 "type": line_type,
                 "values": typed_tokens,
+                "role": item["role"],
             }
 
             if not current_group:
@@ -310,17 +385,25 @@ class ArraySpaceExplorer(ctk.CTk):
         self.parsed_groups = groups
         return groups
 
+    # ------------------------------------------------------------------
+    # Display
+    # ------------------------------------------------------------------
+
     def process_and_display(self):
         self.parse_input_text()
         self._rebuild_inspector_ui()
+        self._resample_all_skips_and_picks()
         self.update_synthesized_output()
 
-    def _rebuild_inspector_ui(self, saved_no_comma_states=None):
+    def _rebuild_inspector_ui(self, saved_state=None):
+        """saved_state: optional list-of-lists of dicts with keys
+        {index, no_comma, skip_chance, max_picks} matching parsed_groups."""
         for widget in self.inspector_frame.winfo_children():
             widget.destroy()
 
         self.spinboxes = []
-        total_space_sizes = []
+        total_raw_sizes = []
+        total_expected_sizes = []
 
         if not self.parsed_groups:
             self.info_label.configure(
@@ -329,17 +412,16 @@ class ArraySpaceExplorer(ctk.CTk):
             return
 
         for g_idx, group in enumerate(self.parsed_groups):
-            group_size = math.prod(len(dim["values"]) for dim in group)
-            total_space_sizes.append(
-                f"Group {g_idx + 1}: {group_size} combinations"
-            )
+            raw_size = math.prod(len(dim["values"]) for dim in group)
 
+            # Expected non-skipped size assumes skip_chance known yet; compute after
+            # controls are built if saved_state not supplied. Placeholder here.
             group_container = ctk.CTkFrame(self.inspector_frame)
             group_container.pack(fill="x", padx=5, pady=5)
 
             lbl_title = ctk.CTkLabel(
                 group_container,
-                text=f"Group {g_idx + 1} (Size: {group_size})",
+                text=f"Group {g_idx + 1} (Raw size: {raw_size})",
                 font=("Arial", 12, "bold"),
             )
             lbl_title.pack(anchor="w", padx=10, pady=(5, 2))
@@ -353,38 +435,35 @@ class ArraySpaceExplorer(ctk.CTk):
                 row_frame.pack(fill="x", padx=10, pady=4)
 
                 indent_prefix = "  " * dim["depth"]
+                role_display = dim.get("role") if dim.get("role") else "(none)"
 
                 first_three = dim["values"][:3]
-                preview_str = ", ".join(
-                    '""' if v == "" else str(v) for v in first_three
-                )
+                preview_str = ", ".join(str(v) for v in first_three)
                 if len(dim["values"]) > 3:
                     preview_str += ", ..."
 
                 lbl_dim = ctk.CTkLabel(
                     row_frame,
                     text=(
-                        f"{indent_prefix}Dim [{d_idx}] (0 .."
-                        f" {len(dim['values']) - 1}) -> Preview: [{preview_str}]"
+                        f"{indent_prefix}[{role_display}] Dim [{d_idx}] "
+                        f"(0 .. {len(dim['values']) - 1}) -> Preview: [{preview_str}]"
                     ),
                     anchor="w",
                 )
                 lbl_dim.pack(side="left", fill="x", expand=True)
 
-                # Spinbox (Up/Down Buttons + Entry)
+                # Spinbox
                 btn_down = ctk.CTkButton(
                     row_frame,
                     text="-",
                     width=30,
-                    command=lambda g=g_idx, d=d_idx: self._adjust_index(
-                        g, d, -1
-                    ),
+                    command=lambda g=g_idx, d=d_idx: self._adjust_index(g, d, -1),
                 )
                 btn_down.pack(side="left", padx=2)
 
                 entry_var = tk.StringVar(value="0")
                 entry_var.trace_add(
-                    "write", lambda *args: self._on_index_change()
+                    "write", lambda *args: self.update_synthesized_output()
                 )
 
                 entry = ctk.CTkEntry(
@@ -399,21 +478,63 @@ class ArraySpaceExplorer(ctk.CTk):
                     row_frame,
                     text="+",
                     width=30,
-                    command=lambda g=g_idx, d=d_idx: self._adjust_index(
-                        g, d, 1
-                    ),
+                    command=lambda g=g_idx, d=d_idx: self._adjust_index(g, d, 1),
                 )
                 btn_up.pack(side="left", padx=2)
 
-                # "Display no comma" checkbox to the right of every line
-                no_comma_var = tk.BooleanVar(value=False)
-                if (
-                    saved_no_comma_states
-                    and g_idx < len(saved_no_comma_states)
-                    and d_idx < len(saved_no_comma_states[g_idx])
-                ):
-                    no_comma_var.set(saved_no_comma_states[g_idx][d_idx])
+                # Skip chance entry
+                skip_var = tk.StringVar(value="0.00")
+                skip_label = ctk.CTkLabel(row_frame, text="Skip:")
+                skip_label.pack(side="left", padx=(10, 2))
+                skip_entry = ctk.CTkEntry(
+                    row_frame, textvariable=skip_var, width=52, justify="center"
+                )
+                skip_entry.pack(side="left", padx=2)
+                skip_var.trace_add(
+                    "write", lambda *args: self.update_synthesized_output()
+                )
+                skip_entry.bind(
+                    "<FocusOut>",
+                    lambda e, v=skip_var: self._clamp_skip(v),
+                )
 
+                # Max picks slider
+                maxpicks_var = tk.IntVar(value=1)
+                mp_label = ctk.CTkLabel(row_frame, text="Max picks:")
+                mp_label.pack(side="left", padx=(10, 2))
+                mp_value_lbl = ctk.CTkLabel(row_frame, text="1", width=28)
+                mp_value_lbl.pack(side="left", padx=(0, 2))
+
+                def _on_mp_change(value, var=maxpicks_var, lbl=mp_value_lbl,
+                                  ent=entry, bd=btn_down, bu=btn_up,
+                                  _d=d_idx, _g=g_idx):
+                    v = int(round(value))
+                    var.set(v)
+                    lbl.configure(text=str(v))
+                    # Disable spinbox controls when max_picks > 1
+                    if v > 1:
+                        ent.configure(state="disabled")
+                        bd.configure(state="disabled")
+                        bu.configure(state="disabled")
+                    else:
+                        ent.configure(state="normal")
+                        bd.configure(state="normal")
+                        bu.configure(state="normal")
+                    self.update_synthesized_output()
+
+                mp_slider = ctk.CTkSlider(
+                    row_frame,
+                    from_=1,
+                    to=max(1, len(dim["values"])),
+                    number_of_steps=max(1, len(dim["values"]) - 1),
+                    command=_on_mp_change,
+                    width=140,
+                )
+                mp_slider.set(1)
+                mp_slider.pack(side="left", padx=2)
+
+                # "Display no comma" checkbox
+                no_comma_var = tk.BooleanVar(value=False)
                 no_comma_chk = ctk.CTkCheckBox(
                     row_frame,
                     text="Display no comma",
@@ -426,14 +547,67 @@ class ArraySpaceExplorer(ctk.CTk):
                     {
                         "var": entry_var,
                         "entry": entry,
+                        "btn_up": btn_up,
+                        "btn_down": btn_down,
                         "no_comma_var": no_comma_var,
+                        "skip_var": skip_var,
+                        "maxpicks_var": maxpicks_var,
+                        "maxpicks_slider": mp_slider,
+                        "maxpicks_label": mp_value_lbl,
                         "max": len(dim["values"]) - 1,
+                        # runtime sample cache (repopulated on resample)
+                        "skip_roll": False,
+                        "pick_indices": [0],
                     }
                 )
 
+                # Restore saved state if provided
+                if saved_state and g_idx < len(saved_state) and d_idx < len(saved_state[g_idx]):
+                    s = saved_state[g_idx][d_idx]
+                    if "index" in s and s["index"] is not None:
+                        entry_var.set(str(s["index"]))
+                    if "no_comma" in s:
+                        no_comma_var.set(bool(s["no_comma"]))
+                    if "skip_chance" in s:
+                        skip_var.set(f"{float(s['skip_chance']):.2f}")
+                    if "max_picks" in s:
+                        mp_slider.set(int(s["max_picks"]))
+                        _on_mp_change(int(s["max_picks"]))
+
             self.spinboxes.append(group_spinboxes)
 
-        self.info_label.configure(text=" | ".join(total_space_sizes))
+        self._update_info_label()
+
+    def _clamp_skip(self, var):
+        try:
+            v = float(var.get())
+        except ValueError:
+            v = 0.0
+        v = max(0.0, min(1.0, v))
+        var.set(f"{v:.2f}")
+        self.update_synthesized_output()
+
+    def _update_info_label(self):
+        parts = []
+        for g_idx, group in enumerate(self.parsed_groups):
+            raw_size = math.prod(len(dim["values"]) for dim in group)
+            expected = 1.0
+            for d_idx, dim in enumerate(group):
+                sb = self.spinboxes[g_idx][d_idx]
+                try:
+                    sc = float(sb["skip_var"].get())
+                except ValueError:
+                    sc = 0.0
+                sc = max(0.0, min(1.0, sc))
+                expected *= len(dim["values"]) * (1.0 - sc)
+            parts.append(
+                f"Group {g_idx + 1}: Raw {raw_size} | Expected non-skipped ~{expected:.1f}"
+            )
+        self.info_label.configure(text=" | ".join(parts) if parts else "Array Space Size: 0")
+
+    # ------------------------------------------------------------------
+    # Index & skip management
+    # ------------------------------------------------------------------
 
     def _adjust_index(self, group_idx, dim_idx, delta):
         sb = self.spinboxes[group_idx][dim_idx]
@@ -441,54 +615,29 @@ class ArraySpaceExplorer(ctk.CTk):
             curr = int(sb["var"].get())
         except ValueError:
             curr = 0
-
         new_val = max(0, min(curr + delta, sb["max"]))
         sb["var"].set(str(new_val))
 
-    def _on_index_change(self):
-        self.update_synthesized_output()
-
-    def update_synthesized_output(self):
-        output_tokens = []
-
+    def _resample_all_skips_and_picks(self):
         for g_idx, group in enumerate(self.parsed_groups):
             for d_idx, dim in enumerate(group):
                 sb = self.spinboxes[g_idx][d_idx]
                 try:
-                    val = int(sb["var"].get())
+                    sc = float(sb["skip_var"].get())
                 except ValueError:
-                    val = 0
+                    sc = 0.0
+                sc = max(0.0, min(1.0, sc))
+                sb["skip_roll"] = random.random() < sc
 
-                clamped_idx = max(0, min(val, sb["max"]))
-                val_str = str(dim["values"][clamped_idx])
-                no_comma = sb["no_comma_var"].get()
+                mp = max(1, int(sb["maxpicks_var"].get()))
+                n_vals = len(dim["values"])
+                k = random.randint(1, min(mp, n_vals))
+                picks = sorted(random.sample(range(n_vals), k))
+                sb["pick_indices"] = picks
 
-                output_tokens.append({"val": val_str, "no_comma": no_comma})
-
-        # Assemble string dynamically, ignoring blank elements
-        rendered_elements = []
-        for idx, item in enumerate(output_tokens):
-            if item["val"] == "":
-                continue
-
-            rendered_elements.append(item)
-
-        synthesized_parts = []
-        for idx, item in enumerate(rendered_elements):
-            synthesized_parts.append(item["val"])
-
-            # Determine separator following this element (if not the last active element)
-            if idx < len(rendered_elements) - 1:
-                if item["no_comma"]:
-                    synthesized_parts.append(" ")
-                else:
-                    synthesized_parts.append(", ")
-
-        output_str = "".join(synthesized_parts)
-        self.output_entry.configure(state="normal")
-        self.output_entry.delete(0, "end")
-        self.output_entry.insert(0, output_str)
-        self.output_entry.configure(state="readonly")
+    def resample_skips_and_picks(self):
+        self._resample_all_skips_and_picks()
+        self.update_synthesized_output()
 
     def roll_random_coordinate(self):
         if not self.parsed_groups:
@@ -500,7 +649,70 @@ class ArraySpaceExplorer(ctk.CTk):
                 rand_idx = random.randint(0, sb["max"])
                 sb["var"].set(str(rand_idx))
 
+        self._resample_all_skips_and_picks()
         self.update_synthesized_output()
+
+    # ------------------------------------------------------------------
+    # Synthesis
+    # ------------------------------------------------------------------
+
+    def update_synthesized_output(self):
+        if not self.parsed_groups:
+            self.output_entry.configure(state="normal")
+            self.output_entry.delete(0, "end")
+            self.output_entry.configure(state="readonly")
+            return
+
+        rendered_elements = []  # list of {val, no_comma} in order
+
+        for g_idx, group in enumerate(self.parsed_groups):
+            for d_idx, dim in enumerate(group):
+                sb = self.spinboxes[g_idx][d_idx]
+
+                if sb.get("skip_roll", False):
+                    continue
+
+                # Determine which value(s) this dimension contributes
+                mp = max(1, int(sb["maxpicks_var"].get()))
+                if mp > 1:
+                    # multi-pick: use cached random subset
+                    picks = sb.get("pick_indices", [0])
+                    if not picks:
+                        picks = [0]
+                else:
+                    try:
+                        val = int(sb["var"].get())
+                    except ValueError:
+                        val = 0
+                    val = max(0, min(val, sb["max"]))
+                    picks = [val]
+
+                no_comma = sb["no_comma_var"].get()
+
+                for p in picks:
+                    p = max(0, min(p, sb["max"]))
+                    val_str = str(dim["values"][p])
+                    rendered_elements.append(
+                        {"val": val_str, "no_comma": no_comma}
+                    )
+
+        synthesized_parts = []
+        for idx, item in enumerate(rendered_elements):
+            synthesized_parts.append(item["val"])
+            if idx < len(rendered_elements) - 1:
+                synthesized_parts.append(" " if item["no_comma"] else ", ")
+
+        output_str = "".join(synthesized_parts)
+        self.output_entry.configure(state="normal")
+        self.output_entry.delete(0, "end")
+        self.output_entry.insert(0, output_str)
+        self.output_entry.configure(state="readonly")
+
+        self._update_info_label()
+
+    # ------------------------------------------------------------------
+    # YAML Save / Load
+    # ------------------------------------------------------------------
 
     def save_yaml(self):
         filepath = filedialog.asksaveasfilename(
@@ -511,14 +723,28 @@ class ArraySpaceExplorer(ctk.CTk):
 
         self.parse_input_text()
         raw_text = self.text_area.get("1.0", "end-1c")
+        raw_roles = self.role_text_area.get("1.0", "end-1c")
 
         groups_export = []
         for g_idx, group in enumerate(self.parsed_groups):
             dims_export = []
             for d_idx, dim in enumerate(group):
                 sb = self.spinboxes[g_idx][d_idx]
-                dim_copy = dict(dim)
-                dim_copy["no_comma"] = sb["no_comma_var"].get()
+                try:
+                    sc = float(sb["skip_var"].get())
+                except ValueError:
+                    sc = 0.0
+                sc = max(0.0, min(1.0, sc))
+
+                dim_copy = {
+                    "role": dim.get("role"),
+                    "depth": dim["depth"],
+                    "type": dim["type"],
+                    "no_comma": bool(sb["no_comma_var"].get()),
+                    "skip_chance": round(sc, 4),
+                    "max_picks": int(sb["maxpicks_var"].get()),
+                    "values": dim["values"],
+                }
                 dims_export.append(dim_copy)
 
             groups_export.append(
@@ -526,19 +752,20 @@ class ArraySpaceExplorer(ctk.CTk):
             )
 
         yaml_data = {
-            "version": "1.0",
+            "version": scriptVersion,
             "settings": {
                 "appearance_mode": ctk.get_appearance_mode(),
                 "window_geometry": self.geometry(),
             },
             "data": {
                 "raw_text": raw_text,
+                "raw_roles": raw_roles,
                 "groups": groups_export,
             },
         }
 
         with open(filepath, "w", encoding="utf-8") as f:
-            yaml.dump(yaml_data, f, default_flow_style=False)
+            yaml.dump(yaml_data, f, default_flow_style=False, allow_unicode=True)
 
     def load_yaml(self):
         filepath = filedialog.askopenfilename(
@@ -561,21 +788,35 @@ class ArraySpaceExplorer(ctk.CTk):
             if "window_geometry" in settings:
                 self.geometry(settings["window_geometry"])
 
-        saved_no_comma_states = []
+        saved_state = []
         if "data" in yaml_data:
-            if "raw_text" in yaml_data["data"]:
-                self.text_area.delete("1.0", "end")
-                self.text_area.insert("1.0", yaml_data["data"]["raw_text"])
+            data = yaml_data["data"]
 
-            if "groups" in yaml_data["data"]:
-                for group in yaml_data["data"]["groups"]:
+            if "raw_text" in data:
+                self.text_area.delete("1.0", "end")
+                self.text_area.insert("1.0", data["raw_text"])
+
+            if "raw_roles" in data:
+                self.role_text_area.delete("1.0", "end")
+                self.role_text_area.insert("1.0", data["raw_roles"])
+
+            if "groups" in data:
+                for group in data["groups"]:
                     group_states = []
                     for dim in group.get("dimensions", []):
-                        group_states.append(dim.get("no_comma", False))
-                    saved_no_comma_states.append(group_states)
+                        group_states.append(
+                            {
+                                "index": 0,
+                                "no_comma": dim.get("no_comma", False),
+                                "skip_chance": dim.get("skip_chance", 0.0),
+                                "max_picks": dim.get("max_picks", 1),
+                            }
+                        )
+                    saved_state.append(group_states)
 
         self.parse_input_text()
-        self._rebuild_inspector_ui(saved_no_comma_states=saved_no_comma_states)
+        self._rebuild_inspector_ui(saved_state=saved_state if saved_state else None)
+        self._resample_all_skips_and_picks()
         self.update_synthesized_output()
 
 
