@@ -213,12 +213,52 @@ class ArraySpaceExplorer(ctk.CTk):
         )
         self.output_control_row.pack(fill="x", padx=10, pady=(0, 10))
 
-        self.output_entry = ctk.CTkEntry(
-            self.output_control_row, font=("Consolas", 14), state="readonly"
+        # ---- FIXED-HEIGHT WRAPPER FOR THE OUTPUT BOX ----
+        self.output_text_wrap = ctk.CTkFrame(
+            self.output_control_row, fg_color="transparent", height=96
         )
-        self.output_entry.pack(
+        self.output_text_wrap.pack(
             side="left", fill="x", expand=True, padx=(0, 10)
         )
+        self.output_text_wrap.pack_propagate(False)
+
+        self.output_entry = ctk.CTkTextbox(
+            self.output_text_wrap,
+            font=("Consolas", 14),
+            height=96,
+            wrap="word",
+        )
+        self.output_entry.pack(
+            side="left", fill="both", expand=True, padx=(0, 0)
+        )
+
+        self.output_scrollbar = ctk.CTkScrollbar(
+            self.output_text_wrap,
+            orientation="vertical",
+            command=self.output_entry.yview,
+        )
+        self.output_scrollbar.pack(side="right", fill="y", padx=(2, 0))
+        self.output_entry.configure(yscrollcommand=self.output_scrollbar.set)
+        self.output_entry.configure(state="disabled")
+        # ---- END FIXED-HEIGHT WRAPPER ----
+
+        self.reroll_btn = ctk.CTkButton(
+            self.output_control_row,
+            text="Re-roll skips & picks",
+            width=170,
+            fg_color="#8a5a2b",
+            hover_color="#6e4720",
+            command=self.resample_skips_and_picks,
+        )
+        self.reroll_btn.pack(side="right", padx=(5, 5))
+
+        self.copy_btn = ctk.CTkButton(
+            self.output_control_row,
+            text="Copy to Clipboard",
+            width=140,
+            command=self.copy_to_clipboard,
+        )
+        self.copy_btn.pack(side="right", padx=(5, 0))
 
         self.reroll_btn = ctk.CTkButton(
             self.output_control_row,
@@ -247,7 +287,7 @@ class ArraySpaceExplorer(ctk.CTk):
             self.theme_btn.configure(text="Dark Mode")
 
     def copy_to_clipboard(self):
-        text = self.output_entry.get()
+        text = self.output_entry.get("1.0", "end-1c")
         if text:
             self.clipboard_clear()
             self.clipboard_append(text)
@@ -698,8 +738,8 @@ class ArraySpaceExplorer(ctk.CTk):
     def update_synthesized_output(self):
         if not self.parsed_groups:
             self.output_entry.configure(state="normal")
-            self.output_entry.delete(0, "end")
-            self.output_entry.configure(state="readonly")
+            self.output_entry.delete("1.0", "end")
+            self.output_entry.configure(state="disabled")
             return
 
         rendered_elements = []  # list of {val, no_comma} in order
@@ -743,9 +783,9 @@ class ArraySpaceExplorer(ctk.CTk):
 
         output_str = "".join(synthesized_parts)
         self.output_entry.configure(state="normal")
-        self.output_entry.delete(0, "end")
-        self.output_entry.insert(0, output_str)
-        self.output_entry.configure(state="readonly")
+        self.output_entry.delete("1.0", "end")
+        self.output_entry.insert("1.0", output_str)
+        self.output_entry.configure(state="disabled")
 
         self._update_info_label()
 
