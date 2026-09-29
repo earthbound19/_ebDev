@@ -3,9 +3,9 @@
 # A CustomTkinter GUI tool for parsing line-separated, comma-delimited multidimensional
 # arrays with indentation-based Cartesian hierarchy. Features interactive coordinate
 # exploration, per-line "No comma" formatting controls, per-line role tagging via a
-# parallel Roles textarea, per-line skip chance, per-line max-picks, random coordinate
-# generation, live prompt synthesis with direct clipboard copy support, window geometry
-# tracking, and YAML config load/save capabilities.
+# parallel Roles textarea, per-line skip chance, per-line max-picks, per-line selection
+# lock, random coordinate generation, live prompt synthesis with direct clipboard copy
+# support, window geometry tracking, and YAML config load/save capabilities.
 
 # DEPENDENCIES
 # - python >= 3.8
@@ -86,7 +86,7 @@ class ArraySpaceExplorer(ctk.CTk):
                 "Empty tokens between commas are stripped. 2 spaces per Cartesian dimension level. "
                 "Roles textarea: one role per line, line N applies to values line N; blank role lines "
                 "are allowed and yield role-less dimensions. Skip chance 0.0-1.0 and Max picks 1..N "
-                "are per-dimension."
+                "are per-dimension. Lock freezes the selected value(s) against random re-rolls."
             ),
             font=("Arial", 12, "italic"),
             text_color="gray",
@@ -397,13 +397,11 @@ class ArraySpaceExplorer(ctk.CTk):
 
     def _rebuild_inspector_ui(self, saved_state=None):
         """saved_state: optional list-of-lists of dicts with keys
-        {index, no_comma, skip_chance, max_picks} matching parsed_groups."""
+        {index, no_comma, skip_chance, max_picks, selection_lock} matching parsed_groups."""
         for widget in self.inspector_frame.winfo_children():
             widget.destroy()
 
         self.spinboxes = []
-        total_raw_sizes = []
-        total_expected_sizes = []
         pending_state = []
 
         if not self.parsed_groups:
@@ -415,8 +413,6 @@ class ArraySpaceExplorer(ctk.CTk):
         for g_idx, group in enumerate(self.parsed_groups):
             raw_size = math.prod(len(dim["values"]) for dim in group)
 
-            # Expected non-skipped size assumes skip_chance known yet; compute after
-            # controls are built if saved_state not supplied. Placeholder here.
             group_container = ctk.CTkFrame(self.inspector_frame)
             group_container.pack(fill="x", padx=5, pady=5)
 
@@ -534,6 +530,17 @@ class ArraySpaceExplorer(ctk.CTk):
                 mp_slider.set(1)
                 mp_slider.pack(side="left", padx=2)
 
+                # Selection lock checkbox
+                lock_var = tk.BooleanVar(value=False)
+                lock_chk = ctk.CTkCheckBox(
+                    row_frame,
+                    text="Lock",
+                    variable=lock_var,
+                    command=self.update_synthesized_output,
+                    width=60,
+                )
+                lock_chk.pack(side="left", padx=(10, 5))
+
                 # "Display no comma" checkbox
                 no_comma_var = tk.BooleanVar(value=False)
                 no_comma_chk = ctk.CTkCheckBox(
@@ -551,6 +558,7 @@ class ArraySpaceExplorer(ctk.CTk):
                         "btn_up": btn_up,
                         "btn_down": btn_down,
                         "no_comma_var": no_comma_var,
+                        "lock_var": lock_var,
                         "skip_var": skip_var,
                         "maxpicks_var": maxpicks_var,
                         "maxpicks_slider": mp_slider,
@@ -577,6 +585,8 @@ class ArraySpaceExplorer(ctk.CTk):
                 sb["var"].set(str(s["index"]))
             if "no_comma" in s:
                 sb["no_comma_var"].set(bool(s["no_comma"]))
+            if "selection_lock" in s:
+                sb["lock_var"].set(bool(s["selection_lock"]))
             if "skip_chance" in s:
                 sb["skip_var"].set(f"{float(s['skip_chance']):.2f}")
             if "max_picks" in s:
@@ -632,6 +642,9 @@ class ArraySpaceExplorer(ctk.CTk):
         sb["var"].set(str(new_val))
 
     def _resample_all_skips_and_picks(self):
+        """Resample skip rolls for every dimension; resample pick subsets only
+        for unlocked dimensions. Locked dimensions keep their current pick
+        subset (manual index, or previously cached multi-pick subset)."""
         for g_idx, group in enumerate(self.parsed_groups):
             for d_idx, dim in enumerate(group):
                 sb = self.spinboxes[g_idx][d_idx]
@@ -641,6 +654,17 @@ class ArraySpaceExplorer(ctk.CTk):
                     sc = 0.0
                 sc = max(0.0, min(1.0, sc))
                 sb["skip_roll"] = random.random() < sc
+
+                if sb["lock_var"].get():
+                    # Preserve current pick subset. Ensure it is well-formed.
+                    if not sb.get("pick_indices"):
+                        try:
+                            val = int(sb["var"].get())
+                        except ValueError:
+                            val = 0
+                        val = max(0, min(val, sb["max"]))
+                        sb["pick_indices"] = [val]
+                    continue
 
                 mp = max(1, int(sb["maxpicks_var"].get()))
                 n_vals = len(dim["values"])
@@ -659,6 +683,8 @@ class ArraySpaceExplorer(ctk.CTk):
         for g_idx, group in enumerate(self.parsed_groups):
             for d_idx, dim in enumerate(group):
                 sb = self.spinboxes[g_idx][d_idx]
+                if sb["lock_var"].get():
+                    continue
                 rand_idx = random.randint(0, sb["max"])
                 sb["var"].set(str(rand_idx))
 
@@ -754,6 +780,7 @@ class ArraySpaceExplorer(ctk.CTk):
                     "depth": dim["depth"],
                     "type": dim["type"],
                     "no_comma": bool(sb["no_comma_var"].get()),
+                    "selection_lock": bool(sb["lock_var"].get()),
                     "skip_chance": round(sc, 4),
                     "max_picks": int(sb["maxpicks_var"].get()),
                     "values": dim["values"],
@@ -821,6 +848,7 @@ class ArraySpaceExplorer(ctk.CTk):
                             {
                                 "index": 0,
                                 "no_comma": dim.get("no_comma", False),
+                                "selection_lock": dim.get("selection_lock", False),
                                 "skip_chance": dim.get("skip_chance", 0.0),
                                 "max_picks": dim.get("max_picks", 1),
                             }
