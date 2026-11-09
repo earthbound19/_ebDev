@@ -260,24 +260,6 @@ class ArraySpaceExplorer(ctk.CTk):
         )
         self.copy_btn.pack(side="right", padx=(5, 0))
 
-        self.reroll_btn = ctk.CTkButton(
-            self.output_control_row,
-            text="Re-roll skips & picks",
-            width=170,
-            fg_color="#8a5a2b",
-            hover_color="#6e4720",
-            command=self.resample_skips_and_picks,
-        )
-        self.reroll_btn.pack(side="right", padx=(5, 5))
-
-        self.copy_btn = ctk.CTkButton(
-            self.output_control_row,
-            text="Copy to Clipboard",
-            width=140,
-            command=self.copy_to_clipboard,
-        )
-        self.copy_btn.pack(side="right", padx=(5, 0))
-
     def toggle_theme(self):
         if self.theme_btn.cget("text") == "Dark Mode":
             ctk.set_appearance_mode("Light")
