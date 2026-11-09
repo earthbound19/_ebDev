@@ -1,1 +1,1 @@
-git config --global safe.directory '*'
+git config --global --add safe.directory '*'
