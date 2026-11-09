@@ -43,7 +43,9 @@ then
   # CLI options re: https://rawpedia.rawtherapee.com/Command-Line_Options :
   # rawtherapee-cli [-o <output>|-O <output>] [-q] [-a] [-s|-S] [-p <files>] [-d] [-j[1-100] [-js<1-3>]|[-b<8|16>] <[-t[z] | [-n]]] [-Y] [-f] -c <input>
   # -p is to specify a processing sidecar/option file (format .pp3)
-  # if a format is specified in a command line switch, but no output file name given, it names the output file after the base name of the source and then appends an extension matching the output format; but I'll specify the output file name anyway (shrug) :
+  # notes:
+  # - if a format is specified in a command line switch, but no output file name given, it names the output file after the base name of the source and then appends an extension matching the output format; but I'll specify the output file name anyway (shrug).
+  # - jpg 92 percent quality would be -j92 instead of $outputFormatSwitch. You would need to hack the targetFileName in the script for jpg. (This is hard-coded for pngs because I hate jpgs.)
   rawtherapee-cli -o $targetFileName -q -s $processingFileParameter -d -b16 $outputFormatSwitch -c $inputFile
 else
   echo Target file $targetFileName already exists. Will not overwrite.
